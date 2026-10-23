@@ -909,7 +909,7 @@ impl GitDriver {
                     let path = checkout::root(&repo)?.join(name);
                     // Reset already replaced tracked paths; remove only captured paths absent from target.
                     if !self
-                        .paths_at_revision(
+                        .read_paths_at(
                             &repo,
                             &Oid::parse(&request.target, repo.object_format()).map_err(failure)?,
                             &[name.as_bytes().to_vec()],

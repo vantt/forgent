@@ -114,8 +114,7 @@ fn literal_prefix(raw: &str) -> Result<&str> {
 fn literal_paths(files: &[String]) -> Result<()> {
     if files.len() > 4096
         || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
-        || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
-            || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
+        || files.iter().any(|p| crate::fgos_scope_literal(p).is_err())
     {
         return Err(failure("invalid-literal-path"));
     }
@@ -716,15 +715,6 @@ impl GitDriver {
             return Err(failure("invalid-object-batch"));
         }
         Ok(results)
-    }
-    pub fn paths_at_revision(
-        &self,
-        repo: &RepoHandle,
-        revision: &Oid,
-        paths: &[Vec<u8>],
-        max_blob_bytes: usize,
-    ) -> Result<Vec<PathRead>> {
-        self.read_paths_at(repo, revision, paths, max_blob_bytes)
     }
 }
 

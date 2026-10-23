@@ -552,19 +552,13 @@ impl GitDriver {
         // apply checkout/transport admission (which refuses include.path).
         // Reading config executes no configured command; mutation still uses
         // the native exact-old config writer below.
-        let out = self.invoke(None, repo.trusted_main_root(),
-            &["config", "--null", "--show-origin", "--list"],
-            crate::driver::Policy::Inspect, None, false, 1024 * 1024,
-            Duration::from_secs(30))?;
+        let out = self.config_listing(None, repo.trusted_main_root(), &["--show-origin"], Duration::from_secs(30))?;
         if !out.success { return Err(failed("hooks-config-read-failed")); }
         crate::driver::parse_config(&out.stdout)?.into_iter()
             .rfind(|(origin, key, _)| origin.starts_with(b"file:") && key == "core.hookspath").map(|(_, _, value)| String::from_utf8(value).map_err(failed)).transpose()
     }
     fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
-        let out = self.invoke(None, repo.trusted_main_root(),
-            &["config", "--null", "--show-scope", "--show-origin", "--list"],
-            crate::driver::Policy::Inspect, None, false, 1024 * 1024,
-            Duration::from_secs(30))?;
+        let out = self.config_listing(None, repo.trusted_main_root(), &["--show-scope", "--show-origin"], Duration::from_secs(30))?;
         if !out.success { return Err(failed("hooks-config-read-failed")); }
         // With both flags Git emits scope\0origin\0key\nvalue\0. Keep
         // the existing key/value parser, but admit only our own config files.

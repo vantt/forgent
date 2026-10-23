@@ -213,7 +213,7 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             "object-read-limit"
         );
         let paths = driver
-            .paths_at_revision(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
+            .read_paths_at(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
             .unwrap();
         assert!(matches!(&paths[0].value,PathValue::Blob(bytes) if bytes==b"first\0bytes"));
         assert!(matches!(paths[1].value, PathValue::Absent));

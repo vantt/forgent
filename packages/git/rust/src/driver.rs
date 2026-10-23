@@ -740,6 +740,21 @@ impl GitDriver {
         cache.insert(repo.git_dir.clone(), fresh);
         Ok(records)
     }
+    /// One unadmitted `git config --list`, for the questions that must see everything the
+    /// configuration says, included files and global scope too. `annotate` is `--show-origin`,
+    /// `--show-scope` or both; `parse_config` reads the answer.
+    pub(crate) fn config_listing(
+        &self,
+        context: Option<&RepoHandle>,
+        root: &Path,
+        annotate: &[&str],
+        timeout: Duration,
+    ) -> Result<Output> {
+        let mut args = vec!["config", "--null"];
+        args.extend_from_slice(annotate);
+        args.push("--list");
+        self.invoke(context, root, &args, Policy::Inspect, None, false, PATH_LIMIT, timeout)
+    }
     /// Read-only diagnostic shared with Remote admission. Scope, rather than
     /// origin spelling, determines trust even for linked worktrees and symlinks.
     pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
@@ -750,16 +765,7 @@ impl GitDriver {
             if context.is_some() && repo.git_dir == repo.common_dir {
                 continue;
             }
-            let out = self.invoke(
-                context,
-                &repo.trusted_main_root,
-                &["config", "--null", "--show-scope", "--list"],
-                Policy::Inspect,
-                None,
-                false,
-                PATH_LIMIT,
-                Duration::from_secs(30),
-            )?;
+            let out = self.config_listing(context, &repo.trusted_main_root, &["--show-scope"], Duration::from_secs(30))?;
             if !out.success {
                 return Err(out.error("git-config-failed"));
             }
@@ -1320,16 +1326,7 @@ impl GitDriver {
         // Conservatively do not persist a verdict for any include directive,
         // including missing or currently inactive includeIf targets.
         let config = self
-            .invoke(
-                None,
-                &self.state_root,
-                &["config", "--null", "--show-origin", "--list"],
-                Policy::Inspect,
-                None,
-                false,
-                PATH_LIMIT,
-                Duration::from_secs(10),
-            )
+            .config_listing(None, &self.state_root, &["--show-origin"], Duration::from_secs(10))
             .ok()?;
         if !config.success {
             return None;

@@ -248,7 +248,7 @@ impl GitInspect {
             "pathsAtRevision" => {
                 let results = self
                     .driver
-                    .paths_at_revision(
+                    .read_paths_at(
                         &repo,
                         &oid("revision")?,
                         &paths()?,
