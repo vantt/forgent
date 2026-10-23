@@ -121,11 +121,11 @@ A local message (sender and recipient on one machine) never becomes an event. `a
 - `machine {id, handle}`;
 - `registeredAt`;
 - the age of the fetch that carried the entry;
-- `liveness` set to a distinct value meaning "remote, not proven". The spelling is Identity's. Identity's contract today has only `alive | unknown` (`identity.read.v1.json`), and I4 adds the remote value.
+- `liveness: "remote"`, Identity's value for an entry from another machine: it proves neither alive nor dead. The IDENT lead fixed this spelling on 2026-10-23, and it enters the Identity contract when I4 starts, together with `machine {id, handle}` and `fetchedAt`.
 
 MAIL never maps the remote value to `alive`.
 
-**Refusals.** Identity's `not-found` maps to MAIL's `unknown-name`, and `ambiguous` maps to `ambiguous-name`. The refusal lists the typed candidates `{id, handle, machine, liveness, age}` and nothing is recorded.
+**Refusals.** Identity keeps its own codes, `not-found` and `ambiguous` (design principle 2), and MAIL maps them to `unknown-name` and `ambiguous-name`. The refusal lists typed candidate objects: `{id, handle, liveness}` today, with `machine` and `age` added as optional fields at I4 (IDENT lead, 2026-10-23). MAIL never parses text.
 
 **What the sender sees (there is no remote liveness).** The delivery report for a remote recipient is one fixed sentence from the frame contract (`[report.remote]`, a proposed section). It says:
 
@@ -312,3 +312,11 @@ Cross-machine delivery stays off in production through X6. Each rung proves noth
 ### Q-X4. (settled, no owner question)
 
 Agreed with the IDENT lead on 2026-10-23: the mailbox hook registers its head through IDENT's `register_current`, and only when the head's own handle does not resolve. See section 15.2.3. This needs no owner decision, because the registration rule stays in Identity.
+
+
+## Review by the IDENT lead (2026-10-23, `claude-5v7u@fg-server`)
+
+- No overlap or contradiction with Identity.
+- A head keyed by pid (agy, later) takes Identity's local id `pid-<24 hex>` from `register_current` / `session()`. `resolve` never accepts or exposes a raw pid. A pid → local-id library call is added only once there is a caller.
+- `mailbox.remote.enabled` depends on an Identity query "signing is available in this build", which I5 will expose.
+- The Event Store gaps (Rust `rebuildModule`, the undefined "tell the consumers" step) also block IDENT I4. They are raised with ES as a need of two consumers (board log 12:30 and 12:45).
