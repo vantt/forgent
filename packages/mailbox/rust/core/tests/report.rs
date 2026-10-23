@@ -277,7 +277,8 @@ fn the_too_large_pointer_names_the_count_and_the_claim_command() {
 }
 
 #[test]
-fn an_alias_refusal_lists_handles_through_the_handle_escape_and_adds_its_note() {
+fn an_alias_refusal_lists_each_candidates_handle_and_full_id_and_an_ambiguous_one_says_the_full_id_reaches_each(
+) {
     use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Liveness};
     let limits = spec_limits();
     let refusal = Refusal::Alias(AliasRefusal::Unknown {
@@ -286,16 +287,38 @@ fn an_alias_refusal_lists_handles_through_the_handle_escape_and_adds_its_note() 
             handle: "codex-ab12@fg-server <x>".to_string(),
             liveness: Liveness::Alive,
         }],
-        no_address_here: true,
     });
     assert_eq!(
         refusal_text(&refusal, &limits),
-        "Refused: unknown-name. Candidates: codex-ab12@fg-server__x_.\n\
-         That session has no mailbox address in this project."
+        "Refused: unknown-name. Candidates: codex-ab12@fg-server__x_ (m1/k)."
+    );
+    let ambiguous = Refusal::Alias(AliasRefusal::Ambiguous {
+        candidates: vec![
+            AliasCandidate {
+                id: "m1/k-one".to_string(),
+                handle: "codex-ab12@m".to_string(),
+                liveness: Liveness::Alive,
+            },
+            AliasCandidate {
+                id: "m1/k-two".to_string(),
+                handle: "codex-ab12@m".to_string(),
+                liveness: Liveness::Unknown,
+            },
+        ],
+    });
+    let text = refusal_text(&ambiguous, &limits);
+    assert!(
+        text.starts_with(
+            "Refused: ambiguous-name. Candidates: codex-ab12@m (m1/k-one), codex-ab12@m (m1/k-two).\n"
+        ),
+        "{text}"
+    );
+    assert!(
+        text.ends_with("fgos mailbox send --to <full id> \"…\""),
+        "{text}"
     );
     let bare = Refusal::Alias(AliasRefusal::Unknown {
         candidates: Vec::new(),
-        no_address_here: false,
     });
     assert_eq!(
         refusal_text(&bare, &limits),

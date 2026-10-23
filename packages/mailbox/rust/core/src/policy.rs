@@ -3,11 +3,10 @@
 //! recorded, but the attempt itself is counted first, so refused attempts
 //! count toward the session budget and the lifetime cap.
 use crate::counters::Account;
-use crate::delivery::{Refusal, SendRequest};
+use crate::delivery::{Recipient, Refusal, SendRequest};
 use crate::envelope::{Header, MessageState};
 use crate::ids::{Cli, Generation, ShortName, WriterKey};
 use crate::limits::Limits;
-use crate::names;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 use serde::{Deserialize, Serialize};
@@ -103,14 +102,11 @@ impl MailboxState {
         limits: &Limits,
     ) -> Result<Admitted, Refusal> {
         check_sender_key(&req.from, limits)?;
-        // An alias refusal takes check 2's place, after the group check.
-        if let Some(refusal) = &req.alias_refusal {
-            if names::is_group(&req.to) {
-                return Err(Refusal::Group);
-            }
-            return Err(Refusal::Alias(refusal.clone()));
-        }
-        let recipient = self.resolve_skipping(&req.to, &req.dead_keys)?;
+        let recipient = match &req.to {
+            Recipient::Name(query) => self.resolve_skipping(query, &req.dead_keys)?,
+            Recipient::Key(key) => self.resolve_key(key, &req.dead_keys)?,
+            Recipient::Refused(refusal) => return Err(Refusal::Alias(refusal.clone())),
+        };
         check_not_self(&req.from, &recipient.key)?;
         self.check_reply_hint(req, from_generation, &recipient.key)?;
         check_size(req, limits)?;

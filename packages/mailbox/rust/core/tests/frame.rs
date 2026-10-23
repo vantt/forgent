@@ -342,6 +342,7 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ),
         ("report.wake-no-channel", &["wake was not used"][..]),
         ("report.role-holder", &["{{role}}", "{{handle}}"][..]),
+        ("refusal.alias.ambiguous", &["full id"][..]),
         ("list.empty", &[][..]),
         (
             "list.line",
@@ -364,7 +365,6 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
                 "{{key}}",
             ][..],
         ),
-        ("refusal.alias.no-address", &["no mailbox address"][..]),
         (
             "refusal.policy",
             &["{{code}}", "{{limit}}", "Do not retry; ask your user."][..],

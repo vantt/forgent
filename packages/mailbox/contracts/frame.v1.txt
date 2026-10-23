@@ -16,7 +16,8 @@
 # record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
 # {{to}} {{from_label}} {{candidates}} {{version}} {{name}} {{key}}) goes through the header escape,
 # except an Identity handle or role ({{role}} {{handle}}, and the candidates of an
-# alias refusal), which goes through the handle escape: the header alphabet plus @ and :.
+# alias refusal, each shown as its handle and its full id in brackets), which goes through
+# the handle escape: the header alphabet plus @, : and /.
 # In [message], {{handle}} is the sender's Identity handle, derived when the frame is
 # rendered and never stored; "unknown" for a head whose handle cannot be derived and
 # "unregistered" for a sender with no head. {{tier}} and {{liveness}} are words fixed by the code.
@@ -82,8 +83,8 @@ Refused: too-large ({{limit}}). Send a path or link instead.
 Refused: {{code}}. Candidates: {{candidates}}.
 [refusal.argument]
 Refused: {{code}}.
-[refusal.alias.no-address]
-That session has no mailbox address in this project.
+[refusal.alias.ambiguous]
+That name does not name one session; each is still reachable by its full id, the text in brackets: fgos mailbox send --to <full id> "…"
 [record.error]
 Not done: the mailbox record failed ({{code}}) and nothing was changed. Try once more later; do not loop.
 [record.unavailable]

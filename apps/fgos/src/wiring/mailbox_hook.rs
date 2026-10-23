@@ -20,7 +20,7 @@ use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::hook::outcome_log;
 use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
-use fgos_mailbox::hook::shell::{self, ShellInput, WriteGate};
+use fgos_mailbox::hook::shell::{self, GateState, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::limits::{load, read_project_config};
 use fgos_mailbox::record::Paths;
@@ -128,8 +128,9 @@ fn run(args: &[OsString]) {
         ancestry: &ancestry,
         resolve: &resolve,
         handle_of: &handle_of,
-        gate,
+        gate: gate.clone(),
     };
+    let gate_idle = gate;
     let outcome = shell::run(
         input,
         &mut std::io::stdin().lock(),
@@ -137,14 +138,31 @@ fn run(args: &[OsString]) {
     );
     let paths = Paths::new(&fgos_dir);
     outcome_log::record(&paths, adapter, event, &outcome, now());
-    // A newly bound head (a quiet call by construction, so the write gate
-    // is still idle and the watchdog still covers this step).
-    let ident = outcome
-        .registered
-        .as_ref()
-        .zip(adapter.cli())
-        .and_then(|(head, cli)| ensure_registered(identity_root.as_deref()?, &cli, head));
-    if let Some(reason) = ident {
-        outcome_log::record_reason(&paths, adapter, event, &reason, now());
+    // Make sure Identity knows the head: on the call that bound it to a new
+    // generation (quiet by construction), and again on a later quiet call
+    // while the latest outcome says Identity had no machine id yet, so a
+    // machine id minted after the head started still registers it. The
+    // write gate must be idle, so the watchdog still covers the step;
+    // steady calls otherwise never touch Identity.
+    let Some((head, cli)) = outcome.bound.as_ref().zip(adapter.cli()) else {
+        return;
+    };
+    let retry = || outcome_log::latest_reason(&paths).as_deref() == Some(IDENT_NO_MACHINE_ID);
+    if gate_idle.state() != GateState::Idle || (head.registered.is_none() && !retry()) {
+        return;
+    }
+    let Some(root) = identity_root.as_deref() else {
+        return;
+    };
+    match ensure_registered(root, &cli, head) {
+        None if head.registered.is_none() => outcome_log::clear(&paths),
+        None => {}
+        Some(reason) => {
+            outcome_log::record_reason(&paths, adapter, event, &reason, now());
+        }
     }
 }
+
+/// The outcome a registering call leaves when Identity has no machine id
+/// yet (`ensure_registered`'s reason for Identity's `machine-id-missing`).
+const IDENT_NO_MACHINE_ID: &str = "ident:machine-id-missing";

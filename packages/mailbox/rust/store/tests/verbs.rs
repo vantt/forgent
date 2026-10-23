@@ -493,6 +493,13 @@ fn status_reports_each_signal_from_a_record_seeded_through_the_stores_own_holds_
     );
 
     let name = with_head(&fgos, "head-a");
+    // A runner attempt's binding and a dead head are not heads, for status
+    // as for list.
+    let gone = Child::spawn();
+    with_cli_head(&fgos, "head-dead", "claude", &gone.head_text());
+    drop(gone);
+    let live = Child::spawn();
+    with_cli_head(&fgos, "att-0123456789abcdef", "claude", &live.head_text());
     let record = fgos.record();
     for (secs, body) in [(0, "one"), (0, "two")] {
         record

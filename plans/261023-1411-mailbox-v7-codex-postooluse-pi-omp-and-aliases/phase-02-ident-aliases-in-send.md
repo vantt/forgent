@@ -50,3 +50,10 @@ Owner 11:38 "B rồi A": right after V6, `send --to` takes an IDENT handle (`cla
 ## Risks
 
 - IDENT's directory is machine-wide and unauthenticated: a same-user process can take `lead:MAIL`. The record check bounds delivery to heads this record verified by the hook's caller check; the report names the holder; spec §8 states the limit.
+
+## Plan-owner decisions after the V7 review (agent, 2026-10-23; `reports/code-review-v7abd.md`)
+
+- H1: delivery follows the session Identity resolved (`info.id == listed.id`). Its owning proof is a two-head wiring test in which the role and the queried handle are held by the head that sorts last; the role-holder line is built from the head that got the mail.
+- H2: a handle two heads of this record derive is refused `ambiguous-name` with both full ids, before Identity is asked and in the derived fallback. A head's full id reaches it even when Identity holds no entry for it (its handle held by another session). Handles keep 4 characters: that is Identity's signed rule, with the same OS user as the trust boundary.
+- M2: `SendRequest.to` is now `Recipient::{Name, Key, Refused}`; a resolved alias is `Key`, matched on the exact key only. `alias_refusal` is gone (L10). Group text is never an alias.
+- L3: an alias held by a session that is not a head of this record answers like a name no session has; the "no mailbox address in this project" line is gone.

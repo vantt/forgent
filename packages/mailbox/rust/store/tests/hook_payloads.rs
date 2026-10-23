@@ -197,13 +197,12 @@ impl Drain {
             .send(
                 SendRequest {
                     from: WriterKey::new(from).unwrap(),
-                    to,
+                    to: fgos_mailbox_core::Recipient::Name(to),
                     body,
                     wake,
                     reply_to: None,
                     dead_keys: Default::default(),
                     stop_drains: self.stop_drains.clone(),
-                    alias_refusal: None,
                 },
                 now,
                 &limits(),

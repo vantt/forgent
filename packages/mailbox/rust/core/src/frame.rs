@@ -100,8 +100,9 @@ pub(crate) fn escape_header(value: &str, limits: &Limits) -> String {
         .collect()
 }
 
-/// An Identity handle (`<cli>-<suffix>@<machine-handle>`) or role alias
-/// (`lead:<LANE>`): the header alphabet plus `@` and `:`, every other
+/// An Identity handle (`<cli>-<suffix>@<machine-handle>`), role alias
+/// (`lead:<LANE>`) or full id (`<machine-id>/<local id>`): the header
+/// alphabet plus `@`, `:` and `/`, every other
 /// character `_`, at most `frame.maxHeaderChars` characters. Kept apart
 /// from [`escape_header`], so short names and every other header value
 /// keep their alphabet.
@@ -109,7 +110,7 @@ pub(crate) fn escape_handle(value: &str, limits: &Limits) -> String {
     value
         .chars()
         .map(|c| {
-            if in_name_alphabet(c) || matches!(c, '@' | ':') {
+            if in_name_alphabet(c) || matches!(c, '@' | ':' | '/') {
                 c
             } else {
                 '_'

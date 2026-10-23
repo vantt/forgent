@@ -599,6 +599,19 @@ fn the_adapters_contract_refuses_missing_or_inconsistent_hook_facts() {
             c["hookFacts"]["codex"]["postToolUseContextMaxBytes"] = Value::Null;
         },
     );
+    for role in [
+        "User",
+        " user",
+        "user ",
+        "admin",
+        "transcript:",
+        "transcript:a b",
+    ] {
+        let label = format!("a channel role outside the closed set: {role:?}");
+        refused(&label, &|c| {
+            c["hookFacts"]["codex"]["channels"]["stop"]["role"] = Value::from(role);
+        });
+    }
     refused("a drained CLI without channel facts", &|c| {
         c["hookFacts"]["claude"]
             .as_object_mut()

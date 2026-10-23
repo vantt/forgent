@@ -145,21 +145,24 @@ pub enum Quiet {
     RunnerHead,
 }
 
-/// A head this call bound to a new generation (created or replaced): what
-/// the entry needs to make sure Identity knows it.
+/// The head a call that reached the drain is bound to: what the entry needs
+/// to make sure Identity knows it.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RegisteredHead {
-    pub generation: fgos_mailbox_core::Generation,
+pub struct BoundHead {
     pub writer: WriterKey,
     pub head: HeadFacts,
+    /// The generation this call created or replaced the binding with;
+    /// `None` when the head was already bound.
+    pub registered: Option<fgos_mailbox_core::Generation>,
 }
 
 /// What an entry logs about one call. It carries no body text.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ShellOutcome {
     pub quiet: Option<Quiet>,
-    /// Set only by a call that created or replaced the head's binding.
-    pub registered: Option<RegisteredHead>,
+    /// Set by every call whose head the drain bound (a registration that
+    /// was refused, or a payload that was not the head's, binds none).
+    pub bound: Option<BoundHead>,
     /// The ids of the claimed items, in frame order.
     pub claimed: Vec<MessageId>,
     /// Whether hold 1 installed a new snapshot.
@@ -292,10 +295,10 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         ..ShellOutcome::default()
     };
     let (begun, sizes) = held.value.value;
-    outcome.registered = begun.registered().map(|generation| RegisteredHead {
-        generation,
+    outcome.bound = begun.bound().then(|| BoundHead {
         writer: resolved.writer,
         head: resolved.head,
+        registered: begun.registered(),
     });
     let claimed = match begun {
         Begun::Quiet { reason, .. } => {

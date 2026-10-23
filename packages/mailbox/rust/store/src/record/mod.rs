@@ -358,6 +358,12 @@ impl Record {
     /// exists passes [`Record::open`]'s checks, and `None` means no record
     /// yet (a directory down to `record/` is missing). The snapshot is
     /// replaced by rename, so an unlocked read sees a whole one.
+    ///
+    /// Unlike a hold, it does not re-check the record directory's identity
+    /// after opening the snapshot by path: a same-user process could swap
+    /// the directory in between and make a report read another snapshot.
+    /// That is inside the same-user limit of spec §8 item 3, and the read
+    /// changes nothing.
     pub fn read_existing(
         fgos_dir: impl Into<PathBuf>,
         limits: &Limits,

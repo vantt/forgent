@@ -13,7 +13,10 @@
 //! else.
 use super::shell::{Quiet, ShellOutcome};
 use super::{Adapter, HookEvent};
-use crate::record::{trusted_mailbox_dir, Paths};
+use crate::record::{read_regular_capped, trusted_mailbox_dir, Paths};
+
+/// The largest outcome file read; a line is a few dozen bytes.
+const MAX_FILE_BYTES: u64 = 4096;
 use fgos_mailbox_core::Timestamp;
 use serde::Serialize;
 
@@ -43,6 +46,22 @@ fn reason(outcome: &ShellOutcome) -> Option<String> {
         Some(Quiet::Drain(_) | Quiet::NoHead(_) | Quiet::RunnerHead) | None => {
             (!outcome.warnings.is_empty()).then(|| "warning".into())
         }
+    }
+}
+
+/// The reason of the latest recorded outcome, when one is there.
+pub fn latest_reason(paths: &Paths) -> Option<String> {
+    trusted_mailbox_dir(paths)?;
+    let bytes = read_regular_capped(&paths.hook_outcome(), MAX_FILE_BYTES).ok()?;
+    let line: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+    line["reason"].as_str().map(String::from)
+}
+
+/// Removes the latest outcome once what it recorded was repaired, so the
+/// file names only a problem that still holds.
+pub fn clear(paths: &Paths) {
+    if let Some(dir) = trusted_mailbox_dir(paths) {
+        let _ = std::fs::remove_file(dir.join(Paths::hook_outcome_name()));
     }
 }
 

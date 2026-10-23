@@ -38,8 +38,10 @@ impl fmt::Display for ResolveRefusal {
 
 impl std::error::Error for ResolveRefusal {}
 
-/// Whether a typed name addresses several heads at once (check 1).
-pub(crate) fn is_group(query: &str) -> bool {
+/// Whether a typed name addresses several heads at once (check 1). A
+/// caller that resolves aliases itself leaves such text to the core, so a
+/// group is refused as a group whatever else it looks like.
+pub fn is_group(query: &str) -> bool {
     query
         .chars()
         .any(|c| c == ',' || c == '*' || c.is_whitespace())
@@ -110,6 +112,21 @@ impl MailboxState {
     /// taken from message text.
     pub fn resolve(&self, query: &str) -> Result<&Binding, ResolveRefusal> {
         self.resolve_skipping(query, &BTreeSet::new())
+    }
+
+    /// The binding of exactly `key` (a head the caller resolved itself),
+    /// unless the store judged it dead: then unknown, as for a name.
+    pub(crate) fn resolve_key(
+        &self,
+        key: &WriterKey,
+        skipped: &BTreeSet<WriterKey>,
+    ) -> Result<&Binding, ResolveRefusal> {
+        match self.bindings.get(key) {
+            Some(binding) if !skipped.contains(key) => Ok(binding),
+            _ => Err(ResolveRefusal::Unknown {
+                candidates: names_of(self.bindings().filter(|b| !skipped.contains(&b.key))),
+            }),
+        }
     }
 
     /// [`MailboxState::resolve`] with the bindings of `skipped` (heads the

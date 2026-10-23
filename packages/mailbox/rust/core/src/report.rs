@@ -98,7 +98,13 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
         ) => {
             let handles: Vec<String> = candidates
                 .iter()
-                .map(|c| escape_handle(&c.handle, limits))
+                .map(|c| {
+                    format!(
+                        "{} ({})",
+                        escape_handle(&c.handle, limits),
+                        escape_handle(&c.id, limits)
+                    )
+                })
                 .collect();
             if handles.is_empty() {
                 "none".to_string()
@@ -117,10 +123,9 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
         ],
     );
     match refusal {
-        Refusal::Alias(AliasRefusal::Unknown {
-            no_address_here: true,
-            ..
-        }) => format!("{text}\n{}", section("refusal.alias.no-address")),
+        Refusal::Alias(AliasRefusal::Ambiguous { .. }) => {
+            format!("{text}\n{}", section("refusal.alias.ambiguous"))
+        }
         _ => text,
     }
 }

@@ -632,10 +632,9 @@ fn an_alias_refusal_is_counted_toward_the_budget_and_the_lifetime_cap_and_refuse
     pair.limits.session.lifetime_cap = 1;
     let refusal = fgos_mailbox_core::AliasRefusal::Unknown {
         candidates: vec![alias_candidate("codex-ab12@fg-server")],
-        no_address_here: true,
     };
     let mut req = plain("a", "codex-ab12@fg-server", "hi");
-    req.alias_refusal = Some(refusal.clone());
+    req.to = fgos_mailbox_core::Recipient::Refused(refusal.clone());
 
     let refused = pair.try_send(req, t(100)).unwrap_err();
 
@@ -661,7 +660,7 @@ fn an_ambiguous_alias_is_refused_ambiguous_name_with_every_candidate() {
         alias_candidate("claude-bbbb@m"),
     ];
     let mut req = plain("a", "lead:MAIL", "hi");
-    req.alias_refusal = Some(fgos_mailbox_core::AliasRefusal::Ambiguous {
+    req.to = fgos_mailbox_core::Recipient::Refused(fgos_mailbox_core::AliasRefusal::Ambiguous {
         candidates: candidates.clone(),
     });
 
@@ -678,6 +677,33 @@ fn an_ambiguous_alias_is_refused_ambiguous_name_with_every_candidate() {
 fn an_alias_resolving_to_the_sender_itself_is_refused_as_self() {
     let mut pair = Pair::new(t(100));
     // The caller resolved the alias to a's own key and passes the key.
-    let refused = pair.try_send(plain("a", "a", "hi"), t(100)).unwrap_err();
+    let mut req = plain("a", "", "hi");
+    req.to = fgos_mailbox_core::Recipient::Key(key("a"));
+    let refused = pair.try_send(req, t(100)).unwrap_err();
     assert_eq!(refused, Refusal::SelfSend);
+}
+
+#[test]
+fn a_recipient_the_caller_resolved_is_matched_on_its_exact_key_only_never_as_a_name() {
+    let mut pair = Pair::new(t(100));
+    // A head whose key is the text of b's short name.
+    pair.add_head(B_NAME, t(100));
+    let mut req = plain("a", "", "for the key");
+    req.to = fgos_mailbox_core::Recipient::Key(key(B_NAME));
+
+    let sent = pair.try_send(req, t(101)).unwrap();
+
+    assert_eq!(pair.state.message(&sent.id).unwrap().to, key(B_NAME));
+    assert_ne!(
+        sent.to.as_str(),
+        B_NAME,
+        "not b, whose name the key text is"
+    );
+
+    let mut gone = plain("a", "", "for nobody");
+    gone.to = fgos_mailbox_core::Recipient::Key(key("no-such-key"));
+    assert_eq!(
+        pair.try_send(gone, t(102)).unwrap_err().code(),
+        "unknown-name"
+    );
 }

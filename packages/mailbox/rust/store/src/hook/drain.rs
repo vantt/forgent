@@ -171,6 +171,21 @@ impl Begun {
         }
     }
 
+    /// Whether the call got past registration: the head is bound to the
+    /// record (refreshed, created or replaced).
+    pub fn bound(&self) -> bool {
+        match self {
+            Self::Quiet { reason, .. } => matches!(
+                reason,
+                QuietReason::StopChannelOff
+                    | QuietReason::StopBlockCap
+                    | QuietReason::NoStepBound
+                    | QuietReason::NothingEligible
+            ),
+            Self::Claimed(_) | Self::Pointer(_) => true,
+        }
+    }
+
     /// The generation a registering call created or replaced.
     pub fn registered(&self) -> Option<Generation> {
         match self {

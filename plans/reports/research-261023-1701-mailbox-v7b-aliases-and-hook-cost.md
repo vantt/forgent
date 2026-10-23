@@ -23,9 +23,9 @@ There is no `handle_for` door. The handle is `session_for(...).info.handle`. pi 
 
 - `CARGO_BUILD_JOBS=4 cargo test -p fgos-mailbox-core -p fgos-mailbox -p fgos -p fgos-identity -- --test-threads=4`: 432 passed, 0 failed (`/tmp/fgos-work/mailbox-v7/p3-gate.log`). Phase 2's gate before that was 360 passed.
 - `cargo tree -p fgos-mailbox -e normal | grep -c host-runtime` printed 0. `Cargo.lock` is unchanged; `fgos-process` moved from a dev-dependency of `apps/fgos` to a normal one.
-- Mutants killed (12):
+- Mutants killed (12). **Correction (V7 review H1):** the mutant that drops the id match in `address` (`info.id == listed.id`) was not among them. It survived the shipped tests, because every alias proof used a record with one head. The "Identity id check" in this list was the one in `ensure_registered`. The review-fix step adds a two-head proof that kills the `address` mutant.
   - core: the alias check placed after resolution;
-  - wiring: a resolved session delivered without the record check, candidates left unfiltered, the derived-handle fallback removed, the Identity id check removed, the register door skipped;
+  - wiring: a resolved session delivered without the record check, candidates left unfiltered, the derived-handle fallback removed, the Identity id check in `ensure_registered` removed, the register door skipped;
   - store: the registered flag set on a refreshing call, and the handle not set at render;
   - phase 1 (5): listed in the V7a report.
 

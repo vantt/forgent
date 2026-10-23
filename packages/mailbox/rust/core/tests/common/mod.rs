@@ -74,7 +74,7 @@ pub fn same_head() -> Option<StoredHead> {
     })
 }
 
-use fgos_mailbox_core::{Checkpoint, Claim, Generation, MessageId, SendRequest};
+use fgos_mailbox_core::{Checkpoint, Claim, Generation, MessageId, Recipient, SendRequest};
 
 /// Two heads of project `forgent`: `a` (Claude, `forgent-claude-2b`) and
 /// `b` (Codex, `forgent-codex-9c`), both at generation 1.
@@ -151,13 +151,12 @@ impl Pair {
 pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
     SendRequest {
         from: key(from),
-        to: to.to_string(),
+        to: Recipient::Name(to.to_string()),
         body,
         wake: false,
         reply_to: None,
         dead_keys: Default::default(),
         stop_drains: [cli("claude"), cli("codex")].into_iter().collect(),
-        alias_refusal: None,
     }
 }
 

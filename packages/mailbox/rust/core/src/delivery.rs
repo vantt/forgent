@@ -37,8 +37,7 @@ const UNREGISTERED_LABEL: &str = "unregistered_";
 pub struct SendRequest<'a> {
     /// The caller's own identity; attribution only.
     pub from: WriterKey,
-    /// A typed name, resolved by the core.
-    pub to: String,
+    pub to: Recipient,
     pub body: &'a str,
     pub wake: bool,
     /// A hint only; the link is derived by the core (spec §5.4).
@@ -50,11 +49,20 @@ pub struct SendRequest<'a> {
     /// `channels.stop.deliver`). A recipient of any other CLI has no channel
     /// a wake could use: its wake takes no effect and spends no allowance.
     pub stop_drains: BTreeSet<Cli>,
-    /// Set when `to` was an alias (an Identity handle, full id or role) the
-    /// caller could not turn into a head of this record: check 2 refuses
-    /// with it in place of name resolution. `None` for a mailbox name, or an
-    /// alias that resolved, whose key is then `to`.
-    pub alias_refusal: Option<AliasRefusal>,
+}
+
+/// Who a send is for (check 2 of spec §5.3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Recipient {
+    /// A typed mailbox name, resolved by the core's name rules.
+    Name(String),
+    /// A head the caller resolved itself (an Identity alias): matched on
+    /// its exact key only, never as a name or a prefix, so no short name can
+    /// ever be taken for it.
+    Key(WriterKey),
+    /// An alias the caller could not turn into exactly one head of this
+    /// record: refused with it in place of resolution.
+    Refused(AliasRefusal),
 }
 
 /// A session an alias refusal points at, as Identity names it: plain data,
@@ -70,15 +78,13 @@ pub struct AliasCandidate {
 /// Why an alias names no head of this record.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AliasRefusal {
-    /// No session, or none this record can deliver to; the candidates are
-    /// this record's heads only.
-    Unknown {
-        candidates: Vec<AliasCandidate>,
-        /// The alias names a live session that is not a head of this
-        /// record, so the answer says it has no address here.
-        no_address_here: bool,
-    },
-    /// Several sessions, each a head of this record.
+    /// No head of this record: whether no session has that name or a
+    /// session elsewhere on the machine has it, the answer is the same, so
+    /// it reveals nothing beyond this record. The candidates are this
+    /// record's heads only.
+    Unknown { candidates: Vec<AliasCandidate> },
+    /// Several heads of this record: the sessions Identity names, or the
+    /// heads that derive the same handle.
     Ambiguous { candidates: Vec<AliasCandidate> },
 }
 
@@ -417,10 +423,18 @@ impl MailboxState {
         let admitted = match self.admit(&req, &account, from_generation, now, limits) {
             Ok(admitted) => admitted,
             Err(refusal) => {
-                let to = match self.resolve_skipping(&req.to, &req.dead_keys) {
-                    Ok(recipient) => self.account(&recipient.key).as_str().to_string(),
-                    Err(_) => UNRESOLVED.to_string(),
+                let recipient = match &req.to {
+                    Recipient::Name(query) => self
+                        .resolve_skipping(query, &req.dead_keys)
+                        .ok()
+                        .map(|b| b.key.clone()),
+                    Recipient::Key(key) => self.binding(key).map(|b| b.key.clone()),
+                    Recipient::Refused(_) => None,
                 };
+                let to = recipient.map_or_else(
+                    || UNRESOLVED.to_string(),
+                    |key| self.account(&key).as_str().to_string(),
+                );
                 self.counters
                     .bump(refusal.reason(), account.as_str(), &to, now, limits);
                 return Err(refusal);

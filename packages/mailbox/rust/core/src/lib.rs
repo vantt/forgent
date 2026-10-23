@@ -31,7 +31,7 @@ mod wake;
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
-    MessageView, NoticeFacts, Refusal, SendOutcome, SendRequest,
+    MessageView, NoticeFacts, Recipient, Refusal, SendOutcome, SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use frame::{
@@ -44,7 +44,7 @@ pub use limits::{
     ChainLimits, CounterLimits, FrameLimits, HumanLimits, Limits, LoopLimits, NoticeLimits,
     QueueLimits, RecordLimits, SessionLimits, WakeLimits,
 };
-pub use names::ResolveRefusal;
+pub use names::{is_group, ResolveRefusal};
 pub use notices::{Notice, NoticeMark, NoticeState};
 pub use policy::LifetimeKey;
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};

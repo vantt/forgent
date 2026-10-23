@@ -548,14 +548,12 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
     let mut checked = Vec::new();
     let unknown_alias = || AliasRefusal::Unknown {
         candidates: Vec::new(),
-        no_address_here: false,
     };
     let ambiguous_alias = || AliasRefusal::Ambiguous {
         candidates: Vec::new(),
     };
     for (expected, later) in [
         ("sender-key-too-long", "alias:unknown-name"),
-        ("group", "alias:unknown-name"),
         // An alias refusal takes check 2's place: it is never resolved, so
         // it comes before everything resolution would reach.
         ("alias:unknown-name", "reply-to-not-offered"),
@@ -602,7 +600,9 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         }
         let mut req = plain(&from, &to, "body");
         req.reply_to = hint;
-        req.alias_refusal = alias;
+        if let Some(refusal) = alias {
+            req.to = fgos_mailbox_core::Recipient::Refused(refusal);
+        }
 
         let result = pair.try_send(req, t(3));
 
@@ -613,5 +613,5 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         );
         checked.push(expected);
     }
-    assert_eq!(checked.len(), 15);
+    assert_eq!(checked.len(), 14);
 }

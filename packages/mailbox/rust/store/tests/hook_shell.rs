@@ -1086,7 +1086,7 @@ fn a_call_that_skipped_or_failed_its_drain_leaves_its_reason_in_the_hook_outcome
 }
 
 #[test]
-fn a_hook_call_that_created_or_replaced_a_binding_reports_it_as_registered_and_a_refreshing_call_does_not(
+fn a_hook_call_names_the_head_it_bound_and_reports_it_as_registered_only_when_it_created_or_replaced_the_binding(
 ) {
     let fgos = TempFgos::new("shell-registered");
     let record = fgos.record();
@@ -1120,14 +1120,21 @@ fn a_hook_call_that_created_or_replaced_a_binding_reports_it_as_registered_and_a
         T0,
     );
 
-    let created = created.registered.expect("the first call registered");
-    assert_eq!(created.generation, fgos_mailbox_core::Generation::FIRST);
+    let created = created.bound.expect("the first call bound the head");
+    assert_eq!(
+        created.registered,
+        Some(fgos_mailbox_core::Generation::FIRST)
+    );
     assert_eq!(created.writer, writer);
+    let refreshed = refreshed
+        .bound
+        .expect("a refreshing call still names its head");
     assert_eq!(refreshed.registered, None);
-    let replaced = replaced
-        .registered
-        .expect("a new head replaced the dead one");
-    assert_eq!(replaced.generation, created.generation.next().unwrap());
+    let replaced = replaced.bound.expect("a new head replaced the dead one");
+    assert_eq!(
+        replaced.registered,
+        Some(fgos_mailbox_core::Generation::FIRST.next().unwrap())
+    );
     assert_eq!(replaced.head.record, second_head.record());
 }
 
@@ -1152,7 +1159,7 @@ fn a_registering_hook_call_emits_no_frame() {
         T0,
     );
 
-    assert!(outcome.registered.is_some());
+    assert!(outcome.bound.and_then(|b| b.registered).is_some());
     assert!(stdout.is_empty(), "{}", String::from_utf8_lossy(&stdout));
     assert!(outcome.claimed.is_empty());
 }

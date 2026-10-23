@@ -840,40 +840,7 @@ fn a_hook_payload_over_the_read_cap_leaves_its_reason_in_the_hook_outcome_file()
 fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_end_and_the_wake_was_not_used(
 ) {
     let scene = Scene::new("codex-no-stop");
-    // The Codex head stays alive after its hook, so the send can reach it.
-    let mut payload: serde_json::Value = serde_json::from_slice(
-        &fs::read(
-            repo_root().join("packages/mailbox/contracts/fixtures/hooks/codex/post-tool-use.json"),
-        )
-        .unwrap(),
-    )
-    .unwrap();
-    payload["session_id"] = serde_json::Value::from(WRITER);
-    let payload_file = scene.root.join("codex-payload.json");
-    fs::write(&payload_file, serde_json::to_vec(&payload).unwrap()).unwrap();
-    let mut head = Command::new(codex_like(&scene.root))
-        .args([
-            "-c",
-            "\"$0\" hook mailbox --cli codex --event post-tool-use < \"$1\"; exec sleep 30",
-        ])
-        .arg(fgos_bin())
-        .arg(&payload_file)
-        .current_dir(scene.main())
-        .env_clear()
-        .env("HOME", scene.home())
-        .env("PATH", std::env::var_os("PATH").unwrap_or_default())
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-    let snapshot = scene.mailbox_dir().join("record/snapshot.json");
-    for _ in 0..200 {
-        if snapshot.exists() {
-            break;
-        }
-        std::thread::sleep(std::time::Duration::from_millis(25));
-    }
+    let _head = CodexHead::start(&scene, WRITER);
     let name = scene.head_name();
 
     let sent = scene.run(
@@ -895,8 +862,77 @@ fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_en
         "{text}"
     );
     assert!(!text.contains("or when its turn ends."), "{text}");
-    let _ = head.kill();
-    let _ = head.wait();
+}
+
+/// A Codex head that stays alive after its first hook (a copy of `/bin/sh`
+/// named `codex` runs the hook with the payload naming `key`, then sleeps),
+/// so a send can reach it; killed when dropped. `start` returns once that
+/// first hook, its Identity step included, has finished.
+struct CodexHead(std::process::Child);
+
+impl CodexHead {
+    fn start(scene: &Scene, key: &str) -> Self {
+        let mut payload: serde_json::Value = serde_json::from_slice(
+            &fs::read(
+                repo_root()
+                    .join("packages/mailbox/contracts/fixtures/hooks/codex/post-tool-use.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        payload["session_id"] = serde_json::Value::from(key);
+        let payload_file = scene.root.join(format!("codex-payload-{key}.json"));
+        let done = scene.root.join(format!("codex-hooked-{key}"));
+        fs::write(&payload_file, serde_json::to_vec(&payload).unwrap()).unwrap();
+        let head = Command::new(codex_like(&scene.root))
+            .args([
+                "-c",
+                "\"$0\" hook mailbox --cli codex --event post-tool-use < \"$1\"; : > \"$2\"; exec sleep 60",
+            ])
+            .arg(fgos_bin())
+            .arg(&payload_file)
+            .arg(&done)
+            .current_dir(scene.main())
+            .env_clear()
+            .env("HOME", scene.home())
+            .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .unwrap();
+        for _ in 0..400 {
+            if done.exists() {
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(25));
+        }
+        assert!(done.exists(), "the Codex head's first hook did not finish");
+        Self(head)
+    }
+
+    fn pid(&self) -> u32 {
+        self.0.id()
+    }
+}
+
+impl Drop for CodexHead {
+    fn drop(&mut self) {
+        let _ = self.0.kill();
+        let _ = self.0.wait();
+    }
+}
+
+/// The short name the record gave the head of `key`.
+fn name_of_key(scene: &Scene, key: &str) -> String {
+    let snapshot: serde_json::Value = serde_json::from_slice(
+        &fs::read(scene.mailbox_dir().join("record/snapshot.json")).unwrap(),
+    )
+    .unwrap();
+    snapshot["bindings"][key]["name"]
+        .as_str()
+        .unwrap()
+        .to_string()
 }
 
 /// Identity's state root of the scene: the default under its `HOME`, with a
@@ -956,7 +992,7 @@ fn send_to(scene: &Scene, to: &str, json: bool) -> Output {
 }
 
 #[test]
-fn a_handle_identity_resolves_to_a_session_that_is_not_a_head_of_this_record_is_refused_unknown_name_and_says_it_has_no_address_here(
+fn a_handle_identity_resolves_to_a_session_that_is_not_a_head_of_this_record_is_refused_as_unknown_like_a_name_no_session_has(
 ) {
     let (scene, root) = scene_with_head("alias-elsewhere");
     let elsewhere = register_identity(
@@ -969,10 +1005,14 @@ fn a_handle_identity_resolves_to_a_session_that_is_not_a_head_of_this_record_is_
     let out = send_to(&scene, &elsewhere, false);
 
     assert_eq!(out.status.code(), Some(1), "{out:?}");
+    // The same answer as for a name no session has: it does not tell that a
+    // session elsewhere on this machine holds it.
     assert_eq!(
         String::from_utf8_lossy(&out.stdout),
-        "Refused: unknown-name. Candidates: none.\nThat session has no mailbox address in this project.\n"
+        "Refused: unknown-name. Candidates: none.\n"
     );
+    let nobody = send_to(&scene, "claude-zzzz@nowhere", false);
+    assert_eq!(nobody.stdout, out.stdout);
     assert!(scene.message_states().is_empty());
 }
 
@@ -1214,4 +1254,140 @@ fn mailbox_list_and_status_run_natively_read_the_record_and_create_nothing() {
     assert_eq!(envelope["data"]["record"], "ok");
     assert_eq!(envelope["data"]["heads"], 1);
     assert!(!log.exists(), "no node child ran");
+}
+
+#[test]
+fn a_role_and_a_handle_reach_the_head_identity_resolved_among_two_heads_and_the_holder_line_names_that_head(
+) {
+    let (scene, root) = scene_with_head("alias-two-heads");
+    // The second head's key sorts after the first's, so a delivery to the
+    // first head of the record would be wrong.
+    let holder_key = "zzz-holder";
+    let info = identity_of(&root, "CODEX_THREAD_ID", holder_key);
+    let codex = CodexHead::start(&scene, holder_key);
+    let entry = fgos_identity::directory::Entry::new(
+        info.id.clone(),
+        info.handle.clone(),
+        "codex".to_string(),
+        None,
+        None,
+        vec!["lead:PROBE".to_string()],
+        fgos_identity::current::os_record(codex.pid()),
+    );
+    fgos_identity::directory::register(&root, entry, true, &fgos_process::facts::judge_here)
+        .unwrap();
+    let holder = name_of_key(&scene, holder_key);
+
+    let by_role = send_to(&scene, "lead:PROBE", false);
+    let by_handle = send_to(&scene, &info.handle, false);
+
+    assert_eq!(by_role.status.code(), Some(0), "{by_role:?}");
+    let text = String::from_utf8_lossy(&by_role.stdout);
+    assert!(text.contains(&format!(" for {holder}\n")), "{text}");
+    assert!(
+        text.ends_with(&format!(
+            "delivered to the current holder of lead:PROBE, {}\n",
+            info.handle
+        )),
+        "{text}"
+    );
+    let text = String::from_utf8_lossy(&by_handle.stdout);
+    assert!(text.contains(&format!(" for {holder}\n")), "{text}");
+}
+
+/// A Codex key whose Identity handle suffix equals `victim`'s: what a
+/// same-user process can choose, since a handle keeps 4 characters.
+fn colliding_codex_key(victim: &str) -> String {
+    let target = fgos_identity::session::suffix(victim);
+    (0u64..)
+        .map(|i| format!("squat-{i}"))
+        .find(|key| fgos_identity::session::suffix(key) == target)
+        .unwrap()
+}
+
+#[test]
+fn a_handle_two_heads_of_the_record_derive_is_refused_ambiguous_and_the_victim_is_still_reached_by_its_full_id(
+) {
+    let scene = Scene::new("alias-squat");
+    let root = identity_root(&scene);
+    let victim_key = "victim-key";
+    let squatter_key = colliding_codex_key(victim_key);
+    let victim = identity_of(&root, "CODEX_THREAD_ID", victim_key);
+    let squatter = identity_of(&root, "CODEX_THREAD_ID", &squatter_key);
+    assert_eq!(victim.handle, squatter.handle);
+    // The squatter registers first and takes the handle in Identity.
+    let _squatting = CodexHead::start(&scene, &squatter_key);
+    let _victim_head = CodexHead::start(&scene, victim_key);
+    assert_eq!(hook_outcome(&scene).as_deref(), Some("ident-handle-in-use"));
+
+    let by_handle = send_to(&scene, &victim.handle, false);
+    let by_id = send_to(&scene, &victim.id, false);
+    let status = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
+
+    assert_eq!(by_handle.status.code(), Some(1), "{by_handle:?}");
+    let text = String::from_utf8_lossy(&by_handle.stdout);
+    assert!(text.starts_with("Refused: ambiguous-name."), "{text}");
+    assert!(text.contains(&format!("({})", victim.id)), "{text}");
+    assert!(text.contains(&format!("({})", squatter.id)), "{text}");
+    assert_eq!(by_id.status.code(), Some(0), "{by_id:?}");
+    assert!(
+        String::from_utf8_lossy(&by_id.stdout)
+            .contains(&format!(" for {}\n", name_of_key(&scene, victim_key))),
+        "{by_id:?}"
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    let conflicts = envelope["data"]["handleConflicts"].as_array().unwrap();
+    assert!(
+        conflicts
+            .iter()
+            .any(|c| c["id"] == victim.id && c["handle"] == victim.handle),
+        "{conflicts:?}"
+    );
+}
+
+#[test]
+fn a_registering_call_of_a_head_identity_already_holds_under_its_own_id_records_nothing() {
+    let scene = Scene::new("ident-own");
+    let root = identity_root(&scene);
+    register_identity(&root, "CLAUDE_CODE_SESSION_ID", WRITER, &[]);
+    let before = identity_sessions(&root);
+
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert_eq!(hook_outcome(&scene), None);
+    assert_eq!(identity_sessions(&root), before);
+}
+
+#[test]
+fn a_head_that_registered_before_the_machine_had_an_id_is_registered_with_identity_at_its_next_quiet_call(
+) {
+    let scene = Scene::new("ident-retry");
+    let first = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(first.status.code(), Some(0));
+    assert_eq!(
+        hook_outcome(&scene).as_deref(),
+        Some("ident:machine-id-missing")
+    );
+    let root = identity_root(&scene);
+
+    let again = scene.claude_hook("post-tool-use", &post_tool_use());
+
+    assert_eq!(again.status.code(), Some(0));
+    assert!(
+        again.stdout.is_empty() && again.stderr.is_empty(),
+        "{again:?}"
+    );
+    let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
+    assert_eq!(identity_sessions(&root), vec![(own.id, own.handle)]);
+    assert_eq!(
+        hook_outcome(&scene),
+        None,
+        "the repaired outcome is cleared"
+    );
 }

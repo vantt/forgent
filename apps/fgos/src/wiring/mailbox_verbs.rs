@@ -16,7 +16,9 @@
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
-use super::mailbox_identity::{address, is_alias, session_of, state_root, Addressed};
+use super::mailbox_identity::{
+    address, handle_conflicts, is_alias, session_of, state_root, Addressed,
+};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
@@ -29,7 +31,7 @@ use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
     list_text, record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, ListRow,
-    Liveness, MessageId, SendRequest, Timestamp, WriterKey,
+    Liveness, MessageId, Recipient, SendRequest, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -349,10 +351,30 @@ fn status(json: bool) -> MailboxAnswer {
     };
     let answer = verbs::status(&fgos_dir, now(), &loaded.limits);
     let mut data = answer.json;
+    let mut text = answer.text;
     data["ok"] = Value::from(answer.record_ok);
+    // A head whose handle does not name it alone (Identity holds it for
+    // another session, or another head derives it too) is named with the
+    // full id that still reaches it.
+    if data["record"] == "ok" {
+        let conflicts = state_root()
+            .zip(verbs::heads(&fgos_dir, &loaded.limits).ok())
+            .map(|(root, heads)| handle_conflicts(&root, &heads))
+            .unwrap_or_default();
+        data["handleConflicts"] = conflicts
+            .iter()
+            .map(|c| json!({ "name": c.name, "handle": c.handle, "id": c.id, "other": c.other }))
+            .collect();
+        for c in &conflicts {
+            text.push_str(&format!(
+                "\nhandle not unique: {} {} is also {}; reach it by its full id {}",
+                c.name, c.handle, c.other, c.id
+            ));
+        }
+    }
     MailboxAnswer {
         data,
-        text: answer.text,
+        text,
         json,
         exit: if answer.record_ok {
             EXIT_DONE
@@ -435,30 +457,30 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 max_read_bytes: loaded.hook.hook.max_read_bytes,
             };
             let wait = Wait::Ms(loaded.hook.hook.lock_wait_ms);
-            let (to_key, alias_refusal, role_holder) = if is_alias(to) {
+            let (recipient, role_holder) = if is_alias(to) {
                 let heads = match verbs::heads(&fgos_dir, &loaded.limits) {
                     Ok(heads) => heads,
                     Err(text) => return failed(text, *json, warning),
                 };
                 match address(state_root().as_deref(), to, &heads) {
-                    Addressed::Head { key, role_holder } => {
-                        (key.as_str().to_string(), None, role_holder)
-                    }
-                    Addressed::Refused(refusal) => (to.clone(), Some(refusal), None),
+                    Addressed::Head { key, role_holder } => (Recipient::Key(key), role_holder),
+                    Addressed::Refused(refusal) => (Recipient::Refused(refusal), None),
                 }
             } else {
-                (to.clone(), None, None)
+                (Recipient::Name(to.clone()), None)
             };
-            let candidates = alias_refusal.as_ref().map(typed_candidates);
+            let candidates = match &recipient {
+                Recipient::Refused(refusal) => Some(typed_candidates(refusal)),
+                Recipient::Name(_) | Recipient::Key(_) => None,
+            };
             let req = SendRequest {
                 from,
-                to: to_key,
+                to: recipient,
                 body,
                 wake: *wake,
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
                 dead_keys: Default::default(),
                 stop_drains: TestedClis::embedded().stop_drains(),
-                alias_refusal,
             };
             let mut sent = verbs::send(&record, req, wait, now(), &loaded.limits, &versions);
             if let (true, Some((role, handle))) = (sent.recorded, role_holder) {

@@ -92,11 +92,13 @@ pub struct HeadView {
 pub fn heads(fgos_dir: &std::path::Path, limits: &Limits) -> Result<Vec<HeadView>, String> {
     let existing =
         Record::read_existing(fgos_dir, limits).map_err(|error| record_error_text(error.code()))?;
-    let Some(existing) = existing else {
-        return Ok(Vec::new());
-    };
-    Ok(existing
-        .state
+    Ok(existing.map_or_else(Vec::new, |existing| live_heads(&existing.state)))
+}
+
+/// The one rule of which bindings count as heads, shared by `list` and
+/// `status`: not a runner attempt's key, not judged dead.
+fn live_heads(state: &fgos_mailbox_core::MailboxState) -> Vec<HeadView> {
+    state
         .bindings()
         .filter(|b| !fgos_identity::is_attempt_writer_id(b.key.as_str()))
         .map(|b| HeadView {
@@ -106,7 +108,7 @@ pub fn heads(fgos_dir: &std::path::Path, limits: &Limits) -> Result<Vec<HeadView
             liveness: stored_liveness(b),
         })
         .filter(|h| h.liveness != Liveness::Dead)
-        .collect())
+        .collect()
 }
 
 /// What the delivery report says of the recipient's CLI version.
@@ -235,7 +237,7 @@ pub fn status(fgos_dir: &std::path::Path, now: Timestamp, limits: &Limits) -> St
     let json = serde_json::json!({
         "record": "ok",
         "recordBytes": existing.snapshot_bytes,
-        "heads": existing.state.bindings().count(),
+        "heads": live_heads(&existing.state).len(),
         "signals": signals,
         "hookOutcome": outcome,
     });

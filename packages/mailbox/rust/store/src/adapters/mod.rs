@@ -165,9 +165,42 @@ struct RawChannel {
     _source: String,
 }
 
-/// The role under which a model takes text as its user's own request; no
-/// delivering channel may have it.
-const USER_ROLE: &str = "user";
+/// The role a channel's text reaches the model under, as the contract
+/// records it: a provider-level message role, or a CLI transcript record
+/// type where the provider-level role was not recorded. A closed set, so a
+/// misspelt role (`User`, ` user`) is refused instead of passing the rule.
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum ChannelRole {
+    /// The model takes the text as its user's own request; no delivering
+    /// channel may have it.
+    User,
+    Developer,
+    System,
+    Tool,
+    /// A transcript record type (`transcript:<type>`): the provider-level
+    /// role is unmeasured, an accepted residual named in the spec (§7.3).
+    Transcript,
+}
+
+impl ChannelRole {
+    fn parse(text: &str) -> Option<Self> {
+        match text {
+            "user" => Some(Self::User),
+            "developer" => Some(Self::Developer),
+            "system" => Some(Self::System),
+            "tool" => Some(Self::Tool),
+            _ => text
+                .strip_prefix("transcript:")
+                .filter(|kind| {
+                    !kind.is_empty()
+                        && kind
+                            .chars()
+                            .all(|c| c.is_ascii_alphanumeric() || matches!(c, ':' | '_' | '-'))
+                })
+                .map(|_| Self::Transcript),
+        }
+    }
+}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -266,7 +299,13 @@ impl TestedClis {
     /// and head executables are unmeasured, so the CLI is quiet as untested
     /// instead of failing the caller check on every call.
     pub fn facts(&self, adapter: Adapter) -> Option<&AdapterFacts> {
-        let word = adapter.word();
+        self.facts_here(adapter.word())
+    }
+
+    /// The facts of the CLI named `word`, only on the platform they were
+    /// measured on: the one platform rule [`TestedClis::facts`], `tier` and
+    /// `stop_drains` share.
+    fn facts_here(&self, word: &str) -> Option<&AdapterFacts> {
         if self.platforms.get(word).map(String::as_str) != Some(std::env::consts::OS) {
             return None;
         }
@@ -277,12 +316,9 @@ impl TestedClis {
     /// where a step drain delivers (no wake channel is built yet), `pull`
     /// otherwise (mail only through `inbox --claim`).
     pub fn tier(&self, cli: &Cli) -> &'static str {
-        let delivers = self.clis.iter().any(|c| c == cli.as_str())
-            && self.platforms.get(cli.as_str()).map(String::as_str) == Some(std::env::consts::OS)
-            && self
-                .facts
-                .get(cli.as_str())
-                .is_some_and(|f| f.post_tool_use_max_bytes.is_some());
+        let delivers = self
+            .facts_here(cli.as_str())
+            .is_some_and(|f| f.post_tool_use_max_bytes.is_some());
         if delivers {
             "turn"
         } else {
@@ -296,10 +332,7 @@ impl TestedClis {
     pub fn stop_drains(&self) -> BTreeSet<Cli> {
         self.clis
             .iter()
-            .filter(|cli| {
-                self.platforms.get(*cli).map(String::as_str) == Some(std::env::consts::OS)
-                    && self.facts.get(*cli).is_some_and(|f| f.stop_delivers)
-            })
+            .filter(|cli| self.facts_here(cli).is_some_and(|f| f.stop_delivers))
             .filter_map(|cli| Cli::new(cli).ok())
             .collect()
     }
@@ -329,10 +362,14 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         ("stop", &raw.channels.stop),
         ("postToolUse", &raw.channels.post_tool_use),
     ] {
-        if channel.deliver && channel.role == USER_ROLE {
+        let Some(role) = ChannelRole::parse(&channel.role) else {
             return refuse(&format!(
-                "channels.{name} delivers under the {USER_ROLE} role"
+                "channels.{name}.role {:?} is not a known role",
+                channel.role
             ));
+        };
+        if channel.deliver && role == ChannelRole::User {
+            return refuse(&format!("channels.{name} delivers under the user role"));
         }
     }
     if raw.channels.post_tool_use.deliver != raw.post_tool_use_context_max_bytes.is_some() {
