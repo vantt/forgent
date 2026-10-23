@@ -13,6 +13,12 @@ import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { HISTORICAL_PLAN_HASHES, verifyMarkdownLinks } from './verify-phase-01.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
+import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { createGitWorktree } from '../src/git/worktree.mjs';
+import { gitPortOptions } from '../src/git/inspect.mjs';
+import { removeWorktree } from '../src/runner/worktree.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
@@ -72,11 +78,7 @@ export function parseArgs(argv) {
 
 function resolveCommit(repoRoot, value, label) {
   try {
-    return execFileSync('git', ['rev-parse', '--verify', `${value}^{commit}`], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim();
+    return resolveCommitSha(value, repoRoot);
   } catch (err) {
     throw new Error(`${label} "${value}" does not resolve to a valid commit: ${err.message}`);
   }
@@ -123,10 +125,10 @@ function byteCompare(actualPath, expectedPath, label) {
 
 export function verifyForbiddenPhase02Diff(worktreeDir, baseSha, fixedEndSha, deps = {}) {
   const run = deps.run || ((command, args) => runOrThrow(command, args, { cwd: worktreeDir }));
-  const diffNames = deps.diffNames || (() => execFileSync('git', ['diff', '--name-only', `${baseSha}..${fixedEndSha}`], {
-    cwd: worktreeDir,
-    encoding: 'utf8',
-  }).split('\n').filter(Boolean));
+  const diffNames = deps.diffNames || (() => {
+    const port = inspectRepo(worktreeDir);
+    return inspectEntries((page) => port.diff({ before: baseSha, after: fixedEndSha, ...page })).map((entry) => inspectPath(entry.path));
+  });
 
   run('git', ['diff', '--check', `${baseSha}..${fixedEndSha}`]);
   const names = diffNames();
@@ -160,7 +162,9 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
   const tempWorktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-verify-phase02-'));
   fs.rmdirSync(tempWorktreeDir);
   console.log(`\nCreating detached clean worktree at ${tempWorktreeDir}...`);
-  execFileSync('git', ['worktree', 'add', '--detach', tempWorktreeDir, fixedEndSha], { cwd: repoRoot, stdio: ['pipe', 'pipe', 'pipe'] });
+  createGitWorktree(gitPortOptions(repoRoot, { mutation: true })).createDetached({
+    path: tempWorktreeDir, base: fixedEndSha, operationId: crypto.randomUUID(),
+  });
 
   const receipt = {
     schema: 'fgos.phase02.verification.receipt.v1',
@@ -175,9 +179,10 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
   };
 
   try {
-    const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    const head = resolveCommitSha('HEAD', tempWorktreeDir);
     if (head !== fixedEndSha) throw new Error(`Worktree checkout mismatch: HEAD ${head} !== FIXED_END ${fixedEndSha}`);
-    const status = execFileSync('git', ['status', '--porcelain'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    const initialEntries = statusEntries(inspectRepo(tempWorktreeDir), 'normal');
+    const status = initialEntries.length ? JSON.stringify(initialEntries) : '';
     if (status) throw new Error(`Worktree is not clean upon checkout:\n${status}`);
     receipt.checks.worktreeBinding = { passed: true, head };
     console.log('✓ Asserted clean detached worktree exactly at FIXED_END before setup');
@@ -185,7 +190,8 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
     console.log('\n[Setup] Provisioning dependencies in clean worktree (npm ci when lockfile exists)...');
     const npmArgs = fs.existsSync(path.join(tempWorktreeDir, 'package-lock.json')) ? ['ci'] : ['install'];
     runOrThrow('npm', npmArgs, { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
-    const postSetupStatus = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    const postSetupEntries = statusEntries(inspectRepo(tempWorktreeDir), 'none');
+    const postSetupStatus = postSetupEntries.length ? JSON.stringify(postSetupEntries) : '';
     if (postSetupStatus) throw new Error(`Tracked files changed after dependency setup:\n${postSetupStatus}`);
     receipt.checks.setup = { passed: true, command: `npm ${npmArgs.join(' ')}` };
     console.log('✓ Dependencies provisioned without tracked-file changes');
@@ -322,7 +328,8 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       console.log('\n[Check 9/9] Skipped full npm test suite (--skip-full-suite)');
     }
 
-    const finalStatus = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    const finalEntries = statusEntries(inspectRepo(tempWorktreeDir), 'none');
+    const finalStatus = finalEntries.length ? JSON.stringify(finalEntries) : '';
     if (finalStatus) throw new Error(`Tracked files changed after verification checks:\n${finalStatus}`);
     receipt.checks.cleanAfterChecks = { passed: true, ignoredGeneratedDepsAccountedFor: true };
 
@@ -333,9 +340,12 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
   } finally {
     if (!keepWorktree) {
       console.log(`\nCleaning up temporary worktree ${tempWorktreeDir}...`);
-      try { execFileSync('git', ['worktree', 'remove', '--force', tempWorktreeDir], { cwd: repoRoot, stdio: 'ignore' }); } catch {}
-      if (fs.existsSync(tempWorktreeDir)) fs.rmSync(tempWorktreeDir, { recursive: true, force: true });
-      console.log('✓ Temporary worktree removed');
+      try {
+        removeWorktree(repoRoot, tempWorktreeDir);
+        console.log('✓ Temporary worktree removed');
+      } catch (err) {
+        console.warn(`Temporary worktree retained at ${tempWorktreeDir}: ${err.message}`);
+      }
     } else {
       console.log(`\nNotice: Worktree retained at ${tempWorktreeDir} (--keep-worktree)`);
     }

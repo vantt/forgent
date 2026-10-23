@@ -11,11 +11,14 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { inspectRepo } from './lib/git-ports.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { writeShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import {
   resolveCommitSha,
   readBlobAtCommit,
+  readBlobBufferAtCommit,
   normalizePosix,
 } from './generate-shipped-path-inventory.mjs';
 import { classifyFile as classifyLegacyRootFile } from './check-legacy-docs-ratchet.mjs';
@@ -50,15 +53,6 @@ function sha256Bytes(input) {
 
 function randomOpaqueId(prefix, bytes = 16) {
   return `${prefix}_${crypto.randomBytes(bytes).toString('hex')}`;
-}
-
-function readBlobBufferAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
-  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {
-    cwd: repoRoot,
-    encoding: 'buffer',
-    maxBuffer: 20 * 1024 * 1024,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
 }
 
 function decodeUtf8(buffer) {
@@ -163,8 +157,14 @@ export function identityScopePathspec() {
 export function registryBindsToCommit(registryCommit, commitSha, repoRoot = process.cwd()) {
   if (!registryCommit || typeof registryCommit !== 'string') return false;
   if (registryCommit === commitSha) return true;
-  const result = spawnSync('git', ['diff', '--quiet', registryCommit, commitSha, '--', ...identityScopePathspec()], { cwd: repoRoot, stdio: 'ignore' });
-  return result.status === 0;
+  try {
+    const port = inspectRepo(repoRoot);
+    const entries = inspectEntries((page) => port.diff({ before: registryCommit, after: commitSha, ...page }));
+    return !entries.some((entry) => identityScopePathspec().some((root) => {
+      const name = inspectPath(entry.path);
+      return name === root || name.startsWith(`${root}/`);
+    }));
+  } catch { return false; }
 }
 
 export function buildIdentityRegistryIndex(registry = {}) {
@@ -746,13 +746,9 @@ export function listCommitEntries(repoRoot, commitSha) {
 }
 
 function listCommitPaths(repoRoot, commitSha) {
-  const out = execFileSync('git', ['ls-tree', '-r', '--name-only', commitSha], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    maxBuffer: 60 * 1024 * 1024,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
-  return out.split('\n').filter(Boolean).map(normalizePosix).sort();
+  const port = inspectRepo(repoRoot);
+  return inspectEntries((page) => port.listTree({ revision: commitSha, prefix: '', ...page }))
+    .filter((entry) => entry.kind !== 'tree').map((entry) => inspectPath(entry.path)).sort();
 }
 
 export function loadShippedPathInventory(commitSha, repoRoot) {
@@ -1237,30 +1233,56 @@ export function readCommitBlobMap(repoRoot, entries, options = {}) {
   const maxSize = options.maxSize ?? 20 * 1024 * 1024;
   const readable = entries.filter((e) => e?.blobSha && Number(e.size) <= maxSize);
   if (readable.length === 0) return new Map();
-  const input = readable.map((e) => e.blobSha).join('\n') + '\n';
-  const result = spawnSync('git', ['cat-file', '--batch'], {
-    cwd: repoRoot,
-    input,
-    maxBuffer: Math.max(64 * 1024 * 1024, readable.reduce((n, e) => n + Number(e.size || 0), 0) + readable.length * 200),
-  });
-  if (result.status !== 0) throw new Error(`git cat-file --batch failed: ${decodeUtf8(result.stderr || Buffer.alloc(0)).trim()}`);
-  const bySha = new Map();
-  let offset = 0;
-  const stdout = result.stdout || Buffer.alloc(0);
-  for (const entry of readable) {
-    const nl = stdout.indexOf(0x0a, offset);
-    if (nl < 0) throw new Error(`git cat-file --batch truncated before ${entry.blobSha}`);
-    const header = stdout.slice(offset, nl).toString('utf8');
-    const [sha, type, sizeText] = header.split(' ');
-    const size = Number(sizeText);
-    if (sha !== entry.blobSha || type !== 'blob' || !Number.isFinite(size)) throw new Error(`git cat-file --batch unexpected header for ${entry.path}: ${header}`);
-    const start = nl + 1;
-    const end = start + size;
-    bySha.set(sha, Buffer.from(stdout.slice(start, end)));
-    offset = end + 1;
+  // L13-2 exemption candidate: callers may explicitly raise maxSize beyond Inspect's
+  // single-object ceiling. Preserve the existing reader for that capacity contract;
+  // do not retry failed typed reads through this path.
+  if (readable.some((entry) => Number(entry.size) > 31 * 1024 * 1024)) {
+    const result = spawnSync('git', ['cat-file', '--batch'], {
+      cwd: repoRoot,
+      input: readable.map((entry) => entry.blobSha).join('\n') + '\n',
+      maxBuffer: Math.max(64 * 1024 * 1024, readable.reduce((n, entry) => n + Number(entry.size || 0), 0) + readable.length * 200),
+    });
+    if (result.status !== 0) throw new Error(`git cat-file --batch failed: ${decodeUtf8(result.stderr || Buffer.alloc(0)).trim()}`);
+    const byPath = new Map();
+    const stdout = result.stdout || Buffer.alloc(0);
+    let offset = 0;
+    for (const entry of readable) {
+      const newline = stdout.indexOf(0x0a, offset);
+      if (newline < 0) throw new Error(`git cat-file --batch truncated before ${entry.blobSha}`);
+      const header = stdout.subarray(offset, newline).toString('utf8');
+      const [sha, type, sizeText] = header.split(' ');
+      const size = Number(sizeText);
+      if (sha !== entry.blobSha || type !== 'blob' || !Number.isFinite(size) || size !== Number(entry.size)) throw new Error(`git cat-file --batch unexpected header for ${entry.path}: ${header}`);
+      const end = newline + 1 + size;
+      if (end >= stdout.length) throw new Error(`git cat-file --batch truncated body for ${entry.path}`);
+      byPath.set(normalizePosix(entry.path), Buffer.from(stdout.subarray(newline + 1, end)));
+      offset = end + 1;
+    }
+    return byPath;
   }
+  const port = inspectRepo(repoRoot);
   const byPath = new Map();
-  for (const entry of readable) byPath.set(normalizePosix(entry.path), bySha.get(entry.blobSha));
+  // Inspect bounds each read to 4096 objects / 32 MiB; retain the caller's per-blob
+  // filter while splitting the aggregate, rather than weakening it or spawning Git.
+  for (let start = 0; start < readable.length;) {
+    let end = start;
+    let bytes = 0;
+    // Leave room for cat-file framing inside the driver's 32 MiB output ceiling.
+    while (end < readable.length && end - start < 4096 && bytes + Number(readable[end].size) <= 31 * 1024 * 1024) {
+      bytes += Number(readable[end++].size);
+    }
+    if (end === start) throw new Error(`${readable[start].path}: object exceeds Inspect read bound`);
+    const batch = readable.slice(start, end);
+    const objects = port.readObjects({ oids: batch.map((entry) => entry.blobSha), maxBytes: 32 * 1024 * 1024 });
+    for (const [index, entry] of batch.entries()) {
+      const object = objects[index];
+      if (object?.kind !== 'present' || object.objectType !== 'blob' || object.bytes.length !== Number(entry.size)) {
+        throw new Error(`${entry.path}: missing or mismatched commit blob ${entry.blobSha}`);
+      }
+      byPath.set(normalizePosix(entry.path), Buffer.from(object.bytes));
+    }
+    start = end;
+  }
   return byPath;
 }
 

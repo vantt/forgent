@@ -11,6 +11,12 @@ import crypto from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
+import { resolveCommitSha, loadCommitTree, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
+import { createGitWorktree } from '../src/git/worktree.mjs';
+import { gitPortOptions } from '../src/git/inspect.mjs';
+import { removeWorktree } from '../src/runner/worktree.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -75,25 +81,10 @@ Options:
 }
 
 export function verifyMarkdownLinks(worktreeDir, baseSha, fixedEndSha) {
-  const diffOut = execFileSync('git', ['diff', '--name-only', `${baseSha}..${fixedEndSha}`], {
-    cwd: worktreeDir,
-    encoding: 'utf8',
-  });
-  const changedFiles = diffOut.split('\n').map((l) => l.trim()).filter(Boolean);
+  const port = inspectRepo(worktreeDir);
+  const changedFiles = inspectEntries((page) => port.diff({ before: baseSha, after: fixedEndSha, ...page })).map((entry) => inspectPath(entry.path));
   const mdFiles = changedFiles.filter((p) => p.toLowerCase().endsWith('.md'));
-
-  const treeOut = execFileSync('git', ['ls-tree', '-r', '--name-only', fixedEndSha], {
-    cwd: worktreeDir,
-    encoding: 'utf8',
-  });
-  const treeFiles = new Set(treeOut.split('\n').filter(Boolean));
-  const treeDirs = new Set();
-  for (const f of treeFiles) {
-    const parts = f.split('/');
-    for (let i = 1; i < parts.length; i++) {
-      treeDirs.add(parts.slice(0, i).join('/'));
-    }
-  }
+  const { treeFiles, treeDirs } = loadCommitTree(fixedEndSha, worktreeDir);
 
   function normpath(p) {
     let norm = path.posix.normalize(p);
@@ -112,20 +103,8 @@ export function verifyMarkdownLinks(worktreeDir, baseSha, fixedEndSha) {
   const linkRegex = /(?<!!)\[[^\]]*\]\(([^)]+)\)/g;
 
   for (const filePath of mdFiles) {
-    try {
-      execFileSync('git', ['cat-file', '-e', `${fixedEndSha}:${filePath}`], {
-        cwd: worktreeDir,
-        stdio: 'pipe',
-      });
-    } catch {
-      continue;
-    }
-
-    const content = execFileSync('git', ['show', `${fixedEndSha}:${filePath}`], {
-      cwd: worktreeDir,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
+    if (!treeFiles.has(filePath)) continue; // A deleted Markdown file has no end-tree links.
+    const content = readBlobAtCommit(fixedEndSha, filePath, worktreeDir);
 
     const parentDir = path.posix.dirname(filePath);
     const lines = content.split('\n');
@@ -173,21 +152,13 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
   let baseSha;
   let fixedEndSha;
   try {
-    baseSha = execFileSync('git', ['rev-parse', '--verify', `${base}^{commit}`], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim();
+    baseSha = resolveCommitSha(base, repoRoot);
   } catch (err) {
     throw new Error(`BASE "${base}" does not resolve to a valid commit: ${err.message}`);
   }
 
   try {
-    fixedEndSha = execFileSync('git', ['rev-parse', '--verify', `${fixedEnd}^{commit}`], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim();
+    fixedEndSha = resolveCommitSha(fixedEnd, repoRoot);
   } catch (err) {
     throw new Error(`FIXED_END "${fixedEnd}" does not resolve to a valid commit: ${err.message}`);
   }
@@ -206,9 +177,8 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
   fs.rmdirSync(tempWorktreeDir);
 
   console.log(`\nCreating detached clean worktree at ${tempWorktreeDir}...`);
-  execFileSync('git', ['worktree', 'add', '--detach', tempWorktreeDir, fixedEndSha], {
-    cwd: repoRoot,
-    stdio: ['pipe', 'pipe', 'pipe'],
+  createGitWorktree(gitPortOptions(repoRoot, { mutation: true })).createDetached({
+    path: tempWorktreeDir, base: fixedEndSha, operationId: crypto.randomUUID(),
   });
 
   const receipt = {
@@ -222,19 +192,14 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
 
   try {
     // 3. Assert worktree invariants
-    const worktreeHead = execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: tempWorktreeDir,
-      encoding: 'utf8',
-    }).trim();
+    const worktreeHead = resolveCommitSha('HEAD', tempWorktreeDir);
 
     if (worktreeHead !== fixedEndSha) {
       throw new Error(`Worktree checkout mismatch: HEAD (${worktreeHead}) does not equal FIXED_END (${fixedEndSha})`);
     }
 
-    const porcelain = execFileSync('git', ['status', '--porcelain'], {
-      cwd: tempWorktreeDir,
-      encoding: 'utf8',
-    }).trim();
+    const entries = statusEntries(inspectRepo(tempWorktreeDir), 'normal');
+    const porcelain = entries.length ? JSON.stringify(entries) : '';
 
     if (porcelain !== '') {
       throw new Error(`Worktree is not clean upon checkout: status entries:\n${porcelain}`);
@@ -404,10 +369,8 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
     }
 
     // Assert forbidden paths were not modified
-    const diffNames = execFileSync('git', ['diff', '--name-only', `${baseSha}..${fixedEndSha}`], {
-      cwd: tempWorktreeDir,
-      encoding: 'utf8',
-    }).split('\n').filter(Boolean);
+    const port = inspectRepo(tempWorktreeDir);
+    const diffNames = inspectEntries((page) => port.diff({ before: baseSha, after: fixedEndSha, ...page })).map((entry) => inspectPath(entry.path));
 
     for (const name of diffNames) {
       if (name.startsWith('docs/specs/') && name !== 'docs/specs/reading-map.md') {
@@ -485,17 +448,11 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
     if (!keepWorktree) {
       console.log(`\nCleaning up temporary worktree ${tempWorktreeDir}...`);
       try {
-        execFileSync('git', ['worktree', 'remove', '--force', tempWorktreeDir], {
-          cwd: repoRoot,
-          stdio: 'ignore',
-        });
-      } catch {}
-      if (fs.existsSync(tempWorktreeDir)) {
-        try {
-          fs.rmSync(tempWorktreeDir, { recursive: true, force: true });
-        } catch {}
+        removeWorktree(repoRoot, tempWorktreeDir);
+        console.log('✓ Temporary worktree removed');
+      } catch (err) {
+        console.warn(`Temporary worktree retained at ${tempWorktreeDir}: ${err.message}`);
       }
-      console.log('✓ Temporary worktree removed');
     } else {
       console.log(`\nNotice: Worktree retained at ${tempWorktreeDir} (--keep-worktree)`);
     }

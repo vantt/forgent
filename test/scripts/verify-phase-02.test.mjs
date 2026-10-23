@@ -1,5 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { sandboxGit } from '../../scripts/lib/sandbox-git.mjs';
+import { verifyMarkdownLinks } from '../../scripts/verify-phase-01.mjs';
 
 import {
   parseArgs,
@@ -60,6 +65,26 @@ test('verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard
     ]; },
   });
   assert.equal(result.changedPathCount, 7);
+});
+
+// Phase 02 consumes Phase 01's link reader. The scope stubs do not prove immutable link reads.
+test('Markdown verification reads the end commit and ignores deleted documents', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-links-'));
+  const git = (args) => sandboxGit(root)(args, { cwd: root });
+  const commit = () => { git(['add', '.']); git(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'fixture']); return git(['rev-parse', 'HEAD']); };
+  try {
+    git(['init', '-q']);
+    fs.writeFileSync(path.join(root, 'deleted.md'), '[old](absent.md)');
+    const base = commit();
+    fs.unlinkSync(path.join(root, 'deleted.md'));
+    fs.writeFileSync(path.join(root, 'ghi chú.md'), '[ok](target.md)\n');
+    fs.writeFileSync(path.join(root, 'target.md'), '# target\n');
+    const end = commit();
+    fs.writeFileSync(path.join(root, 'ghi chú.md'), '[dirty](absent.md)');
+    assert.equal(verifyMarkdownLinks(root, base, end).checkedBlobsCount, 3);
+    const broken = commit();
+    assert.throws(() => verifyMarkdownLinks(root, base, broken), /missing link target/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
 test('verifyForbiddenPhase02Diff rejects unrelated edits', () => {

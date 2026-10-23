@@ -20,7 +20,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
@@ -636,8 +637,10 @@ function loadJson(filePath) {
 }
 
 export function trackedPlatformDocs(repoRoot, { includeUntracked = false } = {}) {
-  const args = ['ls-files', '--cached', ...(includeUntracked ? ['--others', '--exclude-standard'] : []), '--', 'docs/platform'];
-  return [...new Set(execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((file) => file.endsWith('.md')))];
+  const port = inspectRepo(repoRoot);
+  const files = inspectEntries((page) => port.trackedPaths(page)).map(inspectPath);
+  if (includeUntracked) files.push(...statusEntries(port).filter((entry) => entry.untracked).map((entry) => entry.path));
+  return [...new Set(files.filter((file) => file.startsWith('docs/platform/') && file.endsWith('.md')))];
 }
 
 function formatCounts(counts) {

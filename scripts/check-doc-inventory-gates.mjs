@@ -16,8 +16,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { inspectRepo } from './lib/git-ports.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
+import { normalizePosix, readBlobAtCommit, resolveCommitSha, blobOidAtCommit } from './generate-shipped-path-inventory.mjs';
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
 import { checkRatchet, DEFAULT_BASELINE_PATH as RATCHET_BASELINE_PATH, DEFAULT_EXCEPTIONS_PATH as RATCHET_EXCEPTIONS_PATH } from './check-legacy-docs-ratchet.mjs';
 import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, registryBindsToCommit, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
@@ -30,13 +32,9 @@ import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitutio
  * missing/duplicated file.
  */
 export function recomputeInScopePaths(repoRoot, commitSha) {
-  const out = execFileSync('git', ['ls-tree', '-r', '--name-only', commitSha], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    maxBuffer: 60 * 1024 * 1024,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
-  const all = out.split('\n').filter(Boolean).map(normalizePosix);
+  const port = inspectRepo(repoRoot);
+  const all = inspectEntries((page) => port.listTree({ revision: commitSha, prefix: '', ...page }))
+    .filter((entry) => entry.kind !== 'tree').map((entry) => inspectPath(entry.path));
   return all.filter((p) => ADDITIONAL_ROOT_FILES.includes(p) || SCAN_ROOTS.some((root) => p === root || p.startsWith(root + '/')));
 }
 
@@ -597,7 +595,7 @@ export function buildCommittedReviewReportLookup(repoRoot, commitSha) {
     if (!/^[0-9a-f]{40}$/.test(reportCommit || '')) return null;
     if (!ancestors.has(reportCommit)) {
       let ancestor = false;
-      try { execFileSync('git', ['merge-base', '--is-ancestor', reportCommit, commitSha], { cwd: repoRoot, stdio: 'pipe' }); ancestor = true; } catch {}
+      try { ancestor = inspectRepo(repoRoot).ancestry({ ancestor: reportCommit, descendant: commitSha }).answer === 'yes'; } catch {}
       ancestors.set(reportCommit, ancestor);
     }
     if (!ancestors.get(reportCommit)) return null;
@@ -1041,7 +1039,7 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
         path.posix.normalize(ref.receiptPath) !== ref.receiptPath || !/^plans\/[^/]+\/ledger\/candidate-classifications-[a-z0-9-]+\.json$/.test(ref.receiptPath)) return null;
     if (!ancestors.has(ref.receiptCommit)) {
       let ancestor = false;
-      try { execFileSync('git', ['merge-base', '--is-ancestor', ref.receiptCommit, inventory.commit], { cwd: repoRoot, stdio: 'pipe' }); ancestor = true; } catch {}
+      try { ancestor = inspectRepo(repoRoot).ancestry({ ancestor: ref.receiptCommit, descendant: inventory.commit }).answer === 'yes'; } catch {}
       ancestors.set(ref.receiptCommit, ancestor);
     }
     if (!ancestors.get(ref.receiptCommit)) return null;
@@ -1091,11 +1089,11 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
         const provenanceLine = document.match(/^Provenance:\s*(.*)$/m)?.[1];
         const provenance = provenanceLine?.match(/^(\S+) at ([0-9a-f]{7,40})(?=$|[\s;(])/);
         if (!provenance || provenance[1] !== evidence.provenancePath) continue;
-        const namedCommit = execFileSync('git', ['rev-parse', '--verify', `${provenance[2]}^{commit}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+        const namedCommit = resolveCommitSha(provenance[2], repoRoot);
         if (namedCommit !== evidence.provenanceCommit) continue;
         const key = `${namedCommit}:${evidence.provenancePath}`;
         if (!historyProvenanceBlobs.has(key)) {
-          const blobSha = execFileSync('git', ['rev-parse', key], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+          const blobSha = blobOidAtCommit(namedCommit, evidence.provenancePath, repoRoot);
           historyProvenanceBlobs.set(key, { blobSha, bytes: readBlobAtCommit(namedCommit, evidence.provenancePath, repoRoot) });
         }
         const original = historyProvenanceBlobs.get(key);
@@ -1111,7 +1109,7 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
       if (!evidence || evidence.finding !== 'true-and-current' || !/^[0-9a-f]{40}$/.test(evidence.commit || '') ||
           !Array.isArray(evidence.citations) || (evidence.citations.length === 0 && !evidence.commands?.length)) continue;
       try {
-        execFileSync('git', ['merge-base', '--is-ancestor', evidence.commit, ref.receiptCommit], { cwd: repoRoot, stdio: 'pipe' });
+        if (inspectRepo(repoRoot).ancestry({ ancestor: evidence.commit, descendant: ref.receiptCommit }).answer !== 'yes') continue;
         let current = true;
         const citations = [...evidence.citations];
         if (evidence.commands !== undefined) {
@@ -1128,8 +1126,8 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
               path.posix.normalize(citation.path) !== citation.path || !/^[0-9a-f]{40}$/.test(citation.blobSha || '') ||
               !Number.isSafeInteger(citation.startLine) || !Number.isSafeInteger(citation.endLine) ||
               citation.startLine < 1 || citation.endLine < citation.startLine) { current = false; break; }
-          const pinned = execFileSync('git', ['rev-parse', `${evidence.commit}:${citation.path}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
-          const actual = execFileSync('git', ['rev-parse', `${inventory.commit}:${citation.path}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+          const pinned = blobOidAtCommit(evidence.commit, citation.path, repoRoot);
+          const actual = blobOidAtCommit(inventory.commit, citation.path, repoRoot);
           const text = readBlobAtCommit(inventory.commit, citation.path, repoRoot).toString('utf8');
           if (pinned !== citation.blobSha || actual !== pinned || citation.endLine > text.split(/\r?\n/).length) { current = false; break; }
         }
@@ -1322,7 +1320,7 @@ export function loadJson(filePath) {
 }
 
 function currentCommit(cwd) {
-  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim(); }
+  try { return resolveCommitSha('HEAD', cwd); }
   catch { return '<commit>'; }
 }
 
@@ -1389,7 +1387,7 @@ export function loadPreviousRegistries({ repoRoot, cwd, argv, registryRelPath = 
 }
 
 function headCommitOf(repoRoot) {
-  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim(); }
+  try { return inspectRepo(repoRoot).resolveCommit({ name: 'HEAD' }); }
   catch { return null; }
 }
 

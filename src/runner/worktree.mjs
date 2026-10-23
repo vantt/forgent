@@ -146,6 +146,8 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
       execFileSync(command, {
         cwd: worktreePath,
         shell: true,
+        // Like verify commands, these are explicitly configured consumer commands.
+        [Symbol.for('fgos.git.consumer-command')]: true,
         encoding: 'utf8',
         stdio: 'pipe',
         timeout: WORKTREE_SETUP_TIMEOUT_MS,

@@ -4,6 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
+import { inspectRepo } from './lib/git-ports.mjs';
+import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { computeSha256, normalizePosix } from './check-legacy-docs-ratchet.mjs';
 import { isEvidenceMirrorPath } from './check-doc-inventory-gates.mjs';
 import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
@@ -48,7 +51,8 @@ function gitIndex(repoRoot) {
 }
 
 function trackedFiles(repoRoot) {
-  return git(repoRoot, ['ls-files', '-z']).split('\0').filter(Boolean).map(normalizePosix);
+  const port = inspectRepo(repoRoot);
+  return inspectEntries((page) => port.trackedPaths(page)).map(inspectPath);
 }
 
 function existingTrackedPayloads(repoRoot, tree, index = gitIndex(repoRoot)) {
@@ -297,7 +301,7 @@ export function scanMaintainedTextMentions(repoRoot, manifest, {
 }
 
 export function generateManifest({ repoRoot = process.cwd(), sourceCommit = null, generatedBy = 'scripts/check-evidence-relocation.mjs' } = {}) {
-  const commit = sourceCommit ?? git(repoRoot, ['rev-parse', 'HEAD']).trim();
+  const commit = sourceCommit ?? resolveCommitSha('HEAD', repoRoot);
   const index = gitIndex(repoRoot);
   const legacy = [...index.entries()]
     .filter(([rel]) => rel.startsWith('docs/architect/') && isEvidenceMirrorPath(rel))

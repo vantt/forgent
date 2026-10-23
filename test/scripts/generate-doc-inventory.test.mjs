@@ -747,6 +747,33 @@ test('listCommitEntries: omits only the generator output artifacts from the comm
   }
 });
 
+// Consumer scans prove text extraction, not byte preservation or batches larger than the port's
+// object-count bound; this is the owning proof for the shared commit-blob reader.
+test('commit blob reads preserve binary bytes, split bounded batches and reject missing objects', () => {
+  const { tmp } = makeArtifactFixture();
+  try {
+    const bytes = Buffer.from([0, 255, 10, 13, 0, 128]);
+    const blobSha = execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd: tmp, input: bytes, encoding: 'utf8' }).trim();
+    const entries = Array.from({ length: 4097 }, (_, i) => ({ path: `payload-${i}`, blobSha, size: bytes.length }));
+    const contents = generator.readCommitBlobMap(tmp, entries);
+    assert.equal(contents.size, entries.length);
+    assert.deepEqual(contents.get('payload-0'), bytes);
+    assert.deepEqual(contents.get('payload-4096'), bytes);
+    assert.equal(generator.readCommitBlobMap(tmp, entries, { maxSize: bytes.length - 1 }).size, 0);
+    assert.throws(() => generator.readCommitBlobMap(tmp, [{ path: 'missing', blobSha: '1'.repeat(40), size: 1 }]), /missing|blob/);
+    const large = Buffer.alloc(17 * 1024 * 1024, 0x61);
+    const largeSha = execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd: tmp, input: large, encoding: 'utf8' }).trim();
+    const largeEntries = ['large-a', 'large-b'].map((path) => ({ path, blobSha: largeSha, size: large.length }));
+    const splitByBytes = generator.readCommitBlobMap(tmp, largeEntries);
+    for (const entry of largeEntries) assert.ok(splitByBytes.get(entry.path).equals(large));
+    const oversized = Buffer.alloc(33 * 1024 * 1024, 0x62);
+    const oversizedSha = execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd: tmp, input: oversized, encoding: 'utf8' }).trim();
+    const oversizedEntries = [{ path: 'explicit-large-limit', blobSha: oversizedSha, size: oversized.length }];
+    assert.equal(generator.readCommitBlobMap(tmp, oversizedEntries).size, 0);
+    assert.ok(generator.readCommitBlobMap(tmp, oversizedEntries, { maxSize: oversized.length }).get('explicit-large-limit').equals(oversized));
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
 test('isGeneratorOutputArtifact: output locations agree with the checker defaults and the sharded writer layout', () => {
   assert.equal(generator.isGeneratorOutputArtifact(DEFAULT_INVENTORY_PATH), true);
   assert.equal(generator.isGeneratorOutputArtifact(DEFAULT_IDENTITY_REGISTRY_PATH), true);

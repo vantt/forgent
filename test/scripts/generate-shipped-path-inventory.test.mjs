@@ -10,6 +10,8 @@ import {
   scanSurfaceFiles,
   extractPathReferences,
   loadCommitTree,
+  readBlobAtCommit,
+  resolveCommitSha,
   generateInventory,
   generateMarkdownReport,
   normalizeContent,
@@ -56,6 +58,7 @@ function buildInventoryFixtureRepo() {
   for (const p of FIXTURE_CORE_SKILL_PATHS) write(p, '# skill\n');
   write('core/instructions/platform-laws.md', '# Laws\n');
   write('docs/specs/runner.md', '# Runner\n');
+  write('docs/ghi chú\tname.md', '# Byte-safe path\n');
   write('src/runner/dispatch.mjs', '// dispatch\n');
   write(
     'core/skills/index.md',
@@ -83,6 +86,21 @@ function buildInventoryFixtureRepo() {
   git('commit', '-q', '-m', 'fixture');
   return dir;
 }
+
+// The existing inventory fixture owns commit-tree reads; this adds byte paths and immutable blobs,
+// which the path classification cases below cannot observe.
+test('commit reads preserve unusual paths and ignore uncommitted content', () => {
+  const root = buildInventoryFixtureRepo();
+  try {
+    const commit = resolveCommitSha('HEAD', root);
+    fs.writeFileSync(path.join(root, 'docs/specs/runner.md'), 'working tree drift');
+    const tree = loadCommitTree(commit, root);
+    assert.ok(tree.treeFiles.has('docs/ghi chú\tname.md'));
+    assert.equal(readBlobAtCommit(commit, 'docs/specs/runner.md', root), '# Runner\n');
+    assert.throws(() => readBlobAtCommit(commit, 'docs/absent.md', root));
+    assert.throws(() => resolveCommitSha('not-a-ref', root), /valid git commit/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
 
 test('classifyContractScope: distinguishes consumer, repo-local, and mixed contracts', () => {
   // Mixed contracts (dual role: active platform doctrine + template/convention for consumers)

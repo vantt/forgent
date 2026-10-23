@@ -22,7 +22,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { inspectRepo } from './lib/git-ports.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import {
   checkInventory,
@@ -214,7 +214,7 @@ export function summarizeResults(results) {
 }
 
 function headCommitOf(repoRoot) {
-  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim(); }
+  try { return inspectRepo(repoRoot).resolveCommit({ name: 'HEAD' }); }
   catch { return null; }
 }
 

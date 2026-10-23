@@ -90,6 +90,8 @@ test('the scan judges every file its root declares as product, whatever the dire
     write('src/dist/y.mjs', reset);
     write('bin/tool.mjs', reset);
     write('test/z.test.mjs', reset);
+    // Configured setup commands are consumer data, not an exemption for a fixed Git program.
+    write('src/setup.mjs', "import { execFileSync } from 'node:child_process';\nconst commands = JSON.parse(process.env.SETUP_COMMANDS);\nfor (const command of commands) execFileSync(command, { shell: true, [Symbol.for('fgos.git.consumer-command')]: true });\n");
     const result = scan({ root });
     assert.deepEqual(result.sites.map((s) => s.path).sort(), ['bin/tool.mjs', 'src/dist/y.mjs', 'src/runner/fixtures/x.mjs']);
     assert.deepEqual(result.outsideProduct, { test: 1 });

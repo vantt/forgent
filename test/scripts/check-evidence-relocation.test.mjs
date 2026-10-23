@@ -242,6 +242,10 @@ test('generateManifest is deterministic, codepoint-sorted, and represents a move
     assert.ok(moved.every((entry) => entry.after === null));
     assert.ok(one.entries.findIndex((entry) => entry.before.endsWith('/P00.1.md')) < one.entries.findIndex((entry) => entry.before.endsWith('/current.md')));
     assert.deepEqual(exactEntryKeys(one.entries[0]), ['after', 'before', 'bytes', 'collection', 'gitBlob', 'mode', 'relation', 'sha256']);
+    // This owning generation proof previously exercised only an explicitly pinned source.
+    assert.throws(() => generateManifest({ repoRoot: state.root }), /HEAD.*valid git commit/);
+    git(state.root, ['commit', '-qm', 'fixture']);
+    assert.equal(generateManifest({ repoRoot: state.root }).sourceCommit, git(state.root, ['rev-parse', 'HEAD']).trim());
   } finally { cleanup(state); }
 });
 

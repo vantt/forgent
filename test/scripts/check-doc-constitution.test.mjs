@@ -19,6 +19,7 @@ import {
   summarizeCutoverRows,
   classifyPath,
   checkPlacement,
+  trackedPlatformDocs,
   governanceBaselineFields,
   checkPromotion,
   runCli,
@@ -31,6 +32,28 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 const vocabulary = readJson(DEFAULT_VOCABULARY_PATH);
 const constitution = readJson(DEFAULT_CONSTITUTION_PATH);
 const schema = readJson(DEFAULT_SCHEMA_PATH);
+
+// Live-repository placement proofs do not isolate tracked/untracked and byte-path enumeration.
+test('platform docs enumeration preserves byte paths and includes only requested untracked Markdown', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'constitution-paths-'));
+  const write = (file, body = '') => {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), body);
+  };
+  const tracked = 'docs/platform/ghi chú\tname.md';
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: root });
+    write('.gitignore', 'docs/platform/ignored.md\n');
+    write(tracked);
+    write('docs/platform/tracked.txt');
+    write('docs/elsewhere.md');
+    execFileSync('git', ['add', '.'], { cwd: root });
+    write('docs/platform/untracked.md');
+    write('docs/platform/ignored.md');
+    assert.deepEqual(trackedPlatformDocs(root), [tracked]);
+    assert.deepEqual(trackedPlatformDocs(root, { includeUntracked: true }).sort(), [tracked, 'docs/platform/untracked.md'].sort());
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
 
 function hex(char, len) {
   return char.repeat(len);

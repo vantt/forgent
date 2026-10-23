@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { sandboxGit } from './lib/sandbox-git.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isCheckpointReviewReport, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, ordinaryVerdictCellProblems, reviewReportAuthor, reviewReportHeader, reviewSessionIdentity, reviewTableCells, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
@@ -466,7 +467,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
   });
   if (!ordinaryReview && jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard, { author }).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
   if (context.repoRoot && claims.some((row, i) => row.reviewStatus === 'reviewed' && shard.claims[i].reviewStatus !== 'reviewed')) {
-    const reportCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: context.repoRoot, encoding: 'utf8' }).trim();
+    const reportCommit = resolveCommitSha('HEAD', context.repoRoot);
     const reportOf = buildCommittedReviewReportLookup(context.repoRoot, reportCommit);
     for (let i = 0; i < claims.length; i++) {
       if (claims[i].reviewStatus !== 'reviewed' || shard.claims[i].reviewStatus === 'reviewed') continue;
@@ -595,7 +596,7 @@ function renderReviewPack(pack) {
     if (source === target) return 'No text difference.';
     fs.writeFileSync(sourceFile, source); fs.writeFileSync(targetFile, target);
     let patch;
-    try { patch = execFileSync('git', ['diff', '--no-index', '--no-ext-diff', '--no-textconv', '--text', '--no-color', '--', sourceFile, targetFile], { encoding: 'utf8', stdio: 'pipe', maxBuffer: 32 * 1024 * 1024 }); }
+    try { patch = sandboxGit(temporary)(['diff', '--no-index', '--no-ext-diff', '--no-textconv', '--text', '--no-color', '--', sourceFile, targetFile], { cwd: temporary, encoding: 'utf8', stdio: 'pipe', maxBuffer: 32 * 1024 * 1024 }); }
     catch (error) { if (error.status !== 1 || typeof error.stdout !== 'string') throw error; patch = error.stdout; }
     const lines = patch.trimEnd().split('\n');
     const headerEnd = lines.findIndex((line) => line.startsWith('@@ '));
