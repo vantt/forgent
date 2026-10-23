@@ -1,0 +1,11 @@
+✖ a red repo-invariant check blocks the merge even when the item verify is green
+✖ concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)
+✖ dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names
+✖ direct audit rejects a symlink output before reading the corpus
+✖ documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json
+✖ pre-commit allows out-of-scope commit by non-holder while lease is held
+✖ reference-transaction hook catches --no-verify commit touching scoped paths
+✖ the next advance of a run whose ledger ends in an unfinished line repairs it before reading
+✖ two lands into one target exclude each other under the slot, and the second merges onto the first one's result
