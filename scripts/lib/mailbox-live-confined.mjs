@@ -12,8 +12,8 @@
  *   ws/        the CLI's cwd and the run's project (its `.fgos/`); the
  *              project's `.fgos/installation/` (shim and activation) is bound
  *              read-only over it
- *   home/      the private home: the copied login and the CLI's own files
- *   log/       files the CLI itself is told to write (Codex's last message)
+ *   home/      the private home: the copied login, the CLI's own files and its
+ *              last message (Codex `-o`), writable even when the workspace is shared
  * Outside the run directory, read-only to the run: `<base>/ledger/<runId>.json`
  * (the launch facts the orphan sweep reads), `<base>/settings/<runId>.json` (a
  * Claude Code run's hook rows), `<base>/capture/<runId>/` (the harness's captures of
@@ -85,7 +85,7 @@ export function runPaths(base, runId, workspace = null) {
     workspace: wsRoot,
     ws: path.join(wsRoot, 'ws'),
     home: path.join(dir, 'home'),
-    log: path.join(dir, 'log'),
+    lastMessage: path.join(dir, 'home', 'last-message.txt'),
     installation: path.join(wsRoot, 'ws', '.fgos', 'installation'),
     ledger: path.join(base, 'ledger', `${runId}.json`),
     settings: path.join(base, 'settings', `${runId}.json`),
@@ -98,10 +98,9 @@ export function runPaths(base, runId, workspace = null) {
  * the bytes `fgctl` writes) and an activation naming `release` (a directory whose
  * `bin/fgos` is the host under test, never an activated release), the project's `config`
  * (the mailbox opt-in by default), an empty git repository, and the product installer's
- * hook rows for `cli` without its PreToolUse guards (they need the legacy-node payload the
- * private release does not stage). Claude Code's rows go to `paths.settings`, outside the
- * project and read-only to the run; Codex's rows are returned, for the run's CODEX_HOME.
- * Call it after `prepareConfinedRun` (which creates the run directory), before the start.
+ * hook rows for `cli` (see `installRunRows`). Call it after `prepareConfinedRun` (which
+ * creates the run directory), before the start; a second head over the same shared
+ * workspace calls only `installRunRows`.
  */
 export function layOutRunProject(paths, { cli, release, shim, config = { mailbox: { enabled: true } } }) {
   const bin = path.join(paths.installation, 'bin', 'fgos');
@@ -110,6 +109,16 @@ export function layOutRunProject(paths, { cli, release, shim, config = { mailbox
   writeJson(path.join(paths.installation, 'activation.json'), { status: 'ready', releasePath: release });
   writeJson(path.join(paths.ws, '.fgos', 'config.json'), config);
   sandboxGit(paths.workspace)(['init', '-q', paths.ws]);
+  return installRunRows(paths, cli);
+}
+
+/**
+ * The product installer's hook rows for `cli` in the run's project, without its PreToolUse
+ * guards (they need the legacy-node payload the private release does not stage). Claude
+ * Code's rows go to `paths.settings`, outside the project and read-only to the run; Codex's
+ * rows are returned, for the run's CODEX_HOME. The project keeps no hook file of its own.
+ */
+export function installRunRows(paths, cli) {
   if (cli === 'claude') {
     installClaudeHook(paths.ws);
     const file = path.join(paths.ws, '.claude', 'settings.json');
@@ -186,7 +195,7 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
   if (exists(paths.dir)) throw new ConfinedLaunchError(`${paths.dir} exists; every run gets a fresh directory`);
   if (exists(paths.ledger)) throw new ConfinedLaunchError(`${paths.ledger} exists; ${runId} was launched before`);
   if (workspace && !(inside(workspace, base) && isDir(workspace))) throw new ConfinedLaunchError(`a shared workspace must be an existing directory under ${base}`);
-  for (const dir of [paths.ws, paths.log]) fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(paths.ws, { recursive: true });
   const context = { cwd: paths.ws, repoRoot: paths.workspace, attestationStoreDir: path.join(base, 'attestations') };
   const resources = resolveConfinementResources({
     dispatchId: runId,

@@ -114,7 +114,6 @@ function writeTargets(w, runId) {
   return {
     ws: path.join(dir, 'ws', 'probe.txt'),
     mailbox: path.join(dir, 'ws', '.fgos', 'runtime', 'mailbox', 'probe.txt'),
-    log: path.join(dir, 'log', 'probe.txt'),
     home: path.join(dir, 'home', 'probe.txt'),
     sibling: path.join(w.sibling, 'probe.txt'),
     base: path.join(w.base, 'probe.txt'),
@@ -143,7 +142,7 @@ test('a confined run writes its own run directory and nothing else', async (t) =
   const targets = writeTargets(w, 'run-write');
   const { stdout } = await runConfined(w, 'run-write', process.execPath, nodeProbe(WRITE_PROBE), { env: { PROBE: JSON.stringify(targets) } });
   const seen = JSON.parse(stdout);
-  for (const own of ['ws', 'mailbox', 'log', 'home']) assert.equal(seen[own], 'ok', `${own}: ${stdout}`);
+  for (const own of ['ws', 'mailbox', 'home']) assert.equal(seen[own], 'ok', `${own}: ${stdout}`);
   for (const other of ['sibling', 'base', 'repo', 'planted', 'realClaude']) assert.equal(seen[other], 'EROFS', `${other}: ${stdout}`);
   assert.equal(sha256(w.planted), before, 'the planted host file is unchanged');
   for (const other of ['sibling', 'base', 'repo', 'realClaude']) assert.equal(fs.existsSync(targets[other]), false, other);

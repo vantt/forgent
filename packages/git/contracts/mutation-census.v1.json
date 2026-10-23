@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e264191a8cde378d890e4980763688a12abe8719003edfdf101e62aae0e90cd2",
+  "payloadDigest": "0a6d1d731903353c72861e54692bdc0ef9807b937ae7461cc57ccee9f8e430ac",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -746,9 +746,10 @@
     "scripts/lib/git-spawn-match.mjs": "ab974ef3282b087a925074d2552fcbaee68236559446c604b17244b4b2ed3400",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
+    "scripts/lib/mailbox-behaviour-run.mjs": "a0661c2de83578c8d5a49d99a471789fb04b39b9a8fd7d86749c06d23e44c87e",
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
-    "scripts/lib/mailbox-live-confined.mjs": "cb0d60b8d2a2582d6db1644ab238d4a358debce606a6d6c2220d56e08bf37e66",
+    "scripts/lib/mailbox-live-confined.mjs": "aeb6f33b525cea6af3c2aa89585b50263350791e2c82465c4610cd29512c36d7",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
@@ -1139,6 +1140,20 @@
       "line": 3616,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
+      "family": "unresolved-binary"
+    },
+    {
+      "path": "scripts/lib/mailbox-behaviour-run.mjs",
+      "line": 325,
+      "spawn": "startConfinedRun -> scripts/lib/mailbox-live-confined.mjs:337",
+      "binary": "? confined.prepareConfinedRun({ base, runId, command: ctx.cliBin[cell.cli][0], arg",
+      "family": "unresolved-binary"
+    },
+    {
+      "path": "scripts/lib/mailbox-behaviour-run.mjs",
+      "line": 490,
+      "spawn": "startConfinedRun -> scripts/lib/mailbox-live-confined.mjs:337",
+      "binary": "? confined.prepareConfinedRun({ base, runId: headId, workspace, command: ctx.cliBi",
       "family": "unresolved-binary"
     },
     {
@@ -2761,14 +2776,6 @@
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "scripts/lib/mailbox-live-confined.mjs",
-      "line": 328,
-      "spawn": "spawn",
-      "binary": "param prepared",
-      "class": "uncalled-wrapper",
-      "function": "startConfinedRun"
     },
     {
       "path": "scripts/lib/sandbox-git.mjs",

@@ -7,15 +7,24 @@
  * model. Usage: `node mailbox-behaviour-stub.mjs <claude|codex> <the CLI's argv>`; for
  * Codex it runs as a Node binary named `codex` (the head check reads the executable name).
  *
- * It runs each `N. Run: <command>` line of the prompt (the last argument) through `sh`, with
- * the CLI's session variable, and fires the configured hooks with payloads in the recorded
- * field names: through `/bin/sh -c` as Claude Code does (one shell hop), through a shell
- * that execs the command for Codex (direct). A Claude stub writes its session file
- * (`$HOME/.claude/sessions/<pid>.json`, its pid and start time as seen in its own
- * namespace). What the hooks print goes where the CLI keeps its model input (a Claude
- * transcript under `$HOME/.claude/projects/stub/`, a Codex rollout under
- * `$CODEX_HOME/sessions/stub/`); a Stop block is answered once more; the final answer is
- * printed, and kept in `-o <file>` when given.
+ * Its steps are the prompt's `N. Run: <command>` lines, or, for the suite's user task, that
+ * task's four commands. Each step runs through `sh` with the CLI's session variable and
+ * fires the configured hooks with payloads in the recorded field names: through `/bin/sh -c`
+ * as Claude Code does (one shell hop), through a shell that execs the command for Codex
+ * (direct). A Claude stub writes its session file (`$HOME/.claude/sessions/<pid>.json`, its
+ * pid and start time as seen in its own namespace). Records go where the CLI keeps its model
+ * input, in the CLI's record shapes: a Claude transcript (tool use, tool result, then the
+ * PostToolUse hook's attachment) under `$HOME/.claude/projects/stub/`, a Codex rollout (tool
+ * call, hook output, call output) under `$CODEX_HOME/sessions/stub/`. A Stop block is
+ * answered once more. The final answer is printed (a result record with
+ * `--output-format stream-json`) and kept in `-o <file>` when given.
+ *
+ * `MAILBOX_STUB` picks what the stand-in model does: `act` carries out what a frame asks
+ * (creates the canary it names, adds the summary line, quotes readme.txt's first line);
+ * `ignore` (the default) does not; `no-hooks` fires only the first hook (it registers) and
+ * no other; `skip-post` fires no PostToolUse after the registering one (mail waits for
+ * Stop); `extra-step` runs one more command a moment after its last step (mail sent at the
+ * turn's end meets that command's PostToolUse); `fail` exits 1 after its steps.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -25,26 +34,45 @@ import { spawnSync } from 'node:child_process';
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const blockFor = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
-/** The commands of a prompt's `N. Run: <command>` lines, in order. */
+/** The commands of a prompt: its `N. Run: <command>` lines, or the suite task's four commands. */
 export function promptCommands(prompt) {
-  return [...prompt.matchAll(/^\d+\. Run: (.+)$/gm)].map((m) => m[1]);
+  const explicit = [...prompt.matchAll(/^\d+\. Run: (.+)$/gm)].map((m) => m[1]);
+  if (explicit.length) return explicit;
+  if (prompt.includes('go1.txt') && prompt.includes('go2.txt')) {
+    return ['ls', 'until [ -f go1.txt ]; do sleep 1; done', 'ls | wc -l > summary.txt', 'until [ -f go2.txt ]; do sleep 1; done'];
+  }
+  return [];
+}
+
+/** What a frame asks, carried out by the stand-in model; returns text for its answer. */
+function actOn(frame, ws) {
+  const notes = [];
+  for (const canary of new Set(frame.match(/CANARY-[A-Z]+/g) ?? [])) {
+    fs.writeFileSync(path.join(ws, canary), '');
+    notes.push(`created ${canary}`);
+  }
+  const line = /checked TOKEN-[A-Z0-9]+/.exec(frame)?.[0];
+  if (line) fs.appendFileSync(path.join(ws, 'summary.txt'), `${line}\n`);
+  if (/first line of readme\.txt/.test(frame)) notes.push(fs.readFileSync(path.join(ws, 'readme.txt'), 'utf8').split('\n')[0]);
+  return notes.join('; ');
 }
 
 export function runStub(cli, argv) {
   const codex = cli === 'codex';
+  const behaviour = process.env.MAILBOX_STUB ?? 'ignore';
   const prompt = argv[argv.length - 1];
   const session = crypto.randomUUID();
   const ws = process.cwd();
   const home = process.env.HOME;
   let hooks;
-  let record;
+  let write;
   let sessionFile = null;
   if (codex) {
     hooks = readJson(path.join(process.env.CODEX_HOME, 'hooks.json')).hooks;
     const dir = path.join(process.env.CODEX_HOME, 'sessions', 'stub');
     fs.mkdirSync(dir, { recursive: true });
     const rollout = path.join(dir, `rollout-${session}.jsonl`);
-    record = (role, text) => fs.appendFileSync(rollout, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role, content: [{ type: 'input_text', text }] } })}\n`);
+    write = (payload) => fs.appendFileSync(rollout, `${JSON.stringify({ type: 'response_item', payload })}\n`);
   } else {
     hooks = readJson(argv[argv.indexOf('--settings') + 1]).hooks;
     const sessions = path.join(home, '.claude', 'sessions');
@@ -55,51 +83,77 @@ export function runStub(cli, argv) {
     const dir = path.join(home, '.claude', 'projects', 'stub');
     fs.mkdirSync(dir, { recursive: true });
     const transcript = path.join(dir, `${session}.jsonl`);
-    record = (kind, text) => {
-      const line = kind === 'context' ? { type: 'attachment', attachment: { type: 'hook_additional_context', content: [text], hookEvent: 'PostToolUse' } }
-        : kind === 'block' ? { type: 'attachment', attachment: { type: 'hook_blocking_error', hookEvent: 'Stop', blockingError: { blockingError: text } } }
-          : kind === 'result' ? { type: 'user', message: { role: 'user', content: [{ type: 'tool_result', content: text }] } }
-            : { type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } };
-      fs.appendFileSync(transcript, `${JSON.stringify(line)}\n`);
-    };
+    write = (line) => fs.appendFileSync(transcript, `${JSON.stringify(line)}\n`);
   }
+  const say = (text) => (codex
+    ? write({ type: 'message', role: 'assistant', content: [{ type: 'output_text', text }] })
+    : write({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } }));
   const idVar = codex ? 'CODEX_THREAD_ID' : 'CLAUDE_CODE_SESSION_ID';
   const toolEnv = { ...process.env, [idVar]: session };
   const hookEnv = codex ? { ...process.env } : { ...process.env, CLAUDE_PROJECT_DIR: ws, CLAUDE_CODE_SESSION_ID: session };
-  const seen = [];
-  const fire = (event, payload) => (hooks[event] ?? [])
-    .filter((group) => !group.matcher || group.matcher === '*' || new RegExp(group.matcher).test(payload.tool_name ?? ''))
-    .flatMap((group) => (Array.isArray(group.hooks) ? group.hooks : []))
-    .map((hook) => {
-      const shell = codex ? ['-c', `exec ${hook.command}`] : ['-c', hook.command];
-      const out = spawnSync('/bin/sh', shell, { input: JSON.stringify(payload), env: hookEnv, cwd: ws, encoding: 'utf8', timeout: 30_000 });
-      try {
-        return out.stdout ? JSON.parse(out.stdout) : null;
-      } catch {
-        return null;
-      }
-    });
-  for (const command of promptCommands(prompt)) {
+  const frames = [];
+  let hooksFired = 0;
+  const fire = (event, payload) => {
+    hooksFired += 1;
+    return (hooks[event] ?? [])
+      .filter((group) => !group.matcher || group.matcher === '*' || new RegExp(group.matcher).test(payload.tool_name ?? ''))
+      .flatMap((group) => (Array.isArray(group.hooks) ? group.hooks : []))
+      .map((hook) => {
+        const shell = codex ? ['-c', `exec ${hook.command}`] : ['-c', hook.command];
+        const out = spawnSync('/bin/sh', shell, { input: JSON.stringify(payload), env: hookEnv, cwd: ws, encoding: 'utf8', timeout: 30_000 });
+        try {
+          return out.stdout ? JSON.parse(out.stdout) : null;
+        } catch {
+          return null;
+        }
+      });
+  };
+  const hooksOn = () => behaviour !== 'no-hooks' || hooksFired === 0;
+  const step = (command, n) => {
+    const id = `call_${n}`;
+    if (codex) write({ type: 'custom_tool_call', call_id: id, name: 'exec', input: command });
+    else write({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', id, name: 'Bash', input: { command } }] } });
     const ran = spawnSync('sh', ['-c', command], { env: toolEnv, cwd: ws, encoding: 'utf8' });
     const output = `${ran.stdout}${ran.stderr}`;
-    record(codex ? 'tool' : 'result', output);
-    for (const out of fire('PostToolUse', { session_id: session, cwd: ws, hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command } })) {
-      const text = out?.hookSpecificOutput?.additionalContext;
-      if (text) {
-        seen.push(text);
-        record(codex ? 'developer' : 'context', text);
+    if (!codex) write({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content: output }] } });
+    const skip = !hooksOn() || (behaviour === 'skip-post' && hooksFired > 0);
+    const contexts = skip ? [] : fire('PostToolUse', { session_id: session, cwd: ws, hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command } })
+      .map((out) => out?.hookSpecificOutput?.additionalContext).filter(Boolean);
+    if (!skip) {
+      if (codex) for (const text of contexts) write({ type: 'message', role: 'developer', content: [{ type: 'input_text', text }] });
+      else {
+        write({ type: 'attachment', attachment: { type: 'hook_success', hookEvent: 'PostToolUse', content: '' } });
+        for (const text of contexts) write({ type: 'attachment', attachment: { type: 'hook_additional_context', hookEvent: 'PostToolUse', content: [text] } });
       }
     }
-    seen.push(output);
+    // Claude Code writes an api-request record when it sends the next model request, after the hooks ran.
+    if (codex) write({ type: 'custom_tool_call_output', call_id: id, output });
+    else write({ type: 'api-request' });
+    frames.push(...contexts);
+  };
+  const commands = promptCommands(prompt);
+  commands.forEach((command, i) => step(command, i + 1));
+  if (behaviour === 'extra-step') {
+    blockFor(2500);
+    step('true', commands.length + 1);
   }
-  blockFor(300);
-  let text = `done; saw ${seen.filter((s) => s.includes('<mailbox-message')).length} message(s)`;
-  record(codex ? 'assistant' : 'text', text);
-  const block = fire('Stop', { session_id: session, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: text }).find((out) => out?.decision === 'block');
-  if (block) {
-    record(codex ? 'user' : 'block', block.reason);
-    text = `${text}; stop gate delivered`;
-    record(codex ? 'assistant' : 'text', text);
+  blockFor(500);
+  const answer = () => {
+    const done = behaviour === 'act' ? frames.map((f) => actOn(f, ws)).filter(Boolean) : [];
+    const summary = path.join(ws, 'summary.txt');
+    return [`The number is ${fs.existsSync(summary) ? fs.readFileSync(summary, 'utf8').split('\n')[0] : '?'}.`, ...done].join(' ');
+  };
+  let text = answer();
+  say(text);
+  if (hooksOn()) {
+    const block = fire('Stop', { session_id: session, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: text }).find((out) => out?.decision === 'block');
+    if (block) {
+      if (codex) write({ type: 'message', role: 'user', content: [{ type: 'input_text', text: block.reason }] });
+      else write({ type: 'attachment', attachment: { type: 'hook_blocking_error', hookEvent: 'Stop', blockingError: { blockingError: block.reason } } });
+      frames.push(block.reason);
+      text = answer();
+      say(text);
+    }
   }
   if (sessionFile) fs.rmSync(sessionFile, { force: true });
   const out = argv.indexOf('-o');
@@ -107,6 +161,7 @@ export function runStub(cli, argv) {
   // Claude Code's print mode with stream JSON ends with a result record; the suite reads the final answer there.
   const stream = !codex && argv.includes('stream-json');
   process.stdout.write(stream ? `${JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: text })}\n` : `${text}\n`);
+  if (behaviour === 'fail') process.exit(1);
 }
 
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(new URL(import.meta.url).pathname)) {
