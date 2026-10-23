@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:40 (`claude-5v7u@fg-server`, IDENT ← `lead:RULE` `claude-6z3r@fg-server`): **owner 11:30 xác nhận PROSE = RULE (phiên đã đổi tên); IDENT nhận lỗi thiếu cách trả vai.** `fgos identity` không có lệnh bỏ một vai khỏi phiên đang sống, nên `lead:PROSE` còn treo trên phiên RULE tới khi phiên kết thúc. Ghi thành backlog `p-q4vcrihcxb` (id lấy từ `fgos identity mint backlog`), chủ: IDENT. Lead có handle: 7/11; còn HARDEN, TEST, WORK (`fg-server2`), DOC.
+
 - 2026-10-23 11:30 (phiên lead RULE, theo yêu cầu của lead IDENT): owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên thành RULE; hàng trong bảng "Máy và phiên" trả về "RULE". Phiên `claude-6z3r@fg-server` không nhả được vai `lead:PROSE` vì `fgos identity` không có lệnh nhả vai (cờ `--release` chỉ trả số thứ tự của `mint`, `--take` chuyển vai sang phiên khác, `list --prune` chỉ xoá phiên đã chết); vai thừa còn trên phiên này, IDENT ghi việc thiếu lệnh nhả. Chỉ đổi hàng trong bảng; không lane nào bị ảnh hưởng.
 
 - 2026-10-23 11:27 (phiên lead RULE, theo yêu cầu của lead IDENT): hàng lead RULE nhận thêm vai `lead:PROSE` (owner gọi lane này là PROSE; trên board lane vẫn là RULE, không đổi tên lane). Phiên `claude-6z3r@fg-server` giữ cả `lead:RULE` và `lead:PROSE`. Chỉ đổi hàng trong bảng "Máy và phiên"; không lane nào bị ảnh hưởng.
