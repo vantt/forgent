@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice B: crate fgos-config, descriptors and the standard, two locks"
 description: "The Rust crate fgos-config (descriptor dialect and lint, snapshot with provenance and cache, one-file write transaction, comment grammar, redaction), the bundled descriptors that make the standard, and the project-config and global-config locks. Rust-only; no Node door, no migration."
-status: pending
+status: in-progress
 priority: P1
 effort: 75h
 branch: cfg/slice-b-config-crate (linked worktree; never the shared main checkout)
@@ -67,7 +67,7 @@ Parallelism (file-disjoint, see ownership): after 01, tracks {02}, {03 -> 04 -> 
 
 Shared edits handled in order: `src/lint.rs` and `lint.v1.json` (04 then 05); `contracts/failure-codes.v1.json` (01 creates, 03 appends the three parse ids, 04 appends the lint ids, in that order); root `Cargo.toml` (01 only); `src/bundle.rs` (03 creates, 12 then 13 append one list line each, merged by whoever lands second); `src/lib.rs` module lines (01 declares every module up front as a stub, so later phases never edit it); `lock-registry*.json` (02; also touched by HARDEN T1 and DOC per the board's shared-file table, so merge `origin/main` before the edit and post a log line first).
 
-## Frame (proposed 2026-10-23; the owner approves it, then it binds)
+## Frame (approved by the owner 2026-10-23 10:40)
 
 - Scope: the files in the ownership table; nothing else. Out of frame (ask first): any Node-side edit (`src/**`, `bin/**`, `test/**`), a change to a locked law or to the YAML Document spec's profile table, a new dialect field beyond the table in spec section 4 plus the one named in D5, a change to `fgos-yaml-doc`'s public API, a Windows implementation of the file rules.
 - Budget: about 3,900 lines Rust source, 2,900 lines Rust tests, about 170 golden cases (JSON) plus two pinned inputs, about 2,100 lines of descriptor YAML (runner about 1,500), about 200 lines docs. Effort 75h (about 9-10 working days) excluding owner wait time.
@@ -145,7 +145,7 @@ Each phase is its own commit group on the branch; rollback is `git revert` of it
 ## Owner gates
 
 - **Frame approval** (above): budget and scope, asked once before phase 01 starts.
-- **G-B2, phase 13, parks only phases 13 and 14**: which values are the release's standard and which are this repository's own choices. Full text in [phase 13](phase-13-descriptor-runner-and-authoring.md).
+- **G-B2 answered 2026-10-23 10:40: option A** (catalogs from the tuned file after the machine scrub; scalars from today's code defaults; project-specific keys detected or empty; account material never in the standard). Phase 13 asks again only for an entry that fits none of these rules. Original gate, phase 13, parked only phases 13 and 14: which values are the release's standard and which are this repository's own choices. Full text in [phase 13](phase-13-descriptor-runner-and-authoring.md).
 
 No other decision remains open: the forks above are settled with reasons. Owner action items that are not decisions: remove `runner.rigorToTier` from `~/.fgos/config.json` on each machine before Slice C cuts over (D10); remove the dead `lock.predecessorKillWaitMs` key from this repository's project file whenever convenient (Slice D migration also drops it).
 
