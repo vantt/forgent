@@ -66,8 +66,9 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
     throw unavailable(err.message);
   }
 }
-/** This payload's own release addon, memoised; the first call loads. */
-export const nativeDoor = () => own ??= loadNativeAddon();
+/** The addon of this process, memoised: the one a descriptor already loaded (the release builder reads a checkout with the
+ * addon it just built), else this payload's own release. A process holds one addon, so a second file is refused anyway. */
+export const nativeDoor = () => own ??= loaded?.addon ?? loadNativeAddon();
 /** The value of a JSON text an addon entry returned. `JSON.parse` defines each key as an own property, so a `__proto__`
  * key stays data; `special` lists `[path, 'nan' | 'inf' | '-inf']` for the floats JSON has no form for. */
 export function fromDoorJson(text, { special = [] } = {}) {
