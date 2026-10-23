@@ -12,11 +12,11 @@
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
 
-use crate::current::{current_session, os_record};
+use crate::current::{current_session, os_record, session_for, CurrentSession};
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use crate::project;
 use crate::refusal::{Candidate, Liveness, Refusal};
-use crate::resolve::terminal_head;
+use crate::resolve::{terminal_head, WriterKey};
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
 use fgos_process::facts::{judge_here, Record, Verdict};
@@ -357,6 +357,33 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     Ok(Listed::of(&merged, merged.verdict(judge)))
 }
 
+/// Registers `session` on this machine with `head` as the liveness record:
+/// the project of `clone_dir` (none when it is not a registered project) and
+/// [`register`] with `roles` (and `take`). The one registration body behind
+/// [`register_current`] and [`register_writer`].
+fn register_session(
+    state_root: &Path,
+    session: CurrentSession,
+    head: Option<Record>,
+    clone_dir: Option<&Path>,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let project_id = clone_dir
+        .and_then(|dir| project::project_info(state_root, dir).ok())
+        .map(|project| project.id);
+    let entry = Entry::new(
+        session.info.id,
+        session.info.handle,
+        session.local.cli.to_owned(),
+        project_id,
+        clone_dir.map(|dir| dir.display().to_string()),
+        roles.to_vec(),
+        head,
+    );
+    register(state_root, entry, take, &judge_here)
+}
+
 /// Registers the session the process `caller_pid` is, from the real env and
 /// OS process tree: resolves its full id and handle, the project of
 /// `clone_dir` (none when it is not a registered project), the agent head's
@@ -375,20 +402,34 @@ pub fn register_current(
     take: bool,
 ) -> Result<Listed, Refusal> {
     let current = current_session(state_root, caller_pid, fgos_dir)?;
-    let project_id = clone_dir
-        .and_then(|dir| project::project_info(state_root, dir).ok())
-        .map(|project| project.id);
     let tree = os_process_tree();
-    let entry = Entry::new(
-        current.info.id,
-        current.info.handle,
-        current.local.cli.to_owned(),
-        project_id,
-        clone_dir.map(|dir| dir.display().to_string()),
-        roles.to_vec(),
-        head_liveness(tree.as_ref(), caller_pid, &os_record),
-    );
-    register(state_root, entry, take, &judge_here)
+    let head = head_liveness(tree.as_ref(), caller_pid, &os_record);
+    register_session(state_root, current, head, clone_dir, roles, take)
+}
+
+/// Registers the session a hook-carried `key` names, for a caller whose own
+/// env does not carry it (a Codex hook process has no `CODEX_THREAD_ID`).
+/// `head_pid` is the agent head the caller already knows; its process facts
+/// are read here and recorded as the entry's liveness. Refused
+/// `invalid-writer-key` (see [`session_for`]) and `head-not-live` when the
+/// head cannot be read or is not running; every other rule is [`register`]'s.
+pub fn register_writer(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    key: &WriterKey,
+    head_pid: u32,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let session = session_for(state_root, key)?;
+    let head = os_record(head_pid)
+        .filter(|record| judge_here(record) == Verdict::Alive)
+        .ok_or_else(|| Refusal {
+            reason: "head-not-live",
+            detail: format!("process {head_pid} cannot be read or is not running, so it cannot be a session's head"),
+            candidates: Vec::new(),
+        })?;
+    register_session(state_root, session, Some(head), clone_dir, roles, take)
 }
 
 /// Removes `role` from the entry of the session `own_id`, and from no other:

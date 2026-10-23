@@ -328,3 +328,44 @@ fn liveness_is_judged_by_the_terminal_head_never_the_fgos_child() {
     assert_eq!(directory::head_liveness(&detached, 300, &record_of), None, "no terminal ancestor: unknown");
     assert_eq!(directory::head_liveness(&Table(HashMap::new()), 300, &record_of), None);
 }
+
+fn machine_root() -> PathBuf {
+    let root = state_root();
+    fs::write(root.join("machine-id"), "fg-abc234\n").unwrap();
+    root
+}
+
+#[test]
+fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves() {
+    let root = machine_root();
+    let key = fgos_identity::WriterKey { source: "CODEX_THREAD_ID", value: "thread-9" };
+    let roles = vec!["lead:MAIL".to_string()];
+    let listed = directory::register_writer(&root, None, &key, std::process::id(), &roles, false).unwrap();
+    assert_eq!(listed.id, "fg-abc234/thread-9");
+    assert_eq!(listed.cli, "codex");
+    assert!(listed.handle.starts_with("codex-"), "{}", listed.handle);
+    assert_eq!(listed.liveness, Liveness::Alive);
+    let found = directory::resolve(&root, &listed.handle, &judge(&[])).unwrap();
+    assert_eq!(found.id, listed.id);
+    assert_eq!(directory::resolve(&root, "lead:MAIL", &judge(&[])).unwrap().id, listed.id);
+    // the same key registers again as a refresh, the roles kept
+    let again = directory::register_writer(&root, None, &key, std::process::id(), &[], false).unwrap();
+    assert_eq!(again.roles, roles);
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing() {
+    let root = machine_root();
+    let bad = fgos_identity::WriterKey { source: "PI_SESSION_ID", value: "s-1" };
+    assert_eq!(directory::register_writer(&root, None, &bad, std::process::id(), &[], false).unwrap_err().reason, "invalid-writer-key");
+
+    let mut child = std::process::Command::new("true").spawn().unwrap();
+    let gone = child.id();
+    child.wait().unwrap();
+    let key = fgos_identity::WriterKey { source: "CLAUDE_CODE_SESSION_ID", value: "s-2" };
+    assert_eq!(directory::register_writer(&root, None, &key, gone, &[], false).unwrap_err().reason, "head-not-live");
+    assert_eq!(directory::register_writer(&root, None, &key, u32::MAX, &[], false).unwrap_err().reason, "head-not-live");
+    assert_eq!(files(&root), 0, "a refused registration leaves no entry");
+    let _ = fs::remove_dir_all(root);
+}
