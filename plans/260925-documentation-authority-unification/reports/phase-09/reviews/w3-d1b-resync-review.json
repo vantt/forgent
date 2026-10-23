@@ -1,0 +1,431 @@
+{
+ "scope": "w3-d1b-resync",
+ "commit": "6d275ad81",
+ "verdicts": [
+  {
+   "id": "G1:reference-000232",
+   "verdict": "APPROVE",
+   "reason": "The citation of a test that does not exist is gone. The origin is now docs/history/tsk-ikd-return-main-worktree-guard/RESEARCH.md, which exists and resolves from the holder. The quoted rule is unchanged.",
+   "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md:15"
+  },
+  {
+   "id": "G1:reference-003709",
+   "verdict": "APPROVE",
+   "reason": "Seat Binding is now a clickable link to docs/platform/seat-binding/spec.md, which exists at 6d275ad81.",
+   "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md:55"
+  },
+  {
+   "id": "G1:reference-002295 / activation-binding implementation fact",
+   "verdict": "REWORK",
+   "reason": "The new holder still states a false implementation fact: scripts/fgos-shell-integration.sh does NOT run `git rev-parse --git-common-dir`. It walks up from the physical cwd to the first dot-git entry and reads gitdir/commondir from disk with no git child (fgos-shell-integration.sh:27-29,57-90, since 10416a6b0). Only the test uses rev-parse, as an oracle (test/scripts/fgos-shell-integration.test.mjs:159). The workspace.rs half (GitDriver::open_at, workspace.rs:29) is now correct.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md:488 (#git-common-directory-discovery)"
+  },
+  {
+   "id": "G1:finding:retired-history-inbound-links",
+   "verdict": "APPROVE",
+   "reason": "The <a id> anchors for 0011/0012/0013 make all 6 inbound fragments resolve: architecture-map.md x4 and cli-io-contract.md x2 (own link checker: 6 broken before, 0 after). Line 30 is now an in-page anchor that resolves. The clickable Related Files section is restored, and no ADR heading line changed.",
+   "locator": "docs/platform/work-state/decisions/retired-decision-history.md:30,195,251,330,1019"
+  },
+  {
+   "id": "G1:finding:release-manifest-duplicate-and-dead-link + G3:PKG-release-manifest-duplicate",
+   "verdict": "REWORK",
+   "reason": "The duplicate is gone (13 duplicate units now have 1 holder each), but the link is still dead and is now the only copy: the kept paragraph links ../../host-invocation-routing/legacy-cli-transition.md, which resolves to docs/platform/host-invocation-routing/legacy-cli-transition.md, a file that does not exist. The real file is docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md. The commit deleted the copy with the working ../../../architect/... link and kept the broken one. This is the only new broken link in docs/platform after the commit; the before and after lists differ by exactly this one link.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md:258"
+  },
+  {
+   "id": "G3:PKG-doctor-registry-code-truth",
+   "verdict": "REWORK",
+   "reason": "Row 7 says it names every registered check, but it omits the 8 Git checks registered in a loop at src/setup/registrations.mjs:6354-6366: git-worktree-recovery, git-component-compatible, git-transport-config, git-trust-topology, git-operation-journal, git-native-locks, git-publication-refspecs and git-durability-capability. Code registers 143 checks; only the 135 with a literal id are listed. Row 7b equals code exactly (32/32). Removing model-policy-tier-coverage and adding the 8 checks the review named are correct. The receipt and verification.json claims (\"135 checks\", \"registration sets equal code\") are wrong for the same reason.",
+   "locator": "docs/platform/packaging-distribution/spec.md:549 (row 7)"
+  },
+  {
+   "id": "G3:PKG-activation-binding-duplicate",
+   "verdict": "APPROVE",
+   "reason": "All 9 duplicated units (runtime-identity 267-342 vs activation-binding 488-566) now have one holder. The activation-binding links to the §11/§14 anchors, which exist.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md:482-484"
+  },
+  {
+   "id": "G3:PKG-spec-legacy-setup-duplicate",
+   "verdict": "APPROVE",
+   "reason": "spec.md now points to setup-doctor-registry.md#setup (the anchor is unique, line 186), and no copy remains. The <stateRoot>/terminal side effect was added; the registerFix terminal-dir backs it (registrations.mjs:4497).",
+   "locator": "docs/platform/packaging-distribution/spec.md:211-213; contracts/setup-doctor-registry.md:203-210"
+  },
+  {
+   "id": "G3:PKG-receipt-recipe-statement",
+   "verdict": "APPROVE",
+   "reason": "The correction checks out: bindingHashEncoding occurs 10 times at f534aeaea~1, f534aeaea and cffe725b9 (none of them top-level), and 6 times at ae9b9a6ef/6d275ad81, which have a top-level key. The old receipt is untouched because it is outside the writable scope.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/receipt.md#binding-recipe-correction-supersedes-the-old-receipt-sentence"
+  },
+  {
+   "id": "one-holder-per-text (three areas)",
+   "verdict": "APPROVE",
+   "reason": "After the commit, no unit (non-heading, at least 40 chars) is newly duplicated across docs/platform/{runner,work-state,packaging-distribution}. 23 units that were duplicated before now have 1 holder each. The duplicates that remain all predate D1b (see observations).",
+   "locator": "own scan dupcheck2.mjs, 7be0cbc52^ vs 6d275ad81"
+  },
+  {
+   "id": "runner Data Dictionary fenced historical carrier",
+   "verdict": "REWORK",
+   "reason": "D1b rewrote rows 1/1b inside the fenced \"Historical source section 552ef3d6\", whose preamble says it is \"the complete retained legacy direct section ... Historical source text\". The rows now hold current corrections (rigorToTier removed, seat-binding-config) that are neither the legacy bytes nor the live table. Fenced row 1 differs from live h-02842f76ffd2 row 1, so there are now two divergent Data Dictionary holders. The verbatim current legacy row 1/1b (RUL102 cell forms, tierFallback family keys, RUL103 maxTier ceiling) is held nowhere. The pointers carrier in the same file (line 175) was correctly updated to the legacy bytes, so the two carriers are handled inconsistently. Fix: keep the carrier verbatim at current legacy bytes, or relabel it as adapted and bind it to the live table.",
+   "locator": "docs/platform/runner/spec.md:56,63-64 (s13 runner.md#unheaded-block-9)"
+  },
+  {
+   "id": "drift-scan-rerun",
+   "verdict": "APPROVE",
+   "reason": "Reran late-areas/scan-legacy-drift.mjs read-only in /tmp/fgos-work/w3-d1b-resync, changing only the import path, root and destination. The result at HEAD 6d275ad81 matches the committed legacy-drift.json (head 7be0cbc52) for all 33 records, apart from the head field. The four files have missingCurrent=0 and missingChangedSinceInventory=0: work-state 327 units, runner 517, distribution 43, runtime-identity 170.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json"
+  },
+  {
+   "id": "s13 mechanical carriage (1057 rows, exhaustive)",
+   "verdict": "APPROVE",
+   "reason": "Recomputed in Node over every row, no sampling. Every sourceUnitDigest and sourceContent equals the HEAD legacy unit. Every targetUnitDigest equals the HEAD target unit, and ancestry is consistent (headings include themselves, blocks list their parents). Of the 968 content-present rows, 876 are exact and 92 are equal after removing only link targets, heading marks and whitespace. Both envelope rows have their content inside the bound unit. No source unit appears twice. The 2 target collisions are the legacy duplicate ADR 0002 heading and the two retired tee clauses.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+  },
+  {
+   "id": "legacy-added-lines carriage",
+   "verdict": "APPROVE",
+   "reason": "Since inventory pin f0c76c5e5, 726 lines of at least 25 chars were added to the four legacy files. 709 appear verbatim (after normalization) in their successor files. Each of the other 17 is covered by an s13 heading-translation or adjudication row, checked one by one.",
+   "locator": "git diff f0c76c5e5..HEAD on the four sources"
+  },
+  {
+   "id": "binding hashes (all shards)",
+   "verdict": "APPROVE",
+   "reason": "An independent Python recompute of sha256 over sorted compact JSON of the 4 keys plus LF matches every bindingSha256 row in all 23 shards (s13: 1057; s11: 1087; s9: 548; and the rest), with 0 mismatches. Rows with a declared encoding (s4-architecture, s7) still match their declaration.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/*.json"
+  },
+  {
+   "id": "binding target staleness (three areas)",
+   "verdict": "APPROVE",
+   "reason": "Every binding row that targets runner, work-state or packaging-distribution resolves to a live anchor with an equal digest. The one exception is 69 s11 unitCarries to work-state/contracts/knowledge-registry.md, which were already stale before D1b; that file is protected and outside the writable scope.",
+   "locator": "ledger/decisions/s11-preflip-carries.json unitCarries -> knowledge-registry.md"
+  },
+  {
+   "id": "structural-heading-adaptation (40)",
+   "verdict": "APPROVE",
+   "reason": "All 40 are translated or renumbered headings of the same section, for example \"Khởi tạo (init)\" -> \"Init Verb\". Each heading payload is bound separately. Minor loss: the provenance tags in the source headings (per D b2d18cc7..., STR23, S8/S9, Phase 3 S3-closeout) are dropped from the heading text.",
+   "locator": "s13 rows kind=structural-heading-adaptation"
+  },
+  {
+   "id": "0048/0049 supersession notes + withStateTx naming",
+   "verdict": "APPROVE",
+   "reason": "Both D-ADR0070 partial-supersession notes are in the runner decisions holder (h-36d872fbb0e5.md:1534,1547). withStateTx appears 5 times in both the legacy and platform work-state docs.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md:1534,1547"
+  },
+  {
+   "id": "adj[1] work-state.md#unheaded-block-3",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: cleanup-harness.mjs:72-75 leaf vs item TTL). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[2] work-state.md#unheaded-block-4",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: 10b rigor row carried, link rebased). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-4"
+  },
+  {
+   "id": "adj[3] work-state.md#unheaded-block-26",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: store.mjs:1510-1535 clamps doing->todo). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-22"
+  },
+  {
+   "id": "adj[4] work-state.md#unheaded-block-42",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: coding decompose node gone; only fixture-marketing keeps it (domain-registry.mjs:148)). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-39"
+  },
+  {
+   "id": "adj[5] work-state.md#unheaded-block-58",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-55"
+  },
+  {
+   "id": "adj[6] work-state.md#unheaded-block-68",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: 19 verbs carry externalEffect:true). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-34"
+  },
+  {
+   "id": "adj[7] work-state.md#unheaded-block-77",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-64"
+  },
+  {
+   "id": "adj[8] work-state.md#unheaded-block-78",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: bin/fgos.mjs:1094-1102 optional id + mint). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-65"
+  },
+  {
+   "id": "adj[9] work-state.md#unheaded-block-80",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: --tier retired bin/fgos.mjs:655,1099,1222). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-67"
+  },
+  {
+   "id": "adj[10] work-state.md#unheaded-block-81",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: --tier retired). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-68"
+  },
+  {
+   "id": "adj[11] work-state.md#unheaded-block-88",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: store.mjs clamp). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-75"
+  },
+  {
+   "id": "adj[12] work-state.md#unheaded-block-104",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-91"
+  },
+  {
+   "id": "adj[13] work-state.md#unheaded-block-106",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/spec.md#unheaded-block-93"
+  },
+  {
+   "id": "adj[14] work-state.md#unheaded-block-111",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: appendEventLocked->tx.append matches store.mjs). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/work-state/architecture/implementation-pointers.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[15] runner.md#unheaded-block-1",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/spec.md#unheaded-block-1"
+  },
+  {
+   "id": "adj[16] runner.md#unheaded-block-8",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: src/evolve/candidates.mjs deleted in 120af6b3d). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[17] runner.md#unheaded-block-9",
+   "verdict": "REWORK",
+   "reason": "See \"runner Data Dictionary fenced historical carrier\": the unit is bound to a fenced block labelled as verbatim legacy, which was edited into an adapted hybrid.",
+   "locator": "docs/platform/runner/spec.md#unheaded-block-7"
+  },
+  {
+   "id": "adj[18] runner.md#unheaded-block-10",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same contract, link rebased). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md#unheaded-block-4"
+  },
+  {
+   "id": "adj[19] runner.md#unheaded-block-23",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-12"
+  },
+  {
+   "id": "adj[20] runner.md#unheaded-block-27",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: the Work loop writes only a run pointer (loop.mjs:989,1408)). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-16"
+  },
+  {
+   "id": "adj[21] runner.md#unheaded-block-28",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-16"
+  },
+  {
+   "id": "adj[22] runner.md#unheaded-block-37",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: evolve deleted 120af6b3d). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26"
+  },
+  {
+   "id": "adj[23] runner.md#unheaded-block-38",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-27"
+  },
+  {
+   "id": "adj[24] runner.md#unheaded-block-40",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-29"
+  },
+  {
+   "id": "adj[25] runner.md#unheaded-block-51",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-40"
+  },
+  {
+   "id": "adj[26] runner.md#unheaded-block-59",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/spec.md#unheaded-block-9"
+  },
+  {
+   "id": "adj[27] runner.md#unheaded-block-60",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[28] runner.md#unheaded-block-62",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-5"
+  },
+  {
+   "id": "adj[29] runner.md#unheaded-block-63",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: tee caller removed). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-6"
+  },
+  {
+   "id": "adj[30] runner.md#unheaded-block-74",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-17"
+  },
+  {
+   "id": "adj[31] runner.md#unheaded-block-96",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: evolve deleted). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#unheaded-block-5"
+  },
+  {
+   "id": "adj[32] runner.md#unheaded-block-97",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: detectTrunk in merge.mjs:35,43). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[33] runner.md#unheaded-block-101",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/spec.md#unheaded-block-13"
+  },
+  {
+   "id": "adj[34] runner.md#unheaded-block-103",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-7af1f0242611.md#unheaded-block-4"
+  },
+  {
+   "id": "adj[35] runner.md#unheaded-block-104",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-7af1f0242611.md#unheaded-block-5"
+  },
+  {
+   "id": "adj[36] runner.md#unheaded-block-105",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: transport.mjs:190 reads supports.reasoningEffort). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-3"
+  },
+  {
+   "id": "adj[37] runner.md#unheaded-block-109",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-7"
+  },
+  {
+   "id": "adj[38] runner.md#unheaded-block-110",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: assignment-policy.mjs absent). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-8"
+  },
+  {
+   "id": "adj[39] runner.md#unheaded-block-111",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-9"
+  },
+  {
+   "id": "adj[40] runner.md#unheaded-block-123",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-10"
+  },
+  {
+   "id": "adj[41] runner.md#unheaded-block-124",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-11"
+  },
+  {
+   "id": "adj[42] runner.md#unheaded-block-140",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: src/runner/coordination absent (2180b4e72)). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-27"
+  },
+  {
+   "id": "adj[43] runner.md#unheaded-block-141",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-28"
+  },
+  {
+   "id": "adj[44] distribution.md#unheaded-block-5",
+   "verdict": "REWORK",
+   "reason": "The adjudication reason says rows 7/7b are reconciled to every registered id, but row 7 still misses the 8 loop-registered Git checks (see PKG-doctor-registry-code-truth).",
+   "locator": "docs/platform/packaging-distribution/spec.md#unheaded-block-89"
+  },
+  {
+   "id": "adj[45] distribution.md#unheaded-block-9",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: terminal-dir fix registered). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-30"
+  },
+  {
+   "id": "adj[46] runtime-identity-and-activation.md#unheaded-block-7",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: no activationKind in packages/distribution). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-61"
+  },
+  {
+   "id": "adj[47] runtime-identity-and-activation.md#unheaded-block-64",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: init.rs:431-446 static preflight). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-29"
+  },
+  {
+   "id": "adj[48] runtime-identity-and-activation.md#unheaded-block-66",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: same). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-31"
+  },
+  {
+   "id": "adj[49] runtime-identity-and-activation.md#unheaded-block-130",
+   "verdict": "APPROVE",
+   "reason": "The reason is supported (evidence: word diff of the dropped text; the adapted target matches the stated reason). Only the clauses the reason names were dropped; the new legacy content is present.",
+   "locator": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-41"
+  }
+ ],
+ "summary": {
+  "APPROVE": 61,
+  "REWORK": 6,
+  "sample": "Every judgment item was checked: 47 adjudications, 2 envelopes and 40 headings. The 1057 mechanical s13 rows and every binding row in all shards were recomputed exhaustively, so there was no sampling and no seed.",
+  "scratch": "/tmp/fgos-work/w3-d1b-resync/",
+  "topFindings": [
+   "G1:reference-002295 / activation-binding implementation fact",
+   "G1:finding:release-manifest-duplicate-and-dead-link + G3:PKG-release-manifest-duplicate",
+   "G3:PKG-doctor-registry-code-truth",
+   "runner Data Dictionary fenced historical carrier",
+   "adj[17] runner.md#unheaded-block-9",
+   "adj[44] distribution.md#unheaded-block-5"
+  ],
+  "observations": [
+   "These duplicates predate D1b and remain: work-state outcome-record units in both contracts/non-transitioning-records.md (blocks 3-7) and spec.md (6-8, 76); retired-decision-history.md blocks 88-103 vs history/multi-role-harness-distill-record.md; repository-runtime-layout.md #9 vs #28.",
+   "release-manifest.md now has an empty \"## Retained Runtime Identity And Activation Source Detail\" header holding only a preamble, directly followed by \"## Canonical Release Tree Rules\".",
+   "The runner rule RUL104 (fgos run --resume) has the same number as the protected platform RUL104. It is inherited from legacy runner.md and D1b did not change it.",
+   "69 s11 unitCarries to the protected knowledge-registry.md are stale (pre-existing). The knowledge-registry owner must refresh them.",
+   "The legacy docs/specs/distribution.md row 7/7b and its git-common-dir sentence (line 435) are still stale. G9 must not re-import them.",
+   "D1b added bindingSha256 and placement to rows that had none in other shards (s9 30->548, s5-truth 0->11, s10 0->1). All use the 4-key recipe; no row with a declared different encoding was converted."
+  ],
+  "protectedText": "D-ADR0035/0054/0062, the RUL11/RUL104 laws, the 0032 ADR heading layout and Identity §7a are untouched. No path outside the writable list changed, no ADR heading line changed, and knowledge-registry.md is unchanged."
+ }
+}

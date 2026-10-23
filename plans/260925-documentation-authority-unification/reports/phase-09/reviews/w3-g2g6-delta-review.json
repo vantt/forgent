@@ -1,0 +1,650 @@
+{
+ "scope": "w3-g2g6-delta",
+ "commit": "6d275ad81",
+ "deliveryCommit": "b25dadae2",
+ "pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+ "verdicts": [
+  {
+   "id": "G2-F-pin-drift",
+   "verdict": "APPROVE",
+   "reason": "join.py --pin resolves an explicit commit and reads tracked blobs at it. I replayed it twice in a scratch clone at 3d0169f39: all 4 artifacts and stdout are byte-identical to each other and to b25dadae2. The sources of b25dadae2 equal the pin outside plans/. Residual (Low): plan inputs such as the gate register are read from the working tree, so a replay at the landed commit 6d275ad81 differs only in registerSha256 (e802359c... vs fc9f4ec4...; only changedBindings changed, the census sites did not).",
+   "locator": "census-join/join.py:101,106-107; join.json#registerSha256"
+  },
+  {
+   "id": "G2-F-postpin-dynamic",
+   "verdict": "APPROVE",
+   "reason": "post-pin-dynamics.json binds all 132 reviewed sites: 77 owning-test joins and 55 digest-bound non-document judgments, with 0 unbound. My independent step-07 recompute at the pin gives 143 sites, multiset-equal to the committed rows. The 132 equal the review delta by (file, sha). The 11 additional sites are 10 test joins plus doc-git-reads.mjs:10.",
+   "locator": "census-join/post-pin-dynamics.json#rows"
+  },
+  {
+   "id": "G2-F-postpin-hardcoded-join",
+   "verdict": "APPROVE",
+   "reason": "The YAML golden proof is now derived: golden_parse.rs line 184 is #[test], line 185 is fn parse_matches_the_golden_cases, and common/mod.rs line 28 is the regex-derived pub fn fixture_cases. The branch still keys on the filename, but its locators are no longer constants.",
+   "locator": "census-join/join.py:259-263; post-pin-literals.json rows parse.v1.json"
+  },
+  {
+   "id": "G2-F-rust-proof-line",
+   "verdict": "APPROVE",
+   "reason": "The regex now uses only horizontal whitespace. I checked every distinct Rust proof in join, post-pin-dynamics and post-pin-literals at the pin: each line is the #[test] attribute, each functionLine contains fn <title>, and none is #[ignore].",
+   "locator": "census-join/join.py:28-38"
+  },
+  {
+   "id": "G2-F-ignored-child-proof",
+   "verdict": "APPROVE",
+   "reason": "pc-d-0185/0186 now name recovery_matrix.rs:recovery_matrix_all_payload_kinds (#[test] at 511, fn at 512) and record subprocessTest=recovery_matrix_child. rust_proof asserts that an ignored test cannot be the owner.",
+   "locator": "census-join/join.json#rows[pc-d-0185,pc-d-0186]"
+  },
+  {
+   "id": "G2-F-residue-custody-text",
+   "verdict": "APPROVE",
+   "reason": "All 116 empty-proof helper rows now read \"No same-file test caller proved ... no joined custody claimed\". Across join, post-pin-dynamics and post-pin-literals, no row has joined status or \"joins\" custody text with empty owningProofs.",
+   "locator": "census-join/join.py:86-87; residue.json"
+  },
+  {
+   "id": "pc-l-0030",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0030]"
+  },
+  {
+   "id": "pc-l-0031",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0031]"
+  },
+  {
+   "id": "pc-l-0032",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0032]"
+  },
+  {
+   "id": "pc-l-0033",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0033]"
+  },
+  {
+   "id": "pc-l-0034",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0034]"
+  },
+  {
+   "id": "pc-l-0035",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0035]"
+  },
+  {
+   "id": "pc-l-0036",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0036]"
+  },
+  {
+   "id": "pc-l-0037",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0037]"
+  },
+  {
+   "id": "pc-l-0038",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0038]"
+  },
+  {
+   "id": "pc-l-0039",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-l-0039]"
+  },
+  {
+   "id": "pc-d-0775",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0775]"
+  },
+  {
+   "id": "pc-d-0776",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0776]"
+  },
+  {
+   "id": "pc-d-0777",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0777]"
+  },
+  {
+   "id": "pc-d-0778",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0778]"
+  },
+  {
+   "id": "pc-d-0779",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0779]"
+  },
+  {
+   "id": "pc-d-0780",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0780]"
+  },
+  {
+   "id": "pc-d-0781",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0781]"
+  },
+  {
+   "id": "pc-d-0782",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0782]"
+  },
+  {
+   "id": "pc-d-0783",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0783]"
+  },
+  {
+   "id": "pc-d-0784",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0784]"
+  },
+  {
+   "id": "pc-d-0785",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0785]"
+  },
+  {
+   "id": "pc-d-0786",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0786]"
+  },
+  {
+   "id": "pc-d-0787",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0787]"
+  },
+  {
+   "id": "pc-d-0788",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0788]"
+  },
+  {
+   "id": "pc-d-0789",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0789]"
+  },
+  {
+   "id": "pc-d-0790",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0790]"
+  },
+  {
+   "id": "pc-d-0791",
+   "verdict": "APPROVE",
+   "reason": "The row has deletingCommit=5a33989fa39e0eb3d3253ddb4189cb502f93bd21; git show --stat confirms that commit deleted the file. The blocker now names the deletion and is not a shared-helper judgment.",
+   "locator": "census-join/residue.json#rows[id=pc-d-0791]"
+  },
+  {
+   "id": "pc-d-1108",
+   "verdict": "APPROVE",
+   "reason": "Extra deleted reader src/setup/seat-binding-conversion.mjs (graded row) is also attributed to 5a33989fa, giving 28 absent-source rows.",
+   "locator": "census-join/residue.json#rows[id=pc-d-1108]"
+  },
+  {
+   "id": "G2-reader bin/fgos.mjs:3869",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. Acquire success template interpolates only tokenHash (the reason also cites res.result/tokenPath, which are on the --json line 3868; immaterial). No read. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; bin/fgos.mjs:3869"
+  },
+  {
+   "id": "G2-reader bin/fgos.mjs:3875",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. The unheld status template formats res.state. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; bin/fgos.mjs:3875"
+  },
+  {
+   "id": "G2-reader bin/fgos.mjs:3876",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. The held status template formats age, kernelLock, holderTokenHash and worktree. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; bin/fgos.mjs:3876"
+  },
+  {
+   "id": "G2-reader bin/fgos.mjs:3881",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. The release template formats releasedAt and drift.join. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; bin/fgos.mjs:3881"
+  },
+  {
+   "id": "G2-reader bin/fgos.mjs:3890",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. The abandon template formats res.reason. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; bin/fgos.mjs:3890"
+  },
+  {
+   "id": "G2-reader packages/config/rust/src/files.rs:122",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. read_beneath(root, dir.join(YAML_NAME)) is a config.yaml source read. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/config/rust/src/files.rs:122"
+  },
+  {
+   "id": "G2-reader packages/config/rust/src/files.rs:124",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. read_beneath of config.json with tombstone filter is a config source read. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/config/rust/src/files.rs:124"
+  },
+  {
+   "id": "G2-reader packages/config/rust/src/files.rs:128",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. to_string_lossy goes into the config-legacy-shadowed refusal only. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/config/rust/src/files.rs:128"
+  },
+  {
+   "id": "G2-reader packages/config/rust/src/locks.rs:7",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. GLOBAL_CONFIG is a const lock-row name \"global-config\". Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/config/rust/src/locks.rs:7"
+  },
+  {
+   "id": "G2-reader packages/config/rust/src/write.rs:108",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. The Accounts arm reads dir.join(name) beneath the root for the write CAS. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/config/rust/src/write.rs:108"
+  },
+  {
+   "id": "G2-reader packages/yaml-doc/rust/src/profile.rs:295",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. resolve(text, style, tag) is YAML scalar typing. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; packages/yaml-doc/rust/src/profile.rs:295"
+  },
+  {
+   "id": "G2-reader src/runner/dispatch/config.mjs:365",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. A stderr portability warning about a config cell. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; src/runner/dispatch/config.mjs:365"
+  },
+  {
+   "id": "G2-reader src/setup/tier-ladder-comment.mjs:14",
+   "verdict": "APPROVE",
+   "reason": "I read the source at the pin. A $comment line formatter. Correct. The reason is distinct per site and digest-bound to judgmentSourceCommit.",
+   "locator": "census-join/post-pin-dynamics.json; src/setup/tier-ladder-comment.mjs:14"
+  },
+  {
+   "id": "G2-dyn-source-judgments",
+   "verdict": "APPROVE",
+   "reason": "I read all 43 file-level and use/type REJECTs plus doc-git-reads.mjs:10 at the pin. Each is a Rust type or import, YAML Segment path, Cargo crate path, lease/case repo-root plumbing or state-root mint. None constructs or opens a documentation path. Each judgment applies only while its source digest equals the judgment pin.",
+   "locator": "census-join/join.py:305-381"
+  },
+  {
+   "id": "G2-dyn-joins",
+   "verdict": "APPROVE",
+   "reason": "87 joins: every owning proof exists at its stated line. Rust proofs are #[test] and non-ignored. JS titles were matched (3 differ only by escaped quotes). Helper chains name same-file helpers, and contracts fixtures map to golden_* loaders.",
+   "locator": "census-join/post-pin-dynamics.json#rows[status=joined-owning-test]"
+  },
+  {
+   "id": "G2-postpin-literal-judgments",
+   "verdict": "APPROVE",
+   "reason": "16 delta literals: 3 YAML and 5 authoring fixture joins, plus 8 open judgments with row-specific reasons for line, operand and consumer role. The 5 runner.yaml reasons are one template and defer the real judgment, but they stay judgment-required with an owner.",
+   "locator": "census-join/post-pin-literals.json"
+  },
+  {
+   "id": "G6-negative-probes",
+   "verdict": "APPROVE",
+   "reason": "The probes now run through bind_spans and historical_evidence, and each asserts evidence None and a park. My own probes through the committed predicate both park: a far \"e.g.\" under 5 reason variants, and a Bee-titled nav row under 3 reasons plus an \"## Example\" heading variant.",
+   "locator": "preserve-premise/proof.py:288-301"
+  },
+  {
+   "id": "G6-evidence-external-example-whole-file",
+   "verdict": "APPROVE",
+   "reason": "The whole-file search is gone. The marker is matched only against span text, so no distant marker can confirm. The 29 rows are re-judged below. See G6-N1 for over-narrowing.",
+   "locator": "preserve-premise/proof.py:116-119"
+  },
+  {
+   "id": "G6-wrapper-uniformity",
+   "verdict": "APPROVE",
+   "reason": "I enumerated independently at the pin all non-plans/archive lines that cite docs/specs/runner.md with CoordinationSession, Superseded by or retired-in. 163 are outside a snapshot, and all 163 are dated-note proposals (90 files). 7 sit inside a Literal Snapshot and are correctly preserved unrewritten. The 7 hits with no G6 row are not wrapper preserves. agent-coordination/spec.md:20 is a step-03 batch-089 repoint, and the rest are evidence or list lines. No wrapper is missing. Every note carries \"(effective only after the authority flip) ... Prepared successor\".",
+   "locator": "preserve-premise/history-wrapper-proposals.json"
+  },
+  {
+   "id": "G6-pin-drift",
+   "verdict": "APPROVE",
+   "reason": "proof.py --pin was replayed twice at 3d0169f39: 4 artifacts and stdout are byte-identical and equal b25dadae2 (scratch path redirected only). Sources at b25dadae2 equal the pin. The later drift from 7be0cbc52/6d275ad81 is new; see G6-N4.",
+   "locator": "preserve-premise/proof.py:136,140; proof.json#sourceCommit"
+  },
+  {
+   "id": "f00106",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00106] AGENTS.md:13"
+  },
+  {
+   "id": "f00117",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00117] AGENTS.md:60"
+  },
+  {
+   "id": "f00148",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00148] apps/fgos-gateway/Cargo.toml:44"
+  },
+  {
+   "id": "f00156",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00156] gateway.rs:2"
+  },
+  {
+   "id": "f00158",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00158] gateway.rs:40"
+  },
+  {
+   "id": "f00161",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00161] gateway.rs:188"
+  },
+  {
+   "id": "f00162",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00162] gateway.rs:254"
+  },
+  {
+   "id": "f00163",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00163] gateway.rs:555"
+  },
+  {
+   "id": "f00187",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00187] TaskDetail.tsx:9"
+  },
+  {
+   "id": "f00189",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00189] TaskDetail.tsx:487"
+  },
+  {
+   "id": "f00191",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00191] Taskboard.tsx:9"
+  },
+  {
+   "id": "f00193",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00193] Taskboard.tsx:439"
+  },
+  {
+   "id": "f00477",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00477] citation-format.md:34"
+  },
+  {
+   "id": "f00478",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f00478] citation-format.md:51"
+  },
+  {
+   "id": "f03758",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f03758] register-a-fixable...:"
+  },
+  {
+   "id": "f07698",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f07698] routing-handoff.md:23"
+  },
+  {
+   "id": "f07701",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f07701] routing-handoff.md:112"
+  },
+  {
+   "id": "f08044",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08044] cli-io-contract.md:439"
+  },
+  {
+   "id": "f08069",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08069] work-state/spec.md:16"
+  },
+  {
+   "id": "f08071",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08071] work-state/spec.md:33"
+  },
+  {
+   "id": "f08076",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08076] work-state/spec.md:711"
+  },
+  {
+   "id": "f08077",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08077] work-state/spec.md:1071"
+  },
+  {
+   "id": "f08079",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08079] work-state/spec.md:1173"
+  },
+  {
+   "id": "f08084",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08084] work-state/spec.md:1204"
+  },
+  {
+   "id": "f08634",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08634] terminal/SKILL.md:20"
+  },
+  {
+   "id": "f08665",
+   "verdict": "APPROVE",
+   "reason": "The row is now park-unconfirmed-preserve-premise with evidence None. Its candidate successor is present with a sha256 in normalizedOperands.",
+   "locator": "preserve-premise/proof.json#rows[f08665] assignment-runner.mjs:301"
+  },
+  {
+   "id": "f07697",
+   "verdict": "APPROVE",
+   "reason": "Parked with evidence None, which fixes the false confirmation. Note: the candidateSuccessor and blocker name the consumer file itself. That is a self-path successor, which L12-35(7) says fails. The receipt says these park rather than self-link, but the blocker still suggests co-composing that successor (see G6-N3).",
+   "locator": "preserve-premise/proof.json#rows[f07697] docs/platform/runner/contracts/routing-handoff.md:17"
+  },
+  {
+   "id": "f08033",
+   "verdict": "APPROVE",
+   "reason": "Parked with evidence None, which fixes the false confirmation. Note: the candidateSuccessor and blocker name the consumer file itself. That is a self-path successor, which L12-35(7) says fails. The receipt says these park rather than self-link, but the blocker still suggests co-composing that successor (see G6-N3).",
+   "locator": "preserve-premise/proof.json#rows[f08033] docs/platform/work-state/contracts/cli-io-contract.md:15"
+  },
+  {
+   "id": "f08047",
+   "verdict": "APPROVE",
+   "reason": "Parked with evidence None, which fixes the false confirmation. Note: the candidateSuccessor and blocker name the consumer file itself. That is a self-path successor, which L12-35(7) says fails. The receipt says these park rather than self-link, but the blocker still suggests co-composing that successor (see G6-N3).",
+   "locator": "preserve-premise/proof.json#rows[f08047] docs/platform/work-state/contracts/cli-io-contract.md:449"
+  },
+  {
+   "id": "f00515",
+   "verdict": "APPROVE",
+   "reason": "The row is park-source-removed-by-cutover with sourcePresentAfterCutover=false, and the blocker names the non-identical successor. The predicate now applies to all 162 rows in deleted docs consumers.",
+   "locator": "preserve-premise/proof.json#rows[f00515]"
+  },
+  {
+   "id": "f00521",
+   "verdict": "APPROVE",
+   "reason": "The row is park-source-removed-by-cutover with sourcePresentAfterCutover=false, and the blocker names the non-identical successor. The predicate now applies to all 162 rows in deleted docs consumers.",
+   "locator": "preserve-premise/proof.json#rows[f00521]"
+  },
+  {
+   "id": "f00525",
+   "verdict": "APPROVE",
+   "reason": "The row is park-source-removed-by-cutover with sourcePresentAfterCutover=false, and the blocker names the non-identical successor. The predicate now applies to all 162 rows in deleted docs consumers.",
+   "locator": "preserve-premise/proof.json#rows[f00525]"
+  },
+  {
+   "id": "f01225",
+   "verdict": "APPROVE",
+   "reason": "The row is park-source-removed-by-cutover with sourcePresentAfterCutover=false, and the blocker names the non-identical successor. The predicate now applies to all 162 rows in deleted docs consumers.",
+   "locator": "preserve-premise/proof.json#rows[f01225]"
+  },
+  {
+   "id": "f08411",
+   "verdict": "APPROVE",
+   "reason": "The row is park-source-removed-by-cutover with sourcePresentAfterCutover=false, and the blocker names the non-identical successor. The predicate now applies to all 162 rows in deleted docs consumers.",
+   "locator": "preserve-premise/proof.json#rows[f08411]"
+  },
+  {
+   "id": "f05646",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05646]"
+  },
+  {
+   "id": "f05655",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05655]"
+  },
+  {
+   "id": "f05661",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05661]"
+  },
+  {
+   "id": "f05671",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05671]"
+  },
+  {
+   "id": "f05677",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05677]"
+  },
+  {
+   "id": "f05693",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05693]"
+  },
+  {
+   "id": "f05720",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05720]"
+  },
+  {
+   "id": "f05730",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05730]"
+  },
+  {
+   "id": "f05742",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f05742]"
+  },
+  {
+   "id": "f06391",
+   "verdict": "APPROVE",
+   "reason": "judgment-preserve-with-dated-note; successor docs/platform/runner/decisions/h-aabefc85f0c9.md (present, digest).",
+   "locator": "preserve-premise/history-wrapper-proposals.json#rows[f06391]"
+  },
+  {
+   "id": "f06167",
+   "verdict": "APPROVE",
+   "reason": "The line is before \"## Literal Snapshot\". It now gets a dated-note proposal, and the before_snapshot guard rejects the old carriage reason.",
+   "locator": "preserve-premise/proof.py:64-65,225-228"
+  },
+  {
+   "id": "f07526",
+   "verdict": "APPROVE",
+   "reason": "This is navigation, not carriage: historical_evidence returns None on \"Canonical architecture moved to:\". proposedDisposition=repoint-proposal points to docs/platform/agent-coordination/architecture/dispatch-control-plane.md. That target is present, digest-bound and in the move-set successors for docs/architect/.../dispatch-control-plane.md. The successor is hardcoded but asserted.",
+   "locator": "preserve-premise/proof.json#rows[f07526]; proof.py:268-274"
+  },
+  {
+   "id": "G6-N1 example-branch-dead",
+   "verdict": "REWORK",
+   "reason": "Low, conservative. The example/external branch matches span.text. On 726 of 783 reason-triggered rows that span is the bare operand token, so the branch confirms 0 rows at the pin. The positive control uses a whole-line span, which no real row has, so it proves a path that real data never takes. At least 6 genuine same-line example rows now park: f00167 gateway.rs \"e.g. `docs/history/<feature>/`\", f08807 work.mjs \"e.g. \\\"docs/history/foo/CONTEXT.md\\\"\", f07822, f08072 and f08073. Fix: match the bound current line or unit_at(), and make the control use a token-only span.",
+   "locator": "preserve-premise/proof.py:116-119,302-311"
+  },
+  {
+   "id": "G6-N2 carriage-declaration-residual",
+   "verdict": "APPROVE",
+   "reason": "Informational. The carriage-declaration branch still accepts any line after a declaration when the file has no Literal Snapshot heading (691 rows). A structural scan of section closure found only whole-file \"Added in candidate:\" carriers, so this sample shows no new f06167-class mislabel.",
+   "locator": "preserve-premise/proof.py:66-74"
+  },
+  {
+   "id": "G6-N3 self-successor-candidates",
+   "verdict": "APPROVE",
+   "reason": "Low and informational. f07697, f08033 and f08047 list the consumer file as candidateSuccessor, and the blocker says to co-compose it. The Lead must not turn this into a self-link (L12-35(7)). Also, 8 removed-by-cutover parks have a byte-identical successor. That park is over-conservative but safe.",
+   "locator": "preserve-premise/proof.json#rows[f07697,f08033,f08047]"
+  },
+  {
+   "id": "G6-N4 post-landing-drift",
+   "verdict": "APPROVE",
+   "reason": "Informational, Lead custody at final F. Commits 7be0cbc52 and 6d275ad81 changed 15 docs after the pin. That covers 186 G6 rows (120 confirmed history) and the successor digest of 86 wrapper proposals (docs/platform/runner/spec.md). No G2 row sits in a drifted file.",
+   "locator": "git diff 3d0169f39 6d275ad81 -- . :!plans"
+  }
+ ],
+ "summary": {
+  "approve": 103,
+  "rework": 1,
+  "replay": {
+   "joinPy": "2x at pin in shared clone: 4 artifacts + stdout byte-identical and equal to b25dadae2; at 6d275ad81 with --pin only registerSha256 differs",
+   "proofPy": "2x at pin: 4 artifacts + stdout byte-identical and equal to b25dadae2; scratch base path sed-redirected to /tmp/fgos-work/w3-g2g6-delta/scr (path only)"
+  },
+  "independentRecompute": {
+   "dynamicDelta": "143 sites multiset-equal; 132 reviewed bound",
+   "wrapperEnumeration": "163/163 outside-snapshot wrappers proposed; 0 missing",
+   "proofLocators": "all Rust proofs at #[test]/fn, none ignored"
+  },
+  "sample": "All prior REWORK items checked (G2 33 + extra pc-d-1108, G6 50); all 13 readers and all 56 dynamic judgments read; all distinct proof locators checked mechanically. No random sampling was needed.",
+  "gates": {
+   "G2": "records task fixed; G2 still unmet (187 owned judgments, final F)",
+   "G6": "records task fixed; G6 still unmet (parks, note composition, final F)"
+  }
+ }
+}

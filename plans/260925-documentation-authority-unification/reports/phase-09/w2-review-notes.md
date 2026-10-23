@@ -54,3 +54,14 @@
 - MEDIUM: scripts/lib/doc-git-reads.mjs:76 raw cat-file --batch branch only for maxSize>31MiB, used only by test -> drop branch + its exemption row.
 - Note: verifiers list changed paths without rename detection (stricter; counts can differ from historical receipts).
 - 26 census sites all covered by exemption proposal (1 pre-commit, 5 configured commands, 10 missing-capability, 10 pinned tooling).
+## G2/G6 delta (w3-g2g6-delta-review, 103/1) -> final-pin D-turn
+- Low REWORK: G6 example-framing check matches only span text (bare path in 726/783 rows) -> confirms nothing; genuine same-line examples now park (f00167, f08807, f07822, f08072, f08073); fix: match bound line / unit_at(); control span = path only.
+- f07697, f08033, f08047 propose their own file as successor (L12-35(7) forbids self-link) -> fix.
+- --pin covers sources only; register/records read from working tree (registerSha256 differs at 6d275ad81).
+- At F: 15 docs changed after pin by 7be0cbc52/6d275ad81 -> 186 G6 rows + 86 wrapper successor digests (runner/spec.md) to refresh. G2 unaffected.
+## D1b review (w3-d1b-resync-review, 61/6) -> D1c (after D7, with G0-fix2)
+- release-manifest.md:258 kept the broken link ../../host-invocation-routing/legacy-cli-transition.md -> docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md (relative from contracts/).
+- packaging-distribution/spec.md:549 row 7 misses the 8 loop-registered Git checks (src/setup/registrations.mjs:6354-6366, git-worktree-recovery .. git-durability-capability); code has 143 checks; fix receipt claim + adjudication 44. Row 7b exact.
+- activation-binding.md:488: scripts/fgos-shell-integration.sh does NOT run git rev-parse --git-common-dir (reads layout from disk, lines 27-29, 57-90) -> correct sentence.
+- runner/spec.md:56,63-64: fenced "Historical source section 552ef3d6" (verbatim legacy) was edited (rows 1/1b) -> restore verbatim legacy in the fenced block; current truth lives only in runner/subcomponents/h-02842f76ffd2/spec.md; align adjudication 17.
+- Pre-existing: duplicates (work-state outcome record in non-transitioning-records.md and spec.md), 69 stale ledger rows pointing at knowledge-registry.md, runner RUL104 number clash with platform RUL104 (legacy origin) -> note for G9; legacy distribution.md row 7 + git-common-dir sentence stale on main (tell main lane).
