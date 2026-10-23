@@ -482,7 +482,7 @@ The big lead re-checked the evidence for every deviation before answering.
      - Every retained chain is still fully inspected, once instead of twice. The ledger term is gone, and so is a latent refusal at 100 000 ledger entries.
      - Proofs extend `historical_ledger_over_admission_bound_does_not_block_new_publication` and `remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admission`.
      - A tail-peek step is not done in T2. If it is ever done, OPC's five conditions apply: a gap-free listing; a fully valid last record plus its link to the previous record; the pin check; one rule for unknown artifacts shared with doctor; no cache that turns unknown into terminal.
-   - **Backlog item, to be minted with `fgos identity mint backlog` once the mint door is active on this machine** (the active release here has no `mint` yet): "Compact finished Worktree/Refs WAL chains off the hot path."
+   - **Backlog item `p-djrgdijd2c`** (minted 2026-10-23 09:05, `docs/backlog.md`): "Compact finished Worktree/Refs WAL chains off the hot path."
      - It runs through a doctor `--fix` or the guarded prune door, never on every add.
      - A create chain is kept while its registration or checkout exists.
      - A compacted Worktree replay answers recovery-required. Refs replay is as in the reverted 8e1ecbf63.
