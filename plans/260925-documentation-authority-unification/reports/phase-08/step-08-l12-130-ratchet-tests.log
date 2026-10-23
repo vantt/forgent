@@ -1,0 +1,178 @@
+TAP version 13
+# Subtest: deterministic generation: generating baseline twice yields byte-for-byte identical content
+ok 1 - deterministic generation: generating baseline twice yields byte-for-byte identical content
+  ---
+  duration_ms: 1.892869
+  type: 'test'
+  ...
+# Subtest: class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence
+ok 2 - class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence
+  ---
+  duration_ms: 0.122045
+  type: 'test'
+  ...
+# Subtest: new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file
+ok 3 - new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file
+  ---
+  duration_ms: 1.022352
+  type: 'test'
+  ...
+# Subtest: accounted edit: file modified with valid reviewed exception passes
+ok 4 - accounted edit: file modified with valid reviewed exception passes
+  ---
+  duration_ms: 0.535752
+  type: 'test'
+  ...
+# Subtest: unaccounted edit: file modified without exception or with digest mismatch is refused
+ok 5 - unaccounted edit: file modified without exception or with digest mismatch is refused
+  ---
+  duration_ms: 0.448928
+  type: 'test'
+  ...
+# Subtest: unexpected deletion: baselined file missing without exception is refused
+ok 6 - unexpected deletion: baselined file missing without exception is refused
+  ---
+  duration_ms: 0.32107
+  type: 'test'
+  ...
+# Subtest: malformed baseline: schema validator rejects invalid baseline structures
+ok 7 - malformed baseline: schema validator rejects invalid baseline structures
+  ---
+  duration_ms: 0.343427
+  type: 'test'
+  ...
+# Subtest: malformed exception: schema validator rejects invalid exception objects
+ok 8 - malformed exception: schema validator rejects invalid exception objects
+  ---
+  duration_ms: 0.630643
+  type: 'test'
+  ...
+# Subtest: canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2)
+ok 9 - canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2)
+  ---
+  duration_ms: 0.167062
+  type: 'test'
+  ...
+# Subtest: dotfiles: unreviewed dotfile under legacy root is detected and refused
+ok 10 - dotfiles: unreviewed dotfile under legacy root is detected and refused
+  ---
+  duration_ms: 0.471371
+  type: 'test'
+  ...
+# Subtest: non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4)
+ok 11 - non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4)
+  ---
+  duration_ms: 3.151318
+  type: 'test'
+  ...
+# Subtest: symlink identity: replacing a symlink with regular file of identical bytes is refused
+ok 12 - symlink identity: replacing a symlink with regular file of identical bytes is refused
+  ---
+  duration_ms: 0.420037
+  type: 'test'
+  ...
+# Subtest: symlink target: retargeting a symlink to another file of equal bytes is refused
+ok 13 - symlink target: retargeting a symlink to another file of equal bytes is refused
+  ---
+  duration_ms: 3.850764
+  type: 'test'
+  ...
+# Subtest: tree escape: symlink pointing outside repository root or directory symlink is refused
+ok 14 - tree escape: symlink pointing outside repository root or directory symlink is refused
+  ---
+  duration_ms: 0.371325
+  type: 'test'
+  ...
+# Subtest: classification: includes curated generated projections alongside maintained authority
+ok 15 - classification: includes curated generated projections alongside maintained authority
+  ---
+  duration_ms: 0.068165
+  type: 'test'
+  ...
+# Subtest: CLI: exits 0 on clean tree and exits 1 on finding
+ok 16 - CLI: exits 0 on clean tree and exits 1 on finding
+  ---
+  duration_ms: 78.016484
+  type: 'test'
+  ...
+# Subtest: live self-check: repository baseline and ratchet verify cleanly
+ok 17 - live self-check: repository baseline and ratchet verify cleanly
+  ---
+  duration_ms: 63.693598
+  type: 'test'
+  ...
+# Subtest: policy-aware: permits edited and new generated projections without exception
+ok 18 - policy-aware: permits edited and new generated projections without exception
+  ---
+  duration_ms: 0.40519
+  type: 'test'
+  ...
+# Subtest: policy-aware: permits new and edited history-evidence payloads without exception
+ok 19 - policy-aware: permits new and edited history-evidence payloads without exception
+  ---
+  duration_ms: 1.067595
+  type: 'test'
+  ...
+# Subtest: maintained controls: blocks unreviewed new maintained-authority and retained-source files
+ok 20 - maintained controls: blocks unreviewed new maintained-authority and retained-source files
+  ---
+  duration_ms: 0.365061
+  type: 'test'
+  ...
+# Subtest: maintained controls: blocks unaccounted edits to maintained-authority and retained-source
+ok 21 - maintained controls: blocks unaccounted edits to maintained-authority and retained-source
+  ---
+  duration_ms: 0.410982
+  type: 'test'
+  ...
+# Subtest: safety: detects and refuses class spoofing attempts in baseline
+ok 22 - safety: detects and refuses class spoofing attempts in baseline
+  ---
+  duration_ms: 0.315966
+  type: 'test'
+  ...
+# Subtest: messages: ensure messages do not call non-authority payloads maintained authority
+ok 23 - messages: ensure messages do not call non-authority payloads maintained authority
+  ---
+  duration_ms: 0.279039
+  type: 'test'
+  ...
+# Subtest: expired exceptions: exceptions past expiry date are flagged with expired-exception
+ok 24 - expired exceptions: exceptions past expiry date are flagged with expired-exception
+  ---
+  duration_ms: 0.277808
+  type: 'test'
+  ...
+# Subtest: unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception
+ok 25 - unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception
+  ---
+  duration_ms: 0.263183
+  type: 'test'
+  ...
+# Subtest: root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1)
+ok 26 - root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1)
+  ---
+  duration_ms: 0.304119
+  type: 'test'
+  ...
+# Subtest: exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual)
+ok 27 - exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual)
+  ---
+  duration_ms: 0.328356
+  type: 'test'
+  ...
+# Subtest: expiry boundary: explicitly tests active vs expired on expiry date (F4)
+ok 28 - expiry boundary: explicitly tests active vs expired on expiry date (F4)
+  ---
+  duration_ms: 0.348505
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 205.679856

@@ -1,0 +1,1008 @@
+{
+  "inputHEAD": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+  "authority": "L12-130; L12-11; exact check A pairs only, LAST",
+  "status": "historical pair accounting complete; dirty-tree A remains red; suite attribution blocked",
+  "reporter": "audit-report.py unchanged",
+  "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+  "manifestProofs": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "scriptObject": "scripts",
+      "sha256Before": "73a6283ac797faba360eb78f15b2d54015b1c3d1a72e05450a7169b6a26b3000",
+      "sha256After": "a1f427c5f6daf29e0a5f0d0eb003d6325e3336b5031c908c28634346b7d9d365",
+      "exceptionsBefore": 4206,
+      "exceptionsAfter": 4244,
+      "appendedCount": 38,
+      "appended": [
+        {
+          "commit": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ebf45ec6013514ed6176ecbf308214142bbd007a",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "171105af54e260e15afa84fe357e8b2e2033cf13",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "010897c4933537d1909dae852563b00d98b29a29",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-63-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-68-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-79-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-merge-rebindings.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-initial-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-recheck.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-initial-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-cocut-audit.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-neutrality-first.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-step-05-seam5-batch5-judgment-check.py.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "authority": "L12-130; L12-11"
+        }
+      ],
+      "byCommit": {
+        "220a4d9ed674c57098e8e7fd27ae5c54500878a9": 1,
+        "ebf45ec6013514ed6176ecbf308214142bbd007a": 1,
+        "171105af54e260e15afa84fe357e8b2e2033cf13": 1,
+        "010897c4933537d1909dae852563b00d98b29a29": 1,
+        "3feda4d15fea6092fa3e604e29670116c93ba81f": 2,
+        "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3": 32
+      },
+      "bytesAdded": 7890,
+      "byteExactOriginalRecoveredByRemovingOnlyNewArrayData": true,
+      "unchangedNativeCheckerOutsideArray": true,
+      "unchangedPriorExceptionOrderAndValues": true,
+      "noDuplicateNewPair": true,
+      "everyPairIndependentlyExistsInFirstParentNonMergeCommit": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "scriptObject": "readOnlyScripts",
+      "sha256Before": "b783ab2969d40c113c470298d95b8ca92e7741c922515e384845cac92bebaee4",
+      "sha256After": "574d90f1a94f9556ce63f1954367589cbc026ebea935d66f9f57d15e869d148c",
+      "exceptionsBefore": 4206,
+      "exceptionsAfter": 4244,
+      "appendedCount": 38,
+      "appended": [
+        {
+          "commit": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ebf45ec6013514ed6176ecbf308214142bbd007a",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "171105af54e260e15afa84fe357e8b2e2033cf13",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "010897c4933537d1909dae852563b00d98b29a29",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-63-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-68-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-79-binding-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-merge-rebindings.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-initial-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-recheck.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-initial-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-cocut-audit.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-neutrality-first.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-step-05-seam5-batch5-judgment-check.py.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "authority": "L12-130; L12-11"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "authority": "L12-130; L12-11"
+        }
+      ],
+      "byCommit": {
+        "220a4d9ed674c57098e8e7fd27ae5c54500878a9": 1,
+        "ebf45ec6013514ed6176ecbf308214142bbd007a": 1,
+        "171105af54e260e15afa84fe357e8b2e2033cf13": 1,
+        "010897c4933537d1909dae852563b00d98b29a29": 1,
+        "3feda4d15fea6092fa3e604e29670116c93ba81f": 2,
+        "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3": 32
+      },
+      "bytesAdded": 7890,
+      "byteExactOriginalRecoveredByRemovingOnlyNewArrayData": true,
+      "unchangedNativeCheckerOutsideArray": true,
+      "unchangedPriorExceptionOrderAndValues": true,
+      "noDuplicateNewPair": true,
+      "everyPairIndependentlyExistsInFirstParentNonMergeCommit": true
+    }
+  ],
+  "beforeReporterExit": 1,
+  "before": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "unaccountedCount": 38,
+      "exactUnaccountedPairs": [
+        {
+          "commit": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "ebf45ec6013514ed6176ecbf308214142bbd007a",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "171105af54e260e15afa84fe357e8b2e2033cf13",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "010897c4933537d1909dae852563b00d98b29a29",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-63-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-68-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-79-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-merge-rebindings.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-initial-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-recheck.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-initial-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-cocut-audit.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-neutrality-first.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-step-05-seam5-batch5-judgment-check.py.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json"
+        }
+      ],
+      "accountedCount": 4206,
+      "newWorkingViolations": [
+        "CHANGELOG.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log"
+      ],
+      "Aok": false,
+      "Bok": true,
+      "Hfindings": 0,
+      "IequalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "unaccountedCount": 38,
+      "exactUnaccountedPairs": [
+        {
+          "commit": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "ebf45ec6013514ed6176ecbf308214142bbd007a",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "171105af54e260e15afa84fe357e8b2e2033cf13",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "010897c4933537d1909dae852563b00d98b29a29",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-final-records-brief.md"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+        },
+        {
+          "commit": "3feda4d15fea6092fa3e604e29670116c93ba81f",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-63-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-66-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-68-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-79-binding-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-merge-rebindings.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-initial-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-recheck.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-initial-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-cocut-audit.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-neutrality-first.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-step-05-seam5-batch5-judgment-check.py.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-initial-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md"
+        },
+        {
+          "commit": "ab4c65d173f6d40eee7b1e87f87ce973fcee8fc3",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json"
+        }
+      ],
+      "accountedCount": 4206,
+      "newWorkingViolations": [
+        "CHANGELOG.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log"
+      ],
+      "Aok": false,
+      "Bok": true,
+      "Hfindings": 0,
+      "IequalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    }
+  ],
+  "after": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "unaccountedCount": 0,
+      "accountedCount": 4244,
+      "newWorkingViolations": [
+        "CHANGELOG.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-pair-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log"
+      ],
+      "Aok": false,
+      "Bok": true,
+      "Hfindings": 0,
+      "IequalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRows": [],
+      "unaccountedCount": 0,
+      "accountedCount": 4244,
+      "newWorkingViolations": [
+        "CHANGELOG.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-pair-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log"
+      ],
+      "Aok": false,
+      "Bok": true,
+      "Hfindings": 0,
+      "IequalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    }
+  ],
+  "scopeExplanation": {
+    "actualMissingPerManifest": 38,
+    "pruneCommitPairs": 32,
+    "interveningRecords": 2,
+    "briefCommits": 4,
+    "whyNotAll285OrMergePairs": "Existing recipe uses git log --first-parent --no-merges and its existing allowed path list; it reports 32 protected prune paths, two intervening records and four brief pairs. Other pruning paths are not newly inserted by inference. Merge commits are not enumerated as A pairs; full merge main-commit/path/family accounting lives separately in step-08-l12-130-merge-accounting.json. No predicate/allowlist/baseline/old exception or non-array byte changes.",
+    "mergeRecord": "step-08-l12-130-merge-accounting.json",
+    "futureRunnerCommit": "unknown; not pre-accounted. Lead accounts its actual new pairs and replays clean committed bytes."
+  },
+  "needsWrites": [],
+  "afterReporterExit": 1,
+  "dirtyTreeDisposition": "Expected check-A red solely from this uncommitted turn; not clean committed-byte acceptance. Historical unaccounted pairs zero. Ownership and audit-ownership 0/0, checks 1 in both recipes; B/H/I remain green. No failure is skipped.",
+  "rawReporterOutputs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+      "sha256": "e4b4346b731d48531e893ff0c6c8fe75fe7b5f63a2562a29ae7e34059b92c35f",
+      "bytes": 3618904
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+      "sha256": "7ed880f726a75b1e247bd7f1f4a66df706ca90579993fe078666aaa0e0f05d16",
+      "bytes": 3623260
+    }
+  ],
+  "scopeProof": {
+    "allWritesAuthorized": true,
+    "paths": [
+      "CHANGELOG.md",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-pair-accounting.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
+    "changelogAddedLines": [
+      "- Human-mode `fgos docs-lease` prints its result line and exits 0; a refused non-holder `fgos run` writes nothing, including no case-bindings sentinel."
+    ],
+    "gitDiffCheckExit": 0,
+    "noProductTestsSkillsGatesOrBaselinesEdited": true,
+    "originalL12_128TextUnchanged": true
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "inputHEAD": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+  "status": "blocked-partial-records; not Phase 8 closure",
+  "authority": "step-08-final-records-brief.md / L12-130",
+  "checks": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
+      "exit": 0,
+      "entries": 867,
+      "violations": 0,
+      "runtimeReaderDiscovered": false,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "bytes": 83,
+        "sha256": "628a95fda9278e4a0e97d8f7811d4c3a41d7d17b0653cd788d4c0ffea1e62aca"
+      }
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node scripts/check-legacy-docs-ratchet.mjs",
+      "beforeExit": 1,
+      "beforeMismatches": [
+        "docs/specs/reading-map.md",
+        "docs/specs/seat-binding.md"
+      ],
+      "exit": 0,
+      "logs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+          "bytes": 574,
+          "sha256": "d2e5864a96e2a844ea64fbfbeb2830627a253b67bc87e8585dec6c3dfc830d95"
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+          "bytes": 108,
+          "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+        }
+      ]
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test --test-reporter=tap test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "bytes": 6867,
+        "sha256": "83c37bd0c5046ceac1a0746bfcec909d03b868b244a24ccd214b2e21a2b5e044"
+      }
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:94e2689459dfe6a29803ab5e5b4cb10f8af426c84feb6c891c6fe8a7ca2923d6/bin/fgos node --test --test-reporter=tap --test-name-pattern='live self-check: repository baseline and ratchet verify cleanly' test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "bytes": 316,
+        "sha256": "0d5f794fed51145bfded02013e3cb95f3e8b277bd73b54aa4efaaeea0b40eca6"
+      }
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:94e2689459dfe6a29803ab5e5b4cb10f8af426c84feb6c891c6fe8a7ca2923d6/bin/fgos node --test test/setup/registrations.test.mjs",
+      "exit": 1,
+      "tests": 60,
+      "pass": 55,
+      "fail": 5,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "bytes": 12936,
+        "sha256": "17556b1387c938627e62951cfbedbef60c4fb6e02d4129f8f3592302a2b039be"
+      },
+      "classification": "Native prerequisite failure in this worker, not proven worktree-only. resolveMainCheckoutRoot at src/runner/paths.mjs:74-81 catches all Inspect errors and returns null; these fixture checks then say not inside a git checkout. Missing addon is independently visible in worktree-admin. Registry enumeration proofs pass; no source/test change or bypass."
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:94e2689459dfe6a29803ab5e5b4cb10f8af426c84feb6c891c6fe8a7ca2923d6/bin/fgos node --test --test-reporter=tap test/runner/worktree-admin-multiprocess.test.mjs",
+      "exit": 1,
+      "tests": 7,
+      "pass": 0,
+      "fail": 7,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log",
+        "bytes": 12334,
+        "sha256": "386b21e25a3a0f42bd9b5880751f8c2835e7971645576568430a5740709e6f1a"
+      },
+      "classification": "Original load-case attribution blocked: eight-process case fails at git-addon-not-shipped before worktree load. No timeout/flake conclusion. Other six cases also fail with unavailable Git/holder-lock prerequisites. No native bootstrap permitted."
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/census-l130.mjs",
+      "exit": 1,
+      "result": {
+        "method": "Existing scan/census with complete Git read-only file-name inventory filtered by existing declaredProduct; no inspectRepo bootstrap or write-census, no product writes.",
+        "fileCount": 1055,
+        "siteCount": 58,
+        "classCount": 253,
+        "generatedEqual": true,
+        "committedSelfDigestMatches": true,
+        "verdict": {
+          "passed": false,
+          "message": "58 Git spawn site(s) outside the fgos-git driver: .githooks/pre-commit:507 (spawn), bin/fgos.mjs:3496 (unresolved-binary), bin/fgos.mjs:3640 (unresolved-binary), scripts/check-doc-constitution.mjs:640 (spawn), scripts/check-doc-inventory-gates.mjs:33 (spawn), ..."
+        },
+        "l12_117Comparison": {
+          "pin": "aba18e45370a585dd1af0b0fb5070dee255a5eab",
+          "sameSiteIdentitiesExcludingLine": true,
+          "sameClassHistogram": true,
+          "classHistogram": {
+            "standalone-skill-script": 3,
+            "hook-read-context": 21,
+            "configured-binary": 89,
+            "rust-test": 99,
+            "argv-runner": 13,
+            "production-sandbox-probe": 4,
+            "uncalled-wrapper": 21,
+            "git-driver": 1,
+            "sandbox-door": 2
+          }
+        }
+      },
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "bytes": 589,
+        "sha256": "c37d03530244e75be641b8c68827b9806139d18b459bfd3a898757e2885d5dbd"
+      },
+      "recipe": "import fs from 'node:fs';\nimport path from 'node:path';\nimport {execFileSync} from 'node:child_process';\nimport {scan,census,declaredProduct,verifyCensus,censusDigestMatches} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/git-one-door-scan.mjs';\nconst root=process.cwd();\nconst names=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{maxBuffer:64*1024*1024,encoding:'utf8'}).split('\\0').filter(Boolean);\nconst product=declaredProduct(root);\nconst files=names.filter(n=>!product||product(n)).sort().map(n=>path.join(root,n));\nconst result=scan({root,files});\nconst generated=census(result);\nconst committed=JSON.parse(fs.readFileSync('packages/git/contracts/mutation-census.v1.json','utf8'));\nfs.writeFileSync('/tmp/fgos-work/census-l130.json',JSON.stringify(generated,null,2)+'\\n');\nconsole.log(JSON.stringify({method:'Existing scan/census with complete Git read-only file-name inventory filtered by existing declaredProduct; no inspectRepo bootstrap or write-census, no product writes.',fileCount:Object.keys(generated.files).length,siteCount:generated.sites.length,classCount:generated.classes.length,generatedEqual:JSON.stringify(generated)===JSON.stringify(committed),committedSelfDigestMatches:censusDigestMatches(committed),verdict:verifyCensus(committed,root)}));\nprocess.exitCode=generated.sites.length===0?0:1;\n"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B /tmp/fgos-work/head-drift-l130.py",
+      "exit": 0,
+      "result": {
+        "records": 1481,
+        "driftEntries": 542,
+        "bytes": 11086889,
+        "sha256": "f5108ad5acf71fb37191db8a1af437f49a7780ba57195669422acab98aa19cfb",
+        "failing": false
+      },
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "bytes": 154,
+        "sha256": "7e979ccf72b136de7241d9c2e95b57be205156989fb8e3af9574879b2b463483"
+      },
+      "recipe": "import pathlib,json,importlib.util,hashlib,subprocess\nP=pathlib.Path.cwd()/'plans/260925-documentation-authority-unification/reports/phase-08'\ns=importlib.util.spec_from_file_location('step5',P/'step-05-check.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)\nrecords=[]\nfor p in sorted((P/'step-05-records').glob('*.jsonl')):\n with p.open() as f:\n  for line in f:\n   if line.strip():records.append(json.loads(line))\nentries=m.head_drift(records)\nobj={'kind':'Non-failing HEAD drift for Phase 9 PRE-FLIP recomposition under L12-124/L12-130; records remain at their own pins','headCommit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'entries':entries}\n# Complete regeneration through the owning helper; compact JSON removes formatting bulk, not entries.\np=P/'step-05-head-drift.json';p.write_text(json.dumps(obj,ensure_ascii=False,separators=(',',':'))+'\\n')\nprint(json.dumps({'records':len(records),'driftEntries':len(entries),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'failing':False}))\n"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B /tmp/fgos-work/records-l130.py",
+      "exit": 0,
+      "method": "Complete unchanged extractor results at both first parents, merges and HEAD, unique semantic content+ancestry and unchanged immediate neighbours, digest recomputation and reopened current owning shard checks. No ordinal lookup.",
+      "recordRecipeSha256": "e206875d328ffacc3c0246d611b768883b03b385a77e57544a165978fc461809",
+      "recordRecipe": "import pathlib,json,subprocess,hashlib,collections,copy,importlib.util,os\nR=pathlib.Path.cwd();P=R/'plans/260925-documentation-authority-unification/reports/phase-08';D=R/'plans/260925-documentation-authority-unification/ledger/decisions'\nsha=lambda b:hashlib.sha256(b).hexdigest()\ndef git(*a):return subprocess.check_output(['git',*a],text=True)\ndef save(name,obj):(P/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\\n')\nhead=git('rev-parse','HEAD').strip();ms=[git('rev-parse',m).strip() for m in ['e1966d417','cbdf18555']]\nextractors=json.loads(pathlib.Path('/tmp/fgos-work/units-l130.json').read_text());units=extractors[0]['units'];files=list(units['HEAD']);prior=next(iter(units));checks=[];groups=[];edits=[];sources=[]\ndef neighbours(us,u):\n i=us.index(u)\n return {'previous':us[i-1] if i else None,'next':us[i+1] if i+1<len(us) else None}\ndef walk(x,y,p,keys):\n if isinstance(x,dict):\n  f=x.get('targetOwner')\n  if f in files and x.get('targetAnchor'):\n   hits=[u for u in units['HEAD'][f] if u['anchor']==x['targetAnchor'] and u['textDigest']==x.get('targetUnitDigest',x.get('targetDigest'))]\n   assert len(hits)==1,(p,keys,'remaining drift');cur=hits[0];assert x.get('targetAncestry',cur['ancestry'])==cur['ancestry']\n   checks.append({'shard':str(p.relative_to(R)),'keys':keys,'claimId':x.get('claimId'),'targetOwner':f,'afterAnchor':cur['anchor'],'afterDigest':cur['textDigest'],'ancestry':cur['ancestry'],'drift':False})\n   if x!=y:\n    oldhits=[u for u in units[prior][f] if u['textDigest']==y.get('targetUnitDigest',y.get('targetDigest')) and u['anchor']==y['targetAnchor']]\n    assert len(oldhits)==1;old=oldhits[0]\n    candidates=[u for u in units['HEAD'][f] if u['text']==old['text'] and u['ancestry']==old['ancestry']]\n    method='unique complete unchanged content and real ancestry'\n    if not candidates:\n     candidates=[u for u in units['HEAD'][f] if u['unitKind']==old['unitKind'] and u['ancestry']==old['ancestry'] and u['text'].splitlines()[0]==old['text'].splitlines()[0]]\n     method='unique whole-file contract or semantic table opening under exact named heading ancestry, plus complete passages and both neighbours'\n    assert len(candidates)==1 and candidates[0]==cur\n    for u in [old,cur]:assert sha(u['text'].encode())==u['textDigest']\n    on=neighbours(units[prior][f],old);cn=neighbours(units['HEAD'][f],cur)\n    assert all((on[k] is None and cn[k] is None) or (on[k] and cn[k] and on[k]['text']==cn[k]['text'] and on[k]['ancestry']==cn[k]['ancestry']) for k in on)\n    assert {k:v for k,v in x.items() if k not in ['targetUnitDigest','reviewNote']}=={k:v for k,v in y.items() if k not in ['targetUnitDigest','reviewNote']}\n    edits.append({'shard':str(p.relative_to(R)),'keys':keys,'claimId':x.get('claimId'),'targetOwner':f,'beforeAnchor':old['anchor'],'beforeDigest':old['textDigest'],'afterAnchor':cur['anchor'],'afterDigest':cur['textDigest'],'method':method,'oldPassage':old,'currentPassage':cur,'oldNeighbours':on,'currentNeighbours':cn,'beforeRow':y,'afterRow':x,'sourceIdentityUnchanged':True,'independentReview':'pending; no approval carry','mainDiffs':{m:git('diff',m+'^1',m,'--',f) for m in ms}})\n  if x.get('path') in files and 'unitDigest' in x and 'anchor' in x:\n   f=x['path'];hits=[u for u in units['HEAD'][f] if u['anchor']==x['anchor'] and u['textDigest']==x['unitDigest']];assert len(hits)==1;groups.append({'shard':str(p.relative_to(R)),'keys':keys,'path':f,'digest':x['unitDigest']})\n  if x.get('sourcePath') in files:sources.append({'shard':str(p.relative_to(R)),'keys':keys,'claimId':x.get('claimId'),'sourcePath':x['sourcePath'],'sourceUnitDigest':x.get('sourceUnitDigest'),'meaning':'Historical source identity unchanged, not a current target digest.'})\n  for k,v in x.items():walk(v,y[k],p,keys+[k])\n elif isinstance(x,list):\n  for i,v in enumerate(x):walk(v,y[i],p,keys+[i])\nfor p in sorted(D.rglob('*.json')):walk(json.loads(p.read_text()),json.loads(git('show','HEAD:'+str(p.relative_to(R)))),p,[])\n# Pilot proposed target bindings are checked too, if they use the owning target contract.\np=P/'step-01-pilot-b-proposals.json';walk(json.loads(p.read_text()),json.loads(p.read_text()),p,[])\nassert len(edits)==5\nsave('step-08-l12-130-merge-rebindings.json',{'inputHEAD':head,'merges':ms,'method':'L12-65/L12-102: both unchanged extractors agree at every prior/merge/final pin; no ordinal placement. Complete content, semantic identity, real ancestry and immediate neighbours are verified; digest = SHA256 of full unit text. Only targetUnitDigest and pending reviewNote changed.','rebindings':edits})\nfilechecks=[]\nfor f in files:\n filechecks.append({'path':f,'candidate':f.startswith('docs/platform/'),'fileSha256':{pin:sha(git('show',pin+':'+f).encode()) for pin in units if f in units[pin]},'units':{pin:{'count':len(uu[f]),'completeUnitsSha256':sha(json.dumps(uu[f],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode())} for pin,uu in units.items() if f in uu},'directChecked':sum(c['targetOwner']==f for c in checks),'groupMembersChecked':sum(c['path']==f for c in groups)})\nsave('step-08-l12-130-binding-check.json',{'inputHEAD':head,'extractorsAgree':True,'extractors':[{k:v for k,v in e.items() if k!='units'} for e in extractors],'fileChecks':filechecks,'directChecked':len(checks),'groupMembersChecked':len(groups),'changedBindings':len(edits),'remainingDrift':0,'postApplicationDirectChecks':checks,'sourceIdentityJoins':sources,'excludedHistoricalProjection':'ledger/main-sync-successors.json is a historical source projection, not an owning decision shard; it already has older target digests. Like L12-117, owning decisions and Pilot B are traversed; historical identities are not rebound by index.','independentReview':'pending; binding existence/digest proof is not content approval'})\n# Merge accounting and both-parent conflict witnesses.\nmerges=[];allchanged=set()\nfor m in ms:\n a,b=git('rev-parse',m+'^1',m+'^2').splitlines();base=git('merge-base',a,b).strip();paths=git('diff','--name-only',a,m).splitlines();allchanged.update(paths);families=collections.defaultdict(list)\n for p in paths:families['/'.join(p.split('/')[:2]) if '/' in p else 'root files'].append(p)\n docs=[p for p in paths if p.startswith('docs/')]\n conflictpaths=['CHANGELOG.md','packages/git/contracts/mutation-census.v1.json'] if m==ms[0] else ['plans/261017-1313-fgos-platform-program-board/plan.md','plans/261017-1313-fgos-platform-program-board/log.md','docs/platform/packaging-distribution/contracts/setup-doctor-registry.md','packages/git/contracts/mutation-census.v1.json','CHANGELOG.md']\n witnesses=[]\n for f in conflictpaths:\n  bodies={pin:git('show',pin+':'+f) for pin in [a,b,m]}\n  w={'path':f,'sha256':{pin:sha(body.encode()) for pin,body in bodies.items()},'versusFirstParent':git('diff',a,m,'--',f),'versusMain':git('diff',b,m,'--',f)}\n  if '/program-board/' in f or 'fgos-platform-program-board/' in f:w['mainWholeBytesKept']=bodies[b]==bodies[m];assert w['mainWholeBytesKept']\n  if f.endswith('setup-doctor-registry.md'):\n   def ids(body):return body.split(\"Today's registered checks: \")[1].split('. ')[0]\n   expected=ids(bodies[a]).replace('`seat-binding-drain`, ','');assert ids(bodies[m])==expected\n   w['branchMinusDrainExact']=True;w['checkCount']=len(expected.split(', '));w['leaseCheckRetained']='`documentation-cutover-lease`' in expected;assert w['checkCount']==143\n  if f=='CHANGELOG.md':\n   def unrel(s):return s.split('## [Unreleased]\\n',1)[1].split('\\n## ',1)[0].splitlines(keepends=True)\n   aa,bb,cc=[unrel(bodies[t]) for t in [a,b,m]];i=0\n   while i<min(len(aa),len(bb)) and aa[-i-1]==bb[-i-1]:i+=1\n   suffix=aa[-i:] if i else [];expected=(aa[:-i] if i else aa)+(bb[:-i] if i else bb)+suffix\n   w['unreleasedLongestCommonSuffixConcatExact']=cc==expected;w['unreleasedActualSha256']=sha(''.join(cc).encode());w['unreleasedExpectedConcatSha256']=sha(''.join(expected).encode())\n   nb=lambda xs:[s for s in xs if s.strip()]\n   def subseq(xs,ys):\n    it=iter(ys);return all(any(t==s for t in it) for s in xs)\n   w['mainNonblankOrderPreserved']=subseq(nb(bb),nb(cc));w['firstParentNonblankOrderPreserved']=subseq(nb(aa),nb(cc));w['missingFirstParentNonblankLines']=[s.rstrip('\\n') for s in nb(aa) if s not in nb(cc)]\n   if m==ms[0]:\n    assert nb(cc)==nb(expected);w['unionVerified']=True;w['note']='Exact nonblank union, branch entries then main entries with shared suffix once. Literal concatenation differs by one redundant blank line only; no prose lost.'\n   else:\n    assert w['mainNonblankOrderPreserved'] and len(w['missingFirstParentNonblankLines'])==3;w['note']='Second merge intentionally replaces three obsolete main seat-conversion changelog bullets. The main parent is retained in order, plus branch-only documentation/lease lines; not a duplicate union of obsolete and current bullets.'\n  if f.endswith('mutation-census.v1.json'):\n   cs={pin:json.loads(body) for pin,body in bodies.items()};w['siteCounts']={pin:len(c['sites']) for pin,c in cs.items()};w['classCounts']={pin:len(c['classes']) for pin,c in cs.items()};w['generator']='node scripts/git-one-door-scan.mjs --write-census (Lead, not rerun; product path outside writer scope and CLI bootstrap stages .fgos)'\n  witnesses.append(w)\n merges.append({'merge':m,'firstParent':a,'main':b,'base':base,'mainCommitCount':int(git('rev-list','--count',a+'..'+b)),'mainCommits':git('log','--format=%H %s',a+'..'+b).splitlines(),'changedPathCount':len(paths),'changedPaths':paths,'families':dict(families),'changedDocumentation':docs,'mainPathCommits':{f:git('log','--format=%H %s',a+'..'+b,'--',f).splitlines() for f in docs},'leadResolvedConflicts':witnesses})\n# Per-commit board rebase content equality, no branch-name/date inference.\nold='1d89e8177';new='f8220fca0';oldpaths=git('diff-tree','--no-commit-id','--name-only','-r',old).splitlines();newpaths=git('diff-tree','--no-commit-id','--name-only','-r',new).splitlines();od=git('show','--format=','--no-ext-diff',old);nd=git('show','--format=','--no-ext-diff',new)\ndelta=lambda s:[l for l in s.splitlines() if l.startswith(('+','-')) and not l.startswith(('+++','---'))]\nassert delta(od)==delta(nd)\nrebase={'original':git('rev-parse',old).strip(),'rebased':git('rev-parse',new).strip(),'rebasedParent':git('rev-parse',new+'^').strip(),'originalChangedPaths':oldpaths,'rebasedChangedPaths':newpaths,'samePathSet':oldpaths==newpaths,'sameBoardDiffBytes':od==nd,'sameAddedAndRemovedBoardLines':delta(od)==delta(nd),'rebaseContextNote':'Blob ids and neighbouring board context differ after rebase; the two changed board payloads (added/removed lines) are identical, not the entire files or raw diffs.','originalDiff':od,'rebasedDiff':nd,'originMainAtCheck':git('rev-parse','origin/main').strip(),'originalOnOriginMain':subprocess.run(['git','merge-base','--is-ancestor',old,'origin/main']).returncode==0,'rebasedOnOriginMain':subprocess.run(['git','merge-base','--is-ancestor',new,'origin/main']).returncode==0,'meaning':'Lead reports SEAT rebased the DOC board-handle change atop 0fc44d12e. Both board files are taken whole from main in cbdf18555; no plan-owned board bytes or writes.'}\n# Non-overlapping primary/source/protected dependencies, never incidental target mentions.\ndef dependencies(r):\n out=[{'path':r['file'],'pointer':['file']}]\n def w(x,keys):\n  if isinstance(x,str) and x in allchanged:out.append({'path':x,'pointer':keys})\n  elif isinstance(x,dict):\n   for k,v in x.items():\n    if k in allchanged:out.append({'path':k,'pointer':keys+[k]})\n    w(v,keys+[k])\n  elif isinstance(x,list):\n   for i,v in enumerate(x):w(v,keys+[i])\n for k in ['sourceRenderProvenance','protectedPins']:\n  if k in r:w(r[k],[k])\n return [x for x in out if x['path'] in allchanged]\ndeferred={}\nfor stage,paths in [('step3',sorted(P.glob('step-03-records*/*.jsonl'))),('step4',sorted((P/'step-04-records').glob('*.jsonl'))),('step5',sorted((P/'step-05-records').glob('*.jsonl')))]:\n arr=[]\n for p in paths:\n  with p.open() as f:\n   for n,line in enumerate(f,1):\n    if not line.strip():continue\n    r=json.loads(line);deps=dependencies(r)\n    if deps:\n     arr.append({'recordFile':str(p.relative_to(R)),'recordLine':n,'recordSha256':sha(line.rstrip('\\n').encode()),'file':r['file'],'authorInputCommit':r.get('authorInputCommit'),'pinnedDigest':r.get('digest',r.get('sourceSha256')),'currentPrimaryDigest':sha((R/r['file']).read_bytes()) if (R/r['file']).is_file() else None,'changedDependencies':deps,'action':'L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.'})\n deferred[stage]=arr\nsave('step-08-l12-130-deferred-rebinds.json',{'inputHEAD':head,'merges':ms,'scope':'All physical Step 3 revisions; canonical Step 4/5 primary consumer, sourceRenderProvenance and protectedPins only. No incidental target mentions.','counts':{k:len(v) for k,v in deferred.items()},'records':deferred})\nreport={'inputHEAD':head,'decision':'L12-130','merges':merges,'boardRebase':rebase,'reportedPathCountDiscrepancy':{'LeadBrief':349,'actualFirstParentToMerge':merges[0]['changedPathCount'],'command':'git diff --no-renames --name-only e1966d417^1 e1966d417','meaning':'346 net changed paths reproduced, not 349; full exact path list retained; no three invented paths. Lead reconciles prose count.'},'step0':{'directChecked':len(checks),'groupMembersChecked':len(groups),'contentRebindings':len(edits),'remainingDrift':0,'pendingIndependentReview':len(edits)},'overlapCounts':{k:len(v) for k,v in deferred.items()},'overlapRecords':'step-08-l12-130-deferred-rebinds.json','incomingArea':{'path':'docs/platform/yaml-document/spec.md','candidateBindings':sum(x['targetOwner']=='docs/platform/yaml-document/spec.md' for x in checks),'alreadyExistedAtFirstParent':True,'meaning':'New implemented Rust area import, not a newly created spec in this merge: signed draft already present in first parent. No ledger target exists; switchboard/reading-map/inventory routing remains Phase 9 obligation.'},'identityScope':{'path':'docs/platform/identity/spec.md','sha256':sha((R/'docs/platform/identity/spec.md').read_bytes()),'section7aHeaderRetained':all(s in (R/'docs/platform/identity/spec.md').read_text().split('```')[1] for s in ['local writer attribution rule','section 7a','local-writer resolver does not own worker creation, env scrubbing or lineage'])},'limits':['Records only, no repository Git writes, product/test/skill/gate/baseline edits, workspace .fgos mutation or secrets access. The task explicitly names the activation releasePath read for isolated test commands.','No full suite, clone creation or successful checkout timing measured here. Missing raw Lead logs prevent per-title suite classification; supplied totals are not rerun proof.','Impact-analysis degraded/unqueried: fgOS CLI prohibited and no MCP tools; no product symbol modified. Markdown preview remains Lead custody.'],'needsWrites':[]}\nsave('step-08-l12-130-merge-accounting.json',report)\nprint(json.dumps({'bindings':len(checks),'rebindings':len(edits),'overlaps':report['overlapCounts'],'conflicts':[{ 'merge':m['merge'][:9], 'proofs':[{k:v for k,v in w.items() if k not in ['sha256','versusMain','versusFirstParent']} for w in m['leadResolvedConflicts']]} for m in merges],'rebase':{k:v for k,v in rebase.items() if 'Diff' not in k}},ensure_ascii=False))\n",
+      "extractRecipe": "import pathlib,subprocess,json,hashlib,os\nR=pathlib.Path.cwd();P=R/'plans/260925-documentation-authority-unification/reports/phase-08'\nenv=dict(os.environ);env.pop('CLAUDE_CODE_SESSION_ID',None)\ndef git(*args):return subprocess.check_output(['git',*args],text=True)\nmerges=[git('rev-parse',m).strip() for m in ['e1966d417','cbdf18555']]\npins=list(dict.fromkeys([p for m in merges for p in [git('rev-parse',m+'^1').strip(),m]]+['HEAD']))\nfiles=sorted(set(p for m in merges for p in git('diff','--name-only',m+'^1',m,'--','docs').splitlines()))\nresults=[]\nfor stem,key,lib in [('step10-round5','scripts','step10-sync287-lib.mjs'),('step10-sync4d','readOnlyScripts','lib.mjs')]:\n t=pathlib.Path('/tmp/fgos-work')/stem;t.mkdir(exist_ok=True)\n manifest=P.parent/'phase-06'/(stem+'-reproduction.json');scripts=json.loads(manifest.read_text())[key]\n for name,body in scripts.items():\n  assert pathlib.Path(name).name==name;(t/name).write_text(body)\n paths={}\n for pin in pins:\n  paths[pin]={}\n  for f in files:\n   r=subprocess.run(['git','show',pin+':'+f],capture_output=True)\n   if r.returncode:continue\n   dest=t/pin/f;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(r.stdout);paths[pin][f]=str(dest)\n (t/'extract.mjs').write_text(\"import {unitsOf} from './\"+lib+\"';const paths=\"+json.dumps(paths)+\";console.log(JSON.stringify(Object.fromEntries(Object.entries(paths).map(([pin,fs])=>[pin,Object.fromEntries(Object.entries(fs).map(([f,p])=>[f,unitsOf(p)]))]))));\")\n result=json.loads(subprocess.check_output(['node',str(t/'extract.mjs'),'--output-dir',str(t)],env=env,text=True))\n results.append({'manifest':str(manifest.relative_to(R)),'extractor':lib,'extractorSha256':hashlib.sha256(scripts[lib].encode()).hexdigest(),'units':result})\nassert results[0]['units']==results[1]['units']\npathlib.Path('/tmp/fgos-work/units-l130.json').write_text(json.dumps(results,ensure_ascii=False))\nchecks=[]\ndef walk(x,path,loc):\n if isinstance(x,dict):\n  if x.get('targetOwner') in files and x.get('targetAnchor'):\n   f=x['targetOwner'];old=results[0]['units'][pins[0]].get(f,[]);cur=results[0]['units']['HEAD'][f]\n   h=[u for u in cur if u['anchor']==x['targetAnchor'] and u['textDigest']==x.get('targetUnitDigest',x.get('targetDigest'))]\n   checks.append({'shard':str(path.relative_to(R)),'keys':loc,'file':f,'anchor':x['targetAnchor'],'digest':x.get('targetUnitDigest',x.get('targetDigest')),'ok':len(h)==1,'oldMatches':[(u['anchor'],u.get('sample',u['text'])[:80]) for u in old if u['textDigest']==x.get('targetUnitDigest',x.get('targetDigest'))]})\n  for k,v in x.items():walk(v,path,loc+[k])\n elif isinstance(x,list):\n  for i,v in enumerate(x):walk(v,path,loc+[i])\nfor path in sorted((R/'plans/260925-documentation-authority-unification/ledger').rglob('*.json')):\n walk(json.loads(path.read_text()),path,[])\npathlib.Path('/tmp/fgos-work/bindings-l130.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2))\nprint('files',files,'bindings',len(checks),'drifts',sum(not c['ok'] for c in checks))\nfor c in checks:\n if not c['ok']:print(c)\n",
+      "extractRecipeNote": "Diagnostic extractor script first printed historical ledger projections too; only owning decision shards/Pilot B are active targets, as in L12-117. Historical source identities are not rewritten."
+    }
+  ],
+  "suiteSlot": {
+    "provenance": "Lead supplied in step-08-final-records-brief.md; raw run logs absent, not rerun here",
+    "latest": {
+      "commit": "e1966d417",
+      "tests": 9330,
+      "pass": 8833,
+      "fail": 399,
+      "cancelled": 1,
+      "wallSeconds": 1138,
+      "branchOnlyFailureTitlesReported": 11
+    },
+    "mainBaseline": {
+      "commit": "9c7edde30",
+      "tests": 8668,
+      "fail": 392,
+      "olderThanImportedMain": true
+    },
+    "priorBranch": {
+      "commit": "4821f0a4a",
+      "tests": 9276,
+      "fail": 361,
+      "branchOnlyFailureTitlesReported": 12,
+      "reportedClasses": {
+        "load-timeout": 6,
+        "tmp-clone-artifact": 3,
+        "reproduction-A": 2,
+        "dead-vocabulary": 1
+      }
+    },
+    "missingInputs": [
+      {
+        "path": "/tmp/fgos-work/p8-suite3.log",
+        "exists": false
+      },
+      {
+        "path": "/tmp/fgos-work/main-suite.log",
+        "exists": false
+      },
+      {
+        "path": "/tmp/fgos-work/branch-only3.txt",
+        "exists": false
+      }
+    ],
+    "availableCommittedTitleSets": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/suite-logs/branch-failures.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-08/suite-logs/branch-only-failures-44ca64559.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-08/suite-logs/branch-only-failures.txt",
+      "plans/260925-documentation-authority-unification/reports/phase-08/suite-logs/main-failures.txt"
+    ],
+    "knownNewTitles": [
+      {
+        "title": "live self-check: repository baseline and ratchet verify cleanly",
+        "result": "repaired data drift, isolated 1/1 and whole owning file 28/28"
+      },
+      {
+        "title": "8 processes adding worktrees for 5 rounds leave every worktree registered and intact",
+        "result": "isolated native prerequisite failure; original load classification unproved"
+      }
+    ],
+    "unavailableTitleIdentities": 9,
+    "allElevenClassified": false,
+    "leakedDevHostDirectory": {
+      "source": "Lead suite guard supplied in brief",
+      "pattern": ".fgos/runtime/dev-host/run-*/",
+      "inspected": false,
+      "mutated": false,
+      "classifiedCause": null
+    },
+    "stop": "Missing raw logs/title identities and provisioned native replay block complete attribution; do not fabricate a class or infer it from totals. Any actual new branch-only class stops closure."
+  },
+  "pruneFollowup": {
+    "authority": "L12-129 Lead measurements after ab4c65d17, appended under L12-128 without changing original text",
+    "treeGB": 2.94,
+    "worktreeAddSeconds": 139.96,
+    "registrationSeconds": 0.008,
+    "checkoutSeconds": 143.7,
+    "mainCheckoutSeconds": 3.67,
+    "under60SecondsMet": false,
+    "preFlipGate": "L12-129 archive ref + merge, same-change reader migration/retirement and measured candidate checkout"
+  },
+  "changelog": {
+    "priorFixLinePresent": false,
+    "addedLines": 1,
+    "meaning": "Human docs-lease result line/exit 0 and no refused-run sentinel; no behavioral code change."
+  },
+  "ratchetScopeProof": {
+    "allowedChangedExceptionFields": [
+      "expectedDigest",
+      "reviewedAt"
+    ],
+    "onlyPaths": [
+      "docs/specs/reading-map.md",
+      "docs/specs/seat-binding.md"
+    ],
+    "mainMergeAccounting": "current event + exact previous object locator, no new exceptions/baseline/checker edits",
+    "verified": true
+  },
+  "pairAccounting": "LAST; see step-08-l12-130-pair-accounting.json after all other records",
+  "needsWrites": []
+}

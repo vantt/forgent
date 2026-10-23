@@ -1,0 +1,188 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ a new module can register a check via registrations.mjs and see it in checks.mjs's own DOCTOR_CHECKS, without checks.mjs being edited (1.234696ms)
+✔ registering a check with a duplicate id throws rather than silently shadowing the original (0.264163ms)
+✔ a new module can register a config-default independently of any check (D2) (0.179025ms)
+✔ registerConfigDefault rejects a non-object shape (0.087614ms)
+✔ registerConfigDefault requires a non-empty key (0.07467ms)
+✔ the runner's own config-default is registered under the "runner" key (built-in, proves the same mechanism a new module would use) (0.171567ms)
+✔ a new module can register a fix via registrations.mjs and see it in checks.mjs's own FIX_REGISTRATIONS, without checks.mjs being edited (0.109752ms)
+✔ registering a fix with a duplicate id throws rather than silently shadowing the original (0.087592ms)
+✔ registerFix requires a fix function (0.098777ms)
+✔ runFixes invokes every registered fix against the given cwd and reports id/changed/message per entry (17.446308ms)
+✔ ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one (0.585723ms)
+✔ ensureSharedConfigDefaults for the global layer writes the registered runner default with no seat-binding key (0.176017ms)
+✔ ensureSharedConfigDefaults leaves the marker out of a runner section that is already there: converting it is the conversion's job (0.217983ms)
+✔ ensureSharedConfigDefaults on an already-complete shared file does not rewrite it (0.387836ms)
+✔ ensureSharedConfigDefaults on an empty project registers the Workflow capabilities (0.156129ms)
+✔ ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned (0.218085ms)
+✔ setup adds a coding:plan slot beside a project bare-verb plan pool, and bind no longer serves it from that pool (4.643352ms)
+✔ Data Dictionary #7 names exactly the registered doctor checks — no missing entry, no stale one (0.253007ms)
+✔ Data Dictionary #7b names exactly the registered doctor fixes — no missing entry, no stale one (0.103636ms)
+✔ plugin-skill-cli-reachable passes when a workspace installation exists, reporting tier 0 (0.351069ms)
+✔ plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH (0.168684ms)
+✔ plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fgos resolves from PATH (0.447367ms)
+✔ plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists (0.184304ms)
+✔ cli-version-visible passes and its message embeds the resolved packageVersion (0.818746ms)
+✔ plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all (0.146442ms)
+✔ plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy (0.154434ms)
+✔ plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/ (0.149046ms)
+✔ gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts (0.298945ms)
+✔ gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it (0.157774ms)
+✔ the gateway config-default is registered under the "gateway" key with port and an unarmed null token (0.057793ms)
+✔ task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist (0.290998ms)
+✔ task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees (10.123956ms)
+✔ task-spec and workflow-operation checks still fail when the install root lacks its own task-specs (0.500415ms)
+✔ agent-type-names-unique doctor check passes when agent-type names are unique within each tier (2.219681ms)
+✔ agent-type-names-unique doctor check fails on a duplicate within one tier and accepts a higher tier replacing a lower one (1.276355ms)
+✔ agent-type-names-unique doctor check reports a workspace definition with the wrong shape or extension (1.237341ms)
+✖ guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist (5.886058ms)
+✖ events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean (4.265974ms)
+✖ events-compaction-verified passes trivially when no compaction has ever run (3.010386ms)
+✖ events-compaction-verified passes when a real compaction's baseline still matches its archived originals (3.38159ms)
+✖ events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals (2.848479ms)
+✔ findWorkflowStageOperationProblems passes on the live repository setup (1.10821ms)
+✔ findWorkflowStageOperationProblems fails when operation taskSpec does not resolve (0.972451ms)
+✔ findWorkflowStageOperationProblems fails when operation role is not in roleGraph.roles (0.830701ms)
+✔ findWorkflowStageOperationProblems fails when operation skill is not provided by any agent-type (0.927064ms)
+✔ findWorkflowStageOperationProblems fails when operation reason has no matching roleGraph edge (0.776067ms)
+✔ findWorkflowStageOperationProblems fails when multiple operations are marked primary: true (0.756436ms)
+✔ findWorkflowStageOperationProblems fails when the primary operation does not carry the step skill (1.317019ms)
+✔ findWorkflowStageOperationProblems fails when policy rigor or preferPersona is invalid (0.827952ms)
+✔ findWorkflowStageOperationProblems fails on invalid dispatch mode or human-only with executor policy (0.770406ms)
+✔ findWorkflowStageOperationProblems fails on invalid preferExecutor or visibility, and refuses the removed fallbackExecutors key (0.682717ms)
+✔ findWorkflowStageOperationProblems fails on duplicate operation id or empty id (0.778203ms)
+✔ findWorkflowStageOperationProblems fails when required fields taskSpec, role, or skills are missing or empty (0.701926ms)
+✔ findWorkflowStageOperationProblems strictly enforces role as TARGET role (to) for reason edges (0.662076ms)
+✔ findWorkflowStageOperationProblems fails when policy contains disallowed keys (0.606221ms)
+✔ findWorkflowStageOperationProblems fails when a step's operations is not an array (0.629168ms)
+✔ domain-workflow-operations-coverage doctor check is registered and passes on clean repo (0.858021ms)
+✔ doctor check runner-generated-paths accepts an absent or well-formed list and flags a malformed one (1.054478ms)
+✔ doctor check runner-patterns-config passes with defaults or warns when missing (0.745195ms)
+✔ Event Store remote defaults to origin and setup preserves an explicit remote (0.296849ms)
+ℹ tests 60
+ℹ suites 0
+ℹ pass 55
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 214.048222
+
+✖ failing tests:
+
+test at test/setup/registrations.test.mjs:603:1
+✖ guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist (5.886058ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /no main checkout guard warnings recorded/. Input:
+  
+  'not inside a git checkout — nothing to check'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs:618:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'not inside a git checkout — nothing to check',
+    expected: /no main checkout guard warnings recorded/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/setup/registrations.test.mjs:646:1
+✖ events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean (4.265974ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs:663:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/setup/registrations.test.mjs:681:1
+✖ events-compaction-verified passes trivially when no compaction has ever run (3.010386ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /nothing to verify/. Input:
+  
+  'not inside a git checkout — nothing to check'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs:687:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'not inside a git checkout — nothing to check',
+    expected: /nothing to verify/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/setup/registrations.test.mjs:690:1
+✖ events-compaction-verified passes when a real compaction's baseline still matches its archived originals (3.38159ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /1 past compaction/. Input:
+  
+  'not inside a git checkout — nothing to check'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs:709:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'not inside a git checkout — nothing to check',
+    expected: /1 past compaction/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/setup/registrations.test.mjs:712:1
+✖ events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals (2.848479ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs:730:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

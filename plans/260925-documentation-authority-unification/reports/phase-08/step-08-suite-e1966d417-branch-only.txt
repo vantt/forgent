@@ -1,0 +1,11 @@
+✖ 8 processes adding worktrees for 5 rounds leave every worktree registered and intact
+✖ a holder workflow admits its writing unit using its origin, with one sidecar read for execution
+✖ dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names
+✖ dev door runs the real Node consumer from INIT_CWD with default Cargo output
+✖ direct audit rejects a symlink output before reading the corpus
+✖ documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json
+✖ fgos --help --json through the host is the whole manifest, byte-identical to the Node payload
+✖ live self-check: repository baseline and ratchet verify cleanly
+✖ pre-commit allows holder commit touching scoped paths

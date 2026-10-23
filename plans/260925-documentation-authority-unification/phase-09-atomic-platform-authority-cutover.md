@@ -52,6 +52,16 @@ Merge `49ad04648` imports main `708ea6608` and adds the following exact incoming
 - `docs/platform/session-identity/spec.md`
 - `docs/platform/terminal-control/spec.md`
 
+Merges `e1966d417` (local main `1d89e8177`) and `cbdf18555` (main `a0db9ca8e`) add the following incoming `docs/platform/**` changed-file obligations (union/deduplicate with the original and later sets, not additional unique-file counts):
+
+- `docs/platform/component-boundary.md`
+- `docs/platform/event-store/spec.md`
+- `docs/platform/identity/spec.md`
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+- `docs/platform/yaml-document/spec.md`
+
+YAML Document has no candidate binding in the current ledger. Before flip, the documentation-navigation/area-inventory owner must route this incoming area through a switchboard row, the retained reading-map entry union and the inventory; its existing signed spec and imported Rust implementation status do not silently promote it. Identity must retain its section 7a local session-writer scope. Exact changed-document and content/neighbour binding witnesses are in [L12-130 accounting](reports/phase-08/step-08-l12-130-merge-accounting.json); existing source identities and independent-review duties remain intact.
+
 [Phase 8 merge accounting](reports/phase-08/merge-accounting.json) preserves merge/base/digest/main-commit provenance. Final native identity transitions, content/context validation, approvals and per-unit review remain owed against final bytes; incorporate the Phase 8 Step 0 and subsequent N1 receipts rather than deferring those binding repairs. Also include legacy main edits, architecture-manifest changes and any later full identity-scope drift as their existing obligations require.
 
 At landing, reconcile main's only references to its new PF-I011/PF-I012 rows in `plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md` with their candidate PF-I022/PF-I023 identities; do not alter the plan's existing PF-I011/PF-I012. This is an intent-ledger collision account, not contract renumbering authority.

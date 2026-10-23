@@ -1,0 +1,2667 @@
+{
+  "inputHEAD": "220a4d9ed674c57098e8e7fd27ae5c54500878a9",
+  "merges": [
+    "e1966d417648b4d3922fb10ecf6a3f93b4c009f6",
+    "cbdf18555699c9510cad9ebe274f1313d027ada5"
+  ],
+  "scope": "All physical Step 3 revisions; canonical Step 4/5 primary consumer, sourceRenderProvenance and protectedPins only. No incidental target mentions.",
+  "counts": {
+    "step3": 10,
+    "step4": 9,
+    "step5": 125
+  },
+  "records": {
+    "step3": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "b1526ab184a7d8ab5cf9124355efc0cf950788878808dd22a5940bc4c50252c8",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "3b2af89d3f37df9b090790cfd7c0cdf9b8856e6335f500e8baee43b5dfed9a0b",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+        "recordLine": 16,
+        "recordSha256": "a08ddaf2ed0c4b3ac386706094d6a57f84c8450be2dafd03e59cea05d3d260ee",
+        "file": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "65c8bf8e907d50e2fc59986cb3bf26b966719818c47a45c059518bd7e89f0303",
+        "currentPrimaryDigest": "5bb33617b5de29adc04e82a8157787de4b2a7f9509bf8d4e696761226f178625",
+        "changedDependencies": [
+          {
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+        "recordLine": 1,
+        "recordSha256": "08afcd61b4fcdbd3b33265bf40651ae381a29aee46287be531d3787e49e05eee",
+        "file": "docs/platform/component-boundary.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+        "currentPrimaryDigest": "be5512961a25b1deaf8a44f4ed085a8bea43b4b025da7306fb1bc0690e368974",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/component-boundary.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+        "recordLine": 1,
+        "recordSha256": "49d86abfb90457e2380dd5f29899b6fc5d2278af4b8f3025a8d36eed6ead0a1a",
+        "file": "docs/platform/event-store/spec.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "7d26c6c46a48789a8ba63be3576867dd3279308e3894ec8c40bc9317e5f4db80",
+        "currentPrimaryDigest": "8faed7e5ed300e564f63aced45d9249942223096d68d167b1b9747fbc3079146",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/event-store/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+        "recordLine": 10,
+        "recordSha256": "dcdefc180bebfd6ef3a212be9eeb3cbd539d691cfcaa6025929271a96891ff3a",
+        "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "986c26c6f0ed2892f5a9ae7983fe987856894fafb43d7792d7194d11e39dc9ad",
+        "currentPrimaryDigest": "1c86d535fba854a9a31f095fdf182eb8ea84f53c8bfa6114461f7a36ce7a7b25",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+        "recordLine": 1,
+        "recordSha256": "cdedba2cb0ee301765850d58578c3c120833f66ff92a365c7b8fdc116a3a400d",
+        "file": "docs/architecture-manifest.json",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "ca065694d38c4a8f1d158180c4f16a0decfda9443e742f2edae0e849cd4f453d",
+        "currentPrimaryDigest": "788bc1a09f02ef1ee4b3c5dcfa631aeecf7fdd4aec51bf7acd5cc80a63a82da7",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+        "recordLine": 2,
+        "recordSha256": "952ab5dcafe6959ac00b12b43d7711345370f81d5bbc7e0ac325dce5ea4932fc",
+        "file": "docs/backlog.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+        "currentPrimaryDigest": "6c9eaec820db4c1688bbf062b7acbadfccc529085a1f0e72f6d8244aa8ce2a97",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "30edfb2bfc3d73104cfecf3cda58a685f91bd8171445245b6892b82daffb60f2",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "3b2af89d3f37df9b090790cfd7c0cdf9b8856e6335f500e8baee43b5dfed9a0b",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "da95573f0099e96ed5827fa81b7fd0459d3e996087ce136e0645d7b7abc04332",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "3b2af89d3f37df9b090790cfd7c0cdf9b8856e6335f500e8baee43b5dfed9a0b",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "f96ceea9a2e9bf9802b1ac4c7416cc280e5c68a3c37c5344472a622ad3a8c46a",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "3b2af89d3f37df9b090790cfd7c0cdf9b8856e6335f500e8baee43b5dfed9a0b",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      }
+    ],
+    "step4": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordLine": 3,
+        "recordSha256": "b4967b211da5075fe571726d9259eeb880c20c899ca48bdb6dc4651581244baf",
+        "file": "core/instructions/design-principles.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "1ce8aecdf134ad53db49ee0643eae4cadc145ac2136ab553c9f2b391d9a5a084",
+        "currentPrimaryDigest": "1ce8aecdf134ad53db49ee0643eae4cadc145ac2136ab553c9f2b391d9a5a084",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              0,
+              "existingEdgeJoins",
+              0,
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+        "recordLine": 1,
+        "recordSha256": "f72c3cb0e25c09af046b0ed86659e2d982eca459c3c6639e7873743c06494171",
+        "file": "bin/fgos.mjs",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+        "currentPrimaryDigest": "7f3271b07458be4510a6185718492e7a7f6f3edc531029d6be56b07a6b72ce87",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+        "recordLine": 1,
+        "recordSha256": "a44bb49f7559ca3d3d7afcf5565a289cf61f16c7fd01102f07d2816066665a88",
+        "file": "src/cli/command-registry.mjs",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "currentPrimaryDigest": "6aa0020ff3848e24b7b9372285bb8e418d3209c5415e83d3230c0eea744bfb85",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+        "recordLine": 1,
+        "recordSha256": "9b680f703d3228af74173da1d880a21d3b710b4d9fbf55fabbbc9ce985d897be",
+        "file": "apps/fgos-gateway/Cargo.toml",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "560906267efc832f207db70303bda05b42f5afc8bbf7eca4c0a6b78e3634345d",
+        "currentPrimaryDigest": "ff55747c22cfb9c9e78f0b619271962185edb1682c4bd2e0dbf625b93aedc7fb",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos-gateway/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+        "recordLine": 5,
+        "recordSha256": "49bf675f7c9b796380505bb9b633b2b3167a2d9e0d5bf9fb60e7d410d7b70173",
+        "file": "apps/fgos-gateway/src/mcp.rs",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+        "currentPrimaryDigest": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos-gateway/src/mcp.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+        "recordLine": 1,
+        "recordSha256": "8c218697e50bd71903d5837180c4a1db2eabeb0d8c1c4cb39bb83ea8dc3a000a",
+        "file": "CHANGELOG.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+        "currentPrimaryDigest": "22187e47cf3c0785355106a5668855c1a53e662d6bb128d468d5a4b867cb83b2",
+        "changedDependencies": [
+          {
+            "path": "CHANGELOG.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 1,
+        "recordSha256": "d7a282d606dc9c251f19dc9a115d7cc0e7c79b9485c69cb5ca20410bff14a195",
+        "file": "src/runner/dispatch/config.mjs",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+        "currentPrimaryDigest": "f15fcec4f4cf38b1a16aec3b212e2d7d9a4a866d59493720cc1448f30a0b8404",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/config.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 4,
+        "recordSha256": "eb13ce0a0b8be004d96bb27a385abca7bf065a2c85f79c61377d2dd040086434",
+        "file": "core/skills/_shared/citation-format.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "currentPrimaryDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              0,
+              "existingEdgeJoins",
+              7,
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              1,
+              "existingEdgeJoins",
+              7,
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 8,
+        "recordSha256": "3e3d313ae2c829627477849a66d3cbb1f6137aa9b618d9cc45ff161eec0b0a6c",
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "currentPrimaryDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              0,
+              "existingEdgeJoins",
+              0,
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              2,
+              "existingEdgeJoins",
+              0,
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      }
+    ],
+    "step5": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 2,
+        "recordSha256": "1c06f74e0c2b0299e1144547b7140c6f737c48c17f840d7ffbd3704f11b0ccf6",
+        "file": "bin/fgos.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+        "currentPrimaryDigest": "7f3271b07458be4510a6185718492e7a7f6f3edc531029d6be56b07a6b72ce87",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 3,
+        "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+        "file": "src/cli/command-registry.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "currentPrimaryDigest": "6aa0020ff3848e24b7b9372285bb8e418d3209c5415e83d3230c0eea744bfb85",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+        "recordLine": 2,
+        "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+        "file": "apps/fgos-gateway/src/mcp.rs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+        "currentPrimaryDigest": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos-gateway/src/mcp.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 66,
+        "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+        "file": "docs/backlog.md",
+        "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+        "pinnedDigest": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+        "currentPrimaryDigest": "6c9eaec820db4c1688bbf062b7acbadfccc529085a1f0e72f6d8244aa8ce2a97",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 155,
+        "recordSha256": "b1e6bf139a36497c67688204d62d65d4e3a18a166d36b721d128d766b54ced1f",
+        "file": "plugins/fgOS/skills/terminal/rename.sh",
+        "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+        "pinnedDigest": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+        "currentPrimaryDigest": "d6ae42898949ac0548e41abf8e06b20cbc381a53012e9acfa261ff1c9fdecaec",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/rename.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 156,
+        "recordSha256": "3cd4c0e0288e58eb59eb74961f617cf497e8c3a0d5351593e849cf6098596195",
+        "file": "plugins/fgOS/skills/terminal/terminal-port.sh",
+        "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+        "pinnedDigest": "415bc05475a4102bd64421229e822ac3239693349384ab53d7655f5057682f6d",
+        "currentPrimaryDigest": "32cc731bf2a6cd10422fd397c3a5643f3add6c9ea7e474274c4b963137bd44fb",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/terminal-port.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 214,
+        "recordSha256": "7a3bcf679f8239d92bfeb2a3fa6d52b48af2f44aa7c62b57970e774a18f683bb",
+        "file": "scripts/prepare-release.mjs",
+        "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+        "pinnedDigest": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+        "currentPrimaryDigest": "66a025419962863905a07726cc68e1f8c510d50e372239a11833d60ce46ab73c",
+        "changedDependencies": [
+          {
+            "path": "scripts/prepare-release.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 3,
+        "recordSha256": "0d5af178a9ffb73ea263ce099456895d7492fd3fd28580b848e2364022639287",
+        "file": "apps/fgos-gateway/Cargo.toml",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "d22dcdb8cbd1e0136bb43becc999e13fd0a660093d21dd007b83ac548153e733",
+        "currentPrimaryDigest": "ff55747c22cfb9c9e78f0b619271962185edb1682c4bd2e0dbf625b93aedc7fb",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos-gateway/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13,
+        "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+        "file": "bin/fgos.mjs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
+        "currentPrimaryDigest": "7f3271b07458be4510a6185718492e7a7f6f3edc531029d6be56b07a6b72ce87",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 14,
+        "recordSha256": "433d6f7a1764ce52de8f3ea4e0376bb9394d9a10b43d4367f298d6207831808f",
+        "file": "docs/architecture-manifest.json",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "3107c11cadd26ba38d873decdc003dab6bd5420a74c0bd72936871ee5f515887",
+        "currentPrimaryDigest": "788bc1a09f02ef1ee4b3c5dcfa631aeecf7fdd4aec51bf7acd5cc80a63a82da7",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 14,
+        "recordSha256": "420cddb84ee3fc395a6b33dc87e032bfc2013d588afa86bd62fadc61ff9ab524",
+        "file": "packages/event-store/rust/src/identity.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "d0d9f2dd9b289d00109ca19e268c13c4fe9dcd0874d38a7e1060d9e7c2ebc7a8",
+        "currentPrimaryDigest": "b4bf24086e864acbd3a10c4839277ef1a8109c2e0d600abe4dd66ad8ae767398",
+        "changedDependencies": [
+          {
+            "path": "packages/event-store/rust/src/identity.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 17,
+        "recordSha256": "3b1a21bba71e33f22ff8ae2a1844150133e29beec3da90512823490bc6127c4c",
+        "file": "packages/host-runtime/rust/src/providers/external_process/manifest.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "3aa99f3c4f64fc94ea917ddac35da0c9932f0904d3fa30fb43d1d0935f0c83a4",
+        "currentPrimaryDigest": "a1691fd53298f62a962374fa0d333e391eb351100c69a2c9b96ab895a791fd68",
+        "changedDependencies": [
+          {
+            "path": "packages/host-runtime/rust/src/providers/external_process/manifest.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 22,
+        "recordSha256": "05aef022be6ec2f5303c87d7d9f5c9c2917e427b0b6232a5c10f27d468bd6876",
+        "file": "packages/observe/rust/src/metrics_cli/harness.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "8db36fd38e7a6ebd3bcd418b477a6826a70891aa3aeaa7943cfcd2c989c84366",
+        "currentPrimaryDigest": "b25b663049b344f41c826a03ab90a95b7152fb138371e5a737910cb57481ce3b",
+        "changedDependencies": [
+          {
+            "path": "packages/observe/rust/src/metrics_cli/harness.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 3,
+        "recordSha256": "3c2069f5376076e47c912887377f047491341138a0e9c678b05a034a325bcc87",
+        "file": "packages/run-supervisor/rust/src/adopt.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "fcc542da6bc755d6480f12404db59e07f5d6288b1b93919992ddcead85aad1fe",
+        "currentPrimaryDigest": "49af84a9e4d2730a0b61c9d7881f8c2d39cf148e5c69d76b7f2eeba912a1189f",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/adopt.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 5,
+        "recordSha256": "f872110149801ebd51c4fa7034367fcd63a946852f50bf11bbda6dd375f70082",
+        "file": "packages/run-supervisor/rust/src/steps.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "55892a633e62ff2605b98f4afc57f281704a35e912edc63550206d93e03295ae",
+        "currentPrimaryDigest": "30bad93df1d946005054daa5aefdeb0d3df5b4175ebb19bb28cec7680e9dd20b",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/steps.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 6,
+        "recordSha256": "b55bf0359132262ed216cb942b8f88eb95a399a7e459f49d4344041a18730c6a",
+        "file": "packages/run-supervisor/rust/src/supervise.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "1eaee62f4709ac7b135302ed40068905fb50f5ba42d845228fa84d9407d091de",
+        "currentPrimaryDigest": "ffe5ec26c3e649359d18cef69a59cd783eecd9d557eeca8f9af7ed2a6eeb9ecb",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/supervise.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 15,
+        "recordSha256": "09b4f4ed444e319fbf0cc7d3af2b081cd4de8b4acf61b9b3ea3c9eca5a0da624",
+        "file": "src/event-store/native.mjs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "43899fbb698c2b6d698efe018cfbbeb1fe34e67d623243f96d44dcd2d81b10f8",
+        "currentPrimaryDigest": "3df938eef9557243729e5ae94815950c7571a5555154aa1bb1abb401e08aff8f",
+        "changedDependencies": [
+          {
+            "path": "src/event-store/native.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 29,
+        "recordSha256": "244c934afd4b68e43570c367fff4840dbcf19f51e4cd0224c9c15426ce1f6728",
+        "file": "src/runner/dispatch/config.mjs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+        "currentPrimaryDigest": "f15fcec4f4cf38b1a16aec3b212e2d7d9a4a866d59493720cc1448f30a0b8404",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/config.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 21,
+        "recordSha256": "0e7babe03c2e3d056c6c970d6dde236bbfabc979ea522c2069340f130b598e59",
+        "file": "apps/fgos/src/cli_projector.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "5fc75dfcedd08bea98c6d0f2da950a081fbdc80517e78e60f74dc4ba02d0af56",
+        "currentPrimaryDigest": "3e7e75751b281466860cdb4f75ff418e56c9a61e1810d331cf0e5de418046048",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/src/cli_projector.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 32,
+        "recordSha256": "ba5b57b5a6d5be6cc9832a2b34a6e17e801629e1e5a4989c73397fd053057785",
+        "file": "packages/convention/contracts/convention.golden.v1.json",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "baf9be45734b9da620cec89213652d6d5a077f5d6788721e3cf59a36d5647c65",
+        "currentPrimaryDigest": "4e93664cbcb12289b926a7356f4006670c9e8e96e026b7d87061556c30219e7b",
+        "changedDependencies": [
+          {
+            "path": "packages/convention/contracts/convention.golden.v1.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 60,
+        "recordSha256": "48e29946749201fbdae9ba1e2ad671bdafcd66c5fa3499c5bc2e648a4b1c0b86",
+        "file": "packages/git/node-addon/src/event_store.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "4db4794487da76c656b1812924e1b499bf8dbe6c807d8b3a3ea18857cfed60da",
+        "currentPrimaryDigest": "486dc0c163a142ed5574b332b01313945abde6ec37311e047df1b3225167ed85",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/src/event_store.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 77,
+        "recordSha256": "c7d22ef70eb24963e6b327629c5f1e62aa6c49c07a94f67d53cec557338a853f",
+        "file": "packages/host-runtime/rust/Cargo.toml",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "a55c8bc6e582c1d7fccbd3d49a8b81e19e1a4df54f40ed21406abeea98cd1b13",
+        "currentPrimaryDigest": "ab1b86d6c595c9a7f5a9db208a7f590c27ad26c0a1453277fb99a47f17b93bde",
+        "changedDependencies": [
+          {
+            "path": "packages/host-runtime/rust/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 80,
+        "recordSha256": "df80fd1340c8bacf5f2db40d1c118b7a673165ad6f40dc2531691056fdebee95",
+        "file": "packages/observe/rust/Cargo.toml",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "75a042511993a031fcbe2443e194fc4e1d17b504d3c009468f9a607ed4233e6b",
+        "currentPrimaryDigest": "90a21e4f7b3b4c4619dfdc113d0ac50c2f752a5df3aa6024abe855fbfbb93cc7",
+        "changedDependencies": [
+          {
+            "path": "packages/observe/rust/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 96,
+        "recordSha256": "41e76aa79b4b46741b1b6bba63f6b71fa2a6f61a7ccad00b5fe101bf88f261f6",
+        "file": "packages/run-supervisor/rust/Cargo.toml",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "0aebd5850a1b0b845effe44a51d22e3204b4d0ed71fe0b24ce11d3cb0bce1626",
+        "currentPrimaryDigest": "47cedff761304adda8496c95582cbb0bff49eac144b9f2fd34a2e73673482bd0",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 98,
+        "recordSha256": "4559a5ca30e6b71e1a6001250bd28a06977545660c6c5dc60a7779c57e9c1168",
+        "file": "packages/run-supervisor/rust/src/gate.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "0c526123b2a107d2c00fc6ff6a7c06c0abb294873b1851bbeefad99e34873120",
+        "currentPrimaryDigest": "544c9bb6f2e9167620439ecc5feacd7da24eac3e362341cbb541e184f3be421e",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/gate.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "recordLine": 3,
+        "recordSha256": "1662ca0b8587486e800a6ff4c157ffce6711cc19f032701a6de27b733506a609",
+        "file": "packages/run-supervisor/rust/src/publish.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "c6abb1a9808d9d0774307279a37630c020165fc0e7a6a7e0e20e54a817219f3c",
+        "currentPrimaryDigest": "bd22fb4e33151e54220eb6e3de8a541037a178e51d6d41a890dece5bd2de261e",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/publish.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "recordLine": 4,
+        "recordSha256": "115b384cbda26052611db3af6701160ccb385e1770e4e65531f56312724c5f85",
+        "file": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "40db457a237ae133ce00b6ba3304af34d88fcd7f129afbc43dc6d8052a6c6cd3",
+        "currentPrimaryDigest": "0a197c9e279958caa31b555666f3efc45e10050d7086e5511ac9fb369375b5a3",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 10,
+        "recordSha256": "d132075b4c7924496eba8f42dd4587796b92869bcb9e815f04612c8a6d2668c7",
+        "file": "src/setup/event-store-fixes.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
+        "currentPrimaryDigest": "c02842cf801adb41fb3e338c025bc519159833ee256dca558202f19e97d453b2",
+        "changedDependencies": [
+          {
+            "path": "src/setup/event-store-fixes.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+        "file": "src/setup/registrations.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "currentPrimaryDigest": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "changedDependencies": [
+          {
+            "path": "src/setup/registrations.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 45,
+        "recordSha256": "c3736b687a70e44fc613710b0f0a879c7cf423622e2d3bf00058e4e9a668dec1",
+        "file": "packages/terminal-control/rust/tests/core_failures.rs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
+        "currentPrimaryDigest": "c945cffb3b3bc06ba013c6e4441974758acd4261478612e0f27dc12c382d4567",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/core_failures.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 50,
+        "recordSha256": "41bbb1e30336c75f138c5ced28362c245b18452236ba87e02060db48e8f6895f",
+        "file": "test/cli/dispatch-inspect.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ab81c0ecc8fd089c6bf31b1454bf90d3b56b575dd0e25738e3119e5f3f482b53",
+        "currentPrimaryDigest": "265625af3e1a1fc6925d0b25373916278ce88a3579e690b93e6b0d5b566c8017",
+        "changedDependencies": [
+          {
+            "path": "test/cli/dispatch-inspect.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 58,
+        "recordSha256": "c69c7f5bcec19d4562fae8768072a9fb1c63b88a3ac7b8c9179a791612059845",
+        "file": "test/cli/fgos-tool.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "fc5164577a519c1a196ba15748cf826b2737f4f5a2c3d0ed844fc81fd68e96fb",
+        "currentPrimaryDigest": "5e4e34f360329915dd0ac9e4d9e1848e883162cb1884056f8cf489e9486c6ce6",
+        "changedDependencies": [
+          {
+            "path": "test/cli/fgos-tool.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 64,
+        "recordSha256": "e3c9c940bad142d567a844d26d13962b526a7b0ad9a644978930080e4989cbbb",
+        "file": "test/config/global-config.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "311a21f055c47997055bae07186ea746026470e1638f7a83c604e01dcc7829b3",
+        "currentPrimaryDigest": "62158076d7611e85d84ff9beee2e5dc20d750ccef9f6dd9279eda7cbfe402b94",
+        "changedDependencies": [
+          {
+            "path": "test/config/global-config.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 65,
+        "recordSha256": "7f4f1b99b5cba3dd7d39aa7c992c356202025538a94f9f46d90be8e6cfa1f139",
+        "file": "test/config/shared-config-file.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "4254adcce724a2e29467f8ac29e3fb6041f874cbcddba4de58dfdef5acbd9c3e",
+        "currentPrimaryDigest": "f885f18717bceb4312542b1d8012bbf3177e90d11bf66ddd21b4e3e52b6c563f",
+        "changedDependencies": [
+          {
+            "path": "test/config/shared-config-file.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 104,
+        "recordSha256": "a4177788a0629f5acceaa861e6562efaf6218fcd3ded5af9da486f6c90f60a42",
+        "file": "test/runner/credential-store.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "c8fcc8f36f674b88cd926076490e1099e5a57346381e92ebd5efd4f9eb4c9ec5",
+        "currentPrimaryDigest": "330530db60967d18f370a3a91eadac45d23ab55b82e0604c7a1c5729b635be06",
+        "changedDependencies": [
+          {
+            "path": "test/runner/credential-store.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 107,
+        "recordSha256": "f5dd37267447e498246d3af46f64066c644e4f448cd760b75fad87227d10bad1",
+        "file": "test/runner/dispatch-config-patterns.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "8d4c9e4715da2e401a85132ceca861a95c58fcc6cc501a1cd270d7e4997274d5",
+        "currentPrimaryDigest": "45895cfe056fbec7a38accd0dab752b2bddd4b76e49f71bc5cea8a674051d415",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-config-patterns.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 131,
+        "recordSha256": "5aab7395d8ba8c18d1a67084b2a914edd9a3997d1ed550a171300cc969af26a2",
+        "file": "test/runner/repo-locks-multiprocess.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "23f637bfa7e2de0070250331c78329d169a89e163a5d6c99be99b370c431e3ab",
+        "currentPrimaryDigest": "9c8b14bd781387156c8127d174ebd8d2bf270edc053770f4465cd2d517779c45",
+        "changedDependencies": [
+          {
+            "path": "test/runner/repo-locks-multiprocess.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 136,
+        "recordSha256": "ed01f06eabbe4960cbbe353fc7a1d60442ccf21a54d1760e37cab54180169de6",
+        "file": "test/runner/tier-cell.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "6f9ae6c489990d5e7f64ced1a03392506ba470fcb89acc71f4f0e9e4797a1888",
+        "currentPrimaryDigest": "cdebb744145f0eb131b9a4103ed421a2a334cfd105258f2113b066b4a897e3fa",
+        "changedDependencies": [
+          {
+            "path": "test/runner/tier-cell.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 151,
+        "recordSha256": "598d89fe893f4d73cf25171a52a558022ebfa9f815b98f10cf32dd0f6c926555",
+        "file": "test/scripts/dispatch-decide-hook.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "572ed6d111e5614c0358d5d6c1f70ea477ad6161b3ff580fb41bb7d685b3243e",
+        "currentPrimaryDigest": "7bc0a40cbe427a5365e383634ea12b3b780528cf48e8b9478e5ae7600e89d59b",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/dispatch-decide-hook.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 157,
+        "recordSha256": "59cddb7c993fa29b0da26e710a8ab56d27f15bc88c6b15ca584cba4862525d05",
+        "file": "test/scripts/prepare-release.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "c14e0c8668b147c0b7771736bb944a18abb853c99143cdd282e4eba811671d1a",
+        "currentPrimaryDigest": "7df262c56f8ae079e57a44cc2ca10d31f132a673d630f92dcd8a4566628daca1",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/prepare-release.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 186,
+        "recordSha256": "42b6955b64cd13f5661eb70dc04f77122a69d339186b6519a74391320d9a80eb",
+        "file": "test/state/worker-slots.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "5ef95ed0a84974933ddf0917c8fdb13c89248171823f9c4e946fff0bf3b0b678",
+        "currentPrimaryDigest": "167d871425960d9342886dbef046c8ba61472688e312fdbe5ac24ad804f17718",
+        "changedDependencies": [
+          {
+            "path": "test/state/worker-slots.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53",
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "currentPrimaryDigest": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dead-vocabulary-guard.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 2,
+        "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+        "file": "test/architecture.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "bca3887f60c239a1438954dfb803f2eab123c3aa2a78222ee04e1bbf3655a647",
+        "currentPrimaryDigest": "c02e439c66ff093250756b72420d7c20a2030681240eb13abdbc3c6b842af4e1",
+        "changedDependencies": [
+          {
+            "path": "test/architecture.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          },
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "protectedPins",
+              "docs/architecture-manifest.json"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 7,
+        "recordSha256": "5f14296840eb07a6646dd956206ecb1512c599ad417075c5d9f200180133eb8b",
+        "file": "test/cli/fgos-iron-law-gate.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "bfbf43dde292fdccadea4df2f2a2e3129669c1269c4478f0918b287e4d42970d",
+        "currentPrimaryDigest": "fc3ecc10a5bcf1ebce42de4de6c8030b89f6831ef57512b25a2786829f9217ae",
+        "changedDependencies": [
+          {
+            "path": "test/cli/fgos-iron-law-gate.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 16,
+        "recordSha256": "866ebf5e85e87b549df53b34db697b31c98f64234139c97c77ae72fda5da2275",
+        "file": "test/cli/fgos-stage.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "9c971cae27e82dc5fd9d97fb387e213f1cef196f39f159677192f0e2ccacdf02",
+        "currentPrimaryDigest": "496020d2748d97ab8c74413db0eb858fd5c21d01319750b53c7ac33dd20e0e58",
+        "changedDependencies": [
+          {
+            "path": "test/cli/fgos-stage.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 21,
+        "recordSha256": "235448c62f6b1590a703aa5e4fb442260a0c4e57d52f17c5de149488bf8ce6a3",
+        "file": "test/e2e/coexistence-canary.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "34f89393684c25c9bf0616441acf75bb2e418058f0ffd8c32cc08cce293544df",
+        "currentPrimaryDigest": "7025ae501f4cb79129f928877ce42a82425bd2592280a90c06dc8e53a7cac88b",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/coexistence-canary.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 22,
+        "recordSha256": "f689f08cd18e9ded541c41a1a5c265b2845eca939a69b415fab0947d78404290",
+        "file": "test/e2e/domain-aware-stage-literals.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "12475831574b086c96d9bf6410d4f9e14845656e91541f06ff00be2dc8e4285e",
+        "currentPrimaryDigest": "f6a0ff89f587d558af52b0df7fb8c6ab6f2bd6766ad008578c2815fadbf7c920",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/domain-aware-stage-literals.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 23,
+        "recordSha256": "d918e791fc26906fbb6dd48910be07b61d39dafa4f2d91bd7d7acac6edf24c31",
+        "file": "test/e2e/fixture-marketing-domain.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "bf40546d55d5637bec14a42905750c0d2aca6dd4646a522331367b10f49d3406",
+        "currentPrimaryDigest": "16d2224dcc06fff1d3dbbad78eaf5f69e05a17c8f3036d1ba8ed34b57868e387",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/fixture-marketing-domain.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 25,
+        "recordSha256": "693449a8cce198119f5bc9059a869e2bd047f503b7b9255697686d7680af836f",
+        "file": "test/e2e/runner-loop.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "704b3daafb5fe4158deb6dcadda7fe4274a2d3e89c43926dfc0abf965095b8bd",
+        "currentPrimaryDigest": "572ebbd537d310cd699c75494ff0075e608fda106defb231fcaf49f068cb38f3",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/runner-loop.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 26,
+        "recordSha256": "badbd6ac96929c29316f973b73da08bdce0184122980d264335fc409b1d48765",
+        "file": "test/e2e/self-improve-loop.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "09a45ecc69e197c2f6be9343827a22a5d879c3b062f7cab020a80fde1f88106b",
+        "currentPrimaryDigest": "5f06213934a83e3e805a1b6767ca5a27fe71c0d99e7799cc4761600fbd761c80",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/self-improve-loop.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 33,
+        "recordSha256": "70625acc67e2107ec9b70cc6c5ce1180f918e171ab94dfefa4955ee29b64fa68",
+        "file": "test/runner/assignment-dispatch.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "2522aab5f1c7b09bd31e527233b506bed9262be4662e972c31217e1f49783564",
+        "currentPrimaryDigest": "076ba69d844865371234a8cf8fb2b1a5a354cada0da631e652d5f19a926ab525",
+        "changedDependencies": [
+          {
+            "path": "test/runner/assignment-dispatch.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 35,
+        "recordSha256": "fa36f7a72d0477dc18fc479e0ddc03d7be2a0e0d4530f1940e89064c44dab22d",
+        "file": "test/runner/claim-port.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "4211cd020c09487bba723faf418cd6cce74b3674995eb0664a494b5e534d4e5d",
+        "currentPrimaryDigest": "23ac2e402df0fcd6cbb81178bbff62faec3b9946c00d0718e6da6bbc77182e33",
+        "changedDependencies": [
+          {
+            "path": "test/runner/claim-port.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 36,
+        "recordSha256": "5601a4c9efd28ccf7f3fc3720aea59f9b03232d09157eeb13632be4c8d6d63ec",
+        "file": "test/runner/dispatch.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "b4a3a0ff90b14b420f76533064355896454bd2b28bb9de08fa6dc21b5fbe48ab",
+        "currentPrimaryDigest": "a4a8c131bfa13f40ce2086e9f5d91b0448145cd7d4b1d0719ea2e537d966f0bf",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 37,
+        "recordSha256": "e74e8ba435d92dae4f9200e805f7e90c9e2c74c586e0fb83407396c4d0a6a683",
+        "file": "test/runner/driver-rununit.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "6f624b58ed69f848dea60129fa9f3c9242fd55c617ec23f8a6072e3aab5ba63d",
+        "currentPrimaryDigest": "800c811a29086408cccac101ee4af07b31f978d64810499170a8b46ad73d808d",
+        "changedDependencies": [
+          {
+            "path": "test/runner/driver-rununit.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 38,
+        "recordSha256": "4c7e699d8f1ca0835dec18b34474f995b2b87c9689a31bb41ab669f98e0b2fca",
+        "file": "test/runner/loop.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "7347f51285b4cd61982206913d6132c28b5bd2ee59e6a440867926846b65af0e",
+        "currentPrimaryDigest": "6e83274ddfcc916df9e8eac3ece36b446aef58d3d39c3bc1bc5af9fb6c8e2b33",
+        "changedDependencies": [
+          {
+            "path": "test/runner/loop.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 40,
+        "recordSha256": "e09fab0746d25e1352bf831bc4769b7d4eb7b709864035fa05eaf48b7ab6e17e",
+        "file": "test/runner/merge.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+        "currentPrimaryDigest": "44e8822ee9addea2722d2921cddcfb5d2fa25f8f1a16cbd35dd81bdfce948308",
+        "changedDependencies": [
+          {
+            "path": "test/runner/merge.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 1,
+        "recordSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
+        "file": "test/cli/helpers/fgos-cli-harness.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
+        "currentPrimaryDigest": "4aac2ba718c317c3ecaf3a6a23b57c3b98605ffb72bf371b4409650e1cb32f2d",
+        "changedDependencies": [
+          {
+            "path": "test/cli/helpers/fgos-cli-harness.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 13,
+        "recordSha256": "33ee5c69d7c1368d376123a1d977d443b2929ebf102559027e96c6f9c808754e",
+        "file": "test/runner/dispatch-confinement-p05.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "12d97830124eb5a0a70e7bc25b53121c815ef3c644c002f2cd5dc8255313d76e",
+        "currentPrimaryDigest": "edb18d5c686152c5642ae1cea3ebfa2bd23daecdd7dc5f97673dfb0751a04a25",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-confinement-p05.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 14,
+        "recordSha256": "9998e34a6c42bb2e900746ad0fea395b463b5a18752fbc796a38cd1d3b398b75",
+        "file": "test/runner/dispatch-executor-profile.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+        "currentPrimaryDigest": "692cb5fc0fb4752ce5f0830d353c4aaf5f62b776c790aa8fbf3b7a02f04c10d3",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-executor-profile.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 17,
+        "recordSha256": "d2e1c575ac618367dcba904e358b8875d531318e0228b2ffa8f98059e4bb83e2",
+        "file": "test/runner/spawn-worker.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "84d0f3c59e9340e21f5c65dc1f5df4c2e6b277c32242f3083d5a897563a33bef",
+        "currentPrimaryDigest": "91a761056da3225ee7884cb99fc1759b261ab572b774fe5f2edf1b6fa32efee0",
+        "changedDependencies": [
+          {
+            "path": "test/runner/spawn-worker.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 20,
+        "recordSha256": "154a2ed41ee8ef75ff8fb579e1aac24fca7aadc899aedd59c4bd9fd422bd230b",
+        "file": "test/runner/worktree.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+        "currentPrimaryDigest": "f04c17f51ba77ccb4a5e86d34f23803dee8f84282e11541bd00c5104afb9cd0f",
+        "changedDependencies": [
+          {
+            "path": "test/runner/worktree.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 31,
+        "recordSha256": "5ff49548629e8c0a5535d1701206358ceb2b3992e49ff45da97b992cb126b32d",
+        "file": "test/scripts/project-agents.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "632b08c117d16f4bca8cc5c9dfc03488a43407e6ee1ca3a200951fc300a736a4",
+        "currentPrimaryDigest": "f7a7495007f235504f4f831eaabd4d14fd31753f1c19a395302d094c5a14b39c",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/project-agents.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 32,
+        "recordSha256": "ae0878aa5a60dbb33d13f3ea34d7df7ec9a5b3459e23cc773e1f712e5da5b4f7",
+        "file": "test/setup/bin-discovery.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "e86a3cc27bb1c060b76c7869725e2c38aaad54c8b6deb90f05ec7e000d45f897",
+        "currentPrimaryDigest": "303d9711eabf942536b7cf6d0f80b3183d40081bf0d6ec40304319e291384875",
+        "changedDependencies": [
+          {
+            "path": "test/setup/bin-discovery.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 33,
+        "recordSha256": "df63db3ee03dde02ca14e4b470bb9e2e706edb1434c62cdff90ba506f450f13a",
+        "file": "test/setup/capability-catalog-doctrine.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "780b0a0a6aa52a93831691ffb6ec675a5efe4e728050e215e310bf29314b1a0b",
+        "currentPrimaryDigest": "78e1d388dfb8ec067d2b71a330e9be66723e8172f0f7d59a485878ca4ae401e6",
+        "changedDependencies": [
+          {
+            "path": "test/setup/capability-catalog-doctrine.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 34,
+        "recordSha256": "3f9483952ab92b0173051dba4b78f0fc46187e5b768fb85cae4f2b8ba86f0fcd",
+        "file": "test/setup/checks-doctor-config.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ceeba1aee8eea3cfa1dc92a0e0a90d36ce3654f863a2d63d500bb9c7fad3d3de",
+        "currentPrimaryDigest": "e87c2c430624e16621f6eb2ea030bbc8d3e0b8e19c301df53333b6b84f1b0736",
+        "changedDependencies": [
+          {
+            "path": "test/setup/checks-doctor-config.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 35,
+        "recordSha256": "8e61c58b8e1bd693a3af7de2616ea5c7f9cbcd4c51973fd92243e95e10f78ab3",
+        "file": "test/setup/checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+        "currentPrimaryDigest": "f1ef6e7b6142f59eecde0224d4ebc235962c427aae4c806d93a811edd687fed7",
+        "changedDependencies": [
+          {
+            "path": "test/setup/checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 40,
+        "recordSha256": "9891d9a72b9a9d17f4d6d942be08fe25c2c76c659b3373b4244208f42a509fe8",
+        "file": "test/setup/registrations.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "a97b98fc8f47cfac63a765b531b4bff31944908a39761835dd4c449ddb707bed",
+        "currentPrimaryDigest": "52f0269f6afc042fe16d585f1a5e14ce34943e39c2f27bb543ecf7964688df54",
+        "changedDependencies": [
+          {
+            "path": "test/setup/registrations.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 46,
+        "recordSha256": "0fd64bf5f81247a50417135075cd88c35bc77b30d6679821100fbab33a89ed37",
+        "file": "test/state/events-jsonl-truncation-guard.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "720439fc0a2c07548ac7ddaed5e602b627ba170b8920c9d510d2b8714bc57e17",
+        "currentPrimaryDigest": "57c08385083b38d8b3ec766f5762585c6d2e02ad014d658667d8e4ba9757018a",
+        "changedDependencies": [
+          {
+            "path": "test/state/events-jsonl-truncation-guard.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 48,
+        "recordSha256": "30e7517653e29816e2afb32198c3fbbfc86e62f2810773af8a5d34909821a068",
+        "file": "test/state/gate-bypass.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "f3907be480449f98a8cee5308f85c577d763de890a7190d9d251a30edf37caa4",
+        "currentPrimaryDigest": "f16354e474ffbc83a6a7c7f84b8448a02694617f7ebbff71943f1daa8a21e93d",
+        "changedDependencies": [
+          {
+            "path": "test/state/gate-bypass.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 54,
+        "recordSha256": "b9abab5d6b7318195c041faf8f59240628f4ee74770de93d1d8cfb3b2a9a7a1d",
+        "file": "test/state/runtime-coordination.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "dec0108bd4c10fbb6190be4a434a031029e579ba08e2de5ca9227db6da31a3eb",
+        "currentPrimaryDigest": "52d99c7cd938fb10e1dcc34759821a1cffb54ab1980af33e7e9265202a41c309",
+        "changedDependencies": [
+          {
+            "path": "test/state/runtime-coordination.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 57,
+        "recordSha256": "68a5a3f9430eee3cb43f2012df4af0784641ff1b73d27e03eb8122578fa7b5b1",
+        "file": "apps/fgos/tests/cli_tests.rs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "cc3034cf1b16f674f29cccf2fd28208c0e190e038f3b684830f4b6f6200de055",
+        "currentPrimaryDigest": "24288ecddff803ce19e7e83fab928575c7537dfff3c0b9075e3d0a430209afd9",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/tests/cli_tests.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 91,
+        "recordSha256": "b05c30080ff54eaf805391163832610db40db8d8b0a486f2c1bf99c4c76d36d8",
+        "file": "packages/host-runtime/rust/tests/external_provider_manifest_and_registry.rs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ffa583b9b802ab706ec905a8ac02991108a9de0331db29180b9f6ab765b5c8df",
+        "currentPrimaryDigest": "a434c7ba9bf889d963011d8f19bc46a5fa1c825e83015c883c0e2d81eabd5551",
+        "changedDependencies": [
+          {
+            "path": "packages/host-runtime/rust/tests/external_provider_manifest_and_registry.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 13,
+        "recordSha256": "6c6b30a14e1b9e2f4330198929f204b423575770b21f1b4a3ec9a96934687499",
+        "file": "test/cli/dispatch-retired-doors.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "1b3f70a4644c74f7321fb91e71ffb79a10e6bc503e6154ad0c43d37c58e30358",
+        "currentPrimaryDigest": "b5c40f57a4c8973939484473a2350dfc8688133de908b954914096bd80066f87",
+        "changedDependencies": [
+          {
+            "path": "test/cli/dispatch-retired-doors.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 14,
+        "recordSha256": "f64faf9e73d1cb1faeadc94a5bfd96e22094ab14550be28bdbe665eacf113b34",
+        "file": "test/cli/execution-outcome-exit-codes.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "89727ced51031f2827eeafee3e8c0be3d532e64fb24439be1d3a6cfdb5b593d4",
+        "currentPrimaryDigest": "2429732b595ff8fef2060ca89525ff3b73eb64fdaed1bbf3ea2318e36da1dd5d",
+        "changedDependencies": [
+          {
+            "path": "test/cli/execution-outcome-exit-codes.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 33,
+        "recordSha256": "0cbd692781f7f2919d379415ddd32b50f1c00ccd3d198b71a4569cfb1b2ff180",
+        "file": "test/cli/plan-lint.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "7dd041fc0225864e4709b0e79d9b171828b3578f37229db60dc41ce2346c0a50",
+        "currentPrimaryDigest": "2a2869880f2ad9fd860ec847bf50eda70b1c947442bac467b558ddc238a5c61e",
+        "changedDependencies": [
+          {
+            "path": "test/cli/plan-lint.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 34,
+        "recordSha256": "4ce46f80c4d74374f3c760bffb110e22c809b15e6bf5ea6301d3f4d63a5f6f10",
+        "file": "test/cli/run-verb.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ce7c55d660dccbb1c307063f27ffdc3150968dbe73793ffa3a02f11cec5f88ae",
+        "currentPrimaryDigest": "53c519a45c97d4c1e618e8784980f2e533c798ae2cd155191e2e278146f98dea",
+        "changedDependencies": [
+          {
+            "path": "test/cli/run-verb.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 36,
+        "recordSha256": "db06d659b7ac068f8d1056b4da08a969a57b044522da2f15e0f45bb084f1e7eb",
+        "file": "test/direct/merge-gate.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "8433c4efeabcb8e0194c02081c5e8d90c4e51655aaac79693f278adf546516cd",
+        "currentPrimaryDigest": "97e3d8092cc5c130e9d8c45ff76c4126362f9f0cda5574b63f61952004915b29",
+        "changedDependencies": [
+          {
+            "path": "test/direct/merge-gate.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 40,
+        "recordSha256": "4635878f47314503cf8f325e8c418398c9e44604addf0aa7b8424fe3a05acd4f",
+        "file": "test/e2e/main-checkout-borrow-hook.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ac9625c5fc1354f705968f35381c565c8853f6c7d8cc56dacf435624b0233508",
+        "currentPrimaryDigest": "14615a6890ba149a42f62be5f417be5fc80146bfa52b2e76e9f97ec47c57f30a",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/main-checkout-borrow-hook.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 41,
+        "recordSha256": "ea4e25f4834eb5c9164ec65377dc491d7b312ac6ad761dc026f1c2dfaa5fefe1",
+        "file": "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "8e1763eb01503bead0884e87faa93222843784dfd29dcfa26d4124d87df0e47c",
+        "currentPrimaryDigest": "9709ef02733c977630f87026ab77e701852b5b80be180f9371073df7f42e3bb3",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 42,
+        "recordSha256": "b153c85f44563023e885de7bafcfc1052fd6a4e6c26fdd6994fdbdfcfa193a59",
+        "file": "test/e2e/main-checkout-lock-hook.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "33df2031d07683671f3b7d4ce6481b8dae1e4c52064b50305405568c21b557ae",
+        "currentPrimaryDigest": "f661844ea2cfd0ced8efa87440715622be2e47aa402ad04aaf3d5afb96b9e1e5",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/main-checkout-lock-hook.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 43,
+        "recordSha256": "6ecc4aa7fb2943a51d090d04b40af446c2ce66e2db91ff613ec3f0639a7c2015",
+        "file": "test/e2e/pr-gate.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "bbf00eb56b2b35020adc5cbb22dc76fd6672d2782e269fa3072b25b896522728",
+        "currentPrimaryDigest": "fc211fabf15b33ce0de717eefb8d20d808969d84c3bda8c2903d415d6965c983",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/pr-gate.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 46,
+        "recordSha256": "343050fa088a7b02aad5760dcdf4fcbd41c657a01fe208bba03267386abf7aa5",
+        "file": "test/e2e/synthetic-domain.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d100fb74dc0595c27ed7010497930e139fdda14c6a3ddfd9d73e21a0c6a960ac",
+        "currentPrimaryDigest": "5a43f835367011bd475d425c1c8773c2cd892b9741f9be3557033fc82413f73a",
+        "changedDependencies": [
+          {
+            "path": "test/e2e/synthetic-domain.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 51,
+        "recordSha256": "aa6ca1000f6e493582b465c9efb6191244beaf2247e43accb10e9b2c550f750d",
+        "file": "test/event-store/verbs.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "1b98963d950634ae4fd9545568880ffccc4706542aaf6c73d3bc8808c5f692b1",
+        "currentPrimaryDigest": "7e077a73d7a1eb8d921ffb45a0ef95f5d6e9f696b13bfc256bf58842eb55995b",
+        "changedDependencies": [
+          {
+            "path": "test/event-store/verbs.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 65,
+        "recordSha256": "2f0ffac0e0812989ff149c1e5da58ed5314f29b2100d92df7bec27a98f1f939e",
+        "file": "test/helpers/workflow-fixture-repo.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "b9619760056330d62084ccc6d16baf46ab75a795248545ef44fd74aa5830dd25",
+        "currentPrimaryDigest": "61d8e80599fc9003e10f15a18f38f95a1c981fdfb0f9520fab13ffe380fe565d",
+        "changedDependencies": [
+          {
+            "path": "test/helpers/workflow-fixture-repo.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 84,
+        "recordSha256": "3dfe51e42e0a02e97e9d00767e9606430467f4b8cb3ce02e6173bed59eece1d9",
+        "file": "test/plugins/terminal-skill-attach.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "682875ac0fa56ab914747e7d1b5dcc2b1479990b6781f6bc2acdb73723f1b6d8",
+        "currentPrimaryDigest": "c3d28062a6c40fb84af702bcb30833e43f9f5870375f1a7ef76df8413be54e8c",
+        "changedDependencies": [
+          {
+            "path": "test/plugins/terminal-skill-attach.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 89,
+        "recordSha256": "52abdfe00198eb8a36e200a4e3e1dbf14021e6167c73ce7718fbe4c284b1d9ba",
+        "file": "test/run-supervisor/cancel-registry.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "064b466832ef300f2545291394f7ee478a64f2435c0dcd9a07bb3cf91c1269c0",
+        "currentPrimaryDigest": "13fde5f3817df1ee2b03ce56a87a8b892e4c99c502fcf00e3609280b190649c3",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/cancel-registry.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 94,
+        "recordSha256": "7ad27bd71393b3fe68b7459650cd49c61320cd5d935d77add527b783431bded0",
+        "file": "test/run-supervisor/direct-cutover.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ffaaaced65261a85267ec4c33622a02c65da9e6d6b43ef2feb08816f5c377385",
+        "currentPrimaryDigest": "e403d85d6b86cea535ce5ed4599c183884b9e7ecc13f5a7f6e0d41df81226bd1",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/direct-cutover.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 102,
+        "recordSha256": "ad0b6fd02fd79832e8ff96d3e2d6dc4c0a990c584930ab5b7f7fe1f66ad789e2",
+        "file": "test/run-supervisor/support/direct-harness.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "a65b0b3a9a0e00e06f43aa76bbd5bdfcaa1391a5df31b1e8430ded1e41329612",
+        "currentPrimaryDigest": "45740121178efd932ace734e98dad9f7b35e9b499b8e925657d2866f96320101",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/support/direct-harness.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 103,
+        "recordSha256": "422e0ebccec1421e200c127fa4be1a82e2e12f3aa7d51313fc612631d4720736",
+        "file": "test/run-supervisor/support/terminal-harness.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "150ebff63031a32285893f53d7c605fc6357c4207598333470170eb7a4baab4f",
+        "currentPrimaryDigest": "20d02d88dc035c0fb5e38fa11709cfb462450533e6311bf281af5d86f868bdbf",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/support/terminal-harness.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 124,
+        "recordSha256": "440a575764fa7cccd08956127ea2cf4d6b921f0c4e832a160cb1fb319469549a",
+        "file": "test/runner/dispatch-confinement-blind.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "6b454c39875afc1140490e256c4bcbd0de1258869e348f7b3f5f681cb65e0f53",
+        "currentPrimaryDigest": "020436648a8f215980fef6483812240301e8104cf705c8ed7628c8d38bb6adcd",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-confinement-blind.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 126,
+        "recordSha256": "38d94c889dfba193d948a2eac3654e38430e41495d603106d3637ae5f1b2d4a5",
+        "file": "test/runner/dispatch-confinement-policies.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "046956d9f103fdc7ca63450cfc05ba32e3143c9667ae74e08112cc6e502b9c5a",
+        "currentPrimaryDigest": "663896cf4ac50dfe7a94ef696fa4d7c8cd985c8aaec77787651fbf41175bba94",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-confinement-policies.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 127,
+        "recordSha256": "2ebb36d0884924f2de3c5579924824ad8f358f083fd0ccbaf34a9ec1f2031009",
+        "file": "test/runner/dispatch-execute-effort.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "1df7f798ac58fe3d7730fbe0215291850787a78c9d12f95afe91dbd30d05cfcb",
+        "currentPrimaryDigest": "2191c7859844ad87a3d56617246a54b580d80acc86c391b8b519814090899256",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-execute-effort.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 128,
+        "recordSha256": "cd52b5411eeae7baed8d7861137a44221b2458bb42923e386b4e97c2ecf3851c",
+        "file": "test/runner/dispatch-governance-operability.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d18e5f2d7c6fa716073a04d92b6225430a7e143e7137d98865d0f7c289718aa3",
+        "currentPrimaryDigest": "a2fba8885669f66c21b93fad00f1a0e124ad99b618b7b0e5a826557d659b5961",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-governance-operability.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 130,
+        "recordSha256": "e0b3b84c5011669b7885bcb6e5545e5c08c529b8378433e06b75394c3a0e3c95",
+        "file": "test/runner/dispatch-production-call-sites.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "bd59bfcfde77bfbf8acbc388139a7e842aa9918244a30f3c372b8d705544e17c",
+        "currentPrimaryDigest": "ea10898c359d63adc51c294936edc7c8ed74116859c2c1dd63ffa7206d89df67",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-production-call-sites.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 135,
+        "recordSha256": "68a5358e7ca8a147d1f735a71784eab112a8d4df305daf650f2fe046019966a6",
+        "file": "test/runner/dispatch-run-timeout.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "614c1a786870dd36f52cff91137f2552c260167a5466b34a6e40c95533c63dca",
+        "currentPrimaryDigest": "80d0984b4027f3fc86a9f3a70ad2fdf6269702420146e7c25879592d7a5d71cf",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-run-timeout.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 137,
+        "recordSha256": "a54323000871414517aafccbfa0cbe675adff4f32122bc939d9d94b8453b6f83",
+        "file": "test/runner/dispatch-stray-write-attribution.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "01b9cf20aee88111f6bbdb534370ece42d347e1b4d378658acab8b3e4ca4c130",
+        "currentPrimaryDigest": "e333c96fd9697e36fda3cd8f3bd6f6f83e73a2fc65d98e6f5c14921b5e174ba6",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-stray-write-attribution.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 138,
+        "recordSha256": "97b755a12df53b303cf3be677d0ffb231ad77b31fbebdb62f0bbb510656dd890",
+        "file": "test/runner/effective-execution-contract.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d099ecc0de9d00a0897a0b918ef6432eaa8d1528e79f613b2128ff426640a5bd",
+        "currentPrimaryDigest": "f1ed2068f9c32b539d71f912a5c7625e978d666343e8fa0dfbcbec8870597998",
+        "changedDependencies": [
+          {
+            "path": "test/runner/effective-execution-contract.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 143,
+        "recordSha256": "8ebe5e03a95d9a011f145e27b21542f535071718d9d922a77d0637c3a6614c8e",
+        "file": "test/runner/execution/commit-unit-work.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "2837f87579e2ce840c20f3d33573b1e31bf680ad3632fdf242c1a1980b4d7d2c",
+        "currentPrimaryDigest": "610f7d46ba62b548fd1f3cb420f00fababc1fcb0a1078862abfa62fdfce9f1dd",
+        "changedDependencies": [
+          {
+            "path": "test/runner/execution/commit-unit-work.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 149,
+        "recordSha256": "ea97b19a1c8a463ffa03b168f90ee214779bd9105faa969cd20cc47d9122d328",
+        "file": "test/runner/execution/run-posture.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "c1c8d39b6e7d511966c1a0eb8ce038be47519932494cdf090dd6b08c2f7f546c",
+        "currentPrimaryDigest": "5f23c62375aaa72351f4e68e24da10f18c07ba700e7888710d395c975475e56e",
+        "changedDependencies": [
+          {
+            "path": "test/runner/execution/run-posture.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 151,
+        "recordSha256": "bd1f592dbac3b7e839fe8917a0af9bc44d154c7b46f4ca9c135ed7e18396ff8e",
+        "file": "test/runner/execution/run-sync.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "47d68cf29633ad37be2f63fb4bdd9e758b4f3fd99e655f98ea6ff66c910afa14",
+        "currentPrimaryDigest": "959f629a69fb827cd1693ff1fde9d7c990383d4d4acff45c132d0199190a83dd",
+        "changedDependencies": [
+          {
+            "path": "test/runner/execution/run-sync.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 152,
+        "recordSha256": "0e8e9cdddd06a660f6c5dfb2d24a70efaa5a8a9d935cd3cd79444c472be795f0",
+        "file": "test/runner/execution/run.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "f3487845749883b0fd4f0088d58198236e19ab99c8c395c4e07937c149ee376c",
+        "currentPrimaryDigest": "1a3f0588d2e6c9269eafae00e81e6ee4964e98a7ce48e4c981d264695a025037",
+        "changedDependencies": [
+          {
+            "path": "test/runner/execution/run.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 154,
+        "recordSha256": "c2af8367b87a85038e5b0397f9ff22fe8499fa74579959ee5ccb9c68f99c4351",
+        "file": "test/runner/fanout-batch-runner-commit.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "051379ff9b8489d16c542a6c23acc5c7496368b67e2701ae7772c74f163db527",
+        "currentPrimaryDigest": "426fa2dd12701467006eadfbafa90114e08d32a2e69f58a27e8388b84a5c19f1",
+        "changedDependencies": [
+          {
+            "path": "test/runner/fanout-batch-runner-commit.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 159,
+        "recordSha256": "51f51ec175d0159528e15406672e8ad9d9b794b9baefcd5286fa011a89f90ed0",
+        "file": "test/runner/herdr-spawn-adapter.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "0afb42a563f7eca67f0dbaa27b443cd4d1410f8ff327b3ff08b1f3f0bff3b7f9",
+        "currentPrimaryDigest": "4b6efad9a2005312652b070c276f090e59eb32ee7cd6f0b41fc985e563bb96f7",
+        "changedDependencies": [
+          {
+            "path": "test/runner/herdr-spawn-adapter.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 160,
+        "recordSha256": "c384c587d7d59bfbd1a1b2cce9702cda12b86dd86758c8bf7e947d3322b1b57b",
+        "file": "test/runner/land-vs-manual-commit.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "5e45f1bfd43ace3aebbe1cd6184ee61964049c9040c24ee6c660391337240626",
+        "currentPrimaryDigest": "8311bdd54bb2ec601c51dd8143b53d84c7e75965b95acc7177c462c82d8469c5",
+        "changedDependencies": [
+          {
+            "path": "test/runner/land-vs-manual-commit.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 164,
+        "recordSha256": "67b35228fba00ebff291e2bbb0b352b38710268f3fe3e3e5a59306f9649a317f",
+        "file": "test/runner/loop-worker-fixture.helper.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "7c98b6080e69a704b406d8fe82396f5c51bcc72d09ad8fd2705535720491ad8a",
+        "currentPrimaryDigest": "bedb7c7db6732f40eb6d85f05c146eb5b02c6735ff1645a8dd0b24e5851ccb96",
+        "changedDependencies": [
+          {
+            "path": "test/runner/loop-worker-fixture.helper.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 169,
+        "recordSha256": "756b65751530f46997184a84c1e7fefc82ff4ab8d8af8adb7a7cfba232591861",
+        "file": "test/runner/provider-capacity.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "fb0707c7d2318ea79fb0580acc8c861b21ee612fb7c86fcf5a85deca4996cff4",
+        "currentPrimaryDigest": "b4155b45e196480d99e5e2f3b0a32a9ed9cda30fb3973738eaf7ba7dc56e989d",
+        "changedDependencies": [
+          {
+            "path": "test/runner/provider-capacity.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 192,
+        "recordSha256": "73890b9eefdf665aca35e5e059112c52ef7b57240d7819ae1d99ad0068b476fb",
+        "file": "test/scripts/fgos-shell-integration.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "5dc7413f2ab52d947aeb2b9f1654723c4ba806d63ecb308c4b8fd8daba2f143b",
+        "currentPrimaryDigest": "c6d320a7acf7090eb9794a9101cfe905f16e3227a1595c05b680c625d0fc4575",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/fgos-shell-integration.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 200,
+        "recordSha256": "719bbc71f0449fd12cf3a8c52ebed3c4a64e1fc1544cff2d316ccd2d354fdbe0",
+        "file": "test/scripts/run-tests.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "8f340407e83ba0e3b8b5fe105ba99dffd182d1eef0d2900ebe46a9f0e5c782b0",
+        "currentPrimaryDigest": "9148df93bb01b5eaac2e021611f95b9408d94adc4e51bb41ba32fe8565b00143",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/run-tests.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 204,
+        "recordSha256": "e83468b79a356931285dcbd514bb72b9d852e5c773988bd3422b774c419b7141",
+        "file": "test/setup/active-release-drift-check.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "14d790cd49f279aba907e49bdf9c603ba4d7d548c27b8b76bda9c8dc96fab975",
+        "currentPrimaryDigest": "b9623db9fe11fa418e3766915b0966767cb7760a06ed49d2cc61ea286079d5ca",
+        "changedDependencies": [
+          {
+            "path": "test/setup/active-release-drift-check.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 205,
+        "recordSha256": "db6f1ec5363b827a7895ca391424b34a85dcee50b1b0a193c30a86d8ed01beec",
+        "file": "test/setup/agent-cli-trust-check.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "07059ccad64159a43d14c4cb10fec858f87f4b095efb5fa90bd6e1f0f6682a55",
+        "currentPrimaryDigest": "905ef30318ec4f6cf5ca7db5f89101ed147c0e44bfefeeddb8acc448576f4521",
+        "changedDependencies": [
+          {
+            "path": "test/setup/agent-cli-trust-check.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 210,
+        "recordSha256": "8e7564f31d3da52aa0cf2149ea8f97e24c7235060a41a6ace2ffec27af0767f2",
+        "file": "test/setup/checks-setup-envelope.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "4a4ebed384ca7b1f2f3b480c4b5b0b554384edd5829cea9140b41ae2b2c429a8",
+        "currentPrimaryDigest": "8589e5de5527deea3909209aef6cdd2c13986f1a7c6acde39b7ad4a9ad037e29",
+        "changedDependencies": [
+          {
+            "path": "test/setup/checks-setup-envelope.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 214,
+        "recordSha256": "87ade8e6a8ba6c3784875d97bf15f72d532ed5b5c4eec9b65a87f295eb7efec6",
+        "file": "test/setup/confinement-doctor-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "b275fd27f783c2e77bdbd4f37dc267fde7f0917040c96e830a3dce72f38de5e6",
+        "currentPrimaryDigest": "fb8b4710fa34f2efed0cf641581277cf420d2190979492ebcedf95ae1b747a0b",
+        "changedDependencies": [
+          {
+            "path": "test/setup/confinement-doctor-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 216,
+        "recordSha256": "62ab220ff0c77d499481aab24618b94af0d4dc29f6ab80e253054093c4e54757",
+        "file": "test/setup/credential-copies-retained-check.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "3da8a3ac55d60b158c5098f4398423fed0438c86a48b7dc006d4ba22a0d76042",
+        "currentPrimaryDigest": "640a417cac34bf120ab9b5d24b50fac8a22128dfecc896852e70de94eea206fd",
+        "changedDependencies": [
+          {
+            "path": "test/setup/credential-copies-retained-check.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 217,
+        "recordSha256": "43e9479e5f8848ea67777e2f6c44f330d4aeb74d9b36e75a295d5a96f409e99a",
+        "file": "test/setup/doctor-coordination-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "09d23cd3d9f79caf8061217bd72162429a238327d68350f5f6db14c3c57b6123",
+        "currentPrimaryDigest": "d8237c857daa20d88967caf393c1e79fa8f64f2a80e08b25e7154affcab471ec",
+        "changedDependencies": [
+          {
+            "path": "test/setup/doctor-coordination-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 224,
+        "recordSha256": "bc323d359636fcdf4ced45236666ced71efaeb5b2f021e3330f055d1baa7c5a4",
+        "file": "test/setup/model-pool-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "6b9540c77eebf7b363c3d8246456822743a78249bdb9f9ad1fe0ac180b3bcf57",
+        "currentPrimaryDigest": "c8d7af298b1240044027c1b59ec32c3489bbde0083356e8f4a9258e3ccd92df2",
+        "changedDependencies": [
+          {
+            "path": "test/setup/model-pool-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 228,
+        "recordSha256": "878dac3bbf50c8a890de5a3549ae4405a9a2defd848ddb6c6e1c9ba94740f2e9",
+        "file": "test/setup/run-supervisor-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "345d59cae678c121e40556811d6a700c316bac1600ede377264fbbf9015a27a6",
+        "currentPrimaryDigest": "40c4ec8dcb9d1aba53e3c665dd6c1a1c5e69bc98ff8ab3e0fbe41d9b785c16cf",
+        "changedDependencies": [
+          {
+            "path": "test/setup/run-supervisor-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 229,
+        "recordSha256": "07fbe22da5d3d6f2e68fe0ac2f830f6b14710849a9b36fe6ae87909547b9c5f1",
+        "file": "test/setup/terminal-control-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "e4191dfa44fc29356ce69da8ca64d3aff357156e51bc2b8c2f1ce80bebef687a",
+        "currentPrimaryDigest": "6018404c8d3f404552f86d1c328806eb92d2eeb442057a92398b9321f1217e95",
+        "changedDependencies": [
+          {
+            "path": "test/setup/terminal-control-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 232,
+        "recordSha256": "219d577dc96b1ee5b3596100526e02e2dfb370bf3dc6910c3f0fcdd0bfc063c6",
+        "file": "test/setup/visibility-checks.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d4df3c438863395299d0ff1cffa6d19668451c01245e7ea922da2c93a392f9e7",
+        "currentPrimaryDigest": "409679aadecd33b230765316ac6587ad2e3fb260979ac470f04e9e76f68ee0eb",
+        "changedDependencies": [
+          {
+            "path": "test/setup/visibility-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 245,
+        "recordSha256": "1cd0933962f3ffbc36afbfa135eeb9bbdbe3b914fc88ea79573412c99b66c783",
+        "file": "test/state/hot-lock-multiprocess.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "4ed5393a6456045157a59e425bb85f45f2d8e9c3f9e61f93e966606a1266b5bd",
+        "currentPrimaryDigest": "78a3fa113a3a1d82d67322318b31a0a49bbb7ee3dce8ff80130d483d55d14484",
+        "changedDependencies": [
+          {
+            "path": "test/state/hot-lock-multiprocess.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 254,
+        "recordSha256": "8bc5dedcc7ad2e278bff37d5099bee0f6351ad3b24e1f7a5bc18571906aa053d",
+        "file": "test/verbs/worktree-create.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "d84dbced9d54d7a665a3460ea62780c23bcf778ac44e2693413d4653507d0cd0",
+        "currentPrimaryDigest": "99a95bd208d662d957766e63c7e6e3f8bd2554b4591ecac51b884a8c8cc31a7b",
+        "changedDependencies": [
+          {
+            "path": "test/verbs/worktree-create.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 255,
+        "recordSha256": "edf6870f78b7536cbfe474cb32fd50d5963be9a6cf4b3bd8f937e41b56e69738",
+        "file": "test/workflow/advisory-m-contracts.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "7a803e0f03f9f1c2f4ee896641f801bcb031e82484416fdd89b3c8c1de372968",
+        "currentPrimaryDigest": "63a7f4cd88f3471fa0ceb7cb94b31cd4f38a0188c3cf45b756b7baa6ec468e67",
+        "changedDependencies": [
+          {
+            "path": "test/workflow/advisory-m-contracts.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 262,
+        "recordSha256": "932e89f492fef8a726a4178a0c790f19c8e0e025d4999b9a1958608c169b5a51",
+        "file": "test/workflow/units-runner.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "62d56ee68c5a3f466f54d5638c79af9a982eb8bcb792faa9f35e0134fe1a4167",
+        "currentPrimaryDigest": "0f29b78cb3216458bd51fffb6eec5df267b39bc78821f17e12b5a3a45f40ee32",
+        "changedDependencies": [
+          {
+            "path": "test/workflow/units-runner.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 263,
+        "recordSha256": "d165aeab8e48764b1a4faa4f0cb6042229dba43fe6106912814cbda819b75149",
+        "file": "test/workflow/workflow-runner.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "91b875098df406aab14ce2ba1dceba7e157f2decd90e75e7227ac71d0c69da1b",
+        "currentPrimaryDigest": "4b18dfb1c38ae129cd219eff1758d93ab0521a86c39a8183025682be7e1563d4",
+        "changedDependencies": [
+          {
+            "path": "test/workflow/workflow-runner.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+        "recordLine": 20,
+        "recordSha256": "5a560626a39ce783a1a9edd729a76f720d761b7dfaef1bdacbf83cdb4b924614",
+        "file": "test/runner/dispatch-execute-for-capability.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "0a6c3ac6be3b7817f0927e2dffde394a6092280e9eeefb42c4d094f04438dfa4",
+        "currentPrimaryDigest": "0868c800672dbfd0bbb23724c422c9e9a9c8ed66b746c45a7f67114b10a043b7",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-execute-for-capability.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 30,
+        "recordSha256": "5725e1f0f5356fff8b20de4c4f09a7abffa9e0e49afd49fd063f6388b3be7bd0",
+        "file": "packages/terminal-control/rust/tests/common/mod.rs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "2efd1236e7220b349466e3bec19cfcb09ec686986b3e447c2e9cb2fd24bf20aa",
+        "currentPrimaryDigest": "67fb3388ff8fd1584744e2047550d904ae9ceb5905aabb23b997de601bfcdb4f",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/common/mod.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+      }
+    ]
+  }
+}
