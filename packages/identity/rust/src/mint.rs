@@ -207,7 +207,6 @@ mod sequence {
         let (driver, repo) = open_repository(driver_dir, dir)?;
         // Never fall back to a local counter: the number belongs to the origin's.
         let home = driver.sequence_home(&repo).map_err(|e| Refusal {
-            candidates: Vec::new(),
             reason: "sequence-unreachable",
             detail: format!(
                 "number {number} of the {} counter was not given back: its home could not be determined ({})",
