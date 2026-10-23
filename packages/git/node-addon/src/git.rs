@@ -1,7 +1,6 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
 mod config;
 mod recovery;
-mod native_lock;
 mod scoped_commit;
 mod sync;
 mod land;

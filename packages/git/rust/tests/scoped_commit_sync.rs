@@ -639,7 +639,7 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
         .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
         .unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
-    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("retained index.lock runbook"));
     assert!(error.cause.contains("§11"));
     assert!(wal::Wal::open(&f.repo)
         .unwrap()
@@ -1302,7 +1302,7 @@ fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
     fs::write(&path, b"external sync lock").unwrap();
     let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
-    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("retained index.lock runbook"));
     assert!(error.cause.contains("§11"));
     assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
     assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());

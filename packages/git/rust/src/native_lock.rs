@@ -62,7 +62,7 @@ pub struct NativeLockReport {
     pub observed_inode: Option<u64>,
     pub observed_state: Option<String>,
 }
-pub(crate) const UNOWNED_INDEX_LOCK: &str = "native-index-lock-unowned: inspect with repairNativeIndexLock; follow Git spec §11 retained index.lock runbook";
+pub(crate) const UNOWNED_INDEX_LOCK: &str = "native-index-lock-unowned: follow Git spec §11 retained index.lock runbook";
 
 pub(crate) const INDEX_LOCK_RUNBOOK: &str = r#"1. Confirm no process uses the index: the report lists visible holders; additionally
    `fuser -v <git-dir>/index.lock` or `ls -l /proc/*/fd 2>/dev/null | grep index.lock`.
@@ -213,15 +213,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    pub fn repair_native_index_lock(
-        &self,
-        repo: &RepoHandle,
-        held: Vec<BorrowedHandle<'_>>,
-        id: &str,
-    ) -> Result<NativeLockReport> {
-        self.repair_native_index_lock_with_filesystem(repo, held, id, &wal::OsFileSystem)
-    }
-    pub fn repair_native_index_lock_with_filesystem<F: wal::FileSystem>(
+    pub fn repair_native_index_lock<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
@@ -601,7 +593,7 @@ mod tests {
         let (mut child, _fd) = owned(&f);
         let report = f
             .driver
-            .repair_native_index_lock(&f.repo, vec![], "interrupted")
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(report.status, "ownerLiveOrUnknown");
         assert!(f
@@ -609,12 +601,12 @@ mod tests {
             .recover_restore(&f.repo, vec![], "fixture", "interrupted")
             .unwrap_err()
             .cause
-            .contains("repairNativeIndexLock"));
+            .contains("retained index.lock runbook"));
         child.kill().unwrap();
         child.wait().unwrap();
         let report = f
             .driver
-            .repair_native_index_lock(&f.repo, vec![], "interrupted")
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(report.status, "quarantined");
         assert_eq!(
@@ -630,7 +622,7 @@ mod tests {
         );
         assert_eq!(
             f.driver
-                .repair_native_index_lock(&f.repo, vec![], "interrupted")
+                .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
                 .unwrap()
                 .status,
             "absent"
@@ -646,7 +638,7 @@ mod tests {
         fs::write(path.with_file_name("index~pid.lock"), b"pid 1234\n").unwrap();
         let report = f
             .driver
-            .repair_native_index_lock(&f.repo, vec![], "interrupted")
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");
         assert!(report.inspection.contains("unknown external"));
@@ -660,11 +652,23 @@ mod tests {
             assert!(report.inspection.contains(&format!("pid={} exe=", std::process::id())));
             assert!(report.inspection.contains("startTime="));
         }
-        assert_eq!(fs::read(path).unwrap(), b"external");
+        assert_eq!(report.path, path.to_string_lossy());
+        assert!(report.observed_inode.is_some_and(|inode| inode > 0));
+        assert!(report.observed_state.as_deref().is_some_and(|d| d.len() == 64 && d.bytes().all(|b| b.is_ascii_hexdigit())));
+        assert_eq!(fs::read(&path).unwrap(), b"external");
         assert!(f
             .driver
             .recover_restore(&f.repo, vec![], "fixture", "interrupted")
             .is_err());
+        // A dangling symlink in the lock's place is inspected and left alone too.
+        fs::remove_file(&path).unwrap();
+        std::os::unix::fs::symlink("missing-external-target", &path).unwrap();
+        let report = f
+            .driver
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
+            .unwrap();
+        assert_eq!(report.status, "inspectedRepairRequired");
+        assert!(fs::symlink_metadata(&path).unwrap().file_type().is_symlink());
     }
     struct Swap(PathBuf);
     impl FileSystem for Swap {
@@ -686,7 +690,7 @@ mod tests {
         let path = f.main.join(".git/index.lock");
         let report = f
             .driver
-            .repair_native_index_lock_with_filesystem(
+            .repair_native_index_lock(
                 &f.repo,
                 vec![],
                 "interrupted",
@@ -712,7 +716,7 @@ mod tests {
         fs::write(&path, b"different state").unwrap();
         assert_eq!(
             f.driver
-                .repair_native_index_lock(&f.repo, vec![], "interrupted")
+                .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
                 .unwrap()
                 .status,
             "inspectedRepairRequired"
@@ -738,16 +742,16 @@ mod tests {
         child.wait().unwrap();
         assert!(f
             .driver
-            .repair_native_index_lock_with_filesystem(
+            .repair_native_index_lock(
                 &f.repo,
                 vec![],
                 "interrupted",
-                &InterruptBeforeMove
+                &InterruptBeforeMove,
             )
             .is_err());
         let report = f
             .driver
-            .repair_native_index_lock(&f.repo, vec![], "interrupted")
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(report.status, "quarantined");
         assert_eq!(
@@ -771,11 +775,11 @@ mod tests {
             pending(&f);
             let (mut child, _fd) = owned(&f);
             child.kill().unwrap(); child.wait().unwrap();
-            let error = f.driver.repair_native_index_lock_with_filesystem(
+            let error = f.driver.repair_native_index_lock(
                 &f.repo, vec![], "interrupted", &InterruptExchange(step),
             ).unwrap_err();
             assert!(error.cause.contains("interrupted exchange"));
-            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted").unwrap();
+            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem).unwrap();
             assert_eq!(report.status, "quarantined");
             assert!(!f.main.join(".git/index.lock").exists());
             assert_eq!(fs::read(report.quarantine_path.unwrap()).unwrap(), b"retained native lock bytes\0\xff");
@@ -789,7 +793,7 @@ mod tests {
             pending(&f);
             let (mut child, _fd) = owned(&f);
             child.kill().unwrap(); child.wait().unwrap();
-            f.driver.repair_native_index_lock_with_filesystem(
+            f.driver.repair_native_index_lock(
                 &f.repo, vec![], "interrupted", &InterruptExchange("native-lock-after-move"),
             ).unwrap_err();
             let path = f.main.join(".git/index.lock");
@@ -797,7 +801,7 @@ mod tests {
                 fs::rename(&path, path.with_extension("held-guard")).unwrap();
                 fs::create_dir(&path).unwrap();
             } else { fs::write(path.join("foreign"), "preserve").unwrap(); }
-            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted").unwrap();
+            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem).unwrap();
             assert_eq!(report.status, "inspectedRepairRequired");
             assert!(path.is_dir());
             if !replace { assert_eq!(fs::read(path.join("foreign")).unwrap(), b"preserve"); }
@@ -826,7 +830,7 @@ mod tests {
         let directory = f.main.join(".git/fgos/git/native-lock-quarantine");
         let err = f
             .driver
-            .repair_native_index_lock_with_filesystem(
+            .repair_native_index_lock(
                 &f.repo,
                 vec![],
                 "interrupted",
@@ -873,7 +877,7 @@ mod tests {
         child.kill().unwrap();
         child.wait().unwrap();
         let path = f.main.join(".git/index.lock");
-        let report = f.driver.repair_native_index_lock_with_filesystem(
+        let report = f.driver.repair_native_index_lock(
             &f.repo, vec![], "interrupted", &LateSwap(path.clone()),
         ).unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");

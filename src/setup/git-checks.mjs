@@ -3,7 +3,7 @@ import path from 'node:path';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { randomUUID } from 'node:crypto';
-import { loadNativeAddon } from '../git/native.mjs';
+import { loadNativeAddon, nativeError } from '../git/native.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
@@ -131,8 +131,7 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
         recovery.reconcile({ operationId: operation.operationId });
         recovered.push(operation.operationId);
       } catch (err) {
-        let cause;
-        try { cause = JSON.parse(err.message).cause; } catch { cause = err.message; }
+        const { cause } = nativeError(err);
         const writer = cause === 'land-authority-mismatch' ? `; only its writer ${operation.intent.writerIdentity} can recover it` : '';
         kept.push(`${operation.operationId} (${cause}${writer})`);
       }
