@@ -21,7 +21,7 @@
  *       release build of the host (`cargo build --locked --release -p fgos`), recorded
  *       with the commit and the binary's hash, and a dry run of every named case (all
  *       by default) against the stub CLI. Exit 3 on any failure.
- *   run <L1|L2|C1|T1|T2> [--dry]
+ *   run <L1|L2|C1|T1|T2|A1|A2> [--dry]
  *       One case. Refused unless the host `check` built was built from the current HEAD
  *       and is unchanged. `--dry` runs it against the stub under `<base>-dry/`.
  *   report
@@ -85,11 +85,13 @@ const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
  * rung's spent cases (V5: `mailbox-v5-live`) stay read-only evidence. */
 const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v7-live-suite');
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
-const CASES = ['L1', 'L2', 'C1', 'T1', 'T2'];
-const CLI_OF = { L1: 'claude', L2: 'claude', C1: 'codex', T1: 'claude', T2: 'codex' };
+const CASES = ['L1', 'L2', 'C1', 'T1', 'T2', 'A1', 'A2'];
+const CLI_OF = { L1: 'claude', L2: 'claude', C1: 'codex', T1: 'claude', T2: 'codex', A1: 'claude', A2: 'codex' };
 const MIN_FREE_GB = 8;
 const WAIT_MS = 180_000;
-const CLI_TIMEOUT_SEC = { L1: 600, L2: 300, C1: 600, T1: 1500, T2: 1500 };
+const CLI_TIMEOUT_SEC = { L1: 600, L2: 300, C1: 600, T1: 1500, T2: 1500, A1: 600, A2: 600 };
+/** A1: the Identity role the Claude Code head takes in its case's private state root. */
+const ALIAS_ROLE = 'lead:MBXTEST';
 const CLAUDE_BIN = path.join(os.homedir(), '.local', 'bin', 'claude');
 const CODEX_BIN = path.join(os.homedir(), '.local', 'bin', 'codex');
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
@@ -142,6 +144,14 @@ function buildHost() {
   });
   if (out.status !== 0) die('the host did not build');
   const host = releaseHostPath();
+  // A1/A2 give their case's private state root a machine id through Identity's own mint.
+  const mint = spawnSync('cargo', ['build', '--locked', '--release', '-p', 'fgos', '--example', 'identity-mint-machine'], {
+    cwd: REPO_ROOT,
+    env: { ...process.env, CARGO_BUILD_JOBS: '4' },
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+  if (mint.status !== 0) die('the machine id mint did not build');
+  const mintPath = path.join(path.dirname(host), 'examples', 'identity-mint-machine');
   fs.mkdirSync(BASE, { recursive: true });
   const shim = spawnSync('cargo', ['run', '-q', '--locked', '--release', '-p', 'fgos-distribution', '--example', 'print-workspace-shim'], {
     cwd: REPO_ROOT, env: { ...process.env, CARGO_BUILD_JOBS: '4' }, encoding: 'utf8', maxBuffer: 1024 * 1024,
@@ -149,7 +159,7 @@ function buildHost() {
   if (shim.status !== 0 || !shim.stdout.startsWith('#!/bin/sh')) die('the workspace shim generator did not run');
   fs.rmSync(BRANCH_SHIM, { force: true });
   fs.writeFileSync(BRANCH_SHIM, shim.stdout, { mode: 0o555 });
-  writeJson(BUILD_FILE, { commit: headCommit(), sha256: sha256(host), path: host, shimSha256: sha256(BRANCH_SHIM), builtAt: new Date().toISOString() });
+  writeJson(BUILD_FILE, { commit: headCommit(), sha256: sha256(host), path: host, shimSha256: sha256(BRANCH_SHIM), mintPath, mintSha256: sha256(mintPath), builtAt: new Date().toISOString() });
   return host;
 }
 
@@ -161,6 +171,7 @@ function builtHost() {
   if (built.commit !== head) die(`the host was built from ${built.commit}, HEAD is ${head}; run check again`);
   if (!fs.existsSync(built.path) || sha256(built.path) !== built.sha256) die(`${built.path} changed since check built it; run check again`);
   if (!fs.existsSync(BRANCH_SHIM) || sha256(BRANCH_SHIM) !== built.shimSha256) die(`${BRANCH_SHIM} changed since check wrote it; run check again`);
+  if (!built.mintPath || !fs.existsSync(built.mintPath) || sha256(built.mintPath) !== built.mintSha256) die('the machine id mint changed since check built it; run check again');
   return built;
 }
 
@@ -170,6 +181,9 @@ const caseDir = (name, dry) => path.join(dry ? `${BASE}-dry` : BASE, name);
 const projectOf = (dir) => path.join(dir, 'project');
 const homeOf = (dir) => path.join(dir, 'home');
 const shimOf = (dir) => path.join(projectOf(dir), '.fgos', 'installation', 'bin', 'fgos');
+/** The case's Identity state root: the default under the case HOME (a real directory even
+ * when the case HOME links `~/.claude`). */
+const identityRootOf = (dir) => path.join(homeOf(dir), '.local', 'state', 'fgos');
 
 function git(cwd, args) {
   const out = spawnSync('git', args, { cwd, encoding: 'utf8', env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' } });
@@ -202,6 +216,10 @@ function layOut(name, dry, built) {
   if (dry) fs.mkdirSync(homeOf(dir), { recursive: true });
   else if (CLI_OF[name] === 'claude') live.makeClaudeHome({ home: homeOf(dir), claudeDir: CLAUDE_DIR });
   else fs.mkdirSync(homeOf(dir), { recursive: true });
+  if (name.startsWith('A')) {
+    const minted = spawnSync(built.mintPath, [identityRootOf(dir)], { encoding: 'utf8' });
+    if (minted.status !== 0) die(`the case's machine id was not minted: ${minted.stderr}`);
+  }
   const rows = installRows(name, dir);
   return { dir, project, rows, shim: { generator: 'fgos_distribution::shim::workspace_shims', sha256: sha256(BRANCH_SHIM), mainCheckoutSha256: fs.existsSync(MAIN_SHIM) ? sha256(MAIN_SHIM) : null } };
 }
@@ -252,10 +270,11 @@ function messageState(snap, id) {
   return typeof m.state === 'string' ? m.state : Object.keys(m.state)[0];
 }
 
-/** The harness's own send: a sender with no head, through the case's shim. */
-function harnessSend(dir, to, body, wake) {
+/** The harness's own send through the case's shim: by default a sender with no head; `from`
+ * sends as that key (a stand-in peer head). */
+function harnessSend(dir, to, body, wake, from = 'mailbox-live-harness') {
   // The allowlist refuses a session variable; the harness's own sender sets one after it.
-  const env = { ...live.cliEnv({ zdotdir: path.join(dir, 'zdot-harness'), extra: { HOME: homeOf(dir) } }), FGOS_SESSION_ID: 'mailbox-live-harness' };
+  const env = { ...live.cliEnv({ zdotdir: path.join(dir, 'zdot-harness'), extra: { HOME: homeOf(dir) } }), FGOS_SESSION_ID: from };
   const args = ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body];
   const out = spawnSync(shimOf(dir), args, { cwd: projectOf(dir), env, encoding: 'utf8' });
   return { status: out.status, text: (out.stdout || '').trim(), stderr: (out.stderr || '').trim(), id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now() };
@@ -377,6 +396,13 @@ function prompts(name, { peer } = {}) {
 4. Do not run any other tool after step 3.
 5. Write the integers from 1 to 400, separated by single spaces.
 6. End with one line that starts with FINAL: followed by every token that starts with MBX- that a mailbox message asked you to include, separated by spaces, or FINAL: none`;
+    case 'A1':
+    case 'A2':
+      return `This is a test of a message hook. Do exactly these steps, one shell tool call per step, and nothing else.
+1. Run this shell command once: ${name === 'A1' ? `fgos identity session --register --role ${ALIAS_ROLE}` : 'true'}
+2. Run this shell command once: ${waitFile('go.txt')}; fgos mailbox inbox
+3. Do not run any other tool after step 2.
+4. End with one line that starts with FINAL: followed by every token that starts with MBX- that a mailbox message asked you to include, separated by spaces, or FINAL: none`;
     case 'T1':
     case 'T2': {
       const steps = [];
@@ -577,18 +603,19 @@ async function runL2(ctx) {
  * peer to send to: this harness process is the head (a session file names it) and the
  * hook runs below `/bin/sh`, as Claude Code runs it.
  */
-function registerPeer(dir) {
+function registerPeer(dir, home = homeOf(dir)) {
   const peer = crypto.randomUUID();
-  const sessions = path.join(homeOf(dir), '.claude', 'sessions');
+  const sessions = path.join(home, '.claude', 'sessions');
   const ownStart = fs.readFileSync(`/proc/${process.pid}/stat`, 'utf8').split(') ')[1].split(' ')[19];
   // The real HOME of a Codex case is a plain directory; a Claude case's links ~/.claude,
   // where this file must never go.
-  if (fs.lstatSync(path.join(homeOf(dir))).isSymbolicLink()) die('refusing to write a session file under a linked HOME');
+  fs.mkdirSync(home, { recursive: true });
+  if (fs.lstatSync(path.join(home, '.claude'), { throwIfNoEntry: false })?.isSymbolicLink()) die('refusing to write a session file under a linked ~/.claude');
   fs.mkdirSync(sessions, { recursive: true });
   const file = path.join(sessions, `${process.pid}.json`);
   writeJson(file, { pid: process.pid, sessionId: peer, procStart: ownStart, kind: 'interactive', entrypoint: 'sdk-cli', name: 'peer-session-7a', nameSource: 'derived' });
   const payload = JSON.stringify({ session_id: peer, hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command: 'true' }, cwd: projectOf(dir) });
-  const env = { ...live.cliEnv({ zdotdir: path.join(dir, 'zdot-harness'), extra: { HOME: homeOf(dir), CLAUDE_PROJECT_DIR: projectOf(dir) } }), CLAUDE_CODE_SESSION_ID: peer };
+  const env = { ...live.cliEnv({ zdotdir: path.join(dir, 'zdot-harness'), extra: { HOME: home, CLAUDE_PROJECT_DIR: projectOf(dir) } }), CLAUDE_CODE_SESSION_ID: peer };
   const out = spawnSync('/bin/sh', ['-c', '"$0" "$@"; :', shimOf(dir), 'hook', 'mailbox', '--cli', 'claude', '--event', 'post-tool-use'], { cwd: projectOf(dir), env, input: payload, encoding: 'utf8' });
   fs.rmSync(file);
   return { key: peer, status: out.status, name: bindings(snapshot(dir)).find((b) => b.key === peer)?.name ?? null };
@@ -644,6 +671,67 @@ async function runC1(ctx) {
     },
     finals,
   };
+}
+
+/** The sessions Identity's directory of the case holds, through the case's shim. */
+function identitySessions(dir) {
+  const env = live.cliEnv({ zdotdir: path.join(dir, 'zdot-harness'), extra: { HOME: homeOf(dir) } });
+  const out = spawnSync(shimOf(dir), ['identity', 'list', '--json'], { cwd: projectOf(dir), env, encoding: 'utf8' });
+  try {
+    return JSON.parse(out.stdout).data.sessions ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * A1 (Claude Code) and A2 (Codex): Identity names as addresses. A stand-in peer head (its
+ * own HOME, so no session file goes under a linked ~/.claude) sends to the case head by
+ * the handle Identity holds for it, and in A1 also by the role the head took in step 1.
+ * The frames must reach the model inline and show the peer's handle.
+ */
+async function runA(name, ctx) {
+  const { dir } = ctx;
+  const cliName = CLI_OF[name];
+  const peer = registerPeer(dir, path.join(dir, 'peer-home'));
+  if (!peer.name) die(`the stand-in peer did not register (exit ${peer.status})`);
+  const uuid = cliName === 'claude' ? crypto.randomUUID() : null;
+  const byHandle = `MBX-HANDLE-${nonce()}`;
+  const byRole = `MBX-ROLE-${nonce()}`;
+  const cli = startCli(name, ctx, { prompt: prompts(name), uuid });
+  const own = () => bindings(snapshot(dir)).find((b) => b.cli === cliName && b.key !== peer.key);
+  const ownIdentity = () => identitySessions(dir).find((s) => s.cli === cliName && (name !== 'A1' || s.roles.includes(ALIAS_ROLE)));
+  const registered = await waitFor(() => own() && ownIdentity(), cli);
+  let toHandle = null;
+  let toRole = null;
+  if (registered) {
+    toHandle = harnessSend(dir, ownIdentity().handle, `Please include the token ${byHandle} in your final answer. No reply is needed.`, false, peer.key);
+    if (name === 'A1') toRole = harnessSend(dir, ALIAS_ROLE, `Please include the token ${byRole} in your final answer. No reply is needed.`, false, peer.key);
+  }
+  fs.writeFileSync(path.join(ctx.project, 'go.txt'), 'go\n');
+  await cli.done;
+  const problems = finishRun(cli, ctx);
+  const input = cliName === 'claude' ? readModelInput('claude', findTranscript(homeOf(dir), uuid)) : readModelInput('codex', codexRollout(ctx.codexHome));
+  const snap = snapshot(dir);
+  const finals = input.assistantTexts.join('\n').split('\n').filter((l) => l.startsWith('FINAL:'));
+  const identity = ownIdentity() ?? null;
+  const binding = own() ?? null;
+  const inline = (token) => input.contexts.some((c) => c.includes(token) && c.includes('</mailbox-message>'));
+  const peerHandleShown = input.contexts.some((c) => /<mailbox-message [^>]*handle="[^"]*@[^"]*"/.test(c));
+  const checks = {
+    run: check(problems.length === 0, { problems, exit: cli.status }),
+    identityKnowsHead: identity ? check(Boolean(binding) && identity.liveness !== 'dead', { handle: identity.handle, liveness: identity.liveness, roles: identity.roles }) : notObserved('Identity never listed the head'),
+    byHandle: toHandle ? check(Boolean(toHandle.id) && toHandle.text.includes(` for ${binding?.name}`) && messageState(snap, toHandle.id) === 'offered' && inline(byHandle), {
+      answer: toHandle.text, state: toHandle.id ? messageState(snap, toHandle.id) : null, inline: inline(byHandle),
+    }) : notObserved('never sent'),
+    frameShowsHandle: check(peerHandleShown, { peerHandleShown }),
+  };
+  if (name === 'A1') {
+    checks.byRole = toRole ? check(Boolean(toRole.id) && toRole.text.includes(`delivered to the current holder of ${ALIAS_ROLE}, ${identity?.handle}`) && messageState(snap, toRole.id) === 'offered' && inline(byRole), {
+      answer: toRole.text, state: toRole.id ? messageState(snap, toRole.id) : null, inline: inline(byRole),
+    }) : notObserved('never sent');
+  }
+  return { cli, checks, finals };
 }
 
 async function runT(name, ctx) {
@@ -702,7 +790,8 @@ async function cmdRun(name, dry) {
   const outcome = name === 'L1' ? await runL1(ctx)
     : name === 'L2' ? await runL2(ctx)
       : name === 'C1' ? await runC1(ctx)
-        : await runT(name, ctx);
+        : name.startsWith('A') ? await runA(name, ctx)
+          : await runT(name, ctx);
   const { cli, ...rest } = outcome;
   const result = {
     case: name,
