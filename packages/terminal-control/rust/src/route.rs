@@ -434,8 +434,10 @@ mod tests {
         let (config, policy) = core_config(&json!({ "config": { "minCols": 40, "policy": "measured-split" } })).unwrap();
         assert_eq!(config.limits.min_cols, 40);
         assert_eq!(policy.name(), "measured-split");
-        assert!(core_config(&json!({ "config": { "minRows": 0 } })).is_err());
-        assert!(core_config(&json!({ "config": { "policy": "nope" } })).is_err());
+        for bad in [json!({ "minRows": 0 }), json!({ "minCols": 2.5 }), json!({ "maxPanesPerTab": -1 }), json!({ "policy": "nope" })] {
+            let Err(refusal) = core_config(&json!({ "config": bad })) else { panic!("{bad} was accepted") };
+            assert_eq!(refusal.code, "usage", "{bad}");
+        }
     }
 
     #[test]
