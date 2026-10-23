@@ -48,7 +48,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
 | RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:12; owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên. `fgos identity` không có cách nhả vai, nên phiên này vẫn còn thêm vai `lead:PROSE`; IDENT ghi việc thiếu lệnh nhả vai) | `fg-server` |
-| DOC | `lead:DOC` | chưa ghi | ? |
+| DOC | `lead:DOC` | `claude-4c3b@design-lap` (đã nhận vai 10-23 11:30) | `design-lap` |
 
 ## Các luồng
 
