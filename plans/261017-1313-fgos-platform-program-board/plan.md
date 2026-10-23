@@ -24,6 +24,31 @@ Cập nhật lần cuối: **2026-10-18 17:15**, phiên `forgentx-95` (big lead,
 - **Khi nào cập nhật:** khi bắt đầu hoặc xong một phase, khi bị chặn, khi land, khi có quyết định mới của owner ảnh hưởng luồng khác.
 - **Trước khi bắt đầu việc mới đụng tới lock, git, state, config hay runner:** đọc mục [File chung dễ va](#file-chung-dễ-va) và [Quyết định đang treo](#quyết-định-đang-treo).
 
+## Máy và phiên
+
+Danh bạ do IDENT dựng từ các dòng `IDENT roster` mà chính các máy ghi (10-23). Gọi máy bằng **handle máy**, gọi agent bằng **handle phiên** (`<cli>-<4 ký tự>@<handle máy>`, in bằng `fgos identity session`) hoặc **vai** `lead:<LANE>` (nhận bằng `fgos identity session --role lead:<LANE>`; `fgos identity resolve lead:<LANE>` trên cùng máy). Không dùng "máy owner", "máy thứ hai", tên phiên Claude, pane herdr hay writer id để gọi nhau nữa. Spec: [Identity](../../docs/platform/identity/spec.md).
+
+| Handle máy | Machine id | Ghi chú | IDENT trên release đang chạy |
+|---|---|---|---|
+| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | 00–03 (release main `7833d5df1`); thiếu 04, 07 tới lần land kế |
+| `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ (release main `5f7825163`, 10-23 10:34) |
+| `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ (release main `199d85223`, 10-23 08:57) |
+
+Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (handle phiên và máy, đọc từ `fgos identity session`) và nhận vai trên máy mình; cột "Máy" có dấu `?` là IDENT suy từ log board, lead xác nhận hoặc sửa.
+
+| Luồng | Vai | Handle phiên | Máy |
+|---|---|---|---|
+| IDENT | `lead:IDENT` | `claude-5v7u@fg-server` | `fg-server` |
+| SEAT, SEAT-TRIM | `lead:SEAT` | `claude-lcpq@design-lap` | `design-lap` |
+| MAIL | `lead:MAIL` | chưa ghi (phiên `f2c6f8ce`) | `fg-server`? (dòng MAIL ghi "máy owner", nhưng file sự kiện của phiên này nằm ở checkout `fg-server`) |
+| HARDEN | `lead:HARDEN` | chưa ghi (phiên `forgent-a8`) | `fg-server2`? |
+| TEST | `lead:TEST` | chưa ghi (phiên `forgent-f8`) | `fg-server2`? |
+| WORK | `lead:WORK` | chưa ghi (phiên `forgent-cd`) | `fg-server2` |
+| OPC | `lead:OPC` | chưa ghi (phiên `forgent-35`) | `fg-server2` |
+| CFG | `lead:CFG` | chưa ghi (phiên `9548be33`) | `fg-server` |
+| COOK | `lead:COOK` | chưa ghi | `fg-server` |
+| DOC | `lead:DOC` | chưa ghi | ? |
+
 ## Các luồng
 
 Trạng thái: `landed` · `running` · `ready` (chạy được, chưa ai nhận) · `held` (chờ một quyết định hay luồng khác) · `planning` · `not-planned`.
@@ -135,7 +160,8 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 - **Bước kiểm dừng của hàng rào** hiện bắt mọi tiến trình có cwd trong workspace, kể cả tiến trình không phải fgOS. Xem mục "Two deviations" trong [báo cáo landing 4.2](../reports/landing-261017-1219-holder-lock-stop-everything-landing.md).
 - **Tier:** config project đặt `runner.maxTier: flagship` (owner duyệt 13:53). Không override thì việc chạy Sonnet; rigor high, rigor critical của unit và mọi override đều dừng ở Opus. Ngoại lệ (RUL103, 10-17 16:30): capability tự khai rigor trong config được nâng trần cho chính nó, nên `architecture:synthesize`, `architecture:shape`, `architecture:explain` (rigor critical) chạy `frontier` (Fable); `fgos doctor` check `capability-rigor-ceiling` liệt kê chúng. Việc code nên ở tier `advanced`.
 - **Tên báo cáo và plan** lấy từ `fgos convention path`, không tự đặt.
-- **Chuỗi lead trên máy owner:** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
+- **Gọi tên bằng handle** (IDENT, 10-23): dòng mới trên board và trong báo cáo gọi agent bằng handle phiên (`claude-xxxx@fg-server`) hoặc vai (`lead:MAIL`), gọi máy bằng handle máy (`design-lap`, `fg-server`, `fg-server2`), theo bảng [Máy và phiên](#máy-và-phiên). Dòng cũ trong nhật ký giữ nguyên. **Id** dùng chung giữa các máy (work item, backlog, `D-ADR`) lấy từ `fgos identity mint <kind>`, không tự đếm.
+- **Chuỗi lead trên máy owner (`design-lap`):** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
 
 ## Nhật ký
 
