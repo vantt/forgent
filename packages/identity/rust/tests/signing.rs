@@ -73,7 +73,7 @@ fn a_different_key_for_a_pinned_machine_is_refused_until_the_pin_is_forgotten() 
         assert!(changed.detail.contains(&signing::fingerprint(key).unwrap()), "{}", changed.detail);
     }
     assert!(changed.detail.contains("--forget alpha-aaaaaa"));
-    assert_eq!(signing::verify(&verifier, BYTES, &old).unwrap().first_seen, false, "the pinned key still passes");
+    assert!(!signing::verify(&verifier, BYTES, &old).unwrap().first_seen, "the pinned key still passes");
 
     pins::forget(&verifier, "alpha-aaaaaa").unwrap();
     assert!(signing::verify(&verifier, BYTES, &new).unwrap().first_seen);
