@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fdc47d3284d0c8b2a9db215eff765a43e51fbe19bb1af137f1fc4c8f44c7a1b1",
+  "payloadDigest": "11fc71c8b481329c1604d26dbb709cc69f08d3f42465d0d8e01f545eedc1633b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -278,17 +278,16 @@
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "486dc0c163a142ed5574b332b01313945abde6ec37311e047df1b3225167ed85",
-    "packages/git/node-addon/src/git.rs": "380bbcf7b7bef7efb1011ee030f8e5b1131f60b372ce22e55443f065fd26be45",
+    "packages/git/node-addon/src/git.rs": "1513fc6993ce231e718db157a5b120d61a0169ec57b81fd73c3eb3d124da9f2a",
     "packages/git/node-addon/src/git/config.rs": "521afa249294ebd96b038d99d60b5f4ff6119c7d6d6bb930ae41ea709f72515d",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
     "packages/git/node-addon/src/git/inspect.rs": "f16a32a38ea4cdbd0699eaca9d534ab837950f12b654202e3a6ec69f420849b5",
-    "packages/git/node-addon/src/git/land.rs": "3df21cb9512feaea9b774212297fae6336f7fd900b5570f7e3c1321099404979",
-    "packages/git/node-addon/src/git/native_lock.rs": "a8ce95784f1a4f5db1f58980dda6fce26d235eae5e0fd2c315f9a17182dc5f2a",
+    "packages/git/node-addon/src/git/land.rs": "da32357ceab63c0bee80012f165f4ee6a8a2170676fe9842683f454f7f0b8404",
     "packages/git/node-addon/src/git/recovery.rs": "e5f24da2f6f4a3c48fdd6da35d18f6458fb210446deb6f07e85944dc53524d74",
     "packages/git/node-addon/src/git/refs.rs": "d1e1413d7a99cd3d9422927e188ee1a68dbb34ad38df9dec09e3e2d5f6cfcb0b",
     "packages/git/node-addon/src/git/remote.rs": "fac13d0b12aa97cbe0b2abb9b95a042f9ae8f840f440ab7435375fbc7cc30d87",
-    "packages/git/node-addon/src/git/restore.rs": "aae7895522db76e1bf0092d5b5b84baea215a8868956d24ed84774b2cc6cd323",
-    "packages/git/node-addon/src/git/scoped_commit.rs": "daf55ab59289ea8cf48d33c2ad99f14816bba55264fb59b803a2fa51dc625500",
+    "packages/git/node-addon/src/git/restore.rs": "7782f831c6a59554584c6de0764b6f005dd63926e62044fc5938ee93848017bb",
+    "packages/git/node-addon/src/git/scoped_commit.rs": "7c2728283d6e1d76163cd9eb4b9aae2bb12b8d1ad72fa9f1cdaef3c6d6cc46e1",
     "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
     "packages/git/node-addon/src/git/worktree.rs": "4d15190574dcba294db6214c818039ef754fce829a415ba204a43acf10678c30",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
@@ -300,34 +299,34 @@
     "packages/git/rust/src/driver.rs": "98fb5f2e371cdf0c9dc8f55c539002acb07541e7d0105cd1797c321d60a315af",
     "packages/git/rust/src/grant.rs": "1a96595205c5deea732fd37208802e07a44409201ca4e591b89b687e798044b5",
     "packages/git/rust/src/inspect.rs": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b",
-    "packages/git/rust/src/land.rs": "d21ffb7fb1c0f2a02b44d1053c972900e6dae984063f99efda76fa6ade718bec",
-    "packages/git/rust/src/lib.rs": "6bc734f278d61f8e502302450cc21c9d395194eb970a33ac231b949f6aefe02a",
-    "packages/git/rust/src/native_lock.rs": "e58d9fefe02664dcea5e0b3ef734fc2ea42a9e5c489225c08f69acf7f0d672ac",
+    "packages/git/rust/src/land.rs": "0cf8be1440888112cf8a8955f03cecb58580ed3ad65dcecf73f1abedfe8120a0",
+    "packages/git/rust/src/lib.rs": "dbdaf859c6624c2ae576f62fcf45961be1d6a70cf8308d3339ade19c9d9bdd8a",
+    "packages/git/rust/src/native_lock.rs": "94ea0e46e34acdec4de3f40552b33a6cd8f2c4656d524dd9b1539a6cd2d55abb",
     "packages/git/rust/src/objects.rs": "ba519abbf01327819f9f2fb5cf42f05633e108cc6741e26e00b289f54b064b9c",
     "packages/git/rust/src/publication.rs": "2c5ee3b18e54cb8aaf3059959cb3f9f270dbe35d6c50bbb76220f4a18e649ba6",
-    "packages/git/rust/src/recovery.rs": "76d9b597cb4dac6abcc35a9d75459a6b7ff4d1539dc36ec66860a887953ae58a",
+    "packages/git/rust/src/recovery.rs": "a8245f0cf573ccb51cac4373e2ee3566c1d48bafb6142fadc5c5302efe18f073",
     "packages/git/rust/src/refs.rs": "311fb6961e6962d2d5e8761f0da20e90133d367cce8e1ab693b3dd4553af400d",
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
-    "packages/git/rust/src/restore.rs": "016cf0b34794324598e874d4bd24d2509ee717e56ee928d4c01f11bf55a6183f",
-    "packages/git/rust/src/scoped_commit.rs": "5cdca63bd37519c6275289e0ee3392d9e71e4b674dfb9743acb78e3e2cb7d19f",
+    "packages/git/rust/src/restore.rs": "8ebe818730acbc307af3cf3e4a2c7476876eae026a7ea2216d4b4a4a08e1e525",
+    "packages/git/rust/src/scoped_commit.rs": "47582ad7f03b509d30259328ca77575e9959014b31352fcc291959358498d315",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
-    "packages/git/rust/src/sync.rs": "52ef4c01f1650b989a41f3618126c3b44086a2f167a7848e500a26abc805ba47",
-    "packages/git/rust/src/wal.rs": "eff94795c2711d347d62a35d45340e620ea30fe30f3103d1cdb2a8fdc8b9ea51",
-    "packages/git/rust/src/worktree.rs": "4c2f68ca6fe7e2c7f994b335d18286a3207510ba40256de965ba731be23cb90d",
+    "packages/git/rust/src/sync.rs": "0fd36afdf42dc99246386d3ed9b87c2086c88edab260f99bbd9f2327c9a85cca",
+    "packages/git/rust/src/wal.rs": "6a361d9d3ea4bc1d8349a153f98e915d53a8ce6368aae62139a32b6c821f4666",
+    "packages/git/rust/src/worktree.rs": "a1094850624cfe314efc2aed5666c50596557c028ac6614e8f34182b667aee84",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
-    "packages/git/rust/tests/contracts.rs": "35accab3d319e90b7abead537a14e072272537d6c86215603726b458d36ddc79",
+    "packages/git/rust/tests/contracts.rs": "91acedb270a60ee727e10dd823c817d4a914062dead0a8fd6f319f381d4fb2b1",
     "packages/git/rust/tests/head_switch.rs": "9e84d97212a643b94d08c3a62b9916f7294459a0b7022c34acf39175343ff34b",
     "packages/git/rust/tests/head_tree.rs": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
     "packages/git/rust/tests/inspect.rs": "a99b94873ea7c8c4bd729c4bedd7ae3ff72915614a289e9d024597af9daf25c6",
-    "packages/git/rust/tests/land.rs": "2579e5af13402be3ad2e24eb10bc883383c072ab5feab3eb54b4f50d138bf98e",
-    "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
+    "packages/git/rust/tests/land.rs": "65e2b20885fde345be123cff10d437fcb69a73d6f8c723b223cb210212b733f6",
+    "packages/git/rust/tests/land_crash_matrix.rs": "585fc55c1faa87a3e85185b6d90ed135066891b5f0502d66e13097e361736714",
     "packages/git/rust/tests/publication.rs": "6dfe848b3cc247dfcbc3b270ddde01248446ce5eb855b0f1d2ef9bc7ac4014d7",
-    "packages/git/rust/tests/recovery_matrix.rs": "f10897d2701702f185370b1e83c0b526bd2bf1c8c4f72cb91445bd8331731c5c",
+    "packages/git/rust/tests/recovery_matrix.rs": "a36515c02dc3150d723217efc08ce41e6284e95cf5bfdbc7994563a559981718",
     "packages/git/rust/tests/refs_remote.rs": "4965eaea84acdcfee9d30cefcc46ffc06026c68f47f95f6b9ecd6b5812ce64a5",
     "packages/git/rust/tests/repository_config.rs": "71d201335b087e0dae4080e147421618693940a2007f7c6819f10b1a3dc8202a",
-    "packages/git/rust/tests/safe_restore.rs": "9bcf50a48323eaea3a60760da2bcdb7e4cd7f1f924d58a35a9a845fb1bb6bc0f",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "70afc54504d532f507352a6d24c1d144428d8c608c490a0ba442a927efb29d3c",
+    "packages/git/rust/tests/safe_restore.rs": "17d2b23fcfee07473574f3d3f420aba4ca2cbf901480737247fd1f054d792c08",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "b153f2bf59280321e29dc99baccd6b9580dedd40fee9d2335a923faf91a278f8",
     "packages/git/rust/tests/sequence.rs": "40fd63b603f193c20ade1d1dd20bc309c2defc1ce902deda9b4241693f777df1",
     "packages/git/rust/tests/ssh_transport.rs": "0c49c0d61922fc89472a7168711b8d27c1266a50bece8fc200534c1f5b6e8d41",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
@@ -714,12 +713,11 @@
     "src/event-store/native.mjs": "3df938eef9557243729e5ae94815950c7571a5555154aa1bb1abb401e08aff8f",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
-    "src/git/index.mjs": "8553e54d46431f3e458978dd3d577901ce10fcdb806b8df288a03562113f3ad5",
+    "src/git/index.mjs": "462a0c34b6feaced921cac4c899f1e37a05664f55f0f980780f0955abca72304",
     "src/git/inspect.mjs": "40d1010878a9d83c971654fc8f8f7fb175ac7f76b0e2a796db84fdea8a2420ff",
     "src/git/land.mjs": "c30e60f8436809e9f19f63729c22162a8c30545cb3f9cae144e570ebe7b9982d",
-    "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
-    "src/git/native.mjs": "6b6a0e898a3244d5f9cc5a0a62e1c6f1732880ef9e060f408691ed5bd503ace2",
-    "src/git/recovery.mjs": "fa4a733e88d2b3829d6fe5b4903a59cefbd86cd1219847c90014a99d0caa7230",
+    "src/git/native.mjs": "3a86255cd7b3d703bc7b688795ee3c0805f9d9f670ed6ee683dafdbc3a5a69d2",
+    "src/git/recovery.mjs": "c0335f61a6341d6a73ccb615fc809bc26d832bcbba4f04ae0b9e6aa18bdc1507",
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
     "src/git/remote.mjs": "58aafc6f9ff17488427f515268cba52271696f1005ff44e6863977c9859ece4e",
     "src/git/restore.mjs": "cf45149647d6278e9c5f977a857640b34e64ffd4e2b30c5b20fd70e986a65ae8",
@@ -742,7 +740,7 @@
     "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
     "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
     "src/intake/verify-pattern-check.mjs": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
-    "src/native/door.mjs": "123a3f7353c03afa0be3886ace33364471191b5aa5d8be2ecd0aa216f76c84d3",
+    "src/native/door.mjs": "9b45a2721427a1064a05d1bc925962c4c945f84f16ee304a95c20a5bcf06bdcb",
     "src/observe/friction-client.mjs": "8dbce03318efff0234eed9c99117a217fa2c1e6e81049bada559e47bca9d9949",
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
     "src/report/capability-plan-lint.mjs": "7649ad794e0171be44317557be7c10a8d558299e031d41bd28c36a746e0b5aff",
@@ -882,7 +880,7 @@
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
-    "src/runner/merge.mjs": "0ba73203c5499b991bfea6a0729c03f16b8bd48ed67a7138ea56ffb8a12b715f",
+    "src/runner/merge.mjs": "3558d7d9f0bcd3fa6da4f3dd44dc5cfce277a611dcd1eb01061d1e6aaf52cc8f",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -913,7 +911,7 @@
     "src/setup/event-store-fixes.mjs": "c02842cf801adb41fb3e338c025bc519159833ee256dca558202f19e97d453b2",
     "src/setup/executor-posture-coverage.mjs": "b9bb0adc2d173321342aaede10d6e767f221d9194f197bee5f8dcb23901843c4",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "e0f1f610370eb0422798ef9292b74d6e1dfd786ed6eb92f872a762f27df5ad36",
+    "src/setup/git-checks.mjs": "d93d81c56030d4875825c68a16a6fafa20522e6acbbb0b1d6079c3c975bb9b16",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/holder-lock-checks.mjs": "7a4676d00e63d3f47508d1d081d2941a794f30de18931dfce871ed9e396f923d",
     "src/setup/identity-checks.mjs": "492ce7b6fc122b042dcaad5b696336bf8b01935ac2b6334c339a1bd37b892b26",
@@ -1055,14 +1053,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 940,
+      "line": 938,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 970,
+      "line": 968,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
@@ -1881,14 +1879,14 @@
     },
     {
       "path": "packages/git/rust/src/wal.rs",
-      "line": 3021,
+      "line": 3044,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/worktree.rs",
-      "line": 1639,
+      "line": 1629,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -1979,14 +1977,14 @@
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 487,
+      "line": 491,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 502,
+      "line": 506,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2014,7 +2012,7 @@
     },
     {
       "path": "packages/git/rust/tests/safe_restore.rs",
-      "line": 992,
+      "line": 1008,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2438,7 +2436,7 @@
     {
       "path": "scripts/event-store/power-loss-driver.mjs",
       "line": 25,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2452,7 +2450,7 @@
     {
       "path": "scripts/event-store/store-increment-worker.mjs",
       "line": 12,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2466,7 +2464,7 @@
     {
       "path": "scripts/git-addon.mjs",
       "line": 16,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2501,7 +2499,7 @@
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 104,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2578,14 +2576,14 @@
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 701,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 714,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2674,7 +2672,7 @@
     {
       "path": "src/event-store/native.mjs",
       "line": 170,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "decodeLegacyFiles"
@@ -2682,7 +2680,7 @@
     {
       "path": "src/event-store/native.mjs",
       "line": 176,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "branchKey"
@@ -2697,18 +2695,10 @@
     {
       "path": "src/git/index.mjs",
       "line": 17,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "versions"
-    },
-    {
-      "path": "src/git/native-lock.mjs",
-      "line": 7,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
-      "binary": "param loaderOptions",
-      "class": "uncalled-wrapper",
-      "function": "createGitNativeLockRepair"
     },
     {
       "path": "src/holder-lock/index.mjs",
