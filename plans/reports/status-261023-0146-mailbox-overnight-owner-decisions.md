@@ -9,6 +9,9 @@ Phiên `f2c6f8ce`, lead lane MAIL. Toàn bộ mã nằm trên nhánh `mailbox/v1
 
 ## 1. Câu cần owner quyết
 
+**Owner đã trả lời 2026-10-23 11:07: 1A, 2A, 3A, 4A, 5a, 6a, 7a**, đúng như khuyến nghị. V6 bắt đầu.
+
+
 Mỗi câu đã có mặc định tạm, nên không câu nào đang chặn việc. Phần phân tích đầy đủ theo mẫu câu hỏi quyết định nằm trong plan được dẫn ở từng nhóm.
 
 ### V6: đo hành vi model qua hook thật ([plan V6](../261023-0049-mailbox-v6-behaviour-through-real-hook/plan.md), mục "Câu hỏi cho owner")
