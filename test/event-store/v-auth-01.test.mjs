@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -62,7 +63,7 @@ for (const layout of ['a symlinked .fgos', 'its own .fgos']) for (const mode of 
     initStore(dir);
     for (const id of ['one', 'two']) addWork(dir, { id, title: id, kind: 'task', status: 'todo', deps: [], refs: [], risk: 'light', verify: 'true' });
     const ceiling = JSON.stringify({ workerSlots: { ceiling: 1 } });
-    fs.writeFileSync(path.join(dir, 'config.json'), ceiling);
+    writeRawProjectConfig(repo, ceiling);
     const barrier = path.join(temp, 'barrier'); fs.mkdirSync(barrier);
     const children = [];
     t.after(async () => {
@@ -73,7 +74,7 @@ for (const layout of ['a symlinked .fgos', 'its own .fgos']) for (const mode of 
     for (const name of ['a', 'b']) {
       const worktree = path.join(temp, name); git('worktree', 'add', '--detach', worktree, 'HEAD');
       if (layout === 'a symlinked .fgos') fs.symlinkSync(dir, path.join(worktree, '.fgos'), 'dir');
-      else { fs.mkdirSync(path.join(worktree, '.fgos')); fs.writeFileSync(path.join(worktree, '.fgos/config.json'), ceiling); }
+      else { writeRawProjectConfig(worktree, ceiling); }
       const child = spawn(process.execPath, ['--input-type=module', '-e', source, worktree, barrier, name, mode, mode === 'move' ? 'one' : name === 'a' ? 'one' : 'two'], { cwd: worktree, env: { ...process.env, FGOS_SESSION_ID: `race-${name}` } });
       child.output = ''; child.errors = '';
       child.stdout.on('data', b => child.output += b); child.stderr.on('data', b => child.errors += b);

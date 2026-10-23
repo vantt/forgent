@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { sandboxGit } from '../../scripts/lib/sandbox-git.mjs';
 
 // The machine id every fixture checkout shares. Work commands open the Event Store, which needs one: the state
 // root's `machine-id` file (resolved once per process, inherited by every child) and the checkout's own config.
@@ -23,7 +24,7 @@ function ensureFixtureStateRoot() {
 
 export function activateGitFixture(repo) {
   ensureFixtureStateRoot();
-  execFileSync('git', ['-C', repo, 'config', 'fgos.machineId', FIXTURE_MACHINE_ID], { stdio: 'pipe' });
+  sandboxGit(repo)(['-C', repo, 'config', 'fgos.machineId', FIXTURE_MACHINE_ID], { stdio: 'pipe' });
   fs.mkdirSync(path.join(repo, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });
   const fence = path.join(repo, '.fgos/locks/activation.lock');
   fs.mkdirSync(fence, { recursive: true });

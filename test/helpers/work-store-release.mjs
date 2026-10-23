@@ -1,7 +1,7 @@
 import './process-tmp-root.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { sandboxGit } from '../../scripts/lib/sandbox-git.mjs';
 import { ensureGitAddon } from './git-addon.mjs';
 import { activateGitFixture } from './git-fixture.mjs';
 
@@ -13,7 +13,7 @@ ensureGitAddon();
 /** A fixture repository the Event Store can open: a machine id and the activation fence a cutover leaves. */
 export function initializeWorkRepository(repo) {
   fs.mkdirSync(repo, { recursive: true });
-  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { stdio: 'pipe' });
+  const git = (...args) => sandboxGit(repo)(['-C', repo, ...args], { stdio: 'pipe' });
   git('init', '-q', '-b', 'main');
   git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
   activateGitFixture(repo);
@@ -22,6 +22,7 @@ export function initializeWorkRepository(repo) {
 
 // Legacy readers consume the immutable HEAD inventory, never mutable working files.
 export function freezeLegacyWorkFixture(repo) {
-  execFileSync('git', ['-C', repo, 'add', '.fgos/events.jsonl'], { stdio: 'pipe' });
-  execFileSync('git', ['-C', repo, 'commit', '-qm', 'frozen legacy Work fixture'], { stdio: 'pipe' });
+  const git = sandboxGit(repo);
+  git(['-C', repo, 'add', '.fgos/events.jsonl'], { stdio: 'pipe' });
+  git(['-C', repo, 'commit', '-qm', 'frozen legacy Work fixture'], { stdio: 'pipe' });
 }

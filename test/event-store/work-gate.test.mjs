@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { openStore, eventStoreConfig } from '../../src/event-store/index.mjs';
 import { withWorkState, readWorkState } from '../../src/state/work-event-store.mjs';
 import { hotLockDepth } from '../../src/state/hot-lock.mjs';
@@ -443,10 +444,10 @@ test('a consumer that passes no extra roots cannot write into the caller directo
 
 test('the gate reads its configuration from the trusted main root, not from the linked worktree', t => {
   const f = workFixture(t);
-  fs.writeFileSync(path.join(f.hot, 'config.json'), JSON.stringify({ eventStore: { rebuild: { maxAttempts: 2 } } }));
+  writeProjectConfig(f.repo, { eventStore: { rebuild: { maxAttempts: 2 } } });
   const linked = path.join(f.temp, 'linked/.fgos');
   fs.mkdirSync(linked, { recursive: true });
-  fs.writeFileSync(path.join(linked, 'config.json'), JSON.stringify({ eventStore: { rebuild: { maxAttempts: 4 } } }));
+  writeProjectConfig(path.join(f.temp, 'linked'), { eventStore: { rebuild: { maxAttempts: 4 } } });
   f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } }));
   let attempts = 0;
   assert.throws(() => withWorkState(linked, f.hot, 'work-test', () => {}, { store: f.store, rebuild: true, beforeGate() {

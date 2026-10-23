@@ -12,6 +12,7 @@ import { maintainEventStore } from '../../src/event-store/maintenance.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
 function workRepo(t, { remote = false } = {}) {
@@ -86,8 +87,7 @@ test('a store that cannot be opened is reported as a code, never thrown at the c
 test('a shared config that exists but does not parse still seals and never publishes', (t) => {
   const { repo, store } = workRepo(t, { remote: true });
   addAt(store, 3600);
-  fs.mkdirSync(path.join(repo, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repo, '.fgos/config.json'), '{ eventStore: { sync: half-written');
+  writeRawProjectConfig(repo, '{ eventStore: { sync: half-written');
   assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
   assert.equal(projectAge(store), 0, 'the due stream is still sealed');
   assert.equal(store.maintenance([]).lastPush, null, 'the defaults of a file that cannot be read never decide a publish');
@@ -116,6 +116,7 @@ function cliWithNativeSpy(t) {
     fs.rmSync(spy, { force: true });
     const env = { ...process.env };
     if (dispatched) env.FGOS_DISPATCH_DEPTH = '1'; else delete env.FGOS_DISPATCH_DEPTH;
+    // boundary: the start and end triggers are called from the CLI's verb dispatcher in bin/fgos.mjs, so only a real verb run proves them.
     const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, ...(storeDir ? ['--dir', dir] : [])], { cwd: repo, encoding: 'utf8', env });
     return { ...result, calls: fs.existsSync(spy) ? fs.readFileSync(spy, 'utf8').trim().split('\n') : [] };
   };

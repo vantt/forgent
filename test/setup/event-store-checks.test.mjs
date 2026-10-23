@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fixture, append } from '../event-store/phase07-fixture.mjs';
 import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/registrations.mjs';
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
@@ -111,14 +112,12 @@ test('one doctor invocation reuses its status snapshot; a new invocation observe
 
 test('a doctor run remembers a failed setup context instead of retrying it per row, and doctor reports an unreadable shared config', t => {
   const f = fixture(t);
-  const config = path.join(f.repo, '.fgos/config.json');
-  fs.mkdirSync(path.dirname(config), { recursive: true });
-  fs.writeFileSync(config, '{ eventStore: half-written');
+  writeRawProjectConfig(f.repo, '{ eventStore: half-written');
   const check = eventStoreDoctor(f.repo, f.ctx);
   const first = check('event-store-git-version');
   assert.equal(first.passed, false);
   assert.match(first.message, /event-store-config: cannot parse shared config/, 'doctor sees the parse failure, never the defaults');
-  fs.writeFileSync(config, '{}');
+  writeProjectConfig(f.repo, {});
   assert.deepEqual(check('event-store-open-root'), { passed: false, message: first.message }, 'every row of the run reports the one remembered failure');
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
 });

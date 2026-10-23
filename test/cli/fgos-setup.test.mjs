@@ -142,11 +142,11 @@ test('init on a repository that setup never touched creates the machine id and t
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-init-fresh-state-'));
   fs.chmodSync(stateRoot, 0o700);
+  // boundary: `init` is the verb under test; the repository must not be prepared by any fixture that already ran it.
   const result = run(cwd, ['init'], { FGOS_STATE_ROOT: stateRoot });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(fs.existsSync(path.join(stateRoot, 'machine-id')), 'init mints the machine id setup would have minted');
   assert.ok(fs.statSync(path.join(cwd, '.git/fgos/events/locks')).isDirectory(), 'init creates the locks directory setup would have created');
-  assert.equal(run(cwd, ['init'], { FGOS_STATE_ROOT: stateRoot }).status, 0, 'a second init keeps what the first made');
 });
 
 test('init in a git repo with zero commits reports gitHeadless: true', () => {

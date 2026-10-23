@@ -139,6 +139,7 @@ test('fgos doctor still runs and lists every check when agent and workflow files
   const { root, write } = makeProject(t);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
   write('agents/broken.yaml', 'name: broken\ndescription: a: b\n');
+  // boundary: the loop that runs every registered row and survives a failing one belongs to the doctor verb; no lower layer runs the whole list.
   const run = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd: root, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;

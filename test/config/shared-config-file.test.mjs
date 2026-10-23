@@ -30,22 +30,19 @@ test('readSharedConfig returns {} when the shared file does not exist', () => {
 
 test('readSharedConfig reads the shared file directly when it exists', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   writeRawProjectConfig(dir, JSON.stringify({ runner: { timeoutMs: 5000 }, gateBypass: { level: 'standard' } }));
   assert.deepEqual(readSharedConfig(dir), { runner: { timeoutMs: 5000 }, gateBypass: { level: 'standard' } });
 });
 
 test('readSharedConfig throws a clear error on invalid JSON in the shared file', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   writeRawProjectConfig(dir, '{ not valid json');
   assert.throws(() => readSharedConfig(dir), /cannot parse shared config/);
 });
 
 test('readSharedConfigOrEmpty degrades only a half-typed file to {}, and still reports a file it cannot read', () => {
   const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+  writeRawProjectConfig(dir, '{ not valid json');
   assert.deepEqual(readSharedConfigOrEmpty(dir), {});
   fs.rmSync(path.join(dir, '.fgos', 'config.json'));
   fs.mkdirSync(path.join(dir, '.fgos', 'config.json'));

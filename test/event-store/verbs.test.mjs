@@ -10,7 +10,7 @@ import { exportUseCase } from '../../src/verbs/events/export.mjs';
 import { rebuildStoreUseCase } from '../../src/verbs/events/rebuild.mjs';
 import { eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('status exposes real open counts, receipt, refs, deferred fields and linked/subdir discovery', t => {
   const f = fixture(t); append(f.store, [{}]);
@@ -56,14 +56,14 @@ test('config merges project over global and validates integer boundaries; the Wo
   fs.writeFileSync(f.ctx.globalConfigPath, JSON.stringify({ eventStore: { seal: { intervalSec: 10 }, sync: { intervalSec: 20 }, remote: 'backup' } }));
   writeProjectConfig(f.repo, { eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } });
   assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
-  fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{ unrelated: half-written');
+  writeRawProjectConfig(f.repo, '{ unrelated: half-written');
   // A file that exists but does not parse never lends its defaults to a publish decision: the write path and the
   // triggers get a config that does not push, the verbs and doctor get the error.
   assert.equal(readEventStoreConfig(f.repo, f.ctx.globalConfigPath).sync.intervalSec, 0);
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath, { strict: true }), /event-store-config: cannot parse shared config/);
-  fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), JSON.stringify({ unrelated: { broken: true }, eventStore: { sync: { intervalSec: -1 } } }));
+  writeProjectConfig(f.repo, { unrelated: { broken: true }, eventStore: { sync: { intervalSec: -1 } } });
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
-  fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{}');
+  writeProjectConfig(f.repo, {});
   for (const eventStore of [{ seal: { intervalSec: 0 } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
   const { rebuilt } = await rebuildStoreUseCase(f.ctx);
   // A summary, never the view: the size of each collection, the view's revision, and what its cache covers.

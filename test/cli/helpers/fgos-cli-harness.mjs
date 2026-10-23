@@ -27,7 +27,7 @@ import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registr
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { projectConfigPath, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -158,9 +158,9 @@ function envelopeData(stdout) {
 // leave one fresh event open, and keep the commands that follow from sealing it (publishing is explicit-only, and a
 // fresh event is not due), so the damaged file is what they find.
 function corruptEventStore(cwd) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const configPath = projectConfigPath(cwd);
   const config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
-  fs.writeFileSync(configPath, JSON.stringify({ ...config, eventStore: { ...config.eventStore, sync: { intervalSec: 0 } } }));
+  writeProjectConfig(cwd, { ...config, eventStore: { ...config.eventStore, sync: { intervalSec: 0 } } });
   leaveOpenWorkEvent(cwd, { ageSec: 0 });
   const active = path.join(cwd, '.git', 'fgos', 'events', 'project', 'active.jsonl');
   fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('"payload":{', '"payload":{"tampered":true,'));
