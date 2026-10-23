@@ -434,6 +434,33 @@ test('a run fails when it leaves a linked-checkout registration whose checkout w
   fs.rmSync(base, { recursive: true, force: true });
 });
 
+// A fixture's child that outlives its test keeps running in a directory the run then deletes (a blocked git hook
+// lived on for days that way); the run stops it and fails.
+test('a run fails when a process it started still runs in its temp dir, names it and stops it', async () => {
+  const base = tempBase();
+  const logs = [];
+  let straggler;
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    log: (msg) => logs.push(msg),
+    spawn: (_exec, _argv, { env }) => {
+      const marker = path.join(env.TMPDIR, 'fixture', 'hook');
+      straggler = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)', marker], { detached: true, stdio: 'ignore' });
+      straggler.unref();
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.strayProcesses.map((p) => p.pid), [straggler.pid]);
+  assert.ok(logs.some((line) => line.includes(String(straggler.pid))), 'the ERROR names the process');
+  const deadline = Date.now() + 5000;
+  const alive = () => { try { process.kill(straggler.pid, 0); return true; } catch { return false; } };
+  while (alive() && Date.now() < deadline) await delay(20);
+  assert.equal(alive(), false, 'the run stopped it');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 test('leftoverTempPrefixes groups by prefix without the random suffix and tolerates a missing root', () => {
   assert.deepEqual(leftoverTempPrefixes('/nope', () => ['fgos-cli-AAAAAA', 'fgos-cli-BBBBBB', 'x']), { 'fgos-cli-': 2 });
   assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});
