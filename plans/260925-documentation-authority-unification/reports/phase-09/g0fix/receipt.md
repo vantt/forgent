@@ -1,76 +1,61 @@
 # Binding Hash And Residual Repair Receipt
 
-Status: **scoped work verified; assignment blocked by one out-of-scope pilot shard.** Author evidence only; no independent approval or gate closure.
+Status: **All scoped repairs applied and locally replayed; independent review pending.** No G0/G7/G9 approval or gate closure is asserted.
 
-Source pin: `cffe725b948f5a695728c8da08f114e7e97075d6`.
+Original authoring pin: `cffe725b948f5a695728c8da08f114e7e97075d6`. Continuation input: `a27d85d0a`; its pilot write restriction was explicitly lifted by the new assignment.
 
 ## Read First
 
-- [Machine receipt: commands, counts, touched IDs and artifact hashes](receipt.json)
-- [Replay result](verification-result.json) and [read-only replay](verify.py)
-- [Exact before/after ledger records](record-edits.json)
-- [Original and added register hash migrations](recipe-migration.json)
-- [Scope blocker and exact proposed pilot record](needs-writes.json)
+- [Machine receipt](receipt.json), [replay result](verification-result.json), [read-only verifier](verify.py).
+- [Original ledger edits](record-edits.json) and [resolved pilot request with exact before/applied-after record](needs-writes.json).
+- [Hash migration](recipe-migration.json), [original placement witnesses](binding-proofs.json), [candidate repair witnesses](binding-repairs.json).
+- [Authenticated historical source](source-proof.json), [residual coverage](partial-carry-residuals.json), [complete partial-carry sweep](partial-carry-sweep.json).
 
-The repository reading map, area sources and the pre-flip execution plan remain the starting authorities. This work does not promote candidate documents, apply cutover patches, accept A34 residuals or supersede historical reviewer verdicts.
+The reading map and area sources remain the starting authorities. These records do not promote candidate documents, apply cutover patches, accept A34 residuals or replace historical reviewer verdicts.
 
-## Delivered Within Scope
+## Applied Continuation
 
-| Work | Result |
+`pilot/decisions/b-io-contract.json` is the only decision shard changed in this continuation:
+
+- `registryGaps[4]`, `claim_f5365b8e40fb58c75adc56a574263242`, now binds the complete candidate Writer Source Trust Levels block at `docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10`, matching sibling `claim_57f11d837272b3f9781b376ef1665c81`.
+- Candidate unit digest: `f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2`. Both frozen extractors verify the full content, actual ancestry and both immediate neighbours.
+- The refreshed remainder references residual row 14, its unchanged file digest and all **three** deleted/replaced historical source lines. `A34Accepted` remains false; source identity and disposition are unchanged.
+- Both pilot rows now store the declared four-key hash `34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0`. The register projects the actual new binding, and the migration retains both the original hash and the continuation's `e4402240… → 34d1e9c5…` transition.
+- Both rows remain pending; no old approval is inherited. The exact two-record pilot delta is verified against Git objects, and every other pilot field must remain unchanged.
+
+`needsWrites=[]`. No candidate/source document or other decision shard was changed in this continuation.
+
+## Full Assignment Replay
+
+| Owning check | Result |
 |---|---|
-| Register | All 191 original identities retained; 257 unique rows after indexing D1's 121 existing-decision rebinds and the residual/rebind delta union |
-| Ledger | 134 changed records in 13 shards; complete old/new records and immutable source IDs retained |
-| Hash | One declared four-key compact sorted JSON + LF recipe; Python and independent Node computations agree |
-| Placement | Both unchanged frozen Step 0 extractors agree; complete selected content and both immediate neighbours witnessed |
-| Historical sources | 18 source units independently authenticated against historical Git objects |
-| Partial-carry sweep | All 26 ledger rows checked: 14 refreshed, 12 unchanged from Step 0 with existing reviewed section-carrier accounting retained |
-| Replay | Two runs byte-identical; five negative probes reject; two composition patches pass whole-file-hash-gated zero-fuzz forward/rollback |
+| Original 191 register identities plus D1/delta union | 257 unique current rows; every ledger/register/Python/Node hash agrees |
+| Original ledger edits plus pilot continuation | 136 exact record deltas in 14 shards; immutable source IDs retained |
+| Partial carries | All 26 ledger rows plus 1 pilot row checked; 14 ledger residuals and the pilot residual refreshed, 12 unchanged since Step 0 |
+| Historical source authentication | 18 full units checked against historical Git objects |
+| Content and placement | Two unchanged frozen extractors agree; complete selected content and immediate neighbours checked |
+| Credential carriage composition | Both whole-file-hash-gated patches pass zero-fuzz forward/rollback |
+| Replay | Two runs byte-identical; six negative probes reject, including the pilot's old legacy binding |
+| Scope | Only `changedBindings` and `bindingHashEncoding` may differ in the phase-08 register; all other register bytes reconstructed exactly |
 
-Only `changedBindings` and the new root `bindingHashEncoding` change in the phase-08 register. Replay reconstructs the original register **byte-for-byte** after removing/reversing those two fields. Other register counts and projections remain historical; no frozen count field was rewritten to disguise the expanded 257-row review set.
+The prior runner RUL77–RUL97 rebinds, provider-capacity/two-line and pointer/six-line residual corrections, W0 component-boundary confirmation, Observe candidate rebind and conditional credential-store carriage are replayed, not redone. D1's packaging repairs remain untouched.
 
-### Named Rework Corrections
+## Historical Evidence And Current State
 
-- Runner `registryGaps[26]` and `[27]` now bind the full RUL77-onward passage at `unheaded-block-93`, not the RUL76 line. Content, actual Business Rules ancestry and both neighbours identify the successor. The whole-block supersede row explicitly names its five changed historical lines; it no longer adopts the historical all-lines-verbatim assertion.
-- Runner `[24]` residual includes **both** changed table rows, including provider-capacity inventory/state. Runner `[29]` residual includes **all six** changed pointer lines, including loop runner-lock, account-pin parsing, timeout lock lifetime and catchup. Every other rebound partial-carry residual is similarly recomputed from the authenticated full historical source to the current target, retaining every deleted/replaced nonblank source line verbatim.
-- `claim_af89c4e6` was already correctly rebound by W0 to `17b94e60…`. It is independently reconfirmed, not falsely reported as a newly discovered/repaired target delta. Its stale register projection is refreshed.
-- `claim_15308eb4` binds `docs/platform/agent-confinement/spec.md#unheaded-block-73` in the **composed after-state** of `carry:credential-store-setup`, after predecessor `file:docs/platform/agent-confinement/spec.md`. Ledger and register name that conditional state, spec ID and whole-file hashes. The carried unit digest remains `5364ce63…`; its owner, placement and ancestry change. Candidate bytes are untouched. Application/revalidation at the final pin remains owed.
-- `claim_a7278e15` now binds the candidate Observe Owns block at `unheaded-block-5`, as its native sibling does, with the two historical changed lines in its current-digest residual.
-- D1's six packaging review repairs are not redone. Their effective current bindings are used for the global recipe migration. D1's new carry inventory is not miscounted as 1,009 additional *rebindings*.
+The original `binding-proofs.json`, `binding-repairs.json`, `record-edits.json` and residual artifact retain their authoring-pin evidence. In particular, `outOfScopeProposalOnly=true` in residual row 14 describes the **old** scope restriction, not today's live state. Its bytes are retained so every existing residual reference remains valid.
 
-[Binding repairs](binding-repairs.json), [placement proofs](binding-proofs.json), [source proof](source-proof.json), [residuals](partial-carry-residuals.json) and [sweep](partial-carry-sweep.json) retain the exact witnesses. All authored changes remain `pending`; no old approval is inherited. Historical residual files and source IDs are not modified.
+`needs-writes.json` now records resolution and the exact applied delta. The verifier authenticates the original pilot placement, replaces only that effective proof with the already-authored candidate placement in `binding-repairs.json`, and checks **every residual against the live decision record**. There is no proposal fallback. Original ledger edit evidence plus the two explicitly recorded pilot edits must reconstruct the complete current shards exactly.
 
-## Single Hash Recipe
+The one hash recipe remains SHA-256 of UTF-8, sorted-key compact JSON plus exactly one LF, containing exactly `{targetOwner,targetAnchor,targetUnitDigest,targetAncestry}`. Missing values encode as null; Unicode is not ASCII-escaped; arrays retain order. `successorGroup` is excluded, so group members are authenticated separately. D1's existing heading ancestry convention is preserved and checked explicitly.
 
-SHA-256 of UTF-8 sorted-key compact JSON, followed by **exactly one LF**, containing exactly:
-
-```json
-{"targetOwner":"…","targetAnchor":"…","targetUnitDigest":"…","targetAncestry":[]}
-```
-
-Absent fields encode as `null`; arrays retain order; Unicode is not ASCII-escaped. `successorGroup`, placement, composition metadata and review metadata are excluded. The 16 contextual-footer group rows therefore use explicit null anchor/digest/ancestry in this four-key hash; all eight members of each group are separately authenticated. The migration does not pretend the four-key hash cryptographically includes the group.
-
-D1's 52 heading bindings retain its existing ancestry convention (parents plus selected heading). The dual-extractor witness uses parents-only ancestry; replay explicitly checks parent ancestry **and** selected title against the stored D1 array. Arrays are not silently normalized while hashing, and this turn does not redo D1's heading bindings.
-
-## Blocker: Pilot File Outside Writable List
-
-`claim_f5365b8e40fb58c75adc56a574263242` lives in:
-
-`plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json`
-
-That is **not** under `ledger/decisions/**`. It was read but never written. [needs-writes.json](needs-writes.json) contains the exact before/proposed-after record: candidate `cli-io-contract.md#unheaded-block-10`, sibling-matching digest/ancestry, refreshed three-line residual and canonical binding hash. It also records the hash-only update needed for sibling `claims[35]`.
-
-Both pilot register rows have recomputed hashes for their **actual current** pilot bindings, not the unapplied proposal. The pilot ledger-side hashes remain absent. Until the owner/Lead grants or applies that pilot delta, this assignment and global G0 remain blocked. The author replay passes the scoped invariants while explicitly reporting both pilot hash gaps; it does not label the global gate green.
+The credential-store binding remains the conditional after-state of `carry:credential-store-setup` after its named predecessor, not an applied live candidate unit. Final-pin application and independent delta review remain owed.
 
 ## Reproduce And Limits
-
-From the project root:
 
 ```sh
 python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0fix/verify.py
 ```
 
-The verifier only writes disposable files under `/tmp/fgos-work/w2-g0fix-brief/`. It reads current source/ledger bytes, historical Git objects and both unchanged embedded extractors. It replays the approved predecessor and carriage spec on scratch bytes with whole-file SHA checks before every forward/rollback; compares every register hash in Python and Node; checks complete current/conditional placements, historical source witnesses, residual coverage, unchanged pilot bytes and the exact authorized edit set. Negative probes reject stale residual targets, omitted provider-capacity history, incorrect neighbours, incorrect unit digests and the old spaced/no-LF recipe.
+The verifier writes scratch files only under `/tmp/fgos-work/w2-g0fix-brief/`. Compare stdout with `verification-result.json`. Full earlier commands and preparation-only correction history remain available in `receipt.json` at `a27d85d0a`; the continuation did not rerun the historical preparer.
 
-`prepare.py` authored the mechanical migration from the recorded input pin. It now refuses the already-migrated tree before overwriting evidence; use `verify.py` for normal replay. Its preparation-only failures (wrong Observe selector, D1 heading-ancestry convention, compact register serialization and nested-vs-root recipe detection) were corrected before ledger/register mutation; the successful final preparation and replay are recorded in `receipt.json`.
-
-No Node test file, full suite, Cargo workspace test, fgOS CLI, Git write, activation, lease, pair accounting, owner-answer/progress/gate-status write or candidate-doc edit was run. Full `npm test`/`scripts/run-tests.mjs` are expressly prohibited by the brief. No production symbol changed; `impact-analysis: degraded` under its no-CLI boundary. No browser preview/service was launched because it may write outside the exact writable list. D1's saved exact-after record comparisons remain historical for the residual rows this delta updates; use this current delta replay and obtain fresh independent verdicts instead of rewriting D1's receipts.
+No Git mutation, fgOS CLI, Work lifecycle verb, live state/secrets, activation, lease, pair accounting, owner-answer/progress/gate-status write or candidate-doc application occurred. No Node test file, full suite or Cargo workspace test ran; the brief prohibits full-suite commands and this change is records-only. `impact-analysis: degraded` under the no-CLI boundary; no production symbol changed. Browser preview/services were not launched because they could write outside the exact writable scope.

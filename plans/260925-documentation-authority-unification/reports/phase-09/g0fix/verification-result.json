@@ -1,11 +1,12 @@
 {
-  "status": "scoped-replay-pass; global task blocked by declared pilot needsWrites",
+  "status": "replay-pass; all scoped repairs applied; independent review pending",
   "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "continuationSourceCommit": "a27d85d0a",
   "originalRegisterRows": 191,
   "currentRegisterRows": 257,
   "d1RebindRowsIndexed": 121,
-  "changedLedgerRecords": 134,
-  "changedLedgerFiles": 13,
+  "changedLedgerRecords": 136,
+  "changedLedgerFiles": 14,
   "dualExtractorAgreement": true,
   "independentNodePythonHashAgreement": true,
   "d1AdditionalBindingsVerified": 1,
@@ -14,11 +15,9 @@
   "partialCarriesSweptInLedger": 26,
   "partialCarriesRefreshedInLedger": 14,
   "unchangedSinceStep0": 12,
-  "pilotResidualProposalOnly": 1,
-  "pilotLedgerHashGaps": [
-    "claim_57f11d837272b3f9781b376ef1665c81",
-    "claim_f5365b8e40fb58c75adc56a574263242"
-  ],
+  "pilotPartialCarriesSwept": 1,
+  "pilotPartialCarriesRefreshed": 1,
+  "pilotLedgerHashGaps": [],
   "changedSourceLinesById": {
     "claim_40aafcee52b22eda087c5f85eacb9392": 5,
     "claim_f033905b059f073c62ec27f0ee6da620": 5,
@@ -39,12 +38,11 @@
   "negativeProbesRejected": [
     "stale residual target digest",
     "omitted provider-capacity historical source line",
+    "pilot residual checked against the old legacy binding",
     "wrong immediate neighbour",
     "wrong unit digest",
     "legacy spaced JSON without LF recipe"
   ],
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
-  ],
+  "needsWrites": [],
   "independentReview": "pending; no approval or gate closure"
 }

@@ -1502,7 +1502,7 @@
         "4"
       ],
       "id": "claim_f5365b8e40fb58c75adc56a574263242",
-      "status": "needsWrites; proposed refresh only",
+      "status": "refreshed and applied under authorized pilot continuation; independent review pending",
       "residualIndex": 14,
       "changedSourceLines": 3,
       "previousRemainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
@@ -1519,8 +1519,6 @@
       "reboundSinceStep0": true
     }
   ],
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
-  ],
+  "needsWrites": [],
   "noGateAccepted": true
 }

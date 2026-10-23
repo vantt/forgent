@@ -1,4 +1,4 @@
-"""Read-only scoped replay, not an independent semantic approval or global G0 pass.
+"""Read-only replay including the authorized pilot continuation; not G0 approval.
 python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0fix/verify.py
 Only disposable files under /tmp/fgos-work/w2-g0fix-brief/ are written.
 """
@@ -60,10 +60,35 @@ assert original <= index.keys()
 d1 = load(P / 'reports/phase-09/carries/binding-refresh.json')['rows']
 assert {(r['shard'], (r['collection'], str(r['index']))) for r in d1} <= index.keys()
 needs = load(OUT / 'needs-writes.json')
-pilot = needs['needsWrites'][0]
-assert Path(pilot).read_bytes() == subprocess.check_output(['git', 'show', pin + ':' + pilot]), 'out-of-scope pilot changed'
-assert live(pilot, ['registryGaps', '4']) == needs['proposedRecord']['before']
-assert needs['proposedRecord']['after']['targetOwner'] == 'docs/platform/work-state/contracts/cli-io-contract.md'
+assert needs['needsWrites'] == migration['needsWrites'] == []
+pilot_delta = needs['appliedRecord']
+pilot = pilot_delta['file']
+continuation_pin = needs['continuationSourceCommit']
+assert needs['originalNeedsWrites'] == [pilot]
+assert git_json(pin, pilot) == git_json(continuation_pin, pilot), 'pilot input drifted before continuation'
+assert live(pilot, pilot_delta['keys']) == pilot_delta['after']
+assert pilot_delta['after']['targetOwner'] == 'docs/platform/work-state/contracts/cli-io-contract.md'
+assert pilot_delta['after']['targetAnchor'] == 'unheaded-block-10'
+assert pilot_delta['after']['reviewStatus'] == 'pending'
+hash_delta = needs['additionalHashOnlyApplied']
+assert hash_delta['file'] == pilot and hash_delta['keys'] == ['claims', '35']
+sibling_before = at(git_json(pin, pilot), hash_delta['keys'])
+sibling_after = dict(sibling_before, bindingSha256=hash_delta['bindingSha256'])
+assert live(pilot, hash_delta['keys']) == sibling_after
+assert payload(sibling_after) == payload(pilot_delta['after'])
+previous_migration = git_json(continuation_pin, OUT / 'recipe-migration.json')
+previous_index = {key(r): r for r in previous_migration['rows']}
+for m in migration['rows']:
+    previous = previous_index[key(m)]
+    if m['id'] == pilot_delta['after']['claimId']:
+        assert m['continuationPreviousBindingSha256'] == previous['newBindingSha256'] == bh(pilot_delta['before'])
+        assert m['continuationPreviousInput'] == previous['input'] == payload(pilot_delta['before'])
+        assert m['oldRegisterBindingSha256'] == previous['oldRegisterBindingSha256']
+        assert m['oldLedgerBindingSha256'] == previous['oldLedgerBindingSha256']
+    elif m['file'] == pilot:
+        assert m == dict(previous, ledgerHashWritten=True)
+    else:
+        assert m == previous, 'continuation changed an unrelated hash migration row'
 
 # Replay both composed patches and exact rollback without modifying candidate docs.
 carry = next(r for r in load(P / 'reports/phase-09/composition/patch-specs.json')['patches'] if r['id'] == 'carry:credential-store-setup')
@@ -133,21 +158,27 @@ for e in source_proofs:
     check_placement(w)
 source_by_id = {e['id']: e for e in source_proofs}
 
-pilot_hash_gaps = []
 for m in migration['rows']:
     k = key(m); r = live(*k); e = index[k]
     assert r['claimId'] == e['id'] == m['id']
     assert payload(r) == m['input'] == {k: e[k] for k in KEYS}
     assert bh(r) == e['bindingSha256'] == m['newBindingSha256']
     assert e['reviewStatus'] == 'pending'
-    if k[0] != pilot:
-        assert r['bindingSha256'] == bh(r)
-    else:
-        assert r.get('bindingSha256') is None
-        pilot_hash_gaps.append(m['id'])
-assert len(pilot_hash_gaps) == 2
+    assert m['ledgerHashWritten'] is True and r['bindingSha256'] == bh(r)
 assert {key(r) for r in migration['rows'] if r['wasInOriginal191']} == original
+# Keep the original pin's placement evidence immutable, authenticate it, then
+# replace precisely the one pilot proof with its already-authored candidate witness.
+pilot_proof = next(e for e in proofs if e['id'] == pilot_delta['after']['claimId'])
+check_placement(pilot_proof['placement'])
+assert pilot_proof['bindingSha256'] == bh(pilot_delta['before'])
+assert pilot_proof['placement']['selected']['textDigest'] == pilot_delta['before']['targetUnitDigest']
+pilot_repair = next(e for e in repairs if e['id'] == pilot_delta['after']['claimId'])
+assert pilot_repair['beforeBinding'] == payload(pilot_delta['before'])
+assert pilot_repair['afterBinding'] == payload(pilot_delta['after'])
+proofs = [dict(e, bindingSha256=bh(pilot_delta['after']), placement=pilot_repair['placement'])
+          if e['id'] == pilot_delta['after']['claimId'] else e for e in proofs]
 for e in proofs:
+    assert e['bindingSha256'] == live(e['file'], e['keys'])['bindingSha256']
     r = live(e['file'], e['keys'])
     if 'placement' in e:
         u = check_placement(e['placement'])
@@ -186,15 +217,22 @@ def check_residual(e, current, witness=None):
 line_counts = {}
 residual_sha = sha((OUT / 'partial-carry-residuals.json').read_bytes())
 for i, e in enumerate(residuals):
-    r = live(e['file'], e['keys']) if not e['outOfScopeProposalOnly'] else needs['proposedRecord']['after']
+    # outOfScopeProposalOnly is historical author-pin metadata, never a bypass.
+    r = live(e['file'], e['keys'])
     line_counts[e['id']] = check_residual(e, r)
     assert r['residualRef']['row'] == i and r['residualRef']['fileSha256'] == residual_sha
     assert r['residualRef']['residualSha256'] == e['residualSha256']
     assert r['residualRef']['targetUnitDigest'] == r['targetUnitDigest']
     assert r['targetUnitDigest'] in r['remainder'] and residual_sha in r['remainder']
-assert len(residuals) == 15 and sum(e['outOfScopeProposalOnly'] for e in residuals) == 1
+assert len(residuals) == 15
+historical_proposals = [e for e in residuals if e['outOfScopeProposalOnly']]
+assert len(historical_proposals) == 1 and historical_proposals[0]['id'] == pilot_delta['after']['claimId']
+assert payload(live(pilot, pilot_delta['keys'])) == historical_proposals[0]['primaryTarget']
+assert (OUT / 'partial-carry-residuals.json').read_bytes() == subprocess.check_output(
+    ['git', 'show', continuation_pin + ':' + str(OUT / 'partial-carry-residuals.json')]), 'historical residual evidence changed'
 sweep = load(OUT / 'partial-carry-sweep.json')['rows']
-assert len(sweep) == 27
+assert len(sweep) == 27 and load(OUT / 'partial-carry-sweep.json')['needsWrites'] == []
+assert next(e for e in sweep if e['file'] == pilot)['status'] == 'refreshed and applied under authorized pilot continuation; independent review pending'
 for e in sweep:
     baseline = at(git_json(e['step0Commit'], e['file']), e['keys'])
     assert payload(baseline) == e['step0Binding']
@@ -203,7 +241,10 @@ for e in sweep:
         assert payload(r) == e['step0Binding'] and e['reboundSinceStep0'] is False
         assert r['remainder'] == e['existingRemainder']
 # Only these decision subobjects may differ. No source/native ID or historical review rewrite.
-edits = load(OUT / 'record-edits.json')['rows']
+edits = load(OUT / 'record-edits.json')['rows'] + [
+    dict(pilot_delta, id=pilot_delta['after']['claimId']),
+    dict(hash_delta, id=sibling_after['claimId'], before=sibling_before, after=sibling_after),
+]
 changed_files = {e['file'] for e in edits}
 for f in changed_files:
     old = git_json(pin, f); expected = copy.deepcopy(old)
@@ -232,6 +273,7 @@ bad = copy.deepcopy(sample); bad['primaryTarget']['targetUnitDigest'] = '0' * 64
 rejects('stale residual target digest', lambda: check_residual(bad, r))
 bad = copy.deepcopy(sample); bad['changedSourceLines'].pop()
 rejects('omitted provider-capacity historical source line', lambda: check_residual(bad, r))
+rejects('pilot residual checked against the old legacy binding', lambda: check_residual(historical_proposals[0], pilot_delta['before']))
 bad = copy.deepcopy(proofs[0]['placement']); bad['next'] = None
 rejects('wrong immediate neighbour', lambda: check_placement(bad))
 bad = copy.deepcopy(proofs[0]['placement']); bad['selected']['textDigest'] = '0' * 64
@@ -240,4 +282,4 @@ first = migration['rows'][0]
 def wrong_recipe():
     assert sha(json.dumps(first['input'], sort_keys=True, ensure_ascii=False)) == first['newBindingSha256']
 rejects('legacy spaced JSON without LF recipe', wrong_recipe)
-print(json.dumps({'status': 'scoped-replay-pass; global task blocked by declared pilot needsWrites', 'sourceCommit': pin, 'originalRegisterRows': 191, 'currentRegisterRows': len(index), 'd1RebindRowsIndexed': len(d1), 'changedLedgerRecords': len(edits), 'changedLedgerFiles': len(changed_files), 'dualExtractorAgreement': True, 'independentNodePythonHashAgreement': True, 'd1AdditionalBindingsVerified': len(additional), 'composedPatchForwardRollback': 2, 'authenticatedHistoricalSources': len(source_proofs), 'partialCarriesSweptInLedger': 26, 'partialCarriesRefreshedInLedger': 14, 'unchangedSinceStep0': 12, 'pilotResidualProposalOnly': 1, 'pilotLedgerHashGaps': pilot_hash_gaps, 'changedSourceLinesById': line_counts, 'negativeProbesRejected': negative, 'needsWrites': needs['needsWrites'], 'independentReview': 'pending; no approval or gate closure'}, ensure_ascii=False, indent=2))
+print(json.dumps({'status': 'replay-pass; all scoped repairs applied; independent review pending', 'sourceCommit': pin, 'continuationSourceCommit': continuation_pin, 'originalRegisterRows': 191, 'currentRegisterRows': len(index), 'd1RebindRowsIndexed': len(d1), 'changedLedgerRecords': len(edits), 'changedLedgerFiles': len(changed_files), 'dualExtractorAgreement': True, 'independentNodePythonHashAgreement': True, 'd1AdditionalBindingsVerified': len(additional), 'composedPatchForwardRollback': 2, 'authenticatedHistoricalSources': len(source_proofs), 'partialCarriesSweptInLedger': 26, 'partialCarriesRefreshedInLedger': 14, 'unchangedSinceStep0': 12, 'pilotPartialCarriesSwept': 1, 'pilotPartialCarriesRefreshed': 1, 'pilotLedgerHashGaps': [], 'changedSourceLinesById': line_counts, 'negativeProbesRejected': negative, 'needsWrites': [], 'independentReview': 'pending; no approval or gate closure'}, ensure_ascii=False, indent=2))

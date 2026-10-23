@@ -5679,7 +5679,7 @@
           "Writer Source Trust Levels"
         ]
       },
-      "ledgerHashWritten": false,
+      "ledgerHashWritten": true,
       "reviewStatus": "pending"
     },
     {
@@ -5698,8 +5698,8 @@
         "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
         "targetAncestry": null
       },
-      "newBindingSha256": "e44022408389e57e5e24cac9190dbf66c9d174ca2321ae65f23454006d5bb2ba",
-      "input": {
+      "continuationPreviousBindingSha256": "e44022408389e57e5e24cac9190dbf66c9d174ca2321ae65f23454006d5bb2ba",
+      "continuationPreviousInput": {
         "targetOwner": "docs/io-contract.md",
         "targetAnchor": "unheaded-block-5",
         "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
@@ -5708,7 +5708,18 @@
           "Chiều vào — verb + danh tính"
         ]
       },
-      "ledgerHashWritten": false,
+      "newBindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0",
+      "input": {
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-10",
+        "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ]
+      },
+      "ledgerHashWritten": true,
       "reviewStatus": "pending"
     },
     {
@@ -7707,7 +7718,5 @@
     }
   ],
   "independentReview": "pending; no verdict is authored here",
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
-  ]
+  "needsWrites": []
 }
