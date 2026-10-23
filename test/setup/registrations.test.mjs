@@ -1219,7 +1219,7 @@ test('setup registers the mailbox section but writes no mailbox value; the value
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).mailbox, {}, 'no contract value is copied into the tracked config');
     const config = JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json')));
     config.mailbox = { enabled: true, queue: { cap: 7 } };
-    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify(config));
+    writeProjectConfig(temp, config);
     ensureSharedConfigDefaults(temp);
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).mailbox, { enabled: true, queue: { cap: 7 } }, 'what the user set is kept as it is, and nothing is added');
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
@@ -1235,9 +1235,9 @@ test('the mailbox check passes as not enabled until the project opts in, and nam
     assert.match(absent.message, /not enabled/);
     assert.match(absent.message, /mailbox\.enabled/);
     fs.mkdirSync(path.join(temp, '.fgos'));
-    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ mailbox: { enabled: false } }));
+    writeProjectConfig(temp, { mailbox: { enabled: false } });
     assert.match(check.check(temp).message, /not enabled/);
-    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ mailbox: { enabled: true } }));
+    writeProjectConfig(temp, { mailbox: { enabled: true } });
     const on = check.check(temp);
     assert.equal(on.passed, true);
     assert.match(on.message, /^enabled/);

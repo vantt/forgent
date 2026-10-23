@@ -77,6 +77,7 @@ import { fileURLToPath } from 'node:url';
 import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
 import { authRefusalAfterRun, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
 import { installClaudeHook, installCodexHook } from '../../src/setup/agent-hooks.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
@@ -195,7 +196,7 @@ function layOut(name, dry, built) {
   fs.chmodSync(path.join(dir, 'release', 'bin', 'fgos'), 0o755);
   writeJson(path.join(project, '.fgos', 'installation', 'activation.json'), { status: 'ready', releasePath: path.join(dir, 'release') });
   // The project opts in to the mailbox rows, as a user would (spec §16 item 23, provisional).
-  writeJson(path.join(project, '.fgos', 'config.json'), { mailbox: { enabled: true } });
+  writeProjectConfig(project, { mailbox: { enabled: true } });
   if (dry) fs.mkdirSync(homeOf(dir), { recursive: true });
   else if (CLI_OF[name] === 'claude') live.makeClaudeHome({ home: homeOf(dir), claudeDir: CLAUDE_DIR });
   else fs.mkdirSync(homeOf(dir), { recursive: true });
@@ -861,7 +862,7 @@ function cmdCost(runs, which = 'branch') {
   fs.copyFileSync(built.path, host);
   fs.chmodSync(host, 0o755);
   writeJson(path.join(projectOf(dir), '.fgos', 'installation', 'activation.json'), { status: 'ready', releasePath: path.join(dir, 'release') });
-  writeJson(path.join(projectOf(dir), '.fgos', 'config.json'), { mailbox: { enabled: true } });
+  writeProjectConfig(projectOf(dir), { mailbox: { enabled: true } });
   fs.mkdirSync(path.join(homeOf(dir), '.claude', 'sessions'), { recursive: true });
   const session = crypto.randomUUID();
   const start = fs.readFileSync(`/proc/${process.pid}/stat`, 'utf8').split(') ')[1].split(' ')[19];

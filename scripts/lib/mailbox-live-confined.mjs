@@ -33,6 +33,7 @@ import { prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS, readCredentialExpiry } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { installClaudeHook, installCodexHook } from '../../src/setup/agent-hooks.mjs';
+import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { loginDigest, setAsideChangedCopy } from './codex-auth-guard.mjs';
 import { sandboxGit } from './sandbox-git.mjs';
 
@@ -107,7 +108,7 @@ export function layOutRunProject(paths, { cli, release, shim, config = { mailbox
   fs.mkdirSync(path.dirname(bin), { recursive: true });
   fs.writeFileSync(bin, shim, { mode: 0o555 });
   writeJson(path.join(paths.installation, 'activation.json'), { status: 'ready', releasePath: release });
-  writeJson(path.join(paths.ws, '.fgos', 'config.json'), config);
+  writeSharedConfig(paths.ws, config);
   sandboxGit(paths.workspace)(['init', '-q', paths.ws]);
   return installRunRows(paths, cli);
 }

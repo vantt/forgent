@@ -6,6 +6,7 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 import {
   installClaudeHook,
@@ -32,11 +33,10 @@ function mkTempDir(prefix) {
 
 /** Opts the project in to (or out of) the mailbox hook rows through its own config section. */
 function mailboxOptIn(repoRoot, enabled) {
-  const file = path.join(repoRoot, '.fgos', 'config.json');
-  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const file = projectConfigPath(repoRoot);
   const config = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
   config.mailbox = { ...(config.mailbox ?? {}), enabled };
-  fs.writeFileSync(file, JSON.stringify(config));
+  writeProjectConfig(repoRoot, config);
 }
 
 function mockRunnableShim(repoRoot) {
