@@ -15,6 +15,8 @@ pub mod errors;
 pub mod launcher;
 pub mod machine;
 pub mod mint;
+#[cfg(feature = "directory")]
+pub mod pins;
 pub mod proc_tree;
 #[cfg(feature = "directory")]
 pub mod project;
@@ -24,6 +26,8 @@ pub mod provider;
 pub mod refusal;
 pub mod resolve;
 pub mod session;
+#[cfg(feature = "directory")]
+pub mod signing;
 pub mod text;
 
 pub use attempt::{mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
@@ -35,6 +39,10 @@ pub use proc_tree::{os_process_tree, ProcStat, ProcessTree};
 pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 #[cfg(feature = "directory")]
 pub use current::{current_session, machine_info, session_for, session_info, set_alias, CurrentSession, MachineInfo, SessionInfo};
+#[cfg(feature = "directory")]
+pub use pins::{Pin, Recorded};
+#[cfg(feature = "directory")]
+pub use signing::{sign, verify, Signature, Verified};
 #[cfg(feature = "directory")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 #[cfg(feature = "provider")]
