@@ -667,7 +667,8 @@
         "4. Every doctor check",
         "4.2. Project config (written by setup or `--fix`)"
       ],
-      "reviewNote": "L12-130 merge cbdf18555: unique Project config table under the exact 4.2 heading, complete passage and both neighbouring headings checked by both unchanged extractors; seat-binding-drain removed and seat-binding-config comment-refresh semantics retained. Witnesses in step-08-l12-130-merge-rebindings.json. Source identity unchanged; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01"
     },
     {
       "claimId": "claim_4b0be5d6b3c4382616bd5748e7bd6c94",
@@ -1084,7 +1085,8 @@
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "dcedd022b2b1c80d0954de9114c6e6e89b394647832503b76437f11da6643ec5"
     },
     {
       "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
@@ -1102,7 +1104,8 @@
         "Spec: Runner (vòng tự hành)",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-44 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91"
     },
     {
       "claimId": "claim_6f9769825ad867b974bc2f69118c2261",

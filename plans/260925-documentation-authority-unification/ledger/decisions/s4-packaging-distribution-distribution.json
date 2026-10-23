@@ -253,7 +253,8 @@
         "Retained Distribution Source Detail",
         "Contributor hooks setup"
       ],
-      "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "9b2220421d80a589df3f4ff7ae7d9ed100f4221359d193658d04e0fab315edfb"
     },
     {
       "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
@@ -311,7 +312,8 @@
         "Retained Distribution Source Detail",
         "Doctor"
       ],
-      "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "91cb0a7ee757c66cb62710008b59337e2421e38641add8edb7a57baba6ffc48a"
     },
     {
       "claimId": "claim_7120b40ec04026fbdb538c6454614709",

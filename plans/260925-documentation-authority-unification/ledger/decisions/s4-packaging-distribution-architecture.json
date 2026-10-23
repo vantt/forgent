@@ -4685,7 +4685,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "d8be0cc96347deafc779ca217f3151aaa5346cd116fcd7d1cb52cc7e93ffab6e"
     },
     {
       "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
@@ -4703,7 +4704,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "5da9e3d52c8f24acd6f6a1ccab9dbe0e2ce449e2c204eb74efbd9bed4ac932bc"
     },
     {
       "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
@@ -4721,7 +4723,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "f7ae569b878079eb5e43b6a981ce65253eb3a0e0e46ebc107a3976a1a6086249"
     },
     {
       "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
@@ -4739,7 +4742,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "98b990a50bb5a7c2130fed35dceb9e60b8cc326dcece218a4af57e053cb17e9f"
     },
     {
       "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
@@ -4757,7 +4761,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "6c9d8b5c29dabbbfdacbeb921a68af695374dde11080457ab93709de7b34d946"
     },
     {
       "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
@@ -4775,7 +4780,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "1ddc6df2559bcae041fa349e48ce82b27f7605f9457187be855ccb81a7dbccb6"
     },
     {
       "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
@@ -4815,7 +4821,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "fca691219ec69e566804b12927f931ad5905a8be42a49f48a6d1eae2baa54cd8"
     },
     {
       "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
@@ -4834,7 +4841,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "b868adcdc1b987a1224796707ad839bb4a9d1fc529cfd7fba398116d647745dd"
     },
     {
       "claimId": "claim_4486d8c871bc7cace22f5877da298119",
@@ -4853,7 +4861,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "a91b0b6817a4ca842dd365f4da4fd5f1b3d1156c8e371182cb32292f22df08ca"
     },
     {
       "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
@@ -4872,7 +4881,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "17af4874aa27de99cc1c1e81dc447da5a5a760129acbcc71e5bb2e78646cf649"
     },
     {
       "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
@@ -4891,7 +4901,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "b225d8016b28fd2d0b053ea3c22c4a9fcfe6ab73988bf749f0bd8236961c23bd"
     },
     {
       "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
@@ -4910,7 +4921,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "79a55a45b75a8da5334bfbdf1f81cb4739f7523da78528babb20b68b3cbfed1f"
     },
     {
       "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
@@ -4929,7 +4941,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "fb0ec155298b1cd95585bdcbcb7a704ccddcfffc4e70988c6a7db06f0fe318cf"
     },
     {
       "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
@@ -4948,7 +4961,8 @@
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "96b0332d71f2006d89fcb26ce90e84f71d4f22368682b37a38093adecdddb2e0"
     },
     {
       "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
@@ -4986,7 +5000,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "c4f803ee8db6c523e20643ecfff3c5ca860174b9ee8a385df07de7c4610f7e7c"
     },
     {
       "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
@@ -5004,7 +5019,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "19db06754a2cc2a3919c19ad41549aef41bc4021a14dba4e567f56f7e57f99ae"
     },
     {
       "claimId": "claim_4b867492e168a488b4d812642f2aad61",
@@ -5022,7 +5038,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "72a6eecda55d0ec175168ed583c224581d1bc151844d030f06e08d7497b8b71d"
     },
     {
       "claimId": "claim_25d3080e64bc69696f28d89967456930",
@@ -5040,7 +5057,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "c96e01f066213186160a01ab6222224a17d1d339932518a7b52c4c9788cb2664"
     },
     {
       "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
@@ -5058,7 +5076,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "162b5ec02458ab5cd21140c320e3a2012a376dd85d76a82e11ac6859bdfaab9a"
     },
     {
       "claimId": "claim_2d797473f60376ca54f9086ff0856496",
@@ -5076,7 +5095,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e3fc5203fce593bb430bb1069672edbc8493183652bc3e304348a83b47697762"
     },
     {
       "claimId": "claim_f44d55f008d91c249201a984ce908b79",
@@ -5094,7 +5114,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "7616f0605c601970f37c0192b39af88fdd76862198457d2b1a3d8f1ac3a0e57f"
     },
     {
       "claimId": "claim_5802544189befbf7e8e93082025a321f",
@@ -5112,7 +5133,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "a771413d19a050ae66ff5d26ab405939da3e797a6aed573f49453df3daadfce3"
     },
     {
       "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
@@ -5130,7 +5152,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "59d4d8a2e806f42322c7fdae59ee30400310dde9d02c49222f2c149445e82afe"
     },
     {
       "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
@@ -5148,7 +5171,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "6ba8914185dbdd199cc52ce30e0f9a4851010f8061099380fd49b785ded369af"
     },
     {
       "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
@@ -5166,7 +5190,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "fb1ca85b627469971a099596243288c0037be99df1cb968f8323e71d1ec97b2e"
     },
     {
       "claimId": "claim_ba307bc371864f9cec89f991fef61744",
@@ -5184,7 +5209,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "c2a4211a422027909f5b4202f653c71d3071924634b780c5128aaefda9f277dc"
     },
     {
       "claimId": "claim_3673677485dd4449067c9e5074623e1a",
@@ -5202,7 +5228,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "326b6dff832ed58391ad0ef73d3f1de7d16f34b6b97a39899c9aa27aefb251b3"
     },
     {
       "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
@@ -5220,7 +5247,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "9fe3a0b4d48a8ae9674e263f58883fc0d5d374c75d3156a8067343083c1ba8e1"
     },
     {
       "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
@@ -5238,7 +5266,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "6741fd82af9e91eca5343d754abe99262464f70a95932fb75b88e58e7f98281e"
     },
     {
       "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
@@ -5276,7 +5305,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "b11046c1197e49197389c05136959005ed3cfdc4205fadaa5587c016b9f68da7"
     },
     {
       "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
@@ -5294,7 +5324,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "8d8fa33be3d9293730f664d8606d46de876dfc92b004920da8645858a45d0ddc"
     },
     {
       "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
@@ -5312,7 +5343,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "f80baa909689e716796f61eb965b55a9c0e534e956e37639a5fe254f4f313d76"
     },
     {
       "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
@@ -5330,7 +5362,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "dcb59f3b518af1e08dfca2badd4b93492283a4fbf2a8f307fa8f4df5442ed0da"
     },
     {
       "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
@@ -5348,7 +5381,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "381b922575fbabc767a75d5628e412f01da26bead464c4cdcf117e52a2329a43"
     },
     {
       "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
@@ -5366,7 +5400,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "b1ceb0c9ba7fe6a9b348f484567f86b182bce8a693e9d367336b66c32b3b4b9b"
     },
     {
       "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
@@ -5384,7 +5419,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "8bdbd44e1442fb28ef9913f05a6eab6e7549524c70f178d95ce84fe33d977eee"
     },
     {
       "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
@@ -5402,7 +5438,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "7dc389fa38d73c05c6080154b456751f6e02f216fc396578f709f382df65cec7"
     },
     {
       "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
@@ -5420,7 +5457,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e79110057aa833e5c857902f0e14e1c5cbc31d93186db7f070fcb9240d7bd107"
     },
     {
       "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
@@ -5438,7 +5476,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e2fb33642e5fc72a917ddcab5fa2ded6d364966625c578d3f3d5f07c75f9d503"
     },
     {
       "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
@@ -5456,7 +5495,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "bd93ef1a8932e2a3e3631077058ab1ad066848f73d262c0efb3f7b98c5aa4aa9"
     },
     {
       "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
@@ -5474,7 +5514,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "7. Invocation Lease"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "75e2e003ecbf74a80de9f9940ab8705fd1a9778e848cf0d78fcd813790f8254c"
     },
     {
       "claimId": "claim_52a973f8470cb1944a340ed858f04efb",
@@ -5935,7 +5976,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "54fd0b71cf56ca1a1663e71e3241cc13d01a2d14425676dee854c58f923b420d"
     },
     {
       "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
@@ -5953,7 +5995,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "a6c458fe4949a6026aff5ca7052bd3368ac12e2e33564fe942f9e0fe70c5116f"
     },
     {
       "claimId": "claim_181a82457153d16a123d8c3378c30c98",
@@ -5971,7 +6014,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "b4baccb0a433dd909e91a40e49e0fc6514af6d2df1d3070ad9cf5caa2e345abe"
     },
     {
       "claimId": "claim_c6869299794e7b0b8faebb525521af54",
@@ -5989,7 +6033,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "01f5d7bd2c378778482dc3404b9139e0f1c99e89b9318b40ba61f7111e541f43"
     },
     {
       "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
@@ -6007,7 +6052,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "ed278a2489cdf34270970e99c06b1ce1c8ec73c42ecced13fce05d6731280a98"
     },
     {
       "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
@@ -6025,7 +6071,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "cb8390ae51516bc1b2f6444a005f40ea52668011de5f8d4446dee59fb483574d"
     },
     {
       "claimId": "claim_491998778e598a5385e78b541e33bff8",
@@ -6043,7 +6090,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "4a8e298865ae139a2c6021fc0302f1ed8cc3c2c59f4c0e3b126ee76156dd5671"
     },
     {
       "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
@@ -6061,7 +6109,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "a475d7528949b778ceae8f3c09bcce5c12aa0dca4ca3579c01cce8b02503d5d0"
     },
     {
       "claimId": "claim_5a5a447d501facb835101fcf15cf5f9d",
@@ -6079,7 +6128,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "045e8c856c047ff5afee04d777f52ec5d139575aeb99595f4e6d257c188c3f4c"
     },
     {
       "claimId": "claim_0d7b6c7bb749583718df925f63a8ba7f",
@@ -6097,7 +6147,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e4c17d459b9683f95106f8887231f7ce79937b1ea6065eaece382010fc7bf0b6"
     },
     {
       "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
@@ -6115,7 +6166,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e361e22d52f0135aa746ef31c16e4dd496e8ee9e99e092a2b3cb7be0eabc9025"
     },
     {
       "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
@@ -6133,7 +6185,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "6033c8a5d752a0cd45f324bf54de8a712948dc934ce9266c4c809794de5e2caf"
     },
     {
       "claimId": "claim_3a0164aced10388208f0c748829bf990",
@@ -6151,7 +6204,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "4f0f6c2c90ab3f6e0f8682f3640405a77c1d4ca9b04b955fd5ad41c0ffb90eec"
     },
     {
       "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
@@ -6169,7 +6223,8 @@
         "Retained Runtime Identity And Activation Source Detail",
         "10. MigrationJournal"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "184ff927560d48e35cf96fe6c84caac2ec7f18ccd7be6a054c9b805ac40930bb"
     },
     {
       "claimId": "claim_093f54d48d2e2a3efc8f0c865ba57b66",
@@ -6209,7 +6264,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "6d6a0b338de29cff64c974f3d93c9ec3d3e2d792f06f25babb21b9d6584f4549"
     },
     {
       "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
@@ -6228,7 +6284,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "d6e4e827f5fd4cd04b9aa92e1d0bc18c9be70411e373bcb8d1b0269f363cf714"
     },
     {
       "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
@@ -6247,7 +6304,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "2cb5f9ed0cac5b1414506ed90cae6e52dc70270f848ef785418df47bc14654a1"
     },
     {
       "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
@@ -6266,7 +6324,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "63f75db35e71b4d50cc74bf6431265fd9d2db85d919fb072b68df135dee8cf31"
     },
     {
       "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
@@ -6285,7 +6344,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "e904862b482dd754b9e40ece65f1db78fca7daf859fb48667b9f3d11f0716d66"
     },
     {
       "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
@@ -6304,7 +6364,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "d1ac8812d3b806112b17ad0f0bcf82d683dcdc673cfd2a1b4f16ae5be1846cf5"
     },
     {
       "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
@@ -6323,7 +6384,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "98e559e95364ed6606941355b279bd5a458d0121a239eb36a9f355982b325a25"
     },
     {
       "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
@@ -6342,7 +6404,8 @@
         "10. MigrationJournal",
         "Existing Project Adoption"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "584398eb716d634a53d42e4ef68abbf5ea9d2e66fb323fcd039baa6d4d1fc364"
     },
     {
       "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",

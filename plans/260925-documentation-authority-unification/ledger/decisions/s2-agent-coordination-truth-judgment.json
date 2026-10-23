@@ -8905,11 +8905,12 @@
       "targetAnchor": "open-design-questions-under-this-vision",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "bindingSha256": "e5cafdc99ae55a848359c2ec7ae314e846b6f7c1b275a3483cf594a053335ffc"
     },
     {
       "claimId": "claim_ee6b9f0f588bbebae2e0b21f860de343",

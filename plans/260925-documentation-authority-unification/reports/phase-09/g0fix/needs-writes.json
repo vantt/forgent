@@ -1,0 +1,69 @@
+{
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
+  ],
+  "reason": "claim_f5365b8e is in pilot/decisions, not ledger/decisions. The two pilot register rows also cannot receive their new ledger-side bindingSha256 in this scope. No pilot bytes were changed; live register hashes use actual current pilot bindings, never the unapplied proposal.",
+  "proposedRecord": {
+    "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+    "keys": [
+      "registryGaps",
+      "4"
+    ],
+    "before": {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "sourcePath": "docs/io-contract.md",
+      "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+      "claimKind": "contract",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/io-contract.md",
+      "targetAnchor": "unheaded-block-5",
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-5 SHA256 9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
+      "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+      "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
+      "targetAncestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều vào — verb + danh tính"
+      ]
+    },
+    "after": {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "sourcePath": "docs/io-contract.md",
+      "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+      "claimKind": "contract",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-5 SHA256 9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json. W2 G0 correction: Use the exact candidate writer-source trust-level block used by sibling claim_57f11d837272b3f9781b376ef1665c81. Pilot shard is outside writable scope; proposal only. Full content and immediate neighbours: reports/phase-09/g0fix/binding-repairs.json. Historical prose above is not the current binding. Independent review pending; no approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "reviewNote": "Proposed only: pilot file outside writable scope; independent current-target/residual review pending.",
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/14; file SHA256 2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f; residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957; source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ],
+      "residualRef": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
+        "row": 14,
+        "fileSha256": "2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f",
+        "residualSha256": "b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957",
+        "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "A34Accepted": false
+      },
+      "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0"
+    }
+  },
+  "additionalHashOnlyProposal": {
+    "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+    "keys": [
+      "claims",
+      "35"
+    ],
+    "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0"
+  }
+}

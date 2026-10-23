@@ -2423,12 +2423,13 @@
       "targetAnchor": "unheaded-block-49",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "51ad15b70f434a1d71b1b9d16bacf1bf0ef93318c4e94393c060cb121d83b7fd",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Foundation Responsibilities"
-      ]
+      ],
+      "bindingSha256": "661a24df3301367602f6c385cd5509cf5a278b708b08e8d04634c0388c092769"
     },
     {
       "claimId": "claim_be6821741a7773e3e6c856dba6ea5efa",
@@ -2461,12 +2462,13 @@
       "targetAnchor": "unheaded-block-50",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "bfbc77b7282bfde79c5fc43f670983c6805c56a121416964a1ce1c1d3ffe4ba1",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Domain And Integration Responsibilities"
-      ]
+      ],
+      "bindingSha256": "e1c315c5e2e303ff4b3b5049b10197f6c3225d30f660bc6c51802c50c6a054a3"
     },
     {
       "claimId": "claim_899e837dd759dc01afff5c6dd8a322bd",
@@ -2478,12 +2480,13 @@
       "targetAnchor": "unheaded-block-51",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "c06dc574c821ebb3bfe616ab3f17430dce2c7703f7b2eb016789aa0e8c800340",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Domain And Integration Responsibilities"
-      ]
+      ],
+      "bindingSha256": "b8b05959344a978a527a1ca4f367997c81e36818906d02eecddb443e2a92538f"
     },
     {
       "claimId": "claim_b394376d1521888e01f83eb33d0d1a8d",
@@ -2495,12 +2498,13 @@
       "targetAnchor": "unheaded-block-52",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "b9f357eef27d1025c25bfbfd43429dbc2502bda02c81af240f7a8dc4e9d6af48",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Rejected Interpretations"
-      ]
+      ],
+      "bindingSha256": "facf9906a2ddac20ea1daa709394d3daeb3443b71441df44fc2b4d4cb3ad1f97"
     },
     {
       "claimId": "claim_624eb957517f0d874fff22f37be96d0f",
@@ -2533,13 +2537,14 @@
       "targetAnchor": "unheaded-block-55",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "a42735dca2f7773f8f270410c0469b666ddb7fe51e43c6a44ccb1287f8f9b80f",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Protocol Model"
-      ]
+      ],
+      "bindingSha256": "fdf1b1c237bde2a56e5047029a2dc5945f286869df2bfdf275680640b5eeaafc"
     },
     {
       "claimId": "claim_8578eb3520660abdf596e07df634658f",
@@ -2551,13 +2556,14 @@
       "targetAnchor": "unheaded-block-56",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "b233727aa299288753f61a122ef87c06a19794119daacfe18f5184126aeb662f",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Assignment"
-      ]
+      ],
+      "bindingSha256": "fbcf54dc1f2353733fe35dc119ca4883c03de6be3500801afbfba7ff6adaa06b"
     },
     {
       "claimId": "claim_a20a1b52234600165e4b81168ecfe080",
@@ -2632,13 +2638,14 @@
       "targetAnchor": "unheaded-block-57",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "b3362130268b60c5f668a73d275d2c6918de7e57d81b77787387f55556c4d393",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Planning Materialization"
-      ]
+      ],
+      "bindingSha256": "852be03061b4f01763b34cc30a8b4c053768e9c3cddb421ea331486e2c80dbf0"
     },
     {
       "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
@@ -2650,13 +2657,14 @@
       "targetAnchor": "unheaded-block-58",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "97cc4e381c4d07d4aea2c6b7eac6786320e49ac237dee359bc42a2cf94dd0b64",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Extension Design"
-      ]
+      ],
+      "bindingSha256": "665aaa5d5eab82f73a566ae0ac96c2f67d8b7243f95679e546ff70978b5dd642"
     },
     {
       "claimId": "claim_0fef556ca618d0be23ea8b4670f161ef",
@@ -2710,12 +2718,13 @@
       "targetAnchor": "unheaded-block-62",
       "authoredBy": "codex-session:fgos-run_unit-run-17924802c005e7@2026-10-20",
       "reviewStatus": "pending",
-      "reviewNote": "L12-57 imported binding repair proposed; independent review pending; no approval carry.",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "2037530f444b84893e4f4be7fd6c3a9a339a3e26aee0db7f05e6b8e4e5178bdb",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Open Design Questions Under This Vision"
-      ]
+      ],
+      "bindingSha256": "7df0db9ab204d1b8d872d2185d465f21d318727ba2a7e85896f2efad021a88f3"
     },
     {
       "claimId": "claim_40bffb93345a1dc0814d1bb0f8f4e6e5",

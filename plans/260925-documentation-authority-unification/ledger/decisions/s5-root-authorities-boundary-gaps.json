@@ -43,7 +43,8 @@
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "db705326a5bb66057e7e571fa67aed42caf3f6230cdec4c84becad28f449beee"
     },
     {
       "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
@@ -60,7 +61,8 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-117 merge ad98c3882: complete Data Dictionary, ancestry and both neighbours verified with both unchanged extractors; witnesses in step-07-l12-117-merge-rebindings.json. Source identity unchanged; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "8f516d4ac711701ec1cffe88acea71dd3cfb29ddea7b613b8ff756123b207a59"
     },
     {
       "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
@@ -71,16 +73,23 @@
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. This witness item 4 is contained verbatim; successor item 4 is a pure insertion relative to this source, so it contributes no residual. RUL77 heading and RUL79 mixed suffix differ. Pending independent conservation and A34 review; blocks cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. This witness item 4 is contained verbatim; successor item 4 is a pure insertion relative to this source, so it contributes no residual. RUL77 heading and RUL79 mixed suffix differ. Pending independent conservation and A34 review; blocks cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. W2 partial-carry sweep refreshes the current-target-bound residual; complete verbatim line coverage and its historical source witness are in g0fix/partial-carry-residuals.json. Prior acceptance does not cover the changed target/residual.",
       "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "remainder": "Only uncarried historical RUL77/RUL79 lines; item 4 is pure insertion and excluded retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 78b792e3d90361b9fb4fc8443e03020e15e6b235f194744fa4b8dcb2ac8753cb; source c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
-      "reviewEntryId": "claim_f033905b059f073c62ec27f0ee6da620",
-      "evidenceDigest": "ca1b4be0e93aa3510a96d8a4746f2be700336f2f1ad39c40747aa5747545467f",
-      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/1; file SHA256 2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f; residual SHA256 1343bac0aa5f2f3d139ea8fe9dc49939685b79c5c9dec992c851f182f4009ef9; source c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917; primary target docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-36 SHA256 16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "residualRef": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
+        "row": 1,
+        "fileSha256": "2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f",
+        "residualSha256": "1343bac0aa5f2f3d139ea8fe9dc49939685b79c5c9dec992c851f182f4009ef9",
+        "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
+        "A34Accepted": false
+      },
+      "bindingSha256": "9acfc5991a019a63d87b26f4311b05b840ffa6e522fa32cdb023e1e23f3dbe6f",
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json."
     }
   ],
   "correctionSession": "fgos-run_unit-run-1792750955a733"

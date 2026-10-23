@@ -18,7 +18,8 @@
       "rationale": "Source: docs/architecture-manifest.json:1-257#file-block (historical witness at 6f67a444175e111b1e83c9341319a9908544a595); unit SHA256 6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind file-block -> file-block. The single architecture-manifest.v1 file-block retains the same contract/map/layer/rule keys; imported module and adapter inventories changed. Whole-file identity is unambiguous; this is binding repair, not architecture approval. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: file-block -> file-block. Unique whole-file architecture manifest contract: same top-level keys contract, map, layers, rules, components, domains, files. Main extends module/layer inventory; complete JSON file-block is the same contract owner. Changed content is recorded, not approved. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Unique whole-file JSON contract, same contract/map/layers/rules/components/domains/files keys; module inventory extends. Changed passage, not content approval. Target file-block SHA256 ca065694d38c4a8f1d158180c4f16a0decfda9443e742f2edae0e849cd4f453d; source identity unchanged, no native identity assignment or approval carry. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same sole architecture-manifest file-block; retained contract and additive file-layer registrations. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target file-block SHA256 fdf1b0dfb622b5b7aeacecd2ad314c84f53a42711a8020a029bf895dc579711f; source identity unchanged; no native identity assignment or approval carry. L12-48 merge 5fb9627d445fe4de8e06880d840ef523690509a1: Same sole architecture-manifest.v1 whole-file contract and top-level keys. Exact one-entry addition registers src/verbs/worktree/remove.mjs as use-case; deleting that entry reconstructs the entire prior JSON object. Unique passage correspondence, not architecture/content approval. Full before/after passage in step-00-l12-48-merge-rebindings.json; current target file-block SHA256 9be1d045e8cb07f77e8164c3f493e95a522facd5fbdae8363d15b7c53b47a433; source identity unchanged; no native identity assignment or approval carry. L12-57 merge 3732d245d75d7c40b7206ac53707821176c471ec: Unique complete passage opening under identical named ancestry; inspected main delta changes the bound unit. Full historical/current passage retained; no ordinal substitution. Current target file-block SHA256 63f023133c0566012f2289959f9e15d7cf2867ad7b14beded8ff52d2846741e0; source identity unchanged; no native identity assignment or approval carry. L12-79: merge 4ef05b0b831d8cafa72a669625926090f787a28f; complete old/current passage checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-101 merge 2cf6687669b6582faa11e4bdd901f28d836099dd: unchanged extractor anchor correspondence resolves this existing target anchor at current digest; source identity unchanged, no approval carry; independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
       "targetUnitDigest": "788bc1a09f02ef1ee4b3c5dcfa631aeecf7fdd4aec51bf7acd5cc80a63a82da7",
       "targetAncestry": [],
-      "reviewNote": "L12-130 merge cbdf18555: sole architecture-manifest.v1 whole-file contract, complete before/after JSON and main delta verified with both unchanged extractors; witnesses in step-08-l12-130-merge-rebindings.json. Source identity unchanged; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "43019769e2fe0b5d6e492fa1d65bb194b379c201ef5ff00324334fcc9622a605"
     },
     {
       "claimId": "claim_d52f4222d940558ef34a2d7c0f174628",
@@ -51,13 +52,14 @@
       "targetAnchor": "unheaded-block-11",
       "authoredBy": "codex-session:fgos-run_unit-run-1792538670067-4dc5570c@2026-10-21",
       "reviewStatus": "pending",
-      "rationale": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-11 -> unheaded-block-11. The Current High-Level Components table has the same header and Work/Execution/Convention rows; main adds foundation rows and revises Session/Process/Holder-lock and Workflow roles. L12-1 preserves main rows and the plan Event Store row. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-27 Unique Current High-Level Components table, authenticated historical complete passage and same heading ancestry; main adds/updates workflow, git, event-store, process and supervisor rows while retaining component register schema and both sides. Table correspondence is by header, component identities and ancestry, never ordinal. Changed role text remains unapproved. Current target unheaded-block-11 SHA256 f3bbf414a3e8be966ba97af1f47dc0513efd6e3716d8f0a99819c44ab63462a3. No source/native identity assignment or approval carry. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-11 SHA256 7b6ec53a94d9b37eab5969c93ea50d66f2d9c69159a685f2f7459944179864cb; source identity unchanged; no native identity assignment or approval carry. L12-63: merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-66: merge fd126f0c853f320e476b648fe50ac9b4e2256d6c; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-68: merge f12d2a50526ab96c09d7b986cad0c9e6ac3af9f7; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-79: merge 4ef05b0b831d8cafa72a669625926090f787a28f; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-101 merge 2cf6687669b6582faa11e4bdd901f28d836099dd: unchanged extractor anchor correspondence resolves this existing target anchor at current digest; source identity unchanged, no approval carry; independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
+      "rationale": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-11 -> unheaded-block-11. The Current High-Level Components table has the same header and Work/Execution/Convention rows; main adds foundation rows and revises Session/Process/Holder-lock and Workflow roles. L12-1 preserves main rows and the plan Event Store row. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-27 Unique Current High-Level Components table, authenticated historical complete passage and same heading ancestry; main adds/updates workflow, git, event-store, process and supervisor rows while retaining component register schema and both sides. Table correspondence is by header, component identities and ancestry, never ordinal. Changed role text remains unapproved. Current target unheaded-block-11 SHA256 f3bbf414a3e8be966ba97af1f47dc0513efd6e3716d8f0a99819c44ab63462a3. No source/native identity assignment or approval carry. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-11 SHA256 7b6ec53a94d9b37eab5969c93ea50d66f2d9c69159a685f2f7459944179864cb; source identity unchanged; no native identity assignment or approval carry. L12-63: merge bf5d847c9df6a4fac57747ef95ce0d11bc29cb76; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-66: merge fd126f0c853f320e476b648fe50ac9b4e2256d6c; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-68: merge f12d2a50526ab96c09d7b986cad0c9e6ac3af9f7; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-79: merge 4ef05b0b831d8cafa72a669625926090f787a28f; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-101 merge 2cf6687669b6582faa11e4bdd901f28d836099dd: unchanged extractor anchor correspondence resolves this existing target anchor at current digest; source identity unchanged, no approval carry; independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry. W2 G0 correction: W0 already rebound the complete Current High-Level Components table to 17b94e60 after main 6bee0a74f; independently reconfirm the full unique header/rows, Config cell and both neighbours. Do not undo that valid repair or claim it as a new byte delta. Full content and immediate neighbours: reports/phase-09/g0fix/binding-repairs.json. Historical prose above is not the current binding. Independent review pending; no approval carry.",
       "targetUnitDigest": "17b94e60c0e07542ce67f6b9df5b7d705b1ed2207f3c706df1f407b8680138e9",
       "targetAncestry": [
         "Component Boundary",
         "4. Current High-Level Components"
       ],
-      "reviewNote": "W0 merge 022c0ee67: complete Current High-Level Components table matched by its unique header, exact heading ancestry and both unchanged neighbouring blocks with both unchanged Phase 6 extractors; main changes only the Config implementation-status cell. Full witnesses in reports/phase-09/w0-merge-rebindings.json. Source identity unchanged; independent changed-binding review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "a44cca1dbb4f0ad66a5d0a92d5ae9dc752689b310f9243102e0170627aafd31e"
     },
     {
       "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
@@ -80,18 +82,27 @@
       "sourcePath": "docs/specs/confinement-authority.md",
       "sourceUnitDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
       "disposition": "supersede",
-      "targetOwner": "docs/specs/confinement-authority.md",
-      "targetAnchor": "unheaded-block-140",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-73",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "Source: docs/specs/confinement-authority.md:1357-1359#unheaded-block-140 (historical witness at c3272bc6fc70015e995921e1c458658b084b0b11); unit SHA256 a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6.\nTarget: docs/specs/confinement-authority.md:1359-1361#unheaded-block-141 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/confinement-authority.md#unheaded-block-140 under docs/specs/confinement-authority.md#unheaded-block-141; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-141 -> unheaded-block-140. The same section 13.1 numbered invocation/login/trust recipe now names credentialStore and preserves resourceBindings compatibility, with explicit RUL105 gloss; its anchor shifts 141 to 140. Login and trust passage continuity identifies the successor, not position. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "rationale": "Source: docs/specs/confinement-authority.md:1357-1359#unheaded-block-140 (historical witness at c3272bc6fc70015e995921e1c458658b084b0b11); unit SHA256 a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6.\nTarget: docs/specs/confinement-authority.md:1359-1361#unheaded-block-141 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/confinement-authority.md#unheaded-block-140 under docs/specs/confinement-authority.md#unheaded-block-141; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-141 -> unheaded-block-140. The same section 13.1 numbered invocation/login/trust recipe now names credentialStore and preserves resourceBindings compatibility, with explicit RUL105 gloss; its anchor shifts 141 to 140. Login and trust passage continuity identifies the successor, not position. Source identity unchanged; no native identity assignment or approval carry; independent review pending. W2 G0 correction: Bind the carried numbered credentialStore/login/trust recipe under section 13.1 in the after-state of carry:credential-store-setup, after its approved predecessor. This is a conditional composed target, not a presently applied live unit. Full content and immediate neighbours: reports/phase-09/g0fix/binding-repairs.json. Historical prose above is not the current binding. Independent review pending; no approval carry.",
       "targetUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
-        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "targetComposition": {
+        "specId": "carry:credential-store-setup",
+        "specRef": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+        "predecessorSpecId": "file:docs/platform/agent-confinement/spec.md",
+        "beforeSha256": "088cdffe4070462f34aff500dbd5494e6ebb421997352dff433a4b2bd3297153",
+        "expectedAfterSha256": "6509ab97423bb8310a8762172676c1febe80c91c421486c31dbf6527512d8746",
+        "state": "composed-after-state; not applied to workspace"
+      },
+      "bindingSha256": "df2d78816b3779bcfb3f83133cac3c43ba074e0764806962aaf084eb7d22d55e"
     },
     {
       "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
@@ -124,7 +135,8 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-117 merge ad98c3882: complete Data Dictionary, ancestry and both neighbours verified with both unchanged extractors; witnesses in step-07-l12-117-merge-rebindings.json. Source identity unchanged; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "8f516d4ac711701ec1cffe88acea71dd3cfb29ddea7b613b8ff756123b207a59"
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
@@ -143,7 +155,8 @@
         "0005 — Runner & cô lập worker",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "f15cca45e76010dd04ad42c94b0d955f1259ff835611995139c75fbc08533b28"
     },
     {
       "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
@@ -162,7 +175,8 @@
         "0008 — Routing theo audience của từng interface",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "7c280f9f06268b578a9d8e6ff41fbd28a46dded6bf53901381e9f4fa2f065e43"
     },
     {
       "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
@@ -181,7 +195,8 @@
         "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "7ce4fedbc4b81fd17c995f62b857d71d16747c61a74d182222e7b8f4eec00b40"
     },
     {
       "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
@@ -200,7 +215,8 @@
         "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "7eda30ce1ca9d2439469d7be220822f27a5f56e62a89de98dd6d4500032eb427"
     },
     {
       "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
@@ -219,7 +235,8 @@
         "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "5fd6de45ac642457d581c36d952434b3d2072f9bbc299a63f4f32b5ded702164"
     },
     {
       "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
@@ -238,7 +255,8 @@
         "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "d3625801696e520b75a70281a4d4e39aeaeab0ee6425c9ea595d56768e53e2a7"
     },
     {
       "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
@@ -257,7 +275,8 @@
         "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "729f938eda66a492108099482864ee75ec278376894901f649c7f780dfaedf98"
     },
     {
       "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
@@ -276,7 +295,8 @@
         "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
         "Hệ quả"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "94144df70ec8667e4068964a86b546456a526981fc415e4bf3756442ded082d0"
     },
     {
       "claimId": "claim_b91c86788522c3516bef2c7bab859093",
@@ -293,7 +313,8 @@
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "reviewNote": "L12-101 content/anchor rebind after local-main merge; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "124e08e454127b74d29d2b6baaa52b6d08cbf4520a18616e69ebb8eb0a33c197"
     },
     {
       "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
@@ -310,7 +331,8 @@
         "Spec: Runner (vòng tự hành)",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-44 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "9545236ed63c02f92a5695507d46458fbf6f6436b409e5b6c9f0bc99168afc91"
     }
   ],
   "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"

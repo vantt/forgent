@@ -1,0 +1,1526 @@
+{
+  "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "ledgerRows": 26,
+  "pilotAdditionalRows": 1,
+  "rows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "80"
+      ],
+      "id": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "1-component-classes",
+        "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "fileSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "1. Component Classes",
+          "anchor": "1-component-classes",
+          "githubAnchor": "1-component-classes",
+          "stableAnchor": "h-acb633f23754",
+          "startLine": 77,
+          "endLine": 77,
+          "textDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+          "sample": "1. Component Classes",
+          "sectionPayloadDigest": "673a29b5ec914514271f5b49a4bcaa4a501242b6360ba75ce40c62f92ba8c574",
+          "followingBlockDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499",
+          "identityFingerprint": "d9df4cb372fde103375a8e65a9faba3a5e73b267e88b9c4b0f42d28479e9d6f8",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol"
+          ],
+          "text": "#### 1. Component Classes",
+          "sectionText": "#### 1. Component Classes\n\nInvocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — that is a separate axis, **component class**:\n\n```txt\ncomponent class    -> who owns/releases/configures the component\ninvocation mechanism -> how the selected provider is invoked at runtime\n```\n\nA `ProviderDescriptor` therefore declares both: component class (core, packaged extension, or user plugin) and invocation mechanism (built-in, legacy node, external process, or external WASM).\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions).\n\n\n\n**User plugin** — supplied, installed, upgraded, removed outside the fgOS release train; never assumed present, never compiled into the host. Discovered from manifests, linked into the derived registry, granted only explicit capabilities. May add vendor-scoped operations or implement published extension points; owns no core namespace, authority, init/doctor invariant, or ambient access merely by manifest claim."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 68,
+          "endLine": 75,
+          "textDigest": "4d84b71de5a938c290f706f618397babc4a704b66e270c7755b57eca1404b6fa",
+          "sample": "Added in candidate: superseded migration bookkeeping. The legacy source was\nlegacy-current during the 2026-09-14 promotion pass. That dated status applies\nto the legacy input, not ",
+          "identityFingerprint": "02384e5800ac376b696bda039f56f1632a849a92f7e029e98d497fcc551bade6",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "Historical Migration Status Note"
+          ],
+          "text": "Added in candidate: superseded migration bookkeeping. The legacy source was\nlegacy-current during the 2026-09-14 promotion pass. That dated status applies\nto the legacy input, not this candidate. The recorded platform destinations are\n[architecture/external-provider-protocol.md](external-provider-protocol.md),\n[contracts/component-protocol.md](../contracts/component-protocol.md),\nand [contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md).\nSee the [intent preservation ledger](../intent-preservation-ledger.md)\nfor disposition by preserved claim."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-10",
+          "githubAnchor": "unheaded-block-10",
+          "stableAnchor": "unheaded-block-10",
+          "title": "Unheaded block 10",
+          "startLine": 79,
+          "endLine": 79,
+          "textDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499",
+          "sample": "Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — t",
+          "identityFingerprint": "6e8944dddd7932071e4c51edccf8fb8236d8273f2180607ca31b92306d2c249c",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "1. Component Classes"
+          ],
+          "text": "Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — that is a separate axis, **component class**:"
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "1-component-classes",
+        "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "89"
+      ],
+      "id": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "2-invocation-mechanisms",
+        "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "fileSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "2. Invocation Mechanisms",
+          "anchor": "2-invocation-mechanisms",
+          "githubAnchor": "2-invocation-mechanisms",
+          "stableAnchor": "h-dbf1556fed47",
+          "startLine": 97,
+          "endLine": 97,
+          "textDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+          "sample": "2. Invocation Mechanisms",
+          "sectionPayloadDigest": "f990bbcb2e3e62d23034e35275ac4537c0abd0ba1faddc3b1d613ba2f34041fc",
+          "followingBlockDigest": "7c9657b50b7838a59effaedb399fe053cf3fd4cfbd7158d41efa3264787d2819",
+          "identityFingerprint": "5aa88654995bf6b1825e6bbe3bf8eb659660da6000fb6ec12fb03bf8030358b0",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol"
+          ],
+          "text": "#### 2. Invocation Mechanisms",
+          "sectionText": "#### 2. Invocation Mechanisms\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions).\n\n\nThis enum covers semantic providers and is an illustrative host-implementation detail, not the public ABI (the transitional `LegacyCliPassthrough` binding is CLI-only and lives outside this set — see [Legacy CLI Transition](legacy-cli-transition.md)).\n\n\n\n\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost).\n\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost).\n\n\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-14",
+          "githubAnchor": "unheaded-block-14",
+          "stableAnchor": "unheaded-block-14",
+          "title": "Unheaded block 14",
+          "startLine": 93,
+          "endLine": 93,
+          "textDigest": "a98b91fde83ce7dd6be478dcae1d000184b768a68416a5b561b2d9e534350ba0",
+          "sample": "**User plugin** — supplied, installed, upgraded, removed outside the fgOS release train; never assumed present, never compiled into the host. Discovered from manifests, linked into",
+          "identityFingerprint": "32c9430f88f8f2f576a86bc296cc41da1255162d3932f8bac73dbbb852cbcd1a",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "1. Component Classes"
+          ],
+          "text": "**User plugin** — supplied, installed, upgraded, removed outside the fgOS release train; never assumed present, never compiled into the host. Discovered from manifests, linked into the derived registry, granted only explicit capabilities. May add vendor-scoped operations or implement published extension points; owns no core namespace, authority, init/doctor invariant, or ambient access merely by manifest claim."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-15",
+          "githubAnchor": "unheaded-block-15",
+          "stableAnchor": "unheaded-block-15",
+          "title": "Unheaded block 15",
+          "startLine": 100,
+          "endLine": 100,
+          "textDigest": "7c9657b50b7838a59effaedb399fe053cf3fd4cfbd7158d41efa3264787d2819",
+          "sample": "Added in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions).",
+          "identityFingerprint": "bb53a94e2c13ad4e8ddf715b8d9b76b4f6e4431b43a2fd85f57a10a06ebbc082",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "2. Invocation Mechanisms"
+          ],
+          "text": "Added in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions)."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "2-invocation-mechanisms",
+        "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "100"
+      ],
+      "id": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "3-component-protocol",
+        "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "fileSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "3. Component Protocol",
+          "anchor": "3-component-protocol",
+          "githubAnchor": "3-component-protocol",
+          "stableAnchor": "h-bab6626a3b3f",
+          "startLine": 122,
+          "endLine": 122,
+          "textDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+          "sample": "3. Component Protocol",
+          "sectionPayloadDigest": "9229fc3e7df43971e02ec720977cd9190fbe3882ca9fccf689e332f62945383f",
+          "followingBlockDigest": "aa5e4116035d0b11d423c86594b2b314f62685ed66d610c53e45cd409a2f4999",
+          "identityFingerprint": "66a04939a685fc3010a2080c0cb9533bcd069a467d36909a42099855075ce9e0",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol"
+          ],
+          "text": "#### 3. Component Protocol",
+          "sectionText": "#### 3. Component Protocol\n\nThe semantic component protocol is versioned independently from public host protocols — `fgos.component.v1`, distinct from CLI `fgos.v1` and any remote API version. It carries: operation identity and protocol/schema version range; request ID and optional parent/correlation ID; typed request, result, and error payloads; deadline, cancellation, progress, and events where supported; capability context granted by the host; provider identity and diagnostics needed for tracing.\n\nFor process plugins, version one uses JSON-RPC 2.0 semantics over 4-byte big-endian length-prefixed UTF-8 JSON frames on stdio. Newline-delimited JSON is not the contract: a length prefix gives one enforceable maximum-frame boundary and does not make embedded or future formatted content ambiguous. Stdout is protocol only; logs go to stderr or a declared log notification.\n\nThe host starts a process only after static manifest selection. Its first exchange confirms provider identity, accepted manifest digest, component protocol range, supported operation/contract pairs, and concurrency limit. Discovery never depends on this handshake; a mismatch terminates the provider and fails closed.\n\nOne connection obeys these lifecycle rules:\n\n- request IDs are unique per connection;\n- responses may complete out of order only when concurrency greater than one was negotiated;\n- requests, frames, and event queues are bounded to provide backpressure;\n- cancellation sends a protocol notification, waits a bounded grace period, then terminates the provider process if necessary;\n- cancellation acknowledgement does not claim semantic side effects were rolled back;\n- a crash after dispatch yields completion-unknown unless the operation's idempotency contract and key explicitly permit retry;\n- a one-shot CLI may own one process for its lifetime; a gateway may pool or persist connections under the adapter's health/restart policy.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-007 restoration](../contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral).\n\n\n`EncodedMessage` is the wire representation used only at this boundary — never inside the kernel:\n\n```rust\npub struct EncodedMessage {\n    pub contract_id: ContractId,\n    pub version: ContractVersion,\n    pub content_type: ContentType,\n    pub bytes: Bytes,\n}\n```"
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-19",
+          "githubAnchor": "unheaded-block-19",
+          "stableAnchor": "unheaded-block-19",
+          "title": "Unheaded block 19",
+          "startLine": 119,
+          "endLine": 119,
+          "textDigest": "47969483fc1c0d7e06c1f5694770456716379257ad992cfee88f4d213e996259",
+          "sample": "Added in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-e",
+          "identityFingerprint": "dec6d4d0e76220ccf19432a7957bd171342c8de6268ae8c8ff8c8eb2ab538af9",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "2. Invocation Mechanisms"
+          ],
+          "text": "Added in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost)."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-20",
+          "githubAnchor": "unheaded-block-20",
+          "stableAnchor": "unheaded-block-20",
+          "title": "Unheaded block 20",
+          "startLine": 124,
+          "endLine": 124,
+          "textDigest": "aa5e4116035d0b11d423c86594b2b314f62685ed66d610c53e45cd409a2f4999",
+          "sample": "The semantic component protocol is versioned independently from public host protocols — `fgos.component.v1`, distinct from CLI `fgos.v1` and any remote API version. It carries: ope",
+          "identityFingerprint": "59ad6324a488d6c0b3736f9d28c241de252d2ccb641839d88ffbc69664c45e13",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "3. Component Protocol"
+          ],
+          "text": "The semantic component protocol is versioned independently from public host protocols — `fgos.component.v1`, distinct from CLI `fgos.v1` and any remote API version. It carries: operation identity and protocol/schema version range; request ID and optional parent/correlation ID; typed request, result, and error payloads; deadline, cancellation, progress, and events where supported; capability context granted by the host; provider identity and diagnostics needed for tracing."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "3-component-protocol",
+        "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "109"
+      ],
+      "id": "claim_9a5781f0086209a17330035ff0e58638",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "4-plugin-registry-linker",
+        "targetUnitDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "fileSha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "4. Plugin Registry Linker",
+          "anchor": "4-plugin-registry-linker",
+          "githubAnchor": "4-plugin-registry-linker",
+          "stableAnchor": "h-de7e325bf7d1",
+          "startLine": 155,
+          "endLine": 155,
+          "textDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32",
+          "sample": "4. Plugin Registry Linker",
+          "sectionPayloadDigest": "a208fa4696f2121b98ebf8f7320e53cf3d1820b288e3a466a8e1b65a88eb636d",
+          "followingBlockDigest": "db002cc2af859f74874068b3e2db12c43f8dfe07276a1d602e1169446d3e88a8",
+          "identityFingerprint": "e4237eb9a37385b91dd638586cc130db172170f5db48f402d26c015a0a883cee",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol"
+          ],
+          "text": "#### 4. Plugin Registry Linker",
+          "sectionText": "#### 4. Plugin Registry Linker\n\nExternal discovery is data-first: the host scans a static manifest and never executes unknown provider code merely to discover what it claims.\n\nA `manifest.yaml` provider declaration declares at least: plugin ID, version, publisher, and component protocol range; provided `OperationId` values or named extension points; request/result schema references; invocation mechanism and executable/module location; requested host capabilities; platform compatibility and integrity metadata; health and post-selection `describe` operations.\n\n`manifest.yaml` is the one canonical filename for authored, static provider declarations. Its `kind` field distinguishes the declaration shape (`fgos.component`, `fgos.plugin`, `fgos.domain`, ...); every kind shares `manifestVersion`, `id`, `version`, `provides`, `requires`, `capabilities` before kind-specific fields are validated.\n\n**Registry** names only the host's derived runtime index (and its lock/cache), never another authored file. Discovery scans `manifest.yaml`, validates by `kind`, then links accepted claims into the provider registry.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-008 restoration](../verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula).\n\n\n\n\nAuthored catalogs, manifests, and policy are durable inputs; the linked registry lock/cache is rebuildable derived state — it records host version and source fingerprint, is replaced atomically, and is ignored/rebuilt when stale or corrupt. A cache never outranks its authored sources. This is a compiler only in the linking/validation sense; it does not compile plugin source or the `fgos` host binary.\n\nProject configuration overrides global configuration values, but duplicate operation claims do not silently use last-writer-wins — override precedence is not authority precedence. Ambiguity fails closed unless an explicit replacement policy names both the selected provider and the provider being replaced. Configuration can never replace a **built-in** provider (see the kernel contract's Authority section); a replacement policy only ever governs the external/plugin surface this linker discovers."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-27",
+          "githubAnchor": "unheaded-block-27",
+          "stableAnchor": "unheaded-block-27",
+          "title": "Unheaded block 27",
+          "startLine": 146,
+          "endLine": 153,
+          "textDigest": "b09deaedb0776c71a83045cd09134609b48ef35e3919399cb1c6c1039d66ce9b",
+          "sample": "```rust\npub struct EncodedMessage {\n    pub contract_id: ContractId,\n    pub version: ContractVersion,\n    pub content_type: ContentType,\n    pub bytes: Bytes,\n}\n```",
+          "identityFingerprint": "65cd117163b7e3017af8636ff5717d22a9b6191b4636ce82b4c9d6eaea255233",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "3. Component Protocol"
+          ],
+          "text": "```rust\npub struct EncodedMessage {\n    pub contract_id: ContractId,\n    pub version: ContractVersion,\n    pub content_type: ContentType,\n    pub bytes: Bytes,\n}\n```"
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 157,
+          "endLine": 157,
+          "textDigest": "db002cc2af859f74874068b3e2db12c43f8dfe07276a1d602e1169446d3e88a8",
+          "sample": "External discovery is data-first: the host scans a static manifest and never executes unknown provider code merely to discover what it claims.",
+          "identityFingerprint": "281998b8253790ba6acef713437c0e147d4bf9e538f69453fa7160ba974d0d75",
+          "ancestry": [
+            "Architecture: External Provider Protocol",
+            "Retained selected source material",
+            "External Provider Protocol",
+            "4. Plugin Registry Linker"
+          ],
+          "text": "External discovery is data-first: the host scans a static manifest and never executes unknown provider code merely to discover what it claims."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "4-plugin-registry-linker",
+        "targetUnitDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32",
+        "targetAncestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "144"
+      ],
+      "id": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "5-core-contracts",
+        "targetUnitDigest": "9274b7dd1e623096538871b0934d940c5311b7dac7f87b98e8f3bbe9cbdf0e79",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "fileSha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "5. Core Contracts",
+          "anchor": "5-core-contracts",
+          "githubAnchor": "5-core-contracts",
+          "stableAnchor": "h-dc2f52ad5387",
+          "startLine": 203,
+          "endLine": 203,
+          "textDigest": "9274b7dd1e623096538871b0934d940c5311b7dac7f87b98e8f3bbe9cbdf0e79",
+          "sample": "5. Core Contracts",
+          "sectionPayloadDigest": "599761c6d3a1318c0a0f3bac6eec2b4d274af62b08831d38129471f913f7da58",
+          "followingBlockDigest": "86cb21687de69958f80760e385f227f908f68738f5a4a6c9f60f260e4d16d18e",
+          "identityFingerprint": "a920610fbd9c39cf0b7a9f2baba84f180fe9699dfdb462a8a7da7d83cb651f81",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture"
+          ],
+          "text": "#### 5. Core Contracts",
+          "sectionText": "#### 5. Core Contracts\n\nThe name table (§3) says what each type is; this adds the rules it has no room for.\n\n**`OperationId`** — `<component>.<object-type>.<action>[.<variant>]`. `<component>` owns authority; `<object-type>` is singular (`work.item.list` still names `WorkItem`); `<action>` is a small verb set (`create`, `submit`, `show`, `claim`, `approve`, `run`, ...). E.g. `work.item.submit`, `distribution.build.show`. Each host owns its own projection — CLI verbs, REST paths, MCP names, chat intents are not `OperationId`s unless explicitly mapped; REST may keep plural URLs (`GET /work-items` -> `work.item.list`). Not suffixed for a compatible field addition (see versioning below).\n\n**`HostInvocation`** — host kind is an **open string** (`\"cli\" | \"remote\" | \"chat\"`, not a closed enum every future host must exist in R1).\n\n**`OperationRequest`** = `{ operation: OperationId, contract: ContractRef, input: Box<dyn Any + Send> }` — typed per contract; a built-in downcasts `input` directly, never through a decode step.\n\n**No serialization for built-in providers** — the semantic contract is schema + version (`ContractRef`), but in-process representation is typed Rust through `OperationProvider`. `EncodedMessage` (contract id, version, content type, bytes) exists only at the external-process/WASM boundary ([External Provider Protocol](architecture/external-provider-protocol.md)), never as a kernel type. Raw `OsString` argv is never a semantic `OperationRequest` — it stays inside the CLI adapter's transitional lane.\n\n**`ProviderOutcome`** — not a nested `fgos.v1` envelope or HTTP response; the presenter owns public projection; diagnostics travel through the trace/evidence sink, never silently on compatibility stdout/stderr. Human-in-the-loop rule: §8.\n\n**`ProviderDescriptor` / `ConfigPort`** — `lifecycle` is `singleton | per-invocation | pooled`. Invocation mechanism is an **open string** (`\"builtin\" | \"legacy-node\" | \"external-process\" | \"wasm\"`), not a closed enum. `\"legacy-node\"` names `LegacySemanticProvider`: a normal `OperationProvider` whose implementation still calls an extracted Node use case, introduced per operation only when a non-CLI host needs it before the native provider exists ([Legacy CLI Transition](architecture/legacy-cli-transition.md) §1) — distinct from the CLI adapter's exec lane, which is not a provider at all. A provider receives resolved config/context through `ConfigPort` and never reads a second global config file itself.\n\n**`OperationDescriptor` / `OperationCatalog`** — authored by owning components, never inferred from CLI commands or provider manifests. Fields: operation id, owning component id, request/outcome contracts, effect (`read | write | external`), idempotency (`none | keyed | safe`), authority policy id, allowed host kinds, streaming mode. The CLI command registry stays authority for CLI help/grammar and maps selectors into catalogued operations; a registry entry alone cannot create an operation. **R1 simplicity:** one native operation (`distribution.build.show`), so `OperationCatalog` is a `const` array and `RegistrySnapshot` is assembled once at the host's composition root (`apps/fgos`) from const tables via a pure `build_snapshot(catalog, providers, fingerprint)` — the kernel crate never depends on a provider crate, and there is no catalog system, linker, cache, or manifest scan in R1 (§10).\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-002 restoration](contracts/component-protocol.md#restored-contract-versioning)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 201,
+          "endLine": 201,
+          "textDigest": "e52e6cb6135f8ed324f2d8fb0e9e4ed6d1df73a0443dda2196926e9668bbd718",
+          "sample": "**Transitional CLI lane:** the legacy Node lane lives in the CLI adapter, not the kernel — the kernel has exactly one input/output pair. The CLI adapter looks up `CommandRouteDescr",
+          "identityFingerprint": "0d401bfc046c51c5f35936a3e29dfc93c65cb7d52168723c6639edde12973710",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "4. Peer Host Use Cases"
+          ],
+          "text": "**Transitional CLI lane:** the legacy Node lane lives in the CLI adapter, not the kernel — the kernel has exactly one input/output pair. The CLI adapter looks up `CommandRouteDescriptor[selector]`: `legacy-cli` execs the Node payload directly (argv preserved, inherited stdin/cwd/env, signal forwarding, one invocation record) without building an `OperationRequest`; `native` builds one and calls `InvocationService`. Mechanics: [Legacy CLI Transition](architecture/legacy-cli-transition.md)."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-30",
+          "githubAnchor": "unheaded-block-30",
+          "stableAnchor": "unheaded-block-30",
+          "title": "Unheaded block 30",
+          "startLine": 205,
+          "endLine": 205,
+          "textDigest": "86cb21687de69958f80760e385f227f908f68738f5a4a6c9f60f260e4d16d18e",
+          "sample": "The name table (§3) says what each type is; this adds the rules it has no room for.",
+          "identityFingerprint": "382f4738392ae9e1153da4abe3d8cb0261344fa1f702a0a252eb8a698e5f6202",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "5. Core Contracts"
+          ],
+          "text": "The name table (§3) says what each type is; this adds the rules it has no room for."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range ).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "5-core-contracts",
+        "targetUnitDigest": "9274b7dd1e623096538871b0934d940c5311b7dac7f87b98e8f3bbe9cbdf0e79",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "169"
+      ],
+      "id": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+        "targetUnitDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "fileSha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "8. Failure, Cancellation, Lifecycle, And Human Input",
+          "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+          "githubAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+          "stableAnchor": "h-8fb36a9fc51d",
+          "startLine": 271,
+          "endLine": 271,
+          "textDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6",
+          "sample": "8. Failure, Cancellation, Lifecycle, And Human Input",
+          "sectionPayloadDigest": "a6182701fc2342bc0cfb57af9d3938f78825c17dd9dd88234371c35e325eb6d2",
+          "followingBlockDigest": "57b360fb2f5eca6c39e0789d26807cd21d768ecf49004ae6946c79460e18be15",
+          "identityFingerprint": "38d1a84904eef01fab2fcb4720ba8c8f5d843ef4095bc8c7dce8de631557220b",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture"
+          ],
+          "text": "#### 8. Failure, Cancellation, Lifecycle, And Human Input",
+          "sectionText": "#### 8. Failure, Cancellation, Lifecycle, And Human Input\n\nClosed failure families, common across every invocation mechanism:\n\n- semantic validation, precondition, conflict, not-found;\n- caller admission denied, selected-provider capability denied;\n- no binding, ambiguous binding, incompatible contract;\n- provider unavailable, protocol violation, provider crash;\n- deadline exceeded, caller cancelled, completion unknown.\n\nEach host presenter maps these onto its own contract (`fgos.v1`/exit codes, REST/MCP response, chat result); `InvocationService` preserves invocation/provider IDs so projections correlate without scraping output. Transport adapters never turn a provider crash into a semantic failure or infer success from partial output. A remote disconnect cancels through the same invocation context as a CLI interrupt; a crash never authorizes an automatic replay of a non-idempotent operation. The provider port is asynchronous from v1 — deadlines, cancellation, progress, and backpressure are already runtime requirements, so deferring async would change the ABI at the first real remote/process integration.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-003 restoration](contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te).\n\n\nExactly one terminal record is emitted; `dispatched` is the point after which a transport loss may be completion-unknown, and a late response after cancellation/deadline is diagnostic evidence, not a second terminal truth. Records carry invocation/parent-correlation ID, contract versions, registry fingerprint, provider ID, host kind, timing, terminal family, evidence references — never secrets or capability material.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-002 restoration](contracts/component-protocol.md#restored-contract-versioning).\n\n\n**Human input:** a provider never blocks waiting for a person. It returns a `parked` `ProviderOutcome`; the host or work lifecycle re-invokes later. No provider is ever given a mid-invocation callback to solicit input."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-51",
+          "githubAnchor": "unheaded-block-51",
+          "stableAnchor": "unheaded-block-51",
+          "title": "Unheaded block 51",
+          "startLine": 269,
+          "endLine": 269,
+          "textDigest": "78724be9a1f311792885d756c890d78bd57edebfc28b57e42b36d1bb8d907a88",
+          "sample": "Selecting a different provider never silently transfers authority — a replacement returns a result or proof; the existing authority owner still applies transitions and writes state",
+          "identityFingerprint": "04d33e275b45766fd9b05a4a30d3890973018fafe09eafb5511201c1f3b5a048",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "7. Authority (Two-Stage)"
+          ],
+          "text": "Selecting a different provider never silently transfers authority — a replacement returns a result or proof; the existing authority owner still applies transitions and writes state, for built-in, legacy, and external providers alike. Work Lifecycle remains the only owner of Work transitions; Run Result Evaluation may compute confidence without choosing the next status; Dispatch may execute an approved assignment without inventing its operation; an external manifest claim never grants `.fgos`, Git, process, network, or secret access."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-52",
+          "githubAnchor": "unheaded-block-52",
+          "stableAnchor": "unheaded-block-52",
+          "title": "Unheaded block 52",
+          "startLine": 273,
+          "endLine": 273,
+          "textDigest": "57b360fb2f5eca6c39e0789d26807cd21d768ecf49004ae6946c79460e18be15",
+          "sample": "Closed failure families, common across every invocation mechanism:",
+          "identityFingerprint": "5dce8335d1aac724d5dac29ea15145cc3b37cd657b315b1e520d70bee6617fb2",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "8. Failure, Cancellation, Lifecycle, And Human Input"
+          ],
+          "text": "Closed failure families, common across every invocation mechanism:"
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+        "targetUnitDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "177"
+      ],
+      "id": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "9-physical-placement",
+        "targetUnitDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "fileSha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Physical Placement",
+          "anchor": "9-physical-placement",
+          "githubAnchor": "9-physical-placement",
+          "stableAnchor": "h-7c278e54ecd8",
+          "startLine": 295,
+          "endLine": 295,
+          "textDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd",
+          "sample": "9. Physical Placement",
+          "sectionPayloadDigest": "c51adc02424a50747579774080234a1a9eda8133323f53bb1d9cbd83849b5976",
+          "followingBlockDigest": "c840292ccea938c3cf06ce6a02184761ebb3e3e8c6929420be628a793adced07",
+          "identityFingerprint": "9ba1cd8ce19abe5df3fefbb1182053c1a27825c330997a3de38362121dcaf0ba",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture"
+          ],
+          "text": "#### 9. Physical Placement",
+          "sectionText": "#### 9. Physical Placement\n\nThe public command name stays `fgos` — runtime identity is the release digest, not the name, and every skill, hook, plugin, and Herdr call already targets `fgos <verb>`. `fgctl` is a separate bootstrap binary, not a renamed `fgos`. Crate names are kebab-case with an `fgos-` prefix; modules are snake_case.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-004 restoration](architecture/release-boundaries.md#restored-physical-placement-layout-tree).\n\n\nR1 is three crates: `fgos`, `fgos-host-runtime`, `fgos-distribution`. The legacy exec lane is a module inside `apps/fgos`, not a crate, because it is CLI-adapter-local (§4). `component-protocol` waits for R2 (only an external-process adapter needs `EncodedMessage`). Extract further crates only when pressure is real. Neither app owns provider selection; neither host use case imports another; every host feeds the shared authority/router/contracts layer, and provider adapters depend on component protocols, not host presentation. A component is not created merely because one proof verb is convenient (`gate-bypass` stays under its settled authority, not a manufactured `gate-policy` component).\n\nDistribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../packaging-distribution/architecture/runtime-identity-and-activation.md)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-58",
+          "githubAnchor": "unheaded-block-58",
+          "stableAnchor": "unheaded-block-58",
+          "title": "Unheaded block 58",
+          "startLine": 293,
+          "endLine": 293,
+          "textDigest": "3929043697a06a1d0261e12e94ca86851463ab44fdd3422705178cf6caae2849",
+          "sample": "**Human input:** a provider never blocks waiting for a person. It returns a `parked` `ProviderOutcome`; the host or work lifecycle re-invokes later. No provider is ever given a mid",
+          "identityFingerprint": "0b4f3b54a2e90f811768d94cc2b055d53a6a2532131c4fd8f9263bb75dd552a1",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "8. Failure, Cancellation, Lifecycle, And Human Input"
+          ],
+          "text": "**Human input:** a provider never blocks waiting for a person. It returns a `parked` `ProviderOutcome`; the host or work lifecycle re-invokes later. No provider is ever given a mid-invocation callback to solicit input."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-59",
+          "githubAnchor": "unheaded-block-59",
+          "stableAnchor": "unheaded-block-59",
+          "title": "Unheaded block 59",
+          "startLine": 297,
+          "endLine": 297,
+          "textDigest": "c840292ccea938c3cf06ce6a02184761ebb3e3e8c6929420be628a793adced07",
+          "sample": "The public command name stays `fgos` — runtime identity is the release digest, not the name, and every skill, hook, plugin, and Herdr call already targets `fgos <verb>`. `fgctl` is",
+          "identityFingerprint": "025053109d7eecb81db45159c2bc296d110fba6359e4275ef4f2ddb9632885b9",
+          "ancestry": [
+            "Spec: Host Invocation",
+            "Retained selected source material",
+            "Host Invocation And Provider Routing Architecture",
+            "9. Physical Placement"
+          ],
+          "text": "The public command name stays `fgos` — runtime identity is the release digest, not the name, and every skill, hook, plugin, and Herdr call already targets `fgos <verb>`. `fgctl` is a separate bootstrap binary, not a renamed `fgos`. Crate names are kebab-case with an `fgos-` prefix; modules are snake_case."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "9-physical-placement",
+        "targetUnitDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd",
+        "targetAncestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "195"
+      ],
+      "id": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "1-two-distinct-adapters",
+        "targetUnitDigest": "49afb148ce5b49502adacce9e063c07b40e58fb0981db00e6b2d9048a726d90d",
+        "targetAncestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "fileSha256": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "1. Two Distinct Adapters",
+          "anchor": "1-two-distinct-adapters",
+          "githubAnchor": "1-two-distinct-adapters",
+          "stableAnchor": "h-0398ef359b92",
+          "startLine": 78,
+          "endLine": 78,
+          "textDigest": "49afb148ce5b49502adacce9e063c07b40e58fb0981db00e6b2d9048a726d90d",
+          "sample": "1. Two Distinct Adapters",
+          "sectionPayloadDigest": "58a6459f9e8bf0faa05025f675179c86a73fcd6fb2fe89d8d61152829e9b941a",
+          "followingBlockDigest": "070eef9281dcde7aac4cd065ac319c4eb601c82df284dce49286419ad23ec684",
+          "identityFingerprint": "7b7f0308b090718c036390dcdbe7306f91e83ec1c294866ae1eb69fb26e8c233",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition"
+          ],
+          "text": "#### 1. Two Distinct Adapters",
+          "sectionText": "#### 1. Two Distinct Adapters\n\nNode transition needs two adapters with different contracts. Treating them as one provider would create the false impression that captured CLI output is a semantic result.\n\n**`LegacyCliPassthroughProvider`** — CLI-only. Receives preserved `OsString` argv, inherited stdin, cwd/environment, and signal context; returns pre-rendered stdout/stderr bytes plus process exit/signal termination. It never returns `ProviderOutcome` and is never reachable from remote or chat hosts. This is the only adapter most legacy commands need: the CLI adapter looks up `CommandRouteDescriptor[selector]`, and for `route_kind == legacy-cli` execs the Node payload directly (argv preserved, signal forwarding) and writes one invocation record through the shared recorder — without ever building an `OperationRequest` or calling `InvocationService`/Router.\n\n**`LegacySemanticProvider`** — receives and returns real versioned semantic contracts (`OperationRequest`/`ProviderOutcome`). Its Node bridge calls an extracted Node use case directly, never `bin/fgos.mjs` and never an envelope parser. It can serve any admitted host and is introduced per operation only when a non-CLI host needs Node behavior before the native provider exists. Unlike the passthrough, this adapter *is* a normal `OperationProvider` participant in the kernel pipeline (admit -> select -> grant -> invoke -> normalize -> record) — it is \"legacy\" only in that its implementation still calls into Node.\n\nCapturing stdout/stderr in a supervised child improves CLI cancellation and tracing but remains passthrough presentation; it never becomes the bridge used by a remote host.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-009 restoration](../contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case).\n\n\nThe adapters resolve the legacy payload relative to the installed host, never from the caller's cwd, and invoke the Node entry/bridge directly rather than spawning `fgos` recursively. The CLI parent forwards termination consistently; Unix signal equivalence and Windows process-tree behavior are explicit target-specific compatibility tests, not an undocumented `exit.code()` guess."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 68,
+          "endLine": 76,
+          "textDigest": "1456e880d651b7d8ccc5886ccbe36f3bdf676a2acb7218541e53162738d531a6",
+          "sample": "Added in candidate: superseded migration bookkeeping. The legacy source was\nlegacy-current during the 2026-09-14 promotion pass. That dated status applies\nto the legacy input, not ",
+          "identityFingerprint": "c9c8adfe2de91745aa6c6723ba76064d0c6ee1047b28056733129057ef3760e9",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition",
+            "Historical Migration Status Note"
+          ],
+          "text": "Added in candidate: superseded migration bookkeeping. The legacy source was\nlegacy-current during the 2026-09-14 promotion pass. That dated status applies\nto the legacy input, not this candidate. The recorded platform destinations are\n[architecture/legacy-cli-transition.md](legacy-cli-transition.md),\n[contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md),\n[contracts/legacy-payload.md](../contracts/legacy-payload.md),\nand [verification/compatibility-harness.md](../verification/compatibility-harness.md).\nSee the [intent preservation ledger](../intent-preservation-ledger.md)\nfor disposition by preserved claim."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-10",
+          "githubAnchor": "unheaded-block-10",
+          "stableAnchor": "unheaded-block-10",
+          "title": "Unheaded block 10",
+          "startLine": 80,
+          "endLine": 80,
+          "textDigest": "070eef9281dcde7aac4cd065ac319c4eb601c82df284dce49286419ad23ec684",
+          "sample": "Node transition needs two adapters with different contracts. Treating them as one provider would create the false impression that captured CLI output is a semantic result.",
+          "identityFingerprint": "e15ca52ae04af0f11b8692b0b0f0e936f9076439a91d0b40487239a278f1ed0b",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition",
+            "1. Two Distinct Adapters"
+          ],
+          "text": "Node transition needs two adapters with different contracts. Treating them as one provider would create the false impression that captured CLI output is a semantic result."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "1-two-distinct-adapters",
+        "targetUnitDigest": "49afb148ce5b49502adacce9e063c07b40e58fb0981db00e6b2d9048a726d90d",
+        "targetAncestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "202"
+      ],
+      "id": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+        "targetAncestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "fileSha256": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "2. Legacy Payload Identity, Ownership, And Repair Path",
+          "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+          "githubAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+          "stableAnchor": "h-9d420859bd14",
+          "startLine": 94,
+          "endLine": 94,
+          "textDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+          "sample": "2. Legacy Payload Identity, Ownership, And Repair Path",
+          "sectionPayloadDigest": "42a73e8acb1c7233b3b2b4621504459c837df1c5eb5548006b5c207c1d0b7430",
+          "followingBlockDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+          "identityFingerprint": "e3bba4f3dfed74b0c1b7218ce608018f3a3669dd97b409dc61670e2ebe9d0f4a",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition"
+          ],
+          "text": "#### 2. Legacy Payload Identity, Ownership, And Repair Path",
+          "sectionText": "#### 2. Legacy Payload Identity, Ownership, And Repair Path\n\nThree things are separated that the name `bin/fgos.mjs` currently conflates:\n\n| | Today | After R1 |\n|---|---|---|\n| Public name people type | `fgos` → Node | `fgos` → Rust host (workspace shim / PATH) |\n| Payload identity the Rust host execs | none | `legacy-node` — the release manifest's `components.legacyNode` and the `legacy_payload` field of every `legacy-cli` `CommandRouteDescriptor` |\n| File location | `bin/fgos.mjs` at the repo root | unchanged |\n\n**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../../../architect/component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted.\n\nThe public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) §5).\n\nAdded in candidate — checked resolver status (2026-10-13): the preceding activation-binding paragraph is retained selected design. `apps/fgos/src/legacy_exec.rs:69-154` selects the release root from explicit release/dev environment bindings or executable-relative manifest discovery, then verifies the manifest and confined entry. The target identity status in spec.md remains `accepted-not-implemented`; checked resolver behavior does not certify the entire target contract. The ownership rule remains never from PATH, never from caller cwd, never as an alternate package-manager bin entry, and never hardcoded.\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-010 restoration](release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea).\n\n\n**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new(\"node\")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.\n\nEvery selector has exactly one generated `CommandRouteDescriptor`, derived from the Node command registry plus checked migration annotations. Its minimum fields:\n\n```txt\nselector               # canonical command/subcommand selector\nroute_kind             # legacy-cli | native\noperation_id           # required only for native semantic routing\nlegacy_payload         # required only for legacy-cli; named payload identity\nowner_path             # canonical implementation boundary to edit\ncompatibility_tests    # named parity/vector suites required for a repair\n```\n\n`legacy-cli` means the Node payload owns argument parsing and behavior; the Rust host must only recognize the checked selector and preserve the remaining `OsString` argv. `native` means the typed provider owns the operation and the legacy implementation is retained only as an explicitly bounded rollback oracle. A descriptor may not name both paths as active, and an unlisted selector fails the build rather than choosing a fallback.\n\nThe descriptor is both the routing input and the contributor repair map. A repository-local `scripts/explain-command-route.mjs <selector>` reads the same checked artifact and prints route kind, owner path, payload identity, and required compatibility suites. CI rejects a descriptor whose owner or required proof is missing, drift between the Node registry and descriptor, a direct production spawn of the private payload outside `LegacyCliPassthroughProvider` (test fixtures excepted), or a legacy payload removal before its compatibility binding is removed.\n\n**Rollback:** configuration can never replace a built-in provider (kernel contract §7), and there is no runtime provider-selection swap to roll back a native operation. Rollback of a native operation in R1–R2 is a **release rollback through `fgctl`** — the previous release still ships both the native provider and the Node payload during the observation window. There is no \"roll back by changing provider selection\" mechanism; none is promised anywhere in this stack."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-15",
+          "githubAnchor": "unheaded-block-15",
+          "stableAnchor": "unheaded-block-15",
+          "title": "Unheaded block 15",
+          "startLine": 92,
+          "endLine": 92,
+          "textDigest": "6b9eabf20b33d7ceaf04531c961d6da6d91e31fb61ca255f54e0f9f8ecdd1d1d",
+          "sample": "The adapters resolve the legacy payload relative to the installed host, never from the caller's cwd, and invoke the Node entry/bridge directly rather than spawning `fgos` recursive",
+          "identityFingerprint": "79062968d645653d8f58be788c6e3c06a2d2592c9fdd794e00e91a11bd618950",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition",
+            "1. Two Distinct Adapters"
+          ],
+          "text": "The adapters resolve the legacy payload relative to the installed host, never from the caller's cwd, and invoke the Node entry/bridge directly rather than spawning `fgos` recursively. The CLI parent forwards termination consistently; Unix signal equivalence and Windows process-tree behavior are explicit target-specific compatibility tests, not an undocumented `exit.code()` guess."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-16",
+          "githubAnchor": "unheaded-block-16",
+          "stableAnchor": "unheaded-block-16",
+          "title": "Unheaded block 16",
+          "startLine": 96,
+          "endLine": 96,
+          "textDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+          "sample": "Three things are separated that the name `bin/fgos.mjs` currently conflates:",
+          "identityFingerprint": "89f0a57c1e8ae9f297609eb03c779a349642e6ff3b15ad31fd4cadbc6819433f",
+          "ancestry": [
+            "Architecture: Legacy CLI Transition",
+            "Retained selected source material",
+            "Legacy CLI Transition",
+            "2. Legacy Payload Identity, Ownership, And Repair Path"
+          ],
+          "text": "Three things are separated that the name `bin/fgos.mjs` currently conflates:"
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+        "targetAncestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "290"
+      ],
+      "id": "claim_c072318ec582affe5e0e6936961fadc4",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "9-repeat-by-component-boundary",
+        "targetUnitDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "fileSha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "9. Repeat By Component Boundary",
+          "anchor": "9-repeat-by-component-boundary",
+          "githubAnchor": "9-repeat-by-component-boundary",
+          "stableAnchor": "h-5296d650b7cf",
+          "startLine": 340,
+          "endLine": 340,
+          "textDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e",
+          "sample": "9. Repeat By Component Boundary",
+          "sectionPayloadDigest": "f1ec3a7a632d5203e8af415779a1a90b61d4e3a7e7b797a6a0aa7e9088c24349",
+          "followingBlockDigest": "8fd9f660c71f26f5134efb4d9cebe6d3f2cd253694c0b6572c6faa7b6dca998f",
+          "identityFingerprint": "0a47f3421600dc0f9d9ce6a9414af436b1b3954383d88f240db32031bee7ef6b",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration"
+          ],
+          "text": "#### 9. Repeat By Component Boundary",
+          "sectionText": "#### 9. Repeat By Component Boundary\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure).\n\n\n\nNear-thin read-only operations come before complex write owners. File size alone\ndoes not choose order.\n\nA native provider never blocks waiting for a person. An operation that needs\nhuman input returns a `parked` outcome and is re-invoked by the work\nlifecycle, not by a provider-side wait. This must hold before any\n`ask`/`answer`-shaped operation migrates."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-47",
+          "githubAnchor": "unheaded-block-47",
+          "stableAnchor": "unheaded-block-47",
+          "title": "Unheaded block 47",
+          "startLine": 334,
+          "endLine": 338,
+          "textDigest": "e9130dbfa54030bbe1faa4cccd843968ff44bcbf5f78f991eb5810106d19e09e",
+          "sample": "`ready` appears small at the CLI but depends on event loading, replay, domain\nstage mapping, lineage/dependency semantics, and effective runtime claims.\nPorting it first would sile",
+          "identityFingerprint": "20f33ad6bcca7ee72926493fbe7f77c04adcf59a61769e20489818a996a0c86b",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "8. Migrate The Next Small Read-Only Proof",
+            "Why `ready` Is Not A First Proof"
+          ],
+          "text": "`ready` appears small at the CLI but depends on event loading, replay, domain\nstage mapping, lineage/dependency semantics, and effective runtime claims.\nPorting it first would silently turn a host proof into a Work Lifecycle read\nmodel migration. It is a good later read-side slice after `version` and\n`gate-bypass`."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-48",
+          "githubAnchor": "unheaded-block-48",
+          "stableAnchor": "unheaded-block-48",
+          "title": "Unheaded block 48",
+          "startLine": 343,
+          "endLine": 343,
+          "textDigest": "8fd9f660c71f26f5134efb4d9cebe6d3f2cd253694c0b6572c6faa7b6dca998f",
+          "sample": "Added in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure).",
+          "identityFingerprint": "27e12d9caa23927afd940c51645997e3c61b6f29a0f0b33b57c8abbd3c69f82d",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "9. Repeat By Component Boundary"
+          ],
+          "text": "Added in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure)."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "9-repeat-by-component-boundary",
+        "targetUnitDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "295"
+      ],
+      "id": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "10-migrate-read-models-before-writers",
+        "targetUnitDigest": "5ae126eab3838fb0b18c1226734b38c22b3674d2b370d9c47193602a09990c6d",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "fileSha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "10. Migrate Read Models Before Writers",
+          "anchor": "10-migrate-read-models-before-writers",
+          "githubAnchor": "10-migrate-read-models-before-writers",
+          "stableAnchor": "h-a87591a8c5aa",
+          "startLine": 355,
+          "endLine": 355,
+          "textDigest": "5ae126eab3838fb0b18c1226734b38c22b3674d2b370d9c47193602a09990c6d",
+          "sample": "10. Migrate Read Models Before Writers",
+          "sectionPayloadDigest": "815d54242da7d57b452a2cf1f0f5d500f63a6ed15a0802a400996349f92605da",
+          "followingBlockDigest": "6820b1ee737ed435ba7664d9983109eb53e943e0c582ca530f2350152cbb475b",
+          "identityFingerprint": "7e2fd1d7d3739f840464d5e220c90a2d0cd27af492b33457ff226ea65232e728",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration"
+          ],
+          "text": "#### 10. Migrate Read Models Before Writers",
+          "sectionText": "#### 10. Migrate Read Models Before Writers\n\nThe next meaningful proof after the small operations should be a Work Lifecycle\nread-side component, potentially the dependencies needed by `ready`.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure).\n\n\n\nThis creates reusable Rust read models before any event writer moves."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-50",
+          "githubAnchor": "unheaded-block-50",
+          "stableAnchor": "unheaded-block-50",
+          "title": "Unheaded block 50",
+          "startLine": 350,
+          "endLine": 353,
+          "textDigest": "17182ded50a6a6957f1ce127fc4322e00e78b95d999c7b04c8a2b7d4982127ac",
+          "sample": "A native provider never blocks waiting for a person. An operation that needs\nhuman input returns a `parked` outcome and is re-invoked by the work\nlifecycle, not by a provider-side ",
+          "identityFingerprint": "68a02d3bf27d5da56888512ec9e8529ccb2d6e0a3bbc2e7d055430281b998d94",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "9. Repeat By Component Boundary"
+          ],
+          "text": "A native provider never blocks waiting for a person. An operation that needs\nhuman input returns a `parked` outcome and is re-invoked by the work\nlifecycle, not by a provider-side wait. This must hold before any\n`ask`/`answer`-shaped operation migrates."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-51",
+          "githubAnchor": "unheaded-block-51",
+          "stableAnchor": "unheaded-block-51",
+          "title": "Unheaded block 51",
+          "startLine": 357,
+          "endLine": 358,
+          "textDigest": "6820b1ee737ed435ba7664d9983109eb53e943e0c582ca530f2350152cbb475b",
+          "sample": "The next meaningful proof after the small operations should be a Work Lifecycle\nread-side component, potentially the dependencies needed by `ready`.",
+          "identityFingerprint": "c56b813efcf14fc6c58733d3196de62edf4e510050b4bf2d5b89f8240c262d49",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "10. Migrate Read Models Before Writers"
+          ],
+          "text": "The next meaningful proof after the small operations should be a Work Lifecycle\nread-side component, potentially the dependencies needed by `ready`."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "10-migrate-read-models-before-writers",
+        "targetUnitDigest": "5ae126eab3838fb0b18c1226734b38c22b3674d2b370d9c47193602a09990c6d",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "keys": [
+        "claims",
+        "308"
+      ],
+      "id": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "status": "unchanged-since-step0; existing section-carrier accounting retained",
+      "targetBinding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "13-rollback-rules",
+        "targetUnitDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "placement": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "fileSha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1",
+        "selected": {
+          "unitKind": "heading",
+          "level": 4,
+          "title": "13. Rollback Rules",
+          "anchor": "13-rollback-rules",
+          "githubAnchor": "13-rollback-rules",
+          "stableAnchor": "h-34574789399a",
+          "startLine": 398,
+          "endLine": 398,
+          "textDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6",
+          "sample": "13. Rollback Rules",
+          "sectionPayloadDigest": "63d470929a132388df168d2a5c5f1260acecbb6ac0b8183b6e31878c7b3a9b0a",
+          "followingBlockDigest": "74bd29942b042b3f787699eb068cbf52e2d7148b0520745218eb9a933c78b0ab",
+          "identityFingerprint": "fb9d863b35fc8884d73ad542b4bf57a55e2c209463af265b5b9940d6554f1f14",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration"
+          ],
+          "text": "#### 13. Rollback Rules",
+          "sectionText": "#### 13. Rollback Rules\n\nConfig can never replace a built-in provider (host doc open question 2 closed\nas \"prohibit\"). A provider binding is not a runtime-selectable switch, so\nrollback of a native operation in R1–R2 is a release rollback through `fgctl`:\n`ActivationRecord.previousArtifactDigest` + the preserved release directory +\na state-schema compatibility check (see\n[Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md)\n§11). The previous release still contains both the native provider and the\nNode payload during the operation's observation window, so a release rollback\nrestores the legacy path without restoring the old outer executable by hand.\n\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-015 restoration](../contracts/component-protocol.md#restored-rollback-bullets)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-59",
+          "githubAnchor": "unheaded-block-59",
+          "stableAnchor": "unheaded-block-59",
+          "title": "Unheaded block 59",
+          "startLine": 396,
+          "endLine": 396,
+          "textDigest": "52530bbda152c1a02952b0756f8910356bd0b055cb09734dc4765768aba5aa04",
+          "sample": "Node removal is a consequence of zero remaining routes, not a calendar target.",
+          "identityFingerprint": "6561d5cb3fdb3346c4b5cbe5d3cefb6ae5cee256059864045eb88924d76ab01a",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "12. Remove Node"
+          ],
+          "text": "Node removal is a consequence of zero remaining routes, not a calendar target."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 400,
+          "endLine": 408,
+          "textDigest": "74bd29942b042b3f787699eb068cbf52e2d7148b0520745218eb9a933c78b0ab",
+          "sample": "Config can never replace a built-in provider (host doc open question 2 closed\nas \"prohibit\"). A provider binding is not a runtime-selectable switch, so\nrollback of a native operati",
+          "identityFingerprint": "e61b9947f79961bd26e1676cc1239437f9258c203b8c29750da65bf5d4802c4a",
+          "ancestry": [
+            "Architecture: Node To Rust Migration",
+            "Retained selected source material",
+            "Node To Rust Component Migration",
+            "13. Rollback Rules"
+          ],
+          "text": "Config can never replace a built-in provider (host doc open question 2 closed\nas \"prohibit\"). A provider binding is not a runtime-selectable switch, so\nrollback of a native operation in R1–R2 is a release rollback through `fgctl`:\n`ActivationRecord.previousArtifactDigest` + the preserved release directory +\na state-schema compatibility check (see\n[Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md)\n§11). The previous release still contains both the native provider and the\nNode payload during the operation's observation window, so a release rollback\nrestores the legacy path without restoring the old outer executable by hand."
+        }
+      },
+      "existingRemainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef).",
+      "existingReviewStatus": "reviewed",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "13-rollback-rules",
+        "targetUnitDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6",
+        "targetAncestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "keys": [
+        "registryGaps",
+        "22"
+      ],
+      "id": "claim_40aafcee52b22eda087c5f85eacb9392",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 0,
+      "changedSourceLines": 5,
+      "previousRemainder": "Only uncarried historical RUL77/RUL79 lines and the changed item 4 pending-copy-cap line retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 f4af984047c4b4749d392eb331da7317f24509ea78725acbe59ce605cef49ab7; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        "3"
+      ],
+      "id": "claim_f033905b059f073c62ec27f0ee6da620",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 1,
+      "changedSourceLines": 5,
+      "previousRemainder": "Only uncarried historical RUL77/RUL79 lines; item 4 is pure insertion and excluded retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 78b792e3d90361b9fb4fc8443e03020e15e6b235f194744fa4b8dcb2ac8753cb; source c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-36",
+        "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
+        "targetAncestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "keys": [
+        "registryGaps",
+        "0"
+      ],
+      "id": "claim_a7278e1567e5432cfb079506cf2f5050",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 2,
+      "changedSourceLines": 2,
+      "previousRemainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/observe.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "737be92fe1b6afd8577530803a8694cfbf9bf71a632bf36043153cb9244a1bde",
+        "targetAncestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries",
+          "Owns"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "1"
+      ],
+      "id": "claim_f64fa4a36030f89feab71dc5943015c0",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 3,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a; source 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a, primary target 97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-125",
+        "targetUnitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "3"
+      ],
+      "id": "claim_f4058f068a378962aaf237ae038db5af",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 4,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8; source d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8, primary target 20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-134",
+        "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ]
+      },
+      "reboundSinceStep0": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "19"
+      ],
+      "id": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 5,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 bc156e257f11baa165661a9485843d88034862465f95da930b0b9d719cd02fbd; source 5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14, primary target 7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-314",
+        "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "20"
+      ],
+      "id": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 6,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 8bc3606b98c62ce25e24758e61ab2ce29d0b1cae7946de31ef9910caf3b93046; source 24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6, primary target 715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-315",
+        "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "21"
+      ],
+      "id": "claim_93d5f2d34cf452029462ea39674fd255",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 7,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cb83b5bf2a58b18bafc0400f3f78322b8b96752a248e369e78da5e9c05fc0afd; source dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8, primary target 6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-320",
+        "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "23"
+      ],
+      "id": "claim_74a47937380f03ed75fa755f0faccffb",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 8,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757; source f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757, primary target 93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-71",
+        "targetUnitDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "24"
+      ],
+      "id": "claim_20a5804444535524364c0049e5bc87dd",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 9,
+      "changedSourceLines": 2,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 47a5cc727c912f76812cf4bffdbd6317c5283da0811822b14c5557f6f459dd7e; source f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0, primary target 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-9",
+        "targetUnitDigest": "bed26a6b7f0dee207b5bf82ac049ead30f5fe8494120cddfd2261fced5788aad",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Data Dictionary"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "25"
+      ],
+      "id": "claim_072766aafbaf01714df1aa65347a1d24",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 10,
+      "changedSourceLines": 1,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 6516be6ac5cb103b5616f5df325fc593a00c484c50c6f44a6c490fd0ecc2c3fa; source f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2, primary target 8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-90",
+        "targetUnitDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "27"
+      ],
+      "id": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 11,
+      "changedSourceLines": 5,
+      "previousRemainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a; source 77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f, primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Independent A34 acceptance pending; blocks cutover.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-94",
+        "targetUnitDigest": "9d9ecdc5ecd0e2f7cb876584e56f908c6411e950eb56728e99304eb07c41d640",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "28"
+      ],
+      "id": "claim_41571c8f42f542be1f44c9371fad823a",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 12,
+      "changedSourceLines": 8,
+      "previousRemainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_41571c8f42f542be1f44c9371fad823a; row residual SHA256 6bc73a238975f903fb15b4a025ed8df0aa64a628bd8b536e99f6b23e2d3cf64b; source 1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988; primary target 325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-52",
+        "targetUnitDigest": "252ea6dbb0e5e764ac177a1d694964a20df0735fe0588f2a889e8b7f9205f170",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Behaviors & Operations",
+          "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "keys": [
+        "registryGaps",
+        "29"
+      ],
+      "id": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "status": "refreshed-current-target-and-all-changed-source-lines",
+      "residualIndex": 13,
+      "changedSourceLines": 6,
+      "previousRemainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_a64fabc06da00bb0eb8dfaba5ea0c1a6; row residual SHA256 c5271a959105c72b8e294bcc7397b70e7e83edfcedb0b74a750863741a8fabc6; source b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3; primary target 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-102",
+        "targetUnitDigest": "f9156dbbce4fe5458f8a0f499eea3b198ca16c75e3990e5784dc2c19509945f5",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ]
+      },
+      "reboundSinceStep0": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "keys": [
+        "registryGaps",
+        "4"
+      ],
+      "id": "claim_f5365b8e40fb58c75adc56a574263242",
+      "status": "needsWrites; proposed refresh only",
+      "residualIndex": 14,
+      "changedSourceLines": 3,
+      "previousRemainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+      "step0Commit": "f7686163843ca8ce6b58b1fffe0472e57ce774e7",
+      "step0Binding": {
+        "targetOwner": "docs/io-contract.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "targetAncestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ]
+      },
+      "reboundSinceStep0": true
+    }
+  ],
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
+  ],
+  "noGateAccepted": true
+}

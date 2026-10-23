@@ -1,0 +1,159 @@
+{
+  "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "extractors": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "lib": "step10-sync287-lib.mjs",
+      "sha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "lib": "lib.mjs",
+      "sha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41"
+    }
+  ],
+  "agree": true,
+  "files": [
+    {
+      "path": "docs/architecture-manifest.json",
+      "sha256": "788bc1a09f02ef1ee4b3c5dcfa631aeecf7fdd4aec51bf7acd5cc80a63a82da7",
+      "units": 1
+    },
+    {
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sha256": "5bb33617b5de29adc04e82a8157787de4b2a7f9509bf8d4e696761226f178625",
+      "units": 86
+    },
+    {
+      "path": "docs/io-contract.md",
+      "sha256": "2368be78c05693c7a845fe33fd906837d9164fb93ca03c0b63a683efeeb7fd11",
+      "units": 43
+    },
+    {
+      "path": "docs/platform/agent-coordination/vision.md",
+      "sha256": "10489471593b367b403a34a84f003e3587016f6d51096e4a04eaad668094be8c",
+      "units": 95
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "sha256": "d321802bebb3d41bb77b44be6fa0ac18d027a960e9d39ea003c4947134fca689",
+      "units": 297
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "sha256": "524b2c6dd4aa3f8957d19eca7efb0fee1ea6408876fd52ac326ba652cbc9d59d",
+      "units": 138
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "sha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+      "units": 50
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "sha256": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+      "units": 51
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "sha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1",
+      "units": 98
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "sha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+      "units": 91
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "sha256": "b80b8324a39a5c1836df1da07ed04780a332eec6731c1f805f5460f363c22723",
+      "units": 24
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "sha256": "1b4d2eb962f9dfc69dda609fdbac536e392a1a63d0ddd296f1c3d501aba96739",
+      "units": 84
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sha256": "3724d01710c74f42b2ec13d5a9c8d2c20bf5436c09ab8b4bd273a943068f7a49",
+      "units": 95
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sha256": "6ba03ea038f541b938c14ab4d084d9a7d00a33516870db6ac8ee1bb1fc668b51",
+      "units": 59
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sha256": "823892cf039968300c4bb5032a2b4985e10ca53a601cb0e542c9b17479aedf31",
+      "units": 45
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sha256": "15ccb66386fe1b44a154c8555dfdef1ba8eba6a464487f31e7673225f51da7c0",
+      "units": 148
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "sha256": "dadfff52aa1925ab33c1b0f0c6cc1ac404c8a94eba518d4f7713170758321dcc",
+      "units": 211
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "sha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "units": 39
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "sha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f",
+      "units": 14
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sha256": "edcde7411de5311e644cbde9eb86f4ef9b6c9f4e0e6d321407cfe8ef1730fe8a",
+      "units": 75
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "sha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "units": 200
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "sha256": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+      "units": 43
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "sha256": "18c060c9b5f48321820772c44a21277f46aa6392eb67ab97f833ea03e5dc5274",
+      "units": 27
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "sha256": "b43408c78d213ae88352dd3a23d7fc4b2bb78256f25e4734974098295daa9b81",
+      "units": 517
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md@carry:credential-store-setup.md",
+      "sha256": "6509ab97423bb8310a8762172676c1febe80c91c421486c31dbf6527512d8746",
+      "units": 121
+    }
+  ],
+  "compositionChain": [
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "beforeSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "expectedAfterSha256": "088cdffe4070462f34aff500dbd5494e6ebb421997352dff433a4b2bd3297153",
+      "specId": "file:docs/platform/agent-confinement/spec.md",
+      "forwardAndRollbackExact": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "beforeSha256": "088cdffe4070462f34aff500dbd5494e6ebb421997352dff433a4b2bd3297153",
+      "expectedAfterSha256": "6509ab97423bb8310a8762172676c1febe80c91c421486c31dbf6527512d8746",
+      "specId": "carry:credential-store-setup",
+      "forwardAndRollbackExact": true
+    }
+  ]
+}

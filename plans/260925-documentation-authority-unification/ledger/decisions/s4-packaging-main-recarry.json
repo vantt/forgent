@@ -25,7 +25,8 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-117 merge ad98c3882: complete Data Dictionary, ancestry and both neighbours verified with both unchanged extractors; witnesses in step-07-l12-117-merge-rebindings.json. Source identity and residual unchanged; independent review pending; no approval carry."
+      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
+      "bindingSha256": "8f516d4ac711701ec1cffe88acea71dd3cfb29ddea7b613b8ff756123b207a59"
     },
     {
       "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
