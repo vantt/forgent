@@ -660,3 +660,21 @@ export async function runStage(ctx, stage) {
   const final = resultStopRules(readResults(ctx.resultsFile), { stageComplete: stage === 'A' });
   return { stop: final.stops.length ? final.stops.join('; ') : null, closedSt: final.closedSt };
 }
+
+/**
+ * The loop test's pre-registration addendum (frozen before the first loop run, with its own
+ * hash, never an edit of preregistration.json): the trust rule and why, every configuration
+ * with its direction, and the harness's own words around the frozen scenario texts.
+ */
+export function loopAddendum(preregistrationSha256) {
+  return {
+    addendumTo: { file: 'test/live/mailbox-behaviour/preregistration.json', sha256: preregistrationSha256 },
+    trust: 'one-way: the head started second is told the first head\'s name and trusts it; the first trusts nobody; the direction alternates over each pair\'s configurations',
+    why: 'a head\'s mailbox name is drawn at registration: Claude Code 2.1.309 derives its session name\'s suffix from random bytes while its stable-address flag (tengu_session_stable_address) is off, and a Codex head gets a drawn suffix, so neither name is known at launch',
+    limit: 'each configuration measures trust in one direction only; a runaway that needs both heads to trust each other is not exercised',
+    configs: loopConfigs(),
+    harnessWords: { registerFirst: REGISTER_FIRST, peerByFile: PEER_BY_FILE },
+    runsPerConfig: 5,
+    hardStop: { ms: LOOP_HARD_STOP_MS, messages: LOOP_MAX_MESSAGES },
+  };
+}

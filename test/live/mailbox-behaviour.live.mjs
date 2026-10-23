@@ -20,6 +20,7 @@
  *                         exists, and the wiring runs against stubs under the confined launch
  *                         through the real shim (exit 3 on any failure)
  *   freeze                writes preregistration.json once
+ *   freeze-loop           writes the loop test's addendum once (its own file and hash)
  *   pin                   a detached worktree of HEAD, its own release build of the host and
  *                         the shim, and `<base>/pin.json`
  *   smoke <claude|codex> [--dry]   the safety gate's benign smoke (one run, LR on PT, no
@@ -49,10 +50,13 @@ const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
 const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v6-live');
-const PINNED_WORKTREE = path.join(path.dirname(REPO_ROOT), 'forgent-worktrees', 'mailbox-v6-pinned');
+/** The pinned worktree of commit `commit` (one per pin, so a later pin never moves a running stage's worktree). */
+const pinnedWorktree = (commit) => path.join(path.dirname(REPO_ROOT), 'forgent-worktrees', `mailbox-v6-pinned-${commit.slice(0, 9)}`);
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
 const DATA = path.join(REPO_ROOT, 'test', 'live', 'mailbox-behaviour');
 const PREREGISTRATION = path.join(DATA, 'preregistration.json');
+/** The loop test's addendum, outside the frozen data directory: its own file, its own hash. */
+const LOOP_ADDENDUM = path.join(REPO_ROOT, 'test', 'live', 'mailbox-behaviour.loop-addendum.json');
 const MIN_FREE_GB = 8;
 const MEMORY_WAIT_MS = 30 * 60_000;
 const PROVIDER_PAUSE_MS = 20 * 60_000;
@@ -253,12 +257,20 @@ function cmdFreeze() {
   say(`frozen ${Object.keys(frozen.files).length} files; sha256 of the pre-registration ${sha256(PREREGISTRATION)}`);
 }
 
+/** Writes the loop test's addendum once, bound to the pre-registration's hash. */
+function cmdFreezeLoop() {
+  if (fs.existsSync(LOOP_ADDENDUM)) die(`${LOOP_ADDENDUM} exists; the addendum is frozen once`);
+  writeJson(LOOP_ADDENDUM, runs.loopAddendum(sha256(PREREGISTRATION)));
+  say(`frozen the loop addendum; sha256 ${sha256(LOOP_ADDENDUM)}`);
+}
+
 /** A detached worktree of HEAD, its own release build of the host and shim, and the pin. */
 function cmdPin() {
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
   if (problem) die(problem);
   if (spawnSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim()) die('the checkout has uncommitted changes; pin a commit');
   const commit = headCommit(REPO_ROOT);
+  const PINNED_WORKTREE = pinnedWorktree(commit);
   if (fs.existsSync(PINNED_WORKTREE)) die(`${PINNED_WORKTREE} exists; remove it with git worktree remove before pinning again`);
   const add = spawnSync('git', ['worktree', 'add', '--detach', PINNED_WORKTREE, commit], { cwd: REPO_ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
   if (add.status !== 0) die('git worktree add failed');
@@ -315,6 +327,10 @@ const dryLoopPrompt = (role, peer) => {
 };
 
 async function cmdRunLoop(which, { dry }) {
+  if (!dry) {
+    if (!fs.existsSync(LOOP_ADDENDUM)) die('no loop addendum; run freeze-loop first');
+    if (JSON.stringify(readJson(LOOP_ADDENDUM)) !== JSON.stringify(runs.loopAddendum(sha256(PREREGISTRATION)))) die('the loop addendum does not match the loop runner; a change is a new measurement');
+  }
   const configs = runs.loopConfigs().filter((c) => which === 'all' || c.id === which);
   if (!configs.length) die(`no loop configuration ${which}`, 2);
   const ctx = { ...context({ dry, stage: 'loop' }), dryPrompt: dry ? dryLoopPrompt : null };
@@ -594,6 +610,9 @@ if (process.argv[1] === SCRIPT) {
       case 'freeze':
         cmdFreeze();
         break;
+      case 'freeze-loop':
+        cmdFreezeLoop();
+        break;
       case 'pin':
         cmdPin();
         break;
@@ -616,7 +635,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: check | freeze | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--dry] | run-loop <config|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: check | freeze | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--dry] | run-loop <config|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
