@@ -194,6 +194,18 @@ fn a_hook_carried_key_names_the_session_the_env_path_names_and_refuses_what_the_
     let _ = fs::remove_dir_all(root);
 }
 
+#[test]
+fn a_claude_key_names_the_session_whatever_the_head_is_because_only_a_pi_key_reads_it() {
+    let root = state_root();
+    fs::write(root.join("machine-id"), "fg-server-abc234\n").unwrap();
+    let key = WriterKey { source: "CLAUDE_CODE_SESSION_ID", value: "9493ac81" };
+    let bogus = HeadRef { pid: u32::MAX, start_time: "1".into() };
+    let named = session_for(&root, &key, Some(&bogus)).unwrap();
+    assert_eq!(named.info, session_for(&root, &key, None).unwrap().info);
+    assert_eq!(named.local.cli, "claude");
+    let _ = fs::remove_dir_all(root);
+}
+
 /// A process table where each process also has a command name.
 struct Named(Vec<(u32, u32, &'static str)>);
 

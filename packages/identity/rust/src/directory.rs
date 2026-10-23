@@ -263,6 +263,72 @@ fn store(root: &Path, entry: &Entry, replace: bool) -> Result<Installed, Refusal
     result.map_err(|e| write_failed(&dir.join(&name), e))
 }
 
+/// Whether the directory already holds [`MAX_ENTRIES`] entry files, counted by
+/// name alone (no read, no parse, no liveness judgment).
+fn holds_cap(root: &Path) -> Result<bool, Refusal> {
+    let dir = directory(root);
+    let reader = fs::read_dir(&dir).map_err(|e| unreadable(&dir, e))?;
+    let mut count = 0;
+    for item in reader.take(MAX_SCAN) {
+        let item = item.map_err(|e| unreadable(&dir, e))?;
+        if item.file_name().to_string_lossy().ends_with(FILE_SUFFIX) {
+            count += 1;
+            if count >= MAX_ENTRIES {
+                return Ok(true);
+            }
+        }
+    }
+    Ok(false)
+}
+
+/// The one entry file named after `handle`, judged; `None` when it is missing
+/// or this build cannot read it (another format version, or not ours).
+fn read_named(root: &Path, handle: &str, judge: Judge) -> Option<Row> {
+    let file = file_name(handle);
+    let entry = fs::read(directory(root).join(&file))
+        .ok()
+        .and_then(|bytes| serde_json::from_slice::<Entry>(&bytes).ok())
+        .filter(|entry| entry.v == FORMAT_VERSION && file_name(&entry.handle) == file)?;
+    let verdict = entry.verdict(judge);
+    Some(Row { file, entry, verdict })
+}
+
+/// Registration of an entry that takes no role into a directory below its cap:
+/// the atomic create of the handle-named file, and only when the name is
+/// taken, a read of that one entry. A dead holder is replaced, the same
+/// session refreshes, any other is refused `handle-in-use`. No scan, no prune.
+fn register_by_handle(root: &Path, entry: Entry, judge: Judge) -> Result<Listed, Refusal> {
+    let mut merged = entry;
+    if store(root, &merged, false)? == Installed::Created {
+        return Ok(Listed::of(&merged, merged.verdict(judge)));
+    }
+    let mut holder = read_named(root, &merged.handle, judge);
+    if let Some(row) = holder.as_ref().filter(|row| row.verdict == Verdict::Dead) {
+        remove(root, &row.file)?;
+        if store(root, &merged, false)? == Installed::Created {
+            return Ok(Listed::of(&merged, merged.verdict(judge)));
+        }
+        // Another registration took the name in between: it decides now.
+        holder = read_named(root, &merged.handle, judge);
+    }
+    if let Some(row) = holder {
+        if row.entry.id != merged.id {
+            return Err(handle_in_use(&row.entry.id, &merged.id, &merged.handle));
+        }
+        refresh_from(&mut merged, &row.entry);
+    }
+    store(root, &merged, true)?;
+    Ok(Listed::of(&merged, merged.verdict(judge)))
+}
+
+/// `merged` keeps the first registration time and the roles `held` already has.
+fn refresh_from(merged: &mut Entry, held: &Entry) {
+    merged.registered_at = held.registered_at.clone();
+    merged.roles.extend(held.roles.iter().cloned());
+    merged.roles.sort();
+    merged.roles.dedup();
+}
+
 fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
     Refusal {
         candidates: Vec::new(),
@@ -275,10 +341,13 @@ fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
 
 /// Registers `entry`, refreshing the entry the same session already has.
 ///
-/// Every call first removes the entries whose head process is dead. A live
-/// session that already holds the handle with another id refuses the call; a
-/// role held by another live session refuses it too unless `take`, which
-/// removes the role from the holder. At [`MAX_ENTRIES`] the call is refused.
+/// A live or unknown session that already holds the handle with another id
+/// refuses the call; a dead one is replaced. A call that takes no role in a
+/// directory below [`MAX_ENTRIES`] reads at most that one entry. A call that
+/// takes a role, or finds the directory at its cap, first scans the whole
+/// directory and removes the entries whose head process is dead; a role held
+/// by another live session then refuses the call unless `take`, which removes
+/// the role from the holder, and at [`MAX_ENTRIES`] the call is refused.
 pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<Listed, Refusal> {
     if let Some(role) = entry.roles.iter().find(|role| role_problem(role).is_some()) {
         return Err(Refusal {
@@ -289,6 +358,9 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     }
     let dir = directory(root);
     fs::create_dir_all(&dir).map_err(|e| write_failed(&dir, e))?;
+    if entry.roles.is_empty() && !holds_cap(root)? {
+        return register_by_handle(root, entry, judge);
+    }
     let Scan { rows, foreign } = scan(root, judge)?;
     let (rows, _) = sweep(root, rows, |row| row.verdict == Verdict::Dead)?;
 
@@ -323,10 +395,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
 
     let mut merged = entry;
     if let Some(row) = own {
-        merged.registered_at = row.entry.registered_at.clone();
-        merged.roles.extend(row.entry.roles.iter().cloned());
-        merged.roles.sort();
-        merged.roles.dedup();
+        refresh_from(&mut merged, &row.entry);
     }
     match store(root, &merged, own.is_some())? {
         Installed::Created => {}
@@ -391,7 +460,8 @@ fn register_session(
 ///
 /// The cost is bounded for a hook on the first tool call of a head: no
 /// network, no lock (the entry is a create-once file named by the handle),
-/// one durable write, and a directory scan of at most [`MAX_ENTRIES`] files.
+/// one durable write, and no directory scan unless the call takes a role or
+/// the directory is at its cap (see [`register`]).
 /// The CLI's `identity session --register` is this function.
 pub fn register_current(
     state_root: &Path,
