@@ -58,7 +58,15 @@ def historical_evidence(source, line, reason, unit, span):
     """Content + position + reason, not a role/path whitelist."""
     prefix = '\n'.join(source.splitlines()[:line])
     current = source.splitlines()[line-1]
-    if 'inside literal carriage' in reason.lower():
+    # A file-level Purpose label cannot swallow the live wrapper above its
+    # explicit snapshot boundary. Navigation remains navigation even in carriage.
+    snapshot = re.search(r'(?im)^#{1,6} Literal Snapshot\b', source)
+    before_snapshot = snapshot is not None and line <= source.count('\n', 0, snapshot.start()) + 1
+    prior = source.splitlines()[:line-1]
+    previous = next((text for text in reversed(prior) if text.strip()), '')
+    if re.search(r'(?i)Canonical architecture moved to:', current + '\n' + previous):
+        return None
+    if 'inside literal carriage' in reason.lower() and not before_snapshot:
         declaration = reason.split('declaration:',1)[-1].strip().split(' Non-executable successor note:')[0].rstrip('.')
         declaration = declaration.split(' Carriage declaration:')[-1].strip().rstrip('.')
         if declaration and declaration in prefix:
@@ -107,14 +115,15 @@ def historical_evidence(source, line, reason, unit, span):
         return {'kind':'explicit-whole-source-carriage-header','text':'Writer type: Agent carriage; Purpose: Preserve the complete'}
     if re.search(r'(?i)(?:upstream source coordinates|external.project|literal example|illustrative|adversarial)', reason):
         # Require actual quoting/example/source framing; never just the claimed role.
-        marker = re.search(r'(?im)^#{1,6} .*?(?:Example|Ví dụ|Sample|Upstream|Bee|Distill)|^(?:Source|Cursor):[^\n]*|(?:e\.g\.|for example|ví dụ|example project)', source)
+        marker = re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)', span.get('text', ''))
         if marker: return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
     return None
 
 
-def premise(source_present, bound, stable_targets, evidence, wrapper):
+def premise(source_present, bound, stable_targets, evidence, wrapper, source_survives=True):
     if not source_present: return 'park-source-absent'
     if not bound: return 'park-current-passage-unbound'
+    if not source_survives: return 'park-source-removed-by-cutover'
     if wrapper: return 'judgment-preserve-with-dated-note'
     if evidence: return 'preserve-source-confirmed-history'
     if stable_targets: return 'preserve-operand-reachability-unchanged'
@@ -124,10 +133,11 @@ def premise(source_present, bound, stable_targets, evidence, wrapper):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--out', type=pathlib.Path, default=HERE)
+    ap.add_argument('--pin', default='HEAD', help='Commit whose tracked source blobs are proved')
     args = ap.parse_args()
-    assert args.out.resolve() == HERE or str(args.out.resolve()).startswith('/tmp/fgos-work/w1-d4/')
+    assert args.out.resolve() == HERE or str(args.out.resolve()).startswith('/tmp/fgos-work/w2-d4b/')
     args.out.mkdir(parents=True, exist_ok=True)
-    pin = git('rev-parse','HEAD').decode().strip()
+    pin = git('rev-parse','--verify',args.pin+'^{commit}').decode().strip()
     matrix = json.loads((OLD/'step-07-consumer-cutover-matrix.json').read_text())
     catalog = {r['id']:r for r in matrix['recordCatalog'] if r['path'].startswith(('step-03-records/','step-04-records/'))}
     # Empty/zero-edge final batches have no row/catalog entry. Verify the full
@@ -156,7 +166,7 @@ def main():
         if file not in source_cache:
             source_cache[file] = git('show',pin+':'+file).decode() if tracked.get(file) in ('100644','100755') else None
         return source_cache[file]
-    base = pathlib.Path('/tmp/fgos-work/w1-d4');base.mkdir(parents=True,exist_ok=True)
+    base = pathlib.Path('/tmp/fgos-work/w2-d4b');base.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='preserve-',dir=base) as name:
         scratch = pathlib.Path(name)
         run = subprocess.run(['node',str(HERE/'physical-move.mjs'),pin,name],cwd=ROOT,capture_output=True,text=True,check=True)
@@ -212,32 +222,41 @@ def main():
             stable = bool(reach) and all(r['beforePresent'] and r['afterPresent'] and not r['wildcard'] for r in reach)
             current_line = min(bound) if bound else None
             current_text = source.splitlines()[current_line-1] if current_line else ''
-            wrapper = bool(bound and 'inside literal carriage' not in reason.lower() and re.search(r'(?:Superseded by:.*docs/specs/runner\.md|see [`]?docs/specs/runner\.md.*CoordinationSession)',current_text) and ('history-wrapper' in reason or 'Superseded by' in current_text or 'history' in reason.lower()))
+            snapshot = re.search(r'(?im)^#{1,6} Literal Snapshot\b', source or '')
+            inside_snapshot = bool(snapshot and current_line and current_line > source.count('\n',0,snapshot.start())+1)
+            wrapper = bool(bound and not inside_snapshot and 'docs/specs/runner.md' in current_text and
+                           ('Superseded by:' in current_text or ('CoordinationSession' in current_text and re.search(r'(?i)retir|history|historical',current_text))))
             evidence = historical_evidence(source,current_line,reason,unit,spans[0]) if bound else None
             if bound and 'frozen rename copy at 4ee0e3a3c' in reason:
                 origin = git('show','4ee0e3a3c:'+rec['file']).decode()
                 if source == origin:
                     evidence = dict(kind='frozen-source-snapshot-byte-equality',origin='4ee0e3a3c',sha256=sha(origin),text=current_text)
-            result = premise(source is not None,bool(bound),stable,evidence,wrapper)
+            source_survives = present(rec['file']) if rec['file'].startswith('docs/') else source is not None
+            result = premise(source is not None,bool(bound),stable,evidence,wrapper,source_survives)
             check = dict(**basic,token=token,operandSha256=sha(token),statedReason=reason,statedReasonSha256=sha(reason),
                          recordSourceSha256=rec.get('digest'),sourceSha256=sha(source) if source is not None else None,
                          sourceChanged=source is None or sha(source)!=rec.get('digest'),sourceSpans=spans,currentLines=bound,
                          currentUnit=unit,currentUnitSha256=sha(unit),normalizedOperands=reach,
+                         sourcePresentAfterCutover=source_survives,
+                         sourceSuccessors=[dict(path=p,present=present(p),sha256=sha((candidate/p).read_bytes()) if (candidate/p).is_file() else None) for p in move_map.get(rec['file'],[])],
                          evidence=evidence,result=result,proposedDisposition='preserve' if result.startswith('preserve-') else 'owned-park',
                          owner='Documentation consumer-composition owner / Lead',independentApproval=False)
-            if wrapper:
+            if result == 'judgment-preserve-with-dated-note':
                 successor = 'docs/platform/runner/decisions/h-aabefc85f0c9.md' if 'CoordinationSession' in current_text else 'docs/platform/runner/spec.md'
                 assert present(successor)
                 check.update(proposedDisposition='preserve-with-dated-note',decisionOwner='Lead',
                              successor=dict(path=successor,sha256=sha((candidate/successor).read_bytes()),presentAfterCutover=True),
-                             proposedDatedNote='2026-10-23 cutover note: The legacy runner citation above is a historical coordinate, not a post-cutover link. Current successor: '+successor+'.',
+                             proposedDatedNote='2026-10-23 cutover note (effective only after the authority flip): The legacy runner citation above is a historical coordinate, not a post-cutover link. Prepared successor: '+successor+'.',
                              alternatives=['preserve-with-dated-note','repoint'],
                              recommendationReason='L12-26(8)/L12-35(3) explicitly conserve history-wrapper wording. Add a dated, reachable successor outside the literal snapshot rather than rewriting the historical claim. Lead decides; no product patch or acceptance is implied.',
                              blocker='Lead must approve the row-specific dated note or choose repoint; then compose/review it with the owning file patch before cutover.')
             elif not result.startswith('preserve-'):
                 successors = sorted({s['path'] for r in reach for s in r['successors'] if s['present']})
                 check['candidateSuccessors'] = successors
-                if result == 'park-current-passage-unbound':
+                if result == 'park-source-removed-by-cutover':
+                    check['owner'] = 'Documentation consumer-composition owner / Lead'
+                    check['blocker'] = 'Physical cutover removes '+rec['file']+'; operand reachability does not conserve this passage. Review '+row[0]+' in the non-identical successor(s) '+', '.join(s['path'] for s in check['sourceSuccessors'])+' and compose/review its effective disposition; never inherit a preserve from the deleted location.'
+                elif result == 'park-current-passage-unbound':
                     check['owner'] = 'G9 source-binding reviewer / Documentation consumer-composition owner'
                     check['blocker'] = 'Rebind '+row[0]+' in '+rec['file']+' from the recorded spans to one exact current source unit at final pin F; only then rejudge its preserve premise. No digest-only carry over passage drift.'
                 elif result == 'park-source-absent':
@@ -246,6 +265,13 @@ def main():
                 else:
                     lost = ', '.join(r['path'] for r in reach if not r['afterPresent']) or token
                     check['blocker'] = 'For '+row[0]+' in '+rec['file']+', confirm source-bound non-dereferencing semantics of '+lost+' or co-compose/review the live-pointer successor ('+(', '.join(successors) or 'no exact successor currently bound')+'). Lead owns this row before flip; no Step 5 proof inheritance.'
+            if bound and re.search(r'(?i)Canonical architecture moved to:', '\n'.join(source.splitlines()[max(0,current_line-3):current_line])):
+                successor = 'docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
+                assert present(successor) and any(successor==s['path'] for r in reach for s in r['successors'])
+                check.update(proposedDisposition='repoint-proposal',
+                             successor=dict(path=successor,sha256=sha((candidate/successor).read_bytes()),presentAfterCutover=True),
+                             recommendationReason='This is a live "Canonical architecture moved to" navigation assertion before the proposal body, not literal source evidence. Repoint only its legacy destination to the prepared architecture holder; authority still awaits the flip.',
+                             blocker='Lead/consumer-composition owner must compose and independently review this navigation replacement with the owning file patch; no product bytes changed in this records turn.')
             rows.append(check)
         assert collections.Counter(r['stage'] for r in rows) == {'step-03':4804,'step-04':609}
         assert len(retired) == 38 and all(r['sourceRemoved'] for r in retired)
@@ -259,15 +285,35 @@ def main():
                     member = str(item.get('edgeId') or 'slot')+'@'+sha(item['slotKey'])[:20] if stage=='step-04' else str(item.get('referenceId') or item.get('id') or item.get('edgeId'))
                     expected_members.add((catalog[id]['path'],line,member))
         assert seen_members == expected_members, 'final-record preserve identity mismatch'
-        # Negative mutations exercise the same effective decision predicate as rows.
-        probes = [dict(case='false retained-pointer premise over removed target',actual=premise(True,True,False,None,False)),
-                  dict(case='historical-looking reason with mismatching passage',actual=premise(True,False,False,{'kind':'history'},False)),
-                  dict(case='navigation label with no history evidence over removed target',actual=premise(True,True,False,None,False))]
-        assert all(p['actual'].startswith('park-') for p in probes)
+        # Real source mutations pass through bind_spans AND historical_evidence,
+        # not hand-supplied evidence. The first two reproduce the reviewer's bugs.
+        probes = []
+        for case, source, line, text, reason in [
+            ('live pointer with unrelated example forty lines away', 'See docs/specs/x.md\n'+'\n'*40+'e.g. unrelated example\n', 1, 'See docs/specs/x.md', 'literal example; retained native path'),
+            ('navigation row under Bee title', '# Bee\n\n| Read first | docs/specs/x.md |\n', 3, '| Read first | docs/specs/x.md |', 'external.project literal example'),
+            ('historical reason with mismatching passage', '# History\n\n2026-10-23 completed docs/specs/x.md\n', 3, '2026-10-23 completed docs/specs/other.md', 'dated completed history'),
+        ]:
+            spans = [dict(line=line,text=text)]
+            bound = bind_spans(source,spans)
+            evidence = historical_evidence(source,min(bound),reason,unit_at(source,bound),spans[0]) if bound else None
+            actual = premise(True,bool(bound),False,evidence,False)
+            probes.append(dict(case=case,source=source,sourceSha256=sha(source),spans=spans,reason=reason,bound=bound,evidence=evidence,actual=actual))
+        assert all(p['actual'].startswith('park-') and p['evidence'] is None for p in probes)
+        positives = []
+        for case, source, reason, expected in [
+            ('example framing in the actual passage', 'For example docs/specs/x.md', 'literal example', 'explicit-external-or-example-framing'),
+            ('source text after explicit snapshot boundary', '# Literal Snapshot\n\ndocs/specs/x.md', 'inside literal carriage', 'literal-carriage-section'),
+        ]:
+            line = len(source.splitlines())
+            span = dict(line=line,text=source.splitlines()[-1])
+            bound = bind_spans(source,[span])
+            evidence = historical_evidence(source,line,reason,unit_at(source,bound),span)
+            assert evidence and evidence['kind']==expected
+            positives.append(dict(case=case,source=source,span=span,reason=reason,evidence=evidence))
         counts = dict(total=len(rows),byStage=dict(collections.Counter(r['stage'] for r in rows)),byResult=dict(collections.Counter(r['result'] for r in rows)),excludedRetireWithTree=len(retired),recordBatches=len(catalog),finalBatchPopulation=batch_counts)
         report = dict(sourceCommit=pin,authority='L12-137; G6; L12-121 method extended, not inherited',
                       inputs={f:sha((OLD/f).read_bytes()) for f in ['step-07-consumer-cutover-matrix.json','step-05-cutover-move-set.json','step-07-post-move-proof.mjs','step-02j-census-maps-portals-prose.json']},
-                      counts=counts,physical=physical,zeroEdgeBatches=zero_edge_batches,negativeDecisionProbes=probes,
+                      counts=counts,physical=physical,zeroEdgeBatches=zero_edge_batches,negativeDecisionProbes=probes,positiveEvidenceControls=positives,
                       noReadinessClaim=True,independentApproval=False,
                       scope='Tracked source blobs and physical scratch moves only. Exact source spans + reason/operand/source digests per final identity; retained reachability proves operand stability, not contract/runtime parity. Unconfirmed premises are owned parks. No checkout move, source edit, CLI, Git write, live state or test execution.',rows=rows)
         dump(args.out/'proof.json',report)
@@ -275,7 +321,7 @@ def main():
         judgments = [r for r in rows if not r['result'].startswith('preserve-')]
         # One owning evidence row in proof.json. Secondary indexes carry locators,
         # decisions and digests, not duplicate multi-kilobyte source passages.
-        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors']
+        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors','sourcePresentAfterCutover','sourceSuccessors','successor','recommendationReason']
         dump(args.out/'judgments.json',dict(sourceCommit=pin,count=len(judgments),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in judgments]))
         keys += ['decisionOwner','successor','proposedDatedNote','alternatives','recommendationReason']
         dump(args.out/'history-wrapper-proposals.json',dict(sourceCommit=pin,count=sum('decisionOwner' in r for r in rows),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in rows if 'decisionOwner' in r]))

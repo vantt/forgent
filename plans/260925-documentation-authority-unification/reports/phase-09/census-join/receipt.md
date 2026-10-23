@@ -1,36 +1,32 @@
-# Census custody join receipt
+# Census custody follow-up receipt
 
-Source pin: `3e2d05af89313dbfbf0d26cd0de34f6b660d194b`. Records turn only; **G2 is not met** and this is not independent approval or final-pin F coverage.
+Pin: `3d0169f390e21c67bc3fc69081fd1bc07186599f` (HEAD at execution). This supersedes the W1 receipt at `bade6b6b3`, not its historical evidence. **Records task complete; G2 remains unmet**, without independent approval or final-pin F coverage.
 
-## Result
+## Changes and result
 
-Every one of the **1,126** register ids has exactly one row in `join.json` (140 source files). `residue.json` is the exact judgment queue, not an exclusion list.
+- `join.py --pin <commit> --rescan` resolves an explicit commit and reads its tracked blobs; omitting `--pin` still selects HEAD.
+- All **1,126 original ids / 140 files** remain set-equal to the frozen register: **646 owning-test joins, 293 exact grade-record REJECT confirmations, 187 owned judgments**. The latter still comprise 159 fixture, 21 drifted-grade and seven other rows. No old grade, register or source was rewritten.
+- The **27 fixture rows whose sources were deleted** now name deleting commit **`5a33989fa39e0eb3d3253ddb4189cb502f93bd21`** (seat-binding conversion removal). One additional reader row has the same deletion: 28 absent-source judgments total, not shared-helper failures.
+- `pc-d-0185` and `pc-d-0186` now name **`packages/git/rust/tests/recovery_matrix.rs:recovery_matrix_all_payload_kinds`**, not its ignored subprocess. Rust locators name the actual test attribute and separately the function line. The YAML golden locator and loader line are derived from source, not constants.
+- All **116 empty-proof helper rows** explicitly say that no same-file caller is proved; none claims joined custody.
 
-| Custody | Rows |
-|---|---:|
-| Owning test, exact current expression and physical slot | 646 |
-| Confirmed grade-record REJECT, exact current passage and span | 293 |
-| Judgment required | 187 |
+## Post-pin coverage
 
-The residue is **159 fixture sites + 21 drifted REJECT grades + 7 other sites**. All 314 graded sites retain their grade-record line/member locator; only 293 are confirmed, not all 314. Missing sources and changed expressions are not resurrected or treated as confirmed fixtures.
+`post-pin-dynamics.json` reuses the unchanged Step 02l grammar and Step 07 subtraction, preserving the review's occurrence identities across exact diff-line rebinding. All **132 reviewed sites bind** at this pin: **77 owning-test joins + 55 source-judged non-document REJECTs**. Each of the **13 reader hints has a distinct individual reason**, distinguishing lease stdout, config-source reads, a reported config filename, a lock resource name, YAML scalar typing and config warnings/comments. A nearby docs cue is not evidence of a document read.
 
-`join.py` reuses the unchanged `step-02l-inventory.py` grammar. An unchanged Git-diff line maps the historical physical occurrence to the current pin; changed hunks need one exact expression match. Node's bundled Acorn supplies test callback boundaries and same-file fixture-helper call chains. Rust joins use enclosing `#[test]` functions. A role hint never suffices. The owning test titles are **locators, not claims that tests ran**.
+Rescan also finds **11 later dynamic sites**: ten fixture joins and one separately judged repository-root default in `scripts/lib/doc-git-reads.mjs`. Total delta: **143 = 87 proof joins + 56 source judgments**, zero unlisted reviewed sites. Source judgments are bound to the full source digest at this execution pin; later source drift must be rejudged, not inherited. These are proposed grades, **not independent approval**.
 
-## Post-pin literals
+`post-pin-literals.json` retains **16 delta occurrences**: three YAML parser-fixture joins, five Config authoring-fixture joins, and **eight owned judgments** (two generated workflow instructions, five live standard-runner descriptions, one presenter contract citation). All 13 originally judgment-required literals have their own reason, including the five now joined through `authoring_equivalence.rs`. Fixtures stay frozen; generated/live surfaces need their own co-cut review.
 
-`post-pin-literals.json` re-enumerates the unchanged class 4/5/6 census grammar: 84 current new-literal sites relative to the frozen census, with **16 identities not in the original 79-site post-census list**. Three occurrences in `packages/yaml-doc/contracts/fixtures/parse.v1.json` join `packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases`, through the digest-bound fixture loader. Two distinct old path strings appear in three slots.
-
-The remaining **13** delta literals require judgment: two generated skill references, five Config authoring-fixture references, five standard-runner YAML references and one Rust CLI-presenter citation. This is a lexical delta, not a claim that behavioral reader coverage is complete. F must be re-enumerated later.
-
-## Replay and handoff
+## Evidence and replay
 
 ```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --rescan
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py
+python3 -B plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f --rescan
+python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f
 ```
 
-Both exit 0. The verifier runs the join twice in independent scratch directories and compares all three JSON artifacts and stdout byte-for-byte against each other and these working artifacts. Commands, stdout, SHA-256 and sizes live in `../preserve-premise/verification.json`; `receipt.json` records touched-id custody and development failures.
+Both exit 0. `../preserve-premise/verification.json` records two isolated runs, identical stdout and **eight byte-identical G2/G6 artifacts**, equal to delivered files; exact identities, deleted-source custody, reader reasons and Rust/YAML locators are checked. Proof names are custody locators, not claims that product tests ran.
 
-No product test, `npm test`, Cargo suite, fgOS CLI/capability query, Git mutation, pair accounting, live workspace state or secret access was performed. Impact analysis: **degraded/unqueried under the brief's no-CLI boundary**; no product symbol changed. Markdown preview remains Lead custody; no service started. Only this directory and sibling `preserve-premise/` are written. `needsWrites: []`.
+Reuse: W1 join, Node bundled Acorn, unchanged census grammar, grade records and Git diff rebinding; extended the existing Rust test/helper custody rather than adding a scanner. Prior-art history: `bade6b6b3` introduced this records proof; `5e512a829` introduced the recovery parent/subprocess relationship. No removed product mechanism was restored.
 
-Lead/census reviewer owns the 187 original-site judgments, 13 delta-site judgments, independent approval and F refresh. No owning proof or check was weakened.
+No Git mutation, fgOS CLI, lifecycle, `.fgos`/secret read, product-source edit, full suite, product owning test, pair accounting or preview service. Product tests were unnecessary for records-only custody; temporary Git fixtures are allowed by the brief, not a reason to filter tests. Impact-analysis: **degraded/unqueried under no-CLI**. Independent review, eight literal judgments, 187 original judgments, final F refresh and accounting remain Lead custody. Markdown preview deferred to Lead to avoid out-of-scope service state. `needsWrites: []`.

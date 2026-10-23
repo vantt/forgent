@@ -6,7 +6,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if (shards) files['.fgos/events/a.jsonl'] = JSON.stringify({ ts, seq: 2, type: 'work.edit', payload: { id: 'one', patch: { title: 'updated' } }, v: 4 }) + '\\n';\n  if (porting) {\n    files['docs/distillery/state/porting/events.jsonl'] = JSON.stringify({ ts, type: 'porting.add', payload: { id: 'port', status: 'todo' } }) + '\\n';\n    files['docs/distillery/state/porting/state.json'] = '{}\\n';\n  }",
       "currentLine": 12,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         12
@@ -34,7 +34,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if (porting) {\n    files['docs/distillery/state/porting/events.jsonl'] = JSON.stringify({ ts, type: 'porting.add', payload: { id: 'port', status: 'todo' } }) + '\\n';\n    files['docs/distillery/state/porting/state.json'] = '{}\\n';\n  }\n  for (const [p, bytes] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(f.repo, p)), { recursive: true }); fs.writeFileSync(path.join(f.repo, p), bytes); }",
       "currentLine": 13,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         13
@@ -58,10 +58,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0030. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/forgentx-runner.json",
@@ -80,10 +81,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0031. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/forgentx-runner.json",
@@ -102,10 +104,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0032. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/forgentx-runner.json",
@@ -124,10 +127,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0033. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/forgentx-runner.json",
@@ -146,10 +150,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0034. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/forgentx-runner.json",
@@ -168,10 +173,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0035. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/global-runner.json",
@@ -190,10 +196,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0036. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/global-runner.json",
@@ -212,10 +219,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0037. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/global-runner.json",
@@ -234,10 +242,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0038. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/global-runner.json",
@@ -256,10 +265,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-l-0039. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/fixtures/seat-binding-config/global-runner.json",
@@ -306,7 +316,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nconst SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';\n",
       "currentLine": 16,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         16
@@ -324,7 +334,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -332,7 +342,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';\n\nfunction git(root, args) {",
       "currentLine": 17,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         17
@@ -350,7 +360,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -742,7 +752,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { definitionNameOf, definitionFileName } from '../../src/convention/definition-names.mjs';\n\nconst golden = JSON.parse(fs.readFileSync(new URL('../../packages/convention/contracts/convention.golden.v1.json', import.meta.url), 'utf8'));\n\ntest('the shared golden vectors give the same answer here as in the Rust crate', () => {",
       "currentLine": 11,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         11
@@ -768,7 +778,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { checkDeclaredSeats } from '../../src/runner/execution/seat-resolver.mjs';\n\nconst golden = JSON.parse(fs.readFileSync(new URL('../../packages/convention/contracts/convention.golden.v1.json', import.meta.url), 'utf8'));\n\ntest('the shared golden vectors give the same answer here as in the Rust crate', () => {",
       "currentLine": 16,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         16
@@ -794,7 +804,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';\n\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));",
       "currentLine": 17,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         17
@@ -820,7 +830,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';\n\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));",
       "currentLine": 17,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         17
@@ -846,7 +856,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));\nensureScriptAddon();",
       "currentLine": 18,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         18
@@ -872,7 +882,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const cliBootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;\n\nconst sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nconst env = { ...process.env };",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         25
@@ -898,7 +908,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const cliBootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;\n\nconst sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nconst env = { ...process.env };",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         25
@@ -924,7 +934,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nfor (const operation of ['cherry-pick', 'rebase', 'am', 'pull']) {\n  test(`reference guard refuses ${operation} of scoped changes onto main`, t => {\n    const f = fixture(t);\n    f.git(['checkout', '-qb', 'feature']);",
       "currentLine": 792,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         792
@@ -950,7 +960,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    files['docs/distillery/state/porting/state.json'] = '{}\\n';\n  }\n  for (const [p, bytes] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(f.repo, p)), { recursive: true }); fs.writeFileSync(path.join(f.repo, p), bytes); }\n  f.git('add', ...Object.keys(files)); f.git('commit', '-qm', 'tracked legacy fixture');\n  return files;",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -978,7 +988,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    files['docs/distillery/state/porting/state.json'] = '{}\\n';\n  }\n  for (const [p, bytes] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(f.repo, p)), { recursive: true }); fs.writeFileSync(path.join(f.repo, p), bytes); }\n  f.git('add', ...Object.keys(files)); f.git('commit', '-qm', 'tracked legacy fixture');\n  return files;",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -1006,7 +1016,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "// test/setup/event-store-checks.test.mjs (event-store-open-root).\nconst built = ensureGitAddon();\nconst loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };\nconst addon = loadNativeAddon(loaderOptions);\nconst floor = JSON.parse(fs.readFileSync(path.join(root, 'packages/git/contracts/git-floor.v1.json'), 'utf8'));",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22
@@ -1032,7 +1042,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };\nconst addon = loadNativeAddon(loaderOptions);\nconst floor = JSON.parse(fs.readFileSync(path.join(root, 'packages/git/contracts/git-floor.v1.json'), 'utf8'));\nconst linux = { skip: process.platform !== 'linux' };\nconst event = n => ({ eventType: 'topology.created', schemaVersion: 1, payload: { n }, ts: '2026-10-20T00:00:00.000Z' });",
       "currentLine": 24,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         24
@@ -1058,7 +1068,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';\nimport { createGitScopedCommit } from '../../src/git/index.mjs';\nconst built=ensureGitAddon();const loader={descriptor:{manifest:JSON.parse(fs.readFileSync(built.manifest)),releaseRoot:root}};\n// A baseline-only repository has legacy files under .fgos/ but no event directory.\nconst cases=[...['ordinary','temporary','external','symlink'].map(indexMode=>[indexMode,'event-directory']),['ordinary','baseline-only']];",
       "currentLine": 11,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         11
@@ -1084,7 +1094,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "// A baseline-only repository has legacy files under .fgos/ but no event directory.\nconst cases=[...['ordinary','temporary','external','symlink'].map(indexMode=>[indexMode,'event-directory']),['ordinary','baseline-only']];\nfor(const [indexMode,layout] of cases) test(`cutover grant validates exact authority and ${indexMode} hook index (${layout})`,()=>{\n const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-cutover-'));const repo=path.join(temp,'repo');fs.mkdirSync(repo);\n const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();",
       "currentLine": 14,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         14
@@ -1110,7 +1120,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const cases=[...['ordinary','temporary','external','symlink'].map(indexMode=>[indexMode,'event-directory']),['ordinary','baseline-only']];\nfor(const [indexMode,layout] of cases) test(`cutover grant validates exact authority and ${indexMode} hook index (${layout})`,()=>{\n const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-cutover-'));const repo=path.join(temp,'repo');fs.mkdirSync(repo);\n const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();\n const oldState=process.env.FGOS_STATE_ROOT;process.env.FGOS_STATE_ROOT=temp;",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -1136,7 +1146,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const cases=[...['ordinary','temporary','external','symlink'].map(indexMode=>[indexMode,'event-directory']),['ordinary','baseline-only']];\nfor(const [indexMode,layout] of cases) test(`cutover grant validates exact authority and ${indexMode} hook index (${layout})`,()=>{\n const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-cutover-'));const repo=path.join(temp,'repo');fs.mkdirSync(repo);\n const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();\n const oldState=process.env.FGOS_STATE_ROOT;process.env.FGOS_STATE_ROOT=temp;",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -1162,7 +1172,7 @@
       "contextLocatorIsBound": true,
       "currentContext": " const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-cutover-'));const repo=path.join(temp,'repo');fs.mkdirSync(repo);\n const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();\n const oldState=process.env.FGOS_STATE_ROOT;process.env.FGOS_STATE_ROOT=temp;\n try {\n  git('init','-q','--initial-branch=trunk');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');",
       "currentLine": 17,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         17
@@ -1188,7 +1198,7 @@
       "contextLocatorIsBound": true,
       "currentContext": " try {\n  git('init','-q','--initial-branch=trunk');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');\n  const directory=layout==='event-directory';\n  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');",
       "currentLine": 20,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         20
@@ -1214,7 +1224,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const directory=layout==='event-directory';\n  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22
@@ -1240,7 +1250,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const directory=layout==='event-directory';\n  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22,
@@ -1267,7 +1277,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const directory=layout==='event-directory';\n  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22
@@ -1293,7 +1303,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));",
       "currentLine": 23,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         23
@@ -1319,7 +1329,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));",
       "currentLine": 23,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         23,
@@ -1346,7 +1356,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const deleted=['.fgos/events.jsonl',...(directory?['.fgos/events/old.json']:[]),'.fgos/state.json','.fgos/state.json.bak','.fgos/state.json.backup'];\n  fs.mkdirSync(path.join(repo,directory?'.fgos/events':'.fgos'),{recursive:true});for(const p of deleted)fs.writeFileSync(path.join(repo,p),'legacy\\n');fs.writeFileSync(path.join(repo,'.fgos/unrelated'),'keep');\n  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));",
       "currentLine": 23,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         23
@@ -1372,7 +1382,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));\n  git('config','core.hooksPath',path.join(root,'.githooks'));\n  if(indexMode!=='ordinary') {",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         25
@@ -1398,7 +1408,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  fs.mkdirSync(path.join(repo,'logs'));fs.writeFileSync(path.join(repo,'logs/porting.jsonl'),'old');fs.writeFileSync(path.join(repo,'seal.json'),'sealed\\n');\n  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));\n  git('config','core.hooksPath',path.join(root,'.githooks'));\n  if(indexMode!=='ordinary') {",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         25
@@ -1424,7 +1434,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  git('add','.');git('commit','-qm','legacy');const legacy=git('rev-parse','HEAD');git('update-ref','refs/fgos/legacy',legacy);\n  const fence=path.join(repo,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));\n  git('config','core.hooksPath',path.join(root,'.githooks'));\n  if(indexMode!=='ordinary') {\n    const hooks=path.join(repo,'hooks');fs.mkdirSync(hooks);",
       "currentLine": 26,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         26
@@ -1450,7 +1460,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  git('config','core.hooksPath',path.join(root,'.githooks'));\n  if(indexMode!=='ordinary') {\n    const hooks=path.join(repo,'hooks');fs.mkdirSync(hooks);\n    const gitdir=git('rev-parse','--absolute-git-dir');\n    const index=path.join(indexMode==='external'?temp:gitdir,'hook-temporary-index');",
       "currentLine": 28,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         28
@@ -1476,7 +1486,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if(indexMode!=='ordinary') {\n    const hooks=path.join(repo,'hooks');fs.mkdirSync(hooks);\n    const gitdir=git('rev-parse','--absolute-git-dir');\n    const index=path.join(indexMode==='external'?temp:gitdir,'hook-temporary-index');\n    const backing=path.join(gitdir,'hook-index-backing');",
       "currentLine": 29,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         29
@@ -1502,7 +1512,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    const hooks=path.join(repo,'hooks');fs.mkdirSync(hooks);\n    const gitdir=git('rev-parse','--absolute-git-dir');\n    const index=path.join(indexMode==='external'?temp:gitdir,'hook-temporary-index');\n    const backing=path.join(gitdir,'hook-index-backing');\n    const prepare=indexMode==='symlink'?`cp \"$source\" '${backing}'\\nln -sf '${backing}' '${index}'`:`cp \"$source\" '${index}'`;",
       "currentLine": 30,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         30
@@ -1528,7 +1538,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    const backing=path.join(gitdir,'hook-index-backing');\n    const prepare=indexMode==='symlink'?`cp \"$source\" '${backing}'\\nln -sf '${backing}' '${index}'`:`cp \"$source\" '${index}'`;\n    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\\nsource=$(git rev-parse --git-path index)\\n${prepare}\\nGIT_INDEX_FILE='${index}' '${path.join(root,'.githooks/pre-commit')}'\\n`,{mode:0o755});\n    git('config','core.hooksPath',hooks);\n  }",
       "currentLine": 33,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         33
@@ -1554,7 +1564,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    git('config','core.hooksPath',hooks);\n  }\n  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));",
       "currentLine": 36,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         36
@@ -1580,7 +1590,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    git('config','core.hooksPath',hooks);\n  }\n  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));",
       "currentLine": 36,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         36
@@ -1606,7 +1616,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));\n  const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\\n').digest('hex')};\n  // A text operation selector and fd annotation are not a borrowed description.",
       "currentLine": 38,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22,
@@ -1633,7 +1643,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));\n  const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\\n').digest('hex')};\n  // A text operation selector and fd annotation are not a borrowed description.",
       "currentLine": 38,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         38
@@ -1659,7 +1669,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));\n  const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\\n').digest('hex')};\n  // A text operation selector and fd annotation are not a borrowed description.",
       "currentLine": 38,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         38
@@ -1685,7 +1695,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const port=createGitScopedCommit({stateRoot:temp,repoPath:repo,trustedMain:repo,writer:'fixture'},loader);\n  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));\n  const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\\n').digest('hex')};\n  // A text operation selector and fd annotation are not a borrowed description.",
       "currentLine": 38,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         23,
@@ -1712,7 +1722,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const baseline=port.preflight();\n  for(const p of deleted)fs.unlinkSync(path.join(repo,p));if(directory)fs.rmdirSync(path.join(repo,'.fgos/events'));fs.writeFileSync(path.join(repo,'.fgos/events'),'legacy fence\\n');fs.unlinkSync(path.join(repo,'logs/porting.jsonl'));\n  const grant={exactPaths:deleted,legacyRefOid:legacy,sealDigest:createHash('sha256').update('sealed\\n').digest('hex')};\n  // A text operation selector and fd annotation are not a borrowed description.\n  git('add','-A','--','.fgos/events.jsonl');",
       "currentLine": 39,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         39
@@ -1738,7 +1748,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  assert.throws(()=>execFileSync(host,['internal','git-grant-check','--protocol','1','--operation','cutover'],{cwd:repo,stdio:'pipe',env:{...process.env,FGOS_LOCK_FD:'3'}}));\n  assert.throws(()=>execFileSync(host,['internal','git-grant-check','--protocol','99','--operation','cutover'],{cwd:repo,stdio:'pipe'}));\n } finally {if(oldState===undefined)delete process.env.FGOS_STATE_ROOT;else process.env.FGOS_STATE_ROOT=oldState;fs.rmSync(temp,{recursive:true,force:true});}\n});",
       "currentLine": 59,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         59
@@ -1834,7 +1844,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\n// Execute the real hook against a scratch index. No source checkout is staged.\nfor(const mode of ['added','renamed','copied','type-changed','fence','legacy-shard','legacy-checkpoint','unrelated-prefix','head-fence','added-shard','staged-fence'])test(`retired layout hook: ${mode}`,t=>{\n  const repo=fs.mkdtempSync(path.join(os.tmpdir(),'es-hook-'));\n  t.after(()=>fs.rmSync(repo,{recursive:true,force:true}));",
       "currentLine": 10,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         10
@@ -1860,7 +1870,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "// Execute the real hook against a scratch index. No source checkout is staged.\nfor(const mode of ['added','renamed','copied','type-changed','fence','legacy-shard','legacy-checkpoint','unrelated-prefix','head-fence','added-shard','staged-fence'])test(`retired layout hook: ${mode}`,t=>{\n  const repo=fs.mkdtempSync(path.join(os.tmpdir(),'es-hook-'));\n  t.after(()=>fs.rmSync(repo,{recursive:true,force:true}));\n  const git=(...args)=>execFileSync('git',['-C',repo,...args],{encoding:'utf8'}).trim();",
       "currentLine": 11,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         11
@@ -1886,7 +1896,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const target=mode==='fence'?'.fgos/events':['legacy-shard','added-shard'].includes(mode)?'.fgos/events/new-writer.jsonl':mode==='unrelated-prefix'?'.fgos/events-unrelated':'.fgos/events.jsonl';\n  const legacy=mode.startsWith('legacy-');\n  if(legacy)git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events/old.jsonl`);\n  else if(!['fence','staged-fence'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events`);\n  if(['renamed','copied'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},source`);",
       "currentLine": 18,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         18
@@ -1912,7 +1922,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const legacy=mode.startsWith('legacy-');\n  if(legacy)git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events/old.jsonl`);\n  else if(!['fence','staged-fence'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events`);\n  if(['renamed','copied'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},source`);\n  if(mode==='type-changed')git('update-index','--add','--cacheinfo',`120000,${blob},${target}`);",
       "currentLine": 19,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         19,
@@ -1939,7 +1949,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if(legacy)git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events/old.jsonl`);\n  else if(!['fence','staged-fence'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events`);\n  if(['renamed','copied'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},source`);\n  if(mode==='type-changed')git('update-index','--add','--cacheinfo',`120000,${blob},${target}`);\n  const tree=git('write-tree');",
       "currentLine": 20,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         20
@@ -1965,7 +1975,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  else if(!['fence','staged-fence'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events`);\n  if(['renamed','copied'].includes(mode))git('update-index','--add','--cacheinfo',`100644,${blob},source`);\n  if(mode==='type-changed')git('update-index','--add','--cacheinfo',`120000,${blob},${target}`);\n  const tree=git('write-tree');\n  const commit=execFileSync('git',['-C',repo,'commit-tree',tree],{input:'baseline',encoding:'utf8'}).trim();",
       "currentLine": 21,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         21
@@ -1991,7 +2001,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const commit=execFileSync('git',['-C',repo,'commit-tree',tree],{input:'baseline',encoding:'utf8'}).trim();\n  git('update-ref','HEAD',commit);\n  if(mode==='staged-fence')git('update-index','--add','--cacheinfo',`100644,${blob},.fgos/events`);\n  if(['head-fence','added-shard'].includes(mode))git('update-index','--force-remove','.fgos/events');\n  if(mode==='renamed')git('update-index','--force-remove','source');",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         19,
@@ -2018,7 +2028,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if(['head-fence','added-shard'].includes(mode))git('update-index','--force-remove','.fgos/events');\n  if(mode==='renamed')git('update-index','--force-remove','source');\n  git('update-index','--add','--cacheinfo',`100644,${blob},${target}`);\n  const result=spawnSync(process.execPath,[path.resolve('.githooks/pre-commit')],{cwd:repo,encoding:'utf8'});\n  if(['fence','legacy-shard','legacy-checkpoint','unrelated-prefix'].includes(mode)){assert.equal(result.status,0,result.stderr);assert.doesNotMatch(result.stderr,/retired event paths/);}",
       "currentLine": 28,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         28
@@ -2044,7 +2054,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if(mode==='renamed')git('update-index','--force-remove','source');\n  git('update-index','--add','--cacheinfo',`100644,${blob},${target}`);\n  const result=spawnSync(process.execPath,[path.resolve('.githooks/pre-commit')],{cwd:repo,encoding:'utf8'});\n  if(['fence','legacy-shard','legacy-checkpoint','unrelated-prefix'].includes(mode)){assert.equal(result.status,0,result.stderr);assert.doesNotMatch(result.stderr,/retired event paths/);}\n  else {assert.equal(result.status,1,result.stderr);assert.match(result.stderr,/retired event paths cannot be added/);}",
       "currentLine": 29,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         29
@@ -2070,7 +2080,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    }\n  }\n  const poolEntries = prefer.map((name) => ({ executor: name, invocation: `${name}-cli` }));\n  const cfg = {\n    runner: {",
       "currentLine": 135,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         113,
@@ -2099,7 +2109,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    },\n  };\n  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });\n  writeProjectConfig(repoRoot, cfg);\n",
       "currentLine": 151,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         151
@@ -2149,7 +2159,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\n  const home = fixtureDir('fgos-failover-home-');\n  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });\n  // llmAccounts: { pool: { accountId: { family, login } } }, each account holding the family's store.\n  const globalPools = llmAccounts && Object.fromEntries(Object.entries(llmAccounts).map(([pool, accounts]) => [pool, Object.fromEntries(Object.entries(accounts).map(([accountId, { family, login }]) => {",
       "currentLine": 155,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         155
@@ -2177,7 +2187,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });\n  // llmAccounts: { pool: { accountId: { family, login } } }, each account holding the family's store.\n  const globalPools = llmAccounts && Object.fromEntries(Object.entries(llmAccounts).map(([pool, accounts]) => [pool, Object.fromEntries(Object.entries(accounts).map(([accountId, { family, login }]) => {\n    const accountHome = fixtureDir(`fgos-failover-pool-${pool}-${accountId}-`);\n    fs.writeFileSync(path.join(accountHome, 'login'), login);",
       "currentLine": 157,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         157
@@ -2205,7 +2215,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));\nexport const unitDirOf = (repoRoot, res) => path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);\nexport const attemptsOf = (repoRoot, res, key = 'producer/1') => readJson(path.join(unitDirOf(repoRoot, res), 'unit.json')).bindings[key];\nexport const summaryOf = (repoRoot, res) => readJson(path.join(unitDirOf(repoRoot, res), 'unit-summary.json'));\nexport const runFile = (repoRoot, res, subdir, file, role = 'producer') => readJson(path.join(unitDirOf(repoRoot, res), role, subdir, 'runs', '01', file));",
       "currentLine": 181,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         181
@@ -2233,7 +2243,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const unitDirOf = (repoRoot, res) => path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);\nexport const attemptsOf = (repoRoot, res, key = 'producer/1') => readJson(path.join(unitDirOf(repoRoot, res), 'unit.json')).bindings[key];\nexport const summaryOf = (repoRoot, res) => readJson(path.join(unitDirOf(repoRoot, res), 'unit-summary.json'));\nexport const runFile = (repoRoot, res, subdir, file, role = 'producer') => readJson(path.join(unitDirOf(repoRoot, res), role, subdir, 'runs', '01', file));\nexport const selectedAccount = (repoRoot, res, subdir) => runFile(repoRoot, res, subdir, 'provider-capacity-selection.json').accountId;",
       "currentLine": 182,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         182
@@ -2261,7 +2271,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const attemptsOf = (repoRoot, res, key = 'producer/1') => readJson(path.join(unitDirOf(repoRoot, res), 'unit.json')).bindings[key];\nexport const summaryOf = (repoRoot, res) => readJson(path.join(unitDirOf(repoRoot, res), 'unit-summary.json'));\nexport const runFile = (repoRoot, res, subdir, file, role = 'producer') => readJson(path.join(unitDirOf(repoRoot, res), role, subdir, 'runs', '01', file));\nexport const selectedAccount = (repoRoot, res, subdir) => runFile(repoRoot, res, subdir, 'provider-capacity-selection.json').accountId;\n",
       "currentLine": 183,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         183
@@ -2290,7 +2300,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const solo = (id) => ({ id, objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' });\nexport const panel = (id) => ({ id, objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', stanceOptions: ['a', 'b'],\n  seats: [1, 2, 3].map((n) => ({ seat: `member-${n}`, role: 'producer' })).concat([{ seat: 'synthesizer', role: 'synthesizer' }]) });\nexport const run = (fx, unitData, extra = {}) => runUnit({\n  unitData,",
       "currentLine": 188,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         188
@@ -2318,7 +2328,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const run = (fx, unitData, extra = {}) => runUnit({\n  unitData,\n  repoRoot: fx.repoRoot,\n  cwd: fx.worktreeDir,\n  worktree: fx.worktreeDir,",
       "currentLine": 191,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         191
@@ -2346,7 +2356,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  worktree: fx.worktreeDir,\n  session: { herdrPresent: false, headless: true },\n  providerCapacityRuntimeDir: fx.runtimeDir,\n  ...extra,\n});",
       "currentLine": 195,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         195
@@ -2374,7 +2384,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const pin = (accountId) => ({ overrides: [{ origin: 'human-cli', account: accountId }] });\nexport const unitRuns = (fx) => {\n  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');\n  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.startsWith('unit-run-')) : [];\n};",
       "currentLine": 202,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         202
@@ -2402,7 +2412,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "export const pin = (accountId) => ({ overrides: [{ origin: 'human-cli', account: accountId }] });\nexport const unitRuns = (fx) => {\n  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');\n  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.startsWith('unit-run-')) : [];\n};",
       "currentLine": 202,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         202
@@ -2430,7 +2440,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { fileURLToPath } from 'node:url';\n\nconst contract = fileURLToPath(new URL('../../packages/identity/contracts/identity.writer.v1.json', import.meta.url));\nexport const IDENTITY_ENV_KEYS = Object.freeze(JSON.parse(fs.readFileSync(contract, 'utf8'))['x-envOrder']);",
       "currentLine": 5,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         5
@@ -2456,7 +2466,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const WORKER_BODY = `\n  const seen = { id: process.env.FGOS_CASE_ID ?? null, reservation: process.env.FGOS_CASE_RESERVATION ?? null };\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe worker saw the case variables: ' + JSON.stringify(seen) + '. Nothing else was inspected.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22
@@ -2482,7 +2492,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const seen = { id: process.env.FGOS_CASE_ID ?? null, reservation: process.env.FGOS_CASE_RESERVATION ?? null };\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe worker saw the case variables: ' + JSON.stringify(seen) + '. Nothing else was inspected.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;\n",
       "currentLine": 23,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         23
@@ -2508,7 +2518,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "} from '../../src/runner/documentation-cutover-lease.mjs';\n\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));",
       "currentLine": 20,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         20
@@ -2534,7 +2544,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "} from '../../src/runner/documentation-cutover-lease.mjs';\n\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));",
       "currentLine": 20,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         20
@@ -2560,7 +2570,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nconst stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-state-'));\nprocess.env.FGOS_STATE_ROOT = stateRoot;\nafter(() => fs.rmSync(stateRoot, { recursive: true, force: true }));\nensureScriptAddon();",
       "currentLine": 21,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         21
@@ -2586,7 +2596,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "after(() => fs.rmSync(stateRoot, { recursive: true, force: true }));\nensureScriptAddon();\nconst sourceRoot = fileURLToPath(new URL('../../', import.meta.url));\nfunction fixture(t) {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-'));",
       "currentLine": 24,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         24
@@ -2612,7 +2622,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "after(() => fs.rmSync(stateRoot, { recursive: true, force: true }));\nensureScriptAddon();\nconst sourceRoot = fileURLToPath(new URL('../../', import.meta.url));\nfunction fixture(t) {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-'));",
       "currentLine": 24,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         24
@@ -2638,7 +2648,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  fs.mkdirSync(fence, { recursive: true });\n  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));\n  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };\n  return { repoRoot, temp, git, put, worktree };\n}",
       "currentLine": 37,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         37
@@ -2666,7 +2676,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  fs.mkdirSync(fence, { recursive: true });\n  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));\n  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };\n  return { repoRoot, temp, git, put, worktree };\n}",
       "currentLine": 37,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         37
@@ -2694,7 +2704,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  providerModel: family,\n  command: `${family}-bin`,\n  invocations: [{ id: `${family}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, credentialStore: { use: family, homeEnv: `${family.toUpperCase()}_HOME`, files: ['login'] } }],\n});\nconst tiers = (cell) => ({ nano: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell });",
       "currentLine": 21,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         21
@@ -2722,7 +2732,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "});\n\nfor (const owned of [false, true]) test(`ScopedCommit ${owned ? 'owned' : 'foreign'} hook refusal preserves original evidence`, () => {\n const f = fixture(); try {\n  const h = hook(f, owned);",
       "currentLine": 141,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         141
@@ -2748,7 +2758,7 @@
       "contextLocatorIsBound": true,
       "currentContext": " const f = fixture(); try {\n  const h = hook(f, owned);\n  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});",
       "currentLine": 144,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         61,
@@ -2781,7 +2791,7 @@
       "contextLocatorIsBound": true,
       "currentContext": " const f = fixture(); try {\n  const h = hook(f, owned);\n  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});",
       "currentLine": 144,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         81,
@@ -2808,7 +2818,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const h = hook(f, owned);\n  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});\n  assert.equal(result.status,'failed');",
       "currentLine": 145,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         62,
@@ -2837,7 +2847,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const h = hook(f, owned);\n  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});\n  assert.equal(result.status,'failed');",
       "currentLine": 145,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         62,
@@ -2867,7 +2877,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});\n  assert.equal(result.status,'failed');\n  assert.equal(result.reason,owned ? 'hook-refused' : 'git-error');",
       "currentLine": 146,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         61,
@@ -2900,7 +2910,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const baseline = preflightUnitWorktree({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs']}).baseline;\n  fs.mkdirSync(path.join(f.tree,'docs')); fs.writeFileSync(path.join(f.tree,'docs/new'),'new');\n  const result = commitUnitWork({worktree:f.tree,repoRoot:f.main,custody:f.custody,scope:['docs'],unitId:'hook',baseline});\n  assert.equal(result.status,'failed');\n  assert.equal(result.reason,owned ? 'hook-refused' : 'git-error');",
       "currentLine": 146,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         63,
@@ -2929,7 +2939,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  assert.equal(fs.readFileSync(h.count,'utf8'),'call\\n'.repeat(owned ? 2 : 1));\n  assert.equal(f.git(f.tree,'diff','--cached','--name-only'),'');\n  assert.equal(fs.readFileSync(path.join(f.tree,'docs/new'),'utf8'),'new');\n } finally { f.close(); }\n});",
       "currentLine": 153,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         62,
@@ -3003,7 +3013,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "seedFileLocalBwrapRegistry();\n\nprocess.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-state-root-'));\n\nconst mkRuntimeDir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-'));",
       "currentLine": 31,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         31
@@ -3029,7 +3039,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "seedFileLocalBwrapRegistry();\n\nprocess.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-state-root-'));\n\nconst mkRuntimeDir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-'));",
       "currentLine": 31,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         31
@@ -3055,7 +3065,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  digestA = resA.artifactDigest;\n\n  ({ dir: releaseDirB, digest: digestB } = restampRelease(releaseDirA, 'fgctl-upgrade-fixture-b-', (manifest) => {\n    manifest.releaseVersion = '0.2.0';\n  }));",
       "currentLine": 127,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         127
@@ -3081,7 +3091,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));\nafter(() => fs.rmSync(scratch, { recursive: true, force: true }));\nconst release = path.join(scratch, 'release');\nbefore(() => buildRustDistribution({ outDir: release, repoRoot: REPO_ROOT }));\n",
       "currentLine": 31,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         31
@@ -3107,7 +3117,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "after(() => fs.rmSync(scratch, { recursive: true, force: true }));\nconst release = path.join(scratch, 'release');\nbefore(() => buildRustDistribution({ outDir: release, repoRoot: REPO_ROOT }));\n\nfunction stubCargo() {",
       "currentLine": 32,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         32
@@ -3133,7 +3143,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "after(() => fs.rmSync(scratch, { recursive: true, force: true }));\nconst release = path.join(scratch, 'release');\nbefore(() => buildRustDistribution({ outDir: release, repoRoot: REPO_ROOT }));\n\nfunction stubCargo() {",
       "currentLine": 32,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         32
@@ -3159,7 +3169,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const staged = { dir: null, result: null };\nbefore(() => {\n  staged.dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-test-'));\n  const inheritedHost = process.env.FGOS_HOST_BIN;\n  process.env.FGOS_HOST_BIN = path.join(staged.dir, 'no-such-host');",
       "currentLine": 40,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         40
@@ -3185,7 +3195,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  staged.dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-test-'));\n  const inheritedHost = process.env.FGOS_HOST_BIN;\n  process.env.FGOS_HOST_BIN = path.join(staged.dir, 'no-such-host');\n  try {\n    staged.result = buildRustDistribution({ outDir: staged.dir, repoRoot: REPO_ROOT });",
       "currentLine": 42,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         42
@@ -3211,7 +3221,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  process.env.FGOS_HOST_BIN = path.join(staged.dir, 'no-such-host');\n  try {\n    staged.result = buildRustDistribution({ outDir: staged.dir, repoRoot: REPO_ROOT });\n  } finally {\n    if (inheritedHost === undefined) delete process.env.FGOS_HOST_BIN;",
       "currentLine": 44,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         44
@@ -3237,7 +3247,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "} from '../../scripts/check-evidence-relocation.mjs';\n\nconst SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -3255,7 +3265,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -3263,7 +3273,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "} from '../../scripts/check-evidence-relocation.mjs';\n\nconst SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -3281,7 +3291,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -3289,7 +3299,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nconst SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';\n",
       "currentLine": 16,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         16
@@ -3307,7 +3317,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -3315,7 +3325,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const SCRIPT_PATH = fileURLToPath(new URL('../../scripts/check-evidence-relocation.mjs', import.meta.url));\nconst LEGACY_ROOT = 'docs/architect/agent-coordination/verification/collection1';\nconst PLATFORM_ROOT = 'docs/platform/agent-coordination/verification/collection1';\n\nfunction git(root, args) {",
       "currentLine": 17,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         17
@@ -3333,7 +3343,7 @@
       "owningProofs": [],
       "roleHint": "fixture-literal",
       "sourcePresent": true,
-      "sourceSha256": "cb13b6b9ce22aa658fee197ad795808a1e9afff59a4354a753473aeae0b8eed6",
+      "sourceSha256": "2b6ec57b1c35ab3233031e63dbd7d8e7bad676a2f318f85b0820e57386aae830",
       "status": "judgment-required"
     },
     {
@@ -3341,7 +3351,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { fileURLToPath } from 'node:url';\n\nconst REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nexport const golden = JSON.parse(",
       "currentLine": 7,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         7
@@ -3367,7 +3377,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "import { fileURLToPath } from 'node:url';\n\nconst REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nexport const golden = JSON.parse(",
       "currentLine": 7,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         7
@@ -3393,7 +3403,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "\nexport const golden = JSON.parse(\n  fs.readFileSync(path.join(REPO_ROOT, 'packages/seat-binding/contracts/seat-binding.golden.v1.json'), 'utf8'),\n);\n",
       "currentLine": 10,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         10
@@ -3419,7 +3429,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const HOST_BIN = process.env.FGOS_HOST_BIN;\nconst vectors = JSON.parse(\n  fs.readFileSync(path.join(ROOT, 'packages/identity/contracts/vectors/attempt-writer-id.v1.json'), 'utf8'),\n);\n",
       "currentLine": 15,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         15
@@ -3465,10 +3475,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0775. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-checks.test.mjs",
@@ -3487,10 +3498,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0776. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-checks.test.mjs",
@@ -3509,10 +3521,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0777. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-checks.test.mjs",
@@ -3531,10 +3544,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0778. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-checks.test.mjs",
@@ -3553,10 +3567,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0779. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3575,10 +3590,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0780. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3597,10 +3613,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0781. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3619,10 +3636,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0782. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3641,10 +3659,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0783. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3663,10 +3682,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0784. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3685,10 +3705,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0785. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3707,10 +3728,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0786. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3729,10 +3751,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0787. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3751,10 +3774,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0788. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-conversion.test.mjs",
@@ -3773,10 +3797,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0789. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-fence.test.mjs",
@@ -3795,10 +3820,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0790. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-fence.test.mjs",
@@ -3817,10 +3843,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Shared fixture/config/helper, non-test text, or unmatched test boundary: requires source/owning-caller judgment; roleHint is not acceptance.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-0791. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "expressionLinesAtPin": [],
       "file": "test/setup/seat-binding-fence.test.mjs",
@@ -3843,7 +3870,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const REPO_ROOT = path.resolve(__dirname, '../..');\nconst FACADE_URL = new URL('../../src/util/session-identity.mjs', import.meta.url).href;\nconst CONTRACTS = path.join(REPO_ROOT, 'packages', 'identity', 'contracts');\nconst HOST = process.env.FGOS_HOST_BIN;\nconst UNIX = process.platform !== 'win32';",
       "currentLine": 22,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         22
@@ -3869,7 +3896,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    downstream: 'approval', gate: 'approval' },\n]) {\n  test(`${flow.id}: bounded findings reach synthesis/gate; transport failure blocks${flow.id === 'architecture-advisory' ? '; the registered reopen keeps the findings through explanation and owner close' : ''}`, async (t) => {\n    const workflow = loadWorkflow(flow.id);\n    const root = fixture(t, 'findings');",
       "currentLine": 126,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         126
@@ -3895,7 +3922,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "// all four later execute doors, including a foreign origin recorded before\n// the freeze; answering from the holder must never upgrade that origin.\nfor (const originKind of ['main', 'foreign', 'non-Git']) test(`workflow start, resume and answer refuse a ${originKind} non-holder origin before effects`, async () => {\n  const tmp = setupRepo();\n  const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8' });",
       "currentLine": 57,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         57
@@ -3921,7 +3948,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const tmp = setupRepo();\n  const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8' });\n  const holder = path.join(tmp, 'holder');\n  git('worktree', 'add', '-qb', 'holder', holder);\n  const origin = originKind === 'main' ? tmp : originKind === 'foreign' ? setupRepo() : makeFixtureDir('fgos-workflow-outside-');",
       "currentLine": 60,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         60,
@@ -3948,7 +3975,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    { id: 'land', kind: 'integrate', dependsOn: ['write'] },\n  ] });\n  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: origin, worktree: origin });\n  assert.equal(state.status, 'parked');\n  acquireDocumentationCutoverLease({ repoRoot: holder });",
       "currentLine": 68,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         50,
@@ -3983,7 +4010,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: origin, worktree: origin });\n  assert.equal(state.status, 'parked');\n  acquireDocumentationCutoverLease({ repoRoot: holder });\n  const snapshot = () => {\n    const files = {};",
       "currentLine": 70,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         70,
@@ -4010,7 +4037,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "    const walk = (dir) => {\n      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {\n        const file = path.join(dir, entry.name);\n        if (entry.isDirectory()) walk(file);\n        else files[path.relative(tmp, file)] = entry.isSymbolicLink() ? fs.readlinkSync(file) : fs.readFileSync(file).toString('base64');",
       "currentLine": 75,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         75
@@ -4039,7 +4066,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "      }\n    };\n    walk(path.join(tmp, '.fgos'));\n    return { files, refs: git('show-ref'), worktrees: git('worktree', 'list', '--porcelain'), status: git('status', '--porcelain') };\n  };",
       "currentLine": 80,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         80,
@@ -4068,7 +4095,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const before = snapshot();\n  const readOnly = validateWorkflow({ id: 'frozen-read', steps: [{ id: 'read', units: [unit('reader')] }] });\n  const startOptions = { workflow: readOnly, repoRoot: tmp, cwd: origin, worktree: origin };\n  await assert.rejects(() => startWorkflow(startOptions), { code: 'documentation-cutover-lease' });\n  assert.deepEqual(snapshot(), before);",
       "currentLine": 85,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         50,
@@ -4103,7 +4130,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  assert.deepEqual(snapshot(), before, 'no ledger or detached spawn on a refused start');\n  // Naming the holder on a later call must not rewrite this run's origin.\n  const options = { repoRoot: tmp, cwd: holder, worktree: holder };\n  const answer = { ...options, stepId: 'consent', answer: 'yes', approved: true };\n  await assert.rejects(() => resumeWorkflow(state.workflowRunId, options), { code: 'documentation-cutover-lease' });",
       "currentLine": 91,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         50,
@@ -4138,7 +4165,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const WORKER_BODY = `\n  for (const m of prompt.matchAll(/WRITE:(\\\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], m[1] + ' written\\\\n'); }\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;",
       "currentLine": 25,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         25
@@ -4164,7 +4191,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  for (const m of prompt.matchAll(/WRITE:(\\\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], m[1] + ' written\\\\n'); }\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;\n",
       "currentLine": 26,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         26
@@ -4190,7 +4217,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  const sleep = /SLEEP:(\\\\d+)/.exec(prompt);\n  if (sleep) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Number(sleep[1]));\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;",
       "currentLine": 37,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         37
@@ -4216,7 +4243,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  if (sleep) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Number(sleep[1]));\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;\n",
       "currentLine": 38,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         38
@@ -4242,7 +4269,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "const WORKER_BODY = `\n  for (const m of prompt.matchAll(/WRITE:(\\\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], m[1] + ' written\\\\n'); }\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;",
       "currentLine": 30,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         30
@@ -4268,7 +4295,7 @@
       "contextLocatorIsBound": true,
       "currentContext": "  for (const m of prompt.matchAll(/WRITE:(\\\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], m[1] + ' written\\\\n'); }\n  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\\\nThe assigned work was carried out and checked in full detail.\\\\n');\n  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));\n`;\n",
       "currentLine": 31,
-      "custody": "Same-file fixture helper joins explicit call sites in these tests; static custody only.",
+      "custody": "No same-file test caller proved: helper declaration or shared fixture needs an explicit owning caller; no joined custody claimed.",
       "exactExpressionBound": true,
       "expressionLinesAtPin": [
         31
@@ -5117,10 +5144,11 @@
       "status": "judgment-required"
     },
     {
-      "blocker": "Current source no longer contains the complete graded passage/span. Rejudge REJECT custody at this pin; do not carry the old grade over drift.",
+      "blocker": "Source was deleted by 5a33989fa39e0eb3d3253ddb4189cb502f93bd21; review retirement and successor custody for pc-d-1108. This is not a shared-helper judgment and no missing source is recreated.",
       "contextLocatorIsBound": false,
       "currentContext": "",
       "currentLine": null,
+      "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
       "exactExpressionBound": false,
       "exactPassagePresent": false,
       "exactSpanPresent": false,
@@ -5158,5 +5186,5 @@
       "status": "judgment-required"
     }
   ],
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b"
+  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f"
 }

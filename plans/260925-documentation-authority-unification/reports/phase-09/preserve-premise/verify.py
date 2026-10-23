@@ -4,7 +4,7 @@ No test runner, CLI, Git writes or live state. Final-pin acceptance stays with L
 """
 import sys
 sys.dont_write_bytecode = True
-import collections, hashlib, json, pathlib, subprocess, tempfile
+import argparse, collections, hashlib, json, pathlib, re, subprocess, tempfile
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 CENSUS = HERE.parent/'census-join'
@@ -15,20 +15,23 @@ def sha(raw):
 
 
 def main():
-    pin = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    assert not subprocess.check_output(['git','diff','--name-only','HEAD','--','docs','src','scripts','test','packages','apps'],cwd=ROOT).strip(), 'source drift outside records'
-    scratch = pathlib.Path('/tmp/fgos-work/w1-d4');scratch.mkdir(parents=True,exist_ok=True)
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--pin',default='HEAD')
+    args = ap.parse_args()
+    pin = subprocess.check_output(['git','rev-parse','--verify',args.pin+'^{commit}'],cwd=ROOT,text=True).strip()
+    assert not subprocess.check_output(['git','diff','--name-only',pin,'--','docs','src','scripts','test','packages','apps'],cwd=ROOT).strip(), 'source drift outside records / source modules differ from pin'
+    scratch = pathlib.Path('/tmp/fgos-work/w2-d4b');scratch.mkdir(parents=True,exist_ok=True)
     commands, comparisons = [], []
     with tempfile.TemporaryDirectory(prefix='double-replay-',dir=scratch) as name:
         base = pathlib.Path(name)
         for label, script, extra, owning, outputs in [
-            ('census','join.py',['--rescan'],CENSUS,['join.json','residue.json','post-pin-literals.json']),
+            ('census','join.py',['--rescan'],CENSUS,['join.json','residue.json','post-pin-literals.json','post-pin-dynamics.json']),
             ('preserve','proof.py',[],HERE,['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json']),
         ]:
             stdouts = []
             for round in (1,2):
                 out = base/(label+'-'+str(round))
-                argv = ['python3','-B',str((owning/script).relative_to(ROOT)),*extra,'--out',str(out)]
+                argv = ['python3','-B',str((owning/script).relative_to(ROOT)),*extra,'--pin',pin,'--out',str(out)]
                 run = subprocess.run(argv,cwd=ROOT,capture_output=True)
                 commands.append(dict(label=label,round=round,argv=argv,exit=run.returncode,stdout=run.stdout.decode(),stderr=run.stderr.decode()))
                 assert run.returncode == 0, run.stderr.decode()
@@ -43,9 +46,75 @@ def main():
         proof = json.loads((HERE/'proof.json').read_text())
         assert join['sourceCommit'] == proof['sourceCommit'] == pin
         assert len(join['rows']) == len({r['id'] for r in join['rows']}) == 1126
+        register = json.loads((HERE.parent.parent/'phase-08/step-08-preflip-gates.json').read_text())
+        assert {r['id'] for r in join['rows']}=={r['id'] for r in register['nonBehavioralCensusSites']}
+        residue = json.loads((CENSUS/'residue.json').read_text())
+        assert {r['id'] for r in residue['rows']}=={r['id'] for r in join['rows'] if r['status']=='judgment-required'}
+        assert all(r['owningProofs'] for r in join['rows'] if r['status']=='joined-owning-test')
+        assert not any('joins explicit call sites' in r.get('custody','') for r in residue['rows'] if not r['owningProofs'])
+        deleted = [r for r in residue['rows'] if not r['sourcePresent']]
+        assert len(deleted)==28 and all(r['deletingCommit']=='5a33989fa39e0eb3d3253ddb4189cb502f93bd21' for r in deleted)
+        for id in ('pc-d-0185','pc-d-0186'):
+            row, = [r for r in join['rows'] if r['id']==id]
+            assert row['owningProofs'][0]['testTitle']=='recovery_matrix_all_payload_kinds'
+        blobs = {}
+        def source(file):
+            if file not in blobs: blobs[file] = subprocess.check_output(['git','show',pin+':'+file],cwd=ROOT,text=True)
+            return blobs[file]
+        for row in join['rows']:
+            for proof_ref in row['owningProofs']:
+                if proof_ref['file'].endswith('.rs'):
+                    lines = source(proof_ref['file']).splitlines()
+                    assert '#[test]' in lines[proof_ref['line']-1] or '#[tokio::test' in lines[proof_ref['line']-1]
+                    assert re.search(r'fn\s+'+re.escape(proof_ref['testTitle'])+r'\s*\(',lines[proof_ref['functionLine']-1])
+        literals = json.loads((CENSUS/'post-pin-literals.json').read_text())
+        assert literals['sourceCommit']==pin and all(r.get('reason') or r.get('custody') for r in literals['rows'])
+        for row in literals['rows']:
+            for proof_ref in row.get('owningProofs',[]):
+                assert source(proof_ref['file']).splitlines()[proof_ref['line']-1].strip()=='#[test]'
+        dynamics = json.loads((CENSUS/'post-pin-dynamics.json').read_text())
+        reviewed = json.loads((HERE.parent/'reviews/w2-g2-dyn-delta.json').read_text())
+        assert dynamics['sourceCommit']==pin
+        assert dynamics['reviewedSites']==dynamics['reviewedSitesBound']==132 and dynamics['reviewedSitesUnbound']==0
+        assert sorted(r['reviewSite'] for r in dynamics['rows'] if 'reviewSite' in r)==sorted(reviewed)
+        reader_rows = [r for r in dynamics['rows'] if r.get('reviewSite',[None]*6)[5]=='reader']
+        assert len(reader_rows)==13 and len({r['reason'] for r in reader_rows})==13
+        assert all(r['status']=='judged-non-document-REJECT' and r['gradeRecord']['nonDocumentUse'] for r in reader_rows)
+        assert all(r.get('reason') and r.get('owner') for r in dynamics['rows'])
+        assert all(r['owningProofs'] for r in dynamics['rows'] if r['status']=='joined-owning-test')
         assert collections.Counter(r['stage'] for r in proof['rows']) == {'step-03':4804,'step-04':609}
         assert len({r['rowId'] for r in proof['rows']}) == 5413
-        assert len(proof['negativeDecisionProbes']) == 3 and all(r['actual'].startswith('park-') for r in proof['negativeDecisionProbes'])
+        assert len(proof['negativeDecisionProbes']) == 3 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
+        assert all('source' in r and 'spans' in r for r in proof['negativeDecisionProbes'])
+        assert len(proof['positiveEvidenceControls'])==2 and all(r['evidence'] for r in proof['positiveEvidenceControls'])
+        rows = {r['rowId']:r for r in proof['rows']}
+        review = json.loads((HERE.parent/'reviews/w2-g6-preserve-review.json').read_text())
+        live_pointers = [v['id'] for v in review['verdicts'] if v['verdict']=='REWORK' and v['reason'].startswith('live pointer to')]
+        assert len(live_pointers)==29
+        assert all(rows[id]['result']=='park-unconfirmed-preserve-premise' and rows[id]['candidateSuccessors'] and rows[id]['evidence'] is None for id in live_pointers)
+        removed_ids = ['f00515','f00521','f00525','f01225','f08411']
+        assert all(rows[id]['result']=='park-source-removed-by-cutover' and rows[id]['sourceSuccessors'] for id in removed_ids)
+        wrapper_ids = ['f05646','f05655','f05661','f05671','f05677','f05693','f05720','f05730','f05742','f06391','f06167']
+        assert all(rows[id]['result']=='judgment-preserve-with-dated-note' and rows[id]['successor']['presentAfterCutover'] for id in wrapper_ids)
+        assert rows['f06167']['evidence'] is None
+        assert rows['f07526']['result']=='park-unconfirmed-preserve-premise' and rows['f07526']['proposedDisposition']=='repoint-proposal'
+        assert rows['f07526']['successor']['path']=='docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
+        assert not any(r['result'].startswith('preserve-') for r in rows.values() if not r['sourcePresentAfterCutover'])
+        assert all(r['evidence']['text'] in r['sourceSpans'][0]['text'] for r in rows.values() if (r['evidence'] or {}).get('kind')=='explicit-external-or-example-framing')
+        wrapper_lines = []
+        # Independently enumerate wrapper positions, rather than inheriting the
+        # record's often incorrect "inside carriage" label or reason vocabulary.
+        for file in sorted({r['file'] for r in proof['rows'] if r['file'].startswith('docs/platform/') and r['sourceSha256'] is not None}):
+            raw = source(file)
+            snapshot = re.search(r'(?im)^#{1,6} Literal Snapshot\b',raw)
+            wrapper = raw[:snapshot.start()] if snapshot else raw
+            for n,line in enumerate(wrapper.splitlines(),1):
+                if 'docs/specs/runner.md' in line and ('Superseded by:' in line or 'CoordinationSession' in line and re.search(r'(?i)retir|history|historical',line)):
+                    matches = [r for r in proof['rows'] if r['file']==file and r['currentLines'] and n in r['currentLines']]
+                    assert matches and all(r['proposedDisposition']=='preserve-with-dated-note' for r in matches),(file,n)
+                    wrapper_lines.append((file,n))
+        assert len(wrapper_lines)==163
+
         assert len(proof['physical']['negativePremiseProbes']) == 3 and all(r['rejected'] for r in proof['physical']['negativePremiseProbes'])
         assert all(r.get('blocker') and r.get('owner') for r in proof['rows'] if r['proposedDisposition'] != 'preserve')
         assert len(proof['zeroEdgeBatches']) == 27
@@ -70,9 +139,12 @@ def main():
     result = dict(sourceCommit=pin,status='records-replay-passed-not-gate-acceptance',commands=commands,comparisons=comparisons,
                   scriptDigests={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in scripts},
                   counts={'G2':join['counts'],'G6':proof['counts']},wrapperReviewBatchCoverage=wrapper_coverage,
-                  negativeProbes=dict(effectiveDecisionPredicate=3,copiedL12_121HistoricalPredicate=3),
+                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=3,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=2),
+                  followupChecks=dict(reviewedDynamicSites=132,individuallyJudgedReaderHints=13,additionalDynamicSites=len(dynamics['rows'])-132,
+                                      deletedCensusSources=len(deleted),livePointersParked=29,deletedSourcePreservesParked=5,missedWrappersNowNoted=11,allEnumeratedWrapperLines=len(wrapper_lines)),
+                  manualDynamicJudgmentsSourceCommit=dynamics['judgmentSourceCommit'],
                   noReadinessClaim=True,independentApproval=False,
-                  notRun=['npm test','scripts/run-tests.mjs','cargo test --workspace','owning product tests (fixture Git writes / no need for runtime assertions in this records-only task)','fgos CLI / impact capability query (forbidden by brief)','pair accounting (Lead A1 custody)','final-pin F census and independent G2/G6 review','markdown preview (Lead custody)'])
+                  notRun=['npm test','scripts/run-tests.mjs','cargo test --workspace','owning product tests (records-only custody task; no product behavior changed, temporary fixture Git writes are allowed)','fgos CLI / impact capability query (forbidden by brief)','pair accounting (Lead A1 custody)','final-pin F census and independent G2/G6 review','markdown preview (Lead custody)'])
     (HERE/'verification.json').write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
     print(json.dumps({'byteIdenticalArtifacts':len(comparisons),'G2':join['counts'],'G6':proof['counts'],'wrapperCoverage':wrapper_coverage},sort_keys=True))
 

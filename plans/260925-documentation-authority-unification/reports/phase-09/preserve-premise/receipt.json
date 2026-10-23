@@ -1,7 +1,8 @@
 {
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+  "supersedesReceiptAtCommit": "bade6b6b3",
   "gateId": "step3-step4-preserve-premise-review",
-  "status": "records-complete-owned-judgments-open",
+  "status": "followup-records-complete-owned-judgments-open",
   "independentApproval": false,
   "noReadinessClaim": true,
   "counts": {
@@ -13,21 +14,29 @@
     "finalStep4Batches": 33,
     "matrixCatalogBatches": 136,
     "verifiedZeroEdgeBatches": 27,
-    "sourceConfirmedHistory": 3011,
-    "operandReachabilityUnchanged": 1268,
-    "ownedUnconfirmedPremiseParks": 888,
-    "ownedUnboundPassageParks": 92,
+    "sourceConfirmedHistory": 2526,
+    "operandReachabilityUnchanged": 1426,
+    "boundedConfirmations": 3952,
+    "ownedUnconfirmedPremiseParks": 1019,
+    "ownedUnboundPassageParks": 115,
     "ownedAbsentSourceParks": 2,
-    "leadDatedNoteProposals": 152,
-    "proposalSourceFiles": 89,
+    "ownedRemovedSourceParks": 162,
+    "totalParks": 1298,
+    "leadDatedNoteProposals": 163,
+    "proposalSourceFiles": 90,
+    "allWrapperLinesIndependentlyEnumerated": 163,
     "namedReviewBatchFilesCovered": 73,
     "namedReviewBatchFilesMissing": 0,
+    "namedLivePointersParkedWithSuccessors": 29,
+    "namedDeletedConsumerRowsParked": 5,
+    "missedWrappersNowNoted": 11,
     "physicalOldPathsRemoved": 1039,
     "indexBefore": 492,
     "indexAfter": 490,
-    "negativeL12_121PremiseProbes": 3,
-    "negativeEffectiveDecisionProbes": 3,
-    "byteIdenticalArtifactsAcrossG2AndG6": 7
+    "negativeL12_121ControlProbes": 3,
+    "negativeSourceBindingAndEvidenceProbes": 3,
+    "positiveEvidenceControls": 2,
+    "byteIdenticalArtifactsAcrossG2AndG6": 8
   },
   "touchedIds": {
     "owningArtifact": "proof.json",
@@ -37,43 +46,45 @@
     "retiringSelector": "retire-with-tree.json#rows[*].rowId",
     "retiringCount": 38,
     "judgmentSelector": "judgments.json#rows[*].rowId",
-    "judgmentCount": 1134,
+    "judgmentCount": 1461,
     "historyProposalSelector": "history-wrapper-proposals.json#rows[*].rowId",
-    "meaning": "New source/operand/reason/item-digest evidence rows only; no original matrix/record/owner-answer/progress edits. The exhaustive id lists live in the owning artifacts rather than duplicate receipt arrays."
+    "meaning": "New source/operand/reason/item-digest evidence only. Original records remain frozen; proposals require Lead co-composition and independent review."
+  },
+  "namedFindings": {
+    "livePointers": "All 29 reviewer-named ids are owned parks with evidence=null and reachable candidate successors, individually verified by verify.py.",
+    "deletedConsumerRows": ["f00515", "f00521", "f00525", "f01225", "f08411"],
+    "missedWrapperRows": ["f05646", "f05655", "f05661", "f05671", "f05677", "f05693", "f05720", "f05730", "f05742", "f06391", "f06167"],
+    "f06167": "Before Literal Snapshot; no literal-carriage evidence; preserve-with-dated-note proposal.",
+    "f07526": {"disposition": "repoint-proposal", "successor": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md", "applied": false}
   },
   "commands": [
     {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py"],
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
       "exit": 0
     },
     {
-      "argv": ["node", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs", "3e2d05af89313dbfbf0d26cd0de34f6b660d194b", "/tmp/fgos-work/w1-d4/<invocation-scratch>"],
-      "exit": 0,
-      "invocation": "Called by proof.py; tracked document scratch copies, pure generators and copied negative predicate, no original top-level script import."
-    },
-    {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"],
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
       "exit": 0,
       "evidence": "verification.json",
-      "proof": "Two separate G2 runs and two separate G6 runs, byte-identical artifacts and stdout, equal to delivered artifacts; exact identity conservation; named 73-file wrapper coverage."
+      "proof": "Two isolated G2 and G6 runs; eight artifact/stdout byte equalities, final identities, real negative/positive probes and independent wrapper-position enumeration."
     },
-    {"argv": ["git", "diff", "--check"], "exit": 0},
-    {
-      "command": "Read-only git status/rev-parse/log -S historicalPremise and log -S 4804; no add/commit/ref/worktree mutation",
-      "exit": 0,
-      "history": "L12-121 historicalPremise introduced in 9395aa111; extend its physical and digest-bound method rather than resurrecting a removed mechanism."
-    }
+    {"argv": ["git", "diff", "--check"], "exit": 0}
   ],
   "developmentFailures": [
-    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "Initially assumed all 163 final batches have matrix catalog entries; fixed by separately hashing and verifying the 27 omitted zero-edge batches."},
-    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "Some final records use a boolean authorAddedEdge marker; fixed by reading normalizedReference only from actual objects."},
-    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "An adversarial literal contains '..'; fixed by recording unsafe literal status and refusing scratch path lookup, without normalizing away its fixture semantics."}
+    {"command": "verify.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f (development)", "exit": 1, "reason": "Independent wrapper enumeration attempted the already-absent docs/platform/session-identity/spec.md. Fixed enumeration to scan present sources only; absent premise rows remain parked, not skipped from identity accounting."}
   ],
   "priorArt": {
-    "reused": ["L12-121 physical tracked-document scratch move and non-overwriting successor treatment", "unchanged historicalPremise predicate copied from step-07-post-move-proof.mjs", "existing enumerateDocEntries/buildEnduserIndex and computeKnowledgeProjection", "final assembler Step 4 slotKey identity recipe", "final Step 3 normalized references and source spans"],
-    "missingBeforeThisTurn": "The 9650-input L12-121 proof was Step 5-only. It did not establish any final Step 3/4 preserve premise or compose dated wrapper notes."
+    "reused": ["W1 exact span binding and reason/operand/source digests", "L12-121 physical scratch move and non-overwriting destination treatment", "unchanged historicalPremise control copied from step-07-post-move-proof.mjs", "owning document/index/knowledge generators", "final Step 4 slotKey recipe and Step 3 records"],
+    "history": "Read bade6b6b3 historical_evidence introduction and L12-26/L12-35/L12-121 before edits; no removed product mechanism restored.",
+    "missingBeforeFollowup": ["real historical_evidence negative probes", "in-passage-only example evidence", "consumer survival check", "uniform source-position wrapper treatment", "explicit pin"]
   },
-  "impactAnalysis": "degraded/unqueried under the no-CLI records boundary; no product symbol edited",
-  "notRun": ["product owning tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F replay", "independent G6 review", "product note/patch composition", "markdown preview (Lead custody)"],
+  "impactAnalysis": "degraded/unqueried under no-CLI; only scoped records scripts edited",
+  "notRun": ["product owning tests (no product behavior changed)", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F replay", "independent G6 review", "product note/repoint composition", "markdown preview (Lead custody; no out-of-scope service state)"],
+  "remainingOwners": {
+    "allParksAndNoteOrRepointComposition": "Documentation consumer-composition owner / Lead",
+    "sourceBindingAtFinalPin": "G9 source-binding reviewer / Lead",
+    "independentGateReview": "independent preserve-premise reviewer",
+    "accounting": "Lead"
+  },
   "needsWrites": []
 }

@@ -1,7 +1,8 @@
 {
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+  "supersedesReceiptAtCommit": "bade6b6b3",
   "gateId": "non-behavioral-census-join",
-  "status": "records-complete-judgments-open",
+  "status": "followup-records-complete-judgments-open",
   "independentApproval": false,
   "noReadinessClaim": true,
   "counts": {
@@ -14,11 +15,27 @@
     "judgmentFixtureSites": 159,
     "judgmentGradeSites": 21,
     "judgmentOtherSites": 7,
+    "deletedFixtureSites": 27,
+    "deletedReaderSites": 1,
+    "emptyProofHelperCustodyClaimsCorrected": 116,
+    "reviewedDynamicSitesBound": 132,
+    "reviewedDynamicSitesUnbound": 0,
+    "reviewedDynamicOwningTestJoins": 77,
+    "reviewedDynamicNonDocumentJudgments": 55,
+    "individuallyJudgedReaderHints": 13,
+    "additionalDynamicSites": 11,
+    "allDynamicDeltaSites": 143,
+    "allDynamicOwningTestJoins": 87,
+    "allDynamicNonDocumentJudgments": 56,
     "currentNewLiteralSites": 84,
     "postPinDeltaLiteralSites": 16,
     "deltaJoinedYamlFixtureSlots": 3,
-    "deltaJudgmentRequired": 13
+    "deltaJoinedConfigFixtureSlots": 5,
+    "deltaLiteralJudgmentsOpen": 8,
+    "originalLiteralJudgmentsWithIndividualReasons": 13
   },
+  "deletingCommit": "5a33989fa39e0eb3d3253ddb4189cb502f93bd21",
+  "recoveryOwningProof": "packages/git/rust/tests/recovery_matrix.rs:recovery_matrix_all_payload_kinds",
   "touchedIds": {
     "owningArtifact": "join.json",
     "selector": "rows[*].id",
@@ -26,39 +43,37 @@
     "uniqueAndExhaustiveAgainstRegister": true,
     "residueSelector": "residue.json#rows[*].id",
     "postPinLiteralSelector": "post-pin-literals.json#rows[*]",
-    "meaning": "New digest-bound custody rows only; original census/register/grades unchanged. The explicit exhaustive id list is in the owning artifact, not duplicated here."
+    "postPinDynamicSelector": "post-pin-dynamics.json#rows[*]",
+    "reviewedDynamicIdentitySelector": "post-pin-dynamics.json#rows[*].reviewSite",
+    "meaning": "All original and reviewed delta identities retained; exact current source custody, test locators or digest-bound proposed non-document grades. No independent acceptance or test execution claim."
   },
   "commands": [
     {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py", "--rescan"],
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f", "--rescan"],
       "exit": 0
     },
     {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"],
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
       "exit": 0,
       "evidence": "../preserve-premise/verification.json",
-      "proof": "Two isolated join runs, all three artifacts plus stdout byte-identical and equal to delivered bytes."
+      "proof": "Two isolated runs per generator, all eight artifacts and stdout byte-identical; original/delta identities, reader reasons and Rust/YAML locators checked."
     },
-    {
-      "argv": ["node", "--expose-internals", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs"],
-      "exit": 0,
-      "invocation": "Called by join.py with pin and source-file list on stdin; syntax parsing only."
-    }
+    {"argv": ["git", "diff", "--check"], "exit": 0}
   ],
   "developmentFailures": [
-    {
-      "command": "python3 -B census-join/join.py --rescan (initial development version)",
-      "exit": 1,
-      "reason": "A removed source file was assumed present. Fixed by checking the tracked pin tree and leaving removed-source custody unresolved, never recreating the file."
-    }
+    {"command": "read-only Python review-shape inspection", "exit": 1, "reason": "The review delta is an array, not an object; corrected inspection, no data or generator failure."}
   ],
-  "priorArt": [
-    "step-08-preflip-gates.json#nonBehavioralCensusSites",
-    "step-08-post-census-records.jsonl and step-08-post-census-join.json",
-    "Unchanged step-02l-inventory.py build() and grammar",
-    "Read-only Git history and exact diff-line rebinding; no repository mutation"
-  ],
-  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief; no product symbol edited",
-  "notRun": ["product owning tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F census", "independent census review", "markdown preview (Lead custody)"],
+  "priorArt": {
+    "reused": ["W1 join and Node bundled Acorn", "unchanged step-02l-inventory.py build and grammar", "frozen register/grade records", "exact diff-line occurrence rebinding"],
+    "history": ["bade6b6b3 introduced this records join", "5e512a829 introduced the recovery matrix parent/subprocess proof", "5a33989fa removed seat-binding conversion sources"],
+    "missingBeforeFollowup": ["explicit pin", "dynamic delta custody", "per-reader source judgments", "deleted-source attribution", "accurate ignored-parent and Rust/YAML locators"]
+  },
+  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief; only scoped records scripts edited",
+  "notRun": ["product owning tests (no product behavior changed)", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F census", "independent census review", "markdown preview (Lead custody; no out-of-scope service state)"],
+  "remainingOwners": {
+    "187OriginalJudgmentsAnd8LiteralJudgments": "Documentation integration owner / independent census reviewer",
+    "proposedDynamicGradeApproval": "independent census reviewer",
+    "finalPinRefreshAndAccounting": "Lead"
+  },
   "needsWrites": []
 }

@@ -13,10 +13,13 @@ const root = process.cwd();
 const old = path.join(root, 'plans/260925-documentation-authority-unification/reports/phase-08');
 const [pin, tmp] = process.argv.slice(2);
 assert.match(pin, /^[0-9a-f]{40}$/);
-assert.ok(tmp.startsWith('/tmp/fgos-work/w1-d4/'));
+assert.ok(tmp.startsWith('/tmp/fgos-work/w2-d4b/'));
 const sha = x => crypto.createHash('sha256').update(x).digest('hex');
 const read = n => JSON.parse(fs.readFileSync(path.join(old,n), 'utf8'));
 const git = args => execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024 });
+// Imports above are owning generators, not copies. Refuse a historical --pin
+// whose source modules differ from these bytes instead of silently using HEAD.
+assert.equal(git(['diff','--name-only',pin,'--','src']).toString(), '', 'generator source differs from --pin');
 const current = path.join(tmp, 'current'), candidate = path.join(tmp, 'candidate');
 const retained = ['docs/decisions/index.md', 'docs/enduser-docs-index.json', 'docs/architecture-manifest.json'];
 const moves = read('step-05-cutover-move-set.json').paths.filter(r => !retained.includes(r.oldPath));

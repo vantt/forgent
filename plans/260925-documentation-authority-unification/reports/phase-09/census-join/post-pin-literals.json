@@ -4,81 +4,145 @@
   "method": "Unchanged step-02l-inventory.py build() × frozen class4/5/6; compare complete lexical delta to original step-07 census. Not final pin F or behavioral completeness.",
   "rows": [
     {
+      "blocker": "Live generated instruction at .agents/skills/fgos-cook/references/route-table-pending.md:31 cites workflow milestone acceptance in docs/specs/workflow.md; it is navigation, not fixture data. Recompose the canonical core skill and regenerate this surface with the new workflow holder (L13-4).",
       "expressionSha256": "ae7284b0fbcdcaa3cef125e767dc32c6e439712b7ecbb14d722c130b25d3f5d6",
       "file": ".agents/skills/fgos-cook/references/route-table-pending.md",
       "klass": 4,
       "line": 31,
       "operand": "docs/specs/workflow.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live generated instruction at .agents/skills/fgos-cook/references/route-table-pending.md:31 cites workflow milestone acceptance in docs/specs/workflow.md; it is navigation, not fixture data. Recompose the canonical core skill and regenerate this surface with the new workflow holder (L13-4).",
       "roleHint": "reader",
       "sourceSha256": "85519f98cdcdb882c25887ab3561942d9ff6403cf33b31da80764ee005f507ae",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live generated instruction at plugins/fgOS/skills/fgos-cook/references/route-table-pending.md:31 cites workflow milestone acceptance in docs/specs/workflow.md; it is navigation, not fixture data. Recompose the canonical core skill and regenerate this surface with the new workflow holder (L13-4).",
       "expressionSha256": "ae7284b0fbcdcaa3cef125e767dc32c6e439712b7ecbb14d722c130b25d3f5d6",
       "file": "plugins/fgOS/skills/fgos-cook/references/route-table-pending.md",
       "klass": 4,
       "line": 31,
       "operand": "docs/specs/workflow.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live generated instruction at plugins/fgOS/skills/fgos-cook/references/route-table-pending.md:31 cites workflow milestone acceptance in docs/specs/workflow.md; it is navigation, not fixture data. Recompose the canonical core skill and regenerate this surface with the new workflow holder (L13-4).",
       "roleHint": "reader",
       "sourceSha256": "85519f98cdcdb882c25887ab3561942d9ff6403cf33b31da80764ee005f507ae",
       "status": "judgment-required"
     },
     {
+      "custody": "source_bytes() reads authoring-source.config.json; the owning equivalence test compares its JSON value with the reconstructed config.",
       "expressionSha256": "9962d17eead34735648d24a7f486ecb16e37d433c50dd48ef61a1c5a2fac0acf",
       "file": "packages/config/contracts/fixtures/authoring-source.config.json",
       "klass": 5,
       "line": 100,
       "operand": "docs/history/capability-aware-dispatch-activation/CONTEXT.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/config/rust/tests/authoring_equivalence.rs",
+          "functionLine": 204,
+          "line": 203,
+          "locator": "packages/config/rust/tests/authoring_equivalence.rs:standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config",
+          "sourceSha256": "fcc285c903e687e9e2a7ba7a1ac21b682f4c425998fcd5c3db23be7588cb48d1",
+          "testTitle": "standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config"
+        }
+      ],
+      "reason": "Authoring snapshot scalar at 100 retains docs/history/capability-aware-dispatch-activation/CONTEXT.md as pinned executor-description text; it is compared as configuration data, not opened as documentation. Keep the frozen fixture; review the live runner.yaml description separately.",
       "roleHint": "fixture-literal",
       "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
-      "status": "judgment-required"
+      "status": "joined-fixture-contract"
     },
     {
+      "custody": "source_bytes() reads authoring-source.config.json; the owning equivalence test compares its JSON value with the reconstructed config.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "packages/config/contracts/fixtures/authoring-source.config.json",
       "klass": 5,
       "line": 121,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/config/rust/tests/authoring_equivalence.rs",
+          "functionLine": 204,
+          "line": 203,
+          "locator": "packages/config/rust/tests/authoring_equivalence.rs:standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config",
+          "sourceSha256": "fcc285c903e687e9e2a7ba7a1ac21b682f4c425998fcd5c3db23be7588cb48d1",
+          "testTitle": "standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config"
+        }
+      ],
+      "reason": "Authoring snapshot scalar at 121 retains docs/history/agent-coordination-foundation/plan.md as pinned executor-description text; it is compared as configuration data, not opened as documentation. Keep the frozen fixture; review the live runner.yaml description separately.",
       "roleHint": "fixture-literal",
       "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
-      "status": "judgment-required"
+      "status": "joined-fixture-contract"
     },
     {
+      "custody": "source_bytes() reads authoring-source.config.json; the owning equivalence test compares its JSON value with the reconstructed config.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "packages/config/contracts/fixtures/authoring-source.config.json",
       "klass": 5,
       "line": 143,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/config/rust/tests/authoring_equivalence.rs",
+          "functionLine": 204,
+          "line": 203,
+          "locator": "packages/config/rust/tests/authoring_equivalence.rs:standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config",
+          "sourceSha256": "fcc285c903e687e9e2a7ba7a1ac21b682f4c425998fcd5c3db23be7588cb48d1",
+          "testTitle": "standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config"
+        }
+      ],
+      "reason": "Authoring snapshot scalar at 143 retains docs/history/agent-coordination-foundation/plan.md as pinned executor-description text; it is compared as configuration data, not opened as documentation. Keep the frozen fixture; review the live runner.yaml description separately.",
       "roleHint": "fixture-literal",
       "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
-      "status": "judgment-required"
+      "status": "joined-fixture-contract"
     },
     {
+      "custody": "source_bytes() reads authoring-source.config.json; the owning equivalence test compares its JSON value with the reconstructed config.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "packages/config/contracts/fixtures/authoring-source.config.json",
       "klass": 5,
       "line": 162,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/config/rust/tests/authoring_equivalence.rs",
+          "functionLine": 204,
+          "line": 203,
+          "locator": "packages/config/rust/tests/authoring_equivalence.rs:standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config",
+          "sourceSha256": "fcc285c903e687e9e2a7ba7a1ac21b682f4c425998fcd5c3db23be7588cb48d1",
+          "testTitle": "standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config"
+        }
+      ],
+      "reason": "Authoring snapshot scalar at 162 retains docs/history/agent-coordination-foundation/plan.md as pinned executor-description text; it is compared as configuration data, not opened as documentation. Keep the frozen fixture; review the live runner.yaml description separately.",
       "roleHint": "fixture-literal",
       "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
-      "status": "judgment-required"
+      "status": "joined-fixture-contract"
     },
     {
+      "custody": "source_bytes() reads authoring-source.config.json; the owning equivalence test compares its JSON value with the reconstructed config.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "packages/config/contracts/fixtures/authoring-source.config.json",
       "klass": 5,
       "line": 183,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/config/rust/tests/authoring_equivalence.rs",
+          "functionLine": 204,
+          "line": 203,
+          "locator": "packages/config/rust/tests/authoring_equivalence.rs:standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config",
+          "sourceSha256": "fcc285c903e687e9e2a7ba7a1ac21b682f4c425998fcd5c3db23be7588cb48d1",
+          "testTitle": "standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config"
+        }
+      ],
+      "reason": "Authoring snapshot scalar at 183 retains docs/history/agent-coordination-foundation/plan.md as pinned executor-description text; it is compared as configuration data, not opened as documentation. Keep the frozen fixture; review the live runner.yaml description separately.",
       "roleHint": "fixture-literal",
       "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
-      "status": "judgment-required"
+      "status": "joined-fixture-contract"
     },
     {
       "custody": "Golden parse loop consumes fixture_cases(\"parse\"); common/mod.rs resolves fixtures/parse.v1.json. Path strings are scalar parser inputs, not documentation reads.",
@@ -96,7 +160,8 @@
       "owningProofs": [
         {
           "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
-          "line": 185,
+          "functionLine": 185,
+          "line": 184,
           "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
           "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
           "testTitle": "parse_matches_the_golden_cases"
@@ -122,7 +187,8 @@
       "owningProofs": [
         {
           "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
-          "line": 185,
+          "functionLine": 185,
+          "line": 184,
           "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
           "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
           "testTitle": "parse_matches_the_golden_cases"
@@ -148,7 +214,8 @@
       "owningProofs": [
         {
           "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
-          "line": 185,
+          "functionLine": 185,
+          "line": 184,
           "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
           "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
           "testTitle": "parse_matches_the_golden_cases"
@@ -159,71 +226,83 @@
       "status": "joined-fixture-contract"
     },
     {
+      "blocker": "The refusal_json documentation at line 83 cites docs/io-contract.md as the current output-envelope contract. Repoint to docs/platform/work-state/contracts/cli-io-contract.md in the presenter co-cut; no runtime file read occurs here.",
       "expressionSha256": "db121bc2fb494549d902f1da8e326baa8153aceb424b7b3217d77a7ea5177432",
       "file": "apps/fgos/src/cli_presenter.rs",
       "klass": 6,
       "line": 83,
       "operand": "docs/io-contract.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "The refusal_json documentation at line 83 cites docs/io-contract.md as the current output-envelope contract. Repoint to docs/platform/work-state/contracts/cli-io-contract.md in the presenter co-cut; no runtime file read occurs here.",
       "roleHint": "comment",
       "sourceSha256": "0ff90c05d8fa1a81c258285884fef8bc22e1805a414ac04cd7905f9178184192",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live standard runner description at line 402 cites docs/history/capability-aware-dispatch-activation/CONTEXT.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "expressionSha256": "9962d17eead34735648d24a7f486ecb16e37d433c50dd48ef61a1c5a2fac0acf",
       "file": "core/config-standard/runner.yaml",
       "klass": 6,
       "line": 402,
       "operand": "docs/history/capability-aware-dispatch-activation/CONTEXT.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live standard runner description at line 402 cites docs/history/capability-aware-dispatch-activation/CONTEXT.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "roleHint": "help-text",
       "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live standard runner description at line 414 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "core/config-standard/runner.yaml",
       "klass": 6,
       "line": 414,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live standard runner description at line 414 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "roleHint": "help-text",
       "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live standard runner description at line 428 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "core/config-standard/runner.yaml",
       "klass": 6,
       "line": 428,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live standard runner description at line 428 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "roleHint": "help-text",
       "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live standard runner description at line 438 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "core/config-standard/runner.yaml",
       "klass": 6,
       "line": 438,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live standard runner description at line 438 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "roleHint": "help-text",
       "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
       "status": "judgment-required"
     },
     {
+      "blocker": "Live standard runner description at line 451 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
       "file": "core/config-standard/runner.yaml",
       "klass": 6,
       "line": 451,
       "operand": "docs/history/agent-coordination-foundation/plan.md",
       "owner": "Documentation integration owner / final-pin census reviewer",
+      "reason": "Live standard runner description at line 451 cites docs/history/agent-coordination-foundation/plan.md; the path is human-facing configuration text, not a loader operand. Confirm dated evidence vs current instruction in this particular executor description and co-compose any change with schema/standard parity.",
       "roleHint": "help-text",
       "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
       "status": "judgment-required"
     }
   ],
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b"
+  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f"
 }
