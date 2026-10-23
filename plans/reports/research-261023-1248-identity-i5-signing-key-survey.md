@@ -10,7 +10,7 @@ The owner moved the I5 decision (sender authenticity: per-machine signing key, t
 
 ## Survey command
 
-Read-only. It prints key types, fingerprints and counts, never key material. Run it on each machine from any directory and post the output as one board line tagged `IDENT I5 survey`.
+Read-only. It prints key types, fingerprints and counts, never key material. Run it on each machine from inside the forgent checkout (the first line needs an activated project) and post the output as one board line tagged `IDENT I5 survey`.
 
 ```bash
 echo "machine: $(fgos identity machine --json </dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["data"]["handle"])')"
