@@ -165,17 +165,11 @@ pub enum RefValue {
 #[serde(rename_all = "kebab-case")]
 pub enum ResultCode {
     Unchanged,
-    Created,
     Committed,
-    Landed,
-    ConflictedOpen,
-    ConflictAborted,
     Busy,
     Stale,
     Refused,
-    Cancelled,
     Failed,
-    PublishedCheckoutPending,
     CommittedButContractViolation,
     RemoteOutcomeUnknown,
     RecoveryRequired,
