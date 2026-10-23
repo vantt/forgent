@@ -38,7 +38,6 @@ fn floor_record(key: &serde_json::Value, v: &GitFloorVerdict) -> serde_json::Val
 /// The recorded verdict when its key equals `key` exactly; anything
 /// unreadable, foreign or different is no record.
 fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVerdict> {
-    use std::io::Read;
     #[cfg(unix)]
     let file = {
         use std::os::unix::fs::OpenOptionsExt;
@@ -143,9 +142,23 @@ static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTr
 fn io(error: std::io::Error) -> OperationError {
     failure(format!("git-driver-io: {error}"))
 }
+/// A child stopped by its limits is one failure whichever door ran it; `detail.path` says which.
+fn child_failure(cause: &'static str, path: &'static str) -> OperationError {
+    OperationError {
+        detail: Some(Box::new(serde_json::json!({ "path": path }))),
+        ..failure(cause)
+    }
+}
+fn borrow_failure(e: fgos_holder_lock::BorrowError) -> OperationError {
+    use fgos_holder_lock::BorrowError::{Deadline, OutputLimit};
+    match e {
+        Deadline { .. } => child_failure("git-timeout", "borrowed").with_diagnostic(e),
+        OutputLimit(_) => child_failure("git-output-limit", "borrowed").with_diagnostic(e),
+        e => failure(e.to_string()),
+    }
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // Other operation layers arrive after this inspection checkpoint.
 pub(crate) enum Policy {
     Inspect,
     Publication,
@@ -172,7 +185,7 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         watch: bool,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
         let run = if watch { fgos_holder_lock::run_borrowed_io_watched } else { fgos_holder_lock::run_borrowed_io };
-        run(self, spec, io).map_err(|e| failure(e.to_string()))
+        run(self, spec, io).map_err(borrow_failure)
     }
 }
 
@@ -237,16 +250,8 @@ impl GitDriver {
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
-        match driver_directory_builder(0o500).create(&hooks) {
-            Ok(()) => {
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::PermissionsExt;
-                    fs::set_permissions(&hooks, fs::Permissions::from_mode(0o500)).map_err(io)?;
-                }
-            }
-            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => (),
-            Err(e) => return Err(io(e)),
+        if fs::symlink_metadata(&hooks).is_err() {
+            secure_driver_directory(&hooks, 0o500, false)?;
         }
         check_hooks(&hooks)?;
         let git = GIT
@@ -269,7 +274,7 @@ impl GitDriver {
             hooks,
             git,
             containment: containment::select(&Default::default())
-                .map_err(|e| failure(e.to_string()))?,
+                .map_err(|e| failure("git-containment-unavailable").with_diagnostic(e))?,
         })
     }
 
@@ -543,7 +548,7 @@ impl GitDriver {
         {
             return Err(failure("untrusted-worktree"));
         }
-        fgos_holder_lock::validate(h).map_err(|e| failure(e.to_string()))?;
+        fgos_holder_lock::validate(h).map_err(borrow_failure)?;
         let out = self.invoke_input(
             Some(repo),
             root,
@@ -844,16 +849,7 @@ impl GitDriver {
         if out.success {
             return Ok(out.stdout);
         }
-        let cause = if repo.layout.promisor {
-            "promisor-object-unavailable"
-        } else if repo.layout.alternates {
-            "alternate-object-unavailable"
-        } else if repo.layout.shallow {
-            "shallow-history-incomplete"
-        } else {
-            "git-command-failed"
-        };
-        Err(out.error(cause))
+        Err(out.error(layout_cause(&repo.layout, "git-command-failed")))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1190,7 +1186,7 @@ impl GitDriver {
             fd_map: Vec::new(),
             env: env.0,
             cwd: cwd.into(),
-            stdin: Some(reader_file(stdin_r)),
+            stdin: Some(pipe_file(stdin_r)),
             stdout: Some(pipe_file(stdout_w)),
             stderr: Some(pipe_file(stderr_w)),
             mode: StartMode::Direct,
@@ -1203,11 +1199,11 @@ impl GitDriver {
         let mut domain = self
             .containment
             .create(&id)
-            .map_err(|e| failure(e.to_string()))?;
+            .map_err(|e| failure("git-containment-failed").with_diagnostic(e))?;
         let mut spawned = self
             .containment
             .spawn_in(&mut domain, spec)
-            .map_err(|e| failure(e.to_string()))?;
+            .map_err(|e| failure("git-spawn-failed").with_diagnostic(e))?;
         let input = input.to_vec();
         std::thread::spawn(move || {
             use std::io::Write;
@@ -1273,10 +1269,10 @@ impl GitDriver {
                 .map_err(io)?,
         );
         if let Some(cause) = stopped {
-            return Err(failure(cause));
+            return Err(child_failure(cause, "contained"));
         }
         if overflow.load(Ordering::Relaxed) {
-            return Err(failure("git-output-limit"));
+            return Err(child_failure("git-output-limit", "contained"));
         }
         if status.success() {
             if let Some(token) = &watch_token {
@@ -1543,6 +1539,24 @@ impl GitDriver {
     }
 }
 
+/// Why a missing object is the layout's doing rather than a damaged repository: a promisor
+/// remote or an alternate may hold it. A shallow boundary alone cuts history, never objects.
+fn object_gap_cause(layout: &RepoLayout) -> Option<&'static str> {
+    if layout.promisor {
+        Some("promisor-object-unavailable")
+    } else if layout.alternates {
+        Some("alternate-object-unavailable")
+    } else {
+        None
+    }
+}
+/// The one name for a failed read: the layout feature that explains it, else `fallback`.
+fn layout_cause(layout: &RepoLayout, fallback: &'static str) -> &'static str {
+    object_gap_cause(layout)
+        .or(layout.shallow.then_some("shallow-history-incomplete"))
+        .unwrap_or(fallback)
+}
+
 pub(crate) struct Output {
     pub(crate) stdout: Vec<u8>,
     pub(crate) stderr: Vec<u8>,
@@ -1603,44 +1617,7 @@ fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bo
             return Err(failure("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
         }
         if mode == 0o500 {
-            use std::os::fd::IntoRawFd;
-            // fdopendir owns a duplicate, leaving the checked chmod fd alive.
-            let fd = file.try_clone().map_err(io)?.into_raw_fd();
-            // SAFETY: fd is an open directory descriptor, transferred on success.
-            let directory = unsafe { libc::fdopendir(fd) };
-            if directory.is_null() {
-                // SAFETY: failed fdopendir did not take ownership.
-                unsafe { libc::close(fd) };
-                return Err(io(std::io::Error::last_os_error()));
-            }
-            let mut populated = false;
-            let mut read_error = None;
-            loop {
-                // readdir_r reports read errors explicitly and reads this descriptor.
-                let mut entry = std::mem::MaybeUninit::<libc::dirent>::uninit();
-                let mut result = std::ptr::null_mut();
-                #[allow(deprecated)]
-                // SAFETY: directory is live, entry/result are valid output storage.
-                let code = unsafe { libc::readdir_r(directory, entry.as_mut_ptr(), &mut result) };
-                if code != 0 {
-                    read_error = Some(std::io::Error::from_raw_os_error(code));
-                    break;
-                }
-                if result.is_null() {
-                    break;
-                }
-                // SAFETY: successful readdir_r returned an initialized dirent.
-                let name = unsafe { std::ffi::CStr::from_ptr((*result).d_name.as_ptr()) };
-                if name.to_bytes() != b"." && name.to_bytes() != b".." {
-                    populated = true;
-                    break;
-                }
-            }
-            // SAFETY: close the directory and its duplicate fd exactly once.
-            unsafe { libc::closedir(directory) };
-            if populated || read_error.is_some() {
-                return Err(failure(format!("trusted-hooks-not-empty-or-unreadable: {}{}; inspect it, remove foreign files or restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display(), read_error.map(|e| format!(": {e}")).unwrap_or_default())));
-            }
+            hooks_empty(path)?;
         }
         let wanted = if mode == 0o500 {
             mode
@@ -1677,11 +1654,15 @@ fn current_uid() -> u32 {
     // SAFETY: getuid has no preconditions.
     unsafe { libc::getuid() }
 }
-fn check_hooks(path: &Path) -> Result<()> {
-    trusted_directory(path)?;
+fn hooks_empty(path: &Path) -> Result<()> {
     if fs::read_dir(path).map_err(|e| failure(format!("trusted-hooks-unreadable: {}: {e}; inspect it and restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?.next().is_some() {
         return Err(failure(format!("trusted-hooks-not-empty: {}; inspect it, remove foreign files, then rerun fgos doctor --fix (git-driver-directories)", path.display())));
     }
+    Ok(())
+}
+fn check_hooks(path: &Path) -> Result<()> {
+    trusted_directory(path)?;
+    hooks_empty(path)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -1692,24 +1673,11 @@ fn check_hooks(path: &Path) -> Result<()> {
     Ok(())
 }
 #[cfg(unix)]
-fn pipe_file(pipe: std::io::PipeWriter) -> File {
-    use std::os::fd::OwnedFd;
-    File::from(OwnedFd::from(pipe))
-}
+type OwnedPipe = std::os::fd::OwnedFd;
 #[cfg(windows)]
-fn pipe_file(pipe: std::io::PipeWriter) -> File {
-    use std::os::windows::io::OwnedHandle;
-    File::from(OwnedHandle::from(pipe))
-}
-#[cfg(unix)]
-fn reader_file(pipe: std::io::PipeReader) -> File {
-    use std::os::fd::OwnedFd;
-    File::from(OwnedFd::from(pipe))
-}
-#[cfg(windows)]
-fn reader_file(pipe: std::io::PipeReader) -> File {
-    use std::os::windows::io::OwnedHandle;
-    File::from(OwnedHandle::from(pipe))
+type OwnedPipe = std::os::windows::io::OwnedHandle;
+fn pipe_file(pipe: impl Into<OwnedPipe>) -> File {
+    File::from(pipe.into())
 }
 fn capture(
     mut input: impl Read + Send + 'static,
@@ -1955,8 +1923,7 @@ impl Inspect for GitDriver {
             tips.iter().map(Oid::as_str).collect::<Vec<_>>(),
             stop.iter().map(Oid::as_str).collect::<Vec<_>>(),
             &repo.common_dir(),
-        ))
-        .map_err(|e| failure(e.to_string()))?;
+        ))?;
         let mut c: CommitCursor = match cursor {
             Some(c) if c.0.len() <= 64 * 1024 * 1024 => {
                 serde_json::from_slice(&c.0).map_err(|_| failure("invalid-walk-cursor"))?
@@ -2143,13 +2110,7 @@ impl Inspect for GitDriver {
                 return Ok(HeadFact::Unborn { target });
             }
         }
-        Err(out.error(if repo.layout.promisor {
-            "promisor-object-unavailable"
-        } else if repo.layout.shallow {
-            "shallow-history-incomplete"
-        } else {
-            "head-object-unavailable"
-        }))
+        Err(out.error(layout_cause(&repo.layout, "head-object-unavailable")))
     }
     fn list_tree(
         &self,
@@ -2193,12 +2154,8 @@ impl Inspect for GitDriver {
             input.push(0);
             let output = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
             if output.ends_with(b" missing\0") {
-                if repo.layout.promisor || repo.layout.alternates {
-                    return Err(failure(if repo.layout.promisor {
-                        "promisor-object-unavailable"
-                    } else {
-                        "alternate-object-unavailable"
-                    }));
+                if let Some(cause) = object_gap_cause(&repo.layout) {
+                    return Err(failure(cause));
                 }
                 return Ok(TreePage {
                     entries: vec![],
@@ -2431,15 +2388,7 @@ impl Inspect for GitDriver {
             &input,
         )?;
         if !out.success {
-            return Err(out.error(if repo.layout.promisor {
-                "promisor-object-unavailable"
-            } else if repo.layout.alternates {
-                "alternate-object-unavailable"
-            } else if repo.layout.shallow {
-                "shallow-history-incomplete"
-            } else {
-                "path-read-failed"
-            }));
+            return Err(out.error(layout_cause(&repo.layout, "path-read-failed")));
         }
         let mut rest = out.stdout.as_slice();
         let mut result = Vec::new();
@@ -2451,13 +2400,7 @@ impl Inspect for GitDriver {
             let header = &rest[..end];
             rest = &rest[end + 1..];
             let value = if header.ends_with(b" missing") {
-                if repo.layout.promisor {
-                    PathValue::Error(failure("promisor-object-unavailable"))
-                } else if repo.layout.alternates {
-                    PathValue::Error(failure("alternate-object-unavailable"))
-                } else {
-                    PathValue::Absent
-                }
+                object_gap_cause(&repo.layout).map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause)))
             } else {
                 let fields: Vec<_> = header.split(|b| *b == b' ').collect();
                 if fields.len() != 3 {
@@ -2521,21 +2464,7 @@ impl Inspect for GitDriver {
         Ok(config_facts(self, repo, "fgos.machineid")?.pop())
     }
     fn git_floor_verdict(&self) -> Result<GitFloorVerdict> {
-        let v = GitDriver::git_floor_verdict(self)?;
-        Ok(GitFloorVerdict {
-            version: v.version.clone(),
-            minimum: v.minimum.clone(),
-            supported: v.supported,
-            probes: v
-                .probes
-                .iter()
-                .map(|p| FloorProbe {
-                    name: p.name.clone(),
-                    passed: p.passed,
-                    evidence: p.evidence.clone(),
-                })
-                .collect(),
-        })
+        GitDriver::git_floor_verdict(self).cloned()
     }
     fn fetch_mapping_provenance(
         &self,
@@ -2550,39 +2479,41 @@ impl Inspect for GitDriver {
             }
             Err(e) => return Err(failure(format!("git-wal-unreadable: {e}"))),
         };
-        let scan = wal.scan(100_000).map_err(|e| failure(e.to_string()))?;
+        let scan = wal.scan(100_000)?;
         if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
             return Err(failure("git-wal-unreadable"));
         }
         let mut facts = Vec::new();
         for entry in scan.entries {
-            if let Ok(chain) = wal.inspect(&entry.operation_id) {
-                if matches!(
-                    chain.outcome(),
-                    Some(crate::wal::Outcome::ConfigApproved)
-                        | Some(crate::wal::Outcome::Transfer {
-                            acknowledged: true,
-                            unknown: false,
-                            ..
-                        })
-                ) {
-                    if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
-                        let crate::wal::ConfigChange {
-                            remote,
-                            url,
-                            refspecs,
-                            ..
-                        } = change.as_ref();
-                        if remote == _remote {
-                            facts.push((
-                                chain.config_sequence(),
-                                FetchMappingProvenance {
-                                    operation_id: entry.operation_id,
-                                    remote_url: url.clone(),
-                                    refspecs: refspecs.clone(),
-                                },
-                            ));
-                        }
+            if wal.compacted(&entry.operation_id)?.is_some() {
+                continue;
+            }
+            let chain = wal.inspect(&entry.operation_id)?;
+            if matches!(
+                chain.outcome(),
+                Some(crate::wal::Outcome::ConfigApproved)
+                    | Some(crate::wal::Outcome::Transfer {
+                        acknowledged: true,
+                        unknown: false,
+                        ..
+                    })
+            ) {
+                if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
+                    let crate::wal::ConfigChange {
+                        remote,
+                        url,
+                        refspecs,
+                        ..
+                    } = change.as_ref();
+                    if remote == _remote {
+                        facts.push((
+                            chain.config_sequence(),
+                            FetchMappingProvenance {
+                                operation_id: entry.operation_id,
+                                remote_url: url.clone(),
+                                refspecs: refspecs.clone(),
+                            },
+                        ));
                     }
                 }
             }
@@ -3186,6 +3117,7 @@ mod tests {
             .err()
             .unwrap();
         assert_eq!(err.cause, "git-timeout");
+        assert_eq!(err.detail.unwrap()["path"], "contained");
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -3502,13 +3434,7 @@ impl GitDriver {
         if out.success {
             Ok(out.stdout)
         } else {
-            Err(out.error(if repo.layout.promisor {
-                "promisor-object-unavailable"
-            } else if repo.layout.alternates {
-                "alternate-object-unavailable"
-            } else {
-                "git-command-failed"
-            }))
+            Err(out.error(layout_cause(&repo.layout, "git-command-failed")))
         }
     }
     fn commit_batch(

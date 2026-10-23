@@ -301,6 +301,18 @@ pub(crate) fn busy(cause: impl std::fmt::Display) -> OperationError {
         ..classified(ResultCode::Busy, cause)
     }
 }
+impl OperationError {
+    /// Free text that explains a cause belongs in `detail`, never in the cause.
+    pub(crate) fn with_diagnostic(mut self, text: impl std::fmt::Display) -> Self {
+        let mut detail = match self.detail.take().map(|d| *d) {
+            Some(serde_json::Value::Object(map)) => map,
+            _ => Default::default(),
+        };
+        detail.insert("diagnostic".into(), text.to_string().into());
+        self.detail = Some(Box::new(detail.into()));
+        self
+    }
+}
 /// Every port names a WAL failure the same way: a refusal for a request that
 /// cannot proceed, recovery-required for a log that cannot be trusted, with
 /// the diagnostic text in `detail` and never in the cause.
@@ -311,9 +323,10 @@ impl From<wal::WalError> for OperationError {
             Busy | OperationIdConflict | Untrusted | Unsupported | PublicationBorrowUnavailable => ResultCode::Refused,
             Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
         };
-        OperationError {
-            detail: e.diagnostic().map(|text| Box::new(serde_json::json!({ "diagnostic": text }))),
-            ..classified(code, e.cause())
+        let named = classified(code, e.cause());
+        match e.diagnostic() {
+            Some(text) => named.with_diagnostic(text),
+            None => named,
         }
     }
 }
@@ -418,13 +431,13 @@ pub struct ConfigFact {
     pub value: Vec<u8>,
     pub origin: PathBuf,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FloorProbe {
     pub name: String,
     pub passed: bool,
     pub evidence: String,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GitFloorVerdict {
     pub version: String,
     pub minimum: String,
