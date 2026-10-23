@@ -2087,21 +2087,30 @@ impl Inspect for GitDriver {
             self.invoke(Some(repo), &repo.trusted_main_root, args, Policy::Inspect, None, true, 4096, Duration::from_secs(30))
         };
         let target_of = |name: &str| RefName::parse(name).map_err(|_| failure("invalid-head-target"));
-        // One child answers a born HEAD: its commit, then its symbolic name (`HEAD` itself when detached).
+        // HEAD is read by two children, bracketed: the symbolic target first, then the commit with
+        // the target it was read under. One `rev-parse` reads HEAD several times, so a switch in
+        // the middle could pair one branch's commit with another's name; the two names must agree.
+        let first = head(&["symbolic-ref", "--quiet", "HEAD"])?;
+        let target = if first.success {
+            Some(target_of(line(&first.stdout).map_err(|_| failure("invalid-head-target"))?)?)
+        } else if first.code == Some(1) {
+            None
+        } else {
+            return Err(first.error("head-observation-failed"));
+        };
         let out = head(&["rev-parse", "HEAD^{commit}", "--symbolic-full-name", "HEAD"])?;
         if out.success {
             let text = line(&out.stdout).map_err(|_| failure("invalid-head-oid"))?;
             let (value, name) = text.split_once('\n').ok_or_else(|| failure("invalid-head-oid"))?;
             let commit = Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
-            return Ok(match name {
-                "HEAD" => HeadFact::Detached { commit },
-                name => HeadFact::Attached { target: target_of(name)?, commit },
-            });
+            return match (target, name) {
+                (None, "HEAD") => Ok(HeadFact::Detached { commit }),
+                (Some(target), name) if target.as_str() == name => Ok(HeadFact::Attached { target, commit }),
+                _ => Err(failure("head-changed-during-read")),
+            };
         }
         // Not born: a symbolic HEAD whose target is not listed is unborn.
-        let symbolic = head(&["symbolic-ref", "--quiet", "HEAD"])?;
-        if symbolic.success {
-            let target = target_of(line(&symbolic.stdout).map_err(|_| failure("invalid-head-target"))?)?;
+        if let Some(target) = target {
             let page = self.list_refs(
                 repo,
                 &[RefPrefix::parse(target.as_str()).map_err(|_| failure("invalid-head-target"))?],
@@ -2111,8 +2120,6 @@ impl Inspect for GitDriver {
             if !page.entries.iter().any(|e| e.name == target) && page.complete {
                 return Ok(HeadFact::Unborn { target });
             }
-        } else if symbolic.code != Some(1) {
-            return Err(symbolic.error("head-observation-failed"));
         }
         Err(out.error(layout_cause(&repo.layout, "head-object-unavailable")))
     }
