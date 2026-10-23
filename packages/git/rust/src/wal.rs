@@ -2277,6 +2277,9 @@ pub struct Backlog {
     /// Doctor consumers should surface this as capacity debt, never delete ids.
     pub ledger_capacity_warning: bool,
     pub retained_bytes: u64,
+    /// Finished chains still on disk (compacted ones live in the ledger instead).
+    pub retained_terminal: usize,
+    pub oldest_retained: Option<std::time::SystemTime>,
     pub oldest_unresolved: Option<(String, std::time::SystemTime)>,
 }
 impl<F: FileSystem> Wal<F> {
@@ -2357,6 +2360,8 @@ impl<F: FileSystem> Wal<F> {
             ledger_entries: 0,
             ledger_capacity_warning: false,
             retained_bytes: 0,
+            retained_terminal: 0,
+            oldest_retained: None,
             oldest_unresolved: None,
         };
         let mut seen = 0;
@@ -2426,6 +2431,12 @@ impl<F: FileSystem> Wal<F> {
                         result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
                     result.retained_bytes += bytes;
+                    // A compacted leftover reports no modification time, so it never counts as retained.
+                    if let (true, Some(time)) = (terminal, modified) {
+                        result.retained_terminal += 1;
+                        result.oldest_retained =
+                            Some(result.oldest_retained.map_or(time, |old| old.min(time)));
+                    }
                 }
                 result.complete &= !incomplete;
                 if !terminal {
@@ -2961,6 +2972,36 @@ mod tests {
                 assert_eq!(state, Recovery::RecoveryRequired);
             }
         }
+    }
+    #[test]
+    fn scan_counts_only_finished_chains_still_on_disk() {
+        let t = Temp::new();
+        let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let empty = w.scan(100).unwrap();
+        assert_eq!((empty.retained_terminal, empty.oldest_retained), (0, None));
+        let c = success(&w, &attempted(&w, "compacted"));
+        let c = w
+            .append(
+                &c,
+                Phase::PinReleaseAttempt {
+                    prior_target_attempt: None,
+                    expected: c.intent().next.clone(),
+                    next: Tip::Absent,
+                },
+            )
+            .unwrap();
+        let c = w.append(&c, Phase::PinReleased).unwrap();
+        let mut r = reader(c.intent());
+        r.pin = ObservedRef::Direct(Tip::Absent);
+        w.compact(&c, &r, &Authority).unwrap();
+        success(&w, &attempted(&w, "finished"));
+        attempted(&w, "pending");
+        let scan = w.scan(100).unwrap();
+        assert_eq!(
+            (scan.retained_terminal, scan.unresolved, scan.ledger_entries),
+            (1, 1, 1)
+        );
+        assert_eq!(scan.oldest_retained, w.last_change("finished"));
     }
     #[test]
     fn doctor_scan_flags_retained_ledger_capacity_without_deleting_evidence() {

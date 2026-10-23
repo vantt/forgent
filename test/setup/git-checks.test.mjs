@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { checkGit, compatibleGitContracts, fixLandRecovery } from '../../src/setup/git-checks.mjs';
+import { retentionNote } from '../../src/setup/git-retention-note.mjs';
 import { fixture as landFixture } from '../git/land-fixture.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
@@ -122,4 +123,30 @@ test('a failed Land listing is a warning in the journal row and does not hide th
   const row = checkGit(f.repo, 'git-operation-journal', f.loader, broken);
   assert.equal(row.passed, false);
   assert.match(row.message, /1 Git operation\(s\) unresolved.*; warning: Land candidate scan failed: /);
+}));
+
+test('the journal row warns when finished operations keep piling up and only informs below the line', () => {
+  const now = Date.UTC(2026, 9, 23);
+  const day = 86_400_000;
+  const facts = (retainedChains, ageDays, extra = {}) => ({ retainedChains, oldestRetainedAtMs: now - ageDays * day, retainedBytes: 2048, ...extra });
+  assert.equal(retentionNote(facts(0, 0), now), null);
+  assert.equal(retentionNote({ retainedChains: 0, oldestRetainedAtMs: null, retainedBytes: 0 }, now), null);
+  assert.equal(retentionNote(facts(64, 7), now), 'info: 64 finished Git operation(s) retained (2 KiB, oldest 7.0 days)');
+  assert.match(retentionNote(facts(65, 1), now), /^warning: 65 finished Git operation\(s\) retained \(2 KiB, oldest 1\.0 days\), past 64 operations or 7 days; .*report this row/);
+  assert.match(retentionNote(facts(3, 8), now), /^warning: 3 finished .*oldest 8\.0 days/);
+  assert.match(retentionNote({ ...facts(2, 1), oldestRetainedAtMs: null }, now), /^info: 2 finished .*age unknown/);
+  assert.match(retentionNote(facts(1, 1, { ledgerCapacityWarning: true }), now), /^warning: the Git WAL id ledger is at capacity/);
+});
+
+test('the journal row reports the retained finished operations of a real journal with their count and age', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
+  const land = f.port();
+  await land.prepare({ operationId: 'finished-one', request: f.request });
+  land.close();
+  fixLandRecovery(f.repo, f.loader, f.options);
+  const row = checkGit(f.repo, 'git-operation-journal', f.loader, f.options);
+  assert.equal(row.passed, true);
+  // The Land chain and the candidate worktree's own chain are both finished and retained.
+  assert.match(row.message, /info: 2 finished Git operation\(s\) retained \(\d+ KiB, oldest 0\.0 days\)/);
+  assert.equal(row.detail.journal.retainedChains, 2);
+  assert.equal(typeof row.detail.journal.oldestRetainedAtMs, 'number');
 }));

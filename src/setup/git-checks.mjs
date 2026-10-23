@@ -11,6 +11,7 @@ import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import fs from 'node:fs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
+import { retentionNote } from './git-retention-note.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
 // A checkout kept for its owner (dirty) or locked by a still-running process is not a broken registration.
@@ -58,6 +59,7 @@ export function checkGit(cwd, kind, loaderOptions, portOptions) {
         const { journal } = facts;
         const fenceMissing = journal.initialized && facts.activationFence === false;
         const landWarning = journal.initialized && !fenceMissing ? retainedLandWarning(cwd, loaderOptions, portOptions) : null;
+        const notes = [landWarning, retentionNote(journal)].filter(Boolean);
         // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
         const verdict = row([
           fenceMissing && 'git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)',
@@ -65,8 +67,8 @@ export function checkGit(cwd, kind, loaderOptions, portOptions) {
           journal.initialized && !journal.complete && 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`',
           journal.errors.length && `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\``,
           journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land operations`,
-        ], landWarning ?? 'the Git WAL is readable with no unresolved operation', { journal, retainedLand: landWarning });
-        return landWarning && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${landWarning}` } : verdict;
+        ], notes.some(n => n.startsWith('warning:')) ? notes.join('; ') : ['the Git WAL is readable with no unresolved operation', ...notes].join('; '), { journal, retainedLand: landWarning });
+        return notes.length && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${notes.join('; ')}` } : verdict;
       }
       case 'git-native-locks': return row([facts.nativeLocks.length && `${facts.nativeLocks.length} native Git lock(s) present and never removed by fgOS; follow the runbook in docs/platform/git/spec.md section 11`], 'no native Git locks detected', { nativeLocks: facts.nativeLocks });
       default: throw new Error(`unknown Git check: ${kind}`);
