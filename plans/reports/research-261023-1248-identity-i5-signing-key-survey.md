@@ -29,9 +29,9 @@ echo "push transport: $(git remote get-url origin 2>/dev/null | sed -E 's#^(http
 | Machine | OpenSSH | SSH key pairs | ssh-agent | Git signing configured | GPG secret keys | Push transport |
 |---|---|---|---|---|---|---|
 | `fg-server` | 10.2p1 (`ssh-keygen -Y sign` available) | none (`~/.ssh` holds only `authorized_keys` and `known_hosts`) | 0 keys | no | 0 | https, credential helper `gh auth git-credential` |
-| `fg-server2` | pending | | | | | |
+| `fg-server2` | 10.2p1 (`-Y sign` available) | none | 0 keys | no | 0 | https (survey by `claude-muyt@fg-server2`, board 14:05) |
 | `design-lap` | 8.9p1 (`-Y sign` available) | two ED25519 pairs without passphrase, both deploy keys named for other jobs (`fgos-prod-sync`, `vnflow_deploy`); not machine identity keys and not to be reused | 0 keys | no | 0 | https |
 
-## Reading so far
+## Reading
 
-`fg-server` and `design-lap` have no key fit to sign as the machine (`design-lap`'s two keys belong to deploy jobs), so "use the keys already on the machine" would mean creating one there anyway. The choice is then between creating a key by hand per machine (SSH format, signed with `ssh-keygen -Y sign`, which OpenSSH 10.2 has) and Identity minting it in `fgos doctor --fix`, like the machine id. The decision question goes to the owner when the other two rows are filled.
+No machine has a key fit to sign as the machine: `fg-server` and `fg-server2` have no key pair at all, and `design-lap`'s two keys belong to deploy jobs. No machine has Git signing or GPG configured, and every machine pushes over https with a token. "Reuse the keys already on the machine" is therefore not available; every machine needs a new key whichever option is chosen. All three machines have OpenSSH 8.9 or later, so `ssh-keygen -Y sign` / `-Y verify` (OpenSSH 8.1+) is available everywhere and needs no new crypto dependency. The decision question goes to the owner with this evidence (2026-10-23 16:45).

@@ -5,8 +5,8 @@
 
 use fgos_identity::session::{self, Local, PidFacts};
 use fgos_identity::{
-    env_identity, machine, machine_info, session_info, tree_identity, writer_answer, ProcStat,
-    ProcessTree, Source, WriterId, WriterIdentity, ENV_ORDER,
+    env_identity, machine, machine_info, session_for, session_info, tree_identity, writer_answer, ProcStat,
+    ProcessTree, Source, WriterId, WriterIdentity, WriterKey, ENV_ORDER, MAX_ID_LENGTH,
 };
 use serde_json::json;
 use std::collections::HashMap;
@@ -155,5 +155,37 @@ fn the_session_follows_the_machine_alias() {
     let info = session_info(&identity, &machine_info(&root).unwrap(), &no_facts).unwrap();
     assert!(info.handle.ends_with("@owner"), "{}", info.handle);
     assert_eq!(info.id, "fg-server-abc234/s-1", "the id keeps the machine id, never the alias");
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_hook_carried_key_names_the_session_the_env_path_names_and_refuses_what_the_rule_refuses() {
+    let root = state_root();
+    assert_eq!(
+        session_for(&root, &WriterKey { source: "CODEX_THREAD_ID", value: "t-1" }).unwrap_err().reason,
+        "machine-id-missing"
+    );
+    fs::write(root.join("machine-id"), "fg-server-abc234\n").unwrap();
+    let machine = machine_info(&root).unwrap();
+    for (source, value) in [
+        ("CLAUDE_CODE_SESSION_ID", "9493ac81"),
+        ("CODEX_THREAD_ID", " 01a13f6f "),
+        ("FGOS_SESSION_ID", "att-run-1"),
+        ("FGOS_SESSION_ID", "fgos-a"),
+    ] {
+        let by_env = session_info(&from_env(&[(source, value)]), &machine, &no_facts).unwrap();
+        let by_key = session_for(&root, &WriterKey { source, value }).unwrap();
+        assert_eq!(by_key.info, by_env, "{source}={value:?}");
+        assert_eq!(by_key.local.cli, session::local(&from_env(&[(source, value)]), &no_facts).unwrap().cli);
+    }
+    for (source, value) in [
+        ("PI_SESSION_ID", "s-1"),
+        ("CODEX_THREAD_ID", ""),
+        ("CODEX_THREAD_ID", "has space"),
+        ("CODEX_THREAD_ID", &"a".repeat(MAX_ID_LENGTH + 1)),
+    ] {
+        let refusal = session_for(&root, &WriterKey { source, value }).unwrap_err();
+        assert_eq!(refusal.reason, "invalid-writer-key", "{source}={value:?}");
+    }
     let _ = fs::remove_dir_all(root);
 }

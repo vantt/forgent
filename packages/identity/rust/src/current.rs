@@ -6,7 +6,7 @@
 use crate::errors::Error;
 use crate::machine;
 use crate::refusal::Refusal;
-use crate::resolve::{resolve, WriterIdentity};
+use crate::resolve::{resolve, WriterIdentity, WriterKey};
 use crate::session::{self, Local, PidFacts};
 use fgos_process::facts::Record;
 use serde::Serialize;
@@ -140,6 +140,29 @@ pub fn current_session(
         detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
         candidates: Vec::new(),
     })?;
-    let info = info_of(&local, &machine);
-    Ok(CurrentSession { local, info })
+    Ok(named(&machine, local))
+}
+
+fn named(machine: &MachineInfo, local: Local) -> CurrentSession {
+    let info = info_of(&local, machine);
+    CurrentSession { local, info }
+}
+
+/// The session a hook-carried key names on this machine, for a caller whose
+/// own env does not carry it (`invalid-writer-key` when `key.source` is not
+/// one of the writer-id rule's env variables or the value is not a usable id).
+/// Same id, handle and CLI as [`current_session`] gives a process whose env
+/// holds the same key.
+pub fn session_for(state_root: &Path, key: &WriterKey) -> Result<CurrentSession, Refusal> {
+    let local = session::key_local(key).ok_or_else(|| Refusal {
+        reason: "invalid-writer-key",
+        detail: format!(
+            "{:?} is not a writer key: the source must be one of {} and the value a non-empty id of at most {} characters of letters, digits, '.', '_' or '-'",
+            key.source,
+            crate::resolve::ENV_ORDER.join(", "),
+            crate::resolve::MAX_ID_LENGTH,
+        ),
+        candidates: Vec::new(),
+    })?;
+    Ok(named(&machine_info(state_root)?, local))
 }
