@@ -47,7 +47,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
-| RULE (owner gọi là PROSE) | `lead:RULE`, `lead:PROSE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:10) (nhận thêm vai `lead:PROSE` 10-23 11:27; owner gọi lane này là PROSE, suy ra vì bốn phiên owner kể tên là CFG, COOK, MAILBOX, PROSE và PROSE là phiên còn lại trên `fg-server`; sai thì owner sửa) | `fg-server` |
+| RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:12; owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên. `fgos identity` không có cách nhả vai, nên phiên này vẫn còn thêm vai `lead:PROSE`; IDENT ghi việc thiếu lệnh nhả vai) | `fg-server` |
 | DOC | `lead:DOC` | chưa ghi | ? |
 
 ## Các luồng
