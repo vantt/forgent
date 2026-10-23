@@ -120,3 +120,9 @@ From the preparation report: sender labels, canaries read from the body, the Cla
 - Codex: the `PostToolUse`-only adapter, measured again (V7c); the Stop channel stays off for Codex.
 - The loop test in interactive heads, and forced limits with scenarios that reach them.
 - Claim-start recording (V7 Q4).
+
+## Gates (2026-10-23, branch at `41edf8271`)
+
+- `cargo test -p fgos-mailbox -p fgos-mailbox-core`: green; the four V6 test files: 31 of 31; `report` reproduces every per-cell number above (diffed against the stage B report); `node test/live/mailbox-claude.live.mjs check`: every dry case passed.
+- `npm test -- --test-concurrency=4`: 8716 tests, 8600 passed, 18 failed. All 18 also fail on a clean `origin/main` worktree (`bdd6a34ea`) run on this machine (`test/runner/dispatch.test.mjs`: no enabled account of pool "openai" holds a Codex login store; `test/rust-host/fgctl-upgrade.test.mjs` and `fgctl-init-download-sources.test.mjs`: the git driver refuses a group-writable temporary state directory), so none is caused by the branch.
+- `cargo test --workspace`: every test result `ok`, 0 failed.
