@@ -2,7 +2,8 @@
 //! small JSON object in `runtime/mailbox/hook-outcome.json`, beside the
 //! record, so an operator or a later `status` sees why mail was not taken
 //! (a payload over the read cap, an open breaker, a caller that is not the
-//! head, a record error, a panic, a finish that warned). A benign call (mail
+//! head, a record error, a panic, a finish that warned, a newly bound head
+//! Identity did not take: `ident-handle-in-use` or `ident:<reason>`). A benign call (mail
 //! taken, nothing eligible, a subordinate, no head, a runner head) writes
 //! nothing, so the no-mail path stays write-free and the doctor probe writes
 //! nothing. The file holds one outcome, the latest, so it never grows. It is
@@ -53,9 +54,21 @@ pub fn record(
     outcome: &ShellOutcome,
     now: Timestamp,
 ) {
-    let Some(reason) = reason(outcome) else {
-        return;
-    };
+    if let Some(reason) = reason(outcome) {
+        record_reason(paths, adapter, event, &reason, now);
+    }
+}
+
+/// Records `reason` as the latest skipped or failed step of a hook call;
+/// also used by the entry for a step after the shell (making sure Identity
+/// knows a newly bound head).
+pub fn record_reason(
+    paths: &Paths,
+    adapter: Adapter,
+    event: HookEvent,
+    reason: &str,
+    now: Timestamp,
+) {
     let Some(dir) = trusted_mailbox_dir(paths) else {
         return;
     };
@@ -67,7 +80,7 @@ pub fn record(
             HookEvent::Stop => "stop",
             HookEvent::PostToolUse => "post-tool-use",
         },
-        reason: &reason,
+        reason,
     };
     if let Ok(bytes) = serde_json::to_vec(&line) {
         let _ = fgos_durable_file::replace_durably(&dir, Paths::hook_outcome_name(), &bytes);

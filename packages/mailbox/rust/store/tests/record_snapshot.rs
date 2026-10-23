@@ -206,6 +206,7 @@ fn each_core_answer_writes_exactly_when_it_changed_the_state() {
             .hold(Wait::Try, T0, &limits, |_, _| Begun::Quiet {
                 reason: QuietReason::NothingEligible,
                 state_changed,
+                registered: None,
             })
             .unwrap();
         wrote(

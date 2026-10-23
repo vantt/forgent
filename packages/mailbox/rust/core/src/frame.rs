@@ -17,6 +17,9 @@ const GUTTER: &str = "| ";
 
 /// The `agent` value of a sender with no head.
 const NO_AGENT: &str = "unregistered";
+/// The handle a frame shows for a head whose handle the store could not
+/// derive (no machine id yet).
+const NO_HANDLE: &str = "unknown";
 
 /// The contract's sections, `(name, text)`, in file order; parsed once.
 pub fn frame_sections() -> &'static [(&'static str, &'static str)] {
@@ -214,6 +217,11 @@ fn render_message(
     let from = escape_header(&sender.label, limits);
     let id = escape_header(item.id.as_str(), limits);
     let agent = escape_header(sender.cli.as_ref().map_or(NO_AGENT, |c| c.as_str()), limits);
+    let handle = match (&sender.handle, sender.has_head) {
+        (Some(handle), true) => escape_handle(handle, limits),
+        (_, true) => NO_HANDLE.to_string(),
+        (_, false) => NO_AGENT.to_string(),
+    };
     let attempt = item.attempt.to_string();
     let reply = if sender.has_head {
         fill(section("message.reply"), &[("from", &from), ("id", &id)])
@@ -229,6 +237,7 @@ fn render_message(
         &[
             ("from", &from),
             ("agent", &agent),
+            ("handle", &handle),
             ("id", &id),
             ("attempt", &attempt),
             ("body", &body),
@@ -276,7 +285,13 @@ pub fn worst_case_len(item: &ClaimedItem, body_bytes: u64, limits: &Limits) -> u
         ClaimedWhat::Notice(facts) => render_notice(item, facts, limits).len(),
         ClaimedWhat::Mail(from) => {
             let bytes = usize::try_from(body_bytes).unwrap_or(usize::MAX);
-            let around = render_message(item, from, Some(""), limits).len();
+            // The handle is derived after the claim, so the frame around
+            // the body is measured with the longest handle a header holds.
+            let longest = MailFrom {
+                handle: Some("x".repeat(limits.frame.max_header_chars as usize)),
+                ..from.clone()
+            };
+            let around = render_message(item, &longest, Some(""), limits).len();
             let body = bytes
                 .saturating_mul(ENTITY_GROWTH)
                 .saturating_add(bytes.saturating_add(1).saturating_mul(GUTTER_GROWTH));

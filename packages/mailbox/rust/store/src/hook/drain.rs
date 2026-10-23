@@ -33,9 +33,9 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored};
 use fgos_mailbox_core::{
-    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, Finished, Generation,
-    IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest, Registered,
-    Timestamp, WriterKey, FRAME_SEPARATOR,
+    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat, Cli, Finished,
+    Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest,
+    Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
 };
 use fgos_process::facts::Record;
 
@@ -149,6 +149,10 @@ pub enum Begun {
     Quiet {
         reason: QuietReason,
         state_changed: bool,
+        /// The generation this call created or replaced the binding with;
+        /// `None` when the head was already bound (or nothing registered).
+        /// A registering call is always quiet: a new generation has no mail.
+        registered: Option<Generation>,
     },
     /// A claim to render, write and finish; a claim always changes the
     /// snapshot.
@@ -166,7 +170,20 @@ impl Begun {
             Self::Claimed(_) | Self::Pointer(_) => true,
         }
     }
+
+    /// The generation a registering call created or replaced.
+    pub fn registered(&self) -> Option<Generation> {
+        match self {
+            Self::Quiet { registered, .. } => *registered,
+            Self::Claimed(_) | Self::Pointer(_) => None,
+        }
+    }
 }
+
+/// Derives a sender's Identity handle from its writer key and CLI when a
+/// frame is rendered; `None` when it cannot be derived. The wiring builds
+/// it from Identity's doors; the store never derives a handle itself.
+pub type HandleOf<'a> = dyn Fn(&WriterKey, &Cli) -> Option<String> + 'a;
 
 /// What the shell writes to stdout; empty when quiet.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -179,6 +196,7 @@ fn quiet(reason: QuietReason) -> Begun {
     Begun::Quiet {
         reason,
         state_changed: false,
+        registered: None,
     }
 }
 
@@ -237,12 +255,18 @@ pub fn begin(
         head: head_text(&call.head.record),
         handle: call.head.handle.clone().or(session_handle),
     };
-    let (generation, mut changed) = match state.register(request, judged, now, limits, ids) {
-        Ok(Registered::Refreshed { generation, .. }) => (generation, false),
+    let (generation, registered) = match state.register(request, judged, now, limits, ids) {
+        Ok(Registered::Refreshed { generation, .. }) => (generation, None),
         Ok(Registered::Created { generation, .. } | Registered::Replaced { generation, .. }) => {
-            (generation, true)
+            (generation, Some(generation))
         }
         Err(refusal) => return quiet(QuietReason::Registration(refusal)),
+    };
+    let mut changed = registered.is_some();
+    let after = |reason, state_changed| Begun::Quiet {
+        reason,
+        state_changed,
+        registered,
     };
     let key = &call.writer;
     let checkpoint = match call.event {
@@ -253,10 +277,7 @@ pub fn begin(
                 .facts(call.adapter)
                 .is_some_and(|facts| facts.stop_delivers)
             {
-                return Begun::Quiet {
-                    reason: QuietReason::StopChannelOff,
-                    state_changed: changed,
-                };
+                return after(QuietReason::StopChannelOff, changed);
             }
             if payload.first_stop == Some(true) {
                 changed |= state.note_stop(key, generation, false);
@@ -264,10 +285,7 @@ pub fn begin(
             let blocks = state.binding(key).map_or(0, |b| b.stop_blocks);
             if blocks >= hook.stop_block.max {
                 changed |= state.note_stop(key, generation, false);
-                return Begun::Quiet {
-                    reason: QuietReason::StopBlockCap,
-                    state_changed: changed,
-                };
+                return after(QuietReason::StopBlockCap, changed);
             }
             Checkpoint::Stop
         }
@@ -276,12 +294,7 @@ pub fn begin(
             .and_then(|facts| facts.post_tool_use_max_bytes)
         {
             Some(bound) => Checkpoint::BoundedStep(bound),
-            None => {
-                return Begun::Quiet {
-                    reason: QuietReason::NoStepBound,
-                    state_changed: changed,
-                }
-            }
+            None => return after(QuietReason::NoStepBound, changed),
         },
     };
     let claim = state.claim(key, generation, checkpoint, now, limits, ids);
@@ -296,10 +309,7 @@ pub fn begin(
         if checkpoint.is_stop() {
             changed |= state.note_stop(key, generation, false);
         }
-        return Begun::Quiet {
-            reason: QuietReason::NothingEligible,
-            state_changed: changed,
-        };
+        return after(QuietReason::NothingEligible, changed);
     };
     Begun::Claimed(Claimed {
         items: claim.items,
@@ -317,16 +327,24 @@ pub fn begin(
 /// Outside the mutex: every claimed item's frame, joined by one blank line,
 /// then the pointer line when items were left as too large, in the output
 /// shape the CLI was recorded injecting. A body the store could not read
-/// gets the contract's body-missing line.
+/// gets the contract's body-missing line. A sender's handle is derived
+/// here, through `handle_of`, for the frame header only.
 pub fn render_reply(
     claimed: &Claimed,
     bodies: &dyn Fn(&MessageId) -> Option<String>,
+    handle_of: &HandleOf<'_>,
     limits: &Limits,
 ) -> HookReply {
     let mut parts: Vec<String> = claimed
         .items
         .iter()
-        .map(|item| render(item, bodies(&item.id).as_deref(), limits))
+        .map(|item| {
+            let mut item = item.clone();
+            if let ClaimedWhat::Mail(from) = &mut item.what {
+                from.handle = from.cli.as_ref().and_then(|cli| handle_of(&from.key, cli));
+            }
+            render(&item, bodies(&item.id).as_deref(), limits)
+        })
         .collect();
     if claimed.too_large > 0 {
         parts.push(too_large_pointer(claimed.too_large));

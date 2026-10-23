@@ -1,4 +1,9 @@
-//! Identity names as `send` addresses (spec §5.1.1): an Identity handle
+//! The mailbox's use of Identity, in the host wiring only (the mailbox
+//! crates never call Identity): a head's handle derived for a frame header,
+//! a newly bound head made known to Identity's directory, and Identity names
+//! as `send` addresses.
+//!
+//! Addresses (spec §5.1.1): an Identity handle
 //! (`claude-5v7u@fg-server`), a full id (`<machine-id>/<local id>`) or a role
 //! alias (`lead:<LANE>`), resolved through Identity's own doors and delivered
 //! only to a head this project's record holds. The mailbox crates never see
@@ -10,14 +15,24 @@
 //! resolved session is used only when it is one of this record's heads, a
 //! role delivery names the holder in the report, and candidates are cut to
 //! this record's heads, never the machine's sessions.
-use fgos_identity::directory::{resolve, ROLE_PREFIX};
+use fgos_identity::directory::{register_writer, resolve, ROLE_PREFIX};
 use fgos_identity::resolve::{WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
+use fgos_mailbox::hook::shell::RegisteredHead;
 use fgos_mailbox::verbs::HeadView;
 use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Cli, Liveness, WriterKey};
 use fgos_process::facts::judge_here;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+/// Identity's state root, as the `identity` verbs resolve it (an explicit
+/// `FGOS_STATE_ROOT` wins); `None` without a `HOME`, so a caller with no
+/// home reads and writes no machine state.
+pub fn state_root() -> Option<PathBuf> {
+    std::env::var_os("HOME")
+        .filter(|home| !home.is_empty())
+        .map(|_| fgos_holder_lock::state_root::state_root().0)
+}
 
 /// What a typed `--to` becomes.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -43,18 +58,53 @@ pub fn is_alias(to: &str) -> bool {
 /// by Identity from the head's key and CLI. `None` when Identity has no
 /// session-id variable for that CLI or no machine id yet.
 pub fn session_of(state_root: &Path, key: &WriterKey, cli: &Cli) -> Option<SessionInfo> {
+    let key = identity_key(key, cli)?;
+    session_for(state_root, &key)
+        .ok()
+        .map(|session| session.info)
+}
+
+/// The head's key as Identity takes it: the session-id variable Identity
+/// names `cli` by, and the key's value.
+fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
     let source = ENV_ORDER
         .iter()
         .find(|var| cli_of(var, key.as_str()) == cli.as_str())?;
-    session_for(
-        state_root,
-        &IdentityKey {
-            source,
-            value: key.as_str(),
-        },
-    )
-    .ok()
-    .map(|session| session.info)
+    Some(IdentityKey {
+        source,
+        value: key.as_str(),
+    })
+}
+
+/// After a hook call bound a head to a new generation: makes sure Identity
+/// knows that head, once per head process (steady calls never get here).
+/// Its own handle is resolved read-only first: found with its own id, done;
+/// found with another id, a handle collision, nothing registered; not
+/// found, Identity's `register_writer` door with the key from the payload
+/// and the head process the hook verified. Returns the hook-outcome reason
+/// when it did not hold; nothing is retried in this process.
+pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &RegisteredHead) -> Option<String> {
+    let refused = |reason: &str| Some(format!("ident:{reason}"));
+    let Some(key) = identity_key(&head.writer, cli) else {
+        return refused("no-session-variable");
+    };
+    let own = match session_for(state_root, &key) {
+        Ok(session) => session.info,
+        Err(refusal) => return refused(refusal.reason),
+    };
+    match resolve(state_root, &own.handle, &judge_here) {
+        Ok(listed) if listed.id == own.id => None,
+        Ok(_) => Some("ident-handle-in-use".to_string()),
+        Err(refusal) if refusal.reason == "not-found" => {
+            let Some(pid) = head.head.record.pid else {
+                return refused("head-unknown");
+            };
+            register_writer(state_root, None, &key, pid.0, &[], false)
+                .err()
+                .and_then(|refusal| refused(refusal.reason))
+        }
+        Err(refusal) => refused(refusal.reason),
+    }
 }
 
 /// Resolves the alias `to` against Identity's directory under `state_root`

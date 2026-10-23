@@ -15,6 +15,7 @@
 //! then the shell, which reads the breaker before stdin, opens the record
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
+use super::mailbox_identity::{ensure_registered, session_of, state_root};
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::hook::outcome_log;
@@ -23,7 +24,7 @@ use fgos_mailbox::hook::shell::{self, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::limits::{load, read_project_config};
 use fgos_mailbox::record::Paths;
-use fgos_mailbox_core::Timestamp;
+use fgos_mailbox_core::{Cli, Timestamp, WriterKey};
 use std::ffi::OsString;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -110,6 +111,11 @@ fn run(args: &[OsString]) {
     let resolve = resolver_for(adapter, facts, &env, &loaded.hook.hook);
     let project = super::mailbox_root::project_name(&fgos_dir);
     let ancestry = || ancestry_of(std::process::id());
+    // HOME is set (checked first), so Identity's state root resolves here.
+    let identity_root = state_root();
+    let handle_of = |key: &WriterKey, cli: &Cli| {
+        session_of(identity_root.as_deref()?, key, cli).map(|info| info.handle)
+    };
     let input = ShellInput {
         adapter,
         event,
@@ -121,6 +127,7 @@ fn run(args: &[OsString]) {
         clock: &now,
         ancestry: &ancestry,
         resolve: &resolve,
+        handle_of: &handle_of,
         gate,
     };
     let outcome = shell::run(
@@ -128,5 +135,16 @@ fn run(args: &[OsString]) {
         &mut std::io::stdin().lock(),
         &mut std::io::stdout().lock(),
     );
-    outcome_log::record(&Paths::new(&fgos_dir), adapter, event, &outcome, now());
+    let paths = Paths::new(&fgos_dir);
+    outcome_log::record(&paths, adapter, event, &outcome, now());
+    // A newly bound head (a quiet call by construction, so the write gate
+    // is still idle and the watchdog still covers this step).
+    let ident = outcome
+        .registered
+        .as_ref()
+        .zip(adapter.cli())
+        .and_then(|(head, cli)| ensure_registered(identity_root.as_deref()?, &cli, head));
+    if let Some(reason) = ident {
+        outcome_log::record_reason(&paths, adapter, event, &reason, now());
+    }
 }

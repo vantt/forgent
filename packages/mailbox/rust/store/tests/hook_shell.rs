@@ -112,6 +112,7 @@ fn gated_call(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
+        handle_of: &|_, _| None,
         gate,
     };
     run(input, &mut &stdin[..], stdout)
@@ -540,6 +541,7 @@ fn call_as(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
+        handle_of: &|_, _| None,
         gate: WriteGate::new(),
     };
     run(input, &mut &stdin[..], stdout)
@@ -624,6 +626,7 @@ fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_bef
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
+        handle_of: &|_, _| None,
         gate: WriteGate::new(),
     };
     let outcome = run(input, &mut watched, &mut Vec::new());
@@ -925,6 +928,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
+        handle_of: &|_, _| None,
         gate: WriteGate::new(),
     };
     let mut out = Vec::new();
@@ -961,6 +965,7 @@ fn a_malformed_payload_never_opens_or_creates_the_record() {
             clock: &clock,
             ancestry: &ancestry,
             resolve: &resolve,
+            handle_of: &|_, _| None,
             gate: WriteGate::new(),
         };
         let outcome = run(input, &mut &stdin[..], &mut Vec::new());
@@ -1078,4 +1083,76 @@ fn a_call_that_skipped_or_failed_its_drain_leaves_its_reason_in_the_hook_outcome
     let line: serde_json::Value =
         serde_json::from_slice(&std::fs::read(paths.hook_outcome()).unwrap()).unwrap();
     assert_eq!(line["reason"], "warning");
+}
+
+#[test]
+fn a_hook_call_that_created_or_replaced_a_binding_reports_it_as_registered_and_a_refreshing_call_does_not(
+) {
+    let fgos = TempFgos::new("shell-registered");
+    let record = fgos.record();
+    let (stdin, writer) = payload(files::POST_TOOL_USE);
+    let first_head = Head::spawn();
+
+    let created = call(
+        &record,
+        &first_head,
+        first_head.ancestry(),
+        &stdin,
+        &mut Vec::new(),
+        T0,
+    );
+    let refreshed = call(
+        &record,
+        &first_head,
+        first_head.ancestry(),
+        &stdin,
+        &mut Vec::new(),
+        T0,
+    );
+    drop(first_head);
+    let second_head = Head::spawn();
+    let replaced = call(
+        &record,
+        &second_head,
+        second_head.ancestry(),
+        &stdin,
+        &mut Vec::new(),
+        T0,
+    );
+
+    let created = created.registered.expect("the first call registered");
+    assert_eq!(created.generation, fgos_mailbox_core::Generation::FIRST);
+    assert_eq!(created.writer, writer);
+    assert_eq!(refreshed.registered, None);
+    let replaced = replaced
+        .registered
+        .expect("a new head replaced the dead one");
+    assert_eq!(replaced.generation, created.generation.next().unwrap());
+    assert_eq!(replaced.head.record, second_head.record());
+}
+
+#[test]
+fn a_registering_hook_call_emits_no_frame() {
+    let fgos = TempFgos::new("shell-registering-quiet");
+    let record = fgos.record();
+    let first_head = Head::spawn();
+    // Mail waits for the first generation; a takeover must never offer it.
+    registered_with_mail(&record, &first_head);
+    drop(first_head);
+    let second_head = Head::spawn();
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    let mut stdout = Vec::new();
+
+    let outcome = call(
+        &record,
+        &second_head,
+        second_head.ancestry(),
+        &stdin,
+        &mut stdout,
+        T0,
+    );
+
+    assert!(outcome.registered.is_some());
+    assert!(stdout.is_empty(), "{}", String::from_utf8_lossy(&stdout));
+    assert!(outcome.claimed.is_empty());
 }

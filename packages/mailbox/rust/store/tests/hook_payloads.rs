@@ -222,7 +222,12 @@ impl Drain {
     /// The shell after a claim: render, write (here: return), finish.
     fn deliver(&mut self, claimed: &Claimed) -> String {
         let bodies = self.bodies.clone();
-        let reply = render_reply(claimed, &|id| bodies.get(id).cloned(), &limits());
+        let reply = render_reply(
+            claimed,
+            &|id| bodies.get(id).cloned(),
+            &|_, _| None,
+            &limits(),
+        );
         let now = self.tick();
         finish(&mut self.state, claimed.ticket(), now);
         reply.stdout
@@ -872,4 +877,24 @@ fn a_codex_binding_that_already_holds_stop_blocks_answers_stop_channel_off_and_k
     }
     assert_eq!(drain.stop_blocks(), max, "neither reset nor capped");
     assert_eq!(drain.state, before);
+}
+
+#[test]
+fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_and_cli() {
+    let mut drain = Drain::registered(Adapter::Claude);
+    drain.add_peer("peer");
+    drain.send("peer", "hello", false);
+    let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+    let handle_of =
+        |key: &WriterKey, cli: &Cli| Some(format!("{}-{}@fg-test", cli.as_str(), key.as_str()));
+
+    let reply = render_reply(&claimed, &|_| None, &handle_of, &limits());
+
+    let context = context_of(&reply.stdout);
+    assert!(
+        context.contains(" handle=\"codex-peer@fg-test\" "),
+        "{context}"
+    );
+    let snapshot = serde_json::to_string(&drain.state).unwrap();
+    assert!(!snapshot.contains("@fg-test"), "the handle is never stored");
 }

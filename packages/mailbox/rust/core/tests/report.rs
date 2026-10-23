@@ -306,3 +306,20 @@ fn an_alias_refusal_lists_handles_through_the_handle_escape_and_adds_its_note() 
         "delivered to the current holder of lead:MAIL, claude-5v7u@fg-server"
     );
 }
+
+#[test]
+fn candidates_and_recipients_still_render_through_the_header_escape_after_the_handle_escape_was_added(
+) {
+    let limits = spec_limits();
+    let refusal = Refusal::UnknownName {
+        candidates: vec![name("forgent-claude-2b@x"), name("lead:MAIL")],
+    };
+    assert_eq!(
+        refusal_text(&refusal, &limits),
+        "Refused: unknown-name. Candidates: forgent-claude-2b_x, lead_MAIL."
+    );
+    let mut sent = outcome(false, None);
+    sent.to = name("forgent-claude-2b@x");
+    assert!(delivery_report(&sent, &VersionClause::Tested, &limits)
+        .starts_with("recorded a1b2 for forgent-claude-2b_x\n"));
+}

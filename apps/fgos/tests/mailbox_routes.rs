@@ -86,8 +86,21 @@ impl Scene {
 
     /// `fgos <args>` from `cwd` as `writer`, with `stdin`.
     fn run(&self, cwd: &Path, writer: Option<&str>, args: &[&str], stdin: &[u8]) -> Output {
+        self.run_env(cwd, writer, args, stdin, &[])
+    }
+
+    /// [`Scene::run`] with `env` added to the command's variables.
+    fn run_env(
+        &self,
+        cwd: &Path,
+        writer: Option<&str>,
+        args: &[&str],
+        stdin: &[u8],
+        env: &[(&str, &Path)],
+    ) -> Output {
         let mut child = self
             .command(cwd, writer)
+            .envs(env.iter().copied())
             .args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -107,6 +120,11 @@ impl Scene {
     /// `fgos hook mailbox <flags>` run the way [`Scene::claude_hook`] runs
     /// it, so a call that parses as Claude Code's reaches the record.
     fn hook_as_head(&self, flags: &[&str], payload: &[u8]) -> Output {
+        self.hook_as_head_env(flags, payload, &[])
+    }
+
+    /// [`Scene::hook_as_head`] with `env` added to the hook's variables.
+    fn hook_as_head_env(&self, flags: &[&str], payload: &[u8], env: &[(&str, &Path)]) -> Output {
         let own = fgos_process::facts::self_identity().unwrap();
         let pid = std::process::id();
         let session = serde_json::json!({
@@ -133,6 +151,7 @@ impl Scene {
             .env("HOME", self.home())
             .env("PATH", std::env::var_os("PATH").unwrap_or_default())
             .env("CLAUDE_CODE_SESSION_ID", WRITER)
+            .envs(env.iter().copied())
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -790,6 +809,8 @@ fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
 #[test]
 fn a_hook_payload_over_the_read_cap_leaves_its_reason_in_the_hook_outcome_file() {
     let scene = Scene::new("outcome");
+    // Identity can take the head, so the registering call is benign too.
+    identity_root(&scene);
     // The file goes only into a mailbox directory that exists: the head's
     // first call registers it.
     let out = scene.claude_hook("post-tool-use", &post_tool_use());
@@ -1008,7 +1029,13 @@ fn send_to_an_alias_lists_only_this_records_heads_as_candidates() {
 
 #[test]
 fn a_handle_identity_does_not_know_reaches_the_head_whose_derived_handle_it_is() {
-    let (scene, root) = scene_with_head("alias-derived");
+    // The head registers before the machine has an id, so Identity never
+    // took it; the id is minted afterwards.
+    let scene = Scene::new("alias-derived");
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let root = identity_root(&scene);
+    assert!(identity_sessions(&root).is_empty());
     let handle = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER).handle;
 
     let out = send_to(&scene, &handle, false);
@@ -1018,4 +1045,122 @@ fn a_handle_identity_does_not_know_reaches_the_head_whose_derived_handle_it_is()
         String::from_utf8_lossy(&out.stdout).contains(&format!(" for {}", scene.head_name())),
         "{out:?}"
     );
+}
+
+/// The sessions Identity's directory under `root` holds.
+fn identity_sessions(root: &Path) -> Vec<(String, String)> {
+    fgos_identity::directory::list(root, None, false, &fgos_process::facts::judge_here)
+        .unwrap()
+        .sessions
+        .into_iter()
+        .map(|s| (s.id, s.handle))
+        .collect()
+}
+
+fn hook_outcome(scene: &Scene) -> Option<String> {
+    let bytes = fs::read(scene.mailbox_dir().join("hook-outcome.json")).ok()?;
+    let line: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    line["reason"].as_str().map(String::from)
+}
+
+#[test]
+fn a_registering_call_registers_the_head_with_identity_once_and_a_second_call_of_the_same_head_does_not_ask_identity(
+) {
+    let scene = Scene::new("ident-once");
+    let root = identity_root(&scene);
+    let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
+
+    let first = scene.claude_hook("post-tool-use", &post_tool_use());
+
+    assert_eq!(first.status.code(), Some(0), "{first:?}");
+    assert_eq!(identity_sessions(&root), vec![(own.id, own.handle)]);
+    assert_eq!(hook_outcome(&scene), None);
+    // Gone from Identity: a refreshing call of the same head does not put it back.
+    fs::remove_dir_all(fgos_identity::directory::directory(&root)).unwrap();
+    let again = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(again.status.code(), Some(0), "{again:?}");
+    assert!(!fgos_identity::directory::directory(&root).exists());
+}
+
+#[test]
+fn a_registering_call_whose_handle_identity_already_holds_for_another_id_registers_nothing_and_records_ident_handle_in_use(
+) {
+    let scene = Scene::new("ident-in-use");
+    let root = identity_root(&scene);
+    let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
+    let machine = fgos_identity::machine_info(&root).unwrap().id;
+    let squatter = format!("{machine}/someone-else");
+    let entry = fgos_identity::directory::Entry::new(
+        squatter.clone(),
+        own.handle.clone(),
+        "claude".to_string(),
+        None,
+        None,
+        Vec::new(),
+        fgos_identity::current::os_record(std::process::id()),
+    );
+    fgos_identity::directory::register(&root, entry, false, &fgos_process::facts::judge_here)
+        .unwrap();
+
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert_eq!(identity_sessions(&root), vec![(squatter, own.handle)]);
+    assert_eq!(hook_outcome(&scene).as_deref(), Some("ident-handle-in-use"));
+}
+
+#[test]
+fn a_hook_call_whose_identity_step_fails_still_exits_0_with_empty_stdout_and_records_the_failure() {
+    let scene = Scene::new("ident-fails");
+    // No machine id: Identity refuses to name the session.
+
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
+    assert!(
+        scene.head_name().starts_with("main-claude"),
+        "still registered in the mailbox"
+    );
+    assert_eq!(
+        hook_outcome(&scene).as_deref(),
+        Some("ident:machine-id-missing")
+    );
+}
+
+#[test]
+fn the_hook_and_a_sender_resolve_the_same_identity_state_root_under_an_explicit_fgos_state_root() {
+    let scene = Scene::new("ident-root");
+    let pinned = scene.root.join("pinned-state");
+    fs::create_dir_all(&pinned).unwrap();
+    fgos_identity::machine::mint(&pinned, "routes-test").unwrap();
+    let env = [("FGOS_STATE_ROOT", pinned.as_path())];
+
+    let out = scene.hook_as_head_env(
+        &["--cli", "claude", "--event", "post-tool-use"],
+        &post_tool_use(),
+        &env,
+    );
+
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let own = identity_of(&pinned, "CLAUDE_CODE_SESSION_ID", WRITER);
+    assert_eq!(
+        identity_sessions(&pinned),
+        vec![(own.id, own.handle.clone())]
+    );
+    assert!(
+        !scene.home().join(".local/state/fgos").exists(),
+        "HOME's root untouched"
+    );
+    let sent = scene.run_env(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &own.handle, "hi"],
+        b"",
+        &env,
+    );
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    // Without the pinned root the sender reads HOME's, which knows no machine.
+    let unpinned = send_to(&scene, &own.handle, false);
+    assert_eq!(unpinned.status.code(), Some(1), "{unpinned:?}");
 }

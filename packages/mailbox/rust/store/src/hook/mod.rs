@@ -12,8 +12,8 @@ pub mod resolve;
 pub mod shell;
 
 pub use drain::{
-    begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,
-    PointerOnly, QuietReason,
+    begin, finish, render_reply, Begun, Claimed, FinishTicket, HandleOf, HeadFacts, HookCall,
+    HookReply, PointerOnly, QuietReason,
 };
 pub(crate) use drain::{claim_inbox, InboxClaim};
 pub use limits::{BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits};

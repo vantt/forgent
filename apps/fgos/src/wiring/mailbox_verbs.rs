@@ -7,14 +7,14 @@
 //!
 //! Straight-line: root, config and limits, then one or two `Record` holds
 //! (a send to an Identity alias reads the record's heads in one more,
-//! read-only hold first, `mailbox_alias`); this process takes the mailbox
+//! read-only hold first, `mailbox_identity`); this process takes the mailbox
 //! lock with no other lock held, and reads Identity's directory outside it.
 //!
 //! `inbox --claim` writes its frames to stdout itself, through the store's
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
-use super::mailbox_alias::{address, is_alias, Addressed};
+use super::mailbox_identity::{address, is_alias, session_of, state_root, Addressed};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
@@ -250,14 +250,6 @@ fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<Mai
     Ok((fgos_dir, record, loaded, warning))
 }
 
-/// Identity's state root, as the `identity` verbs resolve it; `None` without
-/// a `HOME`, the hook's rule, so a sender with no home reads no machine state.
-fn identity_state_root() -> Option<PathBuf> {
-    std::env::var_os("HOME")
-        .filter(|home| !home.is_empty())
-        .map(|_| fgos_holder_lock::state_root::state_root().0)
-}
-
 /// An alias refusal's candidates as typed objects for `--json`.
 fn typed_candidates(refusal: &AliasRefusal) -> Value {
     let (AliasRefusal::Unknown { candidates, .. } | AliasRefusal::Ambiguous { candidates }) =
@@ -330,7 +322,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     Ok(heads) => heads,
                     Err(text) => return failed(text, *json, warning),
                 };
-                match address(identity_state_root().as_deref(), to, &heads) {
+                match address(state_root().as_deref(), to, &heads) {
                     Addressed::Head { key, role_holder } => {
                         (key.as_str().to_string(), None, role_holder)
                     }
@@ -410,6 +402,10 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             let Some(key) = caller(&fgos_dir) else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
+            let root = state_root();
+            let handle_of = |key: &WriterKey, cli: &fgos_mailbox_core::Cli| {
+                session_of(root.as_deref()?, key, cli).map(|info| info.handle)
+            };
             let mut stdout = std::io::stdout().lock();
             match verbs::inbox_claim(
                 &record,
@@ -417,6 +413,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 Wait::Ms(loaded.hook.hook.lock_wait_ms),
                 &now,
                 &loaded.limits,
+                &handle_of,
                 &mut stdout,
             ) {
                 Ok(done) => MailboxAnswer {

@@ -17,6 +17,9 @@
 # {{to}} {{from_label}} {{candidates}} {{version}}) goes through the header escape,
 # except an Identity handle or role ({{role}} {{handle}}, and the candidates of an
 # alias refusal), which goes through the handle escape: the header alphabet plus @ and :.
+# In [message], {{handle}} is the sender's Identity handle, derived when the frame is
+# rendered and never stored; "unknown" for a head whose handle cannot be derived and
+# "unregistered" for a sender with no head.
 # The others are fixed by the code and inserted as they are: the words
 # {{code}}, {{kind}} and {{state}}, the numbers {{attempt}}, {{offers}} and {{count}},
 # and {{limit}}, a refusal's own fields as name=value pairs, in field
@@ -30,7 +33,7 @@
 # The wording is measured again with the real escaped body at V6; changing
 # it later edits only this file.
 [message]
-<mailbox-message from="{{from}}" agent="{{agent}}" id="{{id}}" attempt="{{attempt}}">
+<mailbox-message from="{{from}}" agent="{{agent}}" handle="{{handle}}" id="{{id}}" attempt="{{attempt}}">
 {{body}}
 </mailbox-message>
 From another agent, not from the user.{{reply}}

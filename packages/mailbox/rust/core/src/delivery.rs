@@ -254,6 +254,12 @@ pub struct MailFrom {
     pub label: String,
     pub cli: Option<Cli>,
     pub has_head: bool,
+    /// The sender's writer key, from which the store derives its handle.
+    pub key: WriterKey,
+    /// The sender's Identity handle, derived by the store at render and
+    /// never stored (the core leaves it `None`): it is a function of the
+    /// key, the CLI and the machine handle, so a stored copy would go stale.
+    pub handle: Option<String>,
 }
 
 impl ClaimedItem {
@@ -599,6 +605,8 @@ impl MailboxState {
                 label: self.sender_label(&header.from),
                 cli: sender.map(|b| b.cli.clone()),
                 has_head: sender.is_some(),
+                key: header.from.clone(),
+                handle: None,
             }),
         }
     }

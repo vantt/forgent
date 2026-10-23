@@ -13,7 +13,7 @@
 //! duplicate window of spec §5.2), instead of being marked offered and lost.
 use super::breaker::Breaker;
 use super::{
-    begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
+    begin, finish, render_reply, Adapter, Begun, Claimed, HandleOf, HeadFacts, HookCall, HookEvent,
     HookLimits, QuietReason,
 };
 use crate::adapters::TestedClis;
@@ -59,6 +59,8 @@ pub struct ShellInput<'a> {
     /// again just before hold 1, for the caller check.
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
     pub resolve: &'a Resolver<'a>,
+    /// Derives a sender's handle for a frame header (see [`HandleOf`]).
+    pub handle_of: &'a HandleOf<'a>,
     /// Shared with the budget watchdog: the shell writes stdout only after
     /// it moved the gate from idle to writing, and the watchdog ends the
     /// process only after it moved it from idle to done.
@@ -143,10 +145,21 @@ pub enum Quiet {
     RunnerHead,
 }
 
+/// A head this call bound to a new generation (created or replaced): what
+/// the entry needs to make sure Identity knows it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RegisteredHead {
+    pub generation: fgos_mailbox_core::Generation,
+    pub writer: WriterKey,
+    pub head: HeadFacts,
+}
+
 /// What an entry logs about one call. It carries no body text.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ShellOutcome {
     pub quiet: Option<Quiet>,
+    /// Set only by a call that created or replaced the head's binding.
+    pub registered: Option<RegisteredHead>,
     /// The ids of the claimed items, in frame order.
     pub claimed: Vec<MessageId>,
     /// Whether hold 1 installed a new snapshot.
@@ -239,9 +252,9 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         adapter: input.adapter,
         event: input.event,
         stdin: &payload,
-        writer: resolved.writer,
+        writer: resolved.writer.clone(),
         project: input.project,
-        head: resolved.head,
+        head: resolved.head.clone(),
     };
     let now = (input.clock)();
     let held = record.hold(wait, now, input.limits, |state, ids| {
@@ -279,6 +292,11 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         ..ShellOutcome::default()
     };
     let (begun, sizes) = held.value.value;
+    outcome.registered = begun.registered().map(|generation| RegisteredHead {
+        generation,
+        writer: resolved.writer,
+        head: resolved.head,
+    });
     let claimed = match begun {
         Begun::Quiet { reason, .. } => {
             outcome.quiet = Some(Quiet::Drain(reason));
@@ -299,6 +317,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             limits: input.limits,
             clock: input.clock,
             gate: &input.gate,
+            handle_of: input.handle_of,
         },
         &claimed,
         &sizes,
@@ -317,6 +336,7 @@ pub(crate) struct Emit<'a> {
     pub limits: &'a Limits,
     pub clock: &'a dyn Fn() -> Timestamp,
     pub gate: &'a WriteGate,
+    pub handle_of: &'a HandleOf<'a>,
 }
 
 /// What the write and the finish did.
@@ -349,7 +369,12 @@ pub(crate) fn emit_and_finish(
                 .map(|text| (id.clone(), text))
         })
         .collect();
-    let reply = render_reply(claimed, &|id| bodies.get(id).cloned(), emit.limits);
+    let reply = render_reply(
+        claimed,
+        &|id| bodies.get(id).cloned(),
+        emit.handle_of,
+        emit.limits,
+    );
     if !write_reply(emit.gate, stdout, &reply.stdout) {
         return emitted;
     }
