@@ -421,13 +421,16 @@ test('a run fails when it leaves a linked-checkout registration whose checkout w
     fs.writeFileSync(path.join(registrations, name, 'gitdir'), `${path.join(checkout, '.git')}\n`);
   };
   register('kept-by-a-person', path.join(base, 'elsewhere'));
+  const logs = [];
   const result = runSelectedTests(['a.test.mjs'], {
     cwd: base,
     env: { TMPDIR: base },
+    log: (msg) => logs.push(msg),
     spawn: (_exec, _argv, { env }) => { register('verify-AbCdEf', path.join(env.TMPDIR, 'fgos-worktrees', 'verify-AbCdEf')); return { status: 0 }; },
   });
   assert.equal(result.status, 1);
   assert.deepEqual(result.strayWorktrees.map((w) => w.name), ['verify-AbCdEf']);
+  assert.ok(logs.some((line) => line.includes('verify-AbCdEf')), 'the ERROR names the registration');
   fs.rmSync(base, { recursive: true, force: true });
 });
 
