@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "about": "Every doctor row of docs/platform/config/spec.md section 11, one source for Rust and Node. doctor and check are the severity per consumer (fail or warn); detailSeverity replaces them for a finding whose detail names the key; fix is an id of `fixes` or null; needsAcknowledgement marks a fix that drops a note. Descriptions are English; no row echoes a value.",
+  "staleBackupDays": 30,
+  "fixes": [
+    "refresh-docs",
+    "remove-redundant",
+    "chmod",
+    "move-under-private",
+    "create-machine-files",
+    "copy-to-destination"
+  ],
+  "rows": [
+    {
+      "id": "config-parse",
+      "description": "A config file does not parse or breaks strict-config.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": null
+    },
+    {
+      "id": "config-schema",
+      "description": "The value a source gives, alone or merged with the others, breaks a section schema, or a key sits in a scope that does not allow it.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": null
+    },
+    {
+      "id": "config-legacy-shadowed",
+      "description": "config.yaml and config.json both exist in one scope.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": null
+    },
+    {
+      "id": "config-format-legacy-json",
+      "description": "A project or global file is still legacy JSON; run fgos config migrate. Warns until every reader moved to Config.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": null
+    },
+    {
+      "id": "config-doc-drift",
+      "description": "A @fgos:doc line differs from the schema and standard render. doctor warns, fgos config check fails.",
+      "doctor": "warn",
+      "check": "fail",
+      "fix": "refresh-docs"
+    },
+    {
+      "id": "config-comment-missing-doc",
+      "description": "A described key carries no @fgos:doc line.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": "refresh-docs"
+    },
+    {
+      "id": "config-comment-missing-why",
+      "description": "A value in a file carries no @fgos:why line.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": null
+    },
+    {
+      "id": "config-comment-migrated-why",
+      "description": "A value still carries the [migrate] reason; replace it with the real one.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": null
+    },
+    {
+      "id": "config-unknown-key",
+      "description": "A key no schema describes.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": null
+    },
+    {
+      "id": "config-redundant-value",
+      "description": "A value equal to the standard; it holds nothing.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": "remove-redundant",
+      "needsAcknowledgement": true,
+      "needsAcknowledgementWhen": "the key carries a why or a note"
+    },
+    {
+      "id": "config-key-in-wrong-file",
+      "description": "An account pool or the gateway token sits in a config file. The destination decides: equal there is the state after the copy stage (the finishing verb removes the source); a project file has no fix.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": "copy-to-destination",
+      "detailSeverity": {
+        "destination-equal": {
+          "doctor": "warn",
+          "check": "warn"
+        }
+      }
+    },
+    {
+      "id": "config-global-permissions",
+      "description": "The global, accounts or token file or ~/.fgos/private is wider than its mode.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": "chmod"
+    },
+    {
+      "id": "config-secret-outside-private",
+      "description": "A file directly under ~/.fgos outside private/ holds an account pool or a token.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": "move-under-private"
+    },
+    {
+      "id": "config-migrate-backup-stale",
+      "description": "A migration backup is older than the stale age and can be deleted.",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": null
+    },
+    {
+      "id": "config-machine-files",
+      "description": "~/.fgos/private or the gateway token file is missing or invalid.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": "create-machine-files"
+    }
+  ]
+}
