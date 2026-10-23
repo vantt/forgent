@@ -30,6 +30,5 @@ export { createGitLand } from './land.mjs';
 export { createGitSafeRestore } from './restore.mjs';
 
 export { createGitRepositoryConfig } from './config.mjs';
-export { createGitNativeLockRepair } from './native-lock.mjs';
 
 export { createGitRecovery } from "./recovery.mjs";

@@ -148,12 +148,13 @@ impl GitLand {
         *slot(&self.state) = State::Pending { closed: false };
         let (core, state) = (Arc::clone(&self.core), Arc::clone(&self.state));
         let held_here = !held.is_empty();
-        let job = move |held| match core.driver.prepare_land_wait(
+        let job = move |held| match core.driver.prepare_land(
             &core.repo,
             held,
             &request,
             &core.writer,
             &id,
+            &wal::OsFileSystem,
             wait_ms,
         ) {
             Ok(session) => {
@@ -194,10 +195,11 @@ impl GitLand {
         };
         let (core, state) = (Arc::clone(&self.core), Arc::clone(&self.state));
         spawn(env, &self.state, move || {
-            let receipt = core.driver.publish_land_wait(
+            let receipt = core.driver.publish_land(
                 &core.repo,
                 &mut session,
                 &evidence,
+                &wal::OsFileSystem,
                 wait_ms.unwrap_or(0).into(),
             );
             settle(&state, Some(session));
@@ -224,7 +226,7 @@ impl GitLand {
                 }
                 self.core
                     .driver
-                    .acknowledge_land(&self.core.repo, &self.core.writer, id, acknowledgement)
+                    .acknowledge_land(&self.core.repo, &self.core.writer, id, acknowledgement, &wal::OsFileSystem)
                     .unwrap_or_else(|e| vec![format!("land-cleanup-deferred: {}", e.cause)])
             }
             None => vec![],

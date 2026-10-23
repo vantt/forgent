@@ -176,7 +176,7 @@ impl GitDriver {
         match &c.intent().kind {
             OperationKind::Land(_) => value(self.recover_land(repo, held, writer, id)?),
             OperationKind::ScopedCommit(_) => {
-                value(self.recover_scoped_commit(repo, held, writer, id)?)
+                value(self.recover_scoped_commit(repo, held, writer, id, &wal::OsFileSystem)?)
             }
             OperationKind::Sync(_) => value(self.inspect_sync(repo, held, writer, id)?),
             OperationKind::Restore(_) => value(self.recover_restore(repo, held, writer, id)?),

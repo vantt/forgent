@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { fixLandRecovery, checkLandRetainedCandidates } from '../../src/setup/git-checks.mjs';
+import { fixLandRecovery, checkGit } from '../../src/setup/git-checks.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
   const f = fixture();
@@ -40,20 +40,25 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
     assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land operation'});
   } finally { f.close(); }
 });
-test('doctor warns, never fails, about a finished Land whose candidate is still retained', async () => {
+test('the journal row warns, never fails, about a finished Land whose candidate is still retained', async () => {
   const f = fixture();
+  const prior = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = f.options.stateRoot;
   try {
-    assert.deepEqual(checkLandRetainedCandidates(f.repo,f.loader),{passed:true,message:'no retained Land candidate'});
     const land = f.port();
     await land.prepare({operationId:'retained-land',request:f.request});
     land.close();
+    const pending = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
+    assert.equal(pending.passed,false);
+    assert.match(pending.message,/1 Git operation\(s\) unresolved.*git-land-recovery/);
     fixLandRecovery(f.repo,f.loader,f.options);
-    const row = checkLandRetainedCandidates(f.repo,f.loader,f.options);
-    assert.equal(row.passed,true);
+    const row = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
+    assert.equal(row.passed,true,row.message);
     assert.match(row.message,/^warning: retained Land candidates: retained-land \(/);
     assert.match(row.message,/pins refs\/fgos\/git-operations\/retained-land\/candidate, refs\/fgos\/git-operations\/retained-land\/source\/candidate, refs\/fgos\/git-operations\/retained-land\/target\/candidate/);
     assert.match(row.message,/No manual release command exists today/);
-  } finally { f.close(); }
+    assert.equal(row.detail.journal.pendingCount,0);
+  } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; f.close(); }
 });
 test('Recovery terminal Restore replay delegates without changing its outcome', () => {
   const f = fixture();

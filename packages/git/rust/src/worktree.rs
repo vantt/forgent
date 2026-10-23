@@ -349,18 +349,8 @@ impl GitDriver {
         {
             return Err(failure("worktree-submodules-preserved"));
         }
-        for name in [
-            "MERGE_HEAD",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-            "BISECT_START",
-            "index.lock",
-        ] {
-            if !missing(&target.git_dir().join(name))? {
-                return Err(recovery("worktree-state-uncertain"));
-            }
+        if crate::scoped_commit::native_state_probe(target.git_dir(), &[])?.is_some() {
+            return Err(recovery("worktree-state-uncertain"));
         }
         Ok(())
     }

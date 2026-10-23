@@ -140,7 +140,7 @@ fn capture(path: &Path, remaining: &mut u64) -> Result<SavedPath> {
     SavedPath::capture_bounded(path, size)
 }
 fn data_path(name: &str) -> bool {
-    name != ".fgos" && !name.starts_with(".fgos/")
+    !checkout::is_store_path(name)
 }
 impl GitDriver {
     /// Whether tracked `.fgos` paths take part in this restore as data paths: a
@@ -461,29 +461,15 @@ impl GitDriver {
         tolerate_stopped_operation: bool,
     ) -> Result<()> {
         fgos_holder_lock::validate_quiescent(checkout::handle(scope, repo)?).map_err(failure)?;
-        for name in [
-            "index.lock",
-            "HEAD.lock",
-            "MERGE_HEAD",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-            "sequencer",
-        ] {
-            if tolerate_stopped_operation
-                && matches!(name, "MERGE_HEAD" | "CHERRY_PICK_HEAD" | "REVERT_HEAD")
-            {
-                continue;
-            }
-            match fs::symlink_metadata(repo.git_dir.join(name)) {
-                Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
-                Ok(_) => return Err(recovery(format!("restore-native-state: {name}"))),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                Err(e) => return Err(failure(e)),
-            }
-        }
-        Ok(())
+        // A bisect leaves only its bookkeeping and never blocks a restore.
+        let tolerated: &[&str] = if tolerate_stopped_operation {
+            &["BISECT_START", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"]
+        } else {
+            &["BISECT_START"]
+        };
+        checkout::require_no_native_state(&repo.git_dir, tolerated, |name| {
+            recovery(format!("restore-native-state: {name}"))
+        })
     }
     fn restore_capture(
         &self,
@@ -716,16 +702,6 @@ impl GitDriver {
         request: &RestoreRequest,
         writer: &str,
         id: &str,
-    ) -> Result<RestoreResult> {
-        self.apply_restore_with_filesystem(repo, held, request, writer, id, &wal::OsFileSystem)
-    }
-    pub fn apply_restore_with_filesystem(
-        &self,
-        repo: &RepoHandle,
-        held: Vec<BorrowedHandle<'_>>,
-        request: &RestoreRequest,
-        writer: &str,
-        id: &str,
         filesystem: &dyn wal::FileSystem,
     ) -> Result<RestoreResult> {
         if !wal::valid_id(id) {
@@ -741,10 +717,10 @@ impl GitDriver {
             }
             let chain = wal.inspect(id)?;
             let OperationKind::Restore(p) = &chain.intent().kind else {
-                return Err(failure("operation-id-conflict"));
+                return Err(failure("operation-id-reused"));
             };
             if p.request != *request || chain.intent().writer_identity != writer {
-                return Err(failure("operation-id-conflict"));
+                return Err(failure("operation-id-reused"));
             }
             return self.restore_observe(&repo, &scope, &wal, &chain, writer);
         }
@@ -811,22 +787,25 @@ impl GitDriver {
             .checkpoint("restore-snapshot-captured")
             .map_err(failure)?;
         let digest = wal.store_restore_snapshot(&snapshot)?;
-        let intent = Intent {
-            kind: OperationKind::Restore(Box::new(RestoreIntent {
-                worktree: checkout::root(&repo)?.to_string_lossy().into(),
-                reference: preview.reference.clone(),
-                request: request.clone(),
-                snapshot: digest.clone(),
-            })),
-            request_digest: wal::canonical_digest(request)?,
-            repo_identity: wal.repository_identity().into(),
-            resource_set: checkout::checkout_resources(&repo)?,
-            authority_binding: checkout::binding(checkout::handle(&scope, &repo)?)?,
-            writer_identity: writer.into(),
-            object_format: repo.object_format(),
-            expected: Tip::Oid(request.expected_head.clone()),
-            next: Tip::Oid(request.target.clone()),
-        };
+        let intent = Intent::of(
+            &wal,
+            &repo,
+            writer,
+            (
+                OperationKind::Restore(Box::new(RestoreIntent {
+                    worktree: checkout::root(&repo)?.to_string_lossy().into(),
+                    reference: preview.reference.clone(),
+                    request: request.clone(),
+                    snapshot: digest.clone(),
+                })),
+                wal::canonical_digest(request)?,
+            ),
+            (
+                checkout::checkout_resources(&repo)?,
+                checkout::binding(checkout::handle(&scope, &repo)?)?,
+            ),
+            (Tip::Oid(request.expected_head.clone()), Tip::Oid(request.target.clone())),
+        );
         let authority = Authority {
             scope: &scope,
             binding: intent.authority_binding.clone(),
@@ -1152,27 +1131,17 @@ impl GitDriver {
         let OperationKind::Restore(p) = &chain.intent().kind else {
             return Err(failure("not-restore-operation"));
         };
-        if p.worktree != checkout::root(repo)?.to_string_lossy()
-            || chain.intent().writer_identity != writer
-            || chain.intent().resource_set != checkout::checkout_resources(repo)?
-            || chain.intent().authority_binding
-                != checkout::binding(checkout::handle(scope, repo)?)?
-        {
-            return Err(failure("restore-authority-mismatch"));
-        }
+        checkout::authority_gate(
+            repo,
+            scope,
+            chain.intent(),
+            (Some(&p.worktree), Some(writer)),
+            "restore-authority-mismatch",
+        )?;
         Ok(p)
     }
     /// Caller acknowledges it has recovered all needed bytes; compact and release evidence.
-    pub fn acknowledge_restore(
-        &self,
-        repo: &RepoHandle,
-        held: Vec<BorrowedHandle<'_>>,
-        writer: &str,
-        id: &str,
-    ) -> Result<()> {
-        self.acknowledge_restore_with_filesystem(repo, held, writer, id, &wal::OsFileSystem)
-    }
-    pub fn acknowledge_restore_with_filesystem<F: wal::FileSystem>(
+    pub fn acknowledge_restore<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,

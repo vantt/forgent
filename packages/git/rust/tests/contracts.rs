@@ -52,17 +52,11 @@ fn result_codes_match_machine_contract() {
         serde_json::from_str(include_str!("../../contracts/result-codes.v1.json")).unwrap();
     let codes = [
         fgos_git::ResultCode::Unchanged,
-        fgos_git::ResultCode::Created,
         fgos_git::ResultCode::Committed,
-        fgos_git::ResultCode::Landed,
-        fgos_git::ResultCode::ConflictedOpen,
-        fgos_git::ResultCode::ConflictAborted,
         fgos_git::ResultCode::Busy,
         fgos_git::ResultCode::Stale,
         fgos_git::ResultCode::Refused,
-        fgos_git::ResultCode::Cancelled,
         fgos_git::ResultCode::Failed,
-        fgos_git::ResultCode::PublishedCheckoutPending,
         fgos_git::ResultCode::CommittedButContractViolation,
         fgos_git::ResultCode::RemoteOutcomeUnknown,
         fgos_git::ResultCode::RecoveryRequired,

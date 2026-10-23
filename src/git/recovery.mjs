@@ -1,5 +1,5 @@
 // Dormant transport. Recovery policy and resource locks belong to Rust.
-import { hotLockDepth } from '../state/hot-lock.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 export function createGitRecovery(options, loaderOptions) {
   const outside = () => { if (hotLockDepth() > 0) throw new Error('exec-under-hot-lock: Git Recovery'); };
