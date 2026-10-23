@@ -626,17 +626,21 @@ export function resultStopRules(results, { stageComplete }) {
   return { stops, closedSt };
 }
 
+/** The cell lists a stage walks in turn (A: the baselines, then the cells; B: the cells), limited to `clis` when given. */
+export const stagePhases = (stage, clis = null) => (stage === 'A' ? [score.baselineCells(), score.cellTable()] : [score.cellTable()])
+  .map((cells) => cells.filter((c) => !clis || clis.includes(c.cli)));
+
 /**
  * Runs stage `stage` (A: the baselines to 5 runs per CLI, then every cell to 5 valid runs;
  * B: every cell to 20) round by round in the interleaved order, never repeating a finished
- * run. Before each start `ctx.beforeRun(cell)` returns a stop reason or null (memory, pins,
+ * run; `ctx.clis`, when given, limits it to those CLIs' cells. Before each start `ctx.beforeRun(cell)` returns a stop reason or null (memory, pins,
  * ceiling, sentinels, login freshness); after each round the result stop rules run. Returns
  * `{stop}` with the reason, or `{stop: null}` when every cell is done.
  */
 export async function runStage(ctx, stage) {
   const target = stage === 'A' ? score.STAGE_A_RUNS : score.RULES.N;
   const closedSt = new Set(ctx.closedSt ?? []);
-  const phases = stage === 'A' ? [score.baselineCells(), score.cellTable()] : [score.cellTable()];
+  const phases = stagePhases(stage, ctx.clis);
   for (const cells of phases) {
     const goal = cells[0].variant === score.BASELINE ? score.RULES.BASELINE_RUNS : target;
     for (let round = 0; ; round += 1) {

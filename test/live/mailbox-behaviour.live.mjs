@@ -26,8 +26,8 @@
  *   smoke <claude|codex> [--dry]   the safety gate's benign smoke (one run, LR on PT, no
  *                         receiver instruction)
  *   run-cell <cli> <variant> <channel|base> [--dry] [--behaviour <stub behaviour>]
- *   run-stage <A|B> [--dry]
- *   run-loop <config|all> [--dry]
+ *   run-stage <A|B> [--cli <claude|codex>] [--dry]   (--cli: only that CLI's cells)
+ *   run-loop <config|pair|all> [--dry]
  *   report [--stage A|B] [--sample] [--dry]
  *   stub <claude|codex> <argv>     the dry runs' CLI
  *
@@ -307,11 +307,12 @@ async function cmdRunCell(cli, variant, channel, { dry, behaviour }) {
   return line;
 }
 
-async function cmdRunStage(stage, { dry }) {
+async function cmdRunStage(stage, { dry, cli }) {
   if (!['A', 'B'].includes(stage)) die('run-stage takes A or B', 2);
+  if (cli && !score.CLIS.includes(cli)) die(`--cli takes ${score.CLIS.join(' or ')}`, 2);
   const ctx = context({ dry, stage });
   recover(ctx);
-  const { stop, closedSt } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null }, stage);
+  const { stop, closedSt } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
   if (closedSt?.length) say(`ST cells closed after stage A for: ${closedSt.join(', ')}`);
   if (stop) die(`stage ${stage} stopped: ${stop}`);
   say(`stage ${stage}: every cell done`);
@@ -331,7 +332,7 @@ async function cmdRunLoop(which, { dry }) {
     if (!fs.existsSync(LOOP_ADDENDUM)) die('no loop addendum; run freeze-loop first');
     if (JSON.stringify(readJson(LOOP_ADDENDUM)) !== JSON.stringify(runs.loopAddendum(sha256(PREREGISTRATION)))) die('the loop addendum does not match the loop runner; a change is a new measurement');
   }
-  const configs = runs.loopConfigs().filter((c) => which === 'all' || c.id === which);
+  const configs = runs.loopConfigs().filter((c) => which === 'all' || c.id === which || c.pair === which);
   if (!configs.length) die(`no loop configuration ${which}`, 2);
   const ctx = { ...context({ dry, stage: 'loop' }), dryPrompt: dry ? dryLoopPrompt : null };
   recover(ctx);
@@ -623,7 +624,7 @@ if (process.argv[1] === SCRIPT) {
         await cmdRunCell(rest[0], rest[1], rest[2], { dry: flag('--dry'), behaviour: option('--behaviour') ?? 'ignore' });
         break;
       case 'run-stage':
-        await cmdRunStage(rest[0], { dry: flag('--dry') });
+        await cmdRunStage(rest[0], { dry: flag('--dry'), cli: option('--cli') });
         break;
       case 'run-loop':
         await cmdRunLoop(rest[0], { dry: flag('--dry') });
@@ -635,7 +636,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: check | freeze | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--dry] | run-loop <config|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: check | freeze | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

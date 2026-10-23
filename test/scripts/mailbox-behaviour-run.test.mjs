@@ -28,6 +28,7 @@ import {
   renderInstruction,
   runIdOf,
   stageOrder,
+  stagePhases,
   stepFinished,
 } from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import { SENDERS, cellTable } from '../../scripts/lib/mailbox-behaviour-score.mjs';
@@ -146,4 +147,12 @@ test('the loop trust runs one way, alternating its direction over each pair, and
   assert.ok(first.startsWith(`${REGISTER_FIRST}\n`), 'started first with a peer to reach: registers before its peer starts');
   assert.ok(first.includes(`the agent named in the file ${PEER_FILE}`));
   assert.equal(loopPrompt(data, 'S1', 'bb', null), 'Side work.', 'no scenario: no name needed');
+});
+
+test('a stage limited to one CLI walks only that CLI\'s cells', () => {
+  const [cells] = stagePhases('B', ['claude']);
+  assert.equal(cells.length, 19);
+  assert.ok(cells.every((c) => c.cli === 'claude'));
+  assert.equal(stagePhases('B')[0].length, 38);
+  assert.deepEqual(stagePhases('A', ['codex']).map((p) => p.length), [1, 19]);
 });
