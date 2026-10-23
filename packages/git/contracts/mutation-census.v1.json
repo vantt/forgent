@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f142128da8b9f2caaddabbd5eedad6953a87f758a5f4ea7dde38f0d750334487",
+  "payloadDigest": "5791f2463bf5e661d0097cef25f035bdbd8f8d62753e0449dff9b9db27255551",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -340,7 +340,7 @@
     "packages/herdr-fgos-common/rust/src/settings.rs": "656623292616ca598ebd64dde89c343bdc5fc0ae8d78a7f91b809b959ec3f11b",
     "packages/holder-lock/rust/src/borrow_vectors.rs": "564243e258853156023e35dbad8c09498a0af1cbfd1b7fb832f8f1d1cef99f7e",
     "packages/holder-lock/rust/src/borrow_windows.rs": "d2ca4abeeebf6df80c2b3251dc7609d5649e804df8e6f6e4e820d9caadf1e7c2",
-    "packages/holder-lock/rust/src/driver/flock.rs": "7b3a8471eedd5f220b96f3f9ec55377c38def45dd68f3590cb1b314f3996da47",
+    "packages/holder-lock/rust/src/driver/flock.rs": "dce71ffbf5b0e2b6575a40aa7064b59e3f7b6b4fcb148ffffa1ce4b1e4dc4e97",
     "packages/holder-lock/rust/src/driver/mod.rs": "07cbfbaf1c0c3f8eeeb810b89f33b0ea2783b6992dc56721475ffd85c2dbfb10",
     "packages/holder-lock/rust/src/driver/windows.rs": "d028f7c2117fcf0036a18617b63d612ee5d82e912068218bfc63602625fc4be3",
     "packages/holder-lock/rust/src/helper.rs": "f4f626f0a45b7d99c5bfbe95f4c791b782ee9ba1f9fecbf930f8618ee405ac6d",
@@ -446,7 +446,7 @@
     "packages/process/rust/src/lib.rs": "ad71de601877e524e4cf019681689f9359a327478acb41a75633319466fba2ef",
     "packages/process/rust/src/mapped.rs": "10a60edf2c77662c0fe53fdfa0cb42ab447421340b613f9dd6c742678c30055c",
     "packages/process/rust/src/platform/linux.rs": "be9faa2af77c0eceab0fdff9028c3cf156c476b076a4102bfa6037ae8825218e",
-    "packages/process/rust/src/platform/macos.rs": "8224a406882097afea071ce4750c7d3f02ff05109662a1366415a3b9d48af455",
+    "packages/process/rust/src/platform/macos.rs": "7c2e2d66b709aaff94e308c6e5aef05a55e170d6ffff9c48d4dffa611ba66f03",
     "packages/process/rust/src/platform/mod.rs": "37eff472f270dc5a3ba0be9f712df1f791bf4ea6200e7724f7e7d8d0c2021364",
     "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
     "packages/process/rust/src/platform/windows_job.rs": "0b4c5b1d99cf6764b23efbddcab454357eb963965b2ca2dbe8f9cd2591fca3bc",
