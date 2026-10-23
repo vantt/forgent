@@ -22,6 +22,25 @@
    }
   },
   {
+   "id": "meta-valid-multi-line-description",
+   "why": "a description may span lines; each line becomes one doc line",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.\nSecond line."
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
    "id": "meta-valid-global-only-account",
    "why": "an accounts entry with global-only scope and a secret sensitivity passes",
    "schema": {

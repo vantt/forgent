@@ -15,7 +15,7 @@ use sha2::{Digest, Sha256};
 
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
-use crate::grammar::{block_for_changed_key, block_for_new_key, doc_line, header_lines};
+use crate::grammar::{block_for_changed_key, block_for_new_key, doc_lines, header_lines};
 use crate::grammar::{Actor, Reason};
 use crate::locks::{scope_params, GLOBAL_CONFIG, PROJECT_CONFIG};
 use crate::schema::{json_at, json_put};
@@ -291,12 +291,20 @@ fn edit(
         doc.set(path, Doc::from_json(value), loss)?;
         let lines = match held {
             true => block_for_changed_key(&doc.comments_at(path)?, actor, reason),
-            false => block_for_new_key(&node(path).unwrap_or_default(), actor, reason),
+            false => block_for_new_key(
+                &node(path).unwrap_or_default(),
+                ctx.standard.value_at(path),
+                actor,
+                reason,
+            ),
         };
         doc.set_comment_block(path, &lines)?;
         for n in (1..path.len()).filter(|n| json_at(&before, &path[..*n]).is_none()) {
-            if let Some(line) = node(&path[..n]).as_ref().and_then(doc_line) {
-                doc.set_comment_block(&path[..n], &[line])?;
+            let lines = node(&path[..n])
+                .map(|node| doc_lines(&node, ctx.standard.value_at(&path[..n])))
+                .unwrap_or_default();
+            if !lines.is_empty() {
+                doc.set_comment_block(&path[..n], &lines)?;
             }
         }
     }

@@ -204,7 +204,7 @@
             "description": {
               "type": "string",
               "minLength": 1,
-              "pattern": "^[^\\n]*\\n?$"
+              "pattern": "\\S"
             }
           }
         },

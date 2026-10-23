@@ -216,6 +216,8 @@ Reason rules for the write doors:
 - A `@fgos:doc` line that differs from the schema's `description` is reported as `config-doc-drift`, fixed by `doctor --fix`. `fgos config check` fails on it (doctor alone only warns), so a forged doc line is visible before a commit lands.
 - Removing a key that carries a `@fgos:why` or free note requires the caller to acknowledge the loss (YAML Document `comment-would-be-lost`); `unset` asks for the reason to keep in the commit message.
 
+A `description` of several lines renders as one `# @fgos:doc` line per source line, in order; the allowed values, bounds and standard value follow the first line. The standard value shown is the one in the standard layer (a scalar, or a list of at most 120 characters; a map shows through its own keys, null is not shown).
+
 Keys with no schema node get no `@fgos:doc` line; their notes are kept.
 
 **Seat Binding §5.1.** The tier ladder that §5.1 writes as a `"$comment"` key beside `modelPolicies`, `tierFallback` and `maxTier` is rendered instead as `# @fgos:doc` lines on those keys. Owner decision 2026-10-22. The ladder text stays one constant owned by the Seat Binding crate and is supplied to Config through that section's schema (its `description`); the representation clause of D-ADR0072 is superseded in the same change, recorded in `docs/specs/seat-binding.md`'s "Lịch sử quyết định", and the pending seat-binding plan's phase 05 drops its `$comment` handling. No `$comment` key is introduced anywhere.

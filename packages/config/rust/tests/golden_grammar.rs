@@ -4,8 +4,8 @@
 use std::path::Path;
 
 use fgos_config::grammar::{
-    block_for_changed_key, block_for_new_key, doc_line, header_lines, parse_block, why_line, Actor,
-    Reason,
+    block_for_changed_key, block_for_new_key, doc_lines, header_lines, parse_block, why_line,
+    Actor, Reason,
 };
 use fgos_identity::{Source, WriterId, WriterIdentity};
 use fgos_yaml_doc::comment::sanitize;
@@ -87,13 +87,18 @@ fn grammar_cases_hold() {
             }
             "header" => header_lines(input["version"].as_u64().unwrap() as u32),
             "doc" => {
-                let line = doc_line(&input["node"]);
-                assert_eq!(line.as_deref(), expect["line"].as_str(), "{id}");
-                line.into_iter().collect()
+                let lines = doc_lines(&input["node"], input.get("standard"));
+                assert_eq!(&json!(lines), &expect["lines"], "{id}");
+                lines
             }
             "new_block" => {
                 let actor = Actor::from_writer(&writer(&input["writer"]));
-                block_for_new_key(&input["node"], &actor, &reason(input))
+                block_for_new_key(
+                    &input["node"],
+                    input.get("standard"),
+                    &actor,
+                    &reason(input),
+                )
             }
             "changed_block" => {
                 let actor = Actor::from_writer(&writer(&input["writer"]));

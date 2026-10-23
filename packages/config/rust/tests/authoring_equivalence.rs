@@ -11,6 +11,7 @@ use std::path::PathBuf;
 use common::contracts;
 use fgos_config::bundle;
 use fgos_config::detect::NoDetectors;
+use fgos_config::grammar::doc_lines;
 use fgos_config::schema::Schemas;
 use fgos_config::snapshot::{snapshot, Context, SessionClass, SnapshotError, SnapshotRequest};
 use fgos_config::standard::Standard;
@@ -288,40 +289,39 @@ fn no_machine_or_owner_specific_string_is_in_the_standard_files() {
 }
 
 #[test]
-fn the_tier_ladder_text_in_the_schema_is_the_ladder_the_seat_binding_contract_renders() {
+fn the_tier_ladder_renders_one_doc_line_per_tier_from_the_seat_binding_contract() {
     let ladder: Value = serde_json::from_str(&read(
         contracts().join("../../seat-binding/contracts/seat-binding.tier-ladder.v1.json"),
     ))
     .unwrap();
-    let lines: Vec<String> = ladder["tiers"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|t| {
-            format!(
-                "{}: {}; self-check: {}; e.g. {}",
-                t["name"].as_str().unwrap(),
-                t["work"].as_str().unwrap(),
-                t["selfCheck"].as_str().unwrap(),
-                t["examples"].as_str().unwrap()
-            )
-        })
-        .collect();
-    let rendered = format!("Tier ladder, weakest first: {}", lines.join(" | "));
+    let mut want = vec!["@fgos:doc Tier ladder, weakest first:".to_string()];
+    want.extend(ladder["tiers"].as_array().unwrap().iter().map(|t| {
+        format!(
+            "@fgos:doc {}: {}; self-check: {}; e.g. {}",
+            t["name"].as_str().unwrap(),
+            t["work"].as_str().unwrap(),
+            t["selfCheck"].as_str().unwrap(),
+            t["examples"].as_str().unwrap()
+        )
+    }));
     let (schemas, _) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
     for path in [
         "runner.modelPolicies",
         "runner.tierFallback",
         "runner.maxTier",
     ] {
-        let node = schemas
-            .resolve(&fgos_yaml_doc::path::parse_path(path).unwrap())
-            .unwrap()
-            .node;
-        let description = node["description"].as_str().unwrap();
+        let path = fgos_yaml_doc::path::parse_path(path).unwrap();
+        let node = schemas.resolve(&path).unwrap().node;
+        let lines = doc_lines(&node, standard.value_at(&path));
         assert!(
-            description.ends_with(&rendered),
-            "{path}: ladder text drifted from the contract"
+            lines.len() > want.len(),
+            "{path:?}: the node's own line comes first"
+        );
+        assert_eq!(
+            &lines[1..],
+            &want[..],
+            "{path:?}: ladder lines drifted from the contract"
         );
     }
 }

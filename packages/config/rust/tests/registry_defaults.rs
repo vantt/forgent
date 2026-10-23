@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use common::contracts;
 use fgos_config::bundle;
-use fgos_config::grammar::doc_line;
+use fgos_config::grammar::doc_lines;
 use fgos_config::schema::Schemas;
 use fgos_config::standard::Standard;
 use fgos_yaml_doc::path::{format_path, parse_path};
@@ -119,16 +119,11 @@ fn standard_files_equal_what_setup_seeds_except_the_named_differences() {
     }
 }
 
-/// The doc line the standard value and the schema node render to. A map's entries are shown by their
-/// own keys, so only a value that is not a map and fits in a line is quoted as the standard value.
-fn rendered(schemas: &Schemas, standard: &Standard, path: &[Segment]) -> Option<String> {
-    let mut node = schemas.resolve(path)?.node.clone();
-    if let Some(value) = standard.value_at(path).filter(|v| !v.is_object()) {
-        if value.to_string().len() <= 120 {
-            node["default"] = value.clone();
-        }
-    }
-    doc_line(&node)
+/// The doc lines the standard value and the schema node render to.
+fn rendered(schemas: &Schemas, standard: &Standard, path: &[Segment]) -> Vec<String> {
+    schemas.resolve(path).map_or_else(Vec::new, |found| {
+        doc_lines(&found.node, standard.value_at(path))
+    })
 }
 
 #[test]
@@ -138,7 +133,7 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
     let mut seen = 0;
     for (name, text) in bundle::STANDARD {
         let mut stack: Vec<(usize, String)> = Vec::new();
-        let mut pending: Option<(usize, String)> = None;
+        let mut pending: Option<(usize, Vec<String>)> = None;
         for (index, line) in text.lines().enumerate() {
             let body = line.trim_start();
             let indent = line.len() - body.len();
@@ -151,12 +146,10 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
                 .strip_prefix("# ")
                 .filter(|d| d.starts_with("@fgos:doc "))
             {
-                assert!(
-                    pending.is_none(),
-                    "{name}:{}: two doc lines above one key",
-                    index + 1
-                );
-                pending = Some((index + 1, doc.to_string()));
+                pending
+                    .get_or_insert_with(|| (index + 1, Vec::new()))
+                    .1
+                    .push(doc.to_string());
                 continue;
             }
             if body.starts_with('#') || body.starts_with('-') || body.is_empty() {
@@ -174,12 +167,7 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
                 let path: Vec<Segment> =
                     stack.iter().map(|(_, k)| Segment::Key(k.clone())).collect();
                 let want = rendered(&schemas, &standard, &path);
-                assert_eq!(
-                    Some(doc),
-                    want,
-                    "{name}:{at}: doc line of {}",
-                    format_path(&path)
-                );
+                assert_eq!(doc, want, "{name}:{at}: doc line of {}", format_path(&path));
                 seen += 1;
             }
         }

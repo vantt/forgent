@@ -382,12 +382,14 @@
       "light",
       "standard",
       "heavy"
-     ],
-     "default": "off"
-    }
+     ]
+    },
+    "standard": "off"
    },
    "expect": {
-    "line": "@fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off."
+    "lines": [
+     "@fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off."
+    ]
    }
   },
   {
@@ -398,12 +400,14 @@
     "node": {
      "description": "Retry count",
      "minimum": 0,
-     "maximum": 5,
-     "default": 2
-    }
+     "maximum": 5
+    },
+    "standard": 2
    },
    "expect": {
-    "line": "@fgos:doc Retry count. Minimum: 0. Maximum: 5. Default: 2."
+    "lines": [
+     "@fgos:doc Retry count. Minimum: 0. Maximum: 5. Default: 2."
+    ]
    }
   },
   {
@@ -416,21 +420,26 @@
     }
    },
    "expect": {
-    "line": "@fgos:doc Free text."
+    "lines": [
+     "@fgos:doc Free text."
+    ]
    }
   },
   {
    "id": "grammar-doc-multiline-description",
-   "why": "spec 7: the doc line comes from the schema node",
+   "why": "spec 7: one doc line per description line, the allowed values and the standard value on the first",
    "input": {
     "kind": "doc",
     "node": {
-     "description": "Line one.\n  Line two.",
-     "default": true
-    }
+     "description": "Line one.\n  Line two."
+    },
+    "standard": true
    },
    "expect": {
-    "line": "@fgos:doc Line one. Line two. Default: true."
+    "lines": [
+     "@fgos:doc Line one. Default: true.",
+     "@fgos:doc Line two."
+    ]
    }
   },
   {
@@ -440,12 +449,14 @@
     "kind": "doc",
     "node": {
      "description": "Invariant check",
-     "x-fgos-sensitivity": "command",
-     "default": "npm test"
-    }
+     "x-fgos-sensitivity": "command"
+    },
+    "standard": "npm test"
    },
    "expect": {
-    "line": "@fgos:doc Invariant check. Default: npm test."
+    "lines": [
+     "@fgos:doc Invariant check. Default: npm test."
+    ]
    }
   },
   {
@@ -455,12 +466,14 @@
     "kind": "doc",
     "node": {
      "description": "Token",
-     "x-fgos-sensitivity": "secret-value",
-     "default": "hunter2"
-    }
+     "x-fgos-sensitivity": "secret-value"
+    },
+    "standard": "hunter2"
    },
    "expect": {
-    "line": "@fgos:doc Token"
+    "lines": [
+     "@fgos:doc Token"
+    ]
    }
   },
   {
@@ -468,12 +481,12 @@
    "why": "spec 7: the doc line comes from the schema node",
    "input": {
     "kind": "doc",
-    "node": {
-     "default": 1
-    }
+    "node": {},
+    "standard": 1
    },
    "expect": {
-    "line": null
+    "line": null,
+    "lines": []
    }
   },
   {
@@ -488,13 +501,13 @@
       "light",
       "standard",
       "heavy"
-     ],
-     "default": "off"
+     ]
     },
     "writer": {
      "session": "vantt"
     },
-    "reason": "dogfood"
+    "reason": "dogfood",
+    "standard": "off"
    },
    "expect": {
     "lines": [
@@ -599,7 +612,9 @@
     ]
    },
    "expect": {
-    "doc": "@fgos:doc Old doc.",
+    "doc": [
+     "@fgos:doc Old doc."
+    ],
     "why": [
      "bob",
      "old reason"
@@ -620,7 +635,7 @@
     ]
    },
    "expect": {
-    "doc": null,
+    "doc": [],
     "why": null,
     "free": [
      "@fgos:why no actor here"
@@ -637,7 +652,7 @@
     ]
    },
    "expect": {
-    "doc": null,
+    "doc": [],
     "why": null,
     "free": [
      "@fgos:why [bob] "
@@ -654,10 +669,162 @@
     ]
    },
    "expect": {
-    "doc": null,
+    "doc": [],
     "why": null,
     "free": [
      "＠fgos:why [x] y"
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-list",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Names."
+    },
+    "standard": [
+     "a",
+     "b"
+    ]
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Names. Default: [\"a\",\"b\"]."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-map-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters; a map is shown through its own keys",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Table."
+    },
+    "standard": {
+     "a": 1
+    }
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Table."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-null-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters; null is not shown",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Maybe."
+    },
+    "standard": null
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Maybe."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-too-long-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Long."
+    },
+    "standard": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Long."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-at-limit",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Edge."
+    },
+    "standard": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Edge. Default: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-keyword-default-ignored",
+   "why": "the standard value comes from the standard layer, never from a default keyword on the node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Free.",
+     "default": 5
+    }
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Free."
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-multi-line-doc",
+   "why": "spec 7: the doc lines are the unbroken run of doc lines above the key",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [bob] why",
+     "a note",
+     "@fgos:doc Late."
+    ]
+   },
+   "expect": {
+    "doc": [
+     "@fgos:doc One.",
+     "@fgos:doc Two."
+    ],
+    "why": [
+     "bob",
+     "why"
+    ],
+    "free": [
+     "a note",
+     "@fgos:doc Late."
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-changed-multi-line-doc",
+   "why": "every existing doc line stays above the replaced why",
+   "input": {
+    "kind": "changed_block",
+    "existing": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [bob] old"
+    ],
+    "writer": {
+     "pid": 7
+    },
+    "reason": "new"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [7] new"
     ]
    }
   }
