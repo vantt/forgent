@@ -646,3 +646,13 @@ pub(crate) fn durable_args<'a>(args: &[&'a str]) -> Vec<&'a str> {
     all.extend_from_slice(args);
     all
 }
+
+/// A ref write whose only durable output is the ref itself: Git flushes the ref
+/// file (or the reftable and its list) and nothing else. `core.fsync=all` adds
+/// no flush to a loose ref write and adds the compaction tables to a reftable
+/// one, so a caller that syncs the ref's directories itself asks for this class.
+pub(crate) fn durable_ref_args<'a>(args: &[&'a str]) -> Vec<&'a str> {
+    let mut all = vec!["-c", "core.fsync=reference", "-c", "core.fsyncMethod=fsync"];
+    all.extend_from_slice(args);
+    all
+}

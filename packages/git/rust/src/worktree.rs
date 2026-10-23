@@ -1,7 +1,7 @@
 //! Worktree administration. One rank-40 hold spans inspection and mutation.
 use crate::{
     driver::Policy,
-    refs::{admission, byte_path, install_pin, pending, release_pin, Authority},
+    refs::{admission, byte_path, install_worktree_pin, pending, release_pin, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -483,7 +483,7 @@ impl GitDriver {
                     Tip::Oid(s) => Oid::parse(s, repo.object_format()).map_err(failure)?,
                     _ => return Err(failure("worktree-candidate-missing")),
                 };
-                install_pin(
+                install_worktree_pin(
                     self,
                     repo,
                     scope.handle("worktree-admin").expect("acquired"),

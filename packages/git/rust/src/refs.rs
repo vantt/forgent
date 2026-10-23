@@ -294,21 +294,52 @@ pub(crate) fn install_pin(
     id: &str,
     candidate: &Oid,
 ) -> Result<()> {
+    write_pin(driver, repo, admin, id, candidate, false)
+}
+/// A Worktree operation's pin. The ref, its directory chain and the candidate's
+/// object directories are flushed once, as one concurrent batch, before the
+/// caller goes on to the effect. On the files backend that batch also flushes
+/// the ref file, which Git writes unflushed; on reftable Git flushes its tables
+/// itself, and the batch holds only directories.
+pub(crate) fn install_worktree_pin(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    admin: &fgos_holder_lock::Handle,
+    id: &str,
+    candidate: &Oid,
+) -> Result<()> {
+    write_pin(driver, repo, admin, id, candidate, true)
+}
+fn write_pin(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    admin: &fgos_holder_lock::Handle,
+    id: &str,
+    candidate: &Oid,
+    worktree: bool,
+) -> Result<()> {
     let pin =
         RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
+    let own_flush = worktree && repo.layout().refs == RefStorage::Files;
     // A durable intent can outlive pin installation but precede Prepared.
     // Reuse only the exact candidate; a different/symbolic pin still refuses.
     if direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+        let create = [
+            "update-ref",
+            "--no-deref",
+            pin.as_str(),
+            candidate.as_str(),
+            &zero_oid(repo.object_format()),
+        ];
+        let args = match (worktree, own_flush) {
+            (true, true) => create.to_vec(),
+            (true, false) => durable_ref_args(&create),
+            (false, _) => durable_args(&create),
+        };
         let pinned = driver.publication_call(
             repo,
             admin,
-            &durable_args(&[
-                "update-ref",
-                "--no-deref",
-                pin.as_str(),
-                candidate.as_str(),
-                &zero_oid(repo.object_format()),
-            ]),
+            &args,
             &[],
             false,
             Duration::from_secs(30),
@@ -317,14 +348,42 @@ pub(crate) fn install_pin(
             return Err(recovery("pin-recovery-required"));
         }
     }
-    sync_refs(repo, &pin)?;
+    let mut dirs = ref_dirs(repo, pin.as_str())?;
+    if own_flush {
+        // Absent (and skipped) when a resumed install finds the pin packed.
+        dirs.push(repo.common_dir().join(pin.as_str()));
+    }
     let objects = repo.common_dir().join("objects");
     let fanout = objects.join(&candidate.as_str()[..2]);
     if fanout.is_dir() {
-        fgos_durable_file::sync_directory(&fanout).map_err(failure)?;
+        dirs.push(fanout);
     }
-    fgos_durable_file::sync_directory(&objects).map_err(failure)?;
-    Ok(())
+    dirs.push(objects);
+    sync_ref_dirs(&dirs, worktree).map_err(failure)
+}
+fn is_worktree(kind: &OperationKind) -> bool {
+    matches!(
+        kind,
+        OperationKind::WorktreeCreate { .. }
+            | OperationKind::WorktreeMove { .. }
+            | OperationKind::WorktreeRemove { .. }
+    )
+}
+/// The directories a Worktree pin's deletion changed. Git prunes the emptied
+/// pin directories, so on the files backend the removal is recorded in the
+/// deepest directory that survives, and in the common directory only when
+/// `packed-refs` was or is there to be rewritten (`packed`). Reftable keeps its
+/// whole chain.
+fn release_dirs(repo: &RepoHandle, pin: &RefName, packed: bool) -> Result<Vec<PathBuf>> {
+    let mut dirs = ref_dirs(repo, pin.as_str())?;
+    if repo.layout().refs == RefStorage::Files {
+        let common = repo.common_dir().to_path_buf();
+        dirs.truncate(1);
+        if packed && dirs.first() != Some(&common) {
+            dirs.push(common);
+        }
+    }
+    Ok(dirs)
 }
 pub(crate) fn release_pin<F: wal::FileSystem>(
     driver: &GitDriver,
@@ -357,19 +416,23 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
             },
         )?
     };
+    let worktree = is_worktree(&terminal.intent().kind);
+    let packed_refs = repo.common_dir().join("packed-refs");
+    // A delete that already ran leaves no trace of what it rewrote.
+    let mut packed = true;
     match direct(driver, repo, &pin)? {
         ExpectedTip::Absent => (),
         ExpectedTip::Oid(oid) if oid.as_str() == candidate => {
+            packed = packed_refs.exists();
+            let delete = ["update-ref", "--no-deref", "-d", pin.as_str(), candidate];
             let out = driver.publication_call(
                 repo,
                 admin,
-                &durable_args(&[
-                    "update-ref",
-                    "--no-deref",
-                    "-d",
-                    pin.as_str(),
-                    candidate,
-                ]),
+                &if worktree {
+                    durable_ref_args(&delete)
+                } else {
+                    durable_args(&delete)
+                },
                 &[],
                 false,
                 Duration::from_secs(30),
@@ -377,10 +440,15 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
             if !out.success || direct(driver, repo, &pin)? != ExpectedTip::Absent {
                 return Err(recovery("pin-release-recovery-required"));
             }
+            packed |= packed_refs.exists();
         }
         _ => return Err(recovery("pin-release-recovery-required")),
     }
-    sync_refs(repo, &pin)?;
+    if worktree {
+        sync_ref_dirs(&release_dirs(repo, &pin, packed)?, true).map_err(failure)?;
+    } else {
+        sync_refs(repo, &pin)?;
+    }
     wal.append(&release, Phase::PinReleased)?;
     Ok(())
 }
@@ -1086,5 +1154,69 @@ impl GitDriver {
         let terminal = wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &terminal)?;
         Ok(outcome)
+    }
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod pin_sync_tests {
+    use super::*;
+    use std::process::Command;
+    fn git(path: &Path, args: &[&str]) {
+        let out = Command::new("git").arg("-C").arg(path).args(args).output().unwrap();
+        assert!(out.status.success(), "{args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    }
+    /// A repository whose pin was created and deleted by plain Git, and its handle.
+    fn released(backend: &str, pack_first: bool) -> (PathBuf, RepoHandle, RefName) {
+        let root = std::env::temp_dir().join(format!(
+            "fgos-pin-sync-{}-{backend}-{pack_first}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir(&root).unwrap();
+        fs::set_permissions(&root, std::os::unix::fs::PermissionsExt::from_mode(0o700)).unwrap();
+        git(&root, &["init", "-q", "--initial-branch=trunk", &format!("--ref-format={backend}")]);
+        let commit = ["-c", "user.name=F", "-c", "user.email=f@example.invalid"];
+        git(&root, &[&commit[..], &["commit", "--allow-empty", "-qm", "base"]].concat());
+        let pin = "refs/fgos/git-operations/op/candidate";
+        git(&root, &["update-ref", pin, "HEAD"]);
+        if pack_first {
+            git(&root, &["pack-refs", "--all"]);
+        }
+        let name = RefName::parse(pin).unwrap();
+        let driver = GitDriver::new(&root).unwrap();
+        let repo = match driver.resolve_repo(&root, &root).unwrap() {
+            ResolveRepo::Repository(r) => r,
+            _ => panic!("repository expected"),
+        };
+        git(&root, &["update-ref", "-d", pin]);
+        (root, repo, name)
+    }
+    #[test]
+    fn released_loose_pin_syncs_only_the_directory_that_lost_its_entry() {
+        let (root, repo, pin) = released("files", false);
+        let common = repo.common_dir().to_path_buf();
+        assert_eq!(release_dirs(&repo, &pin, false).unwrap(), [common.join("refs/fgos")]);
+        fs::remove_dir_all(&root).unwrap();
+    }
+    #[test]
+    fn released_packed_pin_also_syncs_the_common_directory_for_packed_refs() {
+        let (root, repo, pin) = released("files", true);
+        let common = repo.common_dir().to_path_buf();
+        assert!(common.join("packed-refs").exists());
+        assert_eq!(
+            release_dirs(&repo, &pin, true).unwrap(),
+            [common.join("refs/fgos"), common]
+        );
+        fs::remove_dir_all(&root).unwrap();
+    }
+    #[test]
+    fn released_reftable_pin_keeps_its_whole_chain() {
+        let (root, repo, pin) = released("reftable", false);
+        let common = repo.common_dir().to_path_buf();
+        assert_eq!(
+            release_dirs(&repo, &pin, false).unwrap(),
+            [common.join("reftable"), common]
+        );
+        fs::remove_dir_all(&root).unwrap();
     }
 }
