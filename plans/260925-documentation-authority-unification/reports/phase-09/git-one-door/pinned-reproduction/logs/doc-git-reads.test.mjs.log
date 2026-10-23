@@ -1,0 +1,11 @@
+✔ typed commit reads preserve unusual paths, immutable text and exact blob identity (1114.892149ms)
+✔ typed scope binding ignores outside changes and rejects scope changes or unresolved commits (145.435173ms)
+✔ typed blob batches preserve binary bytes, split bounds, filter sizes and reject missing objects (24185.415193ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25697.66057

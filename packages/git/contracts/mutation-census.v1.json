@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3f728bbb2069e9c6d3a215d43ffcf1e103aaa28c98dd3f560b338a6a4483ea60",
+  "payloadDigest": "397b0969d8608f88bf91230dc05fe944b66df4fc9af76c7d9aa3fe1147b334a8",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -668,9 +668,9 @@
     "scripts/check-decision-supersession.mjs": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90",
     "scripts/check-doc-candidate-status.mjs": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94",
     "scripts/check-doc-constitution.mjs": "e06d9ea64bef03d071b174129619dc307380871d702ea2b2857aac8f85104885",
-    "scripts/check-doc-inventory-gates.mjs": "9f64830daa7f31339075d81e4d2393c587bfcdaaf3c95b5dad7304fb0926fab0",
+    "scripts/check-doc-inventory-gates.mjs": "90ed2a7ec4c5a7811fece2e1d7e7b2eac58bd8862d0df93ca031749d86d14096",
     "scripts/check-doc-retirement.mjs": "17a1513a561d92a601039611e179a0868c7bfed08a17cebf58f3bae9ccd91d3d",
-    "scripts/check-evidence-relocation.mjs": "09350631ba17b492e6d16482b721c90900cea081e866aa562cc3a53c56935594",
+    "scripts/check-evidence-relocation.mjs": "031db9cfff392239118d8c8147794d883ba909ee207792ac8d9df568e077ed9c",
     "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",
     "scripts/check-hook-registrations-guarded.mjs": "eb287ab7bec0368418f04d650e20cb4a3c6ce348844152a9e6112f9643e551ae",
     "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
@@ -695,8 +695,8 @@
     "scripts/export-command-selectors.mjs": "8ef578e5f5c2bfbe350a941b5d3896b0684c4030958505f941365e3f6456cdbd",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
-    "scripts/generate-doc-inventory.mjs": "5a675a378bc230ce48d5a2f9e6d3f6390cabb9fadce6b5e0a3266b782dc5c22c",
-    "scripts/generate-shipped-path-inventory.mjs": "279789f81cf344f8c251b5338513862aa7ac43ee54bac8d5d902b155f2fde824",
+    "scripts/generate-doc-inventory.mjs": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+    "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
@@ -712,6 +712,7 @@
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
+    "scripts/lib/doc-git-reads.mjs": "05cc34d350d8d016d38d28f25e6dee7d024c4a6b5a9ad520f4cd22323ea58ff1",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "1ec1179ce9ed73ad9e8ccba357d9ee141cd5bb57aff9d86f39b45eacc8da1ad7",
     "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
@@ -734,7 +735,7 @@
     "scripts/prepare-release.mjs": "66a025419962863905a07726cc68e1f8c510d50e372239a11833d60ce46ab73c",
     "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
     "scripts/project-agents.mjs": "d8ee4167562589fa0c728847571e86bb1c8a487fef3fbb471c843e67d86063ec",
-    "scripts/propose-doc-decisions.mjs": "e3ba53d87580e8b60fee80628433ce453129db14e118b346367fd73b12b0d0b5",
+    "scripts/propose-doc-decisions.mjs": "970be342fed247d4d5584d5fc7ffb1f19b8d2b1841be1b0890bac5d5b44a3472",
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
@@ -751,8 +752,8 @@
     "scripts/test-select.mjs": "8f10398be7ebbd1c782e005218925b84f6757b554b67b827f0d42e0a5686dd8b",
     "scripts/test-timing.mjs": "9b9dd13f78f4aaeaf60d43909e3224c465a4e34270032bf9845c23529bc243c1",
     "scripts/verify-fanout-overlap.mjs": "3f96381f4ea858b09f8103987f83d712a368ebaf9f8297ef223a7190f1d29fd6",
-    "scripts/verify-phase-01.mjs": "404c18bc9e39dcc43907ce760565225c8f6dfcc9ff988c51f1536d476311b04d",
-    "scripts/verify-phase-02.mjs": "d29c347ad03dd79f8ae7457a4e5d52ba37efb8cab0cf39d4c1ff70faf935c5d4",
+    "scripts/verify-phase-01.mjs": "b8f6429342569bad91a324be86f690dcec8a208b84a34c68b20dad740d0e19d1",
+    "scripts/verify-phase-02.mjs": "2a3310393ab78b9dbf7c2dfff6ed48282fd06dd9047bed86c03fb82aa4def88f",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
@@ -1124,7 +1125,18 @@
     },
     {
       "path": "scripts/check-doc-inventory-gates.mjs",
-      "line": 396,
+      "line": 397,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:1249",
+        "scripts/check-doc-constitution.mjs:698"
+      ]
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "line": 440,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
@@ -1135,23 +1147,12 @@
     },
     {
       "path": "scripts/check-doc-inventory-gates.mjs",
-      "line": 439,
+      "line": 1384,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/check-doc-inventory-gates.mjs:1247",
-        "scripts/check-doc-constitution.mjs:698"
-      ]
-    },
-    {
-      "path": "scripts/check-doc-inventory-gates.mjs",
-      "line": 1383,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        "scripts/check-doc-inventory-gates.mjs:1437",
+        "scripts/check-doc-inventory-gates.mjs:1438",
         "scripts/check-doc-retirement.mjs:239"
       ]
     },
@@ -1178,49 +1179,135 @@
     },
     {
       "path": "scripts/generate-doc-inventory.mjs",
+      "line": 56,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1416",
+        "scripts/generate-doc-inventory.mjs:1475",
+        "scripts/generate-doc-inventory.mjs:1632",
+        "scripts/generate-doc-inventory.mjs:1675",
+        "scripts/generate-doc-inventory.mjs:1704"
+      ]
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 166,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-doc-inventory.mjs:1661",
+        "scripts/generate-doc-inventory.mjs:1902"
+      ]
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
       "line": 739,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/generate-doc-inventory.mjs:804",
-        "scripts/generate-doc-inventory.mjs:1688"
+        "scripts/generate-doc-inventory.mjs:808",
+        "scripts/generate-doc-inventory.mjs:1666"
       ]
     },
     {
       "path": "scripts/generate-doc-inventory.mjs",
-      "line": 1218,
+      "line": 749,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn"
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "line": 1222,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/generate-doc-inventory.mjs:1488",
-        "scripts/generate-doc-inventory.mjs:1647",
-        "scripts/generate-doc-inventory.mjs:1686"
+        "scripts/generate-doc-inventory.mjs:1466",
+        "scripts/generate-doc-inventory.mjs:1625",
+        "scripts/generate-doc-inventory.mjs:1664"
       ]
     },
     {
       "path": "scripts/generate-doc-inventory.mjs",
-      "line": 1240,
+      "line": 1241,
       "spawn": "spawnSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/generate-doc-inventory.mjs:1489",
-        "scripts/generate-doc-inventory.mjs:1648",
-        "scripts/generate-doc-inventory.mjs:1689",
-        "scripts/check-doc-inventory-gates.mjs:404",
-        "scripts/check-doc-inventory-gates.mjs:455"
+        "scripts/generate-doc-inventory.mjs:1467",
+        "scripts/generate-doc-inventory.mjs:1626",
+        "scripts/generate-doc-inventory.mjs:1667"
       ]
     },
     {
       "path": "scripts/generate-doc-inventory.mjs",
-      "line": 1435,
+      "line": 1413,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/generate-doc-inventory.mjs:1967"
+        "scripts/generate-doc-inventory.mjs:1945"
+      ]
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 63,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:360",
+        "scripts/generate-shipped-path-inventory.mjs:460",
+        "scripts/generate-shipped-path-inventory.mjs:542",
+        "scripts/generate-shipped-path-inventory.mjs:625",
+        "scripts/generate-shipped-path-inventory.mjs:831",
+        "scripts/generate-doc-inventory.mjs:1411",
+        "scripts/generate-doc-inventory.mjs:1457",
+        "scripts/generate-doc-inventory.mjs:1623",
+        "scripts/generate-doc-inventory.mjs:1658",
+        "scripts/generate-doc-inventory.mjs:1900"
+      ]
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 78,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:361",
+        "scripts/generate-shipped-path-inventory.mjs:461",
+        "scripts/generate-shipped-path-inventory.mjs:544",
+        "scripts/generate-shipped-path-inventory.mjs:626"
+      ]
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "line": 100,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/generate-shipped-path-inventory.mjs:555",
+        "scripts/generate-doc-inventory.mjs:760",
+        "scripts/generate-doc-inventory.mjs:1017",
+        "scripts/generate-doc-inventory.mjs:1268"
+      ]
+    },
+    {
+      "path": "scripts/lib/doc-git-reads.mjs",
+      "line": 76,
+      "spawn": "spawnSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/check-doc-inventory-gates.mjs:405",
+        "scripts/check-doc-inventory-gates.mjs:456"
       ]
     },
     {

@@ -1,0 +1,223 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+  "cwd": "/tmp/fgos-work/w2-d3b-brief/payload",
+  "exit": 1,
+  "overallAuditOk": false,
+  "auditScratch": "/tmp/fgos-work/p8-audit-byph715b",
+  "baselineScratch": "/tmp/fgos-work/p8-audit-p1hvn8jc",
+  "scope": "B only; no claim that ownership or the complete reproduction is green",
+  "manifests": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "B": {
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ],
+        "ok": true
+      },
+      "baselineB": {
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "066f833dc2af325f43a2e7a58857acdc7e9a64ae"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "6f439370a906d1b59374f9d84012b23596e723ac"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ],
+        "ok": false
+      },
+      "sourceWorkingTreePinsMatchAudit": true,
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 1
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "targetDigestDriftCount": 74,
+      "baselineOwnershipEqual": true,
+      "baselineFailingRowsEqual": true,
+      "failingRowsSha256": "f45ffd7aff78c109def4cbf65bc590328518766c16afe719549886c15f9d398b",
+      "Aok": false,
+      "Hcounts": {
+        "files": 625,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 219,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 402
+        },
+        "exemptUnrouted": 302,
+        "checked": 222,
+        "findings": 25,
+        "byType": {
+          "unresolved-link": 20,
+          "missing-candidate-fields": 5
+        }
+      },
+      "IequalToHEAD": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "B": {
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ],
+        "ok": true
+      },
+      "baselineB": {
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "066f833dc2af325f43a2e7a58857acdc7e9a64ae"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "6f439370a906d1b59374f9d84012b23596e723ac"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ],
+        "ok": false
+      },
+      "sourceWorkingTreePinsMatchAudit": true,
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 1
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "targetDigestDriftCount": 74,
+      "baselineOwnershipEqual": true,
+      "baselineFailingRowsEqual": true,
+      "failingRowsSha256": "d6fe16cfbb84209c21b8385dff7a546e1e86dc35f09b5021d44f5a181bfc4f93",
+      "Aok": false,
+      "Hcounts": {
+        "files": 625,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 219,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 402
+        },
+        "exemptUnrouted": 302,
+        "checked": 222,
+        "findings": 25,
+        "byType": {
+          "unresolved-link": 20,
+          "missing-candidate-fields": 5
+        }
+      },
+      "IequalToHEAD": true
+    }
+  ]
+}

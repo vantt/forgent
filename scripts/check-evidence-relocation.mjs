@@ -5,7 +5,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
 import { inspectRepo } from './lib/git-ports.mjs';
-import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { resolveCommitSha } from './lib/doc-git-reads.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { computeSha256, normalizePosix } from './check-legacy-docs-ratchet.mjs';
 import { isEvidenceMirrorPath } from './check-doc-inventory-gates.mjs';

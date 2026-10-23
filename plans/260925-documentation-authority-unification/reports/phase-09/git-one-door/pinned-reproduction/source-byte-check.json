@@ -1,0 +1,102 @@
+{
+  "head": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "restored": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "restoredFrom": "f59e0b639",
+      "byteEqual": true,
+      "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "blobOid": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "restoredFrom": "f59e0b639",
+      "byteEqual": true,
+      "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "blobOid": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+    },
+    {
+      "path": "test/scripts/generate-doc-inventory.test.mjs",
+      "restoredFrom": "f59e0b639",
+      "byteEqual": true,
+      "sha256": "d2d170906be20e9e0ef2619816c77e9eb1f3fbdd35d6ccfb8bcc9b4c8495b25a",
+      "blobOid": "668a2c94cabfc4016cfe6d96d5eb2ce80777fb77"
+    },
+    {
+      "path": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "restoredFrom": "f59e0b639",
+      "byteEqual": true,
+      "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+      "blobOid": "879e3fcc3b48e6008bb1da43d06edb6c8ac606a4"
+    }
+  ],
+  "testedPayload": "/tmp/fgos-work/w2-d3b-brief/payload",
+  "rows": [
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "sourceSha256": "90ed2a7ec4c5a7811fece2e1d7e7b2eac58bd8862d0df93ca031749d86d14096",
+      "testedPayloadSha256": "90ed2a7ec4c5a7811fece2e1d7e7b2eac58bd8862d0df93ca031749d86d14096",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "sourceSha256": "031db9cfff392239118d8c8147794d883ba909ee207792ac8d9df568e077ed9c",
+      "testedPayloadSha256": "031db9cfff392239118d8c8147794d883ba909ee207792ac8d9df568e077ed9c",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "testedPayloadSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "testedPayloadSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "equal": true
+    },
+    {
+      "path": "scripts/propose-doc-decisions.mjs",
+      "sourceSha256": "970be342fed247d4d5584d5fc7ffb1f19b8d2b1841be1b0890bac5d5b44a3472",
+      "testedPayloadSha256": "970be342fed247d4d5584d5fc7ffb1f19b8d2b1841be1b0890bac5d5b44a3472",
+      "equal": true
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "sourceSha256": "b8f6429342569bad91a324be86f690dcec8a208b84a34c68b20dad740d0e19d1",
+      "testedPayloadSha256": "b8f6429342569bad91a324be86f690dcec8a208b84a34c68b20dad740d0e19d1",
+      "equal": true
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "sourceSha256": "2a3310393ab78b9dbf7c2dfff6ed48282fd06dd9047bed86c03fb82aa4def88f",
+      "testedPayloadSha256": "2a3310393ab78b9dbf7c2dfff6ed48282fd06dd9047bed86c03fb82aa4def88f",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/generate-doc-inventory.test.mjs",
+      "sourceSha256": "d2d170906be20e9e0ef2619816c77e9eb1f3fbdd35d6ccfb8bcc9b4c8495b25a",
+      "testedPayloadSha256": "d2d170906be20e9e0ef2619816c77e9eb1f3fbdd35d6ccfb8bcc9b4c8495b25a",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "sourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+      "testedPayloadSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+      "equal": true
+    },
+    {
+      "path": "scripts/lib/doc-git-reads.mjs",
+      "sourceSha256": "05cc34d350d8d016d38d28f25e6dee7d024c4a6b5a9ad520f4cd22323ea58ff1",
+      "testedPayloadSha256": "05cc34d350d8d016d38d28f25e6dee7d024c4a6b5a9ad520f4cd22323ea58ff1",
+      "equal": true
+    },
+    {
+      "path": "test/scripts/doc-git-reads.test.mjs",
+      "sourceSha256": "f83b1567dd4d4c48c5cce8fa366cd8de3a72c3fd8746e86201bf57b4ef7785e5",
+      "testedPayloadSha256": "f83b1567dd4d4c48c5cce8fa366cd8de3a72c3fd8746e86201bf57b4ef7785e5",
+      "equal": true
+    }
+  ]
+}

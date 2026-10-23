@@ -19,10 +19,11 @@ import { execFileSync } from 'node:child_process';
 import { inspectRepo } from './lib/git-ports.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { normalizePosix, readBlobAtCommit, resolveCommitSha, blobOidAtCommit } from './generate-shipped-path-inventory.mjs';
+import { normalizePosix } from './generate-shipped-path-inventory.mjs';
+import { readBlobAtCommit, resolveCommitSha, blobOidAtCommit, readCommitBlobMap, commitsMatchPaths } from './lib/doc-git-reads.mjs';
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
 import { checkRatchet, DEFAULT_BASELINE_PATH as RATCHET_BASELINE_PATH, DEFAULT_EXCEPTIONS_PATH as RATCHET_EXCEPTIONS_PATH } from './check-legacy-docs-ratchet.mjs';
-import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, registryBindsToCommit, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
+import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, identityScopePathspec, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
 import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
 
 /**
@@ -468,7 +469,7 @@ export function validateCommitBlobIntegrity(repoRoot, inventory) {
 export function validateIdentityRegistry(inventory, registry, { repoRoot = null } = {}) {
   const findings = [];
   if (!registry || typeof registry !== 'object') return [{ type: 'missing-identity-registry', message: 'Phase 02 identity registry is required' }];
-  const bound = registry.commit === inventory.commit || (repoRoot !== null && registryBindsToCommit(registry.commit, inventory.commit, repoRoot));
+  const bound = registry.commit === inventory.commit || (repoRoot !== null && commitsMatchPaths(registry.commit, inventory.commit, identityScopePathspec(), repoRoot));
   if (!bound) findings.push({ type: 'identity-registry-commit-mismatch', message: `identity registry commit ${registry.commit || '<missing>'} does not match inventory commit ${inventory.commit}` });
   if (inventory.identityRegistry) {
     if (inventory.identityRegistry.documents !== (registry.documents || []).length) findings.push({ type: 'identity-registry-document-count-binding-mismatch', message: `inventory identityRegistry.documents ${inventory.identityRegistry.documents} does not match registry ${(registry.documents || []).length}` });
@@ -993,7 +994,7 @@ export function validateLegacyGrowth(ratchetResult) {
 /** The saved inventory describes the tree it is checked against, and the registry on disk is the one it was generated from. */
 export function validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes = null }) {
   const findings = [];
-  if (headCommit && inventory?.commit && !registryBindsToCommit(inventory.commit, headCommit, repoRoot)) {
+  if (headCommit && inventory?.commit && !commitsMatchPaths(inventory.commit, headCommit, identityScopePathspec(), repoRoot)) {
     findings.push({ type: 'inventory-stale', message: `the inventory was generated at ${inventory.commit} and the in-scope tree at ${headCommit} differs; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit ${headCommit}` });
   }
   const recorded = inventory?.identityRegistry?.sha256;

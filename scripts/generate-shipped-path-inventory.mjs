@@ -6,8 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { inspectRepo } from './lib/git-ports.mjs';
-import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 
@@ -61,8 +60,11 @@ export function resolveCommitSha(commit, repoRoot = process.cwd()) {
   }
   const trimmed = commit.trim();
   try {
-    const sha = inspectRepo(repoRoot).resolveCommit({ name: trimmed });
-    if (typeof sha !== 'string') throw new Error('commit not found');
+    const sha = execFileSync('git', ['rev-parse', '--verify', `${trimmed}^{commit}`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
     return sha;
   } catch (err) {
     throw new Error(`Explicit commit/treeish "${commit}" must resolve to a valid git commit: ${err.message}`);
@@ -73,10 +75,13 @@ export function resolveCommitSha(commit, repoRoot = process.cwd()) {
  * Loads all tracked files and directories from the given commit SHA.
  */
 export function loadCommitTree(commitSha, repoRoot = process.cwd()) {
-  const port = inspectRepo(repoRoot);
-  const revision = resolveCommitSha(commitSha, repoRoot);
-  const entries = inspectEntries((page) => port.listTree({ revision, prefix: '', ...page })).filter((entry) => entry.kind !== 'tree');
-  const files = entries.map((entry) => inspectPath(entry.path));
+  const out = execFileSync('git', ['ls-tree', '-r', '--name-only', commitSha], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 30 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const files = out.split('\n').filter(Boolean);
   const treeFiles = new Set(files);
   const treeDirs = new Set();
   for (const f of treeFiles) {
@@ -92,24 +97,12 @@ export function loadCommitTree(commitSha, repoRoot = process.cwd()) {
  * Reads a blob's content directly from the git commit tree.
  */
 export function readBlobAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
-  return readBlobBufferAtCommit(commitSha, fileRel, repoRoot).toString('utf8');
-}
-
-export function readBlobBufferAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
-  const port = inspectRepo(repoRoot);
-  const revision = resolveCommitSha(commitSha, repoRoot);
-  const [result] = port.pathsAtRevision({ revision, paths: [[...Buffer.from(fileRel)]], maxBlobBytes: 20 * 1024 * 1024 });
-  if (result?.value.kind !== 'present') throw new Error(`${fileRel}: ${result?.value.cause || result?.value.kind || 'unreadable'} at ${revision}`);
-  return Buffer.from(result.value.bytes);
-}
-
-/** Exact blob identity, not a pathspec match or filesystem hash. */
-export function blobOidAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
-  const port = inspectRepo(repoRoot);
-  const entries = inspectEntries((page) => port.listTree({ revision: commitSha, prefix: fileRel, ...page }));
-  const entry = entries.find((entry) => inspectPath(entry.path) === fileRel && entry.kind === 'blob');
-  if (!entry) throw new Error(`${fileRel}: blob not found at ${commitSha}`);
-  return entry.oid;
+  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 20 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
 }
 
 export const EXT_JOIN_GUARD = new RegExp(

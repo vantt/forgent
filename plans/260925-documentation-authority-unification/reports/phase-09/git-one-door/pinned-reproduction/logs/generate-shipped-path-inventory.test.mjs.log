@@ -1,0 +1,18 @@
+✔ classifyContractScope: distinguishes consumer, repo-local, and mixed contracts (2.836254ms)
+✔ extractPathReferences: extracts core/ conventions and avoids truncated junk (5.032529ms)
+✔ extractPathReferences: handles fenced prose and multiline commands without gluing fake tokens (R1) (1.792175ms)
+✔ table-driven path grammar, negative glued tokens, and positive counterexamples (R1 residual) (8.680211ms)
+✔ deterministic generation: generating inventory twice produces identical results (162.681528ms)
+✔ CLI: outputs JSON and Markdown files correctly (1869.305921ms)
+✔ classifyPathAttributes: deterministically differentiates referenceKind, existenceStatus, sourceRole, resolutionStatus (1068.484949ms)
+✔ repository inventory: detects nonexistent examples and never labels them safe rewrite targets (97.325311ms)
+✔ environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit (50.738155ms)
+✔ fail closed on absent, empty, or non-commit treeish input (178.292421ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3598.541889

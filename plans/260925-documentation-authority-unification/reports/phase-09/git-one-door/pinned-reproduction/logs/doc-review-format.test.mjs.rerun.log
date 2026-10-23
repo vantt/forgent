@@ -1,0 +1,36 @@
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (325.372329ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (564.417661ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (764.005848ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (157.576642ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (660.034937ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (297.641083ms)
+  ✔ source-digest (203.620644ms)
+  ✔ authoredBy (204.735571ms)
+  ✔ authorSession (209.119179ms)
+  ✔ same-session (207.37538ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (1124.072574ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (348.938434ms)
+  ✔ checkpoint 6 (402.295583ms)
+  ✔ checkpoint 10 (363.016888ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (1114.968369ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (285.838129ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (285.884326ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (288.451659ms)
+  ✔ wrong-cell-count (280.192836ms)
+  ✔ non-bare-first-cell (278.40712ms)
+  ✔ target-digest-mismatch (285.692652ms)
+  ✔ source-digest-mismatch (282.058372ms)
+  ✔ bad-verdict (276.092383ms)
+✔ the review lint names the line and claim of each malformed verdict row (1692.215624ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (804.344344ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7896.811656

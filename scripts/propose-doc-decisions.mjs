@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
-import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { resolveCommitSha } from './lib/doc-git-reads.mjs';
 import { sandboxGit } from './lib/sandbox-git.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isCheckpointReviewReport, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, ordinaryVerdictCellProblems, reviewReportAuthor, reviewReportHeader, reviewSessionIdentity, reviewTableCells, validateManualReview } from './check-doc-inventory-gates.mjs';

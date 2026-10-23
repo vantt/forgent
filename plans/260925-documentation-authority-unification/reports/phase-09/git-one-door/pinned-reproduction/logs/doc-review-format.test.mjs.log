@@ -1,0 +1,60 @@
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (803.633566ms)
+✖ the public seeded Markdown can be scored without exposing the seed or private selection key (888.400745ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (1537.310305ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (283.440147ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (1222.793259ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (391.880334ms)
+  ✔ source-digest (523.185734ms)
+  ✔ authoredBy (433.194951ms)
+  ✔ authorSession (460.006221ms)
+  ✔ same-session (318.785796ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (2129.210502ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (694.05247ms)
+  ✔ checkpoint 6 (679.640527ms)
+  ✔ checkpoint 10 (602.407486ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (1980.09354ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (432.535365ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (468.93758ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (431.06437ms)
+  ✔ wrong-cell-count (412.759883ms)
+  ✔ non-bare-first-cell (464.85615ms)
+  ✔ target-digest-mismatch (419.862718ms)
+  ✔ source-digest-mismatch (412.570059ms)
+  ✔ bad-verdict (409.501679ms)
+✔ the review lint names the line and claim of each malformed verdict row (2552.199029ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (1206.883633ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 24
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13791.379361
+
+✖ failing tests:
+
+test at test/scripts/doc-review-format.test.mjs:42:1
+✖ the public seeded Markdown can be scored without exposing the seed or private selection key (888.400745ms)
+  AssertionError [ERR_ASSERTION]: propose-doc-decisions: insufficient eligible rows for deleted-list-item
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3b-brief/payload/test/scripts/doc-review-format.test.mjs:52:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

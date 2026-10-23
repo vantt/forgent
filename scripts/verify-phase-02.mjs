@@ -15,7 +15,7 @@ import { HISTORICAL_PLAN_HASHES, verifyMarkdownLinks } from './verify-phase-01.m
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
-import { resolveCommitSha } from './generate-shipped-path-inventory.mjs';
+import { resolveCommitSha } from './lib/doc-git-reads.mjs';
 import { createGitWorktree } from '../src/git/worktree.mjs';
 import { gitPortOptions } from '../src/git/inspect.mjs';
 import { removeWorktree } from '../src/runner/worktree.mjs';
