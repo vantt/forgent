@@ -2917,6 +2917,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       const repoRoot = flags.dir;
       const worktree = flags.worktree;
+      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+      // Admit before prompt/provider config bootstrap or port construction can
+      // write. Reuse this operation-local result in runUnit without re-reading
+      // the lease or reinterpreting the declared caller checkout.
+      const documentationAdmission = admitDocumentationExecution({
+        repoRoot: portRoot ?? process.cwd(), callerCheckout: worktree ?? process.cwd(),
+      });
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
       // Everything about the one-liner is checked here, before runUnit creates a unit run.
       const unitData = !buildsUnit ? undefined : await adhocUnitFromPrompt(prompt, flags, {
@@ -2947,13 +2954,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
       // run goes on only into a worktree no case owns.
       const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
-      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
-      // Port construction marks the bindings directory. Admit before even that
-      // write, and pass this operation-local result so runUnit does not re-read
-      // the lease or reinterpret the declared caller checkout.
-      const documentationAdmission = admitDocumentationExecution({
-        repoRoot: portRoot ?? process.cwd(), callerCheckout: worktree ?? process.cwd(),
-      });
 
       return attachDirWarning(await runUnit({
         documentationAdmission,
@@ -3871,6 +3871,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'status') {
         const res = inspectDocumentationCutoverLease({ repoRoot });
         if (flags.json) return res;
+        if (res.state === 'corrupt') return 'documentation-cutover lease sidecar is corrupt; failing closed\nrepair with: fgos docs-lease abandon --owner-confirmed --reason "<reason>"\n';
         if (!res.held) return `documentation-cutover lease is ${res.state}\n`;
         return `documentation-cutover lease is held (age: ${Math.round(res.ageMs / 1000)}s, kernel lock: ${res.kernelLock})\nholder token hash: ${res.holderTokenHash}\nworktree: ${res.worktree}\n`;
       }

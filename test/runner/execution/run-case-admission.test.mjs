@@ -23,7 +23,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { projectConfigPath, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 ensureScriptAddon();
@@ -137,15 +137,29 @@ test('documentation lease admission refuses non-holder runs before writes and le
   // host-side constructor write. This child models the host, not a nested
   // dispatch, and must refuse before any worker or unit-control lock starts.
   const bootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;
-  const cli = spawnSync(process.execPath, [
-    '--import', bootstrap, fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url)),
-    'run', '--resume', 'not-created', '--dir', repoRoot, '--worktree', repoRoot, '--json',
-  ], {
-    cwd: repoRoot, env: { ...process.env, FGOS_DISPATCH_DEPTH: '0' }, encoding: 'utf8', timeout: 60_000,
-  });
-  assert.notEqual(cli.status, 0, cli.stderr + cli.stdout);
-  assert.match(cli.stderr + cli.stdout, /documentation cutover lease is held/);
-  assert.equal(fs.existsSync(sentinel), false, 'CLI lease refusal precedes even the bindings sentinel');
+  const configPath = projectConfigPath(repoRoot);
+  const configBefore = fs.readFileSync(configPath);
+  // The old CLI probe covered the constructor write but not prompt-provider
+  // validation, which fills missing config defaults before constructing a Unit.
+  const unitPath = path.join(repoRoot, 'unit.json');
+  fs.writeFileSync(unitPath, JSON.stringify({ ...WRITE_UNIT, writes: [], objective: 'Read' }));
+  for (const args of [
+    ['--resume', 'not-created'],
+    ['Read'],
+    ['Read', '--provider', 'okay'],
+    ['--unit', unitPath],
+  ]) {
+    const cli = spawnSync(process.execPath, [
+      '--import', bootstrap, fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url)),
+      'run', ...args, '--dir', repoRoot, '--worktree', repoRoot, '--json',
+    ], {
+      cwd: repoRoot, env: { ...process.env, FGOS_DISPATCH_DEPTH: '0' }, encoding: 'utf8', timeout: 60_000,
+    });
+    assert.equal(cli.status, 4, cli.stderr + cli.stdout);
+    assert.match(cli.stderr + cli.stdout, /documentation cutover lease is held/);
+    assert.deepEqual(fs.readFileSync(configPath), configBefore, `CLI refusal leaves config bytes unchanged: ${args.join(' ')}`);
+    assert.equal(fs.existsSync(sentinel), false, 'CLI lease refusal precedes even the bindings sentinel');
+  }
   for (const extra of [
     { unitData: WRITE_UNIT },
     { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },

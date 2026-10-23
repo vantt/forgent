@@ -461,6 +461,19 @@ for (const sub of ['acquire', 'status', 'release', 'abandon']) {
       const released = f.rawCli(['status'], f.repo, {}, false);
       assert.equal(released.status, 0, released.stderr + released.stdout);
       assert.equal(released.stdout, 'documentation-cutover lease is released\n');
+      // JSON/held status cannot prove the corrupt human rendering path: a
+      // corrupt record is held fail-closed, but has no holder fields or age.
+      f.put(DEFAULT_SIDECAR_PATH, 'not JSON');
+      f.git(['add', DEFAULT_SIDECAR_PATH]);
+      f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'corrupt status fixture']);
+      const json = f.rawCli(['status']);
+      assert.equal(json.status, 0, json.stderr + json.stdout);
+      assert.deepEqual(JSON.parse(json.stdout).data, { state: 'corrupt', held: true, sidecar: null });
+      const corrupt = f.rawCli(['status'], f.repo, {}, false);
+      assert.equal(corrupt.status, json.status, corrupt.stderr + corrupt.stdout);
+      assert.match(corrupt.stdout, /^documentation-cutover lease sidecar is corrupt; failing closed\n/);
+      assert.doesNotMatch(corrupt.stdout, /NaN|undefined/);
+      assert.match(corrupt.stdout, /fgos docs-lease abandon --owner-confirmed --reason/);
     }
   });
 }
