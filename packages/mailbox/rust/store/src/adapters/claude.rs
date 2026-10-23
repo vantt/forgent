@@ -1,5 +1,5 @@
-//! Claude Code: payloads recorded on 2.1.307 and again on 2.1.308, which
-//! matched in structure (`contracts/fixtures/hooks/claude/` holds the 2.1.308
+//! Claude Code: payloads recorded on 2.1.307, 2.1.308 and 2.1.309, which
+//! matched in structure (`contracts/fixtures/hooks/claude/` holds the 2.1.309
 //! recording). A subagent's event carries
 //! `agent_id`; a head session started with `--agent` carries `agent_type`
 //! alone on its own events (recorded), so only `agent_id`, whatever its

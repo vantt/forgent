@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3c98795d5cefb43905fe50228edd9af8df81b12bd948363d2627eb47f6fb9aeb",
+  "payloadDigest": "7cf5d12953a77474aa2b6625c04df383544765a8cb1693d623bffb89af6239ba",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -443,7 +443,7 @@
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
     "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "54b58a555fdd802865e80a6178dbcf4a32ef5fcbc02db628e26ca15854f8ff03",
     "packages/mailbox/rust/store/src/adapters/agy.rs": "2ca9d10a744245a4b233e26f64b96d6fde27de92394e60d9332b1a830979f9fe",
-    "packages/mailbox/rust/store/src/adapters/claude.rs": "9c70057d8d54d673d0c652bcd07e4376dbe1726ed3a5f6644d018537671bdf88",
+    "packages/mailbox/rust/store/src/adapters/claude.rs": "e76f2b88d48e8c27d6d8cdf58098943a12a4fc2fadb674fa1fbd9ed226c1216e",
     "packages/mailbox/rust/store/src/adapters/claude_head.rs": "c9c9dde4a3b0fc641d63b60f4b4480674f15034c1c08e1ea33dc3d920c333bc7",
     "packages/mailbox/rust/store/src/adapters/codex.rs": "04dbb96b604cf4d72eba561a32d201ba88f166e68b84c8c35fd0e71a2f2b3c6a",
     "packages/mailbox/rust/store/src/adapters/codex_head.rs": "fee227ea7e8a114a9052eee1d17b8ce0af0d2fd8a4a204c2c314abe5c23f6dcb",
@@ -485,7 +485,7 @@
     "packages/mailbox/rust/store/tests/record_crash.rs": "7cea9afb1f5cc1acd4c5340b9902308699d74cb8cb35d4a2520773f4fae81fab",
     "packages/mailbox/rust/store/tests/record_prune.rs": "72ae0203f2840ed402c12e0fa84f720d3443d0f36382af8896822de670fbd4ba",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "ba79b1ba7d3d6407da85a8f64ecccfdada448ba520b46082253605204e23b603",
-    "packages/mailbox/rust/store/tests/verbs.rs": "6fdd30c86371c436831778d51e80a239eb4d1685c389e366450dd57d2e910be6",
+    "packages/mailbox/rust/store/tests/verbs.rs": "1365f0939679a787cc398ecd352da22f229bc22da1a2a1a581483566643c7410",
     "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
     "packages/observe/rust/src/contract.rs": "6c768d1908c4363045e30ec11a6ad9ffa0aea59d391d3e6c04701b8128ac4cfb",
     "packages/observe/rust/src/eval_journal.rs": "378b89c5d666b11cbb6e71b6d42dcd178d327b9067ea1e63417c060b707b98d0",
@@ -761,7 +761,7 @@
     "scripts/prepare-release.mjs": "66a025419962863905a07726cc68e1f8c510d50e372239a11833d60ce46ab73c",
     "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
     "scripts/project-agents.mjs": "d8ee4167562589fa0c728847571e86bb1c8a487fef3fbb471c843e67d86063ec",
-    "scripts/record-mailbox-hook-fixtures.mjs": "b1629059a3266f8cde327d533a4a42f06ad50f6d6df6a4940991867c693fdbf7",
+    "scripts/record-mailbox-hook-fixtures.mjs": "f1a1f57799f537c46cf582310a1b00deecb2befeba3eab73b33789b8822a1cf3",
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
@@ -2781,14 +2781,14 @@
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1189,
+      "line": 1192,
       "spawn": "createTerminalControl -> src/terminal-control/client.mjs:117",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1327,
+      "line": 1330,
       "spawn": "cmdRun -> scripts/record-mailbox-hook-fixtures.mjs:315",
       "binary": "(command-line arguments)",
       "class": "configured-binary"

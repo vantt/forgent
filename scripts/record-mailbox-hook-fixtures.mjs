@@ -665,9 +665,11 @@ function cmdRedact(cli) {
   const vectorsFile = path.join(outDir, 'vectors.json');
   const previous = fs.existsSync(vectorsFile) ? readJson(vectorsFile) : null;
   const keptVectors = previous ? previous.vectors : [];
-  // A re-recording keeps naming the recording it replaces, so every version
-  // the adapters contract lists stays traceable to a recording.
+  // A re-recording keeps naming the recording it replaces and every one that
+  // recording replaced, so every version the adapters contract lists stays
+  // traceable to a recording.
   const replaced = /^recorded (\S+) from (\S+ \S+)/.exec(previous?.source ?? '');
+  const replacedBefore = [...(previous?.source ?? '').matchAll(/replaces the recording of [^;]+/g)].map((m) => m[0]);
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
 
@@ -726,10 +728,11 @@ function cmdRedact(cli) {
   // The operator's notes: observations the recorder cannot derive itself (which user hooks
   // fired, what a subagent's tool process saw); a re-recording without them drops them.
   const notes = fs.existsSync(path.join(BASE, cli, 'notes.txt')) ? fs.readFileSync(path.join(BASE, cli, 'notes.txt'), 'utf8').trim().split('\n').join('; ') : '';
-  const source = [
+  const source = [...new Set([
     `recorded ${run(runs.dump).startedAt.slice(0, 10)} from ${cli} ${version} on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version ${REDACTION_RULES_VERSION})`,
     ...allDirs.map((d) => `${path.basename(d)} run: \`${run(d).command}\` (exit ${run(d).exit})`),
     replaced && replaced[2] !== `${cli} ${version}` ? `replaces the recording of ${replaced[1]} from ${replaced[2]}` : '',
+    ...replacedBefore,
     `variables removed from the parent environment: ${REMOVED_VARS.join(', ')}`,
     contextAccepted
       ? `injection at PostToolUse (${meta.contextShape} shape) matched record type ${accepted.PostToolUse.matchedType}; types rejected as raw hook output: ${accepted.PostToolUse.rejectedTypes.join(', ') || 'none'}; model echoed the context canary: ${accepted.PostToolUse.modelEcho}`
@@ -739,7 +742,7 @@ function cmdRedact(cli) {
     subPost ? 'post-tool-use-subagent.json: recorded' : 'post-tool-use-subagent.json: not recorded (see notes)',
     subStop ? 'stop-subagent.json: the subagent fired a Stop of its own, recorded' : 'the subagent fired no Stop of its own',
     notes,
-  ].filter(Boolean).join('; ');
+  ].filter(Boolean))].join('; ');
   writeJson(path.join(outDir, 'vectors.json'), { cli, source: scrubSource(source), vectors: keptVectors });
   if (unknownKeys.size) process.stdout.write(`replaced because not on the safe list:\n  ${[...unknownKeys].join('\n  ')}\n`);
   process.stdout.write(`${cli}: fixtures written to ${outDir}\n`);

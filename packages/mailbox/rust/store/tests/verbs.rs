@@ -231,12 +231,26 @@ fn send_adds_the_untested_version_clause_from_the_recipients_version() {
     assert_eq!(lines.len(), 3);
     assert!(lines[2].contains("9.9.9 is not one"), "{}", lines[2]);
 
-    session("2.1.308");
-    assert_eq!(
-        report_of(&fgos, &name, &versions).len(),
-        2,
-        "a tested version adds nothing"
-    );
+    let contract: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(common::contracts_dir().join(common::ADAPTERS_CONTRACT)).unwrap(),
+    )
+    .unwrap();
+    let listed: Vec<&str> = contract["testedAgainst"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|entry| entry["cli"] == "claude")
+        .map(|entry| entry["version"].as_str().unwrap())
+        .collect();
+    assert!(listed.contains(&"2.1.309"), "{listed:?}");
+    for version in listed {
+        session(version);
+        assert_eq!(
+            report_of(&fgos, &name, &versions).len(),
+            2,
+            "tested version {version} adds nothing"
+        );
+    }
 
     let codex_name = with_cli_head(&fgos, "head-b", "codex", "{}");
     let codex = VersionSources {
