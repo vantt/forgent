@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Board and consumers switch to handles"
-status: completed
+status: in-progress
 priority: P2
 effort: "2h"
 dependencies: [2]
