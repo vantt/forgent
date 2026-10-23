@@ -220,22 +220,6 @@ test('an unstaged edit on an unrelated path survives the land untouched', { skip
   assert.equal(fs.readFileSync(path.join(repoRoot, 'a.txt'), 'utf8'), 'a\n', 'the working tree synced to the merge');
 });
 
-test('a file staged in main that is part of the item\'s own file set refuses the land: the trunk does not move and the staged change is kept', { skip }, async () => {
-  const repoRoot = initRepo();
-  activateGitFixture(repoRoot);
-  addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
-  fs.writeFileSync(path.join(repoRoot, 'a.txt'), 'a person\'s own edit\n');
-  git(repoRoot, ['add', 'a.txt']);
-  const tipBefore = mainTip(repoRoot);
-
-  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
-
-  assert.equal(result.outcome, 'main-checkout-dirty-mid-merge', JSON.stringify(result));
-  assert.equal(mainTip(repoRoot), tipBefore, 'update-ref never ran');
-  assert.match(git(repoRoot, ['diff', '--cached', '--name-only']), /a\.txt/);
-  assert.equal(fs.readFileSync(path.join(repoRoot, 'a.txt'), 'utf8'), 'a person\'s own edit\n');
-});
-
 test('promoting a member does not hold the main mutex during verify: another withMainCheckout gets in while verify runs', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);

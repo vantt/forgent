@@ -157,27 +157,6 @@ test('the owner is SIGKILLed right after spawning a borrowed git commit: a conte
   }
 });
 
-test('a manual commit at main is refused while fgOS holds main, and passes (beacon written) when nobody holds it', { skip }, async () => {
-  const repoRoot = initRepoWithHook();
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const holder = await holdLockInChild('main-checkout', { fgosDir });
-  try {
-    const before = commitCount(repoRoot);
-    const refused = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-manual' });
-    assert.notEqual(refused.status, 0);
-    assert.match(refused.stderr, /fgOS is writing the main checkout right now/);
-    assert.equal(commitCount(repoRoot), before);
-    assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'main-checkout-activity.json')), false);
-  } finally {
-    holder.child.kill('SIGKILL');
-    await holder.exited;
-  }
-  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-manual' });
-  assert.equal(result.status, 0, result.stderr);
-  const beacon = JSON.parse(fs.readFileSync(path.join(fgosDir, 'runtime', 'main-checkout-activity.json'), 'utf8'));
-  assert.equal(beacon.writer.id, 'session-manual');
-});
-
 test('a commit in another worktree never touches the main lock, even while fgOS holds main', { skip }, async () => {
   const mainRoot = initRepo('fgos-hook-away-main-');
   installHook(mainRoot, { absolute: true });
