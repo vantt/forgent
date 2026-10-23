@@ -16,7 +16,7 @@ mod bundle;
 mod cache;
 mod detect;
 mod files;
-mod grammar;
+pub mod grammar;
 mod lint;
 mod redact;
 mod schema;

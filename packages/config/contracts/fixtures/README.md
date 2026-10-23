@@ -11,6 +11,7 @@ are added as the phases that own them land.
 
 | File | Owning test | Content |
 |---|---|---|
+| `grammar.v1.json` | `tests/golden_grammar.rs` | reasons, actors, doc and why lines, header, comment blocks |
 
 `tests/fixture_shape.rs` owns only fixture integrity (well-formed JSON, unique ids, known failure
 ids); it proves no behaviour.
