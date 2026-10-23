@@ -1,5 +1,5 @@
 // The one in-process door to the combined native addon: locate, verify and load it once per process.
-// Lazy: nothing loads at import time. Git, process facts, durable files and canonical JSON all go through here.
+// Lazy: nothing loads at import time. Git, process facts, durable files, canonical JSON and YAML all go through here.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -62,7 +62,7 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
       helperExes.set(addon, resolved);
     }
     const v = addon.versions(); // Enforce the process marker before exposing any crate.
-    if (v.napi !== entry.napiVersion || typeof v.git !== 'string' || typeof v.eventStore !== 'string' || typeof v.process !== 'number' || typeof v.durableFile !== 'string' || typeof v.canonicalJson !== 'number' || typeof v.holderLock !== 'number' || typeof v.sessionIdentity !== 'number') throw unavailable('combined addon ABI mismatch');
+    if (v.napi !== entry.napiVersion || typeof v.git !== 'string' || typeof v.eventStore !== 'string' || typeof v.process !== 'number' || typeof v.durableFile !== 'string' || typeof v.canonicalJson !== 'number' || typeof v.holderLock !== 'number' || typeof v.sessionIdentity !== 'number' || typeof v.yaml !== 'number') throw unavailable('combined addon ABI mismatch');
     loaded = { file, addon };
     return addon;
   } catch (err) {
@@ -70,8 +70,21 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
     throw unavailable(err.message);
   }
 }
-/** This payload's own release addon, memoised; the first call loads. */
-export const nativeDoor = () => own ??= loadNativeAddon();
+/** The addon of this process, memoised: the one a descriptor already loaded (the release builder reads a checkout with the
+ * addon it just built), else this payload's own release. A process holds one addon, so a second file is refused anyway. */
+export const nativeDoor = () => own ??= loaded?.addon ?? loadNativeAddon();
+/** The value of a JSON text an addon entry returned. `JSON.parse` defines each key as an own property, so a `__proto__`
+ * key stays data; `special` lists `[path, 'nan' | 'inf' | '-inf']` for the floats JSON has no form for. */
+export function fromDoorJson(text, { special = [] } = {}) {
+  let value = JSON.parse(text);
+  for (const [path, word] of special) {
+    const restored = word === 'nan' ? NaN : word === 'inf' ? Infinity : -Infinity;
+    if (path.length === 0) { value = restored; continue; }
+    const parent = path.slice(0, -1).reduce((node, key) => node[key], value);
+    Object.defineProperty(parent, path.at(-1), { value: restored, writable: true, enumerable: true, configurable: true });
+  }
+  return value;
+}
 const notJson = (cause) => Object.assign(new Error(`canonical-json-not-json: ${cause}`), { code: 'canonical-json-not-json' });
 /** The replacer that makes `JSON.stringify` refuse what it would silently turn into `null` or drop from an array. */
 function validating(key, value) {

@@ -22,7 +22,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, yaml: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('ports.v1.json names only operations the loaded addon answers, and each port refuses an unlisted name by name', { skip: process.platform === 'win32' }, () => {

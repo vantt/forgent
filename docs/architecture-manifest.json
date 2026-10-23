@@ -205,7 +205,6 @@
     "src/util/identity-mint.mjs": "kernel",
     "src/util/unique-tmp-tag.mjs": "kernel",
     "src/util/yaml.mjs": "kernel",
-    "src/util/third-party/js-yaml.mjs": "kernel",
     "src/util/host-bin.mjs": "infra",
     "src/convention/convention-client.mjs": "infra",
     "src/convention/definition-names.mjs": "domain",
