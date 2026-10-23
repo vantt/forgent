@@ -1,0 +1,30 @@
+[
+  {
+    "path": "docs/backlog.md",
+    "units": 4
+  },
+  {
+    "path": "docs/platform/component-boundary.md",
+    "units": 297
+  },
+  {
+    "path": "docs/platform/config/spec.md",
+    "units": 94
+  },
+  {
+    "path": "docs/platform/holder-lock/spec.md",
+    "units": 138
+  },
+  {
+    "path": "docs/platform/identity/spec.md",
+    "units": 66
+  },
+  {
+    "path": "docs/specs/distribution.md",
+    "units": 43
+  },
+  {
+    "path": "docs/specs/reading-map.md",
+    "units": 3
+  }
+]

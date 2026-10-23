@@ -1,0 +1,3 @@
+check-legacy-docs-ratchet: 2 violation(s) found under legacy roots:
+  - [unaccounted-edit] docs/specs/distribution.md: modified maintained file has exception but digest mismatch (expected 4165bd22b8bf314cad8a1a7e4283835710bc8790ff55ded7d2f5d8e05d750ecb, got 7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203)
+  - [unaccounted-edit] docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 3b2af89d3f37df9b090790cfd7c0cdf9b8856e6335f500e8baee43b5dfed9a0b, got 7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd)

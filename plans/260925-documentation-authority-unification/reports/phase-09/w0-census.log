@@ -1,0 +1,42 @@
+{
+  "method": "Unchanged scan/census exports; full git ls-files --cached --others --exclude-standard inventory filtered by unchanged declaredProduct. Emit only to scratch, never --write-census in the checkout (outside scope and would bootstrap .fgos). Same L12-130 method.",
+  "fileCount": 1097,
+  "siteCount": 58,
+  "classCount": 254,
+  "classCounts": {
+    "standalone-skill-script": 3,
+    "hook-read-context": 21,
+    "configured-binary": 89,
+    "rust-test": 100,
+    "argv-runner": 13,
+    "production-sandbox-probe": 4,
+    "uncalled-wrapper": 21,
+    "git-driver": 1,
+    "sandbox-door": 2
+  },
+  "generatedEqual": true,
+  "generatedSha256": "92d24c9dc24e20ba5d843e2f6edea3ea48cb205da0b3e84dd932f12fc0c12855",
+  "committedSha256": "92d24c9dc24e20ba5d843e2f6edea3ea48cb205da0b3e84dd932f12fc0c12855",
+  "committedSelfDigestMatches": true,
+  "priorComparison": {
+    "sameSiteIdentitiesExcludingLine": true,
+    "sameClassHistogram": false,
+    "priorSiteCount": 58,
+    "priorClassCount": 253,
+    "priorClassCounts": {
+      "standalone-skill-script": 3,
+      "hook-read-context": 21,
+      "configured-binary": 89,
+      "rust-test": 99,
+      "argv-runner": 13,
+      "production-sandbox-probe": 4,
+      "uncalled-wrapper": 21,
+      "git-driver": 1,
+      "sandbox-door": 2
+    }
+  },
+  "verdict": {
+    "passed": false,
+    "message": "58 Git spawn site(s) outside the fgos-git driver: .githooks/pre-commit:507 (spawn), bin/fgos.mjs:3496 (unresolved-binary), bin/fgos.mjs:3640 (unresolved-binary), scripts/check-doc-constitution.mjs:640 (spawn), scripts/check-doc-inventory-gates.mjs:33 (spawn), ..."
+  }
+}

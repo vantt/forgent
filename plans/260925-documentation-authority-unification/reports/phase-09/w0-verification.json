@@ -1,0 +1,257 @@
+{
+  "inputHEAD": "8a9385eca0759da0b2022b6202518f71667c1430",
+  "commands": [
+    {
+      "name": "extract",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node /tmp/fgos-work/w0/extract.mjs --output-dir /tmp/fgos-work/w0",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-extract.log",
+        "sha256": "decf307b9da2236015161614e1934001d5827f7e8d237275c685817de94efd7c",
+        "bytes": 482
+      }
+    },
+    {
+      "name": "account",
+      "command": "python3 -B /tmp/fgos-work/w0/account.py",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-account.log",
+        "sha256": "4ec3a8ecdbd9cc5efa57977c2b5d328b9696a9c88a647cadc32b223dd2eb88ac",
+        "bytes": 639
+      }
+    },
+    {
+      "name": "verify",
+      "command": "python3 -B /tmp/fgos-work/w0/verify.py",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-verify.log",
+        "sha256": "b91530ea01d64559e38af83ca204977ddc53c85bfe749afad6dd2c275b6c4c36",
+        "bytes": 1023
+      }
+    },
+    {
+      "name": "evidence-before",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-evidence-before.log",
+        "sha256": "628a95fda9278e4a0e97d8f7811d4c3a41d7d17b0653cd788d4c0ffea1e62aca",
+        "bytes": 83
+      }
+    },
+    {
+      "name": "ratchet-before",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 1,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-ratchet-before.log",
+        "sha256": "dcda59bcac638fb376d299f3b3e0fe0dd868688491dce28c4bce91f591737c96",
+        "bytes": 579
+      }
+    },
+    {
+      "name": "ratchet-after",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-ratchet-after.log",
+        "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+        "bytes": 108
+      }
+    },
+    {
+      "name": "ratchet-tests",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node --test --test-reporter=tap test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-ratchet-tests.log",
+        "sha256": "acc6dcc81380883f9c7ef96b1e6f857cc1de621401fb0534a7028ff9f987e536",
+        "bytes": 6867
+      }
+    },
+    {
+      "name": "selectors",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node scripts/export-command-selectors.mjs --check",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-selectors.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "vectors",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node test/rust-host/generate-vectors.mjs --check",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-vectors.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "census",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w0 node /tmp/fgos-work/w0/census.mjs",
+      "exit": 0,
+      "log": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/w0-census.log",
+        "sha256": "62bd944745740157126be44d938a4247a69af5ab11086ce38db15a74c4ebc6d5",
+        "bytes": 1620
+      }
+    }
+  ],
+  "recordVerification": {
+    "inputHEAD": "8a9385eca0759da0b2022b6202518f71667c1430",
+    "assertions": "PASS",
+    "owningDecisionShardsChanged": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json"
+    ],
+    "changedRows": 1,
+    "changedFields": [
+      "targetUnitDigest",
+      "reviewNote"
+    ],
+    "remainingTargetDrift": 0,
+    "exceptionDigestRefreshes": 2,
+    "originalExceptionRationalesAndOtherRowsUnchanged": true,
+    "deferredCounts": {
+      "step3": 11,
+      "step4": 4,
+      "step5": 7
+    },
+    "priorOverlapExactLocatorReplay": {
+      "step3": {
+        "actual": 10,
+        "expected": 10,
+        "missing": [],
+        "extra": []
+      },
+      "step4": {
+        "actual": 9,
+        "expected": 9,
+        "missing": [],
+        "extra": []
+      },
+      "step5": {
+        "actual": 125,
+        "expected": 125,
+        "missing": [],
+        "extra": []
+      }
+    },
+    "recordReplayByteIdentical": true,
+    "pathsWithinScope": true,
+    "bindingSha256": "a44cca1dbb4f0ad66a5d0a92d5ae9dc752689b310f9243102e0170627aafd31e"
+  },
+  "census": {
+    "method": "Unchanged scan/census exports; full git ls-files --cached --others --exclude-standard inventory filtered by unchanged declaredProduct. Emit only to scratch, never --write-census in the checkout (outside scope and would bootstrap .fgos). Same L12-130 method.",
+    "fileCount": 1097,
+    "siteCount": 58,
+    "classCount": 254,
+    "classCounts": {
+      "standalone-skill-script": 3,
+      "hook-read-context": 21,
+      "configured-binary": 89,
+      "rust-test": 100,
+      "argv-runner": 13,
+      "production-sandbox-probe": 4,
+      "uncalled-wrapper": 21,
+      "git-driver": 1,
+      "sandbox-door": 2
+    },
+    "generatedEqual": true,
+    "generatedSha256": "92d24c9dc24e20ba5d843e2f6edea3ea48cb205da0b3e84dd932f12fc0c12855",
+    "committedSha256": "92d24c9dc24e20ba5d843e2f6edea3ea48cb205da0b3e84dd932f12fc0c12855",
+    "committedSelfDigestMatches": true,
+    "priorComparison": {
+      "sameSiteIdentitiesExcludingLine": true,
+      "sameClassHistogram": false,
+      "priorSiteCount": 58,
+      "priorClassCount": 253,
+      "priorClassCounts": {
+        "standalone-skill-script": 3,
+        "hook-read-context": 21,
+        "configured-binary": 89,
+        "rust-test": 99,
+        "argv-runner": 13,
+        "production-sandbox-probe": 4,
+        "uncalled-wrapper": 21,
+        "git-driver": 1,
+        "sandbox-door": 2
+      }
+    },
+    "verdict": {
+      "passed": false,
+      "message": "58 Git spawn site(s) outside the fgos-git driver: .githooks/pre-commit:507 (spawn), bin/fgos.mjs:3496 (unresolved-binary), bin/fgos.mjs:3640 (unresolved-binary), scripts/check-doc-constitution.mjs:640 (spawn), scripts/check-doc-inventory-gates.mjs:33 (spawn), ..."
+    }
+  },
+  "evidenceRelocation": {
+    "entries": 867,
+    "violations": 0,
+    "runtimeReaderDiscovered": false,
+    "exit": 0
+  },
+  "ratchet": {
+    "beforeExit": 1,
+    "beforeMismatches": [
+      "docs/specs/distribution.md",
+      "docs/specs/reading-map.md"
+    ],
+    "afterExit": 0,
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "exceptionCountUnchanged": true,
+    "baselineChanged": false
+  },
+  "leadProofs": {
+    "selectorsCheck": {
+      "suppliedExit": 0,
+      "rerunExit": 0
+    },
+    "vectorsCheck": {
+      "suppliedExit": 0,
+      "rerunExit": 0
+    },
+    "leaseTest": {
+      "tests": 15,
+      "pass": 15,
+      "provenance": "Lead supplied in brief, not rerun"
+    },
+    "registrations": {
+      "tests": 60,
+      "pass": 55,
+      "fail": 5,
+      "provenance": "Lead supplied known worktree-location failures, not rerun/reattributed"
+    }
+  },
+  "exploratoryDiagnostics": [
+    {
+      "command": "extract.mjs (authoring draft)",
+      "exit": 1,
+      "reason": "Initial overbroad SHA(full text) assertion rejected headings; corrected to the existing generator heading composite digest formula, with independent payload and following-block hash checks. No production checker changed."
+    },
+    {
+      "command": "census.mjs (authoring draft)",
+      "exit": 1,
+      "reason": "Draft asserted whole class histogram unchanged from first parent; actual named classes add one rust-test in packages/config/rust/tests/write_concurrency.rs:243. Final report records the difference, while 58 undeclared site identities/families remain unchanged and generated census equals committed bytes."
+    },
+    {
+      "command": "account.py (authoring drafts)",
+      "exit": 1,
+      "reason": "Schema owner enum is at $defs/lock, not inline items; some unchanged ledger rows legitimately omit targetAncestry. Corrected those report traversal assumptions, not the ledger or product."
+    },
+    {
+      "command": "prior-overlap replay (authoring diagnostic)",
+      "exit": 0,
+      "reason": "Expanded physical Step 3 traversal to r1/r2/r3; primary file matching must be exact, not substring (root Cargo.toml is not every Cargo.toml). Final exact locator sets reproduce L12-130 10/9/125 with zero missing/extra, and current import 11/4/7."
+    }
+  ],
+  "limits": [
+    "No full npm/cargo suite, lease/registrations test rerun, fgOS CLI, workspace .fgos/secrets access, Git mutation, native bootstrap or Markdown preview server. Impact-analysis degraded/unqueried under no-CLI boundary; no product symbol edited.",
+    "One current binding remains independently unreviewed. Step 3/4/5 pins/reviews are preserved, not accepted for execution at stale bytes. Gate status/register refresh remains Lead custody, pair accounting is a separate later Unit."
+  ],
+  "needsWrites": []
+}

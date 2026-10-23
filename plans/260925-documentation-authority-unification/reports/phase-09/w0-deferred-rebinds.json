@@ -1,0 +1,527 @@
+{
+  "inputHEAD": "8a9385eca0759da0b2022b6202518f71667c1430",
+  "merge": "022c0ee67447d40ff72bdee307e1988aae2f36a0",
+  "scope": "L12-130 method: all physical Step 3 revisions; canonical Step 4/5 primary file, sourceRenderProvenance and protectedPins overlaps only. Includes two external Step 5 parks in traversal, never reads their .fgos sources. No incidental target mentions.",
+  "gateId": "source-context-and-post-pin-recomposition",
+  "owner": "Documentation source-binding reviewer / Lead",
+  "traversed": {
+    "step3": 1100,
+    "step4": 275,
+    "step5": 1481
+  },
+  "counts": {
+    "step3": 11,
+    "step4": 4,
+    "step5": 7
+  },
+  "records": {
+    "step3": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 4,
+        "recordSha256": "2ec528e548524013cf50acc51e346df04a8a32eb857907e84125c330959ed5dc",
+        "file": "docs/specs/distribution.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+        "currentPrimaryDigest": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/distribution.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "b1526ab184a7d8ab5cf9124355efc0cf950788878808dd22a5940bc4c50252c8",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+        "recordLine": 1,
+        "recordSha256": "08afcd61b4fcdbd3b33265bf40651ae381a29aee46287be531d3787e49e05eee",
+        "file": "docs/platform/component-boundary.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "6c28a1a96e9671e4938a280c3a9102520429f4b75baa81a8f5cbf806d18e639c",
+        "currentPrimaryDigest": "d321802bebb3d41bb77b44be6fa0ac18d027a960e9d39ea003c4947134fca689",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/component-boundary.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-104.jsonl",
+        "recordLine": 1,
+        "recordSha256": "d77bcca6f61e11404401406f23f7d30e5e86fa942ead113554f1fb55cef565ff",
+        "file": "docs/platform/holder-lock/spec.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "2ef3d8c66a4d0720d684da08adc0492a9696c19fdd6d199af22b85dec7e0166f",
+        "currentPrimaryDigest": "524b2c6dd4aa3f8957d19eca7efb0fee1ea6408876fd52ac326ba652cbc9d59d",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/holder-lock/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+        "recordLine": 2,
+        "recordSha256": "952ab5dcafe6959ac00b12b43d7711345370f81d5bbc7e0ac325dce5ea4932fc",
+        "file": "docs/backlog.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+        "currentPrimaryDigest": "344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+        "recordLine": 4,
+        "recordSha256": "a765622c42fc163024bbfb0e4db844826c8d693382566286d147878177618c64",
+        "file": "docs/specs/distribution.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+        "currentPrimaryDigest": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/distribution.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "30edfb2bfc3d73104cfecf3cda58a685f91bd8171445245b6892b82daffb60f2",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+        "recordLine": 4,
+        "recordSha256": "37b2623f9e1a10c069e5d3d3d90fcd5b8934c77b8d14cdcfa28da1135faf4acf",
+        "file": "docs/specs/distribution.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+        "currentPrimaryDigest": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/distribution.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "da95573f0099e96ed5827fa81b7fd0459d3e996087ce136e0645d7b7abc04332",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+        "recordLine": 4,
+        "recordSha256": "a0596bdd6c3f9f851238debfa02f419c620a129f2432bf1905848133b3af7719",
+        "file": "docs/specs/distribution.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+        "currentPrimaryDigest": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/distribution.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "f96ceea9a2e9bf9802b1ac4c7416cc280e5c68a3c37c5344472a622ad3a8c46a",
+        "file": "docs/specs/reading-map.md",
+        "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+        "pinnedDigest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+        "currentPrimaryDigest": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      }
+    ],
+    "step4": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+        "recordLine": 1,
+        "recordSha256": "a44bb49f7559ca3d3d7afcf5565a289cf61f16c7fd01102f07d2816066665a88",
+        "file": "src/cli/command-registry.mjs",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "currentPrimaryDigest": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+        "recordLine": 1,
+        "recordSha256": "8c218697e50bd71903d5837180c4a1db2eabeb0d8c1c4cb39bb83ea8dc3a000a",
+        "file": "CHANGELOG.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+        "currentPrimaryDigest": "4f4e7d515f886620f58cec924f9cb81e851bc7b64ce0d1aa3fdcbf427caa3dfe",
+        "changedDependencies": [
+          {
+            "path": "CHANGELOG.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 4,
+        "recordSha256": "eb13ce0a0b8be004d96bb27a385abca7bf065a2c85f79c61377d2dd040086434",
+        "file": "core/skills/_shared/citation-format.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "currentPrimaryDigest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              0,
+              "existingEdgeJoins",
+              7,
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              1,
+              "existingEdgeJoins",
+              7,
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 8,
+        "recordSha256": "3e3d313ae2c829627477849a66d3cbb1f6137aa9b618d9cc45ff161eec0b0a6c",
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "pinnedDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "currentPrimaryDigest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              0,
+              "existingEdgeJoins",
+              0,
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              0,
+              "renderFiles",
+              2,
+              "existingEdgeJoins",
+              0,
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      }
+    ],
+    "step5": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 3,
+        "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+        "file": "src/cli/command-registry.mjs",
+        "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "pinnedDigest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "currentPrimaryDigest": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 66,
+        "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+        "file": "docs/backlog.md",
+        "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+        "pinnedDigest": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+        "currentPrimaryDigest": "344552da9931e8c5ca9f946e49e0a25c40ff42b61dbf6d99c73310d5e14b7c33",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 13,
+        "recordSha256": "d95f436a3b8d847976d9c4dfe261d5ecb4b9c6781a4db444fd177a8e8c9974ec",
+        "file": "packages/durable-file/rust/src/lib.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "3d48c741c558e976054e9d62d93a033b83588045d452fa2bd41ad30215a95ddd",
+        "currentPrimaryDigest": "f9d55aea154f5ab09f432b94fdf96ebc4c8f8b010426e78efe44ee06978a127c",
+        "changedDependencies": [
+          {
+            "path": "packages/durable-file/rust/src/lib.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 21,
+        "recordSha256": "0e7babe03c2e3d056c6c970d6dde236bbfabc979ea522c2069340f130b598e59",
+        "file": "apps/fgos/src/cli_projector.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "5fc75dfcedd08bea98c6d0f2da950a081fbdc80517e78e60f74dc4ba02d0af56",
+        "currentPrimaryDigest": "d41afd309d135778254910e3cacfec007950d580e46765b4d8167f1694aedbcf",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/src/cli_projector.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 22,
+        "recordSha256": "1191f6ce16f38df95a81d6950814d9120d0a506fab0e6e72e13675825a9ed956",
+        "file": "apps/fgos/src/main.rs",
+        "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "pinnedDigest": "63287fb1c09a11fb2efcee9443a1994ed2867ccd875d8b986d75e9c283f4d9b9",
+        "currentPrimaryDigest": "47cb576fd094609983943ee79bbce670a34b5bfcbe9fbe71c3fd67c6c3f9b068",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/src/main.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 34,
+        "recordSha256": "3f9483952ab92b0173051dba4b78f0fc46187e5b768fb85cae4f2b8ba86f0fcd",
+        "file": "test/setup/checks-doctor-config.test.mjs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "ceeba1aee8eea3cfa1dc92a0e0a90d36ce3654f863a2d63d500bb9c7fad3d3de",
+        "currentPrimaryDigest": "520b9be90302b669fbb9f156fa5afc6bf09ffe4292cd13a8923f9cf2d2de4891",
+        "changedDependencies": [
+          {
+            "path": "test/setup/checks-doctor-config.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 57,
+        "recordSha256": "68a5a3f9430eee3cb43f2012df4af0784641ff1b73d27e03eb8122578fa7b5b1",
+        "file": "apps/fgos/tests/cli_tests.rs",
+        "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "pinnedDigest": "cc3034cf1b16f674f29cccf2fd28208c0e190e038f3b684830f4b6f6200de055",
+        "currentPrimaryDigest": "96864f3dbc92b2bb0a1ff7f16a7ade95bd7abf4b4a728dd1c67d423148e09401",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/tests/cli_tests.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate",
+        "action": "Retain pinned author records and reviews. Re-locate complete consumer/source/render/fixture passages at final pin F, recompose with actual whole-file beforeSha256 and independently review; no stale patch accepted."
+      }
+    ]
+  }
+}

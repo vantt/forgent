@@ -1,0 +1,43 @@
+{
+  "inputHEAD": "8a9385eca0759da0b2022b6202518f71667c1430",
+  "assertions": "PASS",
+  "owningDecisionShardsChanged": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json"
+  ],
+  "changedRows": 1,
+  "changedFields": [
+    "targetUnitDigest",
+    "reviewNote"
+  ],
+  "remainingTargetDrift": 0,
+  "exceptionDigestRefreshes": 2,
+  "originalExceptionRationalesAndOtherRowsUnchanged": true,
+  "deferredCounts": {
+    "step3": 11,
+    "step4": 4,
+    "step5": 7
+  },
+  "priorOverlapExactLocatorReplay": {
+    "step3": {
+      "actual": 10,
+      "expected": 10,
+      "missing": [],
+      "extra": []
+    },
+    "step4": {
+      "actual": 9,
+      "expected": 9,
+      "missing": [],
+      "extra": []
+    },
+    "step5": {
+      "actual": 125,
+      "expected": 125,
+      "missing": [],
+      "extra": []
+    }
+  },
+  "recordReplayByteIdentical": true,
+  "pathsWithinScope": true,
+  "bindingSha256": "a44cca1dbb4f0ad66a5d0a92d5ae9dc752689b310f9243102e0170627aafd31e"
+}

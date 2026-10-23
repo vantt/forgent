@@ -1,0 +1,24 @@
+{
+  "inputHEAD": "8a9385eca0759da0b2022b6202518f71667c1430",
+  "method": "Replay the same exact-primary/embedded-source/protected-pin dependency traversal against L12-130 changed paths; equality of exact physical record locators (not just totals) is required.",
+  "results": {
+    "step3": {
+      "actual": 10,
+      "expected": 10,
+      "missing": [],
+      "extra": []
+    },
+    "step4": {
+      "actual": 9,
+      "expected": 9,
+      "missing": [],
+      "extra": []
+    },
+    "step5": {
+      "actual": 125,
+      "expected": 125,
+      "missing": [],
+      "extra": []
+    }
+  }
+}

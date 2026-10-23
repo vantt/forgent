@@ -1,0 +1,37 @@
+{
+  "mainCommitCount": 118,
+  "changedPaths": 228,
+  "changedDocs": 7,
+  "step0": {
+    "directChecked": 276,
+    "groupMembersChecked": 0,
+    "changedBindings": 1,
+    "remainingDrift": 0,
+    "pendingIndependentReview": 1
+  },
+  "overlaps": {
+    "step3": 11,
+    "step4": 4,
+    "step5": 7
+  },
+  "priorOverlapReplay": {
+    "step3": {
+      "actual": 10,
+      "expected": 10,
+      "missing": [],
+      "extra": []
+    },
+    "step4": {
+      "actual": 9,
+      "expected": 9,
+      "missing": [],
+      "extra": []
+    },
+    "step5": {
+      "actual": 125,
+      "expected": 125,
+      "missing": [],
+      "extra": []
+    }
+  }
+}
