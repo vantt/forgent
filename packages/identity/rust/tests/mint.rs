@@ -247,6 +247,30 @@ fn an_unreachable_remote_refuses_the_claim_and_never_changes_the_format() {
     );
 }
 
+#[test]
+fn an_origin_of_an_unsupported_transport_refuses_the_claim_and_the_give_back_by_name() {
+    // No other case proves it: the give-back used to fall back to a local counter when the
+    // origin could not be read, silently leaving the number used on the origin.
+    let w = world(1);
+    let clone = &w.clones[0];
+    let first = claim_sequence(&w.state, clone, SequenceKind::DecisionFile).unwrap();
+    git(clone, &["config", "remote.origin.url", "git://example.invalid/r"]);
+
+    let claim = claim_sequence(&w.state, clone, SequenceKind::DecisionFile).expect_err("no home");
+    assert_eq!(claim.reason, "sequence-unreachable");
+    assert!(claim.detail.contains("remote-protocol-not-supported"), "{}", claim.detail);
+
+    let give_back = release_sequence(&w.state, clone, SequenceKind::DecisionFile, first.number)
+        .expect_err("a give-back with no home is a refusal, never Ok(false)");
+    assert!(
+        give_back.detail.contains(&format!("number {} ", first.number))
+            && give_back.detail.contains("remote-protocol-not-supported"),
+        "{}",
+        give_back.detail
+    );
+    assert_eq!(w.counter("decision-file"), first.number.to_string(), "the origin's counter is untouched");
+}
+
 /// The one live-forge check, run by hand: two fresh repositories race a claim on a probe
 /// counter of the real remote of this checkout, then the probe ref is deleted.
 /// `cargo test -p fgos-identity --test mint -- --ignored live_forge`

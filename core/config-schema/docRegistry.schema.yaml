@@ -1,0 +1,9 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:docRegistry:v1
+$comment: "owner: enduser-docs-index"
+description: "Whether the end-user docs index is enforced."
+type: object
+properties:
+  enforce:
+    description: When true a stale end-user docs index fails the gate; when false it is only reported.
+    type: boolean

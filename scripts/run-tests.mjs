@@ -239,6 +239,28 @@ export function snapshotGitIdentity(cwd) {
   return lines.sort();
 }
 
+/**
+ * Linked-checkout registrations of the repository at `cwd` whose checkout lies under one of `roots`
+ * (the run's own temp dirs): each outlives its deleted checkout and makes every later worktree add of
+ * that repository refuse until it is pruned. Read from the registration files, like the identity check.
+ */
+export function worktreeRegistrationsUnder(cwd, roots) {
+  const dirs = repositoryDirs(cwd);
+  const realRoots = roots.filter(Boolean).map((root) => { try { return fs.realpathSync(root); } catch { return path.resolve(root); } });
+  if (!dirs || realRoots.length === 0) return [];
+  const base = path.join(dirs.commonDir, 'worktrees');
+  let names;
+  try { names = fs.readdirSync(base); } catch { return []; }
+  const found = [];
+  for (const name of names.sort()) {
+    let gitdir;
+    try { gitdir = fs.readFileSync(path.join(base, name, 'gitdir'), 'utf8').trim(); } catch { continue; }
+    const checkout = path.dirname(gitdir);
+    if (realRoots.some((root) => checkout === root || checkout.startsWith(root + path.sep))) found.push({ name, checkout });
+  }
+  return found;
+}
+
 /** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
 export function diffGitIdentity(before, after) {
   const asMap = (lines) => new Map(lines.map((line) => {
@@ -408,6 +430,7 @@ export function runSelectedTests(files, {
   let result;
   let timedOut = [];
   const tempLeftovers = {};
+  let strayWorktrees = [];
   const supervisor = watchdog && runTemp
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
@@ -425,6 +448,7 @@ export function runSelectedTests(files, {
       if (!root) continue;
       for (const [prefix, count] of Object.entries(leftoverTempPrefixes(root))) tempLeftovers[prefix] = (tempLeftovers[prefix] || 0) + count;
     }
+    strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -459,6 +483,14 @@ export function runSelectedTests(files, {
     log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
     for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
     log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  result.strayWorktrees = strayWorktrees;
+  if (strayWorktrees.length) {
+    log('run-tests: ERROR: test suite left linked-checkout registrations in this repository whose checkouts were in its temp dir:');
+    for (const { name, checkout } of strayWorktrees) log(`  ${name}: ${checkout}`);
+    log('  Every later worktree add here refuses until they go: run `git worktree prune` in this checkout. A test that registers a checkout in the real repository must remove it.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 

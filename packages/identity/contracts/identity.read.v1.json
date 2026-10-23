@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "identity.read.request",
   "title": "Identity read request v1",
-  "description": "`fgos identity machine`, `fgos identity session`, `fgos identity project`, `fgos identity resolve <handle|lead:LANE>` and `fgos identity list [--project]`. Read-only: never mints, never writes. `resolve` answers the one live session of the local directory (<stateRoot>/identity/sessions/) that the handle or role alias names, or is refused `not-found` or `ambiguous` with the candidates in the message (Identity's own codes; the mailbox maps them to its own names), and in `candidates` of the `--json` refusal; `list` answers `{sessions, pruned: 0}`, oldest registration first, only the sessions of this repository's project id with `--project`. `machine` answers the machine id, its handle and its alias; `session` answers this session's full id and handle. A refusal (exit 65, no envelope) names its reason: machine-id-missing when no machine id was minted, unresolved when the caller cannot be told from any other. `project` answers the project id, handle and creation time read from the tracked file .fgos/project.json of the main checkout (also from a linked worktree); a refusal names project-id-missing when no id was minted, project-id-unreadable when the file is not valid, not-a-repository outside a git repository, git-read-failed when the repository cannot be read.",
+  "description": "`fgos identity pins` lists the machine keys this machine pinned: the first key seen for a machine id is remembered in user state (<stateRoot>/identity/pins/<machine-id>, never in a repository) and a different key claimed for that machine is refused `machine-key-changed`; the answer is {pins: [pin]} ordered by machine id. `fgos identity machine` also prints `keyFingerprint`, the `SHA256:` fingerprint of the machine signing key minted by `fgos doctor --fix` (null while no key can be read). `fgos identity machine`, `fgos identity session`, `fgos identity project`, `fgos identity resolve <handle|lead:LANE|full id>` and `fgos identity list [--project]`. Read-only: never mints, never writes. `resolve` answers the one live session of the local directory (<stateRoot>/identity/sessions/) that the handle, role alias or full id (`<machine-id>/<local id>`) names, or is refused `not-found` or `ambiguous` with the candidates in the message (Identity's own codes; the mailbox maps them to its own names; a full id of another machine is `not-found` until the shared directory exists), and in `candidates` of the `--json` refusal; `list` answers `{sessions, pruned: 0}`, oldest registration first, only the sessions of this repository's project id with `--project`. `machine` answers the machine id, its handle and its alias; `session` answers this session's full id and handle. A refusal (exit 65, no envelope) names its reason: machine-id-missing when no machine id was minted, unresolved when the caller cannot be told from any other. `project` answers the project id, handle and creation time read from the tracked file .fgos/project.json of the main checkout (also from a linked worktree); a refusal names project-id-missing when no id was minted, project-id-unreadable when the file is not valid, not-a-repository outside a git repository, git-read-failed when the repository cannot be read.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -14,7 +14,7 @@
       "type": "string"
     }
   },
-  "x-stateRoot": "the fgOS state root (FGOS_STATE_ROOT, else the holder-lock resolution); files machine-id and machine-alias",
+  "x-stateRoot": "the fgOS state root (FGOS_STATE_ROOT, else the holder-lock resolution); files machine-id and machine-alias; under identity/ the signing key machine-key (mode 600) and machine-key.pub, and pins/<machine-id>",
   "x-projectFile": ".fgos/project.json of the main checkout: {v: 1, projectId: 32 hex, handle: Convention project-handle, createdAt}",
   "definitions": {
     "refusal": {
@@ -70,7 +70,32 @@
                 "null"
               ],
               "pattern": "^[a-z][a-z0-9-]{0,39}$"
+            },
+            "keyFingerprint": {
+              "type": ["string", "null"],
+              "pattern": "^SHA256:"
             }
+          }
+        },
+        {
+          "type": "object",
+          "description": "pins",
+          "additionalProperties": false,
+          "required": ["pins"],
+          "properties": {
+            "pins": { "type": "array", "items": {
+              "type": "object",
+              "description": "a pinned machine key (the file <stateRoot>/identity/pins/<machine-id>)",
+              "additionalProperties": false,
+              "required": ["v", "machineId", "publicKey", "fingerprint", "firstSeen"],
+              "properties": {
+                "v": { "const": 1 },
+                "machineId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}$" },
+                "publicKey": { "type": "string", "pattern": "^ssh-ed25519 [A-Za-z0-9+/=]+$" },
+                "fingerprint": { "type": "string", "pattern": "^SHA256:" },
+                "firstSeen": { "type": "string" }
+              }
+            } }
           }
         },
         {
@@ -152,7 +177,8 @@
         "git-read-failed",
         "not-found",
         "ambiguous",
-        "directory-unreadable"
+        "directory-unreadable",
+        "pins-unreadable"
       ]
     }
   }

@@ -1,9 +1,9 @@
 //! Allocation store under `<stateRoot>/terminal/<driver>/<incarnationId>/`.
-//! Records and markers are published once (temp file, fsync, `link(2)`);
-//! only the group hint is rewritten.
+//! Records and markers are published once (temp file, fsync, `link(2)`) and
+//! never rewritten.
 
 use crate::port::ServerIncarnation;
-use crate::record::{AllocationRecord, GroupHint, MarkerKind};
+use crate::record::{AllocationRecord, MarkerKind};
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs;
 use std::io;
@@ -59,7 +59,6 @@ impl Store {
     pub fn open_id(state_root: &Path, driver: &str, incarnation_id: &str) -> io::Result<Store> {
         let dir = driver_dir(state_root, driver).join(incarnation_id);
         create_private_dir(&dir.join("allocations"))?;
-        create_private_dir(&dir.join("groups"))?;
         Ok(Store { dir })
     }
 
@@ -109,16 +108,6 @@ impl Store {
     pub fn has_marker(&self, key: &str, kind: MarkerKind) -> bool {
         self.allocations().join(format!("{key}.{}.json", kind.suffix())).exists()
     }
-
-    /// Rewrite the hint of a group (temp file, rename over).
-    pub fn write_hint(&self, hint: &GroupHint) -> io::Result<()> {
-        let dir = self.dir.join("groups");
-        install_result(fgos_durable_file::replace_durably_with_mode(&dir, &format!("{}.json", hint.group_key), &serde_json::to_vec(hint)?, 0o666)).map(|_| ())
-    }
-
-    pub fn read_hint(&self, group_key: &str) -> io::Result<Option<GroupHint>> {
-        read_json(&self.dir.join("groups").join(format!("{group_key}.json")))
-    }
 }
 
 fn create_private_dir(dir: &Path) -> io::Result<()> {
@@ -141,22 +130,43 @@ fn publish_once<T: Serialize>(dir: &Path, name: &str, value: &T) -> io::Result<b
     install_result(fgos_durable_file::install_once_with_mode(dir, name, &serde_json::to_vec(value)?, 0o666))
 }
 
+/// The file was installed under its final name but the parent directory sync failed, so the
+/// install is visible and not proven durable. It travels inside an `io::Error`; the caller
+/// downcasts it ([`InstallUnproven::of`]) to name the cause and keep the installed fact.
+#[derive(Debug)]
+pub struct InstallUnproven {
+    pub installed: fgos_durable_file::Installed,
+    pub source: io::Error,
+}
+
+impl InstallUnproven {
+    pub fn of(error: &io::Error) -> Option<&InstallUnproven> {
+        error.get_ref().and_then(|inner| inner.downcast_ref::<InstallUnproven>())
+    }
+}
+
+impl std::fmt::Display for InstallUnproven {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "installed ({:?}) but the parent directory sync failed: {}", self.installed, self.source)
+    }
+}
+
+impl std::error::Error for InstallUnproven {}
+
 fn install_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<bool> {
     let installed = match result {
         Ok(installed) => installed,
-        Err(error) => {
-            // The old store ignored cleanup errors and did not sync the parent.
-            // Preserve its result once the final name exists.
-            match error.installed {
-                Some(installed) => {
-                    if let Some(temp) = error.temporary {
-                        let _ = fs::remove_file(temp);
-                    }
-                    installed
+        Err(error) => match error.installed {
+            // Cleanup errors after the name exists do not change what was installed.
+            Some(installed) if error.step != "parent-fsync" => {
+                if let Some(temp) = error.temporary {
+                    let _ = fs::remove_file(temp);
                 }
-                None => return Err(error.source),
+                installed
             }
-        }
+            Some(installed) => return Err(io::Error::other(InstallUnproven { installed, source: error.source })),
+            None => return Err(error.source),
+        },
     };
     Ok(installed == fgos_durable_file::Installed::Created)
 }
@@ -175,7 +185,7 @@ mod install_mapping_tests {
         }
     }
     #[test]
-    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome() {
+    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome_unless_the_parent_sync_failed() {
         let dir = std::env::temp_dir().join(format!(
             "fgos-terminal-control-mapping-{}-{}",
             std::process::id(),
@@ -191,7 +201,6 @@ mod install_mapping_tests {
             "file-fsync",
             "name-installed",
             "temp-removed",
-            "parent-fsync",
         ] {
             let name = step;
             let result = install_result(fgos_durable_file::install_with(
@@ -215,6 +224,18 @@ mod install_mapping_tests {
                 .unwrap());
             }
         }
+        // A marker whose parent directory sync failed is visible but not proven durable: the caller
+        // must not be told plain success, and the installed file stays as the evidence.
+        let result = install_result(fgos_durable_file::install_with(
+            &dir,
+            "parent-fsync",
+            b"original",
+            &FailAt("parent-fsync"),
+        ));
+        let error = result.expect_err("a marker whose durability is unproven was reported as success");
+        let unproven = InstallUnproven::of(&error).expect("the error names the unproven install");
+        assert_eq!(unproven.installed, fgos_durable_file::Installed::Created);
+        assert_eq!(std::fs::read(dir.join("parent-fsync")).unwrap(), b"original");
         std::fs::remove_dir_all(dir).unwrap();
     }
 }

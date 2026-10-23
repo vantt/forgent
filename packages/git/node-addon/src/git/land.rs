@@ -4,16 +4,98 @@ use super::{
 };
 use crate::{check, error};
 use fgos_git::*;
-use napi::{bindgen_prelude::External, Result};
+use napi::{bindgen_prelude::External, Env, JsObject, Result};
 use napi_derive::napi;
 use serde_json::{json, Value};
-use std::path::Path;
-#[napi]
-pub struct GitLand {
+use std::{
+    path::Path,
+    sync::{Arc, Mutex, MutexGuard, PoisonError},
+};
+/// What the port may do next. `Pending` is a call running off the JS thread;
+/// `closed` records a `close()` that arrived meanwhile, so the session that call
+/// produces is dropped when it settles and never holds the destination slot.
+enum State {
+    Idle,
+    Pending { closed: bool },
+    Open(Box<LandSession>),
+}
+struct Core {
     driver: GitDriver,
     repo: RepoHandle,
     writer: String,
-    session: Option<LandSession>,
+}
+/// Why a call failed, kept apart from `napi::Error` so it can cross threads.
+enum Failure {
+    Operation(OperationError),
+    Text(&'static str),
+}
+fn slot(state: &Mutex<State>) -> MutexGuard<'_, State> {
+    state.lock().unwrap_or_else(PoisonError::into_inner)
+}
+/// Ends a pending call. The session is kept only if `close()` did not run meanwhile;
+/// the answer says whether it did.
+fn settle(state: &Mutex<State>, session: Option<LandSession>) -> bool {
+    let mut guard = slot(state);
+    let closed = matches!(*guard, State::Pending { closed: true });
+    *guard = match session {
+        Some(session) if !closed => State::Open(Box::new(session)),
+        _ => State::Idle,
+    };
+    closed
+}
+fn pending_state(state: &Mutex<State>) -> Result<()> {
+    match *slot(state) {
+        State::Idle => Ok(()),
+        State::Pending { .. } => Err(error("land-call-pending")),
+        State::Open(_) => Err(error("land-session-already-open")),
+    }
+}
+fn into_napi(outcome: std::result::Result<Value, Failure>) -> Result<Value> {
+    outcome.map_err(|failure| match failure {
+        Failure::Operation(e) => operation(e),
+        Failure::Text(text) => error(text),
+    })
+}
+fn answer(env: Env, outcome: std::result::Result<Value, Failure>) -> Result<JsObject> {
+    let (deferred, promise) = env.create_deferred::<Value, _>()?;
+    deferred.resolve(move |_| into_napi(outcome));
+    Ok(promise)
+}
+/// The one rule for a call that panics: the port goes back to idle and the call fails by name.
+fn guarded(
+    state: &Mutex<State>,
+    job: impl FnOnce() -> std::result::Result<Value, Failure>,
+) -> std::result::Result<Value, Failure> {
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(job)).unwrap_or_else(|_| {
+        *slot(state) = State::Idle;
+        Err(Failure::Text("land-worker-failed"))
+    })
+}
+/// Runs a call on its own thread so a wait never blocks the event loop, and
+/// returns the promise it settles. A worker that panics leaves the port idle.
+fn spawn(
+    env: Env,
+    state: &Arc<Mutex<State>>,
+    job: impl FnOnce() -> std::result::Result<Value, Failure> + Send + 'static,
+) -> Result<JsObject> {
+    let (deferred, promise) = env.create_deferred::<Value, _>()?;
+    let owned = Arc::clone(state);
+    let spawned = std::thread::Builder::new()
+        .name("fgos-land".into())
+        .spawn(move || {
+            let outcome = guarded(&owned, job);
+            deferred.resolve(move |_| into_napi(outcome));
+        });
+    if let Err(e) = spawned {
+        *slot(state) = State::Idle;
+        return Err(error(e));
+    }
+    Ok(promise)
+}
+#[napi]
+pub struct GitLand {
+    core: Arc<Core>,
+    state: Arc<Mutex<State>>,
 }
 #[napi]
 impl GitLand {
@@ -34,18 +116,20 @@ impl GitLand {
             _ => return Err(error("not-a-repository")),
         };
         Ok(Self {
-            driver,
-            repo,
-            writer,
-            session: None,
+            core: Arc::new(Core {
+                driver,
+                repo,
+                writer,
+            }),
+            state: Arc::new(Mutex::new(State::Idle)),
         })
     }
+    /// With held locks the call makes one attempt on this thread, because a borrowed
+    /// lock never leaves the call that lent it; without them it waits on its own thread.
     #[napi]
-    pub fn prepare(&mut self, args: Value, loans: Vec<External<Loan>>) -> Result<Value> {
+    pub fn prepare(&self, env: Env, args: Value, loans: Vec<External<Loan>>) -> Result<JsObject> {
         check()?;
-        if self.session.is_some() {
-            return Err(error("land-session-already-open"));
-        }
+        pending_state(&self.state)?;
         let request: LandRequest = serde_json::from_value(
             args.get("request")
                 .cloned()
@@ -56,44 +140,81 @@ impl GitLand {
             None => 0,
             Some(value) => value.as_u64().ok_or_else(|| error("invalid land waitMs"))?,
         };
-        let session = self
-            .driver
-            .prepare_land_wait(
-                &self.repo,
-                consume(loans)?,
-                &request,
-                &self.writer,
-                text(&args, "operationId")?,
-                wait_ms,
-            )
-            .map_err(operation)?;
-        let result = json!({"candidate":session.candidate(),"receipt":session.receipt()});
-        self.session = Some(session);
-        Ok(result)
+        let id = text(&args, "operationId")?.to_owned();
+        let held = consume(loans)?;
+        if !held.is_empty() && wait_ms > 0 {
+            return Err(error("land-wait-with-held-locks"));
+        }
+        *slot(&self.state) = State::Pending { closed: false };
+        let (core, state) = (Arc::clone(&self.core), Arc::clone(&self.state));
+        let held_here = !held.is_empty();
+        let job = move |held| match core.driver.prepare_land(
+            &core.repo,
+            held,
+            &request,
+            &core.writer,
+            &id,
+            &wal::OsFileSystem,
+            wait_ms,
+        ) {
+            Ok(session) => {
+                let result = json!({"candidate":session.candidate(),"receipt":session.receipt()});
+                if settle(&state, Some(session)) {
+                    Err(Failure::Text("land-session-closed"))
+                } else {
+                    Ok(result)
+                }
+            }
+            Err(e) => {
+                settle(&state, None);
+                Err(Failure::Operation(e))
+            }
+        };
+        if held_here {
+            return answer(env, guarded(&self.state, || job(held)));
+        }
+        spawn(env, &self.state, move || job(Vec::new()))
     }
     #[napi]
-    pub fn publish(&mut self, evidence: Value, wait_ms: Option<u32>) -> Result<Value> {
+    pub fn publish(&self, env: Env, evidence: Value, wait_ms: Option<u32>) -> Result<JsObject> {
         check()?;
         let evidence: LandEvidence = serde_json::from_value(evidence).map_err(error)?;
-        let session = self
-            .session
-            .as_mut()
-            .ok_or_else(|| error("land-session-required"))?;
-        Ok(json!(self
-            .driver
-            .publish_land_wait(&self.repo, session, &evidence, wait_ms.unwrap_or(0).into())
-            .map_err(operation)?))
+        let mut session = {
+            let mut guard = slot(&self.state);
+            match std::mem::replace(&mut *guard, State::Pending { closed: false }) {
+                State::Open(session) => *session,
+                State::Pending { closed } => {
+                    *guard = State::Pending { closed };
+                    return Err(error("land-call-pending"));
+                }
+                State::Idle => {
+                    *guard = State::Idle;
+                    return Err(error("land-session-required"));
+                }
+            }
+        };
+        let (core, state) = (Arc::clone(&self.core), Arc::clone(&self.state));
+        spawn(env, &self.state, move || {
+            let receipt = core.driver.publish_land(
+                &core.repo,
+                &mut session,
+                &evidence,
+                &wal::OsFileSystem,
+                wait_ms.unwrap_or(0).into(),
+            );
+            settle(&state, Some(session));
+            receipt.map(|r| json!(r)).map_err(Failure::Operation)
+        })
     }
     #[napi]
     pub fn recover(&self, args: Value, loans: Vec<External<Loan>>) -> Result<Value> {
         check()?;
-        if self.session.is_some() {
-            return Err(error("land-session-already-open"));
-        }
+        pending_state(&self.state)?;
         let id = text(&args, "operationId")?;
         let receipt = self
+            .core
             .driver
-            .recover_land(&self.repo, consume(loans)?, &self.writer, id)
+            .recover_land(&self.core.repo, consume(loans)?, &self.core.writer, id)
             .map_err(operation)?;
         let warnings = match args.get("consumerAcknowledgement") {
             Some(value) => {
@@ -103,8 +224,9 @@ impl GitLand {
                 if acknowledgement.is_empty() {
                     return Err(error("land-consumer-acknowledgement-required"));
                 }
-                self.driver
-                    .acknowledge_land(&self.repo, &self.writer, id, acknowledgement)
+                self.core
+                    .driver
+                    .acknowledge_land(&self.core.repo, &self.core.writer, id, acknowledgement, &wal::OsFileSystem)
                     .unwrap_or_else(|e| vec![format!("land-cleanup-deferred: {}", e.cause)])
             }
             None => vec![],
@@ -112,9 +234,13 @@ impl GitLand {
         Ok(json!({"receipt": receipt, "warnings": warnings}))
     }
     #[napi]
-    pub fn close(&mut self) -> Result<()> {
+    pub fn close(&self) -> Result<()> {
         check()?;
-        self.session.take();
+        let mut guard = slot(&self.state);
+        *guard = match *guard {
+            State::Pending { .. } => State::Pending { closed: true },
+            _ => State::Idle,
+        };
         Ok(())
     }
 }

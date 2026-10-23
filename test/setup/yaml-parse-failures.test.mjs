@@ -132,7 +132,7 @@ test('a self-referencing workflow document is a named problem and does not hang 
   write('core/workflows/loop.yaml', 'id: loop\nsteps: &s\n  - id: a\n    capability: demo:loop\n    again: *s\n');
   const result = await checkById('workflow-capabilities-configured')(root);
   assert.equal(result.passed, false);
-  assert.match(result.message, /core\/workflows\/loop\.yaml: cannot be parsed: .*aliases expand to more than/);
+  assert.match(result.message, /core\/workflows\/loop\.yaml: cannot be parsed: node limit \(line 3, column \d+\)/);
 });
 
 test('fgos doctor still runs and lists every check when agent and workflow files are malformed', (t) => {

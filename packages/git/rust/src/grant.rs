@@ -1,6 +1,5 @@
 //! Read-only host check for the cutover guard. A selector conveys no authority.
 use crate::{
-    refs::failure,
     wal::{self, OperationKind, Phase},
     *,
 };
@@ -32,11 +31,11 @@ impl GitDriver {
                 return Err(failure("cutover-main-required"));
             }
             let journal =
-                wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-            if journal.compacted(operation_id).map_err(failure)?.is_some() {
+                wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+            if journal.compacted(operation_id)?.is_some() {
                 return Err(failure("cutover-grant-spent-or-unprepared"));
             }
-            let chain = journal.inspect(operation_id).map_err(failure)?;
+            let chain = journal.inspect(operation_id)?;
             let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
                 return Err(failure("cutover-grant-missing"));
             };

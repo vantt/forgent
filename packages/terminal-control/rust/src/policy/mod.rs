@@ -2,6 +2,7 @@
 //! deterministic function from measured geometry to a placement decision.
 //! It never changes ownership or lifecycle and never closes a pane.
 
+pub mod even_split;
 pub mod measured_split;
 
 use crate::driver::{Direction, Rect, TabGeometry};
@@ -14,8 +15,6 @@ pub struct GroupPane {
     pub tab_id: String,
     pub pane_id: String,
     pub rect: Rect,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub role_hint: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -30,8 +29,9 @@ pub struct Limits {
 #[serde(rename_all = "camelCase")]
 pub struct PlaceRequest {
     pub label: String,
+    /// How many panes the caller's batch will open in all; absent when unknown.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub role_hint: Option<String>,
+    pub group_size: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -66,10 +66,10 @@ pub trait PlacementPolicy {
 }
 
 /// Policy used when `terminal.layout.policy` is not set.
-pub const DEFAULT_POLICY: &str = "measured-split";
+pub const DEFAULT_POLICY: &str = even_split::NAME;
 
 /// Every policy name the registry resolves.
-pub const POLICY_NAMES: [&str; 1] = [measured_split::NAME];
+pub const POLICY_NAMES: [&str; 2] = [even_split::NAME, measured_split::NAME];
 
 /// A configuration error: `terminal.layout.policy` names no known policy.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -94,6 +94,7 @@ impl std::error::Error for PolicyError {}
 /// Resolve a configured policy name; `None` selects the default.
 pub fn policy_by_name(name: Option<&str>) -> Result<Box<dyn PlacementPolicy>, PolicyError> {
     match name.unwrap_or(DEFAULT_POLICY) {
+        even_split::NAME => Ok(Box::new(even_split::EvenSplit)),
         measured_split::NAME => Ok(Box::new(measured_split::MeasuredSplit)),
         other => Err(PolicyError::Unknown {
             name: other.to_string(),

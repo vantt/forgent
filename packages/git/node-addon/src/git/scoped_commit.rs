@@ -50,11 +50,11 @@ impl GitScopedCommit {
             "worktreeState" => Ok(json!(self.driver.checkout_state(&self.repo, held).map_err(operation)?)),
             "preflight" => Ok(json!(self
                 .driver
-                .preflight_commit_for_sync(&self.repo, held, args.get("syncOperationId").and_then(Value::as_str).map(|id| (self.writer.as_str(), id)))
+                .preflight_commit(&self.repo, held, args.get("syncOperationId").and_then(Value::as_str).map(|id| (self.writer.as_str(), id)))
                 .map_err(operation)?)),
             "recover" => Ok(json!(self
                 .driver
-                .recover_scoped_commit(&self.repo, held, &self.writer, text(&args, "operationId")?)
+                .recover_scoped_commit(&self.repo, held, &self.writer, text(&args, "operationId")?, &wal::OsFileSystem)
                 .map_err(operation)?)),
             "commit" => {
                 let baseline: CommitBaseline =
@@ -69,7 +69,8 @@ impl GitScopedCommit {
                         &baseline,
                         &request,
                         &self.writer,
-                        text(&args, "operationId")?
+                        text(&args, "operationId")?,
+                        &wal::OsFileSystem
                     )
                     .map_err(operation)?))
             }

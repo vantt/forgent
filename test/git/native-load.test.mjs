@@ -22,8 +22,50 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, yaml: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
+});
+test('ports.v1.json names only operations the loaded addon answers, and each port refuses an unlisted name by name', { skip: process.platform === 'win32' }, () => {
+  // The listing is what an addon port dispatches; a name the port does not serve is refused with
+  // its own "unknown ... method" cause, and every other answer (including a refusal of the empty
+  // arguments) proves the name is dispatched. No Rust source is parsed.
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/git/contracts/ports.v1.json', import.meta.url), 'utf8'));
+  const unknownMethod = /unknown[- ].*method/;
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ports-'));
+  const repo = path.join(temp, 'repo');
+  let publication;
+  try {
+    execFileSync('git', ['init', '-q', '--initial-branch=trunk', repo]);
+    fs.mkdirSync(path.join(repo, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });
+    fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
+    fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+    const open = (port, ...rest) => new addon[`Git${port}`](temp, repo, repo, ...rest);
+    // Arguments each port reads before it dispatches on the name.
+    const prelude = {
+      Refs: { name: 'refs/heads/ports', operationId: 'ports' },
+      Sync: { operationId: 'ports' },
+      Remote: { remoteGrant: { name: 'origin', pinnedUrl: path.join(temp, 'nowhere') }, mappings: [], operationId: 'ports' },
+      RepositoryConfig: { ownedPath: path.join(temp, 'owned') },
+    };
+    publication = new addon.GitPublication(temp, repo, repo, 'refs/fgos/events/fixture', 'fixture');
+    const ports = {
+      Inspect: open('Inspect'), RepositoryConfig: open('RepositoryConfig'), Publication: publication,
+      ...Object.fromEntries(['Refs', 'Worktree', 'ScopedCommit', 'Sync', 'SafeRestore', 'Remote', 'Recovery', 'Land'].map(name => [name, open(name, 'fixture')])),
+    };
+    assert.deepEqual(Object.keys(contract.ports).sort(), Object.keys(ports).sort());
+    for (const [name, port] of Object.entries(ports)) {
+      if (name === 'Land') { for (const operation of contract.ports.Land) assert.equal(typeof port[operation], 'function', `Land.${operation}`); continue; }
+      const args = prelude[name] ?? {};
+      for (const operation of contract.ports[name]) {
+        try { port.call(operation, args, []); } catch (error) { assert.doesNotMatch(error.message, unknownMethod, `${name}.${operation}`); }
+      }
+      assert.throws(() => port.call('noSuchOperation', args, []), unknownMethod, `${name} refuses an unlisted name`);
+    }
+    for (const name of contract.functions) assert.equal(typeof addon[name], 'function', name);
+  } finally {
+    publication?.close();
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
 });
 test('a second physical addon copy refuses at load, while a child owns its own marker', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-copy-'));
@@ -315,17 +357,18 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     execFileSync('git', ['init', '-q', repo]);
     git('remote', 'add', 'upstream', '/fixture/remote');
     git('remote', 'add', 'origin', '/fixture/origin');
+    for (const mapping of addon.gitFetchMappings('origin')) git('config', '--add', 'remote.origin.fetch', mapping);
     git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
-    const transport = checkGit(repo, 'git-transport-config', options);
+    const transport = checkGit(repo, 'git-repository-config', options);
     assert.equal(transport.passed, false);
     assert.match(transport.message, /persist-credentials: false/);
     assert.match(transport.message, /trusted global credential helper or GIT_CONFIG_GLOBAL/);
     assert.doesNotMatch(transport.message, /AUTHORIZATION: secret/);
     assert.equal(git('config', '--get', 'http.https://github.com/.extraheader'), 'AUTHORIZATION: secret');
     git('config', '--unset', 'http.https://github.com/.extraheader');
-    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);
+    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
     git('config', 'credential.helper', 'untrusted-helper');
-    const localHelper = checkGit(repo, 'git-transport-config', options);
+    const localHelper = checkGit(repo, 'git-repository-config', options);
     assert.equal(localHelper.passed, false);
     assert.match(localHelper.message, /persist-credentials: false/);
     git('config', '--unset', 'credential.helper');
@@ -337,14 +380,8 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\nhelper = trusted-helper\\n');
     process.env.HOME = trustedHome;
     process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');
-    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);
-    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
-    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));
-    const bare = path.join(root, 'bare');
-    execFileSync('git', ['init', '-q', '--bare', bare]);
-    git('remote', 'add', 'helper-proof', bare);
-    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);
-    assert.deepEqual(remotePort.inspectRemote({remoteGrant:{name:'helper-proof',pinnedUrl:bare},refs:['refs/heads/trunk']}), []);
+    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
+    assert.match(checkGit(repo, 'git-component-compatible', options).message, /^info: .+: .+; .+/);
     if (priorHome === undefined) delete process.env.HOME; else process.env.HOME = priorHome;
     if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;
 
@@ -356,30 +393,30 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));
     const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');
     git('config', '--add', 'remote.upstream.fetch', obsolete);
-    assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, false);
+    assert.equal(checkGit(repo, 'git-repository-config', options).passed, false);
     const mappingFix = fixGitFetchMapping(repo, options);
     assert.equal(mappingFix.changed, true, mappingFix.message);
-    const mappingCheck = checkGit(repo, 'git-publication-refspecs', options);
+    const mappingCheck = checkGit(repo, 'git-repository-config', options);
     assert.equal(mappingCheck.passed, true, mappingCheck.message);
     assert.equal(git('config', '--get-all', 'remote.origin.fetch').includes(oldOrigin), false);
     git('config', '--add', 'remote.origin.fetch', oldOrigin);
-    const originCheck = checkGit(repo, 'git-publication-refspecs', options);
+    const originCheck = checkGit(repo, 'git-repository-config', options);
     assert.equal(originCheck.passed, false);
     assert.match(originCheck.message, /obsolete exact legacy mapping.*plain fetch.*doctor --fix/);
     assert.equal(fixGitFetchMapping(repo, options).changed, true);
     assert.equal(git('config', '--get-all', 'remote.upstream.fetch').split('\\n').includes(obsolete), false);
     assert.equal(fixGitFetchMapping(repo, options).changed, false);
     git('config', '--add', 'remote.upstream.fetch', obsolete);
-    assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, false);
+    assert.equal(checkGit(repo, 'git-repository-config', options).passed, false);
     assert.equal(fixGitFetchMapping(repo, options).changed, true);
-    assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, true);
+    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
 
     // Reserved legacy mirrors are diagnosed, never silently read as event tips.
     git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
     git('commit', '--allow-empty', '-qm', 'fixture');
     const badRef = 'refs/fgos/remotes/origin/legacy/events/m';
     git('update-ref', badRef, 'HEAD');
-    const reserved = checkGit(repo, 'git-publication-refspecs', options);
+    const reserved = checkGit(repo, 'git-repository-config', options);
     assert.equal(reserved.passed, false); assert.ok(reserved.message.includes(badRef));
     git('update-ref', '-d', badRef);
 

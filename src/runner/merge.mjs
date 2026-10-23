@@ -100,9 +100,7 @@ const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
 // pre-formatted description (e.g. `diff for branch "${branch}"` or
 // `pull-door diff for range "${range}"`) — this helper never reformats it.
 function diffFailureMessage(label, err) {
-  let cause;
-  try { cause = JSON.parse(err.message).cause; } catch { /* native diagnostic is optional */ }
-  if (err.code === 'ENOBUFS' || cause === 'git-output-limit') {
+  if (err.code === 'ENOBUFS' || nativeError(err).cause === 'git-output-limit') {
     return (
       `${label} exceeds the ${DIFF_MAX_BUFFER}-byte diff limit — ` +
       'the branch is likely very stale relative to its merge target (many commits behind); ' +

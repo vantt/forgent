@@ -24,14 +24,14 @@ export function gitWriter(fgosDir) {
   return String(resolveWriterIdentity(fgosDir).id);
 }
 
-export function gitPortOptions(repoPath, { mutation = false } = {}) {
+/** Mutation options resolve the repository once; a caller that already holds an inspect port for
+ * `repoPath` passes it as `inspect` so that resolution is not repeated. */
+export function gitPortOptions(repoPath, { mutation = false, inspect } = {}) {
   outsideGate();
   const stateRoot = resolveStateRoot().stateRoot;
   const seed = { stateRoot, repoPath, trustedMain: repoPath };
   if (!mutation) return seed;
-  const facts = createGitInspect(seed).resolveRepo();
+  const facts = (inspect ?? createGitInspect(seed)).resolveRepo();
   if (facts.notARepository) return seed;
-  const options = { ...seed, trustedMain: facts.trustedMainRoot };
-  if (mutation) options.writer = gitWriter(path.join(facts.trustedMainRoot, '.fgos'));
-  return options;
+  return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter(path.join(facts.trustedMainRoot, '.fgos')) };
 }

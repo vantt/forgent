@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Commands every runner-created worktree runs after its dependency install.
+worktreeSetup:
+  # @fgos:doc Shell commands run in a new worktree after its dependency install; an empty list runs nothing beyond the install. Default: [].
+  commands: []

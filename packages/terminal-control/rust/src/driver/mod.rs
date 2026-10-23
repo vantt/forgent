@@ -8,7 +8,7 @@ use crate::port::{Refusal, ServerIncarnation};
 use serde::{Deserialize, Serialize};
 
 /// Capability names, exactly as `driver-capabilities.v1.json` spells them.
-pub const CAPABILITIES: [&str; 15] = [
+pub const CAPABILITIES: [&str; 12] = [
     "tab.create",
     "pane.split",
     "pane.close",
@@ -20,9 +20,6 @@ pub const CAPABILITIES: [&str; 15] = [
     "activity.state",
     "label",
     "layout.geometry",
-    "pane.resize",
-    "pane.swap",
-    "pane.move",
     "server.incarnation",
 ];
 
@@ -37,7 +34,7 @@ pub struct Rect {
 
 /// Real size of a pane's pty when the driver can read it. The layout rect a
 /// multiplexer reports can differ from the pty (measured on herdr with two
-/// clients attached), so re-measuring prefers this when present.
+/// clients attached), so re-measuring a new pane prefers this when present.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PtySize {
     pub cols: u32,
@@ -49,8 +46,6 @@ pub struct PtySize {
 pub struct PaneGeometry {
     pub pane_id: String,
     pub rect: Rect,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pty: Option<PtySize>,
 }
 
 /// Measured geometry of one tab.
@@ -131,6 +126,16 @@ pub struct ActivityDetail {
     pub prompt_text: String,
 }
 
+/// What the multiplexer says about the agents it can start. A field is `None`
+/// when the multiplexer's text could not be read: unknown, never a guess.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct AgentFacts {
+    /// The agent kinds a launch may name.
+    pub kinds: Option<Vec<String>>,
+    /// Integration hook state per agent: `current`, `outdated` or `not installed`.
+    pub integrations: Option<std::collections::BTreeMap<String, String>>,
+}
+
 /// Outcome of a close that checked the server incarnation before and after.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CloseOutcome {
@@ -175,26 +180,23 @@ pub trait TerminalDriver {
     ) -> DriverResult<String>;
     fn process_info(&self, pane: &str) -> DriverResult<ProcessInfo>;
     fn activity(&self, pane: &str) -> DriverResult<Activity>;
-    /// Start an agent of `kind` in the pane through the driver's agent support.
-    fn activity_start(
-        &self,
-        pane: &str,
-        name: &str,
-        kind: &str,
-        args: &[String],
-        timeout_ms: u64,
-    ) -> DriverResult<()>;
     /// The driver's own detector verdict for the pane (`activity.state`).
     fn activity_detail(&self, _pane: &str) -> DriverResult<ActivityDetail> {
         Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} gives no detector detail", self.name()) })
     }
-    /// Tell the driver which agent runs in a pane it does not recognise, so
-    /// the pane can be addressed as one (`activity.state`).
-    fn report_agent(&self, _pane: &str, _agent: &str, _state: &str) -> DriverResult<()> {
-        Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} cannot be told an agent", self.name()) })
-    }
-    fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()>;
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
-    /// Geometry of the tab holding `pane`.
+    /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;
+    /// The socket the driver talks to, when it can be named without asking the server.
+    fn socket_path(&self) -> Option<String> {
+        None
+    }
+    /// The agent kinds and integration hooks the multiplexer reports; unknown by default.
+    fn agent_facts(&self) -> AgentFacts {
+        AgentFacts::default()
+    }
+    /// The pty size behind `pane` when the driver and the OS allow the read.
+    fn pane_pty(&self, _pane: &str) -> Option<PtySize> {
+        None
+    }
 }

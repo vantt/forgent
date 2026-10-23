@@ -3,17 +3,19 @@
 //! the hook path); `identity machine|session|project|resolve|list` read
 //! (`identity.read`); `identity machine --alias`, `identity project
 //! --init|--new`, `identity session --register|--drop-role`, `identity list --prune` and
-//! `identity mint <kind>` write (`identity.write`).
+//! `identity pins --forget <machine-id>` and `identity mint <kind>` write (`identity.write`).
 
 use crate::current::{current_session, machine_info, os_pid_facts, session_info, set_alias};
 pub use crate::current::{MachineInfo, SessionInfo};
 use crate::directory;
 use crate::mint;
 use crate::proc_tree::os_process_tree;
+use crate::pins;
 use crate::project;
 pub use crate::refusal::Refusal;
 use crate::resolve::{resolve, WriterIdentity};
 use crate::session::PidFacts;
+use crate::signing;
 use fgos_process::facts::judge_here;
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
@@ -30,7 +32,7 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "resolve", "list", "mint"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "resolve", "list", "mint", "pins"];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
@@ -91,7 +93,7 @@ pub enum Verb {
     /// `session [--register [--role lead:<LANE> [--take]] | --drop-role lead:<LANE>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
-    /// `resolve <handle|lead:<LANE>>`: the one live session it names.
+    /// `resolve <handle|lead:<LANE>|full id>`: the one live session it names.
     Resolve { query: String },
     /// `list [--project] [--prune]`: the sessions the machine knows.
     List { project: bool, prune: bool },
@@ -99,6 +101,8 @@ pub enum Verb {
     Project(ProjectAction),
     /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
     Mint { kind: String, release: Option<u64> },
+    /// `pins [--forget <machine-id>]`: the pinned machine keys, or one pin removed.
+    Pins { forget: Option<String> },
 }
 
 /// What `identity session` does.
@@ -145,11 +149,13 @@ impl IdentityRequest {
             | Verb::Session(SessionAction::Read)
             | Verb::Project(ProjectAction::Read)
             | Verb::Resolve { .. }
+            | Verb::Pins { forget: None }
             | Verb::List { prune: false, .. } => IDENTITY_READ_OPERATION_ID,
             Verb::Machine { alias: Some(_) }
             | Verb::Session(SessionAction::Register { .. } | SessionAction::DropRole { .. })
             | Verb::Project(_)
             | Verb::List { prune: true, .. }
+            | Verb::Pins { forget: Some(_) }
             | Verb::Mint { .. } => IDENTITY_WRITE_OPERATION_ID,
         }
     }
@@ -292,7 +298,19 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
                 Some(alias) => set_alias(&root, alias)?,
                 None => machine_info(&root)?,
             };
-            Ok(serde_json::to_value(info).expect("MachineInfo always serializes"))
+            // The key fingerprint is read-only context; a key that cannot be read shows as null
+            // and the `identity-machine-key` and `identity-ssh-keygen` doctor rows say why.
+            let key_fingerprint = signing::key_fingerprint(&root).ok().flatten();
+            let mut value = serde_json::to_value(info).expect("MachineInfo always serializes");
+            value
+                .as_object_mut()
+                .expect("MachineInfo is an object")
+                .insert("keyFingerprint".into(), serde_json::json!(key_fingerprint));
+            Ok(value)
+        }
+        Verb::Pins { forget: None } => Ok(serde_json::json!({ "pins": pins::list(&root)? })),
+        Verb::Pins { forget: Some(machine_id) } => {
+            Ok(serde_json::json!({ "forgotten": pins::forget(&root, machine_id)? }))
         }
         Verb::Project(action) => {
             let dir = std::env::current_dir().map_err(|e| Refusal {

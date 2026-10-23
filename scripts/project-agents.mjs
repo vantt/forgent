@@ -31,6 +31,7 @@ import path from 'node:path';
 
 import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { parseYaml } from '../src/util/yaml.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
@@ -252,5 +253,6 @@ function main() {
 }
 
 if (isMainModule(import.meta.url)) {
+  ensureAddonForScript();
   main();
 }

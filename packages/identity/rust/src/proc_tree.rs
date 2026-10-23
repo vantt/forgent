@@ -14,6 +14,11 @@ pub struct ProcStat {
 /// (gone, hidden, or the platform has no way to ask).
 pub trait ProcessTree {
     fn stat(&self, pid: u32) -> Option<ProcStat>;
+    /// The kernel's short command name of `pid` (Linux `comm`); `None` when
+    /// unreadable or the platform has no such read.
+    fn comm(&self, _pid: u32) -> Option<String> {
+        None
+    }
 }
 
 /// Linux driver: one `/proc/<pid>/stat` read through `fgos-process`, the
@@ -30,6 +35,10 @@ impl ProcessTree for FactsTree {
             session: relation.session,
             tty_nr: relation.tty_nr,
         })
+    }
+
+    fn comm(&self, pid: u32) -> Option<String> {
+        fgos_process::facts::command_name_of(fgos_process::ProcId(pid))
     }
 }
 

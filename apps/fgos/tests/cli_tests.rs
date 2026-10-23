@@ -1201,6 +1201,7 @@ fn identity_command(args: &[&str]) -> Command {
     for key in [
         "FGOS_SESSION_ID",
         "CODEX_THREAD_ID",
+        "PI_SESSION_ID",
         "CLAUDE_CODE_SESSION_ID",
     ] {
         cmd.env_remove(key);
@@ -1373,6 +1374,8 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
 
     assert_eq!(identity_data(&run("beta", &["resolve", &a, "--json"]))["id"], "fg-server-abc234/alpha");
     assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], a.as_str());
+    assert_eq!(identity_data(&run("beta", &["resolve", "fg-server-abc234/alpha", "--json"]))["handle"], a.as_str());
+    assert_eq!(run("beta", &["resolve", "fg-other-xyz789/alpha"]).status.code(), Some(65));
     assert_eq!(identity_data(&run("beta", &["list", "--json"]))["sessions"].as_array().unwrap().len(), 2);
 
     let held = run("beta", &["session", "--role", "lead:MAIL"]);
@@ -1433,11 +1436,11 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
     assert_eq!(
         identity_data(&machine(&["--json"])),
-        serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server", "alias": null })
+        serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server", "alias": null, "keyFingerprint": null })
     );
     assert_eq!(
         identity_data(&machine(&["--alias", "owner"])),
-        serde_json::json!({ "id": "fg-server-abc234", "handle": "owner", "alias": "owner" })
+        serde_json::json!({ "id": "fg-server-abc234", "handle": "owner", "alias": "owner", "keyFingerprint": null })
     );
     assert_eq!(
         identity_data(&machine(&[]))["handle"],
@@ -1450,6 +1453,33 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
         fs::read_to_string(state.join("machine-alias")).unwrap().trim(),
         "owner"
     );
+    let _ = fs::remove_dir_all(&state);
+}
+
+/// `fgos identity pins`: the wiring of the read and of `--forget` (read versus
+/// write operation, flag validation, exit code of a refusal). What a pin is and
+/// when it is made is owned by the identity crate's signing tests.
+#[test]
+fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
+    let state = std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&state);
+    fs::create_dir_all(state.join("identity/pins")).unwrap();
+    let pin = serde_json::json!({
+        "v": 1, "machineId": "peer-abc234", "publicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPLegqRm6sBzTw7JLFKGzcduIlAVoH8jcr9dq746BdvU",
+        "fingerprint": "SHA256:5wLNh9SwL7zhGNE0qofyBNDQfRFTovOOLn//JmogtF0", "firstSeen": "2026-10-23T00:00:00.000Z"
+    });
+    fs::write(state.join("identity/pins/peer-abc234"), pin.to_string()).unwrap();
+    let pins = |args: &[&str]| {
+        identity_command(&[&["pins"], args].concat()).env("FGOS_STATE_ROOT", &state).output().unwrap()
+    };
+
+    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [pin] }));
+    let missing = pins(&["--forget", "other-abc234"]);
+    assert_eq!(missing.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("[pin-not-found]"));
+    assert_ne!(pins(&["--forget"]).status.code(), Some(0), "--forget needs a machine id");
+    assert_eq!(identity_data(&pins(&["--forget", "peer-abc234"])), serde_json::json!({ "forgotten": pin }));
+    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [] }));
     let _ = fs::remove_dir_all(&state);
 }
 

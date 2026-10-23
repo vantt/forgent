@@ -286,7 +286,8 @@ test('importing reconcile and the reconciliation planner in a fresh process load
     cwd: root,
     encoding: 'utf8',
     timeout: 30_000,
-    env: { ...process.env, RECONCILE_CLOSURE_ENTRIES: JSON.stringify(ENTRY_POINTS.map((file) => pathToFileURL(file).href)) },
+    // No NODE_OPTIONS: the suite's own preloads (git spawn spy, git config guard) load modules before the hook is registered, and a module already loaded is not reported.
+    env: { ...process.env, NODE_OPTIONS: '', RECONCILE_CLOSURE_ENTRIES: JSON.stringify(ENTRY_POINTS.map((file) => pathToFileURL(file).href)) },
   });
   const loaded = JSON.parse(stdout);
   const files = loaded.filter((url) => url.startsWith('file:')).map((url) => fileURLToPath(url)).sort();

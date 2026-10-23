@@ -15,8 +15,12 @@ description: >-
 # fgOS terminal
 
 Renames the current herdr pane, when the session is running inside one,
-to `<task-id> | fg.ssid:<fgOS/bee session id> | a.ssid:<agent tool's own
-session id>` — dropping either session-id segment it cannot resolve. Pure
+to `<short id> · <title> | fg.ssid:<first 8 of the fgOS/bee session id>` —
+the short id is the first 8 characters of the task id, the title is cut at
+24 characters, and a task whose title the skill does not know shows the short
+id alone. The port builds that text from the fields the script passes (one
+format for the shell and for dispatched panes); the agent tool's own session
+id is not shown, and full ids stay in the allocation record. Pure
 herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),
 written through the terminal-control port: it takes the caller's own pane
 (`fgos internal terminal-control attach`, keyed by this session's writer id,
@@ -97,7 +101,9 @@ state, never chrome. This skill only ever writes.
    bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal/rename.sh "<task-id>" "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   substituting `<task-id>` from step 1. Always use the literal
+   substituting `<task-id>` from step 1. When the title of the task is known,
+   pass it as a third argument (`"<title>"`) and it follows the short id;
+   without it the label shows the short id alone. Always use the literal
    `${CLAUDE_PROJECT_DIR}` substitution shown above, never a relative
    path — an installed plugin's files run from a copied cache location,
    not from this repo checkout, so a relative path would resolve to the

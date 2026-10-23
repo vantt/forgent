@@ -17,7 +17,7 @@
   "environment": {
     "FGOS_SESSION_ID": "the minted writer id of the attempt (never empty)",
     "FGOS_PARENT_WRITER_ID": "writer id of the controller that wrote the envelope; absent when the controller has none",
-    "scrubbed": ["CLAUDE_CODE_SESSION_ID", "CODEX_THREAD_ID", "FGOS_PARENT_WRITER_ID"]
+    "scrubbed": ["CLAUDE_CODE_SESSION_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "PI_SESSION_FILE", "FGOS_PARENT_WRITER_ID"]
   },
   "vector": "packages/identity/contracts/vectors/attempt-writer-id.v1.json; the Rust and the Node implementation must reproduce every case"
 }

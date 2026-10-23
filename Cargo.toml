@@ -25,6 +25,7 @@ members = [
     "packages/secrets/rust",
     "packages/seat-binding/rust",
     "packages/yaml-doc/rust",
+    "packages/config/rust",
 ]
 exclude = [
     "herdr-dashboard",
@@ -46,6 +47,9 @@ serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.151"
 thiserror = "=2.0.20"
 sha2 = "=0.10.9"
+# The JSON Schema validator under fgos-config: pinned exactly, no optional features (no I/O, no network
+# retriever). Upgrade record and acceptance tests: packages/config/upgrade-record.md.
+jsonschema = { version = "=0.60.0", default-features = false }
 libc = "=0.2.189"
 windows-sys = { version = "=0.61.2", features = [
     "Win32_Foundation",

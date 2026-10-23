@@ -1,7 +1,7 @@
-//! Dormant Land transaction. The consumer owns verification and business settlement.
+//! Land transaction. The consumer owns verification and business settlement.
 use crate::{
-    refs::{failure, recovery, Authority},
-    scoped_commit::{checkout_resources, paths},
+    refs::Authority,
+    scoped_commit::{checkout_resources, is_store_path, paths, require_no_native_state},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -200,22 +200,7 @@ impl GitDriver {
         Ok(main)
     }
     fn land_native_state(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
-        for name in [
-            "MERGE_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "BISECT_START",
-            "index.lock",
-        ] {
-            match std::fs::symlink_metadata(repo.git_dir().join(name)) {
-                Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
-                Ok(_) => return Err(failure("foreign-main-checkout-state")),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                Err(e) => return Err(failure(e)),
-            }
-        }
+        require_no_native_state(repo.git_dir(), &[], |_| failure("foreign-main-checkout-state"))?;
         let out = self.land_text(repo, scope, &["ls-files", "--unmerged", "-z"], &[])?;
         if !out.is_empty() {
             return Err(failure("foreign-main-checkout-state"));
@@ -255,7 +240,7 @@ impl GitDriver {
             let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             for entry in page.entries {
                 let p = fgos_write_scope::path_text(&entry.path).map_err(failure)?;
-                if p == ".fgos" || p.starts_with(".fgos/") {
+                if is_store_path(p) {
                     continue;
                 }
                 dirty = true;
@@ -281,7 +266,7 @@ impl GitDriver {
         let mut store_collision = false;
         for p in self.ignored_checkout_collisions(repo, candidate)? {
             let path = fgos_write_scope::path_text(&p).map_err(failure)?;
-            if path == ".fgos" || path.starts_with(".fgos/") {
+            if is_store_path(path) {
                 store_collision = true;
             } else {
                 return Err(failure("main-checkout-dirty-mid-merge"));
@@ -289,43 +274,11 @@ impl GitDriver {
         }
         Ok((dirty, store_collision))
     }
-    pub fn prepare_land(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_filesystem(repo, held_locks, req, writer, id, &wal::OsFileSystem)
-    }
-    /// Shared production filesystem seam covers WAL and Land effect boundaries.
+    /// `filesystem` is the seam of the WAL and of every Land effect boundary.
+    /// `wait_ms` bounds only resource acquisition; candidate construction and
+    /// publication are never retried.
     #[allow(clippy::too_many_arguments)]
-    pub fn prepare_land_with_filesystem<F: wal::FileSystem>(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-        filesystem: &F,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_wait(repo, held_locks, req, writer, id, filesystem, 0)
-    }
-    /// Wait only for resource acquisition; never retry candidate construction or publication.
-    pub fn prepare_land_wait(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-        wait_ms: u64,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_wait(repo, held_locks, req, writer, id, &wal::OsFileSystem, wait_ms)
-    }
-    #[allow(clippy::too_many_arguments)]
-    fn prepare_land_with_wait<F: wal::FileSystem>(
+    pub fn prepare_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         held_locks: Vec<BorrowedHandle<'_>>,
@@ -381,9 +334,8 @@ impl GitDriver {
         p.insert("ref".into(), slot_key(&req.destination));
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        let request_digest = wal::canonical_digest(&(req, writer)).map_err(failure)?;
+        let wal = Wal::open_with(repo, filesystem)?;
+        let request_digest = wal::canonical_digest(&(req, writer))?;
         let mut session = LandSession {
             slot,
             candidate: None,
@@ -391,7 +343,7 @@ impl GitDriver {
             request: req.clone(),
             id: id.into(),
         };
-        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+        if let Some(compact) = wal.compacted(id)? {
             if compact.request != request_digest {
                 return Err(failure("operation-id-reused"));
             }
@@ -399,15 +351,15 @@ impl GitDriver {
             session.receipt = Some(land_outcome_receipt(
                 id,
                 &intent,
-                &compact.outcome().map_err(failure)?,
+                &compact.outcome()?,
                 repo,
             )?);
             session.slot = LockScope::seeded(vec![]).map_err(failure)?;
             replay_land_receipt(session.receipt.as_ref().unwrap())?;
             return Ok(session);
         }
-        if wal.known_id(id).map_err(failure)? {
-            let chain = wal.inspect(id).map_err(failure)?;
+        if wal.known_id(id)? {
+            let chain = wal.inspect(id)?;
             let OperationKind::Land(payload) = &chain.intent().kind else {
                 return Err(failure("operation-id-reused"));
             };
@@ -441,7 +393,7 @@ impl GitDriver {
             return Err(failure("land-identical-tips"));
         }
         if observed != ExpectedTip::Oid(target.clone()) {
-            return Err(crate::refs::stale("land-target-changed"));
+            return Err(stale("land-target-changed"));
         }
         for oid in [&source, &target] {
             self.land_text(
@@ -464,11 +416,10 @@ impl GitDriver {
             return Err(ancestor.error("land-ancestry-failed"));
         }
         let land_binding =
-            wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
-                .map_err(failure)?;
+            wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
         // The live destination slot proves no previous session can still publish.
         // Close only this authority's pre-attempt chains; candidate evidence remains.
-        for prior in wal.active(100_000).map_err(failure)? {
+        for prior in wal.active(100_000)? {
             if prior.last().operation_id != id
                 && prior.intent().authority_binding == land_binding
                 && matches!(&prior.intent().kind, OperationKind::Land(p) if p.request.destination == req.destination)
@@ -481,8 +432,7 @@ impl GitDriver {
                     return Err(recovery("land-abandoned-writer-mismatch"));
                 }
                 session.slot.validate().map_err(failure)?;
-                wal.append(&prior, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(failure)?;
+                wal.append(&prior, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             }
         }
         crate::refs::admission_land(
@@ -502,7 +452,7 @@ impl GitDriver {
         std::fs::create_dir_all(&parent).map_err(failure)?;
         let candidate_operation = format!(
             "lc-{}",
-            wal::canonical_digest(&("land-candidate", id)).map_err(failure)?
+            wal::canonical_digest(&("land-candidate", id))?
         );
         let worktree = self.create_detached_worktree(
             repo,
@@ -638,7 +588,7 @@ impl GitDriver {
                 source: req.source.clone(),
                 target: req.target.clone(),
                 candidate,
-                tree_digest: wal::canonical_digest(&tree).map_err(failure)?,
+                tree_digest: wal::canonical_digest(&tree)?,
                 tree,
             };
             let mut resources = vec![req.destination.clone()];
@@ -649,24 +599,20 @@ impl GitDriver {
                 candidate: view.clone(),
             }));
             let binding =
-                wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
-                    .map_err(failure)?;
-            let intent = Intent {
-                request_digest,
-                kind,
-                repo_identity: wal.repository_identity().into(),
-                resource_set: resources,
-                authority_binding: binding.clone(),
-                writer_identity: writer.into(),
-                object_format: repo.object_format(),
-                expected: Tip::Oid(req.target.clone()),
-                next: Tip::Oid(view.candidate.clone()),
-            };
+                wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
+            let intent = Intent::of(
+                &wal,
+                repo,
+                writer,
+                (kind, request_digest),
+                (resources, binding.clone()),
+                (Tip::Oid(req.target.clone()), Tip::Oid(view.candidate.clone())),
+            );
             let authority = Authority {
                 scope: &session.slot,
                 binding,
             };
-            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+            let chain = match wal.begin(id, intent, &authority)? {
                 Begin::Created(c) => c,
                 _ => return Err(recovery("land-recovery-required")),
             };
@@ -692,7 +638,7 @@ impl GitDriver {
                     })
                     .map_err(failure)?;
             }
-            wal.append(&chain, Phase::Prepared).map_err(failure)?;
+            wal.append(&chain, Phase::Prepared)?;
             drop(admin);
             session.candidate = Some(view);
             Ok(session)
@@ -710,34 +656,8 @@ impl GitDriver {
             error
         })
     }
-    pub fn publish_land(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-    ) -> Result<Receipt> {
-        self.publish_land_with_filesystem(repo, session, evidence, &wal::OsFileSystem)
-    }
-    /// Wait at most `wait_ms` for the main checkout; publication itself is never retried.
-    pub fn publish_land_wait(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-        wait_ms: u64,
-    ) -> Result<Receipt> {
-        self.publish_land_with_wait(repo, session, evidence, &wal::OsFileSystem, wait_ms)
-    }
-    pub fn publish_land_with_filesystem<F: wal::FileSystem>(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-        filesystem: &F,
-    ) -> Result<Receipt> {
-        self.publish_land_with_wait(repo, session, evidence, filesystem, 0)
-    }
-    fn publish_land_with_wait<F: wal::FileSystem>(
+    /// Waits at most `wait_ms` for the main checkout; publication itself is never retried.
+    pub fn publish_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         session: &mut LandSession,
@@ -751,9 +671,8 @@ impl GitDriver {
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        let chain = wal.inspect(&session.id).map_err(failure)?;
+        let wal = Wal::open_with(repo, filesystem)?;
+        let chain = wal.inspect(&session.id)?;
         if !matches!(chain.last_state(), Phase::Prepared) {
             return Err(recovery("land-recovery-required"));
         }
@@ -834,7 +753,7 @@ impl GitDriver {
         if crate::refs::direct(self, repo, &destination)?
             != ExpectedTip::Oid(Oid::parse(&req.target, repo.object_format()).map_err(failure)?)
         {
-            return Err(crate::refs::stale("land-target-changed"));
+            return Err(stale("land-target-changed"));
         }
         let main = self.land_target_checkout(repo, &scope, &destination)?;
         let (dirty, store_collision) = if main {
@@ -856,8 +775,7 @@ impl GitDriver {
                         None
                     },
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let chain = wal
             .append(
                 &chain,
@@ -866,22 +784,19 @@ impl GitDriver {
                     expected: chain.intent().expected.clone(),
                     next: chain.intent().next.clone(),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let before = self.checkouts(repo)?;
         filesystem.checkpoint("land-before-cas").map_err(failure)?;
         let cas = self.land_call(
             repo,
             &scope,
-            &[
-                "-c",
-                "core.fsync=all",
+            &durable_args(&[
                 "update-ref",
                 "--no-deref",
                 &req.destination,
                 &c.candidate,
                 &req.target,
-            ],
+            ]),
             &[],
         )?;
         filesystem.checkpoint("land-after-cas").map_err(failure)?;
@@ -901,13 +816,12 @@ impl GitDriver {
                     Phase::Outcome(Outcome::Loss {
                         observed: crate::refs::tip(&observed),
                     }),
-                )
-                .map_err(failure)?;
+                )?;
             let receipt = land_receipt(&terminal, repo)?;
             drop(scope);
             session.receipt = Some(receipt.clone());
             session.slot = LockScope::seeded(vec![]).map_err(failure)?;
-            let mut error = crate::refs::stale("land-cas-lost");
+            let mut error = stale("land-cas-lost");
             error.operation_id = Some(session.id.clone());
             error.receipt = Some(Box::new(receipt));
             return Err(error);
@@ -969,8 +883,7 @@ impl GitDriver {
                     checkout: checkout.into(),
                     observed_only: false,
                 }),
-            )
-            .map_err(failure)?;
+            )?;
         filesystem.checkpoint("land-receipt").map_err(failure)?;
         let receipt = land_receipt(&terminal, repo)?;
         drop(scope);
@@ -994,7 +907,7 @@ fn replay_land_receipt(receipt: &Receipt) -> Result<()> {
         receipt.local_effect.publication_state,
         PublicationState::Unknown
     ) {
-        let mut error = crate::refs::stale("land-cas-lost");
+        let mut error = stale("land-cas-lost");
         error.operation_id = Some(receipt.operation_id.clone());
         error.receipt = Some(Box::new(receipt.clone()));
         return Err(error);
@@ -1095,41 +1008,38 @@ fn compact_land_intent<F: wal::FileSystem>(
         .reference
         .clone()
         .ok_or_else(|| recovery("land-compact-reference-missing"))?;
-    let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &destination))
-        .map_err(failure)?;
+    let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &destination))?;
     // The compact binding deliberately retains the destination and writer, not
     // the disposable candidate directory's inode. No effect uses this view.
-    let intent = Intent {
-        request_digest: c.request.clone(),
-        repo_identity: wal.repository_identity().into(),
-        authority_binding: binding,
-        writer_identity: writer.into(),
-        object_format: repo.object_format(),
-        expected: Tip::Oid(c.expected.clone()),
-        next: Tip::Oid(c.next.clone()),
-        resource_set: vec![destination.clone()],
-        kind: OperationKind::Land(Box::new(wal::LandIntent {
-            request: LandRequest {
-                source: c.next.clone(),
-                target: c.expected.clone(),
-                destination,
-                message: String::new(),
-                squash: false,
-                footprint: None,
-                subtree: None,
-                files: vec![],
-            },
-            candidate: LandCandidate {
-                worktree: PathBuf::new(),
-                source: c.next.clone(),
-                target: c.expected.clone(),
-                candidate: c.next.clone(),
-                tree: String::new(),
-                tree_digest: String::new(),
-            },
-        })),
-    };
-    if !c.matches(&intent).map_err(failure)? {
+    let kind = OperationKind::Land(Box::new(wal::LandIntent {
+        request: LandRequest {
+            source: c.next.clone(),
+            target: c.expected.clone(),
+            destination: destination.clone(),
+            message: String::new(),
+            squash: false,
+            footprint: None,
+            subtree: None,
+            files: vec![],
+        },
+        candidate: LandCandidate {
+            worktree: PathBuf::new(),
+            source: c.next.clone(),
+            target: c.expected.clone(),
+            candidate: c.next.clone(),
+            tree: String::new(),
+            tree_digest: String::new(),
+        },
+    }));
+    let intent = Intent::of(
+        wal,
+        repo,
+        writer,
+        (kind, c.request.clone()),
+        (vec![destination], binding),
+        (Tip::Oid(c.expected.clone()), Tip::Oid(c.next.clone())),
+    );
+    if !c.matches(&intent)? {
         return Err(failure("land-authority-mismatch"));
     }
     Ok(intent)
@@ -1204,9 +1114,9 @@ impl GitDriver {
             })
             .collect();
         let proof = CheckoutProof {
-            next_index_digest: Some(wal::canonical_digest(&next_entries).map_err(failure)?),
+            next_index_digest: Some(wal::canonical_digest(&next_entries)?),
             old_index: None,
-            old_index_digest: Some(wal::canonical_digest(&old_entries.stdout).map_err(failure)?),
+            old_index_digest: Some(wal::canonical_digest(&old_entries.stdout)?),
             old: fingerprints(repo.trusted_main_root(), &paths)?,
             next: fingerprints(
                 candidate
@@ -1244,8 +1154,8 @@ impl GitDriver {
         if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
             return Err(failure("land-main-handle-required"));
         }
-        let wal = Wal::open(repo).map_err(failure)?;
-        let compact = wal.compacted(id).map_err(failure)?;
+        let wal = Wal::open(repo)?;
+        let compact = wal.compacted(id)?;
         let initial = if compact.is_none() {
             Some(
                 wal.inspect(id)
@@ -1263,8 +1173,7 @@ impl GitDriver {
             return Err(failure("not-land-operation"));
         };
         let req = &payload.request;
-        let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
-            .map_err(failure)?;
+        let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
         let pre_attempt = initial.as_ref().is_some_and(|c| {
             !c.records()
                 .iter()
@@ -1297,7 +1206,7 @@ impl GitDriver {
             .acquire("recovery", &recovery_params, Wait::Ms(0))
             .map_err(failure)?;
         if let Some(c) = compact {
-            return land_outcome_receipt(id, &intent, &c.outcome().map_err(failure)?, repo);
+            return land_outcome_receipt(id, &intent, &c.outcome()?, repo);
         }
         let chain = wal
             .inspect(id)
@@ -1327,8 +1236,7 @@ impl GitDriver {
         })?;
         if !attempted {
             let terminal = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?;
+                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return land_receipt(&terminal, repo);
         }
         let destination = RefName::parse(&req.destination).map_err(failure)?;
@@ -1349,8 +1257,7 @@ impl GitDriver {
                             checkout: "pending".into(),
                             observed_only: true,
                         }),
-                    )
-                    .map_err(failure)?;
+                    )?;
                 return land_receipt(&terminal, repo);
             }
         }
@@ -1361,7 +1268,7 @@ impl GitDriver {
                 id,
             ));
         }
-        if wal.native_lock_present(&intent).map_err(failure)? {
+        if wal.native_lock_present(&intent)? {
             return Err(recovery("land-native-ref-lock-preserved"));
         }
         let c = &payload.candidate;
@@ -1409,15 +1316,13 @@ impl GitDriver {
                 self.land_text(
                     repo,
                     &scope,
-                    &[
-                        "-c",
-                        "core.fsync=all",
+                    &durable_args(&[
                         "update-ref",
                         "--no-deref",
                         pin.as_str(),
                         &c.candidate,
                         &c.target,
-                    ],
+                    ]),
                     &[],
                 )?;
                 crate::refs::sync_refs(repo, &pin)?;
@@ -1483,7 +1388,7 @@ impl GitDriver {
                     if !out.success {
                         return Err(out.error("land-index-entries-failed"));
                     }
-                    Ok(wal::canonical_digest(&out.stdout).map_err(failure)? == *expected)
+                    Ok(wal::canonical_digest(&out.stdout)? == *expected)
                 } else {
                     Ok(driver.land_text(repo, &scope, &["write-tree"], &[])? == c.tree)
                 }
@@ -1493,7 +1398,7 @@ impl GitDriver {
                 return Err(old_entries.error("land-index-entries-failed"));
             }
             let old_index_matches = proof.old_index_digest.as_ref()
-                == Some(&wal::canonical_digest(&old_entries.stdout).map_err(failure)?);
+                == Some(&wal::canonical_digest(&old_entries.stdout)?);
             if next_index_matches(self)? && actual == proof.next {
                 "reconciled"
             } else if index == proof.old_index_tree && actual == proof.old && old_index_matches {
@@ -1549,8 +1454,7 @@ impl GitDriver {
                     checkout: checkout.into(),
                     observed_only: true,
                 }),
-            )
-            .map_err(failure)?;
+            )?;
         land_receipt(&terminal, repo)
     }
 }
@@ -1559,16 +1463,7 @@ impl GitDriver {
     /// Cleanup is part of explicit recovery, after the consumer has durably
     /// settled its unique (repoIdentity, operationId, settlementKind) identity.
     /// The opaque acknowledgement is a consumer assertion, never Git settlement.
-    pub fn acknowledge_land(
-        &self,
-        repo: &RepoHandle,
-        writer: &str,
-        id: &str,
-        acknowledgement: &str,
-    ) -> Result<Vec<String>> {
-        self.acknowledge_land_with_filesystem(repo, writer, id, acknowledgement, &wal::OsFileSystem)
-    }
-    pub fn acknowledge_land_with_filesystem<F: wal::FileSystem>(
+    pub fn acknowledge_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         writer: &str,
@@ -1584,9 +1479,8 @@ impl GitDriver {
         if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
             return Err(failure("land-main-handle-required"));
         }
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        if let Some(c) = wal.compacted(id).map_err(failure)? {
+        let wal = Wal::open_with(repo, filesystem)?;
+        if let Some(c) = wal.compacted(id)? {
             let intent = compact_land_intent(&wal, &c, repo, writer)?;
             let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
             let mut p = params(repo);
@@ -1604,7 +1498,7 @@ impl GitDriver {
                 .map(|e| vec![format!("land-compaction-deferred: {e}")])
                 .unwrap_or_default());
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let OperationKind::Land(payload) = &chain.intent().kind else {
             return Err(failure("not-land-operation"));
         };
@@ -1643,12 +1537,11 @@ impl GitDriver {
                 "consumer-acknowledged",
                 acknowledgement,
                 writer,
-            ))
-            .map_err(failure)?,
+            ))?,
         };
         let removal_id = format!(
             "lr-{}",
-            wal::canonical_digest(&("land-cleanup", id)).map_err(failure)?
+            wal::canonical_digest(&("land-cleanup", id))?
         );
         if let Err(e) = self.remove_land_candidate(
             repo,
@@ -1679,15 +1572,13 @@ impl GitDriver {
                         self.land_text(
                             repo,
                             &scope,
-                            &[
-                                "-c",
-                                "core.fsync=all",
+                            &durable_args(&[
                                 "update-ref",
                                 "--no-deref",
                                 "-d",
                                 pin.as_str(),
                                 oid,
-                            ],
+                            ]),
                             &[],
                         )?;
                         if crate::refs::direct(self, repo, &pin)? != ExpectedTip::Absent {
@@ -1705,7 +1596,7 @@ impl GitDriver {
                     })
                     .map_err(failure)?;
             }
-            let terminal = wal.inspect(id).map_err(failure)?;
+            let terminal = wal.inspect(id)?;
             crate::refs::release_pin(
                 self,
                 repo,
@@ -1713,13 +1604,12 @@ impl GitDriver {
                 &wal,
                 &terminal,
             )?;
-            let terminal = wal.inspect(id).map_err(failure)?;
+            let terminal = wal.inspect(id)?;
             let authority = Authority {
                 scope: &scope,
                 binding: chain.intent().authority_binding.clone(),
             };
-            wal.compact(&terminal, &WalReader { driver: self, repo }, &authority)
-                .map_err(failure)?;
+            wal.compact(&terminal, &WalReader { driver: self, repo }, &authority)?;
             Ok(())
         };
         Ok(cleanup()

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "about": "The closed list of x-fgos- annotations of a section schema (spec section 4). The JSON Schema keywords themselves are the standard's and are not copied here. A node that does not state an annotation takes the nearest ancestor's, then the default (when one is listed). Revision is the root $id; owner and justification are $comment text; the standard values live in the standard files, never in a default keyword.",
+  "annotations": [
+    { "name": "x-fgos-scope", "values": ["both", "project-only", "global-only"], "default": "both" },
+    { "name": "x-fgos-sensitivity", "values": ["public", "command", "secret-reference", "secret-value"], "default": "public" },
+    { "name": "x-fgos-file", "values": ["config", "accounts", "token"], "default": "config" },
+    { "name": "x-fgos-merge", "values": ["deep", "replace", "leaf"] },
+    { "name": "x-fgos-absent", "values": ["detected", "required", "off"] }
+  ]
+}

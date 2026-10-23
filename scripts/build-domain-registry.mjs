@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describeYamlError, parseYaml } from '../src/util/yaml.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -58,6 +59,7 @@ function render(compiled) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  ensureAddonForScript();
   const check = process.argv.includes('--check');
   let stale = 0;
   for (const [name, compiled] of Object.entries(compileAllDomains())) {

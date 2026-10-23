@@ -3,7 +3,7 @@
 //! answer ([`crate::resolve`]); this module only names it. The OS is reached
 //! through an injected facts lookup, so every rule here is a pure function.
 
-use crate::resolve::{WriterId, WriterIdentity};
+use crate::resolve::{WriterId, WriterIdentity, WriterKey};
 use crate::text::base32_prefix;
 use sha2::{Digest, Sha256};
 
@@ -49,9 +49,25 @@ pub fn cli_of(env_var: &str, local_id: &str) -> &'static str {
     match env_var {
         "CLAUDE_CODE_SESSION_ID" => "claude",
         "CODEX_THREAD_ID" => "codex",
+        // The neutral label; the process ancestry may say `omp` instead.
+        crate::resolve::PI_SESSION_VAR => "pi",
         _ if local_id.starts_with(crate::attempt::ATTEMPT_PREFIX) => "worker",
         _ => "fgos",
     }
+}
+
+/// The local session of a writer id that came from the env variable `env_var`.
+fn env_local(env_var: &str, id: &str) -> Local {
+    Local {
+        cli: cli_of(env_var, id),
+        id: id.to_owned(),
+    }
+}
+
+/// The local session a hook-carried key names, by the same validity rule and
+/// CLI mapping as the env path; `None` when the key is not a writer id.
+pub fn key_local(key: &WriterKey) -> Option<Local> {
+    key.checked().map(|(source, id)| env_local(source, id))
 }
 
 /// The local session id of a resolved writer, or `None` when the caller
@@ -62,10 +78,13 @@ pub fn local(
     facts: &dyn Fn(u32) -> Option<PidFacts>,
 ) -> Option<Local> {
     match &identity.id {
-        WriterId::Session(id) => Some(Local {
-            cli: cli_of(identity.env_var?, id),
-            id: id.clone(),
-        }),
+        WriterId::Session(id) => {
+            let mut local = env_local(identity.env_var?, id);
+            if let Some(cli) = identity.cli {
+                local.cli = cli;
+            }
+            Some(local)
+        }
         WriterId::Pid(pid) if identity.source == crate::resolve::Source::Pid => Some(Local {
             id: pid_local_id(&facts(*pid)?, *pid),
             cli: "shell",

@@ -77,9 +77,9 @@ function lockHeldError(res, label, fgosDir) {
 }
 
 /** Typed creation; the same holder spans native inspection and registration. */
-export function createWorktreeCheckoutSync(scope, repoRoot, request, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS } = {}) {
+export function createWorktreeCheckoutSync(scope, repoRoot, request, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS, inspect } = {}) {
   scope.assertCanAcquire(WORKTREE_ADMIN, 40);
-  const options = gitPortOptions(repoRoot, { mutation: true });
+  const options = gitPortOptions(repoRoot, { mutation: true, inspect });
   const fgosDir = `${options.trustedMain}/.fgos`;
   const res = acquireSync(scope, WORKTREE_ADMIN, { fgosDir }, { waitMs });
   if (res.result !== 'acquired') throw lockHeldError(res, 'worktree admin', fgosDir);

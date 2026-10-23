@@ -78,6 +78,14 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             driver.resolve_ref(&repo, &absent).unwrap(),
             RefValue::Absent
         ));
+        // A symbolic ref whose target is missing is listed by no pattern, yet it is not absent.
+        let dangling = RefName::parse("refs/heads/dangling").unwrap();
+        git(&repo_path, &["symbolic-ref", dangling.as_str(), "refs/heads/nowhere"]);
+        assert!(matches!(
+            driver.resolve_ref(&repo, &dangling).unwrap(),
+            RefValue::Symbolic(target) if target.as_str() == "refs/heads/nowhere"
+        ));
+        git(&repo_path, &["symbolic-ref", "--delete", dangling.as_str()]);
         assert!(
             matches!(driver.resolve_trunk(&repo, None).unwrap(), TrunkFact::Known(r) if r.as_str()=="refs/heads/trunk")
         );
@@ -205,7 +213,7 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             "object-read-limit"
         );
         let paths = driver
-            .paths_at_revision(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
+            .read_paths_at(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
             .unwrap();
         assert!(matches!(&paths[0].value,PathValue::Blob(bytes) if bytes==b"first\0bytes"));
         assert!(matches!(paths[1].value, PathValue::Absent));
@@ -550,5 +558,63 @@ fn status_lists_ignored_paths_collapsed_only_when_asked() {
     all.extend([("mixed/x.log".to_string(), false, true), ("node_modules/".to_string(), false, true), ("root.log".to_string(), false, true)]);
     all.sort();
     assert_eq!(listed(Ignored::Listed), all, "a wholly ignored directory is collapsed; an ignored file in an untracked one is named");
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
+fn listing_one_namespace_returns_exactly_its_refs_and_pages_the_same_way() {
+    let root = std::env::temp_dir().join(format!("fgos-list-refs-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    git(&root, &["init", "-q", "--initial-branch=trunk", "repo"]);
+    let repo_path = root.join("repo");
+    git(&repo_path, &["config", "user.name", "Fixture"]);
+    git(&repo_path, &["config", "user.email", "fixture@example.invalid"]);
+    git(&repo_path, &["commit", "-q", "--allow-empty", "-m", "first"]);
+    for name in [
+        "refs/heads/foo",
+        "refs/heads/foo2",
+        "refs/heads/food/deep/er",
+        "refs/heads/bar",
+        "refs/tags/foo",
+    ] {
+        git(&repo_path, &["update-ref", name, "HEAD"]);
+    }
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let names = |prefix: &str, max: usize| {
+        let prefixes = [RefPrefix::parse(prefix).unwrap()];
+        let mut cursor = None;
+        let mut pages = Vec::new();
+        loop {
+            let page = driver.list_refs(&repo, &prefixes, cursor, max).unwrap();
+            pages.push(page.entries.iter().map(|e| e.name.as_str().to_owned()).collect::<Vec<_>>());
+            if page.complete {
+                return pages;
+            }
+            cursor = page.next_cursor;
+        }
+    };
+    assert_eq!(
+        names("refs/heads/", 100),
+        vec![vec!["refs/heads/bar", "refs/heads/foo", "refs/heads/foo2", "refs/heads/food/deep/er", "refs/heads/trunk"]]
+    );
+    // A prefix that stops inside a name still selects every ref starting with it.
+    assert_eq!(
+        names("refs/heads/fo", 100),
+        vec![vec!["refs/heads/foo", "refs/heads/foo2", "refs/heads/food/deep/er"]]
+    );
+    assert_eq!(
+        names("refs/heads/fo", 2),
+        vec![vec!["refs/heads/foo", "refs/heads/foo2"], vec!["refs/heads/food/deep/er"]]
+    );
+    assert_eq!(names("refs/tags/foo", 100), vec![vec!["refs/tags/foo"]]);
     let _ = fs::remove_dir_all(&root);
 }

@@ -42,3 +42,13 @@ pub fn mint_machine_id(state_root: String, hostname: String) -> Result<Value> {
     let message = if changed { "machine id minted once" } else { "machine id already exists" };
     Ok(json!({ "changed": changed, "machineId": machine_id, "message": message }))
 }
+
+/// Mints this machine's signing key once under `state_root` and never replaces an existing one:
+/// `{ changed, fingerprint, message }`. A refusal fails with a message that starts with its reason (`ssh-keygen-missing`, ...).
+#[napi(namespace = "sessionIdentity", js_name = "mintMachineKey")]
+pub fn mint_machine_key(state_root: String) -> Result<Value> {
+    check()?;
+    let (changed, fingerprint) = fgos_identity::signing::mint_key(Path::new(&state_root)).map_err(|r| error(format!("{}: {}", r.reason, r.detail)))?;
+    let message = if changed { "machine key minted once" } else { "machine key already exists" };
+    Ok(json!({ "changed": changed, "fingerprint": fingerprint, "message": message }))
+}

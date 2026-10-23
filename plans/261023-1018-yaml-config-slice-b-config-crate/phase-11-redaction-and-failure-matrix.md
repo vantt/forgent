@@ -1,6 +1,6 @@
 # Phase 11: Redaction and the failure-code matrix
 
-Depends on 09, 10. Suggested executor: sonnet (haiku for fixture transcription).
+Depends on 09, 10 (so on the validator crate gate). Suggested executor: sonnet (haiku for fixture transcription).
 
 ## Context
 
@@ -14,9 +14,9 @@ Not here: the `~/.fgos/private` hiding from confined workers (G6, confinement sp
 
 ## Design
 
-- `Display` / `Debug` of every public error and finding type: built from codes, roles, paths, positions and descriptor paths only. This phase audits rather than adds: the types come from earlier phases; the audit is one test over their output.
-- `render_for_display(&Snapshot, &Descriptors) -> Value`: every leaf whose resolved sensitivity is `secret-value` becomes the string `<redacted>`; `secret-reference` leaves stay exactly as stored (they are references; Config has no resolver and the crate does not depend on `fgos-secrets`, asserted by `cargo tree` in the test via `Cargo.toml` text). A `command` value is shown as is (spec section 3: it is data a reader needs to audit).
-- `describe(value, entry) -> String`: used by phase 08's doc line, so a generated `@fgos:doc` never prints a secret kind's value (those have none by lint) and truncates nothing else.
+- `Display` / `Debug` of every public error and finding type: built from codes, roles, paths, positions and schema paths only. This phase audits rather than adds: the types come from earlier phases; the audit is one test over their output.
+- `render_for_display(&Snapshot, &Schemas) -> Value`: every leaf whose resolved sensitivity is `secret-value` becomes the string `<redacted>`; `secret-reference` leaves stay exactly as stored (they are references; Config has no resolver and the crate does not depend on `fgos-secrets`, asserted by `cargo tree` in the test via `Cargo.toml` text). A `command` value is shown as is (spec section 3: it is data a reader needs to audit).
+- `describe(value, entry) -> String`: used by phase 08's doc line (built from the node's `description`), so a generated `@fgos:doc` never prints a secret kind's value (those have none by lint) and truncates nothing else.
 - Diff and explain renderers are Slice C's; they must call `render_for_display`, which is why the function is public and pinned here.
 
 ## Steps

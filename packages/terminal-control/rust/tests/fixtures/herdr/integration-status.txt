@@ -1,0 +1,3 @@
+claude: current (v8) (/home/u/.claude/hooks/herdr-agent-state.sh)
+codex: outdated (v6 < v8) (/home/u/.codex/herdr-agent-state.sh)
+antigravity-cli: not installed (/home/u/.gemini/config/hooks/herdr-agent-state.sh)

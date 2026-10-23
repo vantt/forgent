@@ -1,5 +1,6 @@
 {
   "name": "two-panes-352x69",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

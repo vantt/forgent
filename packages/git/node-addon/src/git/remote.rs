@@ -45,22 +45,14 @@ impl GitRemote {
     #[napi]
     pub fn call(&self, method: String, args: Value, loans: Vec<External<Loan>>) -> Result<Value> {
         check()?;
+        if method != "pushRefs" {
+            return Err(error("unknown-remote-method"));
+        }
         let held = consume(loans)?;
         let grant = RemoteGrant {
             name: text(&args["remoteGrant"], "name")?.into(),
             pinned_url: text(&args["remoteGrant"], "pinnedUrl")?.into(),
         };
-        if method == "inspectRemote" {
-            let names: Vec<String> = serde_json::from_value(args["refs"].clone()).map_err(error)?;
-            let names = names
-                .iter()
-                .map(|n| RefName::parse(n).map_err(error))
-                .collect::<Result<Vec<_>>>()?;
-            return Ok(json!(self
-                .driver
-                .inspect_remote(&self.repo, held, &grant, &names)
-                .map_err(operation)?));
-        }
         let pairs: Vec<(String, String)> =
             serde_json::from_value(args["mappings"].clone()).map_err(error)?;
         let mappings = pairs
@@ -73,15 +65,9 @@ impl GitRemote {
             })
             .collect::<Result<Vec<_>>>()?;
         let id = text(&args, "operationId")?;
-        Ok(json!(match method.as_str() {
-            "fetchRefs" =>
-                self.driver
-                    .fetch_refs(&self.repo, held, &grant, &mappings, &self.writer, id),
-            "pushRefs" =>
-                self.driver
-                    .push_refs(&self.repo, held, &grant, &mappings, &self.writer, id),
-            _ => return Err(error("unknown-remote-method")),
-        }
-        .map_err(operation)?))
+        Ok(json!(self
+            .driver
+            .push_refs(&self.repo, held, &grant, &mappings, &self.writer, id)
+            .map_err(operation)?))
     }
 }

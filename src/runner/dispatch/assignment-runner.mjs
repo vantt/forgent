@@ -104,7 +104,7 @@ import { register as registerDeliveredAttempt, unregister as unregisterDelivered
 import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
-import { resolveHerdrBin } from './terminal-slot.mjs';
+import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
@@ -2021,8 +2021,10 @@ export async function executeAssignment(assignment, opts = {}) {
             ?? effectiveAssignment.unitRunId
             ?? effectiveAssignment.provenance?.unitRunId
             ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
+          dispatchBatchSize: opts.dispatchBatchSize,
           anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
           terminalConfig: opts.terminalConfig,
+          workLabel: workLabelOf(effectiveAssignment),
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
           effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } },

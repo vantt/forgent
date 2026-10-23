@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:bin:v1
+$comment: "owner: distribution"
+description: "Cached locations of the fgos binary."
+type: object
+x-fgos-scope: global-only
+properties:
+  globalFgosPath:
+    description: Absolute path of the global fgos binary cached by setup; the cache moves out of config under the runtime directory.
+    type: string
+    x-fgos-absent: "off"

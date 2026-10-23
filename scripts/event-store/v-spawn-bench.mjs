@@ -40,7 +40,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15
   if (!hostBin) throw new Error('pass --host-bin (real activated Rust host required)');
   hostBin = fs.realpathSync(hostBin);
   const env = { ...process.env, FGOS_HOST_BIN: hostBin };
-  for (const key of Object.keys(env)) if (key.startsWith('GIT_') || ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_SESSION_ID', 'INIT_CWD'].includes(key)) delete env[key];
+  for (const key of Object.keys(env)) if (key.startsWith('GIT_') || ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'PI_SESSION_ID', 'FGOS_SESSION_ID', 'INIT_CWD'].includes(key)) delete env[key];
   // A private native state root prevents fixture locks/config from sharing the checkout's state.
   env.FGOS_STATE_ROOT = path.join(root, '.machine-state');
   fs.mkdirSync(root);

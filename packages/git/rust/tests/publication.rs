@@ -1043,12 +1043,25 @@ fn remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admiss
             &repo,
             &reference(),
             &ExpectedTip::Oid(a.clone()),
-            &ExpectedTip::Oid(a),
+            &ExpectedTip::Oid(a.clone()),
             "blocked",
         )
         .unwrap_err();
     assert!(result.cause.starts_with("publication-backlog-unreadable"));
     assert!(!root.join("fgos/git/operations/blocked").exists());
+    // The Refs port refuses the same corrupt directory by the same evidence, before any record.
+    let refs = driver
+        .ensure_branch(
+            &repo,
+            vec![],
+            &RefName::parse("refs/heads/blocked").unwrap(),
+            &a,
+            "fixture",
+            "refs-blocked",
+        )
+        .unwrap_err();
+    assert_eq!(refs.cause, "git-wal-unreadable");
+    assert!(!root.join("fgos/git/operations/refs-blocked").exists());
 }
 
 #[test]
@@ -1189,10 +1202,23 @@ fn historical_ledger_over_admission_bound_does_not_block_new_publication() {
         &repo,
         &reference(),
         &ExpectedTip::Oid(a.clone()),
-        &ExpectedTip::Oid(a),
+        &ExpectedTip::Oid(a.clone()),
         "after-history",
     )
     .unwrap();
+    // The Refs port reads the same history once, through `active`, so the 100 000 ledger entries
+    // that `scan` counts toward its bound do not refuse it either.
+    drop(port);
+    driver
+        .ensure_branch(
+            &repo,
+            vec![],
+            &RefName::parse("refs/heads/after-history").unwrap(),
+            &a,
+            "fixture",
+            "refs-after-history",
+        )
+        .expect("a ref change under a 100 000-entry ledger");
 }
 
 #[test]
@@ -1283,9 +1309,12 @@ fn publication_config_cache_invalidates_and_transport_budget_is_caller_owned() {
     // The override affects actual transport, while local plumbing still works.
     port.write_blob(&repo, b"local").unwrap();
     let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
-    assert!(port
+    // A borrowed child that runs out of time reads like a contained one, told apart by `detail.path`.
+    let timed_out = port
         .fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
-        .is_err());
+        .unwrap_err();
+    assert_eq!(timed_out.cause, "git-timeout");
+    assert_eq!(timed_out.detail.unwrap()["path"], "borrowed");
     let port = port.with_transport_timeout(std::time::Duration::from_secs(5));
     port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
 }
@@ -2408,8 +2437,32 @@ fn event_publication_recovery_ignores_unrelated_recovery_leaf() {
     drop(leaf);
 }
 
+/// Appends a record to the chain of `id` the first time `step` is reached, the way a second
+/// writer racing for the same operation would.
+struct Race {
+    repo: RepoHandle,
+    id: &'static str,
+    step: &'static str,
+    fired: std::sync::Arc<std::sync::atomic::AtomicBool>,
+}
+impl FileSystem for Race {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.step && !self.fired.swap(true, Ordering::SeqCst) {
+            let wal = wal::Wal::open(&self.repo).map_err(std::io::Error::other)?;
+            let chain = wal.inspect(self.id).map_err(std::io::Error::other)?;
+            wal.append(&chain, Phase::Prepared)
+                .map_err(std::io::Error::other)?;
+        }
+        Ok(())
+    }
+}
+
 #[test]
-fn a_group_read_over_the_output_bound_falls_back_to_single_reads() {
+fn publication_names_a_busy_wal_like_every_other_port() {
+    // `attempted_operation_is_never_replayed_after_fault_or_aba` injects faults but never a second
+    // writer. A writer that wins the next record of this operation's chain makes the loser's append
+    // fail as busy; the caller must see a refusal named `busy`, like Refs gives, not
+    // recovery-required carrying a debug dump of the internal error.
     let t = Temp::new();
     let root = t.0.join("repo");
     init(&root, "sha1", "files");
@@ -2417,28 +2470,91 @@ fn a_group_read_over_the_output_bound_falls_back_to_single_reads() {
     let repo = resolve(&driver, &root);
     let mut h = handle(&t.0.join("seal.lock"));
     let port = PublicationPort::new(&driver, authority(&repo, &mut h));
-    // Three blobs of 30 MiB: each read alone fits the 64 MiB output bound, the group does not.
-    let reads: Vec<_> = (0..3u8)
-        .map(|n| {
-            let blob = port.write_blob(&repo, &vec![n; 30 * 1024 * 1024]).unwrap();
-            let tree = port
-                .write_tree(
-                    &repo,
-                    &[TreeEntry {
-                        name: b"big".to_vec(),
-                        mode: 0o100644,
-                        oid: blob,
-                    }],
-                )
-                .unwrap();
-            (tree, vec![b"big".to_vec()])
-        })
-        .collect();
-    let many = port
-        .read_paths_at_many(&repo, &reads, 32 * 1024 * 1024)
-        .unwrap();
-    assert_eq!(many.len(), 3);
-    for (n, answer) in many.iter().enumerate() {
-        assert!(matches!(&answer[0].value, PathValue::Blob(b) if b.len() == 30 * 1024 * 1024 && b[0] == n as u8));
-    }
+    let a = commit(&port, &repo, vec![], "a");
+    drop(port);
+    let fired = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let racing = PublicationPort::with_filesystem(
+        &driver,
+        authority(&repo, &mut h),
+        Race {
+            repo: resolve(&driver, &root),
+            id: "busy",
+            step: "pin-read-back",
+            fired: fired.clone(),
+        },
+    );
+    let e = racing
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a),
+            "busy",
+        )
+        .unwrap_err();
+    assert!(
+        fired.load(Ordering::SeqCst),
+        "the competing record was never appended: {e:?}"
+    );
+    assert_eq!((e.code, e.cause.as_str()), (ResultCode::Refused, "busy"));
+}
+
+#[test]
+fn a_borrow_that_is_unavailable_has_one_cause_name_whichever_check_finds_it() {
+    // The borrow is checked when the authority is built and again, through the WAL, when an
+    // operation of another writer is found on the same ref. One failure must read the same through
+    // both routes. No existing case compares the two.
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let path = h.path().to_path_buf();
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    drop(port);
+    // An operation of the default writer is left unresolved on the ref.
+    let faulty = PublicationPort::with_filesystem(
+        &driver,
+        authority(&repo, &mut h),
+        Fault("before-target-cas"),
+    );
+    faulty
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a.clone()),
+            "left-behind",
+        )
+        .unwrap_err();
+    drop(faulty);
+
+    // Route one: the authority itself refuses a resource path that is not the borrowed lock.
+    let wrong_path = t.0.join("not-the-seal.lock");
+    fs::write(&wrong_path, b"").unwrap();
+    let built = HolderAuthority::new(&repo, &mut h, &wrong_path, reference(), "test-writer")
+        .err()
+        .expect("a borrow bound to another path");
+
+    // Route two: another writer meets the unresolved operation during admission.
+    let other = HolderAuthority::new(&repo, &mut h, &path, reference(), "other-writer").unwrap();
+    let port = PublicationPort::new(&driver, other);
+    let admitted = port
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a),
+            "second-writer",
+        )
+        .unwrap_err();
+    // Admission may name the blocking operation in front of the cause; the cause itself is one name.
+    assert!(
+        admitted.cause.ends_with(&built.cause),
+        "the same unavailable borrow reads differently through two routes: {:?} and {:?}",
+        built.cause,
+        admitted.cause
+    );
 }

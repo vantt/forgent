@@ -328,3 +328,78 @@ fn liveness_is_judged_by_the_terminal_head_never_the_fgos_child() {
     assert_eq!(directory::head_liveness(&detached, 300, &record_of), None, "no terminal ancestor: unknown");
     assert_eq!(directory::head_liveness(&Table(HashMap::new()), 300, &record_of), None);
 }
+
+fn machine_root() -> PathBuf {
+    let root = state_root();
+    fs::write(root.join("machine-id"), "fg-abc234\n").unwrap();
+    root
+}
+
+fn head_of(pid: u32) -> fgos_identity::HeadRef {
+    let start_time = fgos_process::facts::identity_of(ProcId(pid)).unwrap().start_time;
+    fgos_identity::HeadRef { pid, start_time }
+}
+
+#[test]
+fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves() {
+    let root = machine_root();
+    let key = fgos_identity::WriterKey { source: "CODEX_THREAD_ID", value: "thread-9" };
+    let roles = vec!["lead:MAIL".to_string()];
+    let listed = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &roles, false).unwrap();
+    assert_eq!(listed.id, "fg-abc234/thread-9");
+    assert_eq!(listed.cli, "codex");
+    assert!(listed.handle.starts_with("codex-"), "{}", listed.handle);
+    assert_eq!(listed.liveness, Liveness::Alive);
+    let found = directory::resolve(&root, &listed.handle, &judge(&[])).unwrap();
+    assert_eq!(found.id, listed.id);
+    assert_eq!(directory::resolve(&root, "lead:MAIL", &judge(&[])).unwrap().id, listed.id);
+    // the same key registers again as a refresh, the roles kept
+    let again = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &[], false).unwrap();
+    assert_eq!(again.roles, roles);
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing() {
+    let root = machine_root();
+    let bad = fgos_identity::WriterKey { source: "OMP_SESSION_ID", value: "s-1" };
+    assert_eq!(directory::register_writer(&root, None, &bad, &head_of(std::process::id()), &[], false).unwrap_err().reason, "invalid-writer-key");
+
+    let mut child = std::process::Command::new("sleep").arg("5").spawn().unwrap();
+    let gone = head_of(child.id());
+    child.kill().unwrap();
+    child.wait().unwrap();
+    let key = fgos_identity::WriterKey { source: "CLAUDE_CODE_SESSION_ID", value: "s-2" };
+    assert_eq!(directory::register_writer(&root, None, &key, &gone, &[], false).unwrap_err().reason, "head-not-live");
+    let nobody = fgos_identity::HeadRef { pid: u32::MAX, start_time: "1".into() };
+    assert_eq!(directory::register_writer(&root, None, &key, &nobody, &[], false).unwrap_err().reason, "head-not-live");
+    // a live process with another start time is a reused pid, not the head
+    let mut reused = head_of(std::process::id());
+    reused.start_time.push('0');
+    let refusal = directory::register_writer(&root, None, &key, &reused, &[], false).unwrap_err();
+    assert_eq!(refusal.reason, "head-not-live");
+    assert!(refusal.detail.contains("pid was reused"), "{}", refusal.detail);
+    assert_eq!(files(&root), 0, "a refused registration leaves no entry");
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_full_id_resolves_the_exact_live_entry_of_this_machine_and_never_another_machines() {
+    let root = machine_root();
+    let alive = judge(&[]);
+    let a = entry("alpha", Some(1), &[]);
+    directory::register(&root, a.clone(), false, &alive).unwrap();
+    directory::register(&root, entry("beta", Some(2), &[]), false, &alive).unwrap();
+    directory::register(&root, entry("gone", Some(3), &[]), false, &alive).unwrap();
+
+    assert_eq!(directory::resolve(&root, "fg-abc234/alpha", &alive).unwrap().handle, a.handle);
+    assert_eq!(directory::resolve(&root, " fg-abc234/alpha ", &alive).unwrap().handle, a.handle);
+    let missing = directory::resolve(&root, "fg-abc234/nobody", &alive).unwrap_err();
+    assert_eq!(missing.reason, "not-found");
+    assert_eq!(directory::resolve(&root, "fg-abc234/gone", &judge(&[3])).unwrap_err().reason, "not-found", "a dead head is not resolved");
+
+    let other = directory::resolve(&root, "fg-other99/alpha", &alive).unwrap_err();
+    assert_eq!(other.reason, "not-found");
+    assert!(other.detail.contains("shared directory"), "{}", other.detail);
+    let _ = fs::remove_dir_all(root);
+}

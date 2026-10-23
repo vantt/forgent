@@ -76,3 +76,13 @@ test('the placement policy decides split, newTab or unsupported and its default 
   assert.ok(policy.registry.names.includes(policy.registry.default));
   assert.deepEqual(Object.keys(policy.input.limits).sort(), ['maxPanesPerTab', 'minCols', 'minRows']);
 });
+
+test('the port lists the answers the core gives, and every named refusal is a route error code', () => {
+  assert.ok(port.operations.release.results.includes('unknown'));
+  for (const result of ['unsupported', 'unknown']) assert.ok(port.operations['reconcile-scan'].results.includes(result), result);
+  assert.ok('paneId' in port.results.scan.findings[0]);
+  for (const member of ['endpoint', 'anchorPane', 'agentKinds', 'integrations', 'defaults', 'policies']) assert.ok(member in port.results.capabilities, member);
+  assert.ok('agents' in port.operations.capabilities.input);
+  assert.match(port.operations.attach.rule, /pane-not-owned/);
+  for (const cause of Object.keys(port.configRefusals)) assert.ok(route.errorStdout.code.enum.includes(cause), cause);
+});

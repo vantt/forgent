@@ -1,0 +1,18 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:herdrOrchestrator:v1
+$comment: "owner: agent-coordination"
+description: "Which orchestration steps the herdr launcher starts by itself."
+type: object
+properties:
+  autoDiscover:
+    description: When true the launcher starts the discover step on its own.
+    type: boolean
+  autoMerge:
+    description: When true the launcher starts the merge step on its own.
+    type: boolean
+  autoRetro:
+    description: When true the launcher starts the retrospective step on its own.
+    type: boolean
+  autoCleanup:
+    description: When true the launcher starts the cleanup step on its own.
+    type: boolean

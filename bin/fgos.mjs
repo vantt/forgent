@@ -4231,8 +4231,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Rows of one run share what they read once (the Work view).
       const run = createDoctorRun();
       for (const { id, description, check } of DOCTOR_CHECKS) {
-        const { passed, message } = await check(repoRoot, run);
-        checks.push({ id, description, passed, message });
+        const { passed, message, detail } = await check(repoRoot, run);
+        checks.push({ id, description, passed, message, ...(detail !== undefined && { detail }) });
       }
       return fixed === undefined ? { checks } : { fixed, checks };
     }

@@ -203,11 +203,15 @@ pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
             .any(|p| suffix.starts_with(p)))
     .then_some(suffix))
 }
+/// Event ref tips, the legacy mirrors, and the HEAD the same listing observed (when attached).
+type ListedTips = (Vec<Tip>, BTreeMap<String, Oid>, Option<HeadFact>);
+/// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
+/// its own listed value, comes with it (see `refs::list_with_head`).
 fn tips(
     port: &dyn Inspect,
     repo: &RepoHandle,
     streams: &[StreamId],
-) -> Result<(Vec<Tip>, BTreeMap<String, Oid>), Error> {
+) -> Result<ListedTips, Error> {
     let prefixes = [
         "refs/fgos/events/",
         "refs/fgos/branch-events/",
@@ -220,7 +224,8 @@ fn tips(
     .collect::<Result<Vec<_>, _>>()?;
     let mut tips = Vec::new();
     let mut legacy = BTreeMap::new();
-    for e in crate::refs::list(port, repo, &prefixes)? {
+    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
+    for e in listed {
         let name = e.name.as_str();
         let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
             (
@@ -275,7 +280,7 @@ fn tips(
             mirror,
         });
     }
-    Ok((tips, legacy))
+    Ok((tips, legacy, head))
 }
 fn legacy_files(
     port: &dyn Inspect,
@@ -377,9 +382,14 @@ fn legacy_view(
     repo: &RepoHandle,
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
+    listed_head: Option<HeadFact>,
 ) -> Result<Arc<LegacyView>, Error> {
     let authority = crate::fence::authority(port, repo)?;
-    let head = port.resolve_head(&authority).map_err(git_error)?;
+    // The listing observed `repo`'s HEAD; it answers for the authority only when both are one checkout.
+    let head = match listed_head {
+        Some(head) if authority.git_dir() == repo.git_dir() => head,
+        _ => port.resolve_head(&authority).map_err(git_error)?,
+    };
     let compute = || {
         let (work, porting): (Vec<_>, Vec<_>) =
             read_legacy(port, repo, &authority, &head, refs, streams)?
@@ -547,7 +557,7 @@ fn read_from(
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
-    let (tips, legacy_refs) = tips(port, repo, req.streams)?;
+    let (tips, legacy_refs, mut listed_head) = tips(port, repo, req.streams)?;
     // A replay source is retained by the consumer, not hidden inside the cursor.
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
     let caller_has_history = holds_history(req, &query);
@@ -558,7 +568,7 @@ fn read_from(
     if let Some(Memoized { memo, legacy_held }) =
         memo.filter(|_| retained.is_none() && caller_has_history)
     {
-        let legacy = legacy_view(port, repo, &legacy_refs, req.streams)?;
+        let legacy = legacy_view(port, repo, &legacy_refs, req.streams, listed_head.take())?;
         let observed = Observed {
             tips: &tips,
             legacy_refs: &legacy_refs,
@@ -742,7 +752,7 @@ fn read_from(
         .collect();
     let legacy_view = match early_legacy {
         Some(view) => view,
-        None => legacy_view(port, repo, &legacy_refs, req.streams)?,
+        None => legacy_view(port, repo, &legacy_refs, req.streams, listed_head.take())?,
     };
     cursor.legacy_digest = legacy_view.digest.clone();
     let full_order: Vec<_> = legacy_view

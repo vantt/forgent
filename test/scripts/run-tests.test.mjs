@@ -409,6 +409,29 @@ test('runSelectedTests passes a run whose temp root holds no fgos-* leftovers', 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
+// The suite runs inside a checkout of the real repository: a test that registers a linked checkout there
+// and keeps it leaves a registration that outlives the run's temp dir and blocks every later worktree add.
+test('a run fails when it leaves a linked-checkout registration whose checkout was in its temp dir, and names it', () => {
+  const base = tempBase();
+  const registrations = path.join(base, '.git', 'worktrees');
+  const register = (name, checkout) => {
+    fs.mkdirSync(path.join(registrations, name), { recursive: true });
+    fs.writeFileSync(path.join(registrations, name, 'gitdir'), `${path.join(checkout, '.git')}\n`);
+  };
+  register('kept-by-a-person', path.join(base, 'elsewhere'));
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    log: (msg) => logs.push(msg),
+    spawn: (_exec, _argv, { env }) => { register('verify-AbCdEf', path.join(env.TMPDIR, 'fgos-worktrees', 'verify-AbCdEf')); return { status: 0 }; },
+  });
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.strayWorktrees.map((w) => w.name), ['verify-AbCdEf']);
+  assert.ok(logs.some((line) => line.includes('verify-AbCdEf')), 'the ERROR names the registration');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 test('leftoverTempPrefixes groups by prefix without the random suffix and tolerates a missing root', () => {
   assert.deepEqual(leftoverTempPrefixes('/nope', () => ['fgos-cli-AAAAAA', 'fgos-cli-BBBBBB', 'x']), { 'fgos-cli-': 2 });
   assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});

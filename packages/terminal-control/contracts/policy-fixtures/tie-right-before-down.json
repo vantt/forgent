@@ -1,5 +1,6 @@
 {
   "name": "tie-right-before-down",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

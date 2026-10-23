@@ -1,11 +1,13 @@
 {
   "version": 1,
   "source": "docs/platform/git/spec.md \u00a73\u20134",
-  "implementationStatus": "Publication and RepositoryConfig implemented; Unit ScopedCommit/Sync and Inspect migration implemented on the integration branch; remaining consumer families and phase-08 release proof pending",
   "ports": {
     "Inspect": [
       "resolveRepo",
       "resolveRef",
+      "resolveLiteralRef",
+      "resolveTrunk",
+      "resolveCommit",
       "status",
       "diff",
       "diffText",
@@ -15,11 +17,20 @@
       "listWorktrees",
       "compareContent",
       "snapshotWrites",
-      "listRefs",
-      "readPathsAt",
-      "resolveHead",
       "listTree",
-      "resolveCommit"
+      "lastPathCommitTime",
+      "mergeTree",
+      "attributes",
+      "firstAncestryMerge",
+      "compareCommits",
+      "listBranches",
+      "checkoutFacts",
+      "remoteTracking",
+      "commitTime",
+      "countCommits",
+      "unmatchedCommitCount",
+      "trackedPaths",
+      "remoteUrl"
     ],
     "Refs": [
       "ensureBranch",
@@ -40,7 +51,8 @@
       "preflight",
       "worktreeState",
       "commit",
-      "recover"
+      "recover",
+      "checkpointTrackedFiles"
     ],
     "Sync": [
       "start",
@@ -62,25 +74,22 @@
       "extractPath",
       "acknowledge"
     ],
-    "Checkpoint adapter": [
-      "checkpointTrackedFiles"
-    ],
     "RepositoryConfig": [
-      "ensureFetchMapping",
+      "inspectHooks",
       "ensureHooks",
       "removeOwnedHooksConfig"
     ],
     "Remote": [
-      "fetchRefs",
-      "pushRefs",
-      "inspectRemote"
+      "pushRefs"
     ],
     "Recovery": [
       "inspectOperation",
       "listPending",
+      "listRetainedLand",
       "reconcile"
     ],
     "Publication": [
+      "resolveRepo",
       "writeBlob",
       "writeTree",
       "writeCommit",
@@ -88,14 +97,28 @@
       "readObject",
       "walkCommits",
       "compareAndSwap",
-      "fetchRefs",
       "pushRefs",
-      "listRefs",
-      "readPathsAt",
-      "resolveHead",
-      "listTree"
+      "ensureFetchMapping",
+      "recover",
+      "reconcile",
+      "supersede",
+      "configuredFetchRefspecs",
+      "pushRefspecs",
+      "remoteUrl",
+      "machineId",
+      "fetchMappingProvenance",
+      "gitFloorVerdict"
     ]
   },
+  "functions": [
+    "inspectGit",
+    "inspectGitWorktreeRecovery",
+    "initializeGitWal",
+    "ensureGitFetchMapping",
+    "gitFetchMappings",
+    "prepareGitDriverDirectories",
+    "writeScope"
+  ],
   "publicationExtensions": {
     "writeCommit": "explicit author and committer dates",
     "walkCommits": "caller stop set, ordered parents, tree, bounded opaque continuation",
