@@ -87,4 +87,4 @@ Branch `mailbox/v1-v3`. Each decision is the plan owner's (agent), recorded in s
 
 - `cargo test -p fgos-mailbox-core -p fgos-mailbox -p fgos-identity -p fgos --lib --bins --tests`: 469 passed, 0 failed.
 - Mailbox and setup Node suites (score, run, v7, v7e, confined, auth guard, recorder, agent-hooks): 83 passed, 0 failed.
-- Full `npm test`: see the commit's gate line in the controller message.
+- Full `npm test`: 8635 passed, 18 failed: the known Git-umask failures (`fgctl-upgrade`, `fgctl-init-download-sources`, one `dispatch.test.mjs` case), none in the mailbox.
