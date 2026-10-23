@@ -30,7 +30,7 @@ Danh bạ do IDENT dựng từ các dòng `IDENT roster` mà chính các máy gh
 
 | Handle máy | Machine id | Ghi chú | IDENT trên release đang chạy |
 |---|---|---|---|
-| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | 00–03 (release main `7833d5df1`); thiếu 04, 07 tới lần land kế |
+| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | theo board 10:15: release `2ce473d4` (main `7833d5df1`) = 00–03, thiếu 04, 07; owner 11:10 báo các máy đã land — chờ `lead:SEAT` xác nhận release |
 | `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ (release main `5f7825163`, 10-23 10:34) |
 | `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ (release main `199d85223`, 10-23 08:57) |
 
