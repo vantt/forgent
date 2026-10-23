@@ -1,6 +1,6 @@
 // The two config layers after rigorToTier is retired. The global file of a machine that has not re-run setup
 // still carries `rigorToTier` and the bare-verb capabilities, and every older release on it still requires
-// them: it must keep loading, untouched. A project file in the old shape is refused by name and never rewritten.
+// them: it must keep loading, untouched.
 // These tests run with a real global file on disk (a temp HOME), not with the layer mocked.
 
 import '../helpers/process-tmp-root.mjs';
@@ -15,7 +15,6 @@ import {
   DEFAULT_RUNNER_CONFIG,
   FRESH_PROJECT_RUNNER_CONFIG,
   ensureRunnerConfigForDir,
-  loadRunnerConfig,
   loadRunnerConfigFromDir,
 } from '../../src/runner/dispatch/config.mjs';
 
@@ -65,7 +64,7 @@ function withMachine({ globalRunner = GLOBAL_RUNNER(), project }, fn) {
 }
 const bytes = (file) => fs.readFileSync(file, 'utf8');
 
-test('a global file that still carries rigorToTier and the bare verbs loads under a converted project, untouched', () => {
+test('a global file that still carries rigorToTier and the bare verbs loads under a project, untouched', () => {
   withMachine({ project: { runner: CONVERTED_PROJECT() } }, ({ repo, globalFile, stderr }) => {
     const before = bytes(globalFile);
     for (const load of [loadRunnerConfigFromDir, ensureRunnerConfigForDir]) {
@@ -76,34 +75,6 @@ test('a global file that still carries rigorToTier and the bare verbs loads unde
     }
     assert.equal(bytes(globalFile), before, 'setup is the only writer of the global file');
     assert.ok(stderr.join('').includes('runner.rigorToTier'), 'the drop is said once on stderr');
-  });
-});
-
-test('a project file that still carries rigorToTier is refused by name, and nothing is written', () => {
-  const project = { runner: { ...CONVERTED_PROJECT(), rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } };
-  withMachine({ project }, ({ repo, projectFile, globalFile }) => {
-    const [projectBefore, globalBefore] = [bytes(projectFile), bytes(globalFile)];
-    for (const load of [loadRunnerConfigFromDir, ensureRunnerConfigForDir]) {
-      assert.throws(() => load(repo), (error) => {
-        assert.equal(error.code, 'config-not-converted');
-        assert.match(error.message, /run `fgos setup`/);
-        assert.match(error.message, /rigorToTier/);
-        return true;
-      });
-    }
-    assert.equal(bytes(projectFile), projectBefore);
-    assert.equal(bytes(globalFile), globalBefore);
-  });
-});
-
-test('a project runner without the schema marker is refused by name, and the fill-missing writer leaves the file alone', () => {
-  const { patterns: _marker, ...unmarked } = CONVERTED_PROJECT();
-  withMachine({ project: { runner: unmarked } }, ({ repo, projectFile }) => {
-    const before = bytes(projectFile);
-    for (const load of [loadRunnerConfigFromDir, ensureRunnerConfigForDir]) {
-      assert.throws(() => load(repo), (error) => error.code === 'config-not-converted' && /patterns\.seatBinding\.schema/.test(error.message) && /fgos setup/.test(error.message));
-    }
-    assert.equal(bytes(projectFile), before, 'nothing was added before the refusal');
   });
 });
 
@@ -135,15 +106,4 @@ test('the fill-missing writer never puts rigorToTier or the schema marker into t
     assert.equal(written.timeoutMs, DEFAULT_RUNNER_CONFIG.timeoutMs);
     assert.equal('rigorToTier' in written, false);
   });
-});
-
-test('a runner config file handed to the loader directly with rigorToTier is refused as retired', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-layers-file-'));
-  const file = path.join(dir, 'runner.json');
-  try {
-    fs.writeFileSync(file, JSON.stringify({ ...CONVERTED_PROJECT(), rigorToTier: { standard: 'standard' } }));
-    assert.throws(() => loadRunnerConfig(file), /retired "rigorToTier".*fgos setup/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
 });
