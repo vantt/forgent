@@ -1,0 +1,2033 @@
+{
+  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "historicalReaderFiles": 47,
+  "readerTargetJoins": 135,
+  "specification": "Repoint execution to archiveCommit checkout; recover absent inputs only by original manifest blob, size and digest. Do not alter frozen embedded script text or treat archive replay as current-code proof.",
+  "joins": [
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-applied.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/native-agent.mjs",
+        "line": 20,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e44b8346ece91faba9c6c678c3489f8544d18cb7",
+      "targetSha256": "a061b0a608f7f91cfd8006540d11751eb80ebc7866c7bf976c6d616fc508e44e",
+      "targetSize": 3885260
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-applied.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/reproduction/helpers/native-agent.mjs",
+        "line": 20,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e44b8346ece91faba9c6c678c3489f8544d18cb7",
+      "targetSha256": "a061b0a608f7f91cfd8006540d11751eb80ebc7866c7bf976c6d616fc508e44e",
+      "targetSize": 3885260
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-applied.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/A33ClosureVerification/helperSources/native-agent.mjs",
+        "line": 20,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e44b8346ece91faba9c6c678c3489f8544d18cb7",
+      "targetSha256": "a061b0a608f7f91cfd8006540d11751eb80ebc7866c7bf976c6d616fc508e44e",
+      "targetSize": 3885260
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-applied.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-rebound-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-rebound-verification.json#/nativeHelperSources/closedAgent",
+        "line": 20,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e44b8346ece91faba9c6c678c3489f8544d18cb7",
+      "targetSha256": "a061b0a608f7f91cfd8006540d11751eb80ebc7866c7bf976c6d616fc508e44e",
+      "targetSize": 3885260
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-applied.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261013-1816-host-invocation-native-followup.json",
+      "locator": {
+        "readerPath": "../phase-06/verification-261013-1816-host-invocation-native-followup.json#/reproduction/helpers/closedAgent",
+        "line": 20,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e44b8346ece91faba9c6c678c3489f8544d18cb7",
+      "targetSha256": "a061b0a608f7f91cfd8006540d11751eb80ebc7866c7bf976c6d616fc508e44e",
+      "targetSize": 3885260
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/native-agent.mjs",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/reproduction/helpers/run-agent-gates.py",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/reproduction/helpers/native-agent.mjs",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/A33ClosureVerification/helperSources/native-agent.mjs",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-rebound-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-rebound-verification.json#/nativeHelperSources/closedAgent",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-fixes-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261013-1816-host-invocation-native-followup.json",
+      "locator": {
+        "readerPath": "../phase-06/verification-261013-1816-host-invocation-native-followup.json#/reproduction/helpers/closedAgent",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0c315d8f8c2b48ae39bffd59446629b90edd4347",
+      "targetSha256": "6f0d30b1fe8dc34905ec9b6804874d55daa90cae31c51206f60296d8873523dc",
+      "targetSize": 6165583
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/fix-source-gap.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c24bb6b39c3b5376ef828e877ca20af5be7e516d",
+      "targetSha256": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+      "targetSize": 3733550
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/gap-successors.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c24bb6b39c3b5376ef828e877ca20af5be7e516d",
+      "targetSha256": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+      "targetSize": 3733550
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/bind-pending.mjs",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c24bb6b39c3b5376ef828e877ca20af5be7e516d",
+      "targetSha256": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+      "targetSize": 3733550
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-reproduction.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-reproduction.json#/helpers/persist.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c24bb6b39c3b5376ef828e877ca20af5be7e516d",
+      "targetSha256": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+      "targetSize": 3733550
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/reproduction/helpers/bind-reviewed.mjs",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c24bb6b39c3b5376ef828e877ca20af5be7e516d",
+      "targetSha256": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+      "targetSize": 3733550
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-proposals-redesigns.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/audit-261015-1024-proposals-redesigns-carriage.json",
+      "locator": {
+        "readerPath": "../phase-06/audit-261015-1024-proposals-redesigns-carriage.json#/reproductionSource",
+        "line": 4,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e4daf2a8fd1992bef2ab7359ec0b7687328a42ce",
+      "targetSha256": "5e40097a220636fe227bd60b1ab1d73c5122fa67530d95f7cb850827d532d047",
+      "targetSize": 1529267
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-proposals-redesigns.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md#fence@25005#/reproductionSource",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e4daf2a8fd1992bef2ab7359ec0b7687328a42ce",
+      "targetSha256": "5e40097a220636fe227bd60b1ab1d73c5122fa67530d95f7cb850827d532d047",
+      "targetSize": 1529267
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-proposals-redesigns.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md#fence@25005#/reproductionSource",
+        "line": 24,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e4daf2a8fd1992bef2ab7359ec0b7687328a42ce",
+      "targetSha256": "5e40097a220636fe227bd60b1ab1d73c5122fa67530d95f7cb850827d532d047",
+      "targetSize": 1529267
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-proposals-redesigns.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-corrections-accounting.json",
+      "locator": {
+        "readerPath": "../phase-06/step7-corrections-accounting.json#/reproductionSource",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e4daf2a8fd1992bef2ab7359ec0b7687328a42ce",
+      "targetSha256": "5e40097a220636fe227bd60b1ab1d73c5122fa67530d95f7cb850827d532d047",
+      "targetSize": 1529267
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-proposals-redesigns.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-corrections-accounting.json",
+      "locator": {
+        "readerPath": "../phase-06/step7-corrections-accounting.json#/reproductionSource",
+        "line": 24,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e4daf2a8fd1992bef2ab7359ec0b7687328a42ce",
+      "targetSha256": "5e40097a220636fe227bd60b1ab1d73c5122fa67530d95f7cb850827d532d047",
+      "targetSize": 1529267
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/carriage-label-binding-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/carriage-label-binding-verification.json#/preservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-review-format-blocker.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-review-format-blocker.json#/checkA/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-routing-stop.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-routing-stop.json#/unchangedProofs/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-routing-stop.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-routing-stop.json#/unchangedProofs/1/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/preservation/4/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/unchangedProofs/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/unchangedProofs/1/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/A33ClosureVerification/results/10/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-rebound-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-rebound-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-preparation.json",
+      "locator": {
+        "readerPath": "../phase-06/packaging-preparation.json#/resumeChecks/3/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-review-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/packaging-review-verification.json#/helperSources/preserve-resume.py",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-binding-completion.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-binding-completion.json#/checkA/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-binding-completion.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-binding-completion.json#/finalPreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-accounting-agent-coordination.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-fix-accounting-agent-coordination.json#/prerequisitePreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-accounting-agent-coordination.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-fix-accounting-agent-coordination.json#/finalPreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261013-1816-host-invocation-native-followup.json",
+      "locator": {
+        "readerPath": "../phase-06/verification-261013-1816-host-invocation-native-followup.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-rework-verification.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261014-1830-packaging-batch-close.md.json",
+      "locator": {
+        "readerPath": "../phase-06/verification-261014-1830-packaging-batch-close.md.json#/helperSources/preserve-resume.py",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "e71e5c27733c293317fbd576d945bb7fcc1765d8",
+      "targetSha256": "1feb324202679bb4272c85edc82c0b4684d920910a739997cde7d5a736c12e33",
+      "targetSize": 9802757
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-source-bindings.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-review-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/packaging-review-verification.json#/helperSources/validate-resume.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "70107bd258a01140bc739b0959e1422130769482",
+      "targetSha256": "f04c6f14281915a819295aec5dc28bacdb15630d5c742fea628e488b722132cc",
+      "targetSize": 1695203
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-2-main-merge.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "locator": {
+        "readerPath": "../phase-06/review-2-main-merge-followup.md#fence@91",
+        "line": 22,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "8d0bbffde564039d041755e742fe112d83f4fca1",
+      "targetSha256": "7f268bf7f0360d2d9511accf4f612857f7d84308dc718587bd4e3f552f5835be",
+      "targetSize": 37196747
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0607-whole-system-rereview-01.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json",
+      "locator": {
+        "readerPath": "../phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json#/helperSources/applyVerdicts",
+        "line": 15,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0f81856946ba5b6e126370d74f43aa70202894ce",
+      "targetSha256": "b4c1a817da7138b3c5a13be13c07651a5389137ca9dc2030fe53cb4ebf25fd3a",
+      "targetSize": 1305406
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0607-whole-system-rereview-01.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json",
+      "locator": {
+        "readerPath": "../phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json#/helperSources/corrections",
+        "line": 6,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0f81856946ba5b6e126370d74f43aa70202894ce",
+      "targetSha256": "b4c1a817da7138b3c5a13be13c07651a5389137ca9dc2030fe53cb4ebf25fd3a",
+      "targetSize": 1305406
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0607-whole-system-rereview-01.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json",
+      "locator": {
+        "readerPath": "../phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json#/helperSources/finishVerification",
+        "line": 15,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "0f81856946ba5b6e126370d74f43aa70202894ce",
+      "targetSha256": "b4c1a817da7138b3c5a13be13c07651a5389137ca9dc2030fe53cb4ebf25fd3a",
+      "targetSize": 1305406
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/rebind",
+        "line": 21,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c5281352f10509a0196d00ee47b80c5100f1d52b",
+      "targetSha256": "71f48b3421b0ffe9e30aab9ca7193df73c4d64f448eee8fde4a5a00fd4ed3b17",
+      "targetSize": 1528966
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1526-specs-ui-reworks-main-recarry.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-native-verification.json#/reproduction/verification",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "2605b473b2b79ccf7547189ad1d798636617a39a",
+      "targetSha256": "3e7df16960f60b29a1bf58feb5c4ff6367d8209cf4801b750a4ba2b6800d10b1",
+      "targetSize": 1886171
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1526-specs-ui-reworks-main-recarry.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-native-verification.json#/reproduction/gates",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "2605b473b2b79ccf7547189ad1d798636617a39a",
+      "targetSha256": "3e7df16960f60b29a1bf58feb5c4ff6367d8209cf4801b750a4ba2b6800d10b1",
+      "targetSize": 1886171
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1526-specs-ui-reworks-main-recarry.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-request-binding-proof.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-request-binding-proof.json#/reproduction",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "2605b473b2b79ccf7547189ad1d798636617a39a",
+      "targetSha256": "3e7df16960f60b29a1bf58feb5c4ff6367d8209cf4801b750a4ba2b6800d10b1",
+      "targetSize": 1886171
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1526-specs-ui-reworks-main-recarry.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-nine-rework-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-nine-rework-verification.json#/reproduction/application",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "2605b473b2b79ccf7547189ad1d798636617a39a",
+      "targetSha256": "3e7df16960f60b29a1bf58feb5c4ff6367d8209cf4801b750a4ba2b6800d10b1",
+      "targetSize": 1886171
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-bounded-rereview-b80e8c16c.md.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-audit.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-audit.json#/reproduction",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "db7348ae62549ccb7ec331b39d96870a9eb62a3a",
+      "targetSha256": "0ed4e59f770e9d05f053d0fe058cecdec238f05310351e848d9cda62341945e0",
+      "targetSize": 13523538
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-truth-rebindings-turn21.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-turn21-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/root-authorities-turn21-verification.json#/helperSources/native-final.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "b2e0734531d3bb0ea4818b5e740133ba992a0ec2",
+      "targetSha256": "4579ffa4f1a05c2eda430d803f5c155e06926fe3ddae3d48f41eb5bb3dce74cf",
+      "targetSize": 1627302
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-truth-rebindings-turn21.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-turn21-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/root-authorities-turn21-verification.json#/helperSources/legacy-consequences.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "b2e0734531d3bb0ea4818b5e740133ba992a0ec2",
+      "targetSha256": "4579ffa4f1a05c2eda430d803f5c155e06926fe3ddae3d48f41eb5bb3dce74cf",
+      "targetSize": 1627302
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-truth-rebindings-turn21.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-turn21-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/root-authorities-turn21-verification.json#/helperSources/classify-bindings.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "b2e0734531d3bb0ea4818b5e740133ba992a0ec2",
+      "targetSha256": "4579ffa4f1a05c2eda430d803f5c155e06926fe3ddae3d48f41eb5bb3dce74cf",
+      "targetSize": 1627302
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-truth-rebindings-turn21.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-turn21-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/root-authorities-turn21-verification.json#/helperSources/packs-truth.py",
+        "line": 11,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "b2e0734531d3bb0ea4818b5e740133ba992a0ec2",
+      "targetSha256": "4579ffa4f1a05c2eda430d803f5c155e06926fe3ddae3d48f41eb5bb3dce74cf",
+      "targetSize": 1627302
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-truth-rebindings-turn21.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-authorities-turn21-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/root-authorities-turn21-verification.json#/helperSources/verify-final.mjs",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "b2e0734531d3bb0ea4818b5e740133ba992a0ec2",
+      "targetSha256": "4579ffa4f1a05c2eda430d803f5c155e06926fe3ddae3d48f41eb5bb3dce74cf",
+      "targetSize": 1627302
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/root-boundary-sync-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/bounded-review-validation-resume.json",
+      "locator": {
+        "readerPath": "../phase-06/bounded-review-validation-resume.json#/helperSource",
+        "line": 11,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "6c986322db1c674a47b450737f204df58543374d",
+      "targetSha256": "a984c81ec69e9daca0ddd9f71412cadfd8a461f8f8eb7f3b1f8f02ffbb6a4764",
+      "targetSize": 2362541
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md#fence@59199#/nativeProof/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-26f5-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md#fence@59199#/nativeProof/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-26f5-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1803-runner-bounded-rereview-26f5f6119.md#fence@59199#/nativeProof/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-26f5-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-26f5-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "61d35585d70ca4ca0debcda3e97561d5fc385ef2",
+      "targetSha256": "8ddf7bd58d0ffa61a17b9c96018fc2b5574b1c821c1de326765be6cc70b0e4d6",
+      "targetSize": 1058161
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-bounded-rereview-b80e8c16c.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-runner-bounded-rereview-b80e8c16c.md#fence@77864#/evidence/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-b80e-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 13,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-bounded-rereview-b80e8c16c.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-runner-bounded-rereview-b80e8c16c.md#fence@77864#/evidence/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-b80e-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-bounded-rereview-b80e8c16c.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-runner-bounded-rereview-b80e8c16c.md#fence@77864#/evidence/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-b80e-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "235fd4a043a296ddbeae371eac1243a27432b712",
+      "targetSha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18",
+      "targetSize": 1057645
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 7,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "6d58ba00390cba1280e7b160877f8738bc34053f",
+      "targetSha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
+      "targetSize": 1056286
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 7,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "6d58ba00390cba1280e7b160877f8738bc34053f",
+      "targetSha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
+      "targetSize": 1056286
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 7,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "6d58ba00390cba1280e7b160877f8738bc34053f",
+      "targetSha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
+      "targetSize": 1056286
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9416c67c61db3d215b74f720a67ef06b5076eda6",
+      "targetSha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f",
+      "targetSize": 1057605
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9416c67c61db3d215b74f720a67ef06b5076eda6",
+      "targetSha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f",
+      "targetSize": 1057605
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-final-verification.json#/reproduction/checkHelper",
+        "line": 10,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9416c67c61db3d215b74f720a67ef06b5076eda6",
+      "targetSha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f",
+      "targetSize": 1057605
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/sensitivity-10-checkpoint/pack.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-10-checkpoint.md",
+      "locator": {
+        "readerPath": "../phase-06/review-10-checkpoint.md",
+        "line": 51,
+        "kind": "command-argument",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "8f96b4a2bc5b0ecc0d1cff9ecbf1647b88dd54fc",
+      "targetSha256": "b4acd75708c3b620931488fe08fe8f8500744631247d5ef4ff1c84accb002240",
+      "targetSize": 17438074
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/sensitivity-6-checkpoint-whole-system/pack.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-6-checkpoint.md",
+      "locator": {
+        "readerPath": "../phase-06/review-6-checkpoint.md",
+        "line": 29,
+        "kind": "command-argument",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "cd43438d443d1b85ff6e1be41d407780e06223f1",
+      "targetSha256": "82effc38cc41febf5e20d30b1665c2710595d1d6ede1ff23fc7468abbf2bd0d1",
+      "targetSize": 4600880
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-expected.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/progress.md",
+      "locator": {
+        "readerPath": "../phase-07/progress.md#fence@428",
+        "line": 26,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "81bff1f9a77ea986b644940707accb59e313d319",
+      "targetSha256": "3f9ce1b1b6a81ab437860f45bd07e09cc1ca9afcf4bba50ad391da041817dc07",
+      "targetSize": 2977873
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-carriage-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/audit-261015-1024-proposals-redesigns-carriage.json",
+      "locator": {
+        "readerPath": "../phase-06/audit-261015-1024-proposals-redesigns-carriage.json#/reproductionSource",
+        "line": 4,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "15fb79b03d9ad778eac34c1dcc2795ce157db631",
+      "targetSha256": "5ebbdbee0fff7a8d85c88233788287a3032db3a688a46b6ba83ddc75aea0d68c",
+      "targetSize": 2107492
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-carriage-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md#fence@25005#/reproductionSource",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "15fb79b03d9ad778eac34c1dcc2795ce157db631",
+      "targetSha256": "5ebbdbee0fff7a8d85c88233788287a3032db3a688a46b6ba83ddc75aea0d68c",
+      "targetSize": 2107492
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-carriage-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step7-corrections-accounting.json",
+      "locator": {
+        "readerPath": "../phase-06/step7-corrections-accounting.json#/reproductionSource",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "15fb79b03d9ad778eac34c1dcc2795ce157db631",
+      "targetSha256": "5ebbdbee0fff7a8d85c88233788287a3032db3a688a46b6ba83ddc75aea0d68c",
+      "targetSize": 2107492
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-native-verification.json#/reproduction/verification",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9ae82f823118c97c78b66ab61da597aa7cfc7e10",
+      "targetSha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
+      "targetSize": 1289563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-native-verification.json#/reproduction/verification",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9ae82f823118c97c78b66ab61da597aa7cfc7e10",
+      "targetSha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
+      "targetSize": 1289563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-committed-native-verification.json#/reproduction/verification",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "9ae82f823118c97c78b66ab61da597aa7cfc7e10",
+      "targetSha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
+      "targetSize": 1289563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-rework-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/rebind",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "67703a1750748597146daae5fa6b493d6298c0e3",
+      "targetSha256": "cf3d8ff89419c2e9e5930dc8efbb0a851802de03b18d945b7461c24256a6523d",
+      "targetSize": 2595061
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-rework-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/verification",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "67703a1750748597146daae5fa6b493d6298c0e3",
+      "targetSha256": "cf3d8ff89419c2e9e5930dc8efbb0a851802de03b18d945b7461c24256a6523d",
+      "targetSize": 2595061
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-rework-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/bindingVerification",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "67703a1750748597146daae5fa6b493d6298c0e3",
+      "targetSha256": "cf3d8ff89419c2e9e5930dc8efbb0a851802de03b18d945b7461c24256a6523d",
+      "targetSize": 2595061
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-rework-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/packaging",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "67703a1750748597146daae5fa6b493d6298c0e3",
+      "targetSha256": "cf3d8ff89419c2e9e5930dc8efbb0a851802de03b18d945b7461c24256a6523d",
+      "targetSize": 2595061
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-rework-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step8-final-verification.json#/reproduction/finalization",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "67703a1750748597146daae5fa6b493d6298c0e3",
+      "targetSha256": "cf3d8ff89419c2e9e5930dc8efbb0a851802de03b18d945b7461c24256a6523d",
+      "targetSize": 2595061
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1706-runner-report-81d0ed074.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1706-runner-report-81d0ed074.md#fence@20#/nativeVerification/reproduction/checkHelperSource",
+        "line": 6,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "46cc324f1be260dfe6c3d09658e8823f2b6f8210",
+      "targetSha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
+      "targetSize": 1057679
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1706-runner-report-81d0ed074.md.json",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1706-runner-report-81d0ed074.md.json#/entries/0/nativeVerification/reproduction/checkHelperSource",
+        "line": 6,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "46cc324f1be260dfe6c3d09658e8823f2b6f8210",
+      "targetSha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
+      "targetSize": 1057679
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-native-verification.json#/reproduction/checkHelperSource",
+        "line": 6,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "46cc324f1be260dfe6c3d09658e8823f2b6f8210",
+      "targetSha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
+      "targetSize": 1057679
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "46cc324f1be260dfe6c3d09658e8823f2b6f8210",
+      "targetSha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
+      "targetSize": 1057679
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-native-verification.json#/reproduction/checkHelperSource",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "46cc324f1be260dfe6c3d09658e8823f2b6f8210",
+      "targetSha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
+      "targetSize": 1057679
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1706-runner-report-81d0ed074.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1706-runner-report-81d0ed074.md#fence@20#/nativeVerification/reproduction/reconciliationHelperSource",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1706-runner-report-81d0ed074.md.json",
+      "locator": {
+        "readerPath": "../phase-06/review-request-261015-1706-runner-report-81d0ed074.md.json#/entries/0/nativeVerification/reproduction/reconciliationHelperSource",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-final-audit.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-b80e-final-audit.json#/reproduction/finalAuditSource",
+        "line": 5,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-review-package-index.json",
+      "locator": {
+        "readerPath": "../phase-06/runner-b80e-review-package-index.json#/reproduction/finishBuilder",
+        "line": 11,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-native-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-native-verification.json#/reproduction/reconciliationHelperSource",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-review-package-index.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-review-package-index.json#/reproduction/packageHelperSource",
+        "line": 23,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-review-package-index.json",
+      "locator": {
+        "readerPath": "../phase-06/step9-review-package-index.json#/reproduction/priorGapBindingsHelperSource",
+        "line": 2,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "625a36d859fa3394e7dc4e2d76baba65c12ebd53",
+      "targetSha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4",
+      "targetSize": 3611170
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-rebound-units.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-bounded-rereview-b80e8c16c.md",
+      "locator": {
+        "readerPath": "../phase-06/review-request-runner-bounded-rereview-b80e8c16c.md#fence@47705#/changes/11/before",
+        "line": 4,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "a5c7e503aeb521b9b06af176ea449bdad3c9ff5b",
+      "targetSha256": "a226cb5072131edca974a63bc05b0f16b95ea95ae1a127b2ebd9a23d6d4d440b",
+      "targetSize": 2373598
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/carriage-label-binding-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/carriage-label-binding-verification.json#/preservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-review-format-blocker.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-review-format-blocker.json#/checkA/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-routing-stop.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-routing-stop.json#/unchangedProofs/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-routing-stop.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-routing-stop.json#/unchangedProofs/1/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/preservation/4/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/unchangedProofs/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/closure-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/closure-verification.json#/unchangedProofs/1/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-boundary-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-boundary-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-close-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-close-verification.json#/A33ClosureVerification/results/10/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-rebound-verification.json",
+      "locator": {
+        "readerPath": "../phase-06/host-invocation-rebound-verification.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-preparation.json",
+      "locator": {
+        "readerPath": "../phase-06/packaging-preparation.json#/resumeChecks/3/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-binding-completion.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-binding-completion.json#/checkA/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-binding-completion.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-binding-completion.json#/finalPreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-accounting-agent-coordination.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-fix-accounting-agent-coordination.json#/prerequisitePreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-accounting-agent-coordination.json",
+      "locator": {
+        "readerPath": "../phase-06/truth-fix-accounting-agent-coordination.json#/finalPreservation/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-accounting-agent-coordination.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261013-1816-host-invocation-native-followup.json",
+      "locator": {
+        "readerPath": "../phase-06/verification-261013-1816-host-invocation-native-followup.json#/preservation/0/command/3",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "25045e91ddce118b837921ab48d391c404f98f87",
+      "targetSha256": "8814011c1dbd4611a909df5eda70cf37f0b417619f90e208ed61e95c8063d212",
+      "targetSize": 1832563
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-compare-reproduce.mjs",
+      "locator": {
+        "readerPath": "../phase-07/step-09-close-n1-compare-reproduce.mjs",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "f5fea13c49242feffef75d15c2f349e7ef72fd33",
+      "targetSha256": "d6ae3cbf9a7b061ca9f6d3078d6be1c8591304db0760b4644150ed5274757bd1",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-compare-reproduce.mjs",
+      "locator": {
+        "readerPath": "../phase-07/step-09-close-n1-compare-reproduce.mjs",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "f5fea13c49242feffef75d15c2f349e7ef72fd33",
+      "targetSha256": "d6ae3cbf9a7b061ca9f6d3078d6be1c8591304db0760b4644150ed5274757bd1",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-E-identity.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-compare-reproduce.mjs",
+      "locator": {
+        "readerPath": "../phase-07/step-09-close-n1-r03-compare-reproduce.mjs",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "f0b69b093304be6f0cf06e5075042cb90620f071",
+      "targetSha256": "97896ce1de1c3e451c05e4e86471031ceaad87fb57310a565a09efad8297e31b",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-E-phase02.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-close-n1-r03-compare-reproduce.mjs",
+      "locator": {
+        "readerPath": "../phase-07/step-09-close-n1-r03-compare-reproduce.mjs",
+        "line": 10,
+        "kind": "constructed",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "f0b69b093304be6f0cf06e5075042cb90620f071",
+      "targetSha256": "97896ce1de1c3e451c05e4e86471031ceaad87fb57310a565a09efad8297e31b",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/review-request-a38-step-09-runner-n1-01.md",
+      "locator": {
+        "readerPath": "../phase-07/review-request-a38-step-09-runner-n1-01.md#fence@50",
+        "line": 8,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "56c024dfda9b3259a133d107af9e2a91aa06b36a",
+      "targetSha256": "6ebf7724446bcafaaaaf67dee35e5fa0e9d16ce8323ffc6edbb74e48a0498893",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-E-both.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-portable-comparator.json",
+      "locator": {
+        "readerPath": "../phase-07/step-09-runner-n1-portable-comparator.json#/command",
+        "line": 1,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "56c024dfda9b3259a133d107af9e2a91aa06b36a",
+      "targetSha256": "6ebf7724446bcafaaaaf67dee35e5fa0e9d16ce8323ffc6edbb74e48a0498893",
+      "targetSize": 1545458
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-runner-n1-comparator-actual.json.gz",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-07/review-request-a38-step-09-runner-n1-01.md",
+      "locator": {
+        "readerPath": "../phase-07/review-request-a38-step-09-runner-n1-01.md#fence@50",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "a583da90879f9aea4bc4d50eacccdb49c3e9e461",
+      "targetSha256": "5bbd59528fbe711a5a94e459a433df12769bac4dea04fc09c36230aa03a38742",
+      "targetSize": 5169726
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+      "locator": {
+        "readerPath": "step-02-review-request.md#fence@50",
+        "line": 25,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c0930385361922783a6f05c1cebcf307eb35d4a5",
+      "targetSha256": "d593b434840d04d2a8d1fd44933e33dae196baefa933c1979e12717b13d16f68",
+      "targetSize": 5835641
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-ledger-owner-join.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-request.md",
+      "locator": {
+        "readerPath": "step-02b-review-request.md#fence@67",
+        "line": 47,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "c0930385361922783a6f05c1cebcf307eb35d4a5",
+      "targetSha256": "d593b434840d04d2a8d1fd44933e33dae196baefa933c1979e12717b13d16f68",
+      "targetSize": 5835641
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-seed-reconciliation.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+      "locator": {
+        "readerPath": "step-02-review-request.md#fence@50",
+        "line": 41,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "318a9e190943557eefa7ebda52737820215fff81",
+      "targetSha256": "8712d45dc73b0221480812c0306e347dfaea86504a7df88c62e931e14ed805e1",
+      "targetSize": 2014682
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-verification.json",
+      "locator": {
+        "readerPath": "step-02c-verification.json#/scripts/8/source",
+        "line": 3,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "aae10be77edf64c6e51b61966a75f57b48d947f2",
+      "targetSha256": "a90a30ff8c461fdb92ef74ba173f8fde17b339a09cf65ee2130074e283b673a3",
+      "targetSize": 1406617
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-verification.json",
+      "locator": {
+        "readerPath": "step-02c-verification.json#/scripts/9/source",
+        "line": 32,
+        "kind": "literal",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "aae10be77edf64c6e51b61966a75f57b48d947f2",
+      "targetSha256": "a90a30ff8c461fdb92ef74ba173f8fde17b339a09cf65ee2130074e283b673a3",
+      "targetSize": 1406617
+    },
+    {
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-index.json",
+      "readerPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-verification.json",
+      "locator": {
+        "readerPath": "step-02c-verification.json#/scripts/9/source",
+        "line": 54,
+        "kind": "glob",
+        "liveness": "historical-replay"
+      },
+      "disposition": "historical replay repointed to exact archive execution context; absent target recovered by recorded blob",
+      "owningProof": "historical replay in locator, not a current owning test",
+      "targetBlobId": "aae10be77edf64c6e51b61966a75f57b48d947f2",
+      "targetSha256": "a90a30ff8c461fdb92ef74ba173f8fde17b339a09cf65ee2130074e283b673a3",
+      "targetSize": 1406617
+    }
+  ]
+}

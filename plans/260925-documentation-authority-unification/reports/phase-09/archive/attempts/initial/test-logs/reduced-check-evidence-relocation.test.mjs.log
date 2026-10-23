@@ -1,0 +1,56 @@
+✔ --before passes a consistent tracked fixture (79.720876ms)
+▶ --before rejects a missing file on either side
+  ✔ legacy (39.816698ms)
+  ✔ platform (38.75159ms)
+✔ --before rejects a missing file on either side (79.286486ms)
+▶ --before rejects changed bytes on either side
+  ✔ legacy (37.001538ms)
+  ✔ platform (36.61132ms)
+✔ --before rejects changed bytes on either side (74.275476ms)
+▶ --before rejects unlisted payloads on either side
+  ✔ legacy (39.888114ms)
+  ✔ platform (38.955879ms)
+✔ --before rejects unlisted payloads on either side (79.660798ms)
+▶ --before rejects filesystem mode, git mode, git blob, and symlink drift
+  ✔ filesystem mode (39.573585ms)
+  ✔ git mode (40.567722ms)
+  ✔ git blob (40.168402ms)
+  ✔ symlink (37.635068ms)
+✔ --before rejects filesystem mode, git mode, git blob, and symlink drift (159.0105ms)
+▶ --before regenerates and enforces the classified consumer table
+  ✔ unclassified consumer (38.829604ms)
+  ✔ runtime reader (50.395634ms)
+  ✔ collection-name drift (59.360198ms)
+  ✔ matching-line drift without match-set drift (83.935132ms)
+✔ --before regenerates and enforces the classified consumer table (233.390837ms)
+✔ generateManifest is deterministic, codepoint-sorted, and represents a moved payload (62.741963ms)
+✔ manifest schema rejects unsafe, duplicate, unsorted, and malformed entries (16.46611ms)
+✔ --after passes after deletion and excludes only classified history, fixtures, release history, records, and the exact alias table (54.153825ms)
+▶ --after catches directory and template mentions but does not broadly exclude alias-table names or target directories
+  ✔ directory (39.454745ms)
+  ✔ template (40.299739ms)
+  ✔ alias lookalike (40.103017ms)
+  ✔ nested target (41.644329ms)
+✔ --after catches directory and template mentions but does not broadly exclude alias-table names or target directories (162.335376ms)
+▶ --after reports every payload integrity failure branch
+  ✔ remaining legacy (37.995615ms)
+  ✔ changed byte (37.872864ms)
+  ✔ wrong mode (37.396618ms)
+  ✔ wrong git mode (39.969414ms)
+  ✔ wrong git blob (38.490803ms)
+  ✔ missing platform (35.760024ms)
+  ✔ unlisted platform (40.912213ms)
+  ✔ stray legacy (39.215866ms)
+  ✔ platform symlink (36.996332ms)
+✔ --after reports every payload integrity failure branch (346.410135ms)
+✔ --after reports tracked-file read errors (40.350516ms)
+✔ CLI uses repo-root for relative manifest exclusion (151.835643ms)
+✔ CLI distinguishes configuration errors from policy violations without a stack trace (373.041914ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 41
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2026.147484

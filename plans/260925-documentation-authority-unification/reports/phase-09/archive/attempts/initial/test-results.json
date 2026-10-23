@@ -1,0 +1,482 @@
+[
+  {
+    "phase": "baseline",
+    "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-rationale-reproduction.test.mjs"
+    ],
+    "exit": 1,
+    "seconds": 36.68899994099047,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-rationale-reproduction.test.mjs.log",
+    "sha256": "7f43165b4f0d794826887bf76b00690d64af796ef58ae5f87b045b161797ab6a",
+    "summary": [
+      "ℹ tests 8",
+      "ℹ pass 5",
+      "ℹ fail 3",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/doc-runner-liveness.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-runner-liveness.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 12.627183158067055,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-runner-liveness.test.mjs.log",
+    "sha256": "a22d2b54963b1d190ffeba63a5a5e16016843af06f5fdc8a8ae1987a661e42a4",
+    "summary": [
+      "ℹ tests 1",
+      "ℹ pass 1",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/generate-doc-inventory.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/generate-doc-inventory.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 53.85768346500117,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-doc-inventory.test.mjs.log",
+    "sha256": "6d5c36c35b46bd1e4a0272d4e8c485901ede6691fee3bc8ef0d2dca167c4a63f",
+    "summary": [
+      "ℹ tests 97",
+      "ℹ pass 97",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/verify-phase-02.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/verify-phase-02.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.4231776560191065,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-verify-phase-02.test.mjs.log",
+    "sha256": "539186317d1d1c9d3dae94b07f3c3c1bb6a88bc7816a10ded8feb05a7ddd24cf",
+    "summary": [
+      "ℹ tests 6",
+      "ℹ pass 6",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/check-doc-retirement.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-doc-retirement.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.21095830108970404,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-retirement.test.mjs.log",
+    "sha256": "cbe3c88c0c972106a578d6c51df05e7ccadb8532a3e3284b550818bd933b2880",
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 36",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/check-evidence-relocation.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-evidence-relocation.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 2.0741598109016195,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-evidence-relocation.test.mjs.log",
+    "sha256": "bf8d80774f7532e9b9089ad6dd70ec91e0e54d61765e44559b5e85bcff304e6c",
+    "summary": [
+      "ℹ tests 41",
+      "ℹ pass 41",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/doc-review-format.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-review-format.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 7.4102694150060415,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-review-format.test.mjs.log",
+    "sha256": "90b196c7054ce01ad173312d286581a7b5be4304cd2ed01db2a734e1623a0195",
+    "summary": [
+      "ℹ tests 25",
+      "ℹ pass 25",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/doc-restoration-proofs.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-restoration-proofs.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 3.3843467709375545,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-restoration-proofs.test.mjs.log",
+    "sha256": "1b913492f87b9f8f71cffe31c0c21b8d9745965423e93e2aa13abada0ad0288d",
+    "summary": [
+      "ℹ tests 5",
+      "ℹ pass 5",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/check-doc-constitution.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 2.5451220800168812,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-constitution.test.mjs.log",
+    "sha256": "bd3e8351f17da8dd5b81c34b614abe5cb43d33f64124d9e6d212b79134931e0c",
+    "summary": [
+      "ℹ tests 65",
+      "ℹ pass 65",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "baseline",
+    "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/generate-shipped-path-inventory.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 45.17305944499094,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-shipped-path-inventory.test.mjs.log",
+    "sha256": "222b7a4e73a4d3ec6f42e9aad8200b159d1c5f1c3f30f9ab1e3fb474866c1d17",
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-rationale-reproduction.test.mjs"
+    ],
+    "exit": 1,
+    "seconds": 32.12477206601761,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-rationale-reproduction.test.mjs.log",
+    "sha256": "cd8495ab28de473b001269caa1004d0f440ff6272ffb8fc73c42d1d033997bc2",
+    "summary": [
+      "ℹ tests 8",
+      "ℹ pass 5",
+      "ℹ fail 3",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/doc-runner-liveness.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-runner-liveness.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 8.04476459696889,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-runner-liveness.test.mjs.log",
+    "sha256": "02534cfcc474040e37a182dd29d526d74f4918f34ca89a40fa1041c5d35a7d30",
+    "summary": [
+      "ℹ tests 1",
+      "ℹ pass 1",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/generate-doc-inventory.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/generate-doc-inventory.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 29.66388274799101,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-doc-inventory.test.mjs.log",
+    "sha256": "ad8266d899933195e60475a293bf54c23d7893c4a0cc79b3360e29bd89942ba2",
+    "summary": [
+      "ℹ tests 97",
+      "ℹ pass 97",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/verify-phase-02.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/verify-phase-02.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.41932432702742517,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-verify-phase-02.test.mjs.log",
+    "sha256": "f67b28d7ef4ea913b9977720fd7ecc1b36e50e996f47028c0eeb06508c024caf",
+    "summary": [
+      "ℹ tests 6",
+      "ℹ pass 6",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/check-doc-retirement.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-doc-retirement.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.21245572192128748,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-retirement.test.mjs.log",
+    "sha256": "28452b881cfb8720097f61adcc69a38f42fda10e960426e9655e4a753bd6cc0d",
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 36",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/check-evidence-relocation.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-evidence-relocation.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 2.06070276000537,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-evidence-relocation.test.mjs.log",
+    "sha256": "ad589eae046862d555e62d96ffd6c99a9cac93528f1c94e396742d88847d1f43",
+    "summary": [
+      "ℹ tests 41",
+      "ℹ pass 41",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/doc-review-format.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-review-format.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 7.242499180021696,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-review-format.test.mjs.log",
+    "sha256": "49129ce9897403933187226057027548a27fab168e0eaa64ce5d3876a4c7346d",
+    "summary": [
+      "ℹ tests 25",
+      "ℹ pass 25",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/doc-restoration-proofs.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/doc-restoration-proofs.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 0.517854564008303,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-restoration-proofs.test.mjs.log",
+    "sha256": "d2192218b7222983286ebb3ce10fbcef0e1daa3df619bc84f78e0a52372009b5",
+    "summary": [
+      "ℹ tests 5",
+      "ℹ pass 5",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/check-doc-constitution.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-doc-constitution.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 2.4982454880373552,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-constitution.test.mjs.log",
+    "sha256": "c8a7bf6a8b413f646fd33954a514707c46c51a41efa81ef4a55918f6a78febf3",
+    "summary": [
+      "ℹ tests 65",
+      "ℹ pass 65",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  },
+  {
+    "phase": "reduced",
+    "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/generate-shipped-path-inventory.test.mjs"
+    ],
+    "exit": 0,
+    "seconds": 23.77029295207467,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-shipped-path-inventory.test.mjs.log",
+    "sha256": "2104e59f5b5b9521735a2a77025c2e52aca95baee12d5a561f468306abe3316b",
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  }
+]

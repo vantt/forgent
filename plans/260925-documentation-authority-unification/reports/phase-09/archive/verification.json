@@ -1,0 +1,29 @@
+{
+  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "exit": 0,
+  "partitionFiles": 6663,
+  "movingFiles": 573,
+  "retainedFiles": 6090,
+  "retirementSpecs": 313,
+  "historicalReaderFiles": 47,
+  "historicalJoins": 135,
+  "priorScriptRefOccurrences": 2918,
+  "sixRestoredInputsRetained": true,
+  "alreadyPrunedRecoveryBlobsVerified": 279,
+  "allRecoveryBlobsReachableFromArchiveCommit": true,
+  "negativeProbes": [
+    {
+      "probe": "wrong digest",
+      "rejected": true
+    },
+    {
+      "probe": "wrong object",
+      "rejected": true
+    },
+    {
+      "probe": "unsafe path",
+      "rejected": true
+    }
+  ],
+  "limits": "Structural/digest/object custody only; no independent semantic retirement, enumeration or final-pin acceptance."
+}

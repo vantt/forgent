@@ -1,0 +1,13 @@
+✔ restored claims require owner anchor and the complete committed unit digest (137.988475ms)
+✔ working-tree text cannot supply an uncommitted restoration proof (68.298488ms)
+✔ deferred register entries must point to an existing committed stub anchor (65.659892ms)
+✔ a deferred decision cannot name a nonexistent stub or omit its fields (67.231378ms)
+✔ two legacy sources sharing a short unit retain a multiple-owner blocking finding (131.799687ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 589.85309

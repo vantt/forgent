@@ -1,0 +1,64 @@
+{
+  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "archiveRef": "refs/heads/archive/260925-records",
+  "archiveCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "candidateCommit": "a2206bdff60f020a05184f0b016f130a1304f9c1",
+  "candidateParent": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "candidateLogicalFiles": 16243,
+  "candidateLogicalBytes": 1269268322,
+  "candidatePlanFiles": 6106,
+  "candidatePlanBytes": 1085588711,
+  "runs": [
+    {
+      "run": 1,
+      "seconds": 8.869302909006365,
+      "path": "/tmp/fgos-work/archive/timed-worktree-1",
+      "exit": 0,
+      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
+    },
+    {
+      "run": 2,
+      "seconds": 8.523144954931922,
+      "path": "/tmp/fgos-work/archive/timed-worktree-2",
+      "exit": 0,
+      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
+    },
+    {
+      "run": 3,
+      "seconds": 8.43490734603256,
+      "path": "/tmp/fgos-work/archive/timed-worktree-3",
+      "exit": 0,
+      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
+    }
+  ],
+  "medianSeconds": 8.523144954931922,
+  "filesystem": "/tmp tmpfs; local warm-cache rehearsal, NOT production SSD/F acceptance",
+  "includedArtifactPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/build-design.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/prior-prune-recovery.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/enumeration-review.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/historical-replay-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/prior-script-refs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/reader-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/standalone-retirement-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/scan-receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/archive/verify-design.py"
+  ],
+  "excludedEvidencePaths": [
+    "test-logs/**",
+    "test-results.json",
+    "rehearsal.json (written after measurement)"
+  ],
+  "retainedBytesVerified": 6090,
+  "retirementSpecsApplied": 313,
+  "noProductOrTestSourceChanges": true,
+  "releaseId": "sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+  "rustFreshness": "activated native addon only; checkout Rust freshness not certified"
+}

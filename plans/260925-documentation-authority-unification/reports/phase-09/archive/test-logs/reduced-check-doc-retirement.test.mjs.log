@@ -1,0 +1,44 @@
+✔ every check of both gates gets a result; clean inputs leave only the planned checks blocked and the review check owed (2.546481ms)
+✔ a defect in file-disposition blocks exactly that check (1.047684ms)
+✔ a defect in claims-closed blocks exactly that check (0.259468ms)
+✔ a defect in claims-closed blocks exactly that check (0.226601ms)
+✔ a defect in claims-reviewed blocks exactly that check (0.25238ms)
+✔ a defect in dropped-claims-resolved blocks exactly that check (0.217284ms)
+✔ a defect in aliases-cover-immutable-refs blocks exactly that check (0.357602ms)
+✔ a defect in consumers-rewritten blocks exactly that check (0.249535ms)
+✔ a defect in no-new-legacy-growth blocks exactly that check (0.281215ms)
+✔ a defect in row-set-conserved blocks exactly that check (0.456311ms)
+✔ a defect in row-set-conserved blocks exactly that check (0.220287ms)
+✔ a defect in one-owner-per-semantic-claim blocks exactly that check (0.236424ms)
+✔ a defect in cutover-mode blocks exactly that check (0.161631ms)
+✔ a defect in cutover-mode blocks exactly that check (0.147228ms)
+✔ a defect in reviewed-rationale blocks exactly that check (0.146102ms)
+✔ a defect in canonical-metadata-complete blocks exactly that check (0.156703ms)
+✔ a defect in metadata-and-structure blocks exactly that check (0.124128ms)
+✔ a defect in links-resolve blocks exactly that check (0.115402ms)
+✔ a defect in owner-per-claim blocks exactly that check (0.123114ms)
+✔ the evidence check stays blocked until a verifier exists, whatever the inputs say (0.267187ms)
+✔ a review check stays owed until a record names reviewer, date and evidence, and cutover mode counts it (0.311105ms)
+✔ a check dropped from the constitution is reported as blocked (1.66931ms)
+✔ an unresolved conflict group blocks the plan acceptance check (0.363786ms)
+✔ a check the constitution marks planned is blocked even when its computed measure is clean, and a check with no evaluator is blocked as unevaluated (0.51606ms)
+✔ legacy paths that history reads by path are covered only by a bare-path alias (0.38814ms)
+✔ duplicate groups made only of evidence mirrors resolve by deduplication and do not count as conflicts (0.214006ms)
+✔ consumer edges count only authority readers of legacy paths (0.145898ms)
+✔ the dry run fails only on a conservation invariant; cutover mode also fails while a check is blocked (0.192732ms)
+✔ cli: an unreadable inventory is fatal and names the regenerate command (47.846916ms)
+✔ recorded duplicate and semantic resolutions close only their named conflict groups (0.327509ms)
+✔ the retirement acceptance gate consumes conflict decisions without removing any remaining conflict (0.322033ms)
+✔ malformed and duplicate conflict decisions fail instead of granting closure (0.89413ms)
+✔ historical decisions remain recordable after a group disappears and never close another group (0.148833ms)
+✔ named retiring files participate in history alias coverage without swallowing neighboring paths or kept projections (0.383694ms)
+✔ root-file consumers are counted while both fixed legacy directories and retiring-file readers remain legacy (0.336658ms)
+✔ retiring-file data cannot redefine directory roots, retire instruction files, candidates or the kept decision projection (0.570299ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 200.330798
