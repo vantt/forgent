@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "68983a9dd311250bbb1fadfbde6ce545869a17fb90e3e0208b675ddbab262c14",
+  "payloadDigest": "fd0d68de2a0ef66c6c53038d689f3259ea1b24d6c6ba1d7e46a17ea90f34ecba",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -807,7 +807,7 @@
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
     "scripts/lib/mailbox-behaviour-v7.mjs": "1bbe9f1c2d361881ec4719131db68b894dc103e6175779e2332a71669f8d99dd",
     "scripts/lib/mailbox-behaviour-v7e.mjs": "758ccd2c2548dd4c4ee9a675f15f73fedec14a20c1a697a3b3679c7297cf3640",
-    "scripts/lib/mailbox-behaviour-v7f.mjs": "dd7184004fcb578b6bbe37ff5402490c707e30f3d97a13bb7ef28d4baf2a9729",
+    "scripts/lib/mailbox-behaviour-v7f.mjs": "0ee92601570b5e5a9e1ad46e9a36bb2f7df969717a837038352c65a3e2f7e71a",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "c06eda4b69e1a8ff7bc7d0d2d27a9d8120510110b0c0cd43ee62255a738f2e55",
     "scripts/lib/mailbox-role-recorder.mjs": "ba14471ab7ce65cdefa43e5256acd4e882c18a3a651bae3338ec2bc0616d7ead",

@@ -594,6 +594,37 @@ async function cmdRunLoop(which, { dry }) {
   }
 }
 
+// ---------------------------------------------------------------- rescore (V7f)
+
+/**
+ * Scores again, once, the results lines of V7f's superseded freeze that its scorer misread
+ * (`v7f.SUPERSEDES.rescored`), from each run's kept transcript, its one message and the
+ * oracle's recorded `acted`, with the pinned scorer. The file before the rescore is kept beside
+ * the results; a second rescore is refused.
+ */
+function cmdRescore() {
+  if (ADDENDUM_NAME !== 'v7f') die('rescore takes --addendum v7f', 2);
+  const { problems } = pinState(BASE);
+  if (problems.length) die(problems.join('; '));
+  const resultsFile = path.join(BASE, 'results.jsonl');
+  const before = path.join(BASE, 'results.before-rescore.jsonl');
+  if (fs.existsSync(before)) die(`${before} exists; the rescore is done once`);
+  const lines = runs.readResults(resultsFile);
+  const wanted = new Set(v7f.SUPERSEDES.rescored);
+  const found = lines.filter((l) => wanted.has(l.runId)).map((l) => l.runId);
+  if (found.length !== wanted.size) die(`the results hold ${found.length} of the ${wanted.size} runs to rescore`);
+  const rescored = lines.map((line) => {
+    if (!wanted.has(line.runId)) return line;
+    const paths = confined.runPaths(BASE, line.runId);
+    const messages = snapshotOf(paths.ws)?.messages ?? [];
+    if (messages.length !== 1) die(`${line.runId} holds ${messages.length} messages; a run sends one`);
+    return v7f.rescore(line, { records: runs.modelRecords(line.cli, paths.home), sentId: messages[0].id });
+  });
+  fs.copyFileSync(resultsFile, own(before));
+  fs.writeFileSync(own(resultsFile), rescored.map((l) => `${JSON.stringify(l)}\n`).join(''));
+  for (const l of rescored.filter((x) => wanted.has(x.runId))) say(`${l.runId}: ${l.rescoredFrom} -> ${l.outcome}; nudge by ${(l.nudgeRecord ?? []).join(', ')}; claimed ${l.claimRan}`);
+}
+
 // ---------------------------------------------------------------- report
 
 const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}`);
@@ -1394,6 +1425,9 @@ if (process.argv[1] === SCRIPT) {
       case 'run-loop':
         await cmdRunLoop(rest[0], { dry: flag('--dry') });
         break;
+      case 'rescore':
+        cmdRescore();
+        break;
       case 'report':
         cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare') });
         break;
@@ -1417,7 +1451,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f] check | freeze [v7c|v7e|v7f] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f] check | freeze [v7c|v7e|v7f] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

@@ -179,6 +179,8 @@ export function runStub(cli, argv) {
     // Claude Code's stream-json input: one user message per stdin line, one turn and one result record each, until the input ends.
     for (const message of stdinLines()) {
       const content = String(JSON.parse(message).message?.content ?? '');
+      // Claude Code first records the queued stdin prompt in a bookkeeping record that reaches no model.
+      write({ type: 'queue-operation', operation: 'enqueue', content });
       write({ type: 'user', message: { role: 'user', content } });
       text = turn(content);
       process.stdout.write(resultLine(text));
