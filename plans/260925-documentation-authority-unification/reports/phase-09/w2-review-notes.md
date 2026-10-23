@@ -65,3 +65,9 @@
 - activation-binding.md:488: scripts/fgos-shell-integration.sh does NOT run git rev-parse --git-common-dir (reads layout from disk, lines 27-29, 57-90) -> correct sentence.
 - runner/spec.md:56,63-64: fenced "Historical source section 552ef3d6" (verbatim legacy) was edited (rows 1/1b) -> restore verbatim legacy in the fenced block; current truth lives only in runner/subcomponents/h-02842f76ffd2/spec.md; align adjudication 17.
 - Pre-existing: duplicates (work-state outcome record in non-transitioning-records.md and spec.md), 69 stale ledger rows pointing at knowledge-registry.md, runner RUL104 number clash with platform RUL104 (legacy origin) -> note for G9; legacy distribution.md row 7 + git-common-dir sentence stale on main (tell main lane).
+## D7 review (w3-d7-resync-review, 21/3) -> D7b (after ledger-fix)
+- resync-b /unitCarries/125, /132, /247: banners added 9818f25a8 (2026-09-19) BEFORE retirement 2180b4e72 (2026-10-02) -> kind candidate-metadata-adaptation like rows 36/66/89/319, fix reason (not carried stays).
+- component-boundary.md still has 8 ../specs/ links: lines 69,70,72 runner.md; 73,74 herdr-web-dashboard.md; 75 confinement-authority.md; 81 observe.md; 281 reading-map.md -> repoint to live successors.
+- /bindingRefresh/475 mislabelled "Full unit content preserved" (links changed) -> relabel.
+- docs/reading-map.md:125 cites a plan report path in live text (moves at archive) -> fix; platform-foundations.md:416 verbatim carry names old docs/platform-foundations.md path (check intended).
+- Launch-note authorization for seat-binding/workflow/knowledge-registry edits came from the Lead's D7 prompt addendum -> record in L13-5.
