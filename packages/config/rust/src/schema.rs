@@ -72,6 +72,14 @@ pub(crate) fn descend(
     }
 }
 
+/// The value at `path` of a JSON document: keys through objects, indexes through arrays.
+pub(crate) fn json_at<'a>(value: &'a Value, path: &[Segment]) -> Option<&'a Value> {
+    path.iter().try_fold(value, |node, segment| match segment {
+        Segment::Key(key) => node.get(key.as_str()),
+        Segment::Index(index) => node.get(*index),
+    })
+}
+
 pub struct Schemas {
     pub(crate) sections: Vec<Section>,
     /// The composite validator, compiled on first use (`validate.rs`).

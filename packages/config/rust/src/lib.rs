@@ -13,15 +13,15 @@ pub mod error;
 pub mod locks;
 // Modules below are stubs; each names the phase that fills it.
 pub mod bundle;
-mod cache;
-mod detect;
+pub mod cache;
+pub mod detect;
 pub mod files;
 pub mod grammar;
 pub mod lint;
 mod redact;
 pub mod schema;
 pub mod scope;
-mod snapshot;
+pub mod snapshot;
 pub mod standard;
 pub mod validate;
 mod write;

@@ -5,7 +5,7 @@ use fgos_yaml_doc::merge::{merge, NoRules};
 use fgos_yaml_doc::{Document, Segment, Span};
 use serde_json::Value;
 
-use crate::schema::{load, Schemas};
+use crate::schema::{json_at, load, Schemas};
 use crate::{bundle, ConfigRefusal};
 
 /// One standard file: its section (the file stem), the parsed file and its JSON form.
@@ -65,11 +65,7 @@ impl Standard {
     }
 
     pub fn value_at(&self, path: &[Segment]) -> Option<&Value> {
-        path.iter()
-            .try_fold(&self.value, |node, segment| match segment {
-                Segment::Key(key) => node.get(key.as_str()),
-                Segment::Index(index) => node.get(*index),
-            })
+        json_at(&self.value, path)
     }
 
     /// The file name, line and column a standard value was written at.

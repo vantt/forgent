@@ -11,6 +11,8 @@ pub struct Detail {
     /// For a key in the wrong place: the role of the file it belongs in (`global`, `project`,
     /// `accounts`, `token`, `config`). The crate holds roles; mapping a role to a path is the caller's.
     pub belongs_in: Option<String>,
+    /// For a merge that cannot combine two layers: the layers that hold a value at the path.
+    pub layers: Vec<&'static str>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -66,6 +68,10 @@ impl fmt::Display for ConfigRefusal {
             ("keyword", &detail.keyword),
             ("schema", &detail.schema_path),
             ("belongs-in", &detail.belongs_in),
+            (
+                "layers",
+                &Some(detail.layers.join(",")).filter(|l| !l.is_empty()),
+            ),
         ] {
             if let Some(part) = part {
                 write!(f, " {label}={part}")?;
