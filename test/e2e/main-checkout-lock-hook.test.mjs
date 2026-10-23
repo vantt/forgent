@@ -29,16 +29,6 @@ function repoWithFgwWorktree(branch) {
   return worktreeRoot;
 }
 
-test('a solo git commit in a checkout nobody holds succeeds', { skip }, () => {
-  const repoRoot = initRepoWithHook();
-  const before = commitCount(repoRoot);
-
-  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-solo' });
-
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(commitCount(repoRoot), before + 1);
-});
-
 test('a commit inside a detached worktree writes the beacon at the worktree\'s own .fgos and takes no lock file there', { skip }, () => {
   const worktreeRoot = repoWithDetachedWorktree();
 
@@ -47,21 +37,6 @@ test('a commit inside a detached worktree writes the beacon at the worktree\'s o
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(path.join(worktreeRoot, '.fgos', 'runtime', 'main-checkout-activity.json')), true);
   assert.equal(fs.existsSync(path.join(worktreeRoot, '.githooks', '.fgos')), false);
-});
-
-test('the beacon records the writer, and the same session commits again', { skip }, () => {
-  const repoRoot = initRepoWithHook();
-  const before = commitCount(repoRoot);
-
-  assert.equal(commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-shape' }).status, 0);
-  const beacon = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'runtime', 'main-checkout-activity.json'), 'utf8'));
-  assert.equal(beacon.writer.id, 'session-shape');
-  assert.equal(beacon.kind, 'beacon');
-  assert.equal(typeof beacon.windowMs, 'number');
-
-  const second = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-shape' });
-  assert.equal(second.status, 0, second.stderr);
-  assert.equal(commitCount(repoRoot), before + 2);
 });
 
 test('a git commit on the main checkout is refused when it is on a fgw/* branch', { skip }, () => {

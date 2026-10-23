@@ -27,6 +27,7 @@ import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registr
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -498,7 +499,7 @@ function writeRunnerConfig(cwd, verdict) {
     timeoutMs: 5000,
   };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
+  writeProjectConfig(cwd, { runner: cfg });
 }
 
 // tsk-34y: these `submit` flag-value rejections shared one invariant -- an
@@ -549,7 +550,7 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
+  writeProjectConfig(cwd, { runner: cfg });
 }
 
 function writeHangScript(cwd, ms) {
@@ -1128,7 +1129,7 @@ function removeAdHocWorktree(cwd, worktreePath) {
 
 function writeCleanupTtlConfig(cwd, ttlDays) {
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays } }));
+  writeProjectConfig(cwd, { cleanup: { ttlDays } });
 }
 export {
   ADD_BAD_FLAG_CASES,

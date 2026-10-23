@@ -15,6 +15,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
+import { writeProjectConfig, writeGlobalConfig } from '../helpers/config-fixture.mjs';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -106,6 +107,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'writer-identity-resolvable',
       'identity-machine-id',
       'identity-project-id',
+      'identity-ids-unique',
       'seat-binding-route',
       'seat-binding-config',
       'seat-binding-drain',
@@ -834,9 +836,7 @@ test('decision-index-stale check and fix preserve committed decisions absent fro
 test('config-not-stale passes when the existing config already has every default key', () => {
   const cwd = mkTemp('doctor-config-full-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(cwd, ({
       runner: {
         ...DEFAULT_RUNNER_CONFIG,
         capabilities: DEFAULT_CAPABILITY_SLOTS,
@@ -888,7 +888,7 @@ test('capability-serves-valid fails when runner.capabilities is missing entirely
 test('capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)', () => {
   const cwd = mkTemp('doctor-serves-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  writeProjectConfig(cwd, ({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, true, message);
   assert.match(message, /valid "serves" attribute set, none identical, and "review" is present/);
@@ -898,7 +898,7 @@ test('capability-serves-valid passes on the curated defaults (serves on every sl
 test('capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)', () => {
   const cwd = mkTemp('doctor-serves-none-declared-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
+  writeProjectConfig(cwd, ({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, true, message);
   fs.rmSync(cwd, { recursive: true, force: true });
@@ -908,7 +908,7 @@ test('capability-serves-valid fails when a "serves" value has an unknown key or 
   for (const badServes of [{ notARealKey: 'change' }, { mutates: 'yes' }, { outputKind: 42 }, { size: 'heavy' }, { rigor: 'high' }]) {
     const cwd = mkTemp('doctor-serves-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
+    writeProjectConfig(cwd, ({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
     const { passed, message } = checkById('capability-serves-valid').check(cwd);
     assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
     assert.match(message, /invalid "serves"/);
@@ -919,9 +919,7 @@ test('capability-serves-valid fails when a "serves" value has an unknown key or 
 test('capability-serves-valid fails when two entries declare the identical "serves" attribute set', () => {
   const cwd = mkTemp('doctor-serves-duplicate-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(cwd, ({
       runner: {
         capabilities: {
           review: { serves: { outputKind: 'finding', mutates: false } },
@@ -939,7 +937,7 @@ test('capability-serves-valid fails when two entries declare the identical "serv
 test('capability-serves-valid fails when the "review" slot is missing', () => {
   const cwd = mkTemp('doctor-serves-no-review-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
+  writeProjectConfig(cwd, ({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /missing the "review" slot/);
@@ -965,7 +963,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
   const cwd = mkTemp('doctor-provider-capacity-cwd-');
   const fgosHome = path.join(homeDir, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  fs.writeFileSync(path.join(fgosHome, 'config.json'), JSON.stringify({
+  writeGlobalConfig(homeDir, ({
     runner: {
       providers: {
         'openai-codex': {
@@ -978,7 +976,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
         },
       },
     },
-  }, null, 2));
+  }));
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');
@@ -1036,7 +1034,7 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
 // ─── operation-capability-resolves (Unit I21 fix, round 3, MEDIUM) ────────
 function writeRunnerConfig(dir, runner) {
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(dir, { runner });
 }
 
 test('operation-capability-resolves reports passing status for retired coordination protocols', () => {

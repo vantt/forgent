@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice A: fixture helper, crate fgos-yaml-doc, serde_yaml removal"
 description: "One shared config fixture helper for tests, the Rust crate fgos-yaml-doc with golden fixtures and fuzz targets, a three-candidate parser choice behind an owner gate, and the three serde_yaml users moved onto the crate."
-status: in-progress
+status: completed
 priority: P1
 effort: 56h
 branch: cfg/slice-a-yaml-document (linked worktree; never the shared main checkout)

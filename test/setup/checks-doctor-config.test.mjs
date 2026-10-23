@@ -35,6 +35,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
@@ -58,7 +59,7 @@ function declareExecutor(cwd, id, fields) {
       cfg.runner.capabilities[purpose] ??= {};
     }
   }
-  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(cwd, cfg);
 }
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
@@ -207,9 +208,7 @@ test('config-not-stale reports failed/not-configured when the shared file is abs
 test('config-not-stale passes when the existing config already has every default key', () => {
   const cwd = mkTemp('doctor-config-full-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(cwd, {
       runner: {
         ...DEFAULT_RUNNER_CONFIG,
         capabilities: DEFAULT_CAPABILITY_SLOTS,
@@ -228,8 +227,7 @@ test('config-not-stale passes when the existing config already has every default
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
       eventStore: EVENT_STORE_DEFAULTS,
-    }),
-  );
+    });
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
@@ -238,7 +236,7 @@ test('config-not-stale passes when the existing config already has every default
 test('config-not-stale fails when the shared file is complete except gateBypass', () => {
   const cwd = mkTemp('doctor-config-no-gatebypass-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
+  writeProjectConfig(cwd, { runner: DEFAULT_RUNNER_CONFIG });
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /gateBypass/);
@@ -248,7 +246,7 @@ test('config-not-stale fails when the shared file is complete except gateBypass'
 test('config-not-stale fails when the existing config is missing a default key', () => {
   const cwd = mkTemp('doctor-config-stale-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { executor: { command: 'claude', args: [] } } }));
+  writeProjectConfig(cwd, { runner: { executor: { command: 'claude', args: [] } } });
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
@@ -272,7 +270,7 @@ test('invariant-checks-configured passes when the section is absent or empty', (
   for (const config of [{}, { invariantChecks: { commands: [] } }]) {
     const cwd = mkTemp('doctor-invariant-empty-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify(config));
+    writeProjectConfig(cwd, config);
     const { passed, message } = checkById('invariant-checks-configured').check(cwd);
     assert.equal(passed, true, JSON.stringify(config));
     assert.match(message, /no invariant check runs at return\/merge/);
@@ -284,7 +282,7 @@ test('invariant-checks-configured fails when the section is present but malforme
   for (const malformed of [{ commands: 'not-a-list' }, {}, { commands: ['', '  '] }, { commands: ['real --check', 7] }, ['real --check'], null]) {
     const cwd = mkTemp('doctor-invariant-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ invariantChecks: malformed }));
+    writeProjectConfig(cwd, { invariantChecks: malformed });
     const { passed, message } = checkById('invariant-checks-configured').check(cwd);
     assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
     assert.match(message, /present but malformed/);
@@ -295,10 +293,7 @@ test('invariant-checks-configured fails when the section is present but malforme
 test('invariant-checks-configured passes and names the configured commands', () => {
   const cwd = mkTemp('doctor-invariant-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ invariantChecks: { commands: ['node --test test/architecture.test.mjs'] } }),
-  );
+  writeProjectConfig(cwd, { invariantChecks: { commands: ['node --test test/architecture.test.mjs'] } });
   const { passed, message } = checkById('invariant-checks-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /1 command\(s\): node --test test\/architecture\.test\.mjs/);
@@ -314,7 +309,7 @@ test('worktree-setup-configured passes when the section is absent or empty', () 
   for (const config of [{}, { worktreeSetup: { commands: [] } }]) {
     const cwd = mkTemp('doctor-wtsetup-empty-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify(config));
+    writeProjectConfig(cwd, config);
     const { passed, message } = checkById('worktree-setup-configured').check(cwd);
     assert.equal(passed, true, JSON.stringify(config));
     assert.match(message, /only their dependency install/);
@@ -326,7 +321,7 @@ test('worktree-setup-configured fails when the section is present but malformed'
   for (const malformed of [{ commands: 'cargo build' }, {}, { commands: ['cargo build', ''] }, ['cargo build']]) {
     const cwd = mkTemp('doctor-wtsetup-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: malformed }));
+    writeProjectConfig(cwd, { worktreeSetup: malformed });
     const { passed, message } = checkById('worktree-setup-configured').check(cwd);
     assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
     assert.match(message, /present but malformed/);
@@ -337,7 +332,7 @@ test('worktree-setup-configured fails when the section is present but malformed'
 test('worktree-setup-configured passes and names the configured commands', () => {
   const cwd = mkTemp('doctor-wtsetup-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands: ['cargo build --release'] } }));
+  writeProjectConfig(cwd, { worktreeSetup: { commands: ['cargo build --release'] } });
   const { passed, message } = checkById('worktree-setup-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /1 command\(s\): cargo build --release/);
@@ -360,7 +355,7 @@ test('worker-slots-ceiling-usable fails on a ceiling that silently enforces noth
   for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
     const cwd = mkTemp('doctor-slots-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    writeProjectConfig(cwd, { workerSlots: { ceiling } });
     const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
     assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
     assert.match(message, /enforces NOTHING/);
@@ -374,7 +369,7 @@ test('worker-slots-ceiling-usable fails on a ceiling that silently enforces noth
 test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
   const cwd = mkTemp('doctor-slots-unarmed-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: null } }));
+  writeProjectConfig(cwd, { workerSlots: { ceiling: null } });
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /unarmed/);
@@ -385,7 +380,7 @@ test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, 
 test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
   const cwd = mkTemp('doctor-slots-armed-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: 6 } }));
+  writeProjectConfig(cwd, { workerSlots: { ceiling: 6 } });
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /workerSlots\.ceiling = 6/);
@@ -417,7 +412,7 @@ test('advise-execute-capabilities-configured fails when a slot is missing or mal
   ]) {
     const cwd = mkTemp('doctor-capabilities-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+    writeProjectConfig(cwd, { runner: { capabilities } });
     const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
     assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
     assert.match(message, /missing or has a malformed slot for/);
@@ -428,10 +423,7 @@ test('advise-execute-capabilities-configured fails when a slot is missing or mal
 test('advise-execute-capabilities-configured passes when both slots are declared', () => {
   const cwd = mkTemp('doctor-capabilities-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }),
-  );
+  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /declares "advise", "execute", and "code:implement"/);
@@ -442,7 +434,7 @@ test('workflow-capabilities-configured names a capability a Workflow uses that c
   const cwd = mkTemp('doctor-workflow-caps-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const { 'architecture:frame': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: rest } }));
+  writeProjectConfig(cwd, { runner: { capabilities: rest } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /architecture:frame \(architecture-advisory\)/);
@@ -454,10 +446,7 @@ test('workflow-capabilities-configured accepts a prefix entry, and a bare-verb e
   const cwd = mkTemp('doctor-workflow-caps-verb-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
-  const write = (entries) => fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: { ...rest, ...entries } } }),
-  );
+  const write = (entries) => writeProjectConfig(cwd, { runner: { capabilities: { ...rest, ...entries } } });
   write({ 'architecture:*': { description: 'prefix entry', prefer: [{ executor: 'x' }] } });
   assert.doesNotMatch(checkById('workflow-capabilities-configured').check(cwd).message, /architecture:critique/);
   write({ critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } });
@@ -468,7 +457,7 @@ test('workflow-capabilities-configured accepts a prefix entry, and a bare-verb e
 test('workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool', () => {
   const cwd = mkTemp('doctor-workflow-caps-nopool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
   assert.match(message, /^warning: .*no "prefer" pool/);
@@ -491,7 +480,7 @@ test('workflow-capabilities-configured is clean when each capability resolves to
     if (domain.length % 2 === 0) capabilities[name] = { ...capabilities[name], prefer: [{ executor: 'x' }] };
     else capabilities[`${domain}:*`] = { ...(capabilities[`${domain}:*`] ?? {}), prefer: [{ executor: 'x' }] };
   }
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+  writeProjectConfig(cwd, { runner: { capabilities } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.doesNotMatch(message, /^warning/);
@@ -505,7 +494,7 @@ test('workflow-capabilities-configured also names the runner loop executing capa
   for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
     capabilities[name] = name.includes(':') && name !== 'code:implement' ? { ...slot, prefer: [{ executor: 'x' }] } : slot;
   }
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+  writeProjectConfig(cwd, { runner: { capabilities } });
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /^warning: .*code:implement \(runner loop: coding executing step\)/);
@@ -523,7 +512,7 @@ test('gate-bypass-configured check fails when the shared file has no gateBypass 
 test('gate-bypass-configured check fails when gateBypass.level is present but not a recognized level', () => {
   const cwd = mkTemp('doctor-gatebypass-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /missing or not a recognized level/);
@@ -533,7 +522,7 @@ test('gate-bypass-configured check fails when gateBypass.level is present but no
 test('gate-bypass-configured check passes when gateBypass.level is a recognized level', () => {
   const cwd = mkTemp('doctor-gatebypass-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'standard' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'standard' } });
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /"standard"/);
@@ -543,7 +532,7 @@ test('gate-bypass-configured check passes when gateBypass.level is a recognized 
 test('gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys', () => {
   const cwd = mkTemp('doctor-gatebypass-fix-absent-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 } }));
+  writeProjectConfig(cwd, { runner: { timeoutMs: 5000 } });
   const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, true);
   assert.match(message, new RegExp(`"${DEFAULT_LEVEL}"`));
@@ -556,7 +545,7 @@ test('gate-bypass-configured fix writes a default level when the shared file has
 test('gate-bypass-configured fix repairs a malformed level back to the default', () => {
   const cwd = mkTemp('doctor-gatebypass-fix-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
   const { changed } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, true);
   const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
@@ -568,7 +557,7 @@ test('gate-bypass-configured fix is idempotent: reports unchanged and never rewr
   const cwd = mkTemp('doctor-gatebypass-fix-noop-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const sharedPath = path.join(cwd, '.fgos', 'config.json');
-  fs.writeFileSync(sharedPath, JSON.stringify({ gateBypass: { level: 'heavy' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'heavy' } });
   const before = fs.statSync(sharedPath).mtimeMs;
   const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, false);
@@ -632,10 +621,7 @@ test('herdr-launcher-configured check fails when the shared file has no herdrOrc
 test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
   const cwd = mkTemp('doctor-herdr-launcher-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } }),
-  );
+  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } });
   const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /autoDiscover/);
@@ -645,10 +631,7 @@ test('herdr-launcher-configured check fails when a toggle is present but not a b
 test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
   const cwd = mkTemp('doctor-herdr-launcher-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } }),
-  );
+  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } });
   const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /autoDiscover=true/);
@@ -673,10 +656,7 @@ test('herdr-web-dashboard-configured check fails when the shared file has no her
 test('herdr-web-dashboard-configured check fails when staticServing is present but not a boolean', () => {
   const cwd = mkTemp('doctor-herdr-web-dashboard-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrWebDashboard: { staticServing: 'yes' } }),
-  );
+  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: 'yes' } });
   const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /staticServing/);
@@ -686,10 +666,7 @@ test('herdr-web-dashboard-configured check fails when staticServing is present b
 test('herdr-web-dashboard-configured check passes when staticServing is a boolean', () => {
   const cwd = mkTemp('doctor-herdr-web-dashboard-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrWebDashboard: { staticServing: true } }),
-  );
+  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: true } });
   const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /staticServing=true/);
@@ -718,7 +695,7 @@ test('config-awareness reports project active with global not present, when only
   const homeDir = mkTemp('doctor-awareness-project-only-home-');
   const cwd = mkTemp('doctor-awareness-project-only-cwd-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
+  writeRawProjectConfig(cwd, '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -732,10 +709,10 @@ test('config-awareness reports project active with global not present, when only
 test('config-awareness reports project active with global also present, when both exist', () => {
   const homeDir = mkTemp('doctor-awareness-both-home-');
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  writeRawGlobalConfig(homeDir, '{}');
   const cwd = mkTemp('doctor-awareness-both-cwd-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
+  writeRawProjectConfig(cwd, '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -749,7 +726,7 @@ test('config-awareness reports project active with global also present, when bot
 test('config-awareness falls back to global active with project not present, when only global config exists', () => {
   const homeDir = mkTemp('doctor-awareness-global-only-home-');
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  writeRawGlobalConfig(homeDir, '{}');
   const cwd = mkTemp('doctor-awareness-global-only-cwd-');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
@@ -1033,12 +1010,12 @@ test('tier-vocabulary-dead-keys check passes on clean config', () => {
   const dir = mkTemp('checks-tier-dead-clean-');
   try {
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+    writeProjectConfig(dir, {
       runner: {
         defaults: { tier: 'standard' },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' } },
       },
-    }));
+    });
     const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
     assert.equal(passed, true);
     assert.match(message, /no retired tier vocabulary/);
@@ -1051,7 +1028,7 @@ test('tier-vocabulary-dead-keys check fails when retired keys are present', () =
   const dir = mkTemp('checks-tier-dead-dirty-');
   try {
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+    writeProjectConfig(dir, {
       runner: {
         models: { light: 'haiku' },
         rigorOverrides: { low: 'standard' },
@@ -1059,7 +1036,7 @@ test('tier-vocabulary-dead-keys check fails when retired keys are present', () =
           'code:review': { overrides: { tier: 'standard' } },
         },
       },
-    }));
+    });
     const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
     assert.equal(passed, false);
     assert.match(message, /runner\.models/);
@@ -1077,11 +1054,11 @@ test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leav
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
     const rigorToTier = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
-    fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({ runner: { rigorToTier } }));
+    writeGlobalConfig(fakeHome, { runner: { rigorToTier } });
     withHome(fakeHome, () => {
-      fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { defaults: { tier: 'standard' } } }));
+      writeProjectConfig(dir, { runner: { defaults: { tier: 'standard' } } });
       assert.equal(checkById('tier-vocabulary-dead-keys').check(dir).passed, true, 'a global file that has not re-run setup is not an error');
-      fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { rigorToTier } }));
+      writeProjectConfig(dir, { runner: { rigorToTier } });
       const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(passed, false);
       assert.match(message, /project config contains retired key "runner\.rigorToTier".*fgos setup/);

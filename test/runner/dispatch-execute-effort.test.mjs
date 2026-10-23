@@ -16,6 +16,7 @@ import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
@@ -108,7 +109,7 @@ function fixtureRepo({ commandName = 'codex', executorPatch = {} } = {}) {
     capabilities: { execute: { description: 'changes files', serves: { outputKind: 'change', mutates: true } } },
   };
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(root, { runner });
   return root;
 }
 
@@ -289,7 +290,7 @@ test('fgos run with an effort override renders it into the CLI the bound executo
     capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(repoRoot, { runner });
 
   const res = await runUnit({
     unitData: { id: 'u-effort', objective: 'Touch the readme', capability: 'docs:write', writes: ['README.md'] },
@@ -321,7 +322,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
-  fs.writeFileSync(path.join(repo, '.fgos', 'config.json'), JSON.stringify({ runner }));
+  writeProjectConfig(repo, { runner });
   const wt = makeFixtureDir('fgos-cli-effort-wt-');
   fs.rmSync(wt, { recursive: true, force: true });
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
@@ -350,7 +351,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
-  fs.writeFileSync(path.join(repo, '.fgos', 'config.json'), JSON.stringify({ runner }));
+  writeProjectConfig(repo, { runner });
   const wt = makeFixtureDir('fgos-cli-effort-scoped-wt-');
   fs.rmSync(wt, { recursive: true, force: true });
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });

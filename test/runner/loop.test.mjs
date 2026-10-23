@@ -22,6 +22,7 @@ import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settleme
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Friction records live in the Observe store (.fgos/observe/friction/*.jsonl),
 // not in the work event log.
@@ -768,7 +769,7 @@ function occupySlots(dir, count) {
 }
 
 function writeCeiling(repoRoot, ceiling) {
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling } });
 }
 
 test('no workerSlots ceiling configured leaves the drain-run exactly as it was — occupancy is not a ceiling on its own', async () => {
@@ -1557,16 +1558,13 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
   seedItem(dir, { id: 'item-cli' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         executor: { providerModel: 'node', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
         modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
       }),
-    }),
-  );
+    });
   const nested = path.join(repoRoot, 'nested');
   fs.mkdirSync(nested);
   const runnerBin = path.resolve(import.meta.dirname, '../../bin/fgos-runner.mjs');
@@ -2419,7 +2417,7 @@ test('driver loop routes done review findings with REJECT to fix-verify-red inst
   );
 
   const cfg = configFor(executorScript);
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  writeProjectConfig(repoRoot, { runner: cfg });
 
   seedItem(dir, {
     id,
@@ -2487,7 +2485,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
   );
 
   const cfg = configFor(executorScript);
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  writeProjectConfig(repoRoot, { runner: cfg });
 
   seedItem(dir, {
     id,
@@ -2558,7 +2556,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
   );
 
   const cfg = configFor(executorScript);
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  writeProjectConfig(repoRoot, { runner: cfg });
 
   seedItem(dir, {
     id,
@@ -2615,7 +2613,7 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
   );
 
   const cfg = configFor(executorScript);
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  writeProjectConfig(repoRoot, { runner: cfg });
 
   seedItem(dir, {
     id,
@@ -2670,7 +2668,7 @@ test('Finding 5 regression test: scout-blast-radius/review-item assignment paths
   );
 
   const cfg = configFor(executorScript);
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  writeProjectConfig(repoRoot, { runner: cfg });
 
   seedItem(dir, {
     id,

@@ -13,6 +13,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { readRawEvents } from '../../src/state/store.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -122,17 +123,14 @@ function events(cwd) {
 
 function writeRunnerConfig(repoRoot, executorScript) {
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         timeoutMs: 15000,
       }),
-    }),
-  );
+    });
 }
 
 /** A well-behaved fake executor: writes the file the item's own verify
@@ -250,7 +248,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-a-item', '--text', 'retrospective done', '--rationale', 'test fixture', '--relation', 'none']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+  writeProjectConfig(repoRoot, { cleanup: { ttlDays: 0 } });
   const cleanupResult = fgos(repoRoot, ['cleanup', 'pr-a-item']);
   assert.equal(cleanupResult.status, 0, `cleanup failed: ${cleanupResult.stderr}`);
   assert.equal(envelopeData(cleanupResult.stdout).to, 'done', `cleanup did not close to done: ${cleanupResult.stdout}`);
@@ -493,7 +491,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-e-item', '--text', 'retrospective done', '--rationale', 'test fixture', '--relation', 'none']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+  writeProjectConfig(repoRoot, { cleanup: { ttlDays: 0 } });
   const cleanupEResult = fgos(repoRoot, ['cleanup', 'pr-e-item']);
   assert.equal(cleanupEResult.status, 0, `cleanup failed: ${cleanupEResult.stderr}`);
   assert.equal(envelopeData(cleanupEResult.stdout).to, 'done', `cleanup did not close to done: ${cleanupEResult.stdout}`);

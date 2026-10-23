@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "identity.write.request",
   "title": "Identity write request v1",
-  "description": "Two writes. `fgos identity machine --alias <name>` replaces <stateRoot>/machine-alias atomically; the alias must follow the Convention machine-handle kind, changes the handle only, never the machine id, and needs a machine id to exist. `fgos identity project --init|--new [--handle <name>]` writes .fgos/project.json of the main checkout: `--init` mints once and refuses when the file exists (project-id-exists), in a linked worktree (linked-worktree) or when the remote default branch, as last fetched, already tracks the file (project-id-on-remote); `--new` replaces the id on purpose (a fork split) and skips the last two checks. The handle follows the Convention project-handle kind and defaults to the slug of the folder name. Nothing else ever writes the file.",
+  "description": "Five writes. `fgos identity machine --alias <name>` replaces <stateRoot>/machine-alias atomically; the alias must follow the Convention machine-handle kind, changes the handle only, never the machine id, and needs a machine id to exist. `fgos identity project --init|--new [--handle <name>]` writes .fgos/project.json of the main checkout: `--init` mints once and refuses when the file exists (project-id-exists), in a linked worktree (linked-worktree) or when the remote default branch, as last fetched, already tracks the file (project-id-on-remote); `--new` replaces the id on purpose (a fork split) and skips the last two checks. The handle follows the Convention project-handle kind and defaults to the slug of the folder name. Nothing else ever writes the file. `fgos identity mint <kind> [--release <number>]` mints an id that travels between machines (docs/platform/identity/spec.md, section 4a): `work` gives `tsk-<10 base32>` and `backlog` gives `p-<10 base32>` from the kernel's random bytes and writes nothing; `d-adr` and `decision-file` claim the next number of the counter ref `refs/fgos/seq/<kind>` on the project's `origin` (the repository's own ref when it has none), one more than the larger of the counter and the highest number the repository's documents carry, retrying a refused compare-and-swap up to 5 times. `--release <number>` gives a sequence number back, only while it is still the counter's tip. Without a network the claim is refused (`sequence-unreachable`); the format is never changed to work around it. `fgos identity session --register [--role lead:<LANE> [--take]]` puts this session in the machine's local directory (<stateRoot>/identity/sessions/<hash of handle>.json, one file per session): the entry carries the process facts of the agent head (the highest ancestor holding a terminal, never the transient fgos child), absent when no ancestor holds one. `--role` implies registering. Registration is only ever explicit: the bare verb, `session` without flags, hooks and workers never write it. Every write first removes the entries whose head is dead; a live session already holding the handle with another id is refused (`handle-in-use`, handles never change); a role held by another live session is refused (`role-held`) unless `--take` moves it; at 512 entries the write is refused (`directory-full`). `fgos identity list --prune` removes the entries proven dead (as every write does; an entry whose liveness is unknown is kept) and answers the list.",
   "oneOf": [
     {
       "type": "object",
@@ -22,13 +22,41 @@
         "mint": { "enum": ["init", "new"] },
         "handle": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,39}$" }
       }
+    },
+    {
+      "type": "object",
+      "description": "session registration",
+      "additionalProperties": false,
+      "required": ["register"],
+      "properties": {
+        "register": { "const": true },
+        "role": { "type": "string", "pattern": "^lead:[A-Z][A-Z0-9-]{0,15}$" },
+        "take": { "type": "boolean", "description": "Needs role." }
+      }
+    },
+    {
+      "type": "object",
+      "description": "directory prune",
+      "additionalProperties": false,
+      "required": ["prune"],
+      "properties": { "prune": { "const": true } }
+    },
+    {
+      "type": "object",
+      "description": "id mint",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["work", "backlog", "d-adr", "decision-file"] },
+        "release": { "type": "integer", "minimum": 1 }
+      }
     }
   ],
   "definitions": {
     "outcome": {
       "$id": "identity.write.outcome",
       "title": "Identity write outcome v1",
-      "description": "The machine as `identity.read` prints it after an alias write, or the project minted with where it went and the command that commits it.",
+      "description": "The machine as `identity.read` prints it after an alias write, the project minted with where it went and the command that commits it, the id minted, or the answer to a release.",
       "oneOf": [
         {
           "type": "object",
@@ -53,12 +81,62 @@
             "file": { "const": ".fgos/project.json" },
             "commit": { "type": "string", "description": "The command that commits the new file by pathspec." }
           }
+        },
+        {
+          "type": "object",
+          "description": "session registered (the entry as `identity resolve` prints it)",
+          "additionalProperties": false,
+          "required": ["id", "handle", "cli", "projectId", "clone", "registeredAt", "roles", "liveness"],
+          "properties": {
+            "id": { "type": "string", "description": "<machine-id>/<local id>" },
+            "handle": { "type": "string" },
+            "cli": { "type": "string" },
+            "projectId": { "type": ["string", "null"] },
+            "clone": { "type": ["string", "null"], "description": "Working directory the session registered from." },
+            "registeredAt": { "type": "string" },
+            "roles": { "type": "array", "items": { "type": "string", "pattern": "^lead:[A-Z][A-Z0-9-]{0,15}$" } },
+            "liveness": { "enum": ["alive", "unknown"], "description": "unknown: the session has no terminal ancestor, so nothing can prove it dead. A dead session is never returned." }
+          }
+        },
+        {
+          "type": "object",
+          "description": "directory after a prune (the list as `identity list` prints it)",
+          "additionalProperties": false,
+          "required": ["sessions", "pruned"],
+          "properties": {
+            "sessions": { "type": "array", "items": { "type": "object", "description": "session registered" } },
+            "pruned": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "description": "id minted",
+          "additionalProperties": false,
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": { "type": "string" },
+            "id": { "type": "string" },
+            "number": { "type": "integer", "minimum": 1, "description": "Only for a sequence kind." }
+          }
+        },
+        {
+          "type": "object",
+          "description": "release",
+          "additionalProperties": false,
+          "required": ["kind", "number", "released"],
+          "properties": {
+            "kind": { "type": "string" },
+            "number": { "type": "integer" },
+            "released": { "type": "boolean", "description": "false when somebody claimed after, so the counter stays." }
+          }
         }
       ],
       "x-refusals": [
         "invalid-alias", "machine-id-missing", "machine-id-unreadable", "alias-write-failed",
         "project-id-exists", "project-id-on-remote", "linked-worktree", "invalid-handle", "project-write-failed",
-        "not-a-repository", "git-read-failed", "project-root-unreadable", "no-working-directory"
+        "not-a-repository", "git-read-failed", "project-root-unreadable", "no-working-directory",
+        "unknown-kind", "not-a-sequence", "sequence-unreachable", "sequence-contended", "random-unavailable",
+        "unresolved", "invalid-role", "role-held", "handle-in-use", "directory-full", "directory-unreadable", "directory-write-failed"
       ]
     }
   }

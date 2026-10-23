@@ -1,0 +1,1039 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "merge-no-layers",
+      "why": "no layers merge to null with no origins",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [],
+        "rules": {}
+      },
+      "expect": {
+        "value": null,
+        "origins": {}
+      }
+    },
+    {
+      "id": "merge-one-layer",
+      "why": "a single layer is returned whole, every leaf from layer 0",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1,
+              "b": {
+                "c": [
+                  1,
+                  2
+                ]
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": 1,
+          "b": {
+            "c": [
+              1,
+              2
+            ]
+          }
+        },
+        "origins": {
+          "a": 0,
+          "b.c[0]": 0,
+          "b.c[1]": 0
+        }
+      }
+    },
+    {
+      "id": "merge-absent-falls-through",
+      "why": "spec section 7: a path missing from a layer falls through to the next",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "b": 1
+            }
+          },
+          {
+            "value": {
+              "a": 5,
+              "b": 2
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "b": 1,
+          "a": 5
+        },
+        "origins": {
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "merge-null-wins",
+      "why": "spec section 7: a path present with null wins as null",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": null
+            }
+          },
+          {
+            "value": {
+              "a": 5
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": null
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-null-masks-nested",
+      "why": "a lower null masks the layers below it at a deep path",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": null
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "y": 2
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1
+          }
+        },
+        "origins": {
+          "a.x": 0
+        }
+      }
+    },
+    {
+      "id": "merge-null-over-map",
+      "why": "a present null in the top layer wins over a mapping below",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": null
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": null
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-root-null-top",
+      "why": "a null top layer wins the whole document",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": null
+          },
+          {
+            "value": {
+              "a": 1
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": null,
+        "origins": {
+          "": 0
+        }
+      }
+    },
+    {
+      "id": "merge-root-null-below",
+      "why": "a null layer below the top masks the layers under it",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": null
+          },
+          {
+            "value": {
+              "b": 2
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": 1
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-deep-default",
+      "why": "mappings merge key by key by default, each leaf names its layer",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "y": 2
+              },
+              "b": 3
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1,
+            "y": 2
+          },
+          "b": 3
+        },
+        "origins": {
+          "a.x": 0,
+          "a.y": 1,
+          "b": 1
+        }
+      }
+    },
+    {
+      "id": "merge-highest-wins-scalar",
+      "why": "the highest layer wins a scalar present in both",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": {
+              "a": 2
+            }
+          },
+          {
+            "value": {
+              "a": 3
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": 1
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-three-layers",
+      "why": "three layers contribute different keys",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": {
+              "b": 2
+            }
+          },
+          {
+            "value": {
+              "c": 3
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": 1,
+          "b": 2,
+          "c": 3
+        },
+        "origins": {
+          "a": 0,
+          "b": 1,
+          "c": 2
+        }
+      }
+    },
+    {
+      "id": "merge-sequence-leaf-default",
+      "why": "a sequence is one leaf by default: the highest layer wins it whole",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "l": [
+                1
+              ]
+            }
+          },
+          {
+            "value": {
+              "l": [
+                2,
+                3
+              ]
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "l": [
+            1
+          ]
+        },
+        "origins": {
+          "l[0]": 0
+        }
+      }
+    },
+    {
+      "id": "merge-sequence-absent-falls-through",
+      "why": "a sequence missing from the top layer comes from the next",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {}
+          },
+          {
+            "value": {
+              "l": [
+                2,
+                3
+              ]
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "l": [
+            2,
+            3
+          ]
+        },
+        "origins": {
+          "l[0]": 1,
+          "l[1]": 1
+        }
+      }
+    },
+    {
+      "id": "merge-replace-rule",
+      "why": "spec section 7: a replace path takes the highest layer whole, every leaf under it shares its origin",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "y": 2
+              }
+            }
+          }
+        ],
+        "rules": {
+          "a": "replace"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1
+          }
+        },
+        "origins": {
+          "a.x": 0
+        }
+      }
+    },
+    {
+      "id": "merge-replace-nested-leaves",
+      "why": "replace attributes every leaf under the path to the winning layer",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1,
+                "y": {
+                  "z": 2
+                }
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "w": 9
+              }
+            }
+          }
+        ],
+        "rules": {
+          "a": "replace"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1,
+            "y": {
+              "z": 2
+            }
+          }
+        },
+        "origins": {
+          "a.x": 0,
+          "a.y.z": 0
+        }
+      }
+    },
+    {
+      "id": "merge-leaf-rule-on-map",
+      "why": "a leaf rule on a mapping path treats it as one value",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "y": 2
+              }
+            }
+          }
+        ],
+        "rules": {
+          "a": "leaf"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1
+          }
+        },
+        "origins": {
+          "a.x": 0
+        }
+      }
+    },
+    {
+      "id": "merge-deep-rule-on-nested-path",
+      "why": "a rule for a nested path applies there while the parent merges",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "s": {
+                  "x": 1
+                }
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "s": {
+                  "y": 2
+                },
+                "t": 1
+              }
+            }
+          }
+        ],
+        "rules": {
+          "a.s": "replace"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "s": {
+              "x": 1
+            },
+            "t": 1
+          }
+        },
+        "origins": {
+          "a.s.x": 0,
+          "a.t": 1
+        }
+      }
+    },
+    {
+      "id": "merge-empty-map-leaf",
+      "why": "an empty mapping is a leaf with an origin",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {}
+            }
+          },
+          {
+            "value": {
+              "b": 1
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": {},
+          "b": 1
+        },
+        "origins": {
+          "a": 0,
+          "b": 1
+        }
+      }
+    },
+    {
+      "id": "merge-key-with-dot",
+      "why": "origin paths use the bracket-quoted text form for odd keys",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a.b": 1
+            }
+          },
+          {
+            "value": {
+              "code:implement": {
+                "p": 2
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a.b": 1,
+          "code:implement": {
+            "p": 2
+          }
+        },
+        "origins": {
+          "[\"a.b\"]": 0,
+          "code:implement.p": 1
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-map-vs-seq",
+      "why": "spec section 7: a mapping against a sequence at a deep path names both layers",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": [
+                1
+              ]
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-type-mismatch",
+          "path": "a",
+          "detail": "layer 0 is a mapping, layer 1 is a sequence"
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-map-vs-scalar",
+      "why": "a mapping against a scalar names both layers",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "b": 1
+            }
+          },
+          {
+            "value": {
+              "a": "text"
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-type-mismatch",
+          "path": "a",
+          "detail": "layer 0 is a mapping, layer 2 is a scalar"
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-scalar-top-vs-map",
+      "why": "a scalar on top of a mapping is a mismatch under an explicit deep rule",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          }
+        ],
+        "rules": {
+          "a": "deep"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-type-mismatch",
+          "path": "a",
+          "detail": "layer 0 is a scalar, layer 1 is a mapping"
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-root",
+      "why": "a mapping layer against a scalar layer at the root names both layers",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": "text"
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-type-mismatch",
+          "path": "",
+          "detail": "layer 0 is a mapping, layer 1 is a scalar"
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-nested",
+      "why": "a mismatch deep in the tree carries its full path",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "b": {
+                  "c": 1
+                }
+              }
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "b": [
+                  1
+                ]
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-type-mismatch",
+          "path": "a.b",
+          "detail": "layer 0 is a mapping, layer 1 is a sequence"
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-hidden-by-null-mask",
+      "why": "a mismatch below a null mask is not examined",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": null
+            }
+          },
+          {
+            "value": {
+              "a": [
+                1
+              ]
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1
+          }
+        },
+        "origins": {
+          "a.x": 0
+        }
+      }
+    },
+    {
+      "id": "merge-mismatch-ignored-under-replace",
+      "why": "a replace rule looks at no lower layer, so no mismatch",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          },
+          {
+            "value": {
+              "a": [
+                1
+              ]
+            }
+          }
+        ],
+        "rules": {
+          "a": "replace"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "x": 1
+          }
+        },
+        "origins": {
+          "a.x": 0
+        }
+      }
+    },
+    {
+      "id": "merge-no-rule-scalar-top-ignores-map",
+      "why": "with no rule a scalar top is a leaf and the mapping below is not examined",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": 1
+            }
+          },
+          {
+            "value": {
+              "a": {
+                "x": 1
+              }
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "value": {
+          "a": 1
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-scalar-kinds-do-not-mismatch",
+      "why": "a string over an integer under a deep rule is one kind, the type check is the caller's schema",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "value": {
+              "a": "x"
+            }
+          },
+          {
+            "value": {
+              "a": 1
+            }
+          }
+        ],
+        "rules": {
+          "a": "deep"
+        }
+      },
+      "expect": {
+        "value": {
+          "a": "x"
+        },
+        "origins": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "id": "merge-depth-guard",
+      "why": "a caller's own value nested past the profile bound ends in a depth refusal, not a stack overflow",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "layers": [
+          {
+            "nested": {
+              "key": "a",
+              "depth": 70,
+              "leaf": 1
+            }
+          }
+        ],
+        "rules": {}
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded"
+        }
+      }
+    }
+  ]
+}

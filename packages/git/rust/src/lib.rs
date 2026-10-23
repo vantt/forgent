@@ -14,6 +14,8 @@ mod refs;
 mod worktree;
 pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};
 mod remote;
+mod sequence;
+pub use sequence::{sequence_ref, SequenceHome, SequencePush, SequenceTip};
 pub use inspect::*;
 pub use remote::{RefMapping, RemoteRef};
 mod publication;

@@ -15,6 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -85,7 +86,7 @@ function declareExecutor(cwd, id, fields) {
       cfg.runner.capabilities[purpose] ??= {};
     }
   }
-  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(cwd, cfg);
 }
 
 // tsk-in1-4 D5: `kind` is now the agent/tool BAN CHAT axis, not a probe

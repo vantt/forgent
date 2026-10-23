@@ -12,5 +12,5 @@ tokio = { workspace = true, features = ["sync"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-serde_yaml = "0.9"
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 sha2.workspace = true

@@ -420,11 +420,25 @@
       "test/rust-host/command-routes.test.mjs"
     ],
     "subcommand_flags": {
+      "list": [
+        "dir",
+        "help",
+        "json",
+        "project",
+        "prune"
+      ],
       "machine": [
         "alias",
         "dir",
         "help",
         "json"
+      ],
+      "mint": [
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "release"
       ],
       "project": [
         "dir",
@@ -434,12 +448,21 @@
         "json",
         "new"
       ],
+      "resolve": [
+        "dir",
+        "help",
+        "json",
+        "query"
+      ],
       "session": [
         "dir",
         "fgos-dir",
         "help",
         "json",
-        "pid"
+        "pid",
+        "register",
+        "role",
+        "take"
       ],
       "writer": [
         "dir",

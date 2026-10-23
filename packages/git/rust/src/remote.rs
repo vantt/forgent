@@ -19,8 +19,26 @@ pub struct RemoteRef {
     pub name: RefName,
     pub oid: Oid,
 }
+/// The transport policy every remote call carries: one protocol allowed, no
+/// prompts, no credentials helper.
+pub(crate) fn transfer_argv(scheme: &str, args: &[String]) -> Vec<String> {
+    let mut argv: Vec<String> = [
+        "-c",
+        "protocol.allow=never",
+        "-c",
+        &format!("protocol.{scheme}.allow=always"),
+        "-c",
+        "core.sshCommand=ssh -oBatchMode=yes",
+        "-c",
+        "core.askPass=",
+    ]
+    .map(str::to_owned)
+    .to_vec();
+    argv.extend_from_slice(args);
+    argv
+}
 impl GitDriver {
-    fn transfer_url(
+    pub(crate) fn transfer_url(
         &self,
         repo: &RepoHandle,
         grant: &RemoteGrant,
@@ -58,17 +76,7 @@ impl GitDriver {
     ) -> Result<Output> {
         scope.validate().map_err(failure)?;
         self.preflight(repo)?;
-        let mut argv = vec![
-            "-c".into(),
-            "protocol.allow=never".into(),
-            "-c".into(),
-            format!("protocol.{scheme}.allow=always"),
-            "-c".into(),
-            "core.sshCommand=ssh -oBatchMode=yes".into(),
-            "-c".into(),
-            "core.askPass=".into(),
-        ];
-        argv.extend_from_slice(args);
+        let argv = transfer_argv(scheme, args);
         let held = scope.holding().map_err(failure)?;
         let loan = held.last().and_then(|h| scope.handle(&h.name));
         self.invoke(

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "profiles": {
+    "strict-config": {
+      "input_bytes": 1048576,
+      "depth": 32,
+      "nodes": 100000,
+      "scalar_bytes": 65536,
+      "expanded_bytes": null,
+      "key_bytes": 1024,
+      "aliases": null
+    },
+    "tool": {
+      "input_bytes": 8388608,
+      "depth": 64,
+      "nodes": 100000,
+      "scalar_bytes": 1048576,
+      "expanded_bytes": 16777216,
+      "key_bytes": 1024,
+      "aliases": 100
+    }
+  },
+  "notes": {
+    "input_bytes": "Checked first, before UTF-8 and before the parser recurses.",
+    "depth": "Nesting of collections, block and flow together: the root collection is depth 1. A document at the bound passes, one level more is refused.",
+    "nodes": "Counts values, a shared alias reference once per use, never keys: a mapping is one node, each entry value one more. A document at the bound passes, one more is refused.",
+    "scalar_bytes": "Bytes of one resolved scalar value.",
+    "expanded_bytes": "Total scalar bytes of the tree after alias expansion; the strict-config profile has no aliases, so no bound.",
+    "key_bytes": "Bytes of one resolved key.",
+    "aliases": "Alias tokens in one document; the strict-config profile refuses aliases outright."
+  }
+}

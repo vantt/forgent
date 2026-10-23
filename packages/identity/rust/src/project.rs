@@ -158,7 +158,8 @@ fn main_root(repo: &RepoHandle) -> Result<(PathBuf, bool), Refusal> {
     Ok((root, linked))
 }
 
-fn open(driver_dir: &Path, dir: &Path) -> Result<(GitDriver, RepoHandle), Refusal> {
+/// The Git driver and the repository containing `dir`.
+pub(crate) fn open_repository(driver_dir: &Path, dir: &Path) -> Result<(GitDriver, RepoHandle), Refusal> {
     let git = |e: OperationError| Refusal {
         reason: "git-read-failed",
         detail: e.cause,
@@ -204,7 +205,7 @@ pub struct ProjectMinted {
 /// `identity project` read from `dir`: the main checkout's file, also from a
 /// linked worktree. `driver_dir` is the fgOS state root the Git driver uses.
 pub fn project_info(driver_dir: &Path, dir: &Path) -> Result<ProjectInfo, Refusal> {
-    let (_, repo) = open(driver_dir, dir)?;
+    let (_, repo) = open_repository(driver_dir, dir)?;
     let (root, _) = main_root(&repo)?;
     read(&root).map(ProjectInfo::from).map_err(|e| match e {
         Error::Missing(_) => Refusal {
@@ -226,7 +227,7 @@ pub fn project_init(
     handle: Option<&str>,
     fork: bool,
 ) -> Result<ProjectMinted, Refusal> {
-    let (driver, repo) = open(driver_dir, dir)?;
+    let (driver, repo) = open_repository(driver_dir, dir)?;
     let (root, linked) = main_root(&repo)?;
     if linked {
         return Err(Refusal {

@@ -13,6 +13,7 @@ seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -79,7 +80,7 @@ function setupTestRepo() {
       },
     },
   };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(cfg, null, 2));
+  writeProjectConfig(tmp, cfg);
 
   return tmp;
 }
@@ -331,7 +332,7 @@ test('fgos run refuses one-liner flags without a prompt, an unquoted multi-word 
 const accountHome = () => {
   const home = makeFixtureDir('fgos-cli-run-home-');
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: {} }));
+  writeGlobalConfig(home, { runner: {} });
   return home;
 };
 const failCliHome = (args, cwd, home) => {
@@ -426,7 +427,7 @@ test('fgos run help names --input and --verify', () => {
 const setRunnerConfig = (tmp, patch) => {
   const file = path.join(tmp, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
-  fs.writeFileSync(file, JSON.stringify({ ...cfg, runner: patch(cfg.runner) }, null, 2));
+  writeProjectConfig(tmp, { ...cfg, runner: patch(cfg.runner) });
 };
 
 test('fgos run --override with a tier above the resolved tier is refused by name, and no unit run is left behind', () => {

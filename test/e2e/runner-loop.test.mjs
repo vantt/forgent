@@ -12,6 +12,7 @@ import { execFileSync, spawnSync, spawn } from 'node:child_process';
 import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -122,10 +123,7 @@ function runnerConfigFor(executorScript) {
 
 function writeRunnerConfig(repoRoot, executorScript) {
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({ runner: runnerConfigFor(executorScript) }),
-  );
+  writeProjectConfig(repoRoot, { runner: runnerConfigFor(executorScript) });
 }
 
 function branchLog(repoRoot, branch) {

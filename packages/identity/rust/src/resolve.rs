@@ -116,17 +116,14 @@ pub fn env_identity(
     })
 }
 
-/// Steps 2-4: the highest ancestor (the caller included) holding a
-/// controlling tty; else the caller's session id; else the caller itself,
-/// unresolved. No hop count decides the answer, so the depth of wrapper
-/// layers between the caller and its terminal never changes it.
-pub fn tree_identity(tree: &dyn ProcessTree, caller_pid: u32) -> WriterIdentity {
-    let Some(first) = tree.stat(caller_pid) else {
-        return WriterIdentity::unresolved(caller_pid);
-    };
+/// The highest ancestor (the caller included) holding a controlling tty, the
+/// agent head. No hop count decides the answer, so the depth of wrapper
+/// layers between the caller and its terminal never changes it. `None` when
+/// no process on the way up holds a terminal, or the caller cannot be read.
+pub fn terminal_head(tree: &dyn ProcessTree, caller_pid: u32) -> Option<u32> {
     let mut highest_tty = None;
     let mut pid = caller_pid;
-    let mut stat = first;
+    let mut stat = tree.stat(caller_pid)?;
     for _ in 0..MAX_WALK {
         if stat.tty_nr != 0 {
             highest_tty = Some(pid);
@@ -142,7 +139,16 @@ pub fn tree_identity(tree: &dyn ProcessTree, caller_pid: u32) -> WriterIdentity 
             None => break,
         }
     }
-    match highest_tty {
+    highest_tty
+}
+
+/// Steps 2-4: the terminal head; else the caller's session id; else the
+/// caller itself, unresolved.
+pub fn tree_identity(tree: &dyn ProcessTree, caller_pid: u32) -> WriterIdentity {
+    let Some(first) = tree.stat(caller_pid) else {
+        return WriterIdentity::unresolved(caller_pid);
+    };
+    match terminal_head(tree, caller_pid) {
         Some(root) => WriterIdentity::pid(root),
         None if first.session > 0 => WriterIdentity::pid(first.session),
         None => WriterIdentity::unresolved(caller_pid),

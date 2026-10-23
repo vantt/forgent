@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { prepareActivatedGitFixture } from '../helpers/run-unit-with-port.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
@@ -229,7 +230,7 @@ async function casRepoWithSetup(commands) {
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
   prepareActivatedGitFixture(cwd);
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands } }));
+  writeProjectConfig(cwd, { worktreeSetup: { commands } });
   execGit(cwd, ['branch', 'fgw/tsk-setup', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-setup']);
   fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');

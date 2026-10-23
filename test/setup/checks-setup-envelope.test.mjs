@@ -4,6 +4,7 @@
 // trong 120s của file gốc, nên gom theo chủ đề sẽ đẻ ra nhóm vượt ngưỡng 30s.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
   DEFAULT_CLEANUP_TTL_DAYS,
@@ -60,7 +61,7 @@ test('fgos setup fills a missing default key into an existing ~/.fgos/config.jso
   fs.mkdirSync(globalDir, { recursive: true });
   const globalPath = path.join(globalDir, 'config.json');
   const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
-  fs.writeFileSync(globalPath, `${JSON.stringify(customized, null, 2)}\n`);
+  writeGlobalConfig(homeDir, customized);
 
   const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);

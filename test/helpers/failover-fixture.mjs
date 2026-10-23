@@ -11,6 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnitWithPort as runUnit } from './run-unit-with-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
+import { writeGlobalConfig, writeProjectConfig } from './config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -148,7 +149,7 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
 
   const home = fixtureDir('fgos-failover-home-');
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
@@ -158,7 +159,7 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     fs.writeFileSync(path.join(accountHome, 'login'), login);
     return [accountId, { credentialStore: { [family]: accountHome } }];
   }))]));
-  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } }, null, 2));
+  writeGlobalConfig(home, { runner: { providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } });
   process.env.HOME = home;
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.

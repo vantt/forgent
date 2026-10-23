@@ -113,10 +113,14 @@ test('updateCargoManifestText bumps the package/workspace version only, never a 
   assert.equal(updateCargoManifestText(inherited, '0.2.0'), inherited);
 });
 
-test('updateCargoLockText bumps path crates and leaves registry crates alone', () => {
+test('updateCargoLockText bumps first-party path crates and leaves registry and vendored crates alone', () => {
   const next = updateCargoLockText(CARGO_LOCK, '0.2.0');
   assert.match(next, /name = "fgos"\nversion = "0\.2\.0"/);
   assert.match(next, /name = "dep"\nversion = "0\.1\.0"\nsource =/);
+  const vendoredLock = `${CARGO_LOCK}\n[[package]]\nname = "parser"\nversion = "0.2.2"\n`;
+  const kept = updateCargoLockText(vendoredLock, '0.2.0', new Set(['parser@0.2.2']));
+  assert.match(kept, /name = "parser"\nversion = "0\.2\.2"/);
+  assert.match(kept, /name = "fgos"\nversion = "0\.2\.0"/);
 });
 
 test('prepareRelease moves the Rust crate versions with package.json and lists them in the add command', () => {

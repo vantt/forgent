@@ -17,6 +17,7 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -91,7 +92,7 @@ function setupRepo({ capabilities } = {}) {
     timeoutMs: 60000,
   };
   fs.mkdirSync(path.join(repo, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repo, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(repo, { runner });
   return { repo, runner };
 }
 
@@ -432,7 +433,7 @@ test('a declared operation refuses a non-solo pattern in object form, and no oth
   cfg.runner.executors.fake2 = { ...cfg.runner.executors.fake, providerModel: 'node2' };
   cfg.runner.modelPolicies.node2 = { ...cfg.runner.modelPolicies.node };
   for (const cap of Object.values(cfg.runner.capabilities)) cap.prefer = [{ executor: 'fake' }, { executor: 'fake2' }];
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repo, cfg);
   writePlan(repo);
   const ops = operationsForStep(getDomain('coding'), 'planning');
   const before = fs.existsSync(path.join(repo, '.fgos', 'assignments')) ? fs.readdirSync(path.join(repo, '.fgos', 'assignments')) : [];

@@ -28,7 +28,8 @@ use sha2::{Digest, Sha256};
 use crate::envelope;
 use crate::gate::boottime_ns;
 use crate::go_channel::{read_frame, write_frame};
-use crate::publish::{iso_utc_now, publish_once};
+use crate::publish::publish_once;
+use fgos_identity::text::iso_utc_now;
 use crate::route::{emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
 
 #[cfg(unix)]

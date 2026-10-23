@@ -48,6 +48,7 @@ import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -478,9 +479,7 @@ test('loadRunnerConfig rejects provider account entries that declare placement p
 
 test('loadRunnerConfigFromDir rejects project-local provider account inventory before global merge', () => {
   const repo = mkTempGitRepo();
-  fs.writeFileSync(
-    path.join(repo.fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repo.repoRoot, {
       runner: {
         executor: { command: 'claude', args: ['{prompt}'] },
         modelPolicies: { claude: { standard: 'sonnet' } },
@@ -493,8 +492,7 @@ test('loadRunnerConfigFromDir rejects project-local provider account inventory b
           },
         },
       },
-    }),
-  );
+    });
   assert.throws(() => loadRunnerConfigFromDir(repo.repoRoot), /global-only/);
   fs.rmSync(repo.repoRoot, { recursive: true, force: true });
 });
@@ -1308,10 +1306,7 @@ test('loadRunnerConfigFromDir throws RunnerConfigError when the shared file does
 test('loadRunnerConfigFromDir reads the runner section of the shared file', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } }),
-  );
+  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } });
   const cfg = loadRunnerConfigFromDir(dir);
   assert.equal(cfg.executor.command, 'claude');
   assert.equal(cfg.timeoutMs, 5000);
@@ -1320,23 +1315,17 @@ test('loadRunnerConfigFromDir reads the runner section of the shared file', () =
 test('loadRunnerConfigFromDir throws RunnerConfigError on invalid JSON in the shared file', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+  writeRawProjectConfig(dir, '{ not valid json');
   assert.throws(() => loadRunnerConfigFromDir(dir), RunnerConfigError);
 });
 
 test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/config.json, project winning per key', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } }),
-  );
+  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 } });
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(homeDir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { timeoutMs: 999999, retries: 3 } }),
-  );
+  writeGlobalConfig(homeDir, { runner: { timeoutMs: 999999, retries: 3 } });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
@@ -1365,18 +1354,12 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
 test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instead of throwing', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }),
-  );
+  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(homeDir, '.fgos', 'config.json'),
-    // Pre-tsk-5tm-5 tier names ('lightweight'/'creative'/'analytical'/'critical'),
-    // no longer in MODEL_POLICY_TIERS, still present in a real global file.
-    JSON.stringify({ runner: { modelPolicies: { claude: { lightweight: 'haiku', critical: 'opus' } } } }),
-  );
+  // Pre-tsk-5tm-5 tier names ('lightweight'/'creative'/'analytical'/'critical'),
+  // no longer in MODEL_POLICY_TIERS, still present in a real global file.
+  writeGlobalConfig(homeDir, { runner: { modelPolicies: { claude: { lightweight: 'haiku', critical: 'opus' } } } });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
@@ -1397,16 +1380,10 @@ test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instea
 test('loadRunnerConfigFromDir still lets a global modelPolicies tier key fill a gap when the tier is valid', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }),
-  );
+  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(homeDir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { modelPolicies: { claude: { frontier: 'opus' } } } }),
-  );
+  writeGlobalConfig(homeDir, { runner: { modelPolicies: { claude: { frontier: 'opus' } } } });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
@@ -1441,13 +1418,10 @@ test('ensureRunnerConfigForDir fills missing default keys into an existing share
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   const sharedPath = path.join(dir, '.fgos', 'config.json');
-  fs.writeFileSync(
-    sharedPath,
-    JSON.stringify({
+  writeProjectConfig(dir, {
       runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, patterns: { seatBinding: { schema: 1 } } },
       unrelatedSection: { keep: 'me' },
-    }),
-  );
+    });
 
   const cfg = ensureRunnerConfigForDir(dir);
 
@@ -1463,7 +1437,7 @@ test('ensureRunnerConfigForDir on an already-complete shared file does not rewri
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   const sharedPath = path.join(dir, '.fgos', 'config.json');
-  fs.writeFileSync(sharedPath, JSON.stringify({ runner: FRESH_PROJECT_RUNNER_CONFIG }));
+  writeProjectConfig(dir, { runner: FRESH_PROJECT_RUNNER_CONFIG });
   const before = fs.statSync(sharedPath).mtimeMs;
 
   // Isolate from this machine's real global config (~/.fgos/config.json) —
@@ -3030,7 +3004,7 @@ function writeRunnerConfigFixture(root, cfg) {
   const capabilities = { execute: { serves: { outputKind: 'change', mutates: true } }, ...cfg.capabilities };
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
   const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: { ...cfg, capabilities, patterns } }, null, 2));
+  writeProjectConfig(root, { runner: { ...cfg, capabilities, patterns } });
 }
 
 test('executeExecutorCli fails closed when the executorId is not in cfg.executors at all (F4 intentional contract adjustment)', async () => {
@@ -4611,7 +4585,7 @@ test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full
   const fgosDir = repo.fgosDir;
   initStore(fgosDir);
   // Write shared config with ceiling = 1 into .fgos/config.json
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+  writeProjectConfig(repo.repoRoot, { workerSlots: { ceiling: 1 } });
   // Add 1 doing item to consume the slot
   addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
 
@@ -4625,7 +4599,7 @@ test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is conf
   const repo = mkTempGitRepo();
   const fgosDir = repo.fgosDir;
   initStore(fgosDir);
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+  writeProjectConfig(repo.repoRoot, { workerSlots: { ceiling: 1 } });
 
   addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
   addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
@@ -4953,7 +4927,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
       timeoutMs: 1000,
     };
     const fgosDir = path.join(repoRoot, '.fgos');
-    fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: glmConfig }, null, 2));
+    writeProjectConfig(repoRoot, { runner: glmConfig });
   
     const cfg = loadRunnerConfigFromDir(repoRoot);
     assert.ok(cfg.executors.glm, 'executors.glm is registered');

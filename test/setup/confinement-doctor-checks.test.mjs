@@ -23,16 +23,12 @@ import {
   credentialScanRoots,
 } from '../../src/setup/registrations.mjs';
 import { writeOwnershipMarker, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-doctor-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   return dir;
-}
-
-function writeProjectConfig(dir, config) {
-  const cfgPath = path.join(dir, '.fgos', 'config.json');
-  fs.writeFileSync(cfgPath, JSON.stringify(config, null, 2));
 }
 
 function hasWorkingBwrap(binary = 'bwrap') {
@@ -590,7 +586,7 @@ test('H4: confinement-strict-readiness fails when strict: true and capability la
 test('L2: doctor checks fail when runner config is not readable', () => {
   const dir = mkTempProject();
   try {
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+    writeRawProjectConfig(dir, '{ not valid json');
 
     const res1 = checkConfinementPoliciesDeclared(dir);
     assert.equal(res1.passed, false);

@@ -128,7 +128,7 @@ fn publish_receipt(run_dir: &Path, attempt_id: &str, step_id: &str, detail: Opti
         "attemptId": attempt_id,
         "stepId": step_id,
         "status": "done",
-        "at": crate::publish::iso_utc_now(),
+        "at": fgos_identity::text::iso_utc_now(),
     });
     if let Some(detail) = detail {
         receipt["detail"] = detail;

@@ -4,7 +4,6 @@
 // submits. Side-effecting work (persisting the resulting work item) is the
 // CLI verb's job, not this module's.
 
-import { createHash } from 'node:crypto';
 import { HEAVY_KEYWORDS, matchesKeyword } from './risk-keywords.mjs';
 // work.mjs is a pure, dependency-free module (it imports only the equally pure
 // domain-registry.mjs), so taking the shared title bound from it keeps
@@ -21,8 +20,8 @@ import { truncateTitle } from '../state/work.mjs';
  * Both exits are bounded, per work-item-title-contract D2. Only the no-boundary
  * exit used to be — a first sentence that ran on for a whole paragraph came
  * back whole, which is how 32 of 54 stored titles ended up past the bound. The
- * store doors bound titles too, but this call still has to: its result feeds
- * generateId before addWork ever sees it.
+ * store doors bound titles too, but this call still has to: its result is the
+ * title a submit stores.
  */
 export function deriveTitle(text) {
   const safeText = typeof text === 'string' ? text.trim() : '';
@@ -98,40 +97,4 @@ export function classify(text) {
   const risk = size;
 
   return { size, kind, risk };
-}
-
-// D3: SHA256 -> base36, per porting-log `hash-id-adaptive-length` (3-8 chars
-// adaptive to a 25% collision threshold). The suffix grows by taking a
-// longer prefix of the same digest on each retry, so a longer suffix is
-// always a superset of the shorter one that just collided.
-function hashSuffixSource(seed) {
-  const hex = createHash('sha256').update(seed).digest('hex');
-  return BigInt(`0x${hex}`).toString(36);
-}
-
-const MIN_SUFFIX_LENGTH = 3;
-const MAX_SUFFIX_LENGTH = 8;
-
-/**
- * Generate a stable, kebab-case id (id-systems-audit.md #1: `TSK<hash>`,
- * stored lowercase as `tsk-<hash>` to satisfy work.mjs's ID_PATTERN — the
- * title is never part of the id; it's already stored as its own field).
- * The fixed `tsk-` prefix guarantees letter-start regardless of hash
- * content (a bare hash digest starts with a digit ~89% of the time).
- * Retries with a longer suffix when it collides with `existingIds`,
- * bounded to MAX_SUFFIX_LENGTH attempts.
- */
-export function generateId(title, existingIds = []) {
-  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
-  const suffixSource = hashSuffixSource(typeof title === 'string' ? title : '');
-
-  for (let length = MIN_SUFFIX_LENGTH; length <= MAX_SUFFIX_LENGTH; length += 1) {
-    const candidate = `tsk-${suffixSource.slice(0, length)}`;
-    if (!known.has(candidate)) return candidate;
-  }
-
-  throw new Error(
-    `generateId: exhausted hash suffix range (${MIN_SUFFIX_LENGTH}-${MAX_SUFFIX_LENGTH} chars) ` +
-      `for title ${JSON.stringify(title)} without a unique id`,
-  );
 }

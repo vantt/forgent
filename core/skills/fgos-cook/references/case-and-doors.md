@@ -74,8 +74,11 @@ fgos run "<slice objective, with the plan phase and locked decisions it rests on
   [--input <plan.md>,<phase file>] [--pattern <name>] [--persona <name>] [--timeout <dur>] --json
 ```
 
-- A writing slice names the case worktree and a `--verify` command; without it a
-  reviewed run verifies nothing and the delivery milestone has no receipt.
+- A writing slice names the case worktree, a `--verify` command and the pattern
+  its activity declares (`--pattern reviewed` for `implement-item`, and for
+  `fix-verify-red`, which declares none). Without `--verify` a reviewed run
+  verifies nothing; without `--pattern` the door runs `solo`. Either way the
+  delivery milestone gets no receipt.
 - Writes are exactly the files the slice may change after your expansion (see the
   reading guide); a path the worker needs outside them comes back as `needsWrites`,
   and you decide whether to widen this slice or add another.

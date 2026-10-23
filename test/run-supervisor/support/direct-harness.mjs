@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');
@@ -61,7 +62,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
   git(repoDir, 'add', 'README.md');
   git(repoDir, 'commit', '-m', 'init');
   activateGitFixture(repoDir);
-  fs.writeFileSync(path.join(repoDir, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(repoDir, {
     runner: {
       defaultExecutor: 'noisy',
       defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -82,7 +83,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
       ...runner,
     },
     ...(dispatch ? { dispatch } : {}),
-  }, null, 2));
+  });
   const env = { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir, TMPDIR: tmpDir };
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.CODEX_THREAD_ID;
@@ -95,7 +96,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
       const config = JSON.parse(fs.readFileSync(file, 'utf8'));
       if (nextAgent) config.runner.executors.noisy.invocations[0].env = { AGENT_OPTS: JSON.stringify(nextAgent) };
       if (nextTimeoutMs) config.runner.timeoutMs = nextTimeoutMs;
-      fs.writeFileSync(file, JSON.stringify(config, null, 2));
+      writeProjectConfig(repoDir, config);
     },
     unitFile(id, extra = {}) {
       const file = path.join(repoDir, `${id}.json`);

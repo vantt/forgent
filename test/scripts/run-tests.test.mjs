@@ -9,6 +9,7 @@ import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
 import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -510,7 +511,7 @@ test('snapshotFgos captures files in .fgos including observe/, excluding secrets
   const fgosDir = path.join(base, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
   fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+  writeRawProjectConfig(base, '{"runner":{}}');
   fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{"friction":1}');
   fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');
   fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
@@ -551,7 +552,7 @@ test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occ
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+  writeRawProjectConfig(base, '{"runner":{}}');
 
   const result = runSelectedTests(['a.test.mjs'], {
     cwd: base,
@@ -570,7 +571,7 @@ test('runSelectedTests fails with exit 1 and reports error when test suite leaks
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+  writeRawProjectConfig(base, '{"runner":{}}');
 
   const logs = [];
   const result = runSelectedTests(['a.test.mjs'], {

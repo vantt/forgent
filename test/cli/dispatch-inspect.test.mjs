@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
 
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 function run(args, extra = {}) { return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], { cwd: repo, encoding: 'utf8', ...extra }); }
@@ -28,7 +29,7 @@ test('dispatch inspect --provider-capacity reports redacted global account state
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-provider-home-'));
   const fgosHome = path.join(home, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  fs.writeFileSync(path.join(fgosHome, 'config.json'), JSON.stringify({
+  writeGlobalConfig(home, {
     runner: {
       providers: {
         'openai-codex': {
@@ -41,7 +42,7 @@ test('dispatch inspect --provider-capacity reports redacted global account state
         },
       },
     },
-  }, null, 2));
+  });
   const answer = run(['dispatch', 'inspect', '--provider-capacity'], { env: { ...process.env, HOME: home, USERPROFILE: home } });
   assert.equal(answer.status, 0, answer.stderr);
   const data = JSON.parse(answer.stdout).data;

@@ -12,12 +12,13 @@ import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
 import { createSeatBindingClient } from '../../src/seat-binding/client.mjs';
 import { ladderCommentLines } from '../../src/setup/seat-binding-conversion.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const row = (id) => DOCTOR_CHECKS.find((check) => check.id === id).check;
 const mkProject = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-seat-checks-'));
 const writeConfig = (dir, config) => {
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify(config));
+  writeProjectConfig(dir, config);
 };
 
 // ---- seat-binding-config --------------------------------------------------------------------------

@@ -1,15 +1,19 @@
 //! Native host provider for `fgos identity`: three operations behind one
 //! verb. Bare `identity` answers the writer (`identity.writer`, read-only,
-//! the hook path); `identity machine|session|project` read (`identity.read`);
-//! `identity machine --alias` and `identity project --init|--new` write
-//! (`identity.write`).
+//! the hook path); `identity machine|session|project|resolve|list` read
+//! (`identity.read`); `identity machine --alias`, `identity project
+//! --init|--new`, `identity session --register`, `identity list --prune` and
+//! `identity mint <kind>` write (`identity.write`).
 
+use crate::directory::{self, Entry};
 use crate::errors::Error;
 use crate::machine;
+use crate::mint;
 use crate::proc_tree::os_process_tree;
 use crate::project;
 use crate::resolve::{resolve, WriterIdentity};
 use crate::session::{self, PidFacts};
+use fgos_process::facts::{judge_here, Record};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -26,7 +30,7 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "resolve", "list", "mint"];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
@@ -84,10 +88,28 @@ pub enum Verb {
     Writer,
     /// `machine [--alias <name>]`.
     Machine { alias: Option<String> },
-    /// `session`: this session's full id and handle.
-    Session,
+    /// `session [--register [--role lead:<LANE> [--take]]]`: this session's
+    /// full id and handle, and its entry in the local directory.
+    Session(SessionAction),
+    /// `resolve <handle|lead:<LANE>>`: the one live session it names.
+    Resolve { query: String },
+    /// `list [--project] [--prune]`: the sessions the machine knows.
+    List { project: bool, prune: bool },
     /// `project [--init|--new] [--handle <h>]`.
     Project(ProjectAction),
+    /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
+    Mint { kind: String, release: Option<u64> },
+}
+
+/// What `identity session` does.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub enum SessionAction {
+    /// Print this session's id and handle; writes nothing.
+    #[default]
+    Read,
+    /// `--register`, or `--role`, which implies it: put this session in the
+    /// local directory. `take` moves a role from its live holder.
+    Register { role: Option<String>, take: bool },
 }
 
 /// What `identity project` does.
@@ -117,10 +139,16 @@ impl IdentityRequest {
     pub fn operation_id(&self) -> &'static str {
         match &self.verb {
             Verb::Writer => IDENTITY_OPERATION_ID,
-            Verb::Machine { alias: None } | Verb::Session | Verb::Project(ProjectAction::Read) => {
-                IDENTITY_READ_OPERATION_ID
-            }
-            Verb::Machine { alias: Some(_) } | Verb::Project(_) => IDENTITY_WRITE_OPERATION_ID,
+            Verb::Machine { alias: None }
+            | Verb::Session(SessionAction::Read)
+            | Verb::Project(ProjectAction::Read)
+            | Verb::Resolve { .. }
+            | Verb::List { prune: false, .. } => IDENTITY_READ_OPERATION_ID,
+            Verb::Machine { alias: Some(_) }
+            | Verb::Session(SessionAction::Register { .. })
+            | Verb::Project(_)
+            | Verb::List { prune: true, .. }
+            | Verb::Mint { .. } => IDENTITY_WRITE_OPERATION_ID,
         }
     }
 }
@@ -149,13 +177,17 @@ fn default_caller_pid() -> u32 {
     }
 }
 
+fn caller_pid(request: &IdentityRequest) -> u32 {
+    request.pid.unwrap_or_else(default_caller_pid)
+}
+
 /// Resolves for the request against the real env and OS process tree.
 fn resolve_identity(request: &IdentityRequest) -> WriterIdentity {
     let tree = os_process_tree();
     resolve(
         &|key| std::env::var(key).ok(),
         tree.as_ref(),
-        request.pid.unwrap_or_else(default_caller_pid),
+        caller_pid(request),
         request.fgos_dir.as_deref(),
     )
 }
@@ -236,6 +268,13 @@ fn os_pid_facts(pid: u32) -> Option<PidFacts> {
     })
 }
 
+fn info_of(local: &session::Local, machine: &MachineInfo) -> SessionInfo {
+    SessionInfo {
+        id: session::full_id(&machine.id, local),
+        handle: session::handle(local, &machine.handle),
+    }
+}
+
 /// The session of a resolved writer on this machine; `None` when the caller
 /// cannot be told from any other.
 pub fn session_info(
@@ -243,11 +282,12 @@ pub fn session_info(
     machine: &MachineInfo,
     facts: &dyn Fn(u32) -> Option<PidFacts>,
 ) -> Option<SessionInfo> {
-    let local = session::local(identity, facts)?;
-    Some(SessionInfo {
-        id: session::full_id(&machine.id, &local),
-        handle: session::handle(&local, &machine.handle),
-    })
+    Some(info_of(&session::local(identity, facts)?, machine))
+}
+
+/// The process facts of `pid` as a liveness record.
+fn os_record(pid: u32) -> Option<Record> {
+    fgos_process::facts::identity_of(fgos_process::ProcId(pid)).map(|tuple| tuple.to_record())
 }
 
 fn state_root() -> PathBuf {
@@ -304,6 +344,45 @@ pub fn writer_answer(
     value
 }
 
+/// `identity mint <kind>`: a random id needs nothing but the kernel; a
+/// sequence number is claimed (or, with `release`, given back) on the
+/// repository containing the working directory.
+fn mint_answer(state_root: &Path, kind: &str, release: Option<u64>) -> Result<serde_json::Value, Refusal> {
+    let parsed = mint::Kind::parse(kind).ok_or_else(|| Refusal {
+        reason: "unknown-kind",
+        detail: format!("unknown id kind {kind:?}. Available: {}", mint::KIND_NAMES.join(", ")),
+    })?;
+    match (parsed, release) {
+        (mint::Kind::Random(random), None) => {
+            let id = mint::random(random).map_err(|e| Refusal {
+                reason: "random-unavailable",
+                detail: e.to_string(),
+            })?;
+            Ok(serde_json::json!({ "kind": kind, "id": id }))
+        }
+        (mint::Kind::Random(_), Some(_)) => Err(Refusal {
+            reason: "not-a-sequence",
+            detail: format!("{kind} ids are random; only a sequence kind has a number to give back"),
+        }),
+        (mint::Kind::Sequence(sequence), release) => {
+            let dir = std::env::current_dir().map_err(|e| Refusal {
+                reason: "no-working-directory",
+                detail: e.to_string(),
+            })?;
+            match release {
+                None => {
+                    let claim = mint::claim_sequence(state_root, &dir, sequence)?;
+                    Ok(serde_json::json!({ "kind": kind, "id": claim.id, "number": claim.number }))
+                }
+                Some(number) => {
+                    let released = mint::release_sequence(state_root, &dir, sequence, number)?;
+                    Ok(serde_json::json!({ "kind": kind, "number": number, "released": released }))
+                }
+            }
+        }
+    }
+}
+
 fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
     let root = state_root();
     match &request.verb {
@@ -335,14 +414,54 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             };
             Ok(value.expect("project answers always serialize"))
         }
-        Verb::Session => {
+        Verb::Mint { kind, release } => mint_answer(&root, kind, *release),
+        Verb::Session(action) => {
             let machine = machine_info(&root)?;
             let identity = resolve_identity(request);
-            let session = session_info(&identity, &machine, &os_pid_facts).ok_or_else(|| Refusal {
+            let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
                 reason: "unresolved",
                 detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
             })?;
-            Ok(serde_json::to_value(session).expect("SessionInfo always serializes"))
+            let info = info_of(&local, &machine);
+            match action {
+                SessionAction::Read => Ok(serde_json::to_value(info).expect("SessionInfo always serializes")),
+                SessionAction::Register { role, take } => {
+                    let cwd = std::env::current_dir().ok();
+                    let project_id = cwd
+                        .as_deref()
+                        .and_then(|dir| project::project_info(&root, dir).ok())
+                        .map(|project| project.id);
+                    let tree = os_process_tree();
+                    let entry = Entry::new(
+                        info.id,
+                        info.handle,
+                        local.cli.to_owned(),
+                        project_id,
+                        cwd.map(|dir| dir.display().to_string()),
+                        role.iter().cloned().collect(),
+                        directory::head_liveness(tree.as_ref(), caller_pid(request), &os_record),
+                    );
+                    let listed = directory::register(&root, entry, *take, &judge_here)?;
+                    Ok(serde_json::to_value(listed).expect("Listed always serializes"))
+                }
+            }
+        }
+        Verb::Resolve { query } => {
+            let listed = directory::resolve(&root, query, &judge_here)?;
+            Ok(serde_json::to_value(listed).expect("Listed always serializes"))
+        }
+        Verb::List { project, prune } => {
+            let project_id = if *project {
+                let dir = std::env::current_dir().map_err(|e| Refusal {
+                    reason: "no-working-directory",
+                    detail: e.to_string(),
+                })?;
+                Some(project::project_info(&root, &dir)?.id)
+            } else {
+                None
+            };
+            let sessions = directory::list(&root, project_id.as_deref(), *prune, &judge_here)?;
+            Ok(serde_json::to_value(sessions).expect("Sessions always serializes"))
         }
     }
 }

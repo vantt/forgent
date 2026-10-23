@@ -10,6 +10,7 @@ import { exportUseCase } from '../../src/verbs/events/export.mjs';
 import { rebuildStoreUseCase } from '../../src/verbs/events/rebuild.mjs';
 import { eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('status exposes real open counts, receipt, refs, deferred fields and linked/subdir discovery', t => {
   const f = fixture(t); append(f.store, [{}]);
@@ -53,7 +54,7 @@ test('JSONL export writes canonical reader order, cursors and refuses existing o
 test('config merges project over global and validates integer boundaries; the Work consumer rebuilds its cache', async t => {
   const f = fixture(t);
   fs.writeFileSync(f.ctx.globalConfigPath, JSON.stringify({ eventStore: { seal: { intervalSec: 10 }, sync: { intervalSec: 20 }, remote: 'backup' } }));
-  fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), JSON.stringify({ eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } }));
+  writeProjectConfig(f.repo, { eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } });
   assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{ unrelated: half-written');
   // A file that exists but does not parse never lends its defaults to a publish decision: the write path and the

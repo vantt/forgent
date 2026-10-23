@@ -17,6 +17,7 @@ import {
   resolveFgosBin,
 } from '../../src/setup/bin-discovery.mjs';
 import { loadGlobalConfig } from '../../src/config/global-config.mjs';
+import { globalConfigPath as globalConfigFile, writeGlobalConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempDir(prefix) {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -66,17 +67,17 @@ test('cachedGlobalBin returns null when the global config has no bin.globalFgosP
 
 test('cachedGlobalBin returns the cached path when it still exists on disk', () => {
   const dir = mkTempDir('bin-discovery-cache-hit-');
-  const globalConfigPath = path.join(dir, 'config.json');
+  const globalConfigPath = globalConfigFile(dir);
   const binPath = path.join(dir, 'fgos');
   writeStub(binPath);
-  fs.writeFileSync(globalConfigPath, JSON.stringify({ bin: { globalFgosPath: binPath } }));
+  writeGlobalConfig(dir, { bin: { globalFgosPath: binPath } });
   assert.equal(cachedGlobalBin(globalConfigPath), binPath);
 });
 
 test('cachedGlobalBin self-heals: returns null when the cached path no longer exists on disk', () => {
   const dir = mkTempDir('bin-discovery-cache-stale-');
-  const globalConfigPath = path.join(dir, 'config.json');
-  fs.writeFileSync(globalConfigPath, JSON.stringify({ bin: { globalFgosPath: path.join(dir, 'gone') } }));
+  const globalConfigPath = globalConfigFile(dir);
+  writeGlobalConfig(dir, { bin: { globalFgosPath: path.join(dir, 'gone') } });
   assert.equal(cachedGlobalBin(globalConfigPath), null);
 });
 
@@ -121,8 +122,8 @@ test('refreshGlobalBinCache is a no-op write when the resolved value already mat
 
 test('refreshGlobalBinCache clears a stale cached key when nothing resolves on PATH anymore', () => {
   const dir = mkTempDir('bin-discovery-refresh-clear-');
-  const globalConfigPath = path.join(dir, 'config.json');
-  fs.writeFileSync(globalConfigPath, JSON.stringify({ bin: { globalFgosPath: '/some/stale/path' } }));
+  const globalConfigPath = globalConfigFile(dir);
+  writeGlobalConfig(dir, { bin: { globalFgosPath: '/some/stale/path' } });
   const originalPath = process.env.PATH;
   process.env.PATH = '';
   try {

@@ -2,21 +2,26 @@
 
 use std::io;
 
-/// 128 random bits as 32 lowercase hex characters, from the kernel.
+/// `N` random bytes from the kernel.
 #[cfg(target_os = "linux")]
-pub fn random_hex128() -> io::Result<String> {
+pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
     use std::io::Read;
-    let mut bytes = [0u8; 16];
+    let mut bytes = [0u8; N];
     std::fs::File::open("/dev/urandom")?.read_exact(&mut bytes)?;
-    Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
+    Ok(bytes)
 }
 
 #[cfg(not(target_os = "linux"))]
-pub fn random_hex128() -> io::Result<String> {
+pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
     Err(io::Error::new(
         io::ErrorKind::Unsupported,
         "native random identity driver unavailable",
     ))
+}
+
+/// 128 random bits as 32 lowercase hex characters, from the kernel.
+pub fn random_hex128() -> io::Result<String> {
+    Ok(random_bytes::<16>()?.iter().map(|b| format!("{b:02x}")).collect())
 }
 
 /// Lowercase ASCII letters and digits of `input`, every other run of

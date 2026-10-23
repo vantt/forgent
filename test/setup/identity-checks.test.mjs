@@ -10,8 +10,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { loaderOptions } from '../event-store/phase07-fixture.mjs';
-import { checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -35,14 +34,14 @@ test('warns while no machine id exists, mints once on fix, then passes without r
   assert.equal(absent.passed, true);
   assert.match(absent.message, /^warning: no machine id minted yet; run `fgos doctor --fix`/);
 
-  const first = fixIdentityMachineId(root, { stateRoot: state, loaderOptions });
+  const first = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(first.changed, true);
   const id = fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim();
   const present = checkIdentityMachineId(root, { hostBin: HOST });
   assert.equal(present.passed, true);
   assert.match(present.message, new RegExp(`^machine ${id}, handle `));
 
-  const second = fixIdentityMachineId(root, { stateRoot: state, loaderOptions });
+  const second = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(second.changed, false);
   assert.equal(fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim(), id);
 });
@@ -77,4 +76,29 @@ test('project id row warns while the repository has none, passes after the expli
   const broken = checkIdentityProjectId(repo, { hostBin: HOST });
   assert.equal(broken.passed, false);
   assert.match(broken.message, /project-id-unreadable|not a project file/);
+});
+
+test('ids row passes on a clean registry and names each repeated id, title clash and file number', (t) => {
+  const { root } = withStateRoot(t);
+  const repo = path.join(root, 'registry');
+  fs.mkdirSync(path.join(repo, 'docs/specs'), { recursive: true });
+  fs.mkdirSync(path.join(repo, 'docs/decisions'));
+  const backlog = (ids) => ['| ID | Story |', '|----|-------|', ...ids.map((id) => `| ${id} | a story |`)].join('\n');
+  fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'STR27']));
+  // The same decision recorded in two areas, under the same short title, is one decision.
+  fs.writeFileSync(path.join(repo, 'docs/specs/a.md'), '### D-ADR0070 (guide and ledger) -- text\n');
+  fs.writeFileSync(path.join(repo, 'docs/specs/b.md'), '### D-ADR0070 (guide and ledger) -- other words\n#### Not a decision: D-ADR0071\n');
+  fs.writeFileSync(path.join(repo, 'docs/decisions/0001-one.md'), '# one\n');
+  const clean = checkIdentityIdsUnique(repo);
+  assert.deepEqual(clean, { passed: true, message: '2 backlog ids, 1 D-ADR numbers and 1 decision files, none repeated' });
+
+  fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'p-4f2a7qzb3x']));
+  fs.writeFileSync(path.join(repo, 'docs/specs/b.md'), '### D-ADR0070 (a different decision)\n');
+  fs.writeFileSync(path.join(repo, 'docs/decisions/0001-two.md'), '# two\n');
+  const broken = checkIdentityIdsUnique(repo);
+  assert.equal(broken.passed, false);
+  assert.match(broken.message, /backlog id p-4f2a7qzb3x is used by more than one row/);
+  assert.match(broken.message, /D-ADR0070 is headed with different titles/);
+  assert.match(broken.message, /decision file number 0001 is used by more than one file/);
+  assert.match(broken.message, /fgos identity mint/);
 });

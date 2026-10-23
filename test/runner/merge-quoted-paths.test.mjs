@@ -12,7 +12,6 @@ import {
   isWorkingTreeClean,
   buildOwnFileSet,
   isIgnorableStatusPath,
-  nextFreeDecisionId,
 } from '../../src/runner/merge.mjs';
 import { postLandDrift } from '../../src/state/postland-drift.mjs';
 import { safeGitStatusFiles } from '../../src/runner/dispatch/settlement.mjs';
@@ -98,14 +97,6 @@ test('isWorkingTreeClean still ignores a .fgos path git would quote', (t) => {
   write(repoRoot, '.fgos/sự kiện.jsonl', '{}\n');
 
   assert.equal(isWorkingTreeClean(repoRoot), true);
-});
-
-test('nextFreeDecisionId reads a decision file with a Vietnamese slug', (t) => {
-  const repoRoot = initRepo(t);
-  write(repoRoot, 'docs/decisions/0041-quyết-định.md', '# 0041\n');
-  commitAll(repoRoot, 'decision');
-
-  assert.equal(nextFreeDecisionId(repoRoot, 'HEAD'), '0042');
 });
 
 test('postLandDrift names a shared Vietnamese path and a path one side renamed away', (t) => {

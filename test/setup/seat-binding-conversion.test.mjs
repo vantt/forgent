@@ -16,6 +16,7 @@ import { convertRunnerConfig, ladderCommentLines, registeredCapabilitiesOf } fro
 import { MODEL_POLICY_TIERS, ensureRunnerConfigForDir, loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { discoverWorkflows } from '../../src/workflow/loader.mjs';
 import { createSeatBindingClient } from '../../src/seat-binding/client.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const readFixture = (name) => JSON.parse(fs.readFileSync(new URL(`../fixtures/seat-binding-config/${name}.json`, import.meta.url), 'utf8')).runner;
 const forgentx = () => readFixture('forgentx-runner');
@@ -48,7 +49,7 @@ const plainProject = () => ({
 function withHome(homeRunner, fn) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-conversion-home-'));
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  if (homeRunner) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: homeRunner }));
+  if (homeRunner) writeGlobalConfig(home, { runner: homeRunner });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   const prevWrite = process.stderr.write;
@@ -68,7 +69,7 @@ function withHome(homeRunner, fn) {
 function writeProject(runner) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-conversion-project-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), `${JSON.stringify({ runner }, null, 2)}\n`);
+  writeProjectConfig(dir, { runner });
   return dir;
 }
 
@@ -330,7 +331,7 @@ function freshHome(globalRunnerSection) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-setup-home-'));
   if (globalRunnerSection) {
     fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(home, '.fgos', 'config.json'), `${JSON.stringify({ runner: globalRunnerSection }, null, 2)}\n`);
+    writeGlobalConfig(home, { runner: globalRunnerSection });
   }
   return home;
 }
@@ -396,7 +397,7 @@ test('setup refreshes a $comment that differs from the tier ladder, with a backu
   const shared = JSON.parse(fs.readFileSync(projectFile, 'utf8'));
   const ladder = shared.runner.$comment;
   shared.runner.$comment = ['a stale line'];
-  fs.writeFileSync(projectFile, JSON.stringify(shared));
+  writeProjectConfig(dir, shared);
 
   const { data } = setup(dir, home);
 
@@ -405,7 +406,7 @@ test('setup refreshes a $comment that differs from the tier ladder, with a backu
   assert.equal(backupsOf(dir).length, 2);
 
   delete shared.runner.$comment;
-  fs.writeFileSync(projectFile, JSON.stringify(shared));
+  writeProjectConfig(dir, shared);
   assert.equal(setup(dir, home).data.seatBindingConversion.status, 'unchanged');
 });
 

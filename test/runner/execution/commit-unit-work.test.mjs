@@ -12,6 +12,7 @@ import { changedPaths, commitOnBranch, commitUnitWork as nativeCommitUnitWork, p
 
 import { acquireSync, createLockScope, resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
+import { writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
 const baselines = new Map(), custody = new Map();
 function commitUnitWork(args) {
   return nativeCommitUnitWork({ baseline: baselines.get(args.worktree), custody: custody.get(args.worktree), ...args });
@@ -143,7 +144,7 @@ test('h. .fgos is never committed, even under a bare ** scope', () => withRepo(u
 }));
 
 test('tracked modified .fgos files stay out of a broad scoped commit', () => withRepo({ '.fgos/config.json': 'base\n' }, (dir) => {
-  write(dir, '.fgos/config.json', 'modified\n');
+  writeRawProjectConfig(dir, 'modified\n');
   write(dir, 'a.txt');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'], changedFiles: ['.fgos/config.json', 'a.txt'] });
   assert.equal(r.status, 'committed', r.error);
