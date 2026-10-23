@@ -162,8 +162,7 @@ impl GitDriver {
         let handle = scope
             .handle("repo-config")
             .ok_or_else(|| busy("repo-config-busy"))?;
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let authority = Authority {
             handle,
             binding: wal::canonical_digest(&(

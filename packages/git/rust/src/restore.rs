@@ -734,8 +734,7 @@ impl GitDriver {
         let repo = self.checkout_repository(repo)?;
         let confirmed = confirmed_main_discard(&repo, request);
         let scope = checkout::scope(&repo, held)?;
-        wal::require_activation_fence(&repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(&repo, filesystem)?;
         if wal.known_id(id)? {
             if wal.compacted(id)?.is_some() {
                 return Err(failure("restore-already-acknowledged"));

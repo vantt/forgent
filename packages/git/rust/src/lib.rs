@@ -246,13 +246,7 @@ pub enum Remote {
 pub enum ConsumerSettlement {
     NotOwnedByGit,
 }
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Attribution {
-    ThisInvocationWonCas,
-    EffectObservedOnly,
-    Uncertain,
-}
+pub use wal::Attribution;
 
 #[derive(Debug)]
 pub struct OperationError {

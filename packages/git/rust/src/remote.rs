@@ -223,8 +223,7 @@ impl GitDriver {
             }
         }
         let (url, scheme) = self.remote_target(repo, grant)?;
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources: Vec<String> = destinations.into_iter().map(str::to_owned).collect();
         admission(&wal, id, &resources)?;
         let digest = wal::canonical_digest(&(push, &url, mappings, writer))?;

@@ -381,8 +381,7 @@ impl GitDriver {
         p.insert("ref".into(), slot_key(&req.destination));
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let request_digest = wal::canonical_digest(&(req, writer))?;
         let mut session = LandSession {
             slot,
@@ -748,8 +747,7 @@ impl GitDriver {
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let chain = wal.inspect(&session.id)?;
         if !matches!(chain.last_state(), Phase::Prepared) {
             return Err(recovery("land-recovery-required"));
@@ -1568,8 +1566,7 @@ impl GitDriver {
         if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
             return Err(failure("land-main-handle-required"));
         }
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         if let Some(c) = wal.compacted(id)? {
             let intent = compact_land_intent(&wal, &c, repo, writer)?;
             let mut slot = LockScope::seeded(vec![]).map_err(failure)?;

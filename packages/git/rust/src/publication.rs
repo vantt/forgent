@@ -234,8 +234,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     }
     fn wal(&self, repo: &RepoHandle) -> Result<Wal<&F>> {
         self.authority.validate(repo)?;
-        wal::require_activation_fence(repo)?;
-        Wal::with_filesystem(repo.common_dir(), &self.filesystem).map_err(OperationError::from)
+        Ok(Wal::open_with(repo, &self.filesystem)?)
     }
     /// Admission of `id` on the bound ref. Unresolved chains of the same ref
     /// are closed or block as before. Terminal chains of the same ref, left
@@ -564,7 +563,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             ),
             Outcome::Success {
                 observed,
-                attribution: wal::Attribution::ThisInvocationWonCas,
+                attribution: Attribution::ThisInvocationWonCas,
             } => (
                 observed,
                 PublicationState::CasObservedSuccessful,
@@ -580,15 +579,9 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 PublicationState::NotPublished,
                 Attribution::Uncertain,
             ),
-            Outcome::Superseded { attribution, .. } => (
-                &current,
-                PublicationState::Unknown,
-                if *attribution == wal::Attribution::EffectObservedOnly {
-                    Attribution::EffectObservedOnly
-                } else {
-                    Attribution::Uncertain
-                },
-            ),
+            Outcome::Superseded { attribution, .. } => {
+                (&current, PublicationState::Unknown, *attribution)
+            }
         };
         Ok(Receipt {
             operation_id: id.into(),
@@ -677,7 +670,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             } else if tip(&observed) == i.next {
                 Outcome::Success {
                     observed: tip(&observed),
-                    attribution: wal::Attribution::EffectObservedOnly,
+                    attribution: Attribution::EffectObservedOnly,
                 }
             } else {
                 Outcome::Loss {
@@ -754,7 +747,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         let outcome = match effect {
             Ok(out) if out.success && tip(&observed) == i.next => Outcome::Success {
                 observed: tip(&observed),
-                attribution: wal::Attribution::ThisInvocationWonCas,
+                attribution: Attribution::ThisInvocationWonCas,
             },
             Ok(out)
                 if !out.success
@@ -932,7 +925,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                         &chain,
                         Phase::Outcome(Outcome::Success {
                             observed: i.next.clone(),
-                            attribution: wal::Attribution::EffectObservedOnly,
+                            attribution: Attribution::EffectObservedOnly,
                         }),
                     )?;
                 self.finish(repo, &c)
@@ -944,7 +937,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                         &chain,
                         Phase::Outcome(Outcome::Success {
                             observed: chain.intent().next.clone(),
-                            attribution: wal::Attribution::EffectObservedOnly,
+                            attribution: Attribution::EffectObservedOnly,
                         }),
                     )?;
                 self.finish(repo, &c)

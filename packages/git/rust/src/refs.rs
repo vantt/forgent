@@ -659,8 +659,7 @@ impl GitDriver {
                     .map(|p| p.to_string_lossy().into_owned()),
             }
         };
-        wal::require_activation_fence(repo)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources = vec![name.as_str().into()];
         admission(&wal, id, &resources)?;
         let binding =
