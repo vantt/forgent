@@ -159,6 +159,9 @@ impl IdentityRequest {
 pub struct Refusal {
     pub reason: &'static str,
     pub detail: String,
+    /// The names the caller may have meant (`not-found`) or the sessions the
+    /// name matches (`ambiguous`); empty for every other refusal.
+    pub candidates: Vec<String>,
 }
 
 impl Refusal {
@@ -217,10 +220,12 @@ fn alias_problem(alias: &str) -> Option<&'static str> {
 pub fn machine_info(state_root: &Path) -> Result<MachineInfo, Refusal> {
     let id = machine::read(state_root).map_err(|e| match e {
         Error::Missing(_) => Refusal {
+            candidates: Vec::new(),
             reason: "machine-id-missing",
             detail: "no machine id yet; run `fgos doctor --fix` to mint it".into(),
         },
         e => Refusal {
+            candidates: Vec::new(),
             reason: "machine-id-unreadable",
             detail: e.to_string(),
         },
@@ -237,12 +242,14 @@ pub fn machine_info(state_root: &Path) -> Result<MachineInfo, Refusal> {
 pub fn set_alias(state_root: &Path, alias: &str) -> Result<MachineInfo, Refusal> {
     if let Some(code) = alias_problem(alias) {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "invalid-alias",
             detail: format!("alias {alias:?} is not a machine handle ({code})"),
         });
     }
     let info = machine_info(state_root)?;
     machine::write_alias(state_root, alias).map_err(|e| Refusal {
+        candidates: Vec::new(),
         reason: "alias-write-failed",
         detail: e.to_string(),
     })?;
@@ -349,23 +356,27 @@ pub fn writer_answer(
 /// repository containing the working directory.
 fn mint_answer(state_root: &Path, kind: &str, release: Option<u64>) -> Result<serde_json::Value, Refusal> {
     let parsed = mint::Kind::parse(kind).ok_or_else(|| Refusal {
+        candidates: Vec::new(),
         reason: "unknown-kind",
         detail: format!("unknown id kind {kind:?}. Available: {}", mint::KIND_NAMES.join(", ")),
     })?;
     match (parsed, release) {
         (mint::Kind::Random(random), None) => {
             let id = mint::random(random).map_err(|e| Refusal {
+                candidates: Vec::new(),
                 reason: "random-unavailable",
                 detail: e.to_string(),
             })?;
             Ok(serde_json::json!({ "kind": kind, "id": id }))
         }
         (mint::Kind::Random(_), Some(_)) => Err(Refusal {
+            candidates: Vec::new(),
             reason: "not-a-sequence",
             detail: format!("{kind} ids are random; only a sequence kind has a number to give back"),
         }),
         (mint::Kind::Sequence(sequence), release) => {
             let dir = std::env::current_dir().map_err(|e| Refusal {
+                candidates: Vec::new(),
                 reason: "no-working-directory",
                 detail: e.to_string(),
             })?;
@@ -400,6 +411,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
         }
         Verb::Project(action) => {
             let dir = std::env::current_dir().map_err(|e| Refusal {
+                candidates: Vec::new(),
                 reason: "no-working-directory",
                 detail: e.to_string(),
             })?;
@@ -419,6 +431,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             let machine = machine_info(&root)?;
             let identity = resolve_identity(request);
             let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
+                candidates: Vec::new(),
                 reason: "unresolved",
                 detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
             })?;
@@ -453,6 +466,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
         Verb::List { project, prune } => {
             let project_id = if *project {
                 let dir = std::env::current_dir().map_err(|e| Refusal {
+                    candidates: Vec::new(),
                     reason: "no-working-directory",
                     detail: e.to_string(),
                 })?;

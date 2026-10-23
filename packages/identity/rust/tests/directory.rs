@@ -82,9 +82,11 @@ fn unknown_names_are_not_found_with_the_close_candidates() {
     let by_handle = directory::resolve(&root, "claude-aaa", &alive).unwrap_err();
     assert_eq!(by_handle.reason, "not-found");
     assert!(by_handle.detail.contains("claude-aaaa@fg"), "{}", by_handle.detail);
+    assert_eq!(by_handle.candidates, ["claude-aaaa@fg"]);
     let by_role = directory::resolve(&root, "lead:MA", &alive).unwrap_err();
     assert_eq!(by_role.reason, "not-found");
     assert!(by_role.detail.contains("lead:MAIL"), "{}", by_role.detail);
+    assert_eq!(by_role.candidates, ["lead:MAIL"]);
     assert_eq!(directory::resolve(&root, "", &alive).unwrap_err().reason, "not-found");
 }
 
@@ -104,6 +106,8 @@ fn a_role_held_twice_is_ambiguous_and_lists_both() {
     let refusal = directory::resolve(&root, "lead:MAIL", &alive).unwrap_err();
     assert_eq!(refusal.reason, "ambiguous");
     assert!(refusal.detail.contains("claude-aaaa@fg") && refusal.detail.contains("claude-bbbb@fg"));
+    assert_eq!(refusal.candidates.len(), 2);
+    assert!(refusal.candidates.iter().all(|c| c.contains("@fg (fg-abc234/")));
 }
 
 #[test]

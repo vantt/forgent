@@ -158,6 +158,7 @@ pub fn head_liveness(
 
 fn unreadable(path: &Path, error: impl std::fmt::Display) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "directory-unreadable",
         detail: format!("{}: {error}", path.display()),
     }
@@ -165,6 +166,7 @@ fn unreadable(path: &Path, error: impl std::fmt::Display) -> Refusal {
 
 fn write_failed(path: &Path, error: impl std::fmt::Display) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "directory-write-failed",
         detail: format!("{}: {error}", path.display()),
     }
@@ -245,6 +247,7 @@ fn store(root: &Path, entry: &Entry, replace: bool) -> Result<Installed, Refusal
 
 fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "handle-in-use",
         detail: format!(
             "handle {handle} is already registered by the live session {registered}; {wanted} cannot take it (handles never change)"
@@ -261,6 +264,7 @@ fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
 pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<Listed, Refusal> {
     if let Some(role) = entry.roles.iter().find(|role| role_problem(role).is_some()) {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "invalid-role",
             detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
         });
@@ -280,6 +284,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
             .find(|row| row.entry.id != entry.id && row.entry.roles.contains(role));
         if let (Some(holder), false) = (holder, take) {
             return Err(Refusal {
+                candidates: Vec::new(),
                 reason: "role-held",
                 detail: format!(
                     "{role} is held by the live session {}; pass --take to move it to {}",
@@ -290,6 +295,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     }
     if own.is_none() && rows.len() + foreign >= MAX_ENTRIES {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "directory-full",
             detail: format!(
                 "the session directory holds {MAX_ENTRIES} entries; run `fgos identity list --prune` to drop the dead ones (an entry whose liveness is unknown is never removed automatically)"
@@ -371,6 +377,7 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
             Err(Refusal {
                 reason: "not-found",
                 detail: format!("no live session is named {query:?}; candidates: {}", join(&names)),
+                candidates: names,
             })
         }
         many => {
@@ -378,6 +385,7 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
             Err(Refusal {
                 reason: "ambiguous",
                 detail: format!("{query:?} names {} live sessions: {}", many.len(), join(&ids)),
+                candidates: ids,
             })
         }
     }
