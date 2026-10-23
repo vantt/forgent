@@ -1,0 +1,9 @@
+# W2 D2b: finish the composition parks (Doer brief, records turn)
+
+Status: Lead brief under L12-137. Builds on D2 (`composition/receipt.md`) and D1 (`carries/receipt.md`, holders now committed).
+
+Common rules: read `preflip-execution-plan.md` §1-§2, `w1-review-notes.md` and `owner-answers.md` (L13-*) in this directory, and the receipts of the wave-1 Doers that your task builds on. Never a git write in this repository (temporary test-fixture repositories under /tmp are fine), never the fgos CLI against this repo, never `.fgos/` or secrets, never `scripts/run-tests.mjs` or `npm test`. Python `python3 -B`; scratch `/tmp/fgos-work/<brief-name>/`. Single tests only: `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <file>` (`releasePath` from `/home/vantt/projects/forgentX/.fgos/installation/activation.json`); report what could not run. No pair accounting; no `owner-answers.md`/`progress.md`/`preflip-gate-status.json` writes: write `receipt.md` + `receipt.json` in your own directory. Anything outside the writable list: stop, report `needsWrites`. Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
+
+Tasks: finish the 15 unfinished park entries (now that D1's holders exist; 19 predecessors deferred for source drift → compose at current bytes or name the blocker); fix or explain the two red owning guards D2 reported (dead-vocabulary-guard is allowed red under P7-DOC-GAP-05 — confirm it is only that; generate-shipped-path-inventory test); every spec composed on top of the approved spec's `expectedAfterSha256` for the same file; own fuzz=0 roundtrip. Update `composition/patch-specs.json` and `composition/receipt.*` in place (keep earlier entries).
+
+Writable (exact): plans/260925-documentation-authority-unification/reports/phase-09/composition/**.
