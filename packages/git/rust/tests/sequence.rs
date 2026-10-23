@@ -163,11 +163,16 @@ fn a_local_claim_asks_git_to_flush_even_when_the_repository_configures_writeout_
 
     let calls = fs::read_to_string(logging_git_log()).unwrap();
     let root = f.root.canonicalize().unwrap();
-    let ours: Vec<&str> = calls.lines().filter(|l| l.starts_with(root.to_str().unwrap())).collect();
-    for verb in ["commit-tree", "update-ref"] {
+    // The driver's floor probe may run first in a scratch `git-floor-*` directory under the same
+    // root; only the calls that write the counter are judged.
+    let ours: Vec<&str> = calls
+        .lines()
+        .filter(|l| l.starts_with(root.to_str().unwrap()) && !l.contains("/git-floor-"))
+        .collect();
+    for (verb, mark) in [("commit-tree", ""), ("update-ref", "refs/fgos/seq/d-adr")] {
         let call = ours
             .iter()
-            .find(|l| l.split(' ').any(|word| word == verb))
+            .find(|l| l.split(' ').any(|word| word == verb) && l.contains(mark))
             .unwrap_or_else(|| panic!("no {verb} call in {ours:?}"));
         assert!(
             call.contains("core.fsync=all") && call.contains("core.fsyncMethod=fsync"),
