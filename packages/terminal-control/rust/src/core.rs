@@ -559,7 +559,7 @@ impl<'a> Core<'a> {
         let record = self.live_record(&store, key)?;
         let info = match self.driver.process_info(&record.pane_id) {
             Ok(info) => info,
-            Err(refusal) => return Ok(SendOutcome::ForegroundNotAgent { reason: format!("the pane's foreground could not be read: {refusal:?}") }),
+            Err(refusal) => return Ok(SendOutcome::ForegroundNotAgent { reason: format!("the pane's foreground could not be read: {refusal}") }),
         };
         if self.foreground_of(&store, key, &info).is_none() {
             let reason = if identity::is_bare_shell(&info) {

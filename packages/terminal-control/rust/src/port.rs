@@ -65,6 +65,15 @@ pub enum Refusal {
     Unknown { reason: String },
 }
 
+impl std::fmt::Display for Refusal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Refusal::Unsupported { capability, detail } => write!(f, "{capability} unsupported: {detail}"),
+            Refusal::Unknown { reason } => f.write_str(reason),
+        }
+    }
+}
+
 /// Where a slot came from; the core only ever closes `Allocated` ones.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

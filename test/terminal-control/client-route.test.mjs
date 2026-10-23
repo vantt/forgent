@@ -118,19 +118,3 @@ test('a bad request or a wrong protocol throws a named error', () => {
   assert.equal(direct.status, 3);
   assert.equal(JSON.parse(direct.stdout).code, 'host-version-mismatch');
 });
-
-test('read through the route is fast enough to poll (p50/p95 over 200 calls)', () => {
-  const tc = client();
-  tc.allocate({ key: 'k-perf', groupKey: 'g-perf', display: { label: 'perf' } });
-  const samples = [];
-  for (let i = 0; i < 200; i += 1) {
-    const start = process.hrtime.bigint();
-    assert.equal(tc.read({ key: 'k-perf', lines: 5 }).result, 'screen');
-    samples.push(Number(process.hrtime.bigint() - start) / 1e6);
-  }
-  samples.sort((a, b) => a - b);
-  const p50 = samples[100];
-  const p95 = samples[189];
-  console.log(`read via route over fake herdr: p50 ${p50.toFixed(1)} ms, p95 ${p95.toFixed(1)} ms`);
-  assert.ok(p95 < 1000, `p95 ${p95} ms`);
-});

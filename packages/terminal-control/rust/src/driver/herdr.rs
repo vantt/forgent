@@ -37,6 +37,8 @@ pub struct HerdrConfig {
     pub socket_path: Option<String>,
     /// Per-command timeout; 0 means [`DEFAULT_TIMEOUT_MS`].
     pub timeout_ms: u64,
+    /// When the operation's whole budget runs out: no command is allowed past it.
+    pub deadline: Option<Instant>,
     /// Extra environment for every command.
     pub env: Vec<(String, String)>,
 }
@@ -55,7 +57,11 @@ impl HerdrConfig {
     }
 
     fn timeout(&self) -> Duration {
-        Duration::from_millis(if self.timeout_ms == 0 { DEFAULT_TIMEOUT_MS } else { self.timeout_ms })
+        let each = Duration::from_millis(if self.timeout_ms == 0 { DEFAULT_TIMEOUT_MS } else { self.timeout_ms });
+        match self.deadline {
+            Some(deadline) => each.min(deadline.saturating_duration_since(Instant::now())),
+            None => each,
+        }
     }
 }
 

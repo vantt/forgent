@@ -176,6 +176,17 @@ fn a_hung_herdr_command_is_unknown_after_the_timeout() {
 }
 
 #[test]
+fn a_command_never_runs_past_the_operations_budget() {
+    let mut fake = Fake::new("budget").env("FAKE_HERDR_HANG", "pane get");
+    fake.config.timeout_ms = 30_000;
+    fake.config.deadline = Some(std::time::Instant::now() + std::time::Duration::from_millis(800));
+    let d = fake.driver();
+    let started = std::time::Instant::now();
+    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang past the budget is never read as gone");
+    assert!(started.elapsed() < std::time::Duration::from_secs(5), "the command outlived the budget: {:?}", started.elapsed());
+}
+
+#[test]
 fn an_unreadable_answer_is_unknown() {
     let fake = Fake::new("garbled").env("FAKE_HERDR_GARBLE", "1");
     let d = fake.driver();
@@ -384,6 +395,59 @@ mod incarnation {
         assert!(fake.calls().iter().any(|c| c == "pane close wS:p59Y"), "the close itself was issued once");
         assert_eq!(fake.calls().iter().filter(|c| c.starts_with("pane close")).count(), 1, "never closed a second time");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn each_operation_runs_a_fixed_number_of_herdr_commands() {
+        use fgos_terminal_control::core::{Core, CoreConfig};
+        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
+        use fgos_terminal_control::port::{AllocateRequest, Disposition, Display, LaunchSpec};
+
+        let fake = Fake::new("count");
+        let sock = fake.dir.join("s");
+        let _listener = UnixListener::bind(&sock).unwrap();
+        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
+        let driver = fake.driver();
+        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
+        let core = Core::new(&driver, &MeasuredSplit, config);
+        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { label: key.into(), ..Default::default() }, cwd: None, env: Default::default() };
+        let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
+        // Commands herdr was asked to run by one operation; the probe at construction is not counted.
+        let ran = |op: &dyn Fn()| {
+            let before = fake.calls().len();
+            op();
+            fake.calls().len() - before
+        };
+
+        let counts = [
+            ("capabilities", ran(&|| drop(core.capabilities()))),
+            ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
+            ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
+            ("attach", ran(&|| drop(core.attach("k3", "wS:p59Z", Some("g3"), None).unwrap()))),
+            ("launch refused for an attached pane", ran(&|| drop(core.launch("k3", &spec).unwrap_err()))),
+            ("send refused at a shell", ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap()))),
+            ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
+            ("inspect", ran(&|| drop(core.inspect("k1", false)))),
+            ("label", ran(&|| core.label("k1", &Display { label: "renamed".into(), ..Default::default() }).unwrap())),
+            ("reconcile-scan over three records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
+            ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
+        ];
+        assert_eq!(
+            counts,
+            [
+                ("capabilities", 0),
+                ("allocate into a new tab", 1),
+                ("allocate beside a live pane", 8),
+                ("attach", 4),
+                ("launch refused for an attached pane", 1),
+                ("send refused at a shell", 2),
+                ("read", 2),
+                ("inspect", 3),
+                ("label", 2),
+                ("reconcile-scan over three records", 6),
+                ("release close", 2),
+            ],
+        );
     }
 
     #[test]
