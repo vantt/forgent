@@ -20,7 +20,7 @@ Source pin: `5e03159334df726e43ffe9505ad4ed43f72ba94d`. Authority: L12-124. Reco
 ## Parks and gates
 
 - All 3275 effective parks are individually owned in step-07-readiness.json#parkOwners, with original record locators and blockers.
-- step-08-preflip-gates.json enumerates current-digest changed-binding reviews, L12-96 composition duties, non-behavioral census joins, all 17 dropped claims, Git one-door sites and retention duties. Every gate is explicitly PRE-FLIP, not met. Lead suite and independent closure remain required before close.
+- step-08-preflip-gates.json enumerates current-digest changed-binding reviews, L12-96 composition duties, non-behavioral census joins, all 17 dropped claims, Git one-door sites, retention, L12-129 archive/reader/checkout, current-source recomposition, final-code holder Land and staged docs-lease release gates. Every gate is explicitly PRE-FLIP, not met. Disposition-only counts are not readiness. Verify beforeSha256 equality before every patch application; fuzz-zero alone is insufficient. Lead suite and independent closure remain required before close.
 - Step 1 current-disposition table: step-08-current-judgments.json (47/47).
 - Post-census admission/disposition and parity obligations: step-08-post-census-records.jsonl; no live state, secrets, product code or runtime was read/executed.
 - SC2 checks effective classes. The former 7/17/27 versus 8/16/27 split was original versus effective overlay classification, not differing writer populations. New writer expressions include false-positive stderr/validation and non-document destinations, explicitly traced rather than guessed aliases.

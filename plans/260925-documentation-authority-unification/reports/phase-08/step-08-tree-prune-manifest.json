@@ -18,10 +18,10 @@
   "summary": {
     "inventoriedFiles": 576,
     "inventoriedBytes": 3670548669,
-    "keptFiles": 291,
-    "keptBytes": 2176951389,
-    "removedFiles": 285,
-    "removedBytes": 1493597280,
+    "keptFiles": 297,
+    "keptBytes": 2197917555,
+    "removedFiles": 279,
+    "removedBytes": 1472631114,
     "regenerableFiles": 0
   },
   "classification": {
@@ -57,8 +57,14 @@
     "logicalBytesOnly": true,
     "workingTree": {
       "byteEncoding": "Fixed-width decimal strings avoid changing the measured manifest length when filling this receipt.",
-      "repository": {"files": 16294, "bytes": "2938090282"},
-      "plan": {"files": 6479, "bytes": "2757592511"},
+      "repository": {
+        "files": 16294,
+        "bytes": "2938090282"
+      },
+      "plan": {
+        "files": 6479,
+        "bytes": "2757592511"
+      },
       "method": "HEAD git ls-tree -r -l logical blob totals, minus original bytes of changed/deleted tracked paths, plus their working bytes and the sole new manifest. All changed paths confined to the plan. Ignored/untracked scratch, Git objects, dependencies and filesystem block allocation are excluded; symlink metadata outside the change stays at HEAD. No .fgos file is opened."
     }
   },
@@ -87,8 +93,20 @@
       "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
       "beforeExit": 1,
       "afterPruneExit": 1,
-      "eachManifestCommands": {"ownership.mjs": 0, "audit-ownership.mjs": 0, "checks.mjs": 1},
-      "eachManifestBeforeAccounting": {"accountedPairs": 4200, "unaccountedPairs": 6, "targetDigestDrifts": 0, "B": true, "HFindings": 0, "IEqualToHEAD": true, "IFrozenBaselineUnchanged": true},
+      "eachManifestCommands": {
+        "ownership.mjs": 0,
+        "audit-ownership.mjs": 0,
+        "checks.mjs": 1
+      },
+      "eachManifestBeforeAccounting": {
+        "accountedPairs": 4200,
+        "unaccountedPairs": 6,
+        "targetDigestDrifts": 0,
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true
+      },
       "scope": "Current working-path violations are expected until actual runner commit and separate L12-11 accounting; no clean-byte acceptance."
     },
     {
@@ -96,38 +114,85 @@
         "python3 -B plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduce.py --output-dir /tmp/fgos-work/tree-prune-proof/round5",
         "python3 -B plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduce.py --output-dir /tmp/fgos-work/tree-prune-proof/sync4d"
       ],
-      "exits": [1, 1],
-      "round5Children": {"independent": 1, "checks": 1, "fast": 0, "ownership": 0, "audit-ownership": 0, "replay": 0},
-      "sync4dChildren": {"independent": 1, "checks": 1, "ownership": 0, "audit-ownership": 0, "replay": 0},
+      "exits": [
+        1,
+        1
+      ],
+      "round5Children": {
+        "independent": 1,
+        "checks": 1,
+        "fast": 0,
+        "ownership": 0,
+        "audit-ownership": 0,
+        "replay": 0
+      },
+      "sync4dChildren": {
+        "independent": 1,
+        "checks": 1,
+        "ownership": 0,
+        "audit-ownership": 0,
+        "replay": 0
+      },
       "optionalNativeInventoryRun": false,
       "independentBaselineComparison": {
         "procedure": "Temporarily restore ALL 285 proposed deletions from exact gitBlob bytes; verify each SHA-256; run unchanged independent auditor; then delete only those exact payloads again. Compare the complete resulting JSON against both post-prune recipe results, not only counts.",
         "command": "node plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs --output /tmp/fgos-work/tree-prune-proof/independent-before.json",
         "beforeExit": 1,
-        "afterExits": [1, 1],
+        "afterExits": [
+          1,
+          1
+        ],
         "byteIdentical": true,
         "bytes": 186068,
         "sha256": "9413e7b98ef0269a1a16a69b3d697c08563172afc4a6d5963e5cd07084eaa464",
         "rowsScanned": 12953,
         "shardsScanned": 98,
         "findings": 247,
-        "findingTypes": {"target-citation-facts": 88, "source-citation-not-bound": 74, "source-citation-facts": 63, "correction-after-absent": 7, "section-lines": 6, "link-counts": 4, "section-line-witnesses": 3, "section-equality": 1, "correction-before-absent": 1},
+        "findingTypes": {
+          "target-citation-facts": 88,
+          "source-citation-not-bound": 74,
+          "source-citation-facts": 63,
+          "correction-after-absent": 7,
+          "section-lines": 6,
+          "link-counts": 4,
+          "section-line-witnesses": 3,
+          "section-equality": 1,
+          "correction-before-absent": 1
+        },
         "interpretation": "Existing source/rationale red unchanged; no removed-input exception or new diagnostic. This does not waive L12-14 or certify the complete recipes green. Lead owns red disposition and closure proof."
       }
     },
     {
       "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py --final --pin 5e03159334df726e43ffe9505ad4ed43f72ba94d",
-      "exits": [0, 0],
+      "exits": [
+        0,
+        0
+      ],
       "allFiveOutputsIdenticalToCommitted": true,
       "stdoutIdentical": true,
       "stdoutSha256": "f11c194a736c4450a99334bc489b3f5712411658fc2845a62badaf8afcad6021",
       "outputBytes": 7475179,
       "outputs": {
-        "step-07-consumer-cutover-matrix.json": {"bytes": 3832732, "sha256": "1add06ac19d62862ffc353352cce01c2e3b28ba5305a3cb457b47a02ac27b1cb"},
-        "step-07-patch-order.json": {"bytes": 798976, "sha256": "8f09d07982289e50c713b78c3c8b15109b52a7627deb9d1cbbe502b6180aaa36"},
-        "step-07-readiness.json": {"bytes": 1534467, "sha256": "8ff20415234344bffe3fa07f15cf9d53630481b3ec58c74d1109edd2948d96c3"},
-        "step-07-composed-patches.json": {"bytes": 1305741, "sha256": "d50338a51ab65582c8130041ab105ec126a377e16d64f65d27b02e24b263e292"},
-        "step-07-final-assembly-report.md": {"bytes": 3263, "sha256": "f4e6ffc5dc18d922a042b32cec09ec001482d5031b5b67c5b4998a46f1e23542"}
+        "step-07-consumer-cutover-matrix.json": {
+          "bytes": 3832732,
+          "sha256": "1add06ac19d62862ffc353352cce01c2e3b28ba5305a3cb457b47a02ac27b1cb"
+        },
+        "step-07-patch-order.json": {
+          "bytes": 798976,
+          "sha256": "8f09d07982289e50c713b78c3c8b15109b52a7627deb9d1cbbe502b6180aaa36"
+        },
+        "step-07-readiness.json": {
+          "bytes": 1534467,
+          "sha256": "8ff20415234344bffe3fa07f15cf9d53630481b3ec58c74d1109edd2948d96c3"
+        },
+        "step-07-composed-patches.json": {
+          "bytes": 1305741,
+          "sha256": "d50338a51ab65582c8130041ab105ec126a377e16d64f65d27b02e24b263e292"
+        },
+        "step-07-final-assembly-report.md": {
+          "bytes": 3263,
+          "sha256": "f4e6ffc5dc18d922a042b32cec09ec001482d5031b5b67c5b4998a46f1e23542"
+        }
       }
     }
   ],
@@ -135,19 +200,58 @@
     "status": "six-actual-ancestor-pairs-appended-last; runner-commit-accounting-and-clean-byte-acceptance-pending",
     "authority": "L12-11 / L12-128; prior CLI repair provenance L12-127",
     "addedPairs": [
-      {"commit": "462ea0b29791bf03c40823c1536b3ed726ce072c", "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-brief.md"},
-      {"commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311", "path": "bin/fgos.mjs"},
-      {"commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311", "path": "packages/git/contracts/mutation-census.v1.json"},
-      {"commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311", "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"},
-      {"commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311", "path": "test/e2e/documentation-cutover-lease-hooks.test.mjs"},
-      {"commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311", "path": "test/runner/execution/run-case-admission.test.mjs"}
+      {
+        "commit": "462ea0b29791bf03c40823c1536b3ed726ce072c",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-brief.md"
+      },
+      {
+        "commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311",
+        "path": "bin/fgos.mjs"
+      },
+      {
+        "commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311",
+        "path": "packages/git/contracts/mutation-census.v1.json"
+      },
+      {
+        "commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+      },
+      {
+        "commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311",
+        "path": "test/e2e/documentation-cutover-lease-hooks.test.mjs"
+      },
+      {
+        "commit": "4821f0a4af37460b3e8a4105a6f1119a09e3c311",
+        "path": "test/runner/execution/run-case-admission.test.mjs"
+      }
     ],
     "dataOnlyValidationExit": 0,
     "validation": "Both additions identical; every pair present in its actual commit diff; original exception prefix and every non-exception source/JSON value unchanged. No allowlist, baseline, predicate, binding, or future commit id altered.",
     "finalAuditExit": 1,
-    "eachFinalManifest": {"ownershipExit": 0, "auditOwnershipExit": 0, "checksExit": 1, "accountedPairs": 4206, "unaccountedPairs": 0, "workingViolations": 32, "targetDigestDrifts": 0, "B": true, "HFindings": 0, "IEqualToHEAD": true, "IFrozenBaselineUnchanged": true},
-    "finalReproductionTest": {"exit": 1, "tests": 8, "passed": 6, "failed": 2, "onlyFailures": "Both A bookkeeping recipes reject this turn's uncommitted record/deletion paths; all other owning cases pass."},
-    "whitespaceCheck": {"command": "git diff --check", "exit": 0},
+    "eachFinalManifest": {
+      "ownershipExit": 0,
+      "auditOwnershipExit": 0,
+      "checksExit": 1,
+      "accountedPairs": 4206,
+      "unaccountedPairs": 0,
+      "workingViolations": 32,
+      "targetDigestDrifts": 0,
+      "B": true,
+      "HFindings": 0,
+      "IEqualToHEAD": true,
+      "IFrozenBaselineUnchanged": true
+    },
+    "finalReproductionTest": {
+      "exit": 1,
+      "tests": 8,
+      "passed": 6,
+      "failed": 2,
+      "onlyFailures": "Both A bookkeeping recipes reject this turn's uncommitted record/deletion paths; all other owning cases pass."
+    },
+    "whitespaceCheck": {
+      "command": "git diff --check",
+      "exit": 0
+    },
     "futureRunnerCommit": "Unknown, not pre-accounted. Lead separately accounts actual runner commit/path pairs, INCLUDING ALL 285 deletions and actual record writes, in both protected manifests, then replays clean committed bytes. No working-tree-green or closure claim."
   },
   "inventory": [
@@ -8354,12 +8458,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "0940742c53d36cade0964467defe2bbcdec8c501b4a470214274c8768c988903",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-01-345f15d95.md",
@@ -8501,12 +8608,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "b91202dedad7d7304cd934a0e8044a4822d745acdb8cd8150f139b5d7f4cd601",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-02-345f15d95.md",
@@ -8974,12 +9084,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "75092ed847121d13c6e703530d36dc8541ba87da59e06b9a32fec7453499912c",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-02-345f15d95.md",
@@ -9157,12 +9270,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "179c535a0a24b32838a3a161ee4aee09e9ed4d5d0e83675c13e48c44f5b387e5",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-05-345f15d95.json",
@@ -9212,12 +9328,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "79bb78552048163226df14339210eb221dc589f8d4a39aa1ecb02188077f1968",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-05-345f15d95.md",
@@ -9672,12 +9791,15 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
-      "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical review-input/diff packet; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "scriptRefs": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+      ],
+      "class": "owning record",
+      "reason": "L12-133 correction: directory-filter sourceWitness input of round3/round4 rationale rebuilds; restored byte-exactly from manifested gitBlob. Not a superseded intermediate.",
       "regenerateCommand": null,
       "sha256": "f3c018a6bd6692a85c4ddef58e3633d4e9de0299f139ae57a606be2547a0deb0",
-      "action": "remove"
+      "action": "keep"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-native-01-345f15d95.md",
@@ -37479,5 +37601,84 @@
       "sha256": "704bc549891c7fdac665b18d46362c192c758478cd4ca61d717635f785774159",
       "action": "keep"
     }
-  ]
+  ],
+  "directoryReaderCorrection": {
+    "authority": "L12-133; review C r2 D3",
+    "date": "2026-10-23",
+    "otherRemovedDirectoryInputsFound": 0,
+    "readerAudit": "step-08-closure-r2-reader-audit.json",
+    "restoredBytes": 20966166,
+    "restoredFiles": [
+      {
+        "bytes": 5204984,
+        "gitBlob": "322ab9a5ddf35486d98b91506c2eeb6671e2a5c8",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-01-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "0940742c53d36cade0964467defe2bbcdec8c501b4a470214274c8768c988903"
+      },
+      {
+        "bytes": 10751833,
+        "gitBlob": "57f853bcc48d7f326da0de09a25b8728a94023b6",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-02-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "b91202dedad7d7304cd934a0e8044a4822d745acdb8cd8150f139b5d7f4cd601"
+      },
+      {
+        "bytes": 1663799,
+        "gitBlob": "8dd5dbda38001a9219638390afcc7884dcc5a5e2",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-02-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "75092ed847121d13c6e703530d36dc8541ba87da59e06b9a32fec7453499912c"
+      },
+      {
+        "bytes": 1016518,
+        "gitBlob": "71b517423a4ae87202d4317bc4fe894053a8beb0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-04-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "179c535a0a24b32838a3a161ee4aee09e9ed4d5d0e83675c13e48c44f5b387e5"
+      },
+      {
+        "bytes": 1168413,
+        "gitBlob": "07ab2d1cfbeea717a7dd3f929008e88b743fddb8",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-05-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "79bb78552048163226df14339210eb221dc589f8d4a39aa1ecb02188077f1968"
+      },
+      {
+        "bytes": 1160619,
+        "gitBlob": "af13289b15e9007d56f581f8f3d9dc16197af20d",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-native-01-345f15d95.json",
+        "scriptRefs": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:21",
+          "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs:33"
+        ],
+        "sha256": "f3c018a6bd6692a85c4ddef58e3633d4e9de0299f139ae57a606be2547a0deb0"
+      }
+    ],
+    "scope": "Restores owning inputs, not a new pruning authorization. Historical checkout/logical-byte measurements remain at their original tree, not claimed current after restoration."
+  },
+  "historicalL12_128Summary": {
+    "inventoriedBytes": 3670548669,
+    "inventoriedFiles": 576,
+    "keptBytes": 2176951389,
+    "keptFiles": 291,
+    "regenerableFiles": 0,
+    "removedBytes": 1493597280,
+    "removedFiles": 285
+  }
 }

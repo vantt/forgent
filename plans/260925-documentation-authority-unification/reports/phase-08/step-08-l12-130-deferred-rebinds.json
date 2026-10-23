@@ -28,7 +28,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
@@ -46,7 +49,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
@@ -64,7 +70,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
@@ -82,7 +91,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
@@ -100,7 +112,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
@@ -118,7 +133,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
@@ -136,7 +154,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
@@ -154,7 +175,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
@@ -172,7 +196,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
@@ -190,7 +217,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       }
     ],
     "step4": [
@@ -217,7 +247,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
@@ -235,7 +268,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
@@ -253,7 +289,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
@@ -271,7 +310,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
@@ -289,7 +331,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
@@ -307,7 +352,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
@@ -325,7 +373,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
@@ -363,7 +414,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
@@ -401,7 +455,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       }
     ],
     "step5": [
@@ -421,7 +478,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
@@ -439,7 +499,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
@@ -457,7 +520,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -475,7 +541,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -493,7 +562,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -511,7 +583,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -529,7 +604,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
@@ -547,7 +625,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
@@ -565,7 +646,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
@@ -583,7 +667,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
@@ -601,7 +688,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
@@ -619,7 +709,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
@@ -637,7 +730,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
@@ -655,7 +751,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
@@ -673,7 +772,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
@@ -691,7 +793,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
@@ -709,7 +814,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
@@ -727,7 +835,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -745,7 +856,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -763,7 +877,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -781,7 +898,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -799,7 +919,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -817,7 +940,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -835,7 +961,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
@@ -853,7 +982,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
@@ -871,7 +1003,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
@@ -889,7 +1024,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
@@ -907,7 +1045,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
@@ -925,7 +1066,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -943,7 +1087,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -961,7 +1108,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -979,7 +1129,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -997,7 +1150,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1015,7 +1171,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1033,7 +1192,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1051,7 +1213,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1069,7 +1234,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1087,7 +1255,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1105,7 +1276,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1123,7 +1297,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
@@ -1141,7 +1318,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
@@ -1159,7 +1339,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
@@ -1184,7 +1367,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1202,7 +1388,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1220,7 +1409,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1238,7 +1430,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1256,7 +1451,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1274,7 +1472,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1292,7 +1493,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1310,7 +1514,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1328,7 +1535,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1346,7 +1556,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1364,7 +1577,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1382,7 +1598,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1400,7 +1619,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
@@ -1418,7 +1640,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1436,7 +1661,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1454,7 +1682,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1472,7 +1703,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1490,7 +1724,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1508,7 +1745,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1526,7 +1766,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1544,7 +1787,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1562,7 +1808,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1580,7 +1829,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1598,7 +1850,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1616,7 +1871,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1634,7 +1892,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1652,7 +1913,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1670,7 +1934,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1688,7 +1955,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
@@ -1706,7 +1976,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1724,7 +1997,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1742,7 +2018,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1760,7 +2039,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1778,7 +2060,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1796,7 +2081,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1814,7 +2102,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1832,7 +2123,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1850,7 +2144,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1868,7 +2165,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1886,7 +2186,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1904,7 +2207,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1922,7 +2228,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1940,7 +2249,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1958,7 +2270,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1976,7 +2291,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -1994,7 +2312,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2012,7 +2333,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2030,7 +2354,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2048,7 +2375,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2066,7 +2396,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2084,7 +2417,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2102,7 +2438,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2120,7 +2459,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2138,7 +2480,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2156,7 +2501,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2174,7 +2522,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2192,7 +2543,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2210,7 +2564,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2228,7 +2585,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2246,7 +2606,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2264,7 +2627,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2282,7 +2648,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2300,7 +2669,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2318,7 +2690,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2336,7 +2711,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2354,7 +2732,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2372,7 +2753,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2390,7 +2774,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2408,7 +2795,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2426,7 +2816,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2444,7 +2837,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2462,7 +2858,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2480,7 +2879,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2498,7 +2900,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2516,7 +2921,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2534,7 +2942,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2552,7 +2963,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2570,7 +2984,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2588,7 +3005,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2606,7 +3026,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -2624,7 +3047,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
@@ -2642,7 +3068,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       },
       {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
@@ -2660,7 +3089,10 @@
             ]
           }
         ],
-        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest."
+        "action": "L12-124 Phase 9 PRE-FLIP recompose: retain all pinned records/reviews; relocate complete passages/source/render/fixture co-cuts at the final pin and independently review changed bindings. Not accepted or executable from old digest.",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "owner": "Documentation source-binding reviewer / Lead",
+        "status": "pre-flip gate"
       }
     ]
   }

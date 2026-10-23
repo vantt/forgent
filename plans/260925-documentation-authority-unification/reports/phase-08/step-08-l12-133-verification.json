@@ -1,0 +1,573 @@
+{
+  "authority": "L12-133",
+  "inputCommit": "890715ead353e350f6e66cba811b15e606d07194",
+  "recordsOnly": true,
+  "checks": [
+    {
+      "name": "twelve unique owned unmet gates, projected exactly into readiness",
+      "passed": true
+    },
+    {
+      "name": "518 changed-source records exactly conserved from recomposition register",
+      "passed": true
+    },
+    {
+      "name": "changed records retain owners and original source-witness fields, including explicit null for retired/external inputs",
+      "passed": true
+    },
+    {
+      "name": "all 144 overlaps owned before flip",
+      "passed": true
+    },
+    {
+      "name": "all eight observed changed composed specs retained including Git",
+      "passed": true
+    },
+    {
+      "name": "readyRows removed, no eligibility claim from disposition counts",
+      "passed": true
+    },
+    {
+      "name": "changedBindings five current hashes",
+      "passed": true
+    },
+    {
+      "name": "pendingChangedSinceStep0 five current hashes",
+      "passed": true
+    },
+    {
+      "name": "Pilot B is 18 preserved and 3 rejected; owning rejected rows agree",
+      "passed": true
+    },
+    {
+      "name": "six exact restored inputs with both reader locators",
+      "passed": true
+    },
+    {
+      "name": "restored inventory class owning, keeps 297 and removes 279",
+      "passed": true
+    },
+    {
+      "name": "all five determinism outputs match exact bytes, under 8 MB",
+      "passed": true
+    },
+    {
+      "name": "matrix/order/composed stay byte-identical to HEAD",
+      "passed": true
+    },
+    {
+      "name": "Phase 9 Requirements name every added gate",
+      "passed": true
+    },
+    {
+      "name": "original L12-131 text preserved, dated correction appended",
+      "passed": true
+    },
+    {
+      "name": "no stale scorecard missing-log slot or 9/9 Land count",
+      "passed": true
+    },
+    {
+      "name": "whitespace diff check",
+      "passed": true
+    },
+    {
+      "name": "exact writable paths only",
+      "passed": true
+    }
+  ],
+  "structuralChecksExit": 0,
+  "preAccountingAudit": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "targetDigestDriftRows": 0,
+      "accountedPairs": 4244,
+      "unaccountedPairs": 36,
+      "workingViolations": [],
+      "B": true,
+      "HFindings": 0,
+      "I": {
+        "equal": false,
+        "equalToHEAD": true,
+        "frozenBaselineUnchanged": true
+      }
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "targetDigestDriftRows": 0,
+      "accountedPairs": 4244,
+      "unaccountedPairs": 36,
+      "workingViolations": [],
+      "B": true,
+      "HFindings": 0,
+      "I": {
+        "equal": false,
+        "equalToHEAD": true,
+        "frozenBaselineUnchanged": true
+      }
+    }
+  ],
+  "preAccountingOwningTest": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs",
+    "exit": 1,
+    "tests": 8,
+    "passed": 6,
+    "failed": 2,
+    "failure": "checks.mjs A only; ownership drift already resolved"
+  },
+  "fullRecipesBeforeAccounting": [
+    {
+      "recipe": "round5",
+      "exit": 1,
+      "commands": [
+        {
+          "command": [
+            "node",
+            "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+            "--output",
+            "/tmp/fgos-work/closure-r2-full-round5/independent.json"
+          ],
+          "exitCode": 1,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/step10-independent-rationale-audit.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-round5/checks.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-round5"
+          ],
+          "exitCode": 1,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/checks.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-round5/fast.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/fast.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-round5/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/ownership.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-round5/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/audit-ownership.log"
+        },
+        {
+          "command": [
+            "python3",
+            "/tmp/fgos-work/closure-r2-full-round5/replay.py",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-round5/replay.log"
+        }
+      ],
+      "independentAudit": {
+        "findings": 247,
+        "bytes": 186068,
+        "sha256": "9413e7b98ef0269a1a16a69b3d697c08563172afc4a6d5963e5cd07084eaa464",
+        "rowsScanned": 12953,
+        "shardsScanned": 98,
+        "identicalToHistoricalBaseline": true
+      }
+    },
+    {
+      "recipe": "sync4d",
+      "exit": 1,
+      "commands": [
+        {
+          "command": [
+            "node",
+            "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+            "--output",
+            "/tmp/fgos-work/closure-r2-full-sync4d/independent.json"
+          ],
+          "exitCode": 1,
+          "log": "/tmp/fgos-work/closure-r2-full-sync4d/step10-independent-rationale-audit.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-sync4d/checks.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-sync4d"
+          ],
+          "exitCode": 1,
+          "log": "/tmp/fgos-work/closure-r2-full-sync4d/checks.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-sync4d/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-sync4d/ownership.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/closure-r2-full-sync4d/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-sync4d/audit-ownership.log"
+        },
+        {
+          "command": [
+            "python3",
+            "/tmp/fgos-work/closure-r2-full-sync4d/replay.py",
+            "--output-dir",
+            "/tmp/fgos-work/closure-r2-full-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/closure-r2-full-sync4d/replay.log"
+        }
+      ],
+      "independentAudit": {
+        "findings": 247,
+        "bytes": 186068,
+        "sha256": "9413e7b98ef0269a1a16a69b3d697c08563172afc4a6d5963e5cd07084eaa464",
+        "rowsScanned": 12953,
+        "shardsScanned": 98,
+        "identicalToHistoricalBaseline": true
+      }
+    }
+  ],
+  "finalProof": {
+    "auditCommand": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+    "auditExit": 1,
+    "auditSummaries": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "noNewDoubleOwnership": true,
+        "targetDigestDriftRows": 0,
+        "accountedPairs": 4280,
+        "unaccountedPairs": 0,
+        "workingViolationCount": 15,
+        "workingViolations": [
+          "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-assembly-report.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-determinism.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-readiness.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-current-judgments.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-reader-audit.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-verification.json"
+        ],
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true,
+        "interpretation": "checks exits 1 solely for author working paths; no committed pair or target-digest drift remains. This is not clean committed-byte acceptance."
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "noNewDoubleOwnership": true,
+        "targetDigestDriftRows": 0,
+        "accountedPairs": 4280,
+        "unaccountedPairs": 0,
+        "workingViolationCount": 15,
+        "workingViolations": [
+          "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-assembly-report.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-determinism.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-readiness.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-current-judgments.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-reader-audit.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-verification.json"
+        ],
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true,
+        "interpretation": "checks exits 1 solely for author working paths; no committed pair or target-digest drift remains. This is not clean committed-byte acceptance."
+      }
+    ],
+    "owningTest": {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "tests": 8,
+      "passed": 6,
+      "failed": 2,
+      "failure": "Both fresh-reviewer titles at checks.mjs A for 15 current author working paths; no audit-ownership failure",
+      "sixOutputSafetyCases": "pass",
+      "logSha256": "745852920a8dcd5403cf4fce9f4f832be8046dc161a839204ff9764a0445686a"
+    },
+    "fullRecipes": [
+      {
+        "recipe": "round5",
+        "exit": 1,
+        "commands": [
+          {
+            "command": [
+              "node",
+              "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+              "--output",
+              "/tmp/fgos-work/closure-r2-final-round5/independent.json"
+            ],
+            "exitCode": 1,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/step10-independent-rationale-audit.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-round5/checks.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-round5"
+            ],
+            "exitCode": 1,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/checks.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-round5/fast.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-round5"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/fast.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-round5/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-round5"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/ownership.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-round5/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-round5"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/audit-ownership.log"
+          },
+          {
+            "command": [
+              "python3",
+              "/tmp/fgos-work/closure-r2-final-round5/replay.py",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-round5"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-round5/replay.log"
+          }
+        ],
+        "independentAudit": {
+          "findings": 247,
+          "bytes": 186068,
+          "sha256": "9413e7b98ef0269a1a16a69b3d697c08563172afc4a6d5963e5cd07084eaa464",
+          "identicalToHistoricalBaseline": true
+        },
+        "interpretation": "Independent audit remains the exact 247-finding baseline red; checks A is author working bytes only; ownership/audit/replay (and round5 fast) pass. Not a green recipe or waived red."
+      },
+      {
+        "recipe": "sync4d",
+        "exit": 1,
+        "commands": [
+          {
+            "command": [
+              "node",
+              "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+              "--output",
+              "/tmp/fgos-work/closure-r2-final-sync4d/independent.json"
+            ],
+            "exitCode": 1,
+            "log": "/tmp/fgos-work/closure-r2-final-sync4d/step10-independent-rationale-audit.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-sync4d/checks.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-sync4d"
+            ],
+            "exitCode": 1,
+            "log": "/tmp/fgos-work/closure-r2-final-sync4d/checks.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-sync4d/ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-sync4d"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-sync4d/ownership.log"
+          },
+          {
+            "command": [
+              "node",
+              "/tmp/fgos-work/closure-r2-final-sync4d/audit-ownership.mjs",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-sync4d"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-sync4d/audit-ownership.log"
+          },
+          {
+            "command": [
+              "python3",
+              "/tmp/fgos-work/closure-r2-final-sync4d/replay.py",
+              "--output-dir",
+              "/tmp/fgos-work/closure-r2-final-sync4d"
+            ],
+            "exitCode": 0,
+            "log": "/tmp/fgos-work/closure-r2-final-sync4d/replay.log"
+          }
+        ],
+        "independentAudit": {
+          "findings": 247,
+          "bytes": 186068,
+          "sha256": "9413e7b98ef0269a1a16a69b3d697c08563172afc4a6d5963e5cd07084eaa464",
+          "identicalToHistoricalBaseline": true
+        },
+        "interpretation": "Independent audit remains the exact 247-finding baseline red; checks A is author working bytes only; ownership/audit/replay (and round5 fast) pass. Not a green recipe or waived red."
+      }
+    ],
+    "dataOnlyExceptionValidationExit": 0,
+    "scopeValidationExit": 0,
+    "gitDiffCheckExit": 0,
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-assembly-report.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-determinism.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-07-readiness.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-current-judgments.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-01-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-accounting-02-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-02-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-04-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-decisions-05-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-native-01-345f15d95.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-reader-audit.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-pair-accounting.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-verification.json"
+    ],
+    "cleanCommittedAcceptance": false,
+    "nextOwner": "Lead: separately account actual future runner commit and replay clean committed bytes before acceptance; no suite/cutover authorization."
+  },
+  "noFullSuiteRun": true,
+  "cleanCommittedAcceptance": false,
+  "futureCommitPreAccounted": false,
+  "needsWrites": [],
+  "scratchValidatorDevelopmentNote": "Two initial scratch assertions exited 1 because they incorrectly assumed non-null source digests for all 518 historical records. Retired paths and one external park legitimately retain explicit null; final conservation check requires the exact original records/keys/owners without fabricating digests. No production test/check was changed."
+}

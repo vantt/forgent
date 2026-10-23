@@ -1,0 +1,423 @@
+{
+  "authority": "L12-11 / L12-133",
+  "inputCommit": "890715ead353e350f6e66cba811b15e606d07194",
+  "performedLast": true,
+  "status": "actual-ancestor-pairs-accounted-and-validated-last; author working-byte/clean committed acceptance pending",
+  "actualPairsAddedPerManifest": 36,
+  "previousPairsPerManifest": 4244,
+  "currentPairsPerManifest": 4280,
+  "addedPairs": [
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "CHANGELOG.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "bin/fgos.mjs",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "packages/git/contracts/mutation-census.v1.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "test/e2e/documentation-cutover-lease-hooks.test.mjs",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "path": "test/runner/execution/run-case-admission.test.mjs",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "7389e61c5cd5dd7622cf902badd77f3bc142e511",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-records-fix-brief.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-A-r2.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-B-r2.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-C-r2.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-code-fix-brief.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-records-fix-brief.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "CHANGELOG.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-pair-accounting.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+      "authority": "L12-133"
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-suite-e1966d417-branch-only.txt",
+      "authority": "L12-133"
+    }
+  ],
+  "commitAccounting": [
+    {
+      "commit": "890715ead353e350f6e66cba811b15e606d07194",
+      "changedPaths": [
+        "CHANGELOG.md",
+        "bin/fgos.mjs",
+        "docs/platform/git/spec.md",
+        "packages/git/contracts/mutation-census.v1.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "test/e2e/documentation-cutover-lease-hooks.test.mjs",
+        "test/runner/execution/run-case-admission.test.mjs"
+      ],
+      "pairsAppended": 6,
+      "alreadyAllowedPaths": [
+        "docs/platform/git/spec.md"
+      ],
+      "reasonForNoException": "Existing unchanged check-A allowed paths; full actual first-parent diff recorded, no invented missing pairs."
+    },
+    {
+      "commit": "7389e61c5cd5dd7622cf902badd77f3bc142e511",
+      "changedPaths": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-records-fix-brief.md"
+      ],
+      "pairsAppended": 1,
+      "alreadyAllowedPaths": [],
+      "reasonForNoException": "Existing unchanged check-A allowed paths; full actual first-parent diff recorded, no invented missing pairs."
+    },
+    {
+      "commit": "1c9e642e51fba981f8b6cd4cc537547a2bc54a99",
+      "changedPaths": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-A-r2.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-B-r2.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-08-closure-C-r2.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-code-fix-brief.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-records-fix-brief.md"
+      ],
+      "pairsAppended": 5,
+      "alreadyAllowedPaths": [],
+      "reasonForNoException": "Existing unchanged check-A allowed paths; full actual first-parent diff recorded, no invented missing pairs."
+    },
+    {
+      "commit": "1eae797d8cd19fda3947e923881cbdb56fb6cd1c",
+      "changedPaths": [
+        "CHANGELOG.md",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-after.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-audit-before.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-binding-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-census-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-evidence-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-head-drift-l130.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-merge-rebindings.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-pair-accounting.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-after.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-before.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-live.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-ratchet-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-registrations.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-worktree-admin.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-08-suite-e1966d417-branch-only.txt",
+        "scripts/check-legacy-docs-ratchet.exceptions.json"
+      ],
+      "pairsAppended": 24,
+      "alreadyAllowedPaths": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "scripts/check-legacy-docs-ratchet.exceptions.json"
+      ],
+      "reasonForNoException": "Existing unchanged check-A allowed paths; full actual first-parent diff recorded, no invented missing pairs."
+    }
+  ],
+  "validationExit": 0,
+  "mutationProof": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "beforeBytes": 1240712,
+      "afterBytes": 1247575,
+      "exceptionsBefore": 4244,
+      "exceptionsAfter": 4280,
+      "oldExceptionArrayBytePrefixUnchanged": true,
+      "onlyExactNewPairsInserted": true,
+      "allOtherScriptAndMetadataValuesUnchanged": true,
+      "rawOutsideEncodedChecksStringByteIdentical": true,
+      "checksOutsideInsertedArrayBytesIdentical": true,
+      "predicatesBaselinesAllowlistsChanged": false,
+      "sha256After": "04f15a455a74a1e3354b61fa061b0c8174d3df673bc78b970809e8003f40d2a9"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "beforeBytes": 1250419,
+      "afterBytes": 1257282,
+      "exceptionsBefore": 4244,
+      "exceptionsAfter": 4280,
+      "oldExceptionArrayBytePrefixUnchanged": true,
+      "onlyExactNewPairsInserted": true,
+      "allOtherScriptAndMetadataValuesUnchanged": true,
+      "rawOutsideEncodedChecksStringByteIdentical": true,
+      "checksOutsideInsertedArrayBytesIdentical": true,
+      "predicatesBaselinesAllowlistsChanged": false,
+      "sha256After": "39e5942a18d38c96cdc681f52e3f08b1394afed1bd3303f1a6063c0ba3e93f4d"
+    }
+  ],
+  "futureRunnerCommitPreAccounted": false,
+  "cleanCommittedAcceptance": false,
+  "finalProof": {
+    "auditExit": 1,
+    "manifests": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "noNewDoubleOwnership": true,
+        "targetDigestDriftRows": 0,
+        "accountedPairs": 4280,
+        "unaccountedPairs": 0,
+        "workingViolationCount": 15,
+        "workingViolations": [
+          "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-assembly-report.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-determinism.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-readiness.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-current-judgments.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-reader-audit.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-verification.json"
+        ],
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true,
+        "interpretation": "checks exits 1 solely for author working paths; no committed pair or target-digest drift remains. This is not clean committed-byte acceptance."
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "noNewDoubleOwnership": true,
+        "targetDigestDriftRows": 0,
+        "accountedPairs": 4280,
+        "unaccountedPairs": 0,
+        "workingViolationCount": 15,
+        "workingViolations": [
+          "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-assembly-report.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-final-determinism.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-07-readiness.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-current-judgments.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-130-deferred-rebinds.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-phase-08-scorecard.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-tree-prune-manifest.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-closure-r2-reader-audit.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-08-l12-133-verification.json"
+        ],
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true,
+        "interpretation": "checks exits 1 solely for author working paths; no committed pair or target-digest drift remains. This is not clean committed-byte acceptance."
+      }
+    ],
+    "owningTest": {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "tests": 8,
+      "passed": 6,
+      "failed": 2,
+      "failure": "Both fresh-reviewer titles at checks.mjs A for 15 current author working paths; no audit-ownership failure",
+      "sixOutputSafetyCases": "pass",
+      "logSha256": "745852920a8dcd5403cf4fce9f4f832be8046dc161a839204ff9764a0445686a"
+    },
+    "fullRecipeExits": [
+      1,
+      1
+    ],
+    "independentBaselineFindings": 247,
+    "dataOnlyValidationExit": 0,
+    "scopeValidationExit": 0,
+    "gitDiffCheckExit": 0,
+    "allActualMissingCommittedPairsAccounted": true,
+    "explanation": "Append and final data-only validation use actual existing commits only. All 36 missing pairs are now accounted; checks A sees 15 current author report paths. Frozen B, H and effective I pass. No predicate, baseline, allowlist, source binding or future commit changed. Final receipt-only updates do not change those path sets."
+  }
+}

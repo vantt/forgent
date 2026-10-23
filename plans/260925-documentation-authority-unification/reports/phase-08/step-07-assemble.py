@@ -440,7 +440,7 @@ def assemble(pin_arg, output_dir, final=False):
                                  dict(id='fresh-independent-closure-review', owner='Lead / independent A38 reviewer', status='pending', blocker='No independent acceptance of this rebuilt handoff is claimed.')],
                      parkProjection=resolution['effectiveFamilies'], parkProjectionMemberCount=2311,
                      changedCandidateUnion=candidate_union,
-                     rowReadinessCounts=dict(rows=len(rows), blockedRows=counts['prepared-for-cutover'] + counts['individually parked'], readyRows=len(rows)-counts['prepared-for-cutover']-counts['individually parked']),
+                     rowReadinessCounts=dict(rows=len(rows), blockedRows=counts['prepared-for-cutover'] + counts['individually parked'], nonPreparedNonParkedRows=len(rows)-counts['prepared-for-cutover']-counts['individually parked'], basis='Disposition counts only, NOT readiness: source-context-and-post-pin-recomposition and every other PRE-FLIP gate still apply. No readyRows eligibility claim.'),
                      historicalParkConservation=dict(originalMembers=2311, flips=2131, originalFamilyParks=180, additionalIntegrationParks=34),
                      matrixViolations=dict(writerDestinationAliases=0, unmatchedRows=0),
                      externalParks=resolution['externalLocatorReevaluations'])
@@ -456,7 +456,7 @@ def assemble(pin_arg, output_dir, final=False):
               '- Render-only/row/generator actions without exact final composition remain owned parks; no hand editing of generated skills or projections is proposed.',
               '- Source drift and its disposition are enumerated in patch-order.sourceRecompositionChecks and step-08-source-recomposition.json. Historical source digests are not overwritten.', '', '## Parks and gates', '',
               f'- All {len(parks)} effective parks are individually owned in step-07-readiness.json#parkOwners, with original record locators and blockers.',
-              '- step-08-preflip-gates.json enumerates current-digest changed-binding reviews, L12-96 composition duties, non-behavioral census joins, all 17 dropped claims, Git one-door sites and retention duties. Every gate is explicitly PRE-FLIP, not met. Lead suite and independent closure remain required before close.',
+              '- step-08-preflip-gates.json enumerates current-digest changed-binding reviews, L12-96 composition duties, non-behavioral census joins, all 17 dropped claims, Git one-door sites, retention, L12-129 archive/reader/checkout, current-source recomposition, final-code holder Land and staged docs-lease release gates. Every gate is explicitly PRE-FLIP, not met. Disposition-only counts are not readiness. Verify beforeSha256 equality before every patch application; fuzz-zero alone is insufficient. Lead suite and independent closure remain required before close.',
               '- Step 1 current-disposition table: step-08-current-judgments.json (47/47).',
               '- Post-census admission/disposition and parity obligations: step-08-post-census-records.jsonl; no live state, secrets, product code or runtime was read/executed.',
               '- SC2 checks effective classes. The former 7/17/27 versus 8/16/27 split was original versus effective overlay classification, not differing writer populations. New writer expressions include false-positive stderr/validation and non-document destinations, explicitly traced rather than guessed aliases.',
