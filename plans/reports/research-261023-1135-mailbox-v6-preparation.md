@@ -89,3 +89,9 @@ Codex flags confirmed from `codex exec --help` (`-m`, `-o`, `--json`, `-c`) and 
 - Owner or controller: the loop test's name rule (deviation 6) decides phase 6, not stage A.
 - Outcome 3 is out (W8 no) unless V5's entry later keeps the claim start.
 - Stage A runs from the pinned worktree: `cd /home/vantt/projects/forgent-worktrees/mailbox-v6-pinned && node test/live/mailbox-behaviour.live.mjs run-stage A`.
+
+## Plan-owner decisions (2026-10-23)
+
+- Outcome 3, the in-flight timeout, is dropped from V6: W8 is no. Claim-start recording is a V7 candidate.
+- Touches outside mailbox, accepted and listed for the merge review: `src/runner/dispatch/provider-credential-renewal.mjs` (read-only Claude Code expiry reader); `test/setup/agent-hooks.test.mjs`, `test/setup/registrations.test.mjs`, `test/live/mailbox-claude.live.mjs` (config writes through the test helper).
+- Loop trust: decided by whether names are deterministic from the writer key, frozen as a pre-registration addendum before phase 6 (spec §17).

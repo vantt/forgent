@@ -42,3 +42,7 @@ Print mode only (plan section 7): an exchange lives only while both processes do
 ## Sync
 
 Start and end: merge `origin/main` under the pinned-build rule. Commit the loop results on the branch.
+
+## Plan-owner decision on trust (2026-10-23)
+
+Asymmetric trust (only one head trusts the other) would understate runaway risk. Before this phase: check whether a head's mailbox name is deterministic from its writer key (V4 preset Claude Code session ids). Deterministic for both CLIs of a pair: both heads launch trusting each other. Otherwise: the second head is told the first's name and trusts it, run in both directions across the configurations (half with aa trusting bb, half the reverse), and the report states the limit. The choice is frozen as a pre-registration addendum with its own hash before the first loop run.
