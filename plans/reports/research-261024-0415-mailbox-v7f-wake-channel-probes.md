@@ -136,7 +136,7 @@ Harness `test/live/mailbox-wake-probe.live.mjs`, logic `scripts/lib/mailbox-wake
 
 - Mailbox Node suites (score, run, v7, v7e, v7f, wake-probe, confined with the host, auth guard, recorder, agent-hooks): green.
   - Without `FGOS_HOST_BIN`, the 11 confined-launch tests refuse to run, by design.
-- Full `npm test -- --test-concurrency=4`: see the controller summary (run on `3defb0d88` plus the docs commit). The 18 known Git-umask failures (`tsk-42l7rs4htz`) are expected.
+- Full `npm test -- --test-concurrency=4` on `3defb0d88`: 8768 tests, 8652 passed, 18 failed. All 18 are the known Git-umask failures (`tsk-42l7rs4htz`): 15 in `fgctl-upgrade`, 2 in `fgctl-init-download-sources`, 1 in `dispatch.test.mjs`. None is in the mailbox.
 - No Rust changed; `cargo test` is not rerun.
 - Mutants, applied by hand and each reverted: 18 (harness, first pass), 4 (the scorer fix), 12 (wake probes): all killed. One survivor was fixed by pinning the session count.
 
