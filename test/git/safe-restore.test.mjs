@@ -39,7 +39,7 @@ for (const linked of [false, true]) test(`SafeRestore preserves binary, staged/u
     assert.deepEqual(port.recover({ operationId: 'restore' }, held), out);
     assert.deepEqual(port.apply({ request, operationId: 'restore' }, held), out);
     assert.throws(() => port.extractPath({ operationId: 'restore', path: 'b', destination: f.repo }, held), /outside-repository/);
-    assert.throws(() => port.apply({ request: { ...request, reason: 'different' }, operationId: 'restore' }, held), /operation-id-conflict/);
+    assert.throws(() => port.apply({ request: { ...request, reason: 'different' }, operationId: 'restore' }, held), /operation-id-reused/);
   } finally { lease?.handle.release(); f.close(); }
 });
 test('SafeRestore refuses stale HEAD, backward ancestry, native residue and unsafe config without changing bytes', () => {

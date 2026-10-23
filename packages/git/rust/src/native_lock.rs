@@ -563,7 +563,7 @@ mod tests {
             confirmed_by: None,
         };
         f.driver
-            .apply_restore_with_filesystem(
+            .apply_restore(
                 &f.repo,
                 vec![],
                 &req,

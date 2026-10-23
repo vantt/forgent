@@ -1,7 +1,7 @@
 //! Dormant Land transaction. The consumer owns verification and business settlement.
 use crate::{
     refs::Authority,
-    scoped_commit::{checkout_resources, paths},
+    scoped_commit::{checkout_resources, is_store_path, paths, require_no_native_state},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -200,22 +200,7 @@ impl GitDriver {
         Ok(main)
     }
     fn land_native_state(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
-        for name in [
-            "MERGE_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "BISECT_START",
-            "index.lock",
-        ] {
-            match std::fs::symlink_metadata(repo.git_dir().join(name)) {
-                Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
-                Ok(_) => return Err(failure("foreign-main-checkout-state")),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                Err(e) => return Err(failure(e)),
-            }
-        }
+        require_no_native_state(repo.git_dir(), &[], |_| failure("foreign-main-checkout-state"))?;
         let out = self.land_text(repo, scope, &["ls-files", "--unmerged", "-z"], &[])?;
         if !out.is_empty() {
             return Err(failure("foreign-main-checkout-state"));
@@ -255,7 +240,7 @@ impl GitDriver {
             let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             for entry in page.entries {
                 let p = fgos_write_scope::path_text(&entry.path).map_err(failure)?;
-                if p == ".fgos" || p.starts_with(".fgos/") {
+                if is_store_path(p) {
                     continue;
                 }
                 dirty = true;
@@ -281,7 +266,7 @@ impl GitDriver {
         let mut store_collision = false;
         for p in self.ignored_checkout_collisions(repo, candidate)? {
             let path = fgos_write_scope::path_text(&p).map_err(failure)?;
-            if path == ".fgos" || path.starts_with(".fgos/") {
+            if is_store_path(path) {
                 store_collision = true;
             } else {
                 return Err(failure("main-checkout-dirty-mid-merge"));
@@ -289,43 +274,11 @@ impl GitDriver {
         }
         Ok((dirty, store_collision))
     }
-    pub fn prepare_land(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_filesystem(repo, held_locks, req, writer, id, &wal::OsFileSystem)
-    }
-    /// Shared production filesystem seam covers WAL and Land effect boundaries.
+    /// `filesystem` is the seam of the WAL and of every Land effect boundary.
+    /// `wait_ms` bounds only resource acquisition; candidate construction and
+    /// publication are never retried.
     #[allow(clippy::too_many_arguments)]
-    pub fn prepare_land_with_filesystem<F: wal::FileSystem>(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-        filesystem: &F,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_wait(repo, held_locks, req, writer, id, filesystem, 0)
-    }
-    /// Wait only for resource acquisition; never retry candidate construction or publication.
-    pub fn prepare_land_wait(
-        &self,
-        repo: &RepoHandle,
-        held_locks: Vec<BorrowedHandle<'_>>,
-        req: &LandRequest,
-        writer: &str,
-        id: &str,
-        wait_ms: u64,
-    ) -> Result<LandSession> {
-        self.prepare_land_with_wait(repo, held_locks, req, writer, id, &wal::OsFileSystem, wait_ms)
-    }
-    #[allow(clippy::too_many_arguments)]
-    fn prepare_land_with_wait<F: wal::FileSystem>(
+    pub fn prepare_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         held_locks: Vec<BorrowedHandle<'_>>,
@@ -647,17 +600,14 @@ impl GitDriver {
             }));
             let binding =
                 wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
-            let intent = Intent {
-                request_digest,
-                kind,
-                repo_identity: wal.repository_identity().into(),
-                resource_set: resources,
-                authority_binding: binding.clone(),
-                writer_identity: writer.into(),
-                object_format: repo.object_format(),
-                expected: Tip::Oid(req.target.clone()),
-                next: Tip::Oid(view.candidate.clone()),
-            };
+            let intent = Intent::of(
+                &wal,
+                repo,
+                writer,
+                (kind, request_digest),
+                (resources, binding.clone()),
+                (Tip::Oid(req.target.clone()), Tip::Oid(view.candidate.clone())),
+            );
             let authority = Authority {
                 scope: &session.slot,
                 binding,
@@ -706,34 +656,8 @@ impl GitDriver {
             error
         })
     }
-    pub fn publish_land(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-    ) -> Result<Receipt> {
-        self.publish_land_with_filesystem(repo, session, evidence, &wal::OsFileSystem)
-    }
-    /// Wait at most `wait_ms` for the main checkout; publication itself is never retried.
-    pub fn publish_land_wait(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-        wait_ms: u64,
-    ) -> Result<Receipt> {
-        self.publish_land_with_wait(repo, session, evidence, &wal::OsFileSystem, wait_ms)
-    }
-    pub fn publish_land_with_filesystem<F: wal::FileSystem>(
-        &self,
-        repo: &RepoHandle,
-        session: &mut LandSession,
-        evidence: &LandEvidence,
-        filesystem: &F,
-    ) -> Result<Receipt> {
-        self.publish_land_with_wait(repo, session, evidence, filesystem, 0)
-    }
-    fn publish_land_with_wait<F: wal::FileSystem>(
+    /// Waits at most `wait_ms` for the main checkout; publication itself is never retried.
+    pub fn publish_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         session: &mut LandSession,
@@ -1087,36 +1011,34 @@ fn compact_land_intent<F: wal::FileSystem>(
     let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &destination))?;
     // The compact binding deliberately retains the destination and writer, not
     // the disposable candidate directory's inode. No effect uses this view.
-    let intent = Intent {
-        request_digest: c.request.clone(),
-        repo_identity: wal.repository_identity().into(),
-        authority_binding: binding,
-        writer_identity: writer.into(),
-        object_format: repo.object_format(),
-        expected: Tip::Oid(c.expected.clone()),
-        next: Tip::Oid(c.next.clone()),
-        resource_set: vec![destination.clone()],
-        kind: OperationKind::Land(Box::new(wal::LandIntent {
-            request: LandRequest {
-                source: c.next.clone(),
-                target: c.expected.clone(),
-                destination,
-                message: String::new(),
-                squash: false,
-                footprint: None,
-                subtree: None,
-                files: vec![],
-            },
-            candidate: LandCandidate {
-                worktree: PathBuf::new(),
-                source: c.next.clone(),
-                target: c.expected.clone(),
-                candidate: c.next.clone(),
-                tree: String::new(),
-                tree_digest: String::new(),
-            },
-        })),
-    };
+    let kind = OperationKind::Land(Box::new(wal::LandIntent {
+        request: LandRequest {
+            source: c.next.clone(),
+            target: c.expected.clone(),
+            destination: destination.clone(),
+            message: String::new(),
+            squash: false,
+            footprint: None,
+            subtree: None,
+            files: vec![],
+        },
+        candidate: LandCandidate {
+            worktree: PathBuf::new(),
+            source: c.next.clone(),
+            target: c.expected.clone(),
+            candidate: c.next.clone(),
+            tree: String::new(),
+            tree_digest: String::new(),
+        },
+    }));
+    let intent = Intent::of(
+        wal,
+        repo,
+        writer,
+        (kind, c.request.clone()),
+        (vec![destination], binding),
+        (Tip::Oid(c.expected.clone()), Tip::Oid(c.next.clone())),
+    );
     if !c.matches(&intent)? {
         return Err(failure("land-authority-mismatch"));
     }
@@ -1541,16 +1463,7 @@ impl GitDriver {
     /// Cleanup is part of explicit recovery, after the consumer has durably
     /// settled its unique (repoIdentity, operationId, settlementKind) identity.
     /// The opaque acknowledgement is a consumer assertion, never Git settlement.
-    pub fn acknowledge_land(
-        &self,
-        repo: &RepoHandle,
-        writer: &str,
-        id: &str,
-        acknowledgement: &str,
-    ) -> Result<Vec<String>> {
-        self.acknowledge_land_with_filesystem(repo, writer, id, acknowledgement, &wal::OsFileSystem)
-    }
-    pub fn acknowledge_land_with_filesystem<F: wal::FileSystem>(
+    pub fn acknowledge_land<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         writer: &str,

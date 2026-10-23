@@ -370,6 +370,29 @@ pub(crate) fn worktree_resources(kind: &OperationKind) -> WalResult<Vec<String>>
 }
 
 impl Intent {
+    /// What is asked `(kind, digest)`, who holds it `(resources, binding)` and
+    /// the tip it moves `(expected, next)`; the repository, writer and object
+    /// format are filled the same way for every port.
+    pub(crate) fn of<F: FileSystem>(
+        wal: &Wal<F>,
+        repo: &RepoHandle,
+        writer: &str,
+        (kind, request_digest): (OperationKind, String),
+        (resource_set, authority_binding): (Vec<String>, String),
+        (expected, next): (Tip, Tip),
+    ) -> Self {
+        Self {
+            kind,
+            request_digest,
+            repo_identity: wal.repository_identity().into(),
+            resource_set,
+            authority_binding,
+            writer_identity: writer.into(),
+            object_format: repo.object_format(),
+            expected,
+            next,
+        }
+    }
     /// Delete keeps the old object reachable until its terminal receipt.
     pub fn candidate(&self) -> &Tip {
         if self.next == Tip::Absent
