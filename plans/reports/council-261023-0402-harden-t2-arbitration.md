@@ -287,6 +287,10 @@ The seats' estimates run from Rust ≤ +100 (correctness) to −1 100 (simplicit
   - Q1 and Q2 of the simplicity seat: the red-team said "keep for one release". The big lead decides "delete after a clean two-machine census" (D8), because these drains have already outlived a release.
   - `herdr_driver_live.rs` is kept, as the red-team asked, even though it is not in the gate.
 
+## Owner answers (ask 2, 2026-10-23 11:10)
+
+"Q0a Q1a Q2a Q3: A1 A2": shapes and size approved; Q1 (a); Q2 (a); additions A1 and A2. These are recorded as parent plan decisions 18–22, with 22 being the terminal layout and naming review the owner asked for.
+
 ## Unresolved questions
 
-Q0–Q3 in §6.
+None.

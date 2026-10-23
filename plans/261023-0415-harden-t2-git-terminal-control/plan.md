@@ -501,6 +501,8 @@ The big lead re-checked the evidence for every deviation before answering.
      - The CF05 negative case injects at the checkpoint, not as an fsync EIO.
      - The test wrapper directories are not removed: the fake ssh bin dir and `fgos-sequence-git-<pid>`.
 
+10. **Owner answers, 2026-10-23 11:10: Q0a Q1a Q2a, Q3 A1 and A2** (parent plan decisions 18–22). Phases 10, 11, 12 and 13 run; phases 14, 15 and 16 do not. Q0 being yes lifts the assumption behind phases 1–9 and 17. The rest of phase 6 runs as one lead, Rust first, then Node: E-26, F-8, the core half of E-14, the D6 test swap, then E-13, E-15, E-16, the Node half of E-14 and the test retirements. It runs in parallel with phase 4.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.
