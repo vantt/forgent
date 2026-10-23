@@ -15,7 +15,7 @@ pub mod locks;
 mod bundle;
 mod cache;
 mod detect;
-mod files;
+pub mod files;
 mod grammar;
 mod lint;
 mod redact;

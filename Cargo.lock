@@ -214,6 +214,8 @@ name = "fgos-durable-file"
 version = "0.2.0"
 dependencies = [
  "libc",
+ "rustix",
+ "sha2",
  "windows-sys",
 ]
 
