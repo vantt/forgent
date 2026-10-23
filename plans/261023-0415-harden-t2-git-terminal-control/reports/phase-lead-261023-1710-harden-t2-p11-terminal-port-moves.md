@@ -83,7 +83,7 @@ Targets missed: Node -57 including shell (target -120) and Rust +220 (target +90
 
 ## Concerns and open points
 
-1. **macOS (and any non-Linux unix).** The Process door reads a parent only on Linux (`relation_of`). Off Linux `attach` passes only a pane whose shell is the caller itself, so `/fgOS:terminal`, `/fgOS:terminal-close` and a dispatch anchor are silent no-ops there (the deleted script walked `ps`). The spec and contract say so. Fixing it means a macOS `relation_of` in `packages/process` (T0's crate). Owner or big lead call.
+1. **macOS (resolved after the first report: the big lead asked for a macOS `relation_of`; done in a follow-up commit, compile-checked for `aarch64-apple-darwin` only; terminal-control cannot be checked for that target because `fgos-holder-lock` already fails to compile there (`has_borrowed_copy`), unrelated).** Original concern, now moot except on Windows: The Process door reads a parent only on Linux (`relation_of`). Off Linux `attach` passes only a pane whose shell is the caller itself, so `/fgOS:terminal`, `/fgOS:terminal-close` and a dispatch anchor are silent no-ops there (the deleted script walked `ps`). The spec and contract say so. Fixing it means a macOS `relation_of` in `packages/process` (T0's crate). Owner or big lead call.
 2. **Behaviour change.** A `FGOS_HERDR_ANCHOR_PANE` that the dispatching process does not run inside (a detached controller, a daemon) is now ignored: the group opens its own tab, which is what the round already does when the attach fails. In the CHANGELOG line.
 3. **Blind-read grant** has a new failure mode: with no `HERDR_SOCKET_PATH` and no answering route it refuses (`confinement-grant-invalid`) instead of hiding a guessed directory. Silent hiding-nothing was the alternative; I judged that worse.
 4. `capabilities` got an optional `agents` request flag (deviation above).
@@ -93,4 +93,4 @@ Targets missed: Node -57 including shell (target -120) and Rust +220 (target +90
 
 ## Unresolved questions
 
-- macOS ancestry (concern 1): extend the Process door, or accept the no-op there?
+- none open; the macOS door change has never run on a Mac (only compiled).
