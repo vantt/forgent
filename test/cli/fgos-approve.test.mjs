@@ -1,9 +1,9 @@
+import '../helpers/process-tmp-root.mjs';
 // fgos-approve.test.mjs -- phần "approve" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   EDIT_BAD_FLAG_CASES,
@@ -145,29 +145,18 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
 });
 
 
-test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is dirty on main — no more manual events.jsonl commit before every approve', () => {
+test('approve of a runner item succeeds after an unrelated event is appended on main: events never dirty the checkout', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
   commitPendingBeforeApprove(cwd, 'approve-fgos-only-dirty');
 
-  // Dirty ONLY the live event log on main after the item is proposed — an
-  // unrelated `add` appends an event and never touches any other file —
-  // deliberately left uncommitted (unlike makeRunnerProposedItem's own
-  // commitPending calls, which fold everything together). Tầng A/T2
-  // (TA-D2/TA-D11): the new event lands in a per-writer file under
-  // `.fgos/events/<writer-id>-<openTs>.jsonl`, not baseline-0's
-  // `.fgos/events.jsonl` — same live-log noise, different physical path.
+  // An unrelated `add` appends an event to the Event Store, which lives outside the working tree.
   assert.equal(addOk(cwd, 'approve-fgos-only-dirty-noise').status, 0);
-
-  const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
-    .split('\n')
-    .filter(Boolean);
-  assert.equal(statusLines.length, 1, 'sanity: the live event log must be the ONLY dirty path at this point');
-  assert.match(statusLines[0], /\.fgos\/events(\.jsonl|\/.*\.jsonl)$/);
+  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim(), '', 'an appended event leaves the checkout clean');
 
   const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
-  assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);
+  assert.equal(result.status, 0, `approve should succeed: ${result.stderr}`);
   assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'delivered');
 });
 

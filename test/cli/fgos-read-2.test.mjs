@@ -46,6 +46,7 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
+  corruptEventStore,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -240,7 +241,7 @@ test('ready on a directory with no log at all returns an empty result, exit 0 (a
 test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption-ready');
-  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+  corruptEventStore(cwd);
 
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 5);

@@ -152,8 +152,5 @@
     "remove": "one rank-40 hold; identity, live cwd, custody, full status, pending WAL, expected tip, delivery ancestry and evidence digest; no force or recursive fallback",
     "recovery": "operation-specific registration/inode evidence; recorded destination only; no repeated TargetAttempt; unknown and dirty residues preserved",
     "doctor": "git-worktree-recovery is read-only; phase 04 adds custody diagnostics to the same row"
-  },
-  "legacyEvents": {
-    "exactPaths": "Explicit legacy event paths only: .fgos/events.jsonl, .fgos/events/<shard>.jsonl, .fgos/events/archive/<shard>.jsonl, .fgos/porting/events.jsonl; validated under main-checkout 50 only. WORK removes at Event Store cutover."
   }
 }

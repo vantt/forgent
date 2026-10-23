@@ -6,7 +6,9 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { checkDispatchAttestation } from '../../src/runner/attestation-guard.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 
 function git(dir, args) {
   return execFileSync('git', args, { cwd: dir, encoding: 'utf8', shell: false }).trim();
@@ -14,15 +16,10 @@ function git(dir, args) {
 
 function setupTestRepo() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-attest-test-'));
-  git(tmpDir, ['init']);
-  git(tmpDir, ['config', 'user.name', 'Test User']);
-  git(tmpDir, ['config', 'user.email', 'test@example.com']);
+  const fgosDir = initializeWorkRepository(tmpDir);
   fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Test Repo\n');
   git(tmpDir, ['add', 'README.md']);
   git(tmpDir, ['commit', '-m', 'initial commit']);
-
-  const fgosDir = path.join(tmpDir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
 
   return { tmpDir, fgosDir };
 }
@@ -48,8 +45,7 @@ test('checkDispatchAttestation: returns skipped when no executor.dispatch event 
 test('checkDispatchAttestation: returns skipped when baseCommit or headRef is null (in-session dispatch)', () => {
   const { tmpDir, fgosDir } = setupTestRepo();
   try {
-    const logPath = path.join(fgosDir, 'events.jsonl');
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-1', executorId: 'session', baseCommit: null, headRef: null },
     });
@@ -71,8 +67,7 @@ test('checkDispatchAttestation: returns ok when headRef matches and branch tip i
     git(tmpDir, ['add', 'work.txt']);
     git(tmpDir, ['commit', '-m', 'worker commit']);
 
-    const logPath = path.join(fgosDir, 'events.jsonl');
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-1', executorId: 'cli', baseCommit, headRef: branch },
     });
@@ -92,9 +87,8 @@ test('checkDispatchAttestation: reads LAST matching event across retries', () =>
     const baseCommit1 = git(tmpDir, ['rev-parse', 'HEAD']);
     const branch = 'fgw/tsk-retry';
 
-    const logPath = path.join(fgosDir, 'events.jsonl');
     // First event: old/stale event pointing to main as headRef
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-retry', executorId: 'cli', baseCommit: baseCommit1, headRef: 'main' },
     });
@@ -106,7 +100,7 @@ test('checkDispatchAttestation: reads LAST matching event across retries', () =>
 
     const baseCommit2 = baseCommit1;
     // Second event (retry): correct branch headRef
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-retry', executorId: 'cli', baseCommit: baseCommit2, headRef: branch },
     });
@@ -125,9 +119,8 @@ test('checkDispatchAttestation: halts when recorded headRef diverges from actual
     const branch = 'fgw/tsk-43z-shape';
     git(tmpDir, ['checkout', '-b', branch]);
 
-    const logPath = path.join(fgosDir, 'events.jsonl');
     // Worker recorded headRef as 'main' instead of 'fgw/tsk-43z-shape'
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-43z-shape', executorId: 'cli', baseCommit, headRef: 'main' },
     });
@@ -153,8 +146,7 @@ test('checkDispatchAttestation: halts when branch tip is NOT a descendant of bas
     git(tmpDir, ['add', 'unrelated.txt']);
     git(tmpDir, ['commit', '-m', 'unrelated commit']);
 
-    const logPath = path.join(fgosDir, 'events.jsonl');
-    appendEvent(logPath, {
+    appendWorkEvent(fgosDir, {
       type: 'executor.dispatch',
       payload: { id: 'tsk-diverged', executorId: 'cli', baseCommit, headRef: branch },
     });
@@ -163,6 +155,39 @@ test('checkDispatchAttestation: halts when branch tip is NOT a descendant of bas
     assert.equal(res.ok, false);
     assert.equal(res.reason, 'attestation-mismatch');
     assert.match(res.detail, /is not a descendant of recorded baseCommit/);
+  } finally {
+    cleanupTestRepo(tmpDir);
+  }
+});
+
+const dispatched = (fgosDir, tmpDir, id, branch) => appendWorkEvent(fgosDir, {
+  type: 'executor.dispatch',
+  payload: { id, executorId: 'cli', baseCommit: git(tmpDir, ['rev-parse', 'HEAD']), headRef: branch },
+});
+
+test('checkDispatchAttestation: fails closed on a history whose stored bytes were altered', () => {
+  const { tmpDir, fgosDir } = setupTestRepo();
+  try {
+    dispatched(fgosDir, tmpDir, 'tsk-1', 'main');
+    assert.equal(checkDispatchAttestation(fgosDir, tmpDir, 'tsk-1', 'main').ok, true);
+
+    const active = path.join(tmpDir, '.git/fgos/events/project/active.jsonl');
+    fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('executor.dispatch', 'executor.tampered'));
+    assert.throws(() => checkDispatchAttestation(fgosDir, tmpDir, 'tsk-1', 'main'));
+  } finally {
+    cleanupTestRepo(tmpDir);
+  }
+});
+
+test('checkDispatchAttestation: refuses an incomplete history instead of passing on what it could read', () => {
+  const { tmpDir, fgosDir } = setupTestRepo();
+  try {
+    dispatched(fgosDir, tmpDir, 'tsk-1', 'main');
+    // An event whose writer had seen history this clone does not hold: the read is incomplete.
+    prepareWorkStore(fgosDir, fgosDir).store.append('project',
+      [{ eventType: 'executor.dispatch', schemaVersion: 1, payload: { id: 'tsk-1' }, ts: new Date().toISOString() }],
+      { 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:project': 1 }, 'fixture', []);
+    assert.throws(() => checkDispatchAttestation(fgosDir, tmpDir, 'tsk-1', 'main'), { code: 'event-store-incomplete-history' });
   } finally {
     cleanupTestRepo(tmpDir);
   }

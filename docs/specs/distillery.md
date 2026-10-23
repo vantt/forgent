@@ -131,8 +131,8 @@ source comparison, candidate ranking) are out of scope here — see Open Gaps.
 
 - CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)
 - State/lifecycle rules: `src/state/porting.mjs`
-- Durable record + human-readable-log sync: `src/state/porting-store.mjs`
+- Durable record: `src/state/porting-store.mjs` (the single write door, on the Event Store); human-readable-log resync after a status change: the `move` verb of `.agents/skills/distill/scripts/distill.mjs`
 - Human-readable log: `docs/distillery/porting-log.md`
-- Durable record storage: `docs/distillery/state/porting/`
+- Durable record storage: the Event Store stream `project:porting` (sealed onto the machine's `refs/fgos/events/<machine-id>` like Work's events, `docs/platform/event-store/spec.md`). The view and its cursor live in the untracked cache `.fgos/cache/porting-state.json`; nothing under `docs/distillery/state/porting/` is written any more, and `fgos events migrate` imports an existing `events.jsonl` there into the legacy ref and deletes both tracked files (`events.jsonl`, `state.json`). The human-readable log `docs/distillery/porting-log.md` stays tracked.
 - One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`
 - Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths.

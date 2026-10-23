@@ -76,7 +76,10 @@ pub fn maintenance(layout: &Layout) -> Result<Value, Error> {
         rows.push(json!({"stream":stream.as_str(),"oldestUnsealedAgeSec":age}));
     }
     let sync = crate::sync::sync_status(layout)?;
-    Ok(json!({"streams":rows,"lastPush":sync.last_push}))
+    // Any sync that ran, whether it reached the push or failed before it (an
+    // offline fetch), is the attempt of its interval.
+    let last_attempt = (sync.time > 0).then(|| json!({"time":sync.time,"remote":sync.remote}));
+    Ok(json!({"streams":rows,"lastPush":sync.last_push,"lastAttempt":last_attempt}))
 }
 pub fn status(
     driver: &GitDriver,

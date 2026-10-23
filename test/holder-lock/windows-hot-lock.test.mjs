@@ -172,7 +172,7 @@ test('a record another process holds open is waited on to the timeout, named, an
   }
 });
 
-test('a release whose unlink stays sharing-blocked throws hot-lock-release-stuck and leaves the record', { skip: SKIP }, async () => {
+test('a release whose unlink stays sharing-blocked keeps the committed result and leaves the record', { skip: SKIP }, async () => {
   const f = fixture();
   let holder;
   try {
@@ -180,19 +180,16 @@ test('a release whose unlink stays sharing-blocked throws hot-lock-release-stuck
     holder = holdOpenWithoutSharing(record, 6);
     const run = runChild(`
       const { withStateTx } = await import(${JSON.stringify(HOT_LOCK_URL)});
-      try {
-        withStateTx(process.argv[1], () => {
-          // the record is linked; wait until the other process has it open without sharing
-          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500);
-        }, { prefetched: { writer: ${WRITER} } });
-        console.log('RELEASED');
-      } catch (err) {
-        console.log(JSON.stringify({ code: err.code, path: err.path }));
-      }
+      const answer = { kept: withStateTx(process.argv[1], () => {
+        // the record is linked; wait until the other process has it open without sharing
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500);
+        return 'committed';
+      }, { prefetched: { writer: ${WRITER} } }) };
+      console.log(JSON.stringify(answer));
     `, [f.fgosDir]);
     const result = await run.done;
     const answer = JSON.parse(result.stdout.trim());
-    assert.equal(answer.code, 'hot-lock-release-stuck');
+    assert.equal(answer.kept, 'committed');
     assert.ok(fs.existsSync(record), 'the record stays');
   } finally {
     holder?.kill();

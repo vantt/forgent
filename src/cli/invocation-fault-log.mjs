@@ -24,11 +24,10 @@
 //       store is absent, the record goes to the main checkout's existing
 //       store or nowhere.
 //
-// The log is `.fgos/`-resident but deliberately NOT `events.jsonl`: that file
-// is the rebuild source for all state, and a pure-observability record has no
-// business in it. It is also gitignored — `.fgos/` is only partly ignored and
-// `events.jsonl` is tracked on purpose, so without that entry every recorded
-// argv would be committed and pushed.
+// The log is `.fgos/`-resident but deliberately NOT a Work event: the Event
+// Store is the source of all Work state, and a pure-observability record has
+// no business in it. It is also gitignored — `.fgos/` is only partly ignored,
+// so without that entry every recorded argv would be committed and pushed.
 
 import fs from 'node:fs';
 import path from 'node:path';

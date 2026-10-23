@@ -198,7 +198,7 @@ test('event-store product code has no Git spawn site and no classified spawn: it
   const owned=entry=>EVENT_OWNED.some(prefix=>entry.path.startsWith(prefix));
   assert.deepEqual(sites.filter(owned),[],'event-store code spawns git');
   // Rust integration tests build fixture repositories with git; only product code is judged. A wrapper
-  // no product code calls (`decodeLegacyFiles`, `branchKey`: only tests pass them loader options) is
+  // no product code calls (`decodeLegacyFiles`: only tests pass it loader options) is
   // reported by the scan so a later caller is noticed, but no spawn reaches it: that caller would
   // turn it into a site or a configured binary, which the two assertions here do judge.
   assert.deepEqual(classes.filter(c=>owned(c)&&!['rust-test','uncalled-wrapper'].includes(c.class)),[],'event-store code carries a classified git spawn');
@@ -228,37 +228,15 @@ export function readerFindings(sources) {
   }
   return stableFindings(sites, 'retired-event');
 }
-const dormantReaderFindings = {
-  "bin/fgos.mjs: repairTruncatedLastLine: retired-event": 1,
-  "scripts/backfill-unit-summaries.mjs: readFileSync: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: import readEvents: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: readEvents: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: readFileSync: retired-event": 1,
-  "scripts/migration-proof-2a.mjs: readFileSync: retired-event": 1,
-  "scripts/probe-storytelling-material.mjs: import readEvents: retired-event": 1,
-  "scripts/probe-storytelling-material.mjs: readEvents: retired-event": 1,
-  "src/runner/attestation-guard.mjs: import readEvents: retired-event": 1,
-  "src/runner/attestation-guard.mjs: readEvents: retired-event": 1,
-  "src/setup/registrations.mjs: readEventsJsonLines: retired-event": 2,
-  "src/setup/registrations.mjs: readFileSync: retired-event": 1,
-  "src/state/events-compaction.mjs: import readEvents: retired-event": 1,
-  "src/state/events-compaction.mjs: readEvents: retired-event": 1,
-  "src/state/events-jsonl-truncation-guard.mjs: advanceEventsJsonlTruncationGuard: retired-event": 1,
-  "src/state/events.mjs: import readEvents: retired-event": 1,
-  "src/state/events.mjs: import readEventsFromByte: retired-event": 1,
-  "src/state/porting-store.mjs: import readEvents: retired-event": 1,
-  "src/state/replay.mjs: import readEvents: retired-event": 1,
-  "src/state/replay.mjs: import readEventsFromByte: retired-event": 1,
-  "src/state/store.mjs: import readAllEventsFromDir: retired-event": 1,
-  "src/verbs/events/migrate.mjs: import readAllEventsFromDir: retired-event": 1
-};
+// Every reader of the retired event files is gone from product code; a new one is a finding, not debt to declare.
+const dormantReaderFindings = {};
 
-test('dormant reader census retains declared sites and rejects additions or stale debt',()=>{
+test('no product file reads the retired event files or imports a reader of them',()=>{
   const files=execFileSync('rg',['--files','src','bin','scripts','packages','apps'],{encoding:'utf8'}).trim().split('\n')
     .filter(f=>/\.(?:mjs|js|rs)$/.test(f)&&!/(?:^|\/)(?:test|tests|examples)\//.test(f));
   const sources=Object.fromEntries(files.map(f=>[f,fs.readFileSync(f,'utf8')]));
   assert.deepEqual(readerFindings(sources),dormantReaderFindings,
-    'reader debt is site-specific, including legacy owner files');
+    'a reader of the retired event files appeared in product code');
 });
 
 test('dormant identity ignores unrelated edits but detects a new reader inside a legacy owner',()=>{

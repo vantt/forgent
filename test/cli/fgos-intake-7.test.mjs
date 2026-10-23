@@ -90,7 +90,7 @@ import {
 
 // tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
 // state-write verb no longer silently auto-vivifies `.fgos/` via
-// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+// creating a store itself when it's missing; it refuses instead.
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
 //
@@ -141,7 +141,7 @@ test('add --acceptance persists work.acceptance as the given array, validated th
   // tsk-5q5-2: evidence must resolve to a real path under cwd (the new
   // write-time traceability gate) -- tmpCwd() only guarantees `.fgos/`
   // files exist, so this points there rather than a fictional source path.
-  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/events.jsonl' }];
+  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/coexistence.json' }];
   const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
@@ -163,7 +163,7 @@ test('add --acceptance is refused when a clause supplies text+evidence together 
 
 test('add --acceptance succeeds when a text+evidence clause cites a real path that exists under cwd', () => {
   const cwd = tmpCwd();
-  const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/events.jsonl documents the real event log' }];
+  const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/coexistence.json documents the real store layout' }];
   const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['traceable'].acceptance, clauses);
@@ -255,7 +255,7 @@ test('move --to delivered succeeds when every acceptance clause has non-empty ev
   // gate can't silently no-op this edit and let the item coast through on
   // an acceptance field that was never actually set (RUL58's own
   // absent-is-unaffected rule would otherwise mask exactly that).
-  const editResult = run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  const editResult = run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/coexistence.json' }])]);
   assert.equal(editResult.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
 
   const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'delivered']);

@@ -1,48 +1,10 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from '../../src/state/replay.mjs';
-import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
-import { repairTruncatedLastLine } from '../../src/state/events.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { foldEvents, viewRevision, serializeView } from '../../src/state/replay.mjs';
 
-// Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
-function tmpLogPath() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-'));
-  return path.join(dir, 'events.jsonl');
-}
-
-// tsk-49e: a full `.fgos`-shaped dir with a real state.json snapshot,
-// written through store.mjs's own real write path (never hand-crafted) --
-// the snapshot fast path only ever exists on disk this way in production.
-function tmpFgosDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-'));
-  initStore(dir);
-  return dir;
-}
-
-// Tầng A/T2 moved store.mjs's real write path from `dir/events.jsonl`
-// (baseline-0, frozen per TA-D12) to one open file per writer under
-// `dir/events/` (TA-D2/TA-D11). These tests seed through store.mjs's real
-// write path on purpose (per tmpFgosDir's own doc comment) and then probe
-// `rebuildView`'s single-file incremental mechanism directly against
-// wherever that path actually landed -- one writer per test process, so
-// there is exactly one file under `events/` once anything has been added.
-function logPathOf(dir) {
-  const eventsDir = path.join(dir, 'events');
-  try {
-    const files = fs.readdirSync(eventsDir).filter((f) => f.endsWith('.jsonl'));
-    if (files.length > 0) return path.join(eventsDir, files.sort().at(-1));
-  } catch {
-    // events/ doesn't exist yet (nothing written since initStore) -- baseline-0 is still the real file.
-  }
-  return path.join(dir, 'events.jsonl');
-}
+const TS = '2026-07-15T00:00:00.000Z';
+const ev = (type, payload, ts = TS) => ({ ts, type, payload });
 
 test('foldEvents on an empty log yields an empty view', () => {
   assert.deepEqual(foldEvents([]), { work: {}, decisions: [] });
@@ -166,20 +128,14 @@ test('foldEvents ignores a work.move for an id that was never added', () => {
   assert.deepEqual(foldEvents(events), { work: {}, decisions: [] });
 });
 
-test('rebuildView reads through events.mjs readEvents and returns [] work for an uninitialized log', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-'));
-  const view = rebuildView(path.join(dir, 'missing.jsonl'));
-  assert.deepEqual(view, { work: {}, decisions: [] });
-});
-
-test('rebuildView twice from the same log produces deep-equal views (determinism)', () => {
-  const logPath = tmpLogPath();
-  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'decision', payload: { text: 'locked D5' } });
-
-  const first = rebuildView(logPath);
-  const second = rebuildView(logPath);
+test('foldEvents twice over the same events produces deep-equal views (determinism)', () => {
+  const events = [
+    ev('work.add', { id: 'a', title: 'A', status: 'todo' }),
+    ev('work.move', { id: 'a', from: 'todo', to: 'doing' }),
+    ev('decision', { text: 'locked D5' }),
+  ];
+  const first = foldEvents(events);
+  const second = foldEvents(events);
   assert.deepEqual(first, second);
   assert.equal(first.work.a.status, 'doing');
   assert.equal(first.decisions.length, 1);
@@ -501,18 +457,11 @@ test('foldEvents ignores a settling work.move (-> done) for an id that was never
   assert.equal('settlements' in foldEvents(events), false);
 });
 
-test('rebuildView preserves the historical ts from each event, never the current wall-clock time', () => {
-  const logPath = tmpLogPath();
+test('foldEvents preserves the historical ts from each event, never the current wall-clock time', () => {
   // A ts far in the past — if replay ever called Date.now() instead of using
   // event.ts, this assertion would fail against "now".
   const pastTs = '2001-01-01T00:00:00.000Z';
-  fs.writeFileSync(
-    logPath,
-    `${JSON.stringify({ seq: 1, ts: pastTs, type: 'decision', payload: { text: 'old decision' } })}\n`,
-    'utf8',
-  );
-
-  const view = rebuildView(logPath);
+  const view = foldEvents([{ seq: 1, ts: pastTs, type: 'decision', payload: { text: 'old decision' } }]);
   assert.equal(view.decisions[0].ts, pastTs);
 });
 
@@ -790,10 +739,11 @@ test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when 
 // WITHOUT the hash leaking into the fold return shape (which whole-view
 // snapshot + backward-compat tests pin).
 
+const ADD_A = ev('work.add', { id: 'a', title: 'A', status: 'todo' });
+const MOVE_A = ev('work.move', { id: 'a', from: 'todo', to: 'doing' });
+
 test('serializeView returns serialized JSON string and matching revision hash (tsk-37d)', () => {
-  const logPath = tmpLogPath();
-  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  const view = rebuildView(logPath);
+  const view = foldEvents([ADD_A]);
 
   const { viewStr, revision } = serializeView(view);
   assert.equal(typeof viewStr, 'string');
@@ -801,36 +751,26 @@ test('serializeView returns serialized JSON string and matching revision hash (t
   assert.deepEqual(JSON.parse(viewStr), view);
 });
 
-test('viewRevision is deterministic: rebuilding the same log twice yields byte-identical revisions', () => {
-  const logPath = tmpLogPath();
-  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-
-  const r1 = viewRevision(rebuildView(logPath));
-  const r2 = viewRevision(rebuildView(logPath));
+test('viewRevision is deterministic: folding the same events twice yields byte-identical revisions', () => {
+  const r1 = viewRevision(foldEvents([ADD_A, MOVE_A]));
+  const r2 = viewRevision(foldEvents([ADD_A, MOVE_A]));
   assert.equal(r1, r2);
   assert.match(r1, /^[0-9a-f]{64}$/, 'sha256 hex, same shape as the C1 data_hash');
 });
 
 test('viewRevision is sensitive: a new event changes the revision', () => {
-  const logPath = tmpLogPath();
-  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  const before = viewRevision(rebuildView(logPath));
-
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  const after = viewRevision(rebuildView(logPath));
+  const before = viewRevision(foldEvents([ADD_A]));
+  const after = viewRevision(foldEvents([ADD_A, MOVE_A]));
 
   assert.notEqual(before, after, 'a state mutation must move the fingerprint');
 });
 
-test('viewRevision does NOT leak into the fold return: rebuildView still returns the pure {work, decisions, ...} shape', () => {
-  const logPath = tmpLogPath();
-  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  const view = rebuildView(logPath);
+test('viewRevision does NOT leak into the fold return: foldEvents still returns the pure {work, decisions, ...} shape', () => {
+  const view = foldEvents([ADD_A]);
 
   viewRevision(view); // computing the hash must not mutate the view
   assert.equal('revision' in view, false, 'the revision is a persisted sibling, never part of the fold return');
-  assert.deepEqual(rebuildView(logPath), view, 'rebuild return unchanged by the revision primitive');
+  assert.deepEqual(foldEvents([ADD_A]), view, 'fold return unchanged by the revision primitive');
 });
 
 test('foldEvents folds a goal.focus event to view.focus === id', () => {
@@ -909,475 +849,33 @@ test("foldEvents skips retired tool.register/tool.remove events (tsk-in1-1 D1) �
   assert.equal(Object.hasOwn(view, "tools"), false);
 });
 
-// ─── tsk-49e: incremental-read snapshot fast path ──────────────────────────
+// ─── folding onto a seed view (an incremental refold from a cursor) ──────────
 
-// Tầng A/T2 moved store.mjs's real per-writer log to `.fgos/events/<writer
-// id>.jsonl` -- no longer a SIBLING of `.fgos/state.json`, which is exactly
-// what `tryIncrementalRebuild` requires (it looks up `state.json` via
-// `path.dirname(logPath)`). The fast path below is therefore correctly
-// UNREACHABLE for a per-writer file today -- `rebuildView` degrades to a
-// full read instead of ever guessing, per the same wrong-in-doubt-costs-
-// speed-not-truth guarantee tsk-49e always gave (never a wrong view, just a
-// slower one). T4 (Tầng A) restores a real fast path for this file shape by
-// redefining the anchor as a per-file map rather than a single sibling
-// snapshot; this test asserts today's honest interim behavior, not a
-// regression.
-test('rebuildView falls back to a full read (never a crash) for a per-writer log path, since state.json is no longer its sibling', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
+test('foldEvents onto a seed view equals one fold of all the events and never mutates the seed', () => {
+  const head = [ADD_A, MOVE_A];
+  const tail = [ev('work.edit', { id: 'a', patch: { priority: 7 } }), ev('decision', { text: 'later' })];
+  const seed = foldEvents(head);
+  const seedBefore = structuredClone(seed);
 
-  let readCount = 0;
-  const originalReadFileSync = fs.readFileSync;
-  fs.readFileSync = function patched(target, ...rest) {
-    if (target === logPath) readCount++;
-    return originalReadFileSync.call(fs, target, ...rest);
-  };
-  let view;
-  try {
-    view = rebuildView(logPath);
-  } finally {
-    fs.readFileSync = originalReadFileSync;
-  }
-  assert.equal(readCount, 1, 'the fast path cannot find its sibling state.json for a per-writer path, so it falls back to exactly one full read');
-  assert.equal(view.work.a.status, 'todo', 'the fallback full read is still correct');
+  const incremental = foldEvents(tail, seed);
+  assert.deepEqual(incremental, foldEvents([...head, ...tail]));
+  assert.equal(incremental.work.a.priority, 7);
+  assert.deepEqual(seed, seedBefore, 'the seed view is the caller\'s: folding must leave it untouched');
+
+  incremental.decisions.push({ text: 'mutated by caller, must not leak' });
+  incremental.work.a.priority = 999;
+  assert.deepEqual(seed, seedBefore, 'mutating the result must not reach the seed either');
 });
 
-test('rebuildView via the zero-read fast path still returns a view deep-equal to a fresh full read', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
-
-  const viaFastPath = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(viaFastPath, freshFold);
-});
-
-test('rebuildView incrementally folds new events after the snapshot, deep-equal to a fresh full read', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  // state.json now snapshots the log as of the addWork above. Append MORE
-  // events directly (bypassing store.mjs's own refreshView) so the log
-  // genuinely outgrows the snapshot without state.json itself moving.
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 42 } } });
-
-  const incremental = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(incremental, freshFold);
-  assert.equal(incremental.work.a.status, 'doing');
-  assert.equal(incremental.work.a.priority, 42);
-});
-
-// Same T4 dependency as the fallback test above: a per-writer log's
-// state.json is no longer its sibling, so `tryIncrementalRebuild` cannot
-// find a snapshot to diff against at all and always falls back to one full
-// read here -- correctly, not a partial/incremental one. `readEventsFromByte`
-// (the actual only-new-bytes primitive) still has its OWN direct unit
-// coverage elsewhere in this file; this test now asserts the honest
-// end-to-end fallback shape for this file layout, not byte-range narrowing.
-test('rebuildView falls back to exactly one full read for a per-writer log path when the log grows past what a real fast path would need', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  const sizeAtSnapshot = fs.statSync(logPath).size;
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-
-  const originalReadFileSync = fs.readFileSync;
-  let fullFileReadCount = 0;
-  fs.readFileSync = function patched(target, ...rest) {
-    if (target === logPath) fullFileReadCount++;
-    return originalReadFileSync.call(fs, target, ...rest);
-  };
-  let view;
-  try {
-    view = rebuildView(logPath);
-  } finally {
-    fs.readFileSync = originalReadFileSync;
-  }
-  assert.equal(fullFileReadCount, 1, 'exactly one full read of the log, since no fast path applies for this file shape today');
-  assert.equal(view.work.a.status, 'doing', 'the fallback full read still folds the newly-appended event correctly');
-  assert.ok(fs.statSync(logPath).size > sizeAtSnapshot, 'sanity: the log genuinely grew past the snapshot');
-});
-
-test('rebuildView falls back to a full read when the log SHRANK since the snapshot (never trusts a smaller file)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  addWork(dir, { id: 'b', title: 'B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  // Truncate the log back to something SMALLER than the snapshot recorded --
-  // simulates any pathological external rewrite that shrinks the file.
-  const raw = fs.readFileSync(logPath, 'utf8');
-  const firstLineEnd = raw.indexOf('\n') + 1;
-  fs.writeFileSync(logPath, raw.slice(0, firstLineEnd), 'utf8');
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'must still produce a CORRECT view of the (now-shrunk) real log, never a stale cached one');
-});
-
-test('rebuildView is safe against repairTruncatedLastLine (tail-only rewrite -- prefix genuinely untouched)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  // Simulate a crash mid-append: a genuinely corrupt trailing line.
-  fs.appendFileSync(logPath, '{"seq":999,"type":"work.move","payload":{"id":"a"', 'utf8'); // no closing brace, no trailing \n
-  repairTruncatedLastLine(logPath);
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the repaired log');
-  assert.ok(view.work.a, 'the item added before the corruption must still be present');
-});
-
-test('rebuildView falls back to a full read after a resort+reseq rewrite changes the fingerprint (a duplicate-seq line sorted by ts and renumbered)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  // Craft a real seq duplicate directly on the log (a different `ts`, same
-  // `seq` as an existing line), then manually apply the same resort-by-ts
-  // + renumber-seq-1..N rewrite the retired contiguity fix used to perform
-  // -- this test cares about rebuildView's fingerprint behavior on that
-  // REWRITE SHAPE, not about any particular repair mechanism.
-  const raw = fs.readFileSync(logPath, 'utf8');
-  const lastEvent = JSON.parse(raw.trim().split('\n').pop());
-  const duplicateLine = `${JSON.stringify({ ...lastEvent, ts: '2026-08-11T00:00:00.000Z' })}\n`;
-  fs.appendFileSync(logPath, duplicateLine, 'utf8');
-
-  const linesBefore = fs.readFileSync(logPath, 'utf8').trim().split('\n');
-  const parsed = linesBefore.map((l) => JSON.parse(l));
-  parsed.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
-  const resequenced = parsed.map((e, i) => JSON.stringify({ ...e, seq: i + 1 }));
-  assert.notDeepEqual(resequenced, linesBefore, 'sanity: the crafted duplicate seq actually changed line content on resort+reseq');
-  fs.writeFileSync(logPath, `${resequenced.join('\n')}\n`, 'utf8');
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the resorted+resequenced log');
-});
-
-test('rebuildView falls back to a full read after a wholesale reordering rewrite (git merge=union stand-in)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-
-  // Simulate what git's own docs say merge=union produces: the same lines,
-  // reordered, never a targeted edit -- a real union merge could ALSO
-  // reorder lines that were already part of the pre-snapshot prefix.
-  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
-  const reordered = [...lines].reverse().map((l) => `${l}\n`).join('');
-  fs.writeFileSync(logPath, reordered, 'utf8');
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the reordered log');
-});
-
-test('rebuildView falls back to a full read when state.json has no snapshot field at all (pre-tsk-49e state.json, or hand-edited)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
-  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
-  delete persisted.snapshot;
-  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold);
-});
-
-test('rebuildView falls back to a full read when the snapshot sub-fields are malformed (wrong type, not absent)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
-  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
-  persisted.snapshot.size = 'not-a-number';
-  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
-
-  const view = rebuildView(logPath);
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold);
-});
-
-test('rebuildView zero-read fast path never mutates the persisted view when a caller mutates the returned object (cloneTopLevel protects the snapshot)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 7 } } });
-
-  const first = rebuildView(logPath); // incremental fold onto the snapshot's savedView
-  first.decisions.push({ text: 'mutated by caller, must not leak' });
-  first.work.a.priority = 999;
-
-  const second = rebuildView(logPath); // same log, same snapshot -- must be unaffected by the mutation above
-  assert.deepEqual(second.decisions, []);
-  assert.equal(second.work.a.priority, 7);
-});
-
-test('determinism: the zero-read fast path\'s round-tripped view is deep-equal to a fresh fold for a multi-field, realistic item', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, {
-    id: 'a', title: 'A realistic item', kind: 'feature', status: 'todo', deps: [], risk: 'standard', refs: ['docs/x.md'],
-    verify: 'npm test', size: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
-  });
-  const logPath = logPathOf(dir);
-  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
-
-  const viaFastPath = rebuildView(logPath); // exact-match zero-read shortcut
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(viaFastPath, freshFold, 'the round-trip through state.json (JSON.stringify/parse) must never drop or alter a field a fresh fold would carry');
-});
-
-test('work.handoff replay normalizes the retired human-advisor literal to advisor (tsk-397 D16 rename) -- an append-only log already carrying pre-rename events must not strand an item with a holder the current vocabulary rejects', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  // Raw pre-rename event shape, exactly as a real log written before D16 has it
-  // (.fgos/events.jsonl seq 18440, tsk-1yf) -- never re-authored to the new
-  // literal, since the whole point is proving replay heals an already-written
-  // retired value, not that a fresh write uses the new one.
-  appendEvent(logPath, { type: 'work.handoff', payload: { id: 'a', from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' } });
-
-  const view = rebuildView(logPath);
+test('work.handoff replay normalizes the retired human-advisor literal to advisor (tsk-397 D16 rename) -- an append-only history already carrying pre-rename events must not strand an item with a holder the current vocabulary rejects', () => {
+  // Raw pre-rename event shape, exactly as a history written before D16 has it -- never re-authored to the new
+  // literal, since the whole point is proving replay heals an already-written retired value.
+  const events = [
+    ADD_A,
+    MOVE_A,
+    ev('work.handoff', { id: 'a', from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+  ];
+  const view = foldEvents(events);
   assert.equal(view.work.a.holder, 'advisor');
   assert.equal(view.callThreads.a.at(-1).to, 'advisor');
-
-  const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'the snapshot fast path and a fresh full fold must normalize identically');
-});
-
-// Local helper: reads the whole log via a bypass path (never through
-// rebuildView, so these tests' own "fresh full read" oracle is never
-// itself affected by the snapshot fast path under test).
-function readEventsWhole(logPath) {
-  const raw = fs.readFileSync(logPath, 'utf8');
-  return raw
-    .split('\n')
-    .filter((l) => l !== '')
-    .map((l) => JSON.parse(l));
-}
-
-// ─── Tầng A/T3: multi-file discovery + total order + dedupe ────────────────
-
-test('rebuildViewFromDir merges baseline-0 + per-writer files and rebuilds twice deep-equal even with a same-ts cross-file collision', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-multifile-'));
-  const eventsDir = path.join(dir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-
-  const tiedTs = '2026-08-23T00:00:00.000Z';
-  fs.writeFileSync(
-    path.join(dir, 'events.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-08-22T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } })}\n`,
-    'utf8',
-  );
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-a-20260823T000000000Z.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: tiedTs, type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' }, src: 'writer-a', h: 'aaaa000000000001' })}\n`,
-    'utf8',
-  );
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-b-20260823T000000001Z.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: tiedTs, type: 'work.edit', payload: { id: 'a', patch: { priority: 7 } }, src: 'writer-b', h: 'bbbb000000000002' })}\n`,
-    'utf8',
-  );
-
-  const first = rebuildViewFromDir(dir);
-  const second = rebuildViewFromDir(dir);
-  assert.deepEqual(first, second, 'rebuilding the same multi-file set twice must be deep-equal (TA-D7 total order is deterministic even on a ts tie)');
-  assert.equal(first.work.a.status, 'doing');
-  assert.equal(first.work.a.priority, 7);
-});
-
-test('readAllEventsFromDir dedupes a new-format event by its own h, even if it appears in two files', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-dedupe-'));
-  const eventsDir = path.join(dir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'events.jsonl'), '', 'utf8');
-
-  const shared = { seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, src: 'writer-a', h: 'cccc000000000003' };
-  fs.writeFileSync(path.join(eventsDir, 'writer-a-1.jsonl'), `${JSON.stringify(shared)}\n`, 'utf8');
-  // Simulates a compaction-crash straddle (TA-D13): the same event surviving
-  // in both an original file and a not-yet-archived baseline copy.
-  fs.writeFileSync(path.join(eventsDir, 'baseline-crash-copy.jsonl'), `${JSON.stringify(shared)}\n`, 'utf8');
-
-  const events = readAllEventsFromDir(dir);
-  assert.equal(events.length, 1, 'the same h across two files is one logical event, not two');
-});
-
-test('readAllEventsFromDir dedupes a legacy (pre-hash) baseline line by its own raw content, matching events-jsonl-contiguity.mjs precedent', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-legacy-dedupe-'));
-  const legacyLine = JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
-  // Two byte-identical legacy lines in the SAME baseline file (a union-merge
-  // artifact, tsk-3wq's own original failure shape) must collapse to one.
-  fs.writeFileSync(path.join(dir, 'events.jsonl'), `${legacyLine}\n${legacyLine}\n`, 'utf8');
-
-  const events = readAllEventsFromDir(dir);
-  assert.equal(events.length, 1, 'two byte-identical legacy lines (no h) dedupe by raw content');
-});
-
-test('readAllEventsFromDir ignores a subdirectory under .fgos/events/ (archive/ exclusion, structural via isFile())', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-archive-'));
-  const eventsDir = path.join(dir, 'events');
-  const archiveDir = path.join(eventsDir, 'archive');
-  fs.mkdirSync(archiveDir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'events.jsonl'), '', 'utf8');
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-a-1.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, src: 'writer-a', h: 'dddd000000000004' })}\n`,
-    'utf8',
-  );
-  fs.writeFileSync(
-    path.join(archiveDir, 'baseline-old.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'work.add', payload: { id: 'z', title: 'Z', status: 'todo' }, src: 'writer-z', h: 'eeee000000000005' })}\n`,
-    'utf8',
-  );
-
-  const view = rebuildViewFromDir(dir);
-  assert.ok(view.work.a, 'the real per-writer file is read');
-  assert.equal(view.work.z, undefined, 'a file under archive/ is never discovered');
-});
-
-test('rebuildViewFromDir on the real repo events.jsonl (23K+ lines, baseline-0 only, no events/ dir) rebuilds twice deep-equal', () => {
-  const realLogPath = path.resolve(fileURLToPath(import.meta.url), '../../../.fgos/events.jsonl');
-  let stat;
-  try {
-    stat = fs.statSync(realLogPath);
-  } catch {
-    return; // no real log in this checkout (e.g. a fresh clone) -- nothing to prove here
-  }
-  if (stat.size === 0) return;
-
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-real-log-'));
-  fs.copyFileSync(realLogPath, path.join(dir, 'events.jsonl')); // read-only copy -- the real file is never opened for writing
-
-  const first = rebuildViewFromDir(dir);
-  const second = rebuildViewFromDir(dir);
-  assert.deepEqual(first, second, 'rebuilding the real 23K+-line log twice through the multi-file door must still be deep-equal (D3 determinism holds at real scale)');
-  assert.ok(Object.keys(first.work).length > 0, 'sanity: the real log actually folds real work items');
-});
-
-// ─── Tầng A/T4: incremental anchor restored for the multi-file shape ───────
-
-test('rebuildViewFromDir takes the zero-read fast path when every discovered file is byte-identical to its snapshot', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-
-  let readCount = 0;
-  const originalReadFileSync = fs.readFileSync;
-  fs.readFileSync = function patched(target, ...rest) {
-    if (target === logPath) readCount++;
-    return originalReadFileSync.call(fs, target, ...rest);
-  };
-  let view;
-  try {
-    view = rebuildViewFromDir(dir);
-  } finally {
-    fs.readFileSync = originalReadFileSync;
-  }
-  assert.equal(readCount, 0, 'zero reads of the writer file -- only state.json + stats, the fast path T4 restores');
-  assert.equal(view.work.a.status, 'todo');
-});
-
-test('rebuildViewFromDir incrementally folds new events appended after the snapshot (bypassing store.mjs), deep-equal to a fresh full read', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 9 } } });
-
-  const incremental = rebuildViewFromDir(dir);
-  const fresh = foldEvents(readAllEventsFromDir(dir));
-  assert.deepEqual(incremental, fresh);
-  assert.equal(incremental.work.a.status, 'doing');
-  assert.equal(incremental.work.a.priority, 9);
-});
-
-test('rebuildViewFromDir falls back to a full read when a new writer file appears under .fgos/events/ since the snapshot', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const eventsDir = path.join(dir, 'events');
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-z-1.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:01.000Z', type: 'work.add', payload: { id: 'b', title: 'B', status: 'todo' }, src: 'writer-z', h: 'ffff000000000006' })}\n`,
-    'utf8',
-  );
-
-  const view = rebuildViewFromDir(dir);
-  const fresh = foldEvents(readAllEventsFromDir(dir));
-  assert.deepEqual(view, fresh, 'must still be correct via the full-read fallback');
-  assert.ok(view.work.b, 'the new file IS discovered -- the fallback still reads everything');
-});
-
-test('rebuildViewFromDir falls back to a full read when a per-writer file shrank since the snapshot', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
-  const logPath = logPathOf(dir);
-  const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-  fs.writeFileSync(logPath, `${lines[0]}\n`, 'utf8'); // truncate back to just the add -- shrank relative to the last snapshot
-
-  const view = rebuildViewFromDir(dir);
-  assert.equal(view.work.a.status, 'todo', 'honestly reflects the shrunk file via full read, never a stale cached status');
-});
-
-test('rebuildViewFromDir falls back to a full read when a newly-read event\'s ts does not exceed maxTs (TA-D8 strict tie check)', () => {
-  const dir = tmpFgosDir();
-  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  const logPath = logPathOf(dir);
-  const priorEvent = JSON.parse(fs.readFileSync(logPath, 'utf8').trim());
-  // Same ts as the already-snapshotted event -- a tie, not strictly greater.
-  fs.appendFileSync(
-    logPath,
-    `${JSON.stringify({ ...priorEvent, seq: priorEvent.seq + 1, type: 'work.edit', payload: { id: 'a', patch: { priority: 3 } }, h: 'gggg000000000007' })}\n`,
-    'utf8',
-  );
-
-  const view = rebuildViewFromDir(dir);
-  assert.equal(view.work.a.priority, 3, 'still correct via the full-read fallback despite the ts tie');
-});
-
-test('buildSnapshotFromDir computes maxTs as the true maximum ts across every discovered file, not file-iteration order', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-maxts-'));
-  fs.writeFileSync(
-    path.join(dir, 'events.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } })}\n`,
-    'utf8',
-  );
-  const eventsDir = path.join(dir, 'events');
-  fs.mkdirSync(eventsDir);
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-a-1.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' }, src: 'writer-a', h: 'hhhh000000000008' })}\n`,
-    'utf8',
-  );
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-b-1.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-05-01T00:00:00.000Z', type: 'work.edit', payload: { id: 'a', patch: { priority: 1 } }, src: 'writer-b', h: 'iiii000000000009' })}\n`,
-    'utf8',
-  );
-
-  const snapshot = buildSnapshotFromDir(dir);
-  assert.equal(snapshot.maxTs, '2026-08-23T00:00:00.000Z', 'max ts must come from writer-a (most recent), regardless of readdir order');
-  assert.equal(Object.keys(snapshot.files).length, 3, 'baseline (\'\') + writer-a + writer-b, one entry each');
-});
-
-test('buildSnapshotFromDir records size:0/lastLine:null for baseline-0 when it does not physically exist yet', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-nobaseline-'));
-  fs.mkdirSync(path.join(dir, 'events'));
-  fs.writeFileSync(
-    path.join(dir, 'events', 'writer-a-1.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, src: 'writer-a', h: 'jjjj00000000000a' })}\n`,
-    'utf8',
-  );
-
-  const snapshot = buildSnapshotFromDir(dir);
-  assert.deepEqual(snapshot.files[''], { size: 0, lastLine: null });
 });

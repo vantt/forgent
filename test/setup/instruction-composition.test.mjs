@@ -1,5 +1,6 @@
 // instruction-composition.test.mjs — effective instruction-set composition (P4)
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -27,8 +28,7 @@ function writeRecordedDecisionIndex(projectRoot, {
   rationale = 'fixture',
   scope = 'test',
 } = {}) {
-  const fgosDir = path.join(projectRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+  const fgosDir = initializeWorkRepository(projectRoot);
   addDecision(fgosDir, { text, rationale, scope, source: 'test' });
   generateDecisionIndex(projectRoot, fgosDir);
 }

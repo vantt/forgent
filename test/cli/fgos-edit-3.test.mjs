@@ -163,7 +163,7 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
   // tsk-5q5-2: evidence must resolve to a real path under cwd.
-  const retryEdit = run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  const retryEdit = run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/coexistence.json' }])]);
   assert.equal(retryEdit.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
   const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']);
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');

@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 // merge.mjs — the approval-gate merge engine (per pr-lifecycle D1-D5):
 // mechanics that turn an approved proposal into a merged, verified `done`
 // item — extracted from bin/fgos.mjs so the CLI stays a thin verb table,
@@ -38,6 +37,7 @@ import crypto from 'node:crypto';
 // name anymore. Wiring an actual caller to pass a non-default trunk is out
 // of scope here (Epic 4's job); this only makes the primitive capable.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree, deleteBranchRef, gitWorktrees, realpathOrSelf } from './worktree.mjs';
@@ -45,11 +45,13 @@ import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goa
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { listSessions } from './session.mjs';
-import { listWork } from '../state/store.mjs';
+import { listWork, readAppliedEvents } from '../state/store.mjs';
+import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { branchKey } from '../event-store/index.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
 import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
-import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
 import { LockScope, acquireSync, createLockScope, lockHolders, probe } from '../holder-lock/index.mjs';
 import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
@@ -157,11 +159,9 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
 /** Whether a working tree has no pending changes outside of `.fgos/` — the
  * single shared gate both `return` (subtree scope) and `approve` (whole-repo
  * scope) check before either lets an item advance. `.fgos/` itself is
- * excluded: it's a live store with its own write door, mutated by the very
- * take/return/approve lifecycle operations this gate guards (each appends an
- * event as part of the same call), so it never signals an actually-dirty
- * code tree — only a manual `.fgos/events.jsonl` commit made that true
- * before this exclusion existed.
+ * excluded: it holds the store's own view caches and runtime files, written
+ * by the very take/return/approve lifecycle operations this gate guards, so
+ * it never signals an actually-dirty code tree.
  *
  * `scope` picks git's own pathspec: `'whole-repo'` (the default) runs `git
  * status --porcelain` with no pathspec — `approve` is expected to see the
@@ -839,9 +839,10 @@ export function declareLandFiles(repoRoot, item, target, source) {
  * `fgw/<root>`, a nested root into its parent, a promoted member into its
  * integration branch. Land's session on the destination's full-ref slot,
  * not a caller-held slot, excludes other merges into that target through
- * candidate construction, verification and publication. Work's own event
- * files are committed through its declared checkpoint before Land starts;
- * nothing is swept into the land. A stale publication is returned once, and
+ * candidate construction, verification and publication. Work's project
+ * stream is sealed before Land starts; nothing is swept into the land. After
+ * publication Work promotes the branch's event stream and reports the result
+ * as `promotion` on the merged outcome. A stale publication is returned once, and
  * Work owns settlement; publication authorizes no candidate cleanup.
  */
 export async function landRunnerItem(repoRoot, item, {
@@ -867,20 +868,17 @@ export async function landRunnerItem(repoRoot, item, {
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
   if (onMain && mergeHeadExists(repoRoot)) return { outcome: 'merge-blocked-other-item', branch };
-  // Work decides which event files are due outside every lock; the commit
-  // itself takes the main checkout only for its own duration. Without one,
-  // no-wait still refuses in milliseconds when the main checkout Land would
-  // publish into is busy, instead of after a full verify that cannot publish.
-  const checkpoint = prepareMainFgosCheckpoint(fgosDir, repoRoot);
-  if (checkpoint?.files.length || (onMain && lockWaitMs === 0)) {
+  // Without the lock wait, no-wait still refuses in milliseconds when the
+  // main checkout Land would publish into is busy, instead of after a full
+  // verify that cannot publish.
+  if (onMain && lockWaitMs === 0) {
     try {
-      await withMainCheckout(new LockScope('land-runner-item'), checkpoint?.files.length ? 'checkpoint' : 'precheck', (mainHandle) => {
-        if (checkpoint?.files.length) checkpointMainFgos(mainHandle, fgosDir, repoRoot, { prepared: checkpoint });
-      }, { fgosDir, ...(lockWaitMs > 0 && { waitMs: lockWaitMs }) });
+      await withMainCheckout(new LockScope('land-runner-item'), 'precheck', () => {}, { fgosDir });
     } catch (err) {
       throw toMergeLockError(err, { branch });
     }
   }
+  sealProjectBeforeLand(fgosDir, branch);
   // Trusted-side resolutions are bytes bound to the target they were read
   // against; only then is that target pinned, otherwise Land pins its own.
   const pinned = resolveRefSha(repoRoot, target);
@@ -1001,16 +999,63 @@ export async function landRunnerItem(repoRoot, item, {
     port.close();
   } })();
   if (result.outcome !== 'merged') return result;
-  // Drift detection is read-only reporting after publication, outside the
-  // publication's error handling: its failure never turns a land into a
-  // failed merge.
+  // Promotion and drift detection run after publication, outside the
+  // publication's error handling: neither failure turns a land into a failed
+  // merge.
+  const promotion = promoteAfterLand(fgosDir, branch);
   let postLand;
   try {
     postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) });
   } catch (err) {
     postLand = { landed: item.id, target, landedFiles, error: `post-land drift detection failed: ${err.message}` };
   }
-  return { ...result, postLand };
+  return { ...result, promotion, postLand };
+}
+
+/**
+ * Work's seal-before-land policy (Event Store spec §16): everything Work has
+ * acknowledged is on the project ref before this land can publish anything,
+ * and the promotion that follows always has a published project to follow.
+ * Nothing is published yet, so a store that cannot seal refuses the land.
+ */
+function sealProjectBeforeLand(fgosDir, branch) {
+  try {
+    prepareWorkStore(fgosDir, fgosDir).store.seal('project', []);
+  } catch (err) {
+    throw new MergeError(`cannot merge "${branch}": sealing Work's events before the land failed (${err.message})`, {
+      branch, code: 'event-seal-failed',
+    });
+  }
+}
+
+/**
+ * Promote the landed branch's event stream into the project once the land is
+ * published. The land already happened, so a failure here is a recorded
+ * result, never a throw: `{ stream, error, retryable: true }` rides on the
+ * `merged` outcome, and the same call is safe to repeat (a stream the project
+ * already names is left alone).
+ */
+export function promoteAfterLand(fgosDir, branch) {
+  let stream = null;
+  try {
+    stream = `branch:${branchKey(branch)}`;
+    const { store } = prepareWorkStore(fgosDir, fgosDir);
+    const promoted = promoteLandedStreams(store, stream, String(resolveWriterIdentity(fgosDir).id), []);
+    return { stream, promoted: promoted.length > 0 };
+  } catch (err) {
+    return { stream, error: { code: err.code ?? null, message: err.message }, retryable: true };
+  }
+}
+
+/** Work owns promotion policy; Git Land knows nothing about event streams.
+ * `stream` is the branch stream's name (`branch:<branchKey>`); the stream is
+ * promoted through its last own event unless the project already names it. */
+export function promoteLandedStreams(store, stream, writer, heldRanks) {
+  if (!store.maintenance(heldRanks).streams.some((row) => row.stream === stream)) return [];
+  const read = store.read({ streams: ['project', stream], project: false }, heldRanks);
+  const throughSeq = Math.max(0, ...read.events.filter((event) => event.stream === stream && event.origin === store.ownOrigin).map((event) => event.seq));
+  if (!throughSeq || read.events.some((event) => event.type === 'store.promote' && event.payload?.stream === stream && event.payload.throughSeq >= throughSeq)) return [];
+  return [store.promote({ branch: stream, throughSeq, cursor: read.cursor.cover, writer }, heldRanks)];
 }
 
 /** Work's unique settlement identity `(repoIdentity, operationId,
@@ -1044,6 +1089,75 @@ export function acknowledgeLand(repoRoot, operationId, acknowledgement) {
   } finally {
     port?.close();
   }
+}
+
+/**
+ * The acknowledgement Land stores for a result Work recorded in `event`: the
+ * event's own hash. The hash covers the event's origin and sequence, so two
+ * machines that each recorded their own result for the same item name
+ * different acknowledgements. An event without a hash (a legacy record) names
+ * nothing durable: the empty value is refused by Land, which keeps the candidate.
+ */
+export function landAcknowledgement(event) {
+  return typeof event?.h === 'string' && event.h ? `work-event:${event.h}` : '';
+}
+
+/** The Land operations whose result `payload` records: a delivery's settlement identity, or the
+ * `landOperationIds` that a blocked move or an engine decision carries. A decision that only
+ * prepares an operation (`landOperation`) records no result and names nothing here. */
+function settledLandOperations(payload) {
+  return [payload?.landSettlement?.operationId, ...(Array.isArray(payload?.landOperationIds) ? payload.landOperationIds : [])]
+    .filter((id) => typeof id === 'string' && id.length > 0);
+}
+
+// Retained Land operations one sweep looks at before it reports an incomplete scan.
+const RETAINED_LAND_SCAN_BOUND = 10_000;
+
+/**
+ * Release every retained Land candidate whose result Work has durably
+ * recorded, however late: a release that was deferred (busy merge slot or
+ * main checkout) or a command that died between recording and releasing.
+ * The Work event that recorded the operation (matched on its operation id)
+ * supplies the acknowledgement, and only an event that took effect counts: a
+ * recorded conflict never applied, so it releases nothing; a candidate with no such event stays,
+ * because the acknowledgement is never guessed. Nothing throws: what cannot
+ * be listed, read or released comes back in `warnings`, and Land itself
+ * keeps whatever it cannot prove safe to remove.
+ *
+ * Reading Work's history costs a full read, so it happens only when Land
+ * reports at least one retained candidate.
+ *
+ * @returns {{released: string[], warnings: string[]}}
+ */
+export function releaseRecordedLand(repoRoot) {
+  const released = [];
+  const warnings = [];
+  let candidates;
+  try {
+    const scan = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).listRetainedLand({ bound: RETAINED_LAND_SCAN_BOUND });
+    candidates = scan.candidates;
+    if (!scan.complete) warnings.push(`land-release-incomplete-scan: more than ${RETAINED_LAND_SCAN_BOUND} Land operations; some candidates were not looked at`);
+    if (candidates.length === 0) return { released, warnings };
+  } catch (err) {
+    return { released, warnings: [`land-release-skipped: ${err.message}`] };
+  }
+  const recordedBy = new Map();
+  try {
+    for (const event of readAppliedEvents(path.join(repoRoot, '.fgos'))) {
+      if (typeof event?.h !== 'string' || !event.h) continue;
+      for (const operationId of settledLandOperations(event.payload)) if (!recordedBy.has(operationId)) recordedBy.set(operationId, event);
+    }
+  } catch (err) {
+    return { released, warnings: [...warnings, `land-release-skipped: reading Work's history failed (${err.message})`] };
+  }
+  for (const { operationId } of candidates) {
+    const event = recordedBy.get(operationId);
+    if (!event) continue;
+    const failed = acknowledgeLand(repoRoot, operationId, landAcknowledgement(event));
+    if (failed.length === 0) released.push(operationId);
+    else warnings.push(...failed.map((warning) => `${operationId}: ${warning}`));
+  }
+  return { released, warnings };
 }
 
 /** The ref the main checkout has checked out, or null when it is detached. */

@@ -1509,7 +1509,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'rebuild',
     invoke: 'fgos rebuild',
-    description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
+    description: 'Rebuild every registered consumer view (Work, porting) from the Event Store. Prints a per-consumer summary (counts, revision, cover), never the views.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
     touchesState: true,
@@ -1518,18 +1518,23 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'repair',
-    invoke: 'fgos repair',
-    description: 'Repair a truncated final line in .fgos/events.jsonl (the common crash-mid-append shape); backs up the original log first.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos repair'],
+  withSubcommands({
+    name: 'events',
+    invoke: 'fgos events <sync|status|export|migrate>',
+    description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
+    subcommands: {
+      sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' } }, required: [] } },
+      status: { description: 'Inspect integrity and publication state: refs, streams, unsealed events, deferred and missing predecessors.', examples: ['fgos events status'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' } }, required: [] } },
+      export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
+      migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
+    },
+    examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export', 'fgos events migrate --check'],
     touchesState: true,
-    requiresExistingStore: true,
-    externalEffect: false,
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'rollup',
     invoke: 'fgos rollup',
@@ -1552,7 +1557,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'show',
     invoke: 'fgos show',
-    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
+    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning) and the conflicts recorded against it (acknowledged on one machine, never applied here). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
     parameters: {
       type: 'object',
       properties: {

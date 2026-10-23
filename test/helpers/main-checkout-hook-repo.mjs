@@ -70,7 +70,7 @@ export function initRepoWithHook(prefix) {
 /** A process env for one "session": no inherited session identity or lock descriptor. */
 export function sessionEnv(overlay = {}) {
   const env = { ...process.env, ...overlay };
-  for (const name of ['FGOS_SESSION_ID', 'CLAUDE_CODE_SESSION_ID', 'FGOS_LOCK_FD', 'FGOS_DISABLE_OPPORTUNISTIC_CHECKS']) {
+  for (const name of ['FGOS_SESSION_ID', 'CLAUDE_CODE_SESSION_ID', 'FGOS_LOCK_FD']) {
     if (!(name in overlay)) delete env[name];
   }
   return env;

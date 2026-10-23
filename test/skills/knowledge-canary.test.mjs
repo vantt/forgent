@@ -5,14 +5,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { runKnowledgeCanary } from '../../scripts/knowledge-canary.mjs';
 import { initStore } from '../../src/state/store.mjs';
 
 function setupGitRepoWithStore() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-canary-test-'));
-  execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
+  // The Work store opens only in a repository the Event Store can use: a machine id and the activation fence.
+  initializeWorkRepository(tmpDir);
 
   const readme = path.join(tmpDir, 'README.md');
   fs.writeFileSync(readme, '# Test Repo\n', 'utf8');

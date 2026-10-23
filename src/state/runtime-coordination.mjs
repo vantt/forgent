@@ -10,7 +10,7 @@ import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { withStateTx } from './hot-lock.mjs';
+import { withWorkState } from './work-event-store.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 
 const mainFgosDirCache = new Map();
@@ -42,12 +42,11 @@ export function getMainFgosDir(dir) {
  * `dirInput` is the `.fgos` the caller operates on; the transaction may write
  * there too when it is not the main one.
  */
-export function withMainState(dirInput, fn) {
+export function withMainState(dirInput, fn, options) {
   const mainFgosDir = getMainFgosDir(dirInput);
   const writer = resolveWriterIdentity(dirInput).id;
   if (mainFgosDir !== dirInput) resolveWriterIdentity(mainFgosDir);
-  const extraRoots = path.resolve(mainFgosDir) === path.resolve(dirInput) ? [] : [dirInput];
-  return withStateTx(mainFgosDir, fn, { prefetched: { mainFgosDir, writer, extraRoots } });
+  return withWorkState(dirInput, mainFgosDir, writer, fn, options);
 }
 
 export class ClaimError extends Error {
@@ -81,20 +80,21 @@ export function getItemDurableRevision(view, id) {
  * effective-view read would have shown the item as plain `todo` instead of
  * surfacing that its claim state is unknown.
  */
-export function readClaim(fgosDirInput, id) {
+export function readClaim(fgosDirInput, id, tx) {
   if (!id || typeof id !== 'string') return null;
+  if (hotLockDepth() > 0 && !tx) throw new ClaimError('state-tx-read-required', 'gated claim reads require the transaction');
   const claimsDir = resolveFgosFile(getMainFgosDir(fgosDirInput), FGOS_FILE.CLAIMS_DIR);
-  return readClaimFile(claimsDir, id);
+  return readClaimFile(claimsDir, id, tx);
 }
 
 // Reads one claim file from an already-resolved claims directory. Resolving
 // the main checkout spawns git, so a caller reading many claims resolves once
 // and calls this per file instead of going back through `readClaim`.
-function readClaimFile(claimsDir, id) {
+function readClaimFile(claimsDir, id, tx) {
   const claimFilePath = path.join(claimsDir, `${id}.json`);
   let raw;
   try {
-    raw = fs.readFileSync(claimFilePath, 'utf8');
+    raw = tx ? tx.readText(claimFilePath) : fs.readFileSync(claimFilePath, 'utf8');
   } catch (err) {
     if (err.code === 'ENOENT') return null;
     // 'corrupt-log' (store.mjs's EXIT_CODES, exit 5): the same
@@ -113,12 +113,13 @@ function readClaimFile(claimsDir, id) {
 /**
  * Read all active runtime claims as a map `{ [id]: claimRecord }`.
  */
-export function readClaims(fgosDirInput) {
+export function readClaims(fgosDirInput, tx) {
+  if (hotLockDepth() > 0 && !tx) throw new ClaimError('state-tx-read-required', 'gated claim reads require the transaction');
   const fgosDir = getMainFgosDir(fgosDirInput);
   const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
   let files = [];
   try {
-    files = fs.readdirSync(claimsDir, { withFileTypes: true })
+    files = tx ? tx.list(claimsDir).filter(name => name.endsWith('.json')) : fs.readdirSync(claimsDir, { withFileTypes: true })
       .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
       .map((entry) => entry.name);
   } catch (err) {
@@ -129,7 +130,7 @@ export function readClaims(fgosDirInput) {
   const claims = {};
   for (const file of files) {
     const id = file.slice(0, -5);
-    const claim = readClaimFile(claimsDir, id);
+    const claim = readClaimFile(claimsDir, id, tx);
     if (claim) {
       claims[id] = claim;
     }
@@ -173,7 +174,7 @@ export function acquireClaimTx(tx, {
   const claimFilePath = path.join(claimsDir, `${id}.json`);
 
   if (!force) {
-    const existing = readClaimFile(claimsDir, id);
+    const existing = readClaimFile(claimsDir, id, tx);
     if (existing) {
       throw new ClaimError('conflict', `Item "${id}" is already claimed by claimId "${existing.claimId}"`);
     }
@@ -257,7 +258,7 @@ export function releaseClaimTx(tx, args = {}) {
 
   let existing;
   try {
-    const raw = fs.readFileSync(claimFilePath, 'utf8');
+    const raw = tx.readText(claimFilePath);
     existing = JSON.parse(raw);
   } catch (err) {
     if (err.code === 'ENOENT') return { released: false, reason: 'no-claim' };

@@ -71,7 +71,6 @@ for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => process.exit(130)
 const env = { ...process.env };
 delete env.CLAUDE_CODE_SESSION_ID;
 delete env.NODE_TEST_CONTEXT;
-env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = '1';
 
 const tally = { pass: 0, fail: 0, hang: 0 };
 for (let round = 1; round <= rounds; round += 1) {

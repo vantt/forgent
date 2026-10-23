@@ -7,6 +7,7 @@
 // the CLI verb wiring (`fgos decision-index[--check]`).
 
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -26,7 +27,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-'));
+  initializeWorkRepository(dir);
+  return dir;
 }
 
 function run(cwd, args) {
@@ -92,8 +95,7 @@ test('buildDecisionIndexMarkdown: escapes a pipe and collapses embedded newlines
 
 test('computeDecisionIndex: reports changed:true against a nonexistent index file, and returns the would-be content without writing it', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+  const fgosDir = initializeWorkRepository(repoRoot);
   addDecision(fgosDir, { text: 'D1: repo-wide thing', rationale: 'r', scope: 'repo' });
 
   const { changed, nextContent } = computeDecisionIndex(repoRoot, fgosDir);
@@ -104,8 +106,7 @@ test('computeDecisionIndex: reports changed:true against a nonexistent index fil
 
 test('generateDecisionIndex: writes the file on first call, then reports changed:false and does not rewrite on a second call with nothing new', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+  const fgosDir = initializeWorkRepository(repoRoot);
   addDecision(fgosDir, { text: 'D1: repo-wide thing', rationale: 'r', scope: 'repo' });
 
   const first = generateDecisionIndex(repoRoot, fgosDir);
@@ -146,8 +147,7 @@ test('buildDecisionIndexMarkdown: state wins by ADR identity and fallback scope/
 
 test('generateDecisionIndex: an empty-to-empty regenerate (nothing was ever recorded) is not a refusal -- there is no real content to lose', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+  const fgosDir = initializeWorkRepository(repoRoot);
 
   const first = generateDecisionIndex(repoRoot, fgosDir);
   assert.equal(first.changed, true);

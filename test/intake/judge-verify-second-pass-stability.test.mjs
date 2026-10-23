@@ -7,6 +7,7 @@ import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from '../../src/intake/verify-pattern-check.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
 // tsk-1x3 D17 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
 // judgeVerifySemanticCorrectness's LLM-fallback branch is retired --
@@ -30,7 +31,7 @@ import { addWork, listWork } from '../../src/state/store.mjs';
 // since no code path can produce that shape anymore.
 
 function tmpStoreDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-discovery-stability-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-discovery-stability-')));
 }
 
 function sampleWork(overrides = {}) {

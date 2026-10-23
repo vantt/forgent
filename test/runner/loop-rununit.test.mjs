@@ -40,8 +40,8 @@ function setup() {
   git(repoRoot, 'add', 'seed.txt');
   git(repoRoot, 'commit', '-q', '-m', 'init');
   const dir = path.join(repoRoot, '.fgos');
-  initStore(dir);
   activateGitFixture(repoRoot);
+  initStore(dir);
   const scriptDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-exec-'));
   const worktreeDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-wt-'));
   return { repoRoot, dir, scriptDir, worktreeDir };

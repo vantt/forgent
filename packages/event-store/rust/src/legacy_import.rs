@@ -1,17 +1,18 @@
 //! HEAD-only inventory and legacy publication. Git owns objects, refs and WAL.
 use crate::{
+    commit_memo::CommitMemo,
     envelope::Seal,
     errors::{invalid, Error, ErrorCode},
     layout::{Layout, StreamId},
     legacy::{self, LegacyEvent},
-    walk::{blob, git_error},
+    walk::{blobs, git_error},
 };
 use fgos_git::*;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::result::Result;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
     pub from_commit: Oid,
@@ -40,9 +41,12 @@ pub fn inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Err
 }
 /// The existing pre-migration consumer roots; broad porting discovery belongs
 /// to migrate/doctor, never the routine admission/read path.
-fn consumer_inventory(port: &dyn Inspect, repo: &RepoHandle) -> Result<Inventory, Error> {
-    let head = port.resolve_head(repo).map_err(git_error)?;
-    let from_commit = committed_head(&head)?;
+fn consumer_inventory(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    head: &HeadFact,
+) -> Result<Inventory, Error> {
+    let from_commit = committed_head(head)?;
     let refs = crate::refs::list(
         port,
         repo,
@@ -113,7 +117,22 @@ fn committed_head(head: &HeadFact) -> Result<&Oid, Error> {
         HeadFact::Unborn { .. } => Err(invalid("migration requires a committed HEAD")),
     }
 }
+/// The tracked legacy files of one commit never change, so every read and
+/// admission of a process shares one inventory per commit and root set.
+static INVENTORIES: CommitMemo<Inventory> = CommitMemo::new();
+
 fn inventory_roots_at(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&[u8]],
+) -> Result<Inventory, Error> {
+    let question = roots.join(&0u8);
+    INVENTORIES.get_or_compute(repo, from_commit, &question, || {
+        read_inventory_roots_at(port, repo, from_commit, roots)
+    })
+}
+fn read_inventory_roots_at(
     port: &dyn Inspect,
     repo: &RepoHandle,
     from_commit: &Oid,
@@ -151,8 +170,8 @@ fn inventory_roots_at(
     let sibling = porting_log
         .as_ref()
         .map(|p| format!("{}state.json", p.strip_suffix("events.jsonl").unwrap()));
-    let mut files = BTreeMap::new();
     let mut migrated = false;
+    let mut wanted = Vec::new();
     for entry in entries {
         let path =
             std::str::from_utf8(&entry.path).map_err(|_| invalid("non-UTF8 tracked path"))?;
@@ -165,10 +184,16 @@ fn inventory_roots_at(
         if entry.kind != ObjectType::Blob || entry.mode != 0o100644 {
             return Err(invalid("legacy paths must be regular files"));
         }
+        wanted.push(entry.path);
+    }
+    // One Git process reads every legacy file of the commit, however many.
+    let mut files = BTreeMap::new();
+    for (path, bytes) in wanted.iter().zip(blobs(port, repo, from_commit, &wanted)?) {
         files.insert(
-            path.into(),
-            blob(port, repo, from_commit, &entry.path)?
-                .ok_or_else(|| invalid("legacy file disappeared"))?,
+            std::str::from_utf8(path)
+                .map_err(|_| invalid("non-UTF8 tracked path"))?
+                .to_owned(),
+            bytes.ok_or_else(|| invalid("legacy file disappeared"))?,
         );
     }
     Ok(Inventory {
@@ -588,7 +613,14 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
     let mut cursor = None;
     loop {
         let page = driver
-            .status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)
+            .status(
+                repo,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                cursor,
+                4096,
+            )
             .map_err(git_error)?;
         for e in page.entries {
             let p = std::str::from_utf8(&e.path).map_err(|_| invalid("status path UTF8"))?;
@@ -615,13 +647,12 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
 pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> Result<(), Error> {
     let authority = crate::fence::authority(driver, repo)?;
     let repo = &authority;
-    if matches!(
-        driver.resolve_head(repo).map_err(git_error)?,
-        HeadFact::Unborn { .. }
-    ) {
+    // One HEAD observation answers the whole admission.
+    let head = driver.resolve_head(repo).map_err(git_error)?;
+    if matches!(head, HeadFact::Unborn { .. }) {
         return Ok(());
     }
-    let inv = consumer_inventory(driver, repo)?;
+    let inv = consumer_inventory(driver, repo, &head)?;
     if !inv.migrated {
         if inv.files.keys().any(|p| retired_path(p)) {
             return Err(Error::new(
@@ -631,7 +662,7 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
         }
         return Ok(());
     }
-    let pin = crate::fence::pinned_legacy(driver, repo)
+    let pin = crate::fence::pinned_at_head(driver, repo, &head)
         .map_err(|e| {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,

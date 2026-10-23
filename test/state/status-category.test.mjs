@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/status-category.test.mjs — decision record 0027 (D2/D3):
 // `statusCategory` is frozen onto the `work.move`/`work.add` event payload
 // at WRITE time (store.mjs), never derived on read (docs/platform-
@@ -13,7 +15,6 @@
 // appearing/not-appearing on the event payload, never a changed transition
 // or a changed existing field.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -25,7 +26,7 @@ import { foldEvents } from '../../src/state/replay.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-status-category-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-status-category-')));
 }
 
 function addSampleWork(dir, id, overrides = {}) {

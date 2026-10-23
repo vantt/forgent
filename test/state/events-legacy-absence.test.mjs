@@ -67,15 +67,12 @@ test("fgos doctor's DOCTOR_CHECKS/FIX_REGISTRATIONS no longer register the retir
   const { DOCTOR_CHECKS, FIX_REGISTRATIONS } = await import('../../src/setup/registrations.mjs');
   assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-contiguous'), false);
   assert.equal(FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-contiguous'), false);
-  // The sibling truncation-detection check (tsk-cgg, a different failure
-  // class, out of this retirement's scope) must still be registered.
-  assert.equal(DOCTOR_CHECKS.some((c) => c.id === 'events-jsonl-not-truncated'), true);
 });
 
 test('no remaining production source (src/, scripts/) imports the retired contiguity modules', () => {
   // Scoped to real import-specifier couplings (a quoted module path after
   // `from`/`import(`), not free-floating prose -- other production files
-  // (e.g. src/state/replay.mjs, src/state/events-compaction.mjs) legitimately
+  // (e.g. src/state/replay.mjs) legitimately
   // still cite the retired module BY NAME in a doc-comment as historical
   // design precedent, without importing anything from it; that citation is
   // narrative, not a functional coupling, and is out of this test's scope.
