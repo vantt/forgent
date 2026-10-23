@@ -5,7 +5,7 @@
 
 use fgos_identity::session::{self, Local, PidFacts};
 use fgos_identity::{
-    env_identity, machine, machine_info, os_process_tree, pi_family_cli, resolve, session_for, session_info,
+    env_identity, machine, HeadRef, machine_info, os_process_tree, pi_family_cli, resolve, session_for, session_info,
     tree_identity, writer_answer, ProcStat, ProcessTree, Source, WriterId, WriterIdentity, WriterKey, ENV_ORDER,
     MAX_ID_LENGTH,
 };
@@ -264,10 +264,17 @@ fn a_hook_carried_pi_key_with_a_head_pid_gives_the_handle_the_env_path_gives_tha
     let by_env = resolve(&|k| (k == "PI_SESSION_ID").then(|| key.value.to_string()), tree.as_ref(), head, None);
     let machine = machine_info(&root).unwrap();
     let env_info = session_info(&by_env, &machine, &no_facts).unwrap();
-    let by_key = session_for(&root, &key, Some(head)).unwrap();
+    let start_time = fgos_process::facts::identity_of(fgos_process::ProcId(head)).unwrap().start_time;
+    let head_ref = HeadRef { pid: head, start_time };
+    let by_key = session_for(&root, &key, Some(&head_ref)).unwrap();
+    let reused = HeadRef { start_time: format!("{}0", head_ref.start_time), ..head_ref.clone() };
+    let untrusted = session_for(&root, &key, Some(&reused)).unwrap();
     child.kill().unwrap();
     child.wait().unwrap();
     assert_eq!(by_key.local.cli, "omp");
+    // a start time that is not the process's means its ancestry is not trusted: neutral label, same id
+    assert_eq!(untrusted.info.id, by_key.info.id);
+    assert!(untrusted.info.handle.starts_with("pi-"), "{}", untrusted.info.handle);
     assert_eq!(by_key.info, env_info);
     assert!(by_key.info.handle.starts_with("omp-"), "{}", by_key.info.handle);
     // without a head pid the label is the neutral one, and the id stays the same

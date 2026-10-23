@@ -47,6 +47,6 @@ pub use provider::{
     IDENTITY_READ_OPERATION_ID, IDENTITY_WRITE_DESCRIPTOR, IDENTITY_WRITE_OPERATION_ID,
 };
 pub use resolve::{
-    env_identity, resolve, resolve_current, terminal_head, tree_identity, Source, WriterId, WriterIdentity, WriterKey,
+    env_identity, resolve, resolve_current, terminal_head, tree_identity, HeadRef, Source, WriterId, WriterIdentity, WriterKey,
     pi_family_cli, ENV_ORDER, MAX_ID_LENGTH, PI_SESSION_VAR, REGISTRY_FILE,
 };
