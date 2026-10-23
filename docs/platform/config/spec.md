@@ -4,11 +4,11 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for fgOS configuration: which files, which schema, which value wins, who may write, and the comments every writer must leave
-Design status: Signed by the owner on 2026-10-22 as a whole; amended 2026-10-23 (section 4 now JSON Schema, section 10 settled, counts corrected; see "Lịch sử quyết định")
+Design status: Signed by the owner on 2026-10-22 as a whole; amended 2026-10-23 (section 4 now JSON Schema, section 10 settled, counts corrected) and again 2026-10-23 11:45 (shape in the schema, values in a separate standard file, fewer annotations); see "Lịch sử quyết định"
 Implementation status: Not started
 Canonical: Yes
 Owner: Config component (proposed)
-Source (planned): packages/config/rust (crate fgos-config); section schemas (JSON Schema authored as YAML) core/config-schema/
+Source (planned): packages/config/rust (crate fgos-config); section schemas (JSON Schema authored as YAML) core/config-schema/, section standards (the release's standard values) core/config-standard/
 Contracts (planned): packages/config/contracts/
 Last reviewed: 2026-10-23
 Related:
@@ -38,7 +38,7 @@ Two owner requirements shape it:
 | Owns | Does not own |
 |---|---|
 | Which files are config, their scope and precedence (section 3) | YAML syntax, byte-preserving edits, comment injection guard (YAML Document) |
-| Loading the bundled section schemas, the lint of their `x-fgos-` annotations, and applying a JSON Schema validator crate to the effective value (section 4) | The JSON Schema syntax and the value checker (the standard and the validator crate); the meaning of a section: each section's schema is written by the component that owns the section |
+| Loading the bundled section schemas and standard files, the lint of the schemas' `x-fgos-` annotations and of the standard against them, and applying a JSON Schema validator crate to the effective value (section 4) | The JSON Schema syntax and the value checker (the standard and the validator crate); the meaning of a section: each section's schema is written by the component that owns the section |
 | The effective snapshot with provenance and its cache (section 5) | Cross-field rules a section owner checks itself, such as most of `validateRunnerConfigShape` |
 | The write doors, the write transaction and its conflict rule (section 6) | Lock mechanism (Holder-lock), durable replace (Durable File) |
 | The `@fgos:` comment grammar and when a reason is required (section 7) | Secret values; Config stores references and Secrets resolves them (section 9) |
@@ -59,7 +59,7 @@ Dependencies, one way: Config → YAML Document, Holder-lock, Durable File, Secr
 | Gateway token | `~/.fgos/private/gateway-token` | the machine | the gateway bearer token, one line, nothing else, not YAML; mode 0600 |
 
 `~/.fgos/private/` (mode 0700) holds the accounts file, the token file and every backup that may contain either; it is hidden from every confined worker (section 9). One directory, not a list of file names, so a backup or a later machine secret is hidden by where it is written, not by remembering to add it.
-| Standard | rendered from the section schemas bundled with the release | built in | the complete standard configuration (section 4); read-only; applied in memory, never written by a read |
+| Standard | the standard files bundled with the release (`core/config-standard/<section>.yaml`) | built in | the complete standard configuration (section 4); read-only; applied in memory, never written by a read |
 
 Precedence: project over global over standard, the rule of `docs/distribution-vision.md`. A schema can narrow it: a key whose schema node carries `x-fgos-scope: global-only` is refused in the project file by name, and `x-fgos-scope: project-only` the reverse. The accounts file is a source for its own keys only and the token file is not config at all: neither is a layer of this ladder, and a key that belongs to one of them is refused in the project and global files by name (`config-key-in-wrong-file`, naming the file it belongs in). A value `detected` at read time (section 8) ranks between global and standard and exists only for keys whose schema node says `x-fgos-absent: detected`; a project or global value always wins over it.
 
@@ -69,7 +69,7 @@ Why (evidence 2026-10-22): this repository's project file is 1557 lines, of whic
 
 **The project file is not trusted for machine keys.** Anyone who lands a commit can change the project file, so a key that decides who may reach this machine, which secret goes where, or what runs here unconfined must not be overridable from it. Rules:
 
-1. A schema node whose `x-fgos-sensitivity` is not `public` must declare `x-fgos-scope` explicitly; the annotation lint refuses `both` for those keys unless the node carries a written `x-fgos-justification`.
+1. A schema node whose `x-fgos-sensitivity` is not `public` must declare `x-fgos-scope` explicitly; the annotation lint refuses `both` for those keys unless the node carries a written justification (a `$comment` that starts `justification:`, section 4).
 2. `x-fgos-scope: global-only` applies to ancestors: a project value at any ancestor path of a `global-only` key, including `null` and a `replace`-merged mapping, is refused with the same error.
 3. A schema path can name every entry of a map (`additionalProperties`, section 4), so a rule such as "`runner.providers.<name>.accounts` is global-only" is expressible (in this spec `<name>` is prose for any entry of a map, not schema syntax).
 4. These are `global-only` from the first slice, each pinned by a fixture: the whole `gateway` section (today the gateway reads only `~/.fgos/config.json`, `apps/fgos-gateway/src/gateway.rs:143`, so this keeps current behaviour), `secrets.globalFile`, `secrets.sources`, `secrets.declarations.<name>.consumers`, and `bin.*`. The account pools (`runner.providers.<name>.accounts`, today's rule in `provider-capacity.mjs`, and `runner.llmAccounts`) and `gateway.token` go further: they leave the config files for their own files (table above).
@@ -78,11 +78,18 @@ Exactly one source per scope: when both `config.yaml` and `config.json` exist in
 
 Not config, and never converted to YAML: `.fgos/installation/activation.json`, `.fgos/distribution.json`, release `manifest.json`, `native-addon.json`, `.fgos/coexistence.json`, `~/.fgos/confinement-backends.json`, `events.jsonl`, `state.json`, lock and receipt files. Config starts after the bootstrap that reads them.
 
-## 4. Schema
+## 4. Schema and standard
 
 Config files are YAML, so people can edit them and keep comments. Their schema invents no syntax: it is **JSON Schema draft 2020-12**, the dialect of fgOS's other contracts (`packages/*/contracts/*.schema*.json`, and `docs/contracts/fgos-gateway-api-v1.yaml` through OpenAPI 3.1). What matters is standard fields; syntax and validator are the best existing ones, and developers maintain the schema with ordinary JSON Schema tooling (owner, 2026-10-23).
 
-Each component that owns a section ships a **section schema**: one JSON Schema document per section, authored as YAML at `core/config-schema/<section>.yaml` (file name = the top-level key) so developers can comment it. It is parsed with the same `strict-config` profile as a config file and then handed to the validator as JSON. The root carries `x-fgos-owner` (the component) and `x-fgos-version`. Config bundles the section schemas with the release and imports no module of any owner; it never calls back into JavaScript.
+**Shape and values are separate files** (owner, 2026-10-23 11:45), so developers maintain shape in the schema and values in the standard, and a person can open the standard, copy from it or edit it:
+
+| What | File | Holds |
+|---|---|---|
+| Section schema | `core/config-schema/<section>.schema.yaml` | shape and meaning only: type, enum, bounds, description, properties, additionalProperties, required, `$defs`/`$ref`, and the few annotations below |
+| Section standard | `core/config-standard/<section>.yaml` | the release's standard values for that section: a normal config file in the `@fgos:` comment format (section 7), validated by the schema exactly like a project or global file |
+
+The file name before the first `.` is the top-level key (`runner.schema.yaml` and `runner.yaml` are the `runner` section). Each component that owns a section ships both. A schema is parsed with the same `strict-config` profile as a config file and then handed to the validator as JSON. Config bundles both sets with the release and imports no module of any owner; it never calls back into JavaScript.
 
 **Standard keywords keep their standard meaning:**
 
@@ -90,14 +97,15 @@ Each component that owns a section ships a **section schema**: one JSON Schema d
 |---|---|
 | `type` | string, integer, number, boolean, array, object; a type list such as `[object, "null"]` |
 | `enum`, `minimum`, `maximum` | the allowed values and the bounded range |
-| `default` | the **standard value**, applied when the key is absent in every config file; at a map it may hold the whole catalog (below) |
-| `description` | one line: what the key does, its allowed values and its standard value; it is the text of the generated `# @fgos:doc` line (section 7) |
+| `description` | one line: what the key does and its allowed values; with the standard value read from the standard file it is the text of the generated `# @fgos:doc` line (section 7) |
 | `properties` | the known keys of an object |
 | `additionalProperties` | the schema of every entry of a map or catalog (replaces the earlier custom `<any>` path segment); `patternProperties` is not used (the path walk does not interpret patterns) |
 | `required` | keys that must be present in the effective configuration (judged on the merged value, below) |
 | `$defs`, `$ref` | reuse inside the bundled set; no remote reference is followed |
+| `$id`, `$comment` | the revision and the notes for people, below |
+| `default` | **not used.** The standard file is the one source of standard values, so a second copy cannot drift; the lint refuses the keyword |
 
-**fgOS-only facts are annotation keywords with the `x-fgos-` prefix.** JSON Schema validators ignore keywords they do not know, so these never change validation:
+**Facts the standard cannot express are annotation keywords with the `x-fgos-` prefix**, the minimum set. JSON Schema validators ignore keywords they do not know, so these never change validation:
 
 | Annotation | Values | Meaning |
 |---|---|---|
@@ -105,35 +113,41 @@ Each component that owns a section ships a **section schema**: one JSON Schema d
 | `x-fgos-sensitivity` | `public` (default); `command` (the value is executed or becomes argv: `invariantChecks.commands`, `worktreeSetup.commands`, `runner.executor` and `runner.executors.<name>` command, args and env, confinement backend references and the `unconfined` mode); `secret-reference` (section 9); `secret-value` (interim, `gateway.token` only, deleted when the token moves to Secrets) | how the value is treated |
 | `x-fgos-file` | `config` (default), `accounts`, `token` | the one file the key may live in |
 | `x-fgos-merge` | `deep`, `replace`, `leaf` | the YAML Document merge primitive's rule for this path |
-| `x-fgos-absent` | `detected`, `required`, `off`; used only where there is no `default` | `detected`: no standard value, detected at read time (section 8); `required`: no standard value, missing is a reported error; `off`: missing means the feature is off. `fgos config standard` prints `required` and `detected` keys as commented placeholders |
-| `x-fgos-suggestion` | a value of the key's type | an optional **setup suggestion**, written only by `init` when it creates a file, with `@fgos:why [setup:suggested] <source>`; never applied by a read |
-| `x-fgos-justification` | text | the written justification section 3 rule 1 asks for when a non-public key keeps `scope: both` |
-| `x-fgos-owner`, `x-fgos-version` | component name; positive integer | at the schema root; the version is bumped when `description`, `enum`, bounds or `default` change |
+| `x-fgos-absent` | `detected`, `required`, `off`; used only where the standard file holds no value for the key | `detected`: no standard value, detected at read time (section 8); `required`: no standard value, missing is a reported error; `off`: missing means the feature is off. `fgos config standard` prints `required` and `detected` keys as commented placeholders |
+
+The other facts the earlier annotation list carried live where JSON Schema already puts them or belong elsewhere:
+
+| Fact | Where |
+|---|---|
+| Revision of the schema (what triggers doc refresh, section 7) | the schema's `$id`: `urn:fgos:config-schema:<section>:v<N>`, N a positive integer bumped when a `description`, `enum`, bound or the section's standard value changes |
+| Owning component | the schema root's `$comment`, whose first line is `owner: <component>` |
+| Justification for keeping `x-fgos-scope: both` on a non-public key (section 3 rule 1) | that node's `$comment`, which starts `justification: <text>` |
+| A setup suggestion (a value `init` may write for a new project) | not in the schema. It is a value, not shape, and only one case used it (this repository's `invariantChecks` command, which this repository keeps in its own config, section 13). `init` takes any such value from the setup code that creates the file and writes it with `@fgos:why [setup:suggested] <source>` (section 7); a read never applies it |
 
 An annotation on a schema node applies to every descendant node that does not state it itself (so `x-fgos-scope: global-only` on `gateway` covers the whole section). A config path resolves to a schema node by walking `properties`, then `additionalProperties`, following `$ref`; a path with no node is undescribed.
 
-**Config's own code keeps only what no validator does:** loading the bundled schemas; a small lint of the `x-fgos-` annotations and of the scope and sensitivity rules of section 3 (unknown annotation, wrong annotation value, missing owner or version, missing `description`, implicit or unjustified scope, wrong file placement, a secret with a `default`, a `default` that fails its own schema); scope and placement enforcement; the snapshot (merge through YAML Document, provenance); the write transaction; the comment grammar; redaction. There is no custom type dialect and no custom value checker.
+**Config's own code keeps only what no validator does:** loading the bundled schemas and standard files; a small lint of the `x-fgos-` annotations, of the `$id` and `$comment` conventions, of the scope and sensitivity rules of section 3 and of the standard against the schema (unknown annotation, wrong annotation value, missing `$id` revision or `owner:` comment, a `default` keyword, missing `description`, implicit or unjustified scope, wrong file placement, a standard value on a secret, file-placed or absent-marked key, a standard file with no schema, a standard that fails its own schema); scope and placement enforcement; the snapshot (merge through YAML Document, provenance); the write transaction; the comment grammar; redaction. There is no custom type dialect and no custom value checker.
 
-**Validation is the validator crate's.** "The validator crate" is an existing JSON Schema validator chosen by the owner after a supply-chain review (`plans/reports/research-261023-1109-json-schema-validator-crate-choice.md`); Config adopts it only after that sign-off, behind the same gate Slice A used for its parser. It validates the **effective** value (the merge of the layers), never one file alone, because a file holds only differences (section 3) and `required` and whole-section shape can only hold for the merge. A finding carries the instance path, the schema keyword and the schema path, attributed to a source file, line and column through the snapshot's provenance; the validator's message text is dropped, because it can quote a value (section 9). A type mismatch is reported, never repaired. A key with no schema node is reported by doctor as a warning, and kept on every write.
+**Validation is the validator crate's.** "The validator crate" is an existing JSON Schema validator chosen by the owner after a supply-chain review (`plans/reports/research-261023-1109-json-schema-validator-crate-choice.md`; the owner picked `jsonschema` 0.60.0 on 2026-10-23, conditional on the source review `plans/reports/review-261023-1145-jsonschema-supply-chain-review.md`); Config adopts it only after that sign-off, behind the same gate Slice A used for its parser. It validates the **effective** value (the merge of the layers), never one file alone, because a file holds only differences (section 3) and `required` and whole-section shape can only hold for the merge. A standard file is validated like any other file, as a layer, with `required` judged only on the merge. A finding carries the instance path, the schema keyword and the schema path, attributed to a source file, line and column through the snapshot's provenance; the validator's message text is dropped, because it can quote a value (section 9). A type mismatch is reported, never repaired. A key with no schema node is reported by doctor as a warning, and kept on every write.
 
-**The standard is data, complete and readable.** A `default` may be a whole catalog: the entries of a map (every capability, every executor, every model policy, the tier fallback, the patterns, the workflow presets) are listed in the owning section schema, not seeded from JavaScript constants (today `DEFAULT_CAPABILITY_SLOTS` in `src/setup/registrations.mjs:2262` and the other setup seeds). Config renders the schemas into one standard file in the same `@fgos:` comment format as a config file, shipped with the release and shown by `fgos config standard`. The standard holds no account, no token and no machine-detected value, so it is the same on every machine.
+**The standard is data, complete and readable.** The standard files hold every standard value, and a value may be a whole catalog: the entries of a map (every capability, every executor, every model policy, the tier fallback, the patterns, the workflow presets) are listed in the owning section's standard file, not seeded from JavaScript constants (today `DEFAULT_CAPABILITY_SLOTS` in `src/setup/registrations.mjs:2262` and the other setup seeds). A standard file is a normal config file: it starts `# @fgos:v1`, and each key carries its `# @fgos:doc` line rendered from the schema (section 7). It is the baseline, not a difference, so it carries no `@fgos:why` and the redundancy rule (section 3) does not apply to it. The files ship with the release and `fgos config standard` prints them in section order. The standard holds no account, no token and no machine-detected value, so it is the same on every machine.
 
-**The first standard is authored from this repository's tuned catalog**, not from the setup seed: the seed is stale (section 3) and the tuned catalog is the one that runs every day. Owner decision G-B2, 2026-10-23, rule A: catalogs (`runner.capabilities`, `runner.executors`, `modelPolicies`, `tierFallback`, `patterns`, `defaults`, `coordination`) come from the tuned file after the machine-specific scrub (the catalog is not clean: an executor description names a login profile); scalars come from the code defaults, that is, what every reader assumes when the key is absent (this repository's own timeouts, tier ceiling and parallelism stay its differences); project-specific keys (`runner.executor`, `runner.generatedPaths`) are detected or empty; account material is never in the standard. After that, a standard change is a schema change reviewed like code, with its `x-fgos-version` bumped.
+**The first standard is authored from this repository's tuned catalog**, not from the setup seed: the seed is stale (section 3) and the tuned catalog is the one that runs every day. Owner decision G-B2, 2026-10-23, rule A: catalogs (`runner.capabilities`, `runner.executors`, `modelPolicies`, `tierFallback`, `patterns`, `defaults`, `coordination`) come from the tuned file after the machine-specific scrub (the catalog is not clean: an executor description names a login profile), into `core/config-standard/runner.yaml`; scalars come from the code defaults, that is, what every reader assumes when the key is absent (this repository's own timeouts, tier ceiling and parallelism stay its differences); project-specific keys (`runner.executor`, `runner.generatedPaths`) are detected or empty; account material is never in the standard. After that, a standard change is a standard-file or schema change reviewed like code, with the schema's `$id` revision bumped.
 
-A standard entry that a later release renames or removes is reported by doctor when a file still holds fields under the old name (`config-unknown-key`): for a map with a catalog, a name is known when it is in the catalog or allowed by `additionalProperties`, so where a map does not allow free names a stray old name is visible.
+A standard entry that a later release renames or removes is reported by doctor when a file still holds fields under the old name (`config-unknown-key`): for a map with a catalog, a name is known when it is in the standard or allowed by `additionalProperties`, so where a map does not allow free names a stray old name is visible.
 
-To change a standard value, a person or agent copies the fields to change into the project or global file and edits them there (`fgos config set`, or by hand with a `@fgos:why`). A map merges per entry (`x-fgos-merge: deep` at the map), so changing one capability means writing one capability, and every other entry keeps following the standard into the next release. A file that wants to own a whole section uses `x-fgos-merge: replace` on it, which the schema must allow. The standard file of the release is never edited in place: a release upgrade replaces it.
+To change a standard value, a person or agent copies the fields to change into the project or global file and edits them there (`fgos config set`, or by hand with a `@fgos:why`). A map merges per entry (`x-fgos-merge: deep` at the map), so changing one capability means writing one capability, and every other entry keeps following the standard into the next release. A file that wants to own a whole section uses `x-fgos-merge: replace` on it, which the schema must allow. The installed copy of the standard files is never edited in place: a release upgrade replaces it.
 
-The 14 `registerConfigDefault` calls in `src/setup/registrations.mjs` become section schemas in the first slice (the config file has 15 top-level sections; `lock` has no registration and is retired, section 10). The hand-written merge rules become annotations or are retired: the seat-binding capability keys refused in the global file become `x-fgos-scope: project-only`; the account inventory becomes `x-fgos-file: accounts` with `x-fgos-scope: global-only`; the one remaining `sectionOf` copy (`src/terminal-control/config.mjs:40`) and `mergeWithGlobalConfig`'s fill-missing merge are the merge primitive's own defaults; the `runner.rigorToTier`, stale-tier-key and extended-cell filters of `sanitizeGlobal` serve older releases on the machine and are not annotations.
+The 14 `registerConfigDefault` calls in `src/setup/registrations.mjs` become section schemas and standard files in the first slice (the config file has 15 top-level sections; `lock` has no registration and is retired, section 10). The hand-written merge rules become annotations or are retired: the seat-binding capability keys refused in the global file become `x-fgos-scope: project-only`; the account inventory becomes `x-fgos-file: accounts` with `x-fgos-scope: global-only`; the one remaining `sectionOf` copy (`src/terminal-control/config.mjs:40`) and `mergeWithGlobalConfig`'s fill-missing merge are the merge primitive's own defaults; the `runner.rigorToTier`, stale-tier-key and extended-cell filters of `sanitizeGlobal` serve older releases on the machine and are not annotations.
 
-The default and the suggestion are separate on purpose. Today `fgos setup` writes `node --test test/architecture.test.mjs` into every project's `invariantChecks.commands`, a command that fails in a project without that file, while the reader refuses to assume it. Under this schema that value is at most an `x-fgos-suggestion` of this repository, and its standard value is the empty list.
+Value and suggestion are separate on purpose. Today `fgos setup` writes `node --test test/architecture.test.mjs` into every project's `invariantChecks.commands`, a command that fails in a project without that file, while the reader refuses to assume it. Under this design the standard value of `invariantChecks.commands` is the empty list (in `core/config-standard/invariantChecks.yaml`), and that command is at most a value this repository keeps in its own file.
 
 ## 5. Read: the snapshot
 
 `snapshot(projectRoot)` returns, for the project and the machine:
 
 - the effective value of every described key and of every undescribed key present in a file;
-- for every value, its provenance: `project`, `global`, `accounts`, `standard` or `detected`, with file, line and column when it came from a file;
+- for every value, its provenance: `project`, `global`, `accounts`, `standard` or `detected`, with file, line and column when it came from a file (a `standard` value names the bundled standard file);
 - the byte revision of each source file.
 
 Rules:
@@ -141,7 +155,7 @@ Rules:
 1. **A read never writes.** No file is created, filled or reformatted by a read, a check or `doctor` without `--fix`. Today's `ensureRunnerConfigForDir`, which writes the project file on the read path, is removed; its callers receive the in-memory standard.
 2. **Missing is not malformed.** An absent file is an empty source. A file that does not parse, or breaks the `strict-config` profile, is an error for every caller, doctor and runner alike; it never becomes an empty object.
 3. **Absent is not null** (YAML Document section 7).
-4. **Cache by content.** A snapshot is reused while every source's size and sha256 and the schema bundle's digest are unchanged: one stat and one hash per source per read, never a process-lifetime cache. Measured: stat plus read plus sha256 of the 40 KB config costs about 24 µs, less than today's read plus `JSON.parse` at about 59 µs (spike, G1).
+4. **Cache by content.** A snapshot is reused while every source's size and sha256 and the digest of the schema and standard bundle are unchanged: one stat and one hash per source per read, never a process-lifetime cache. Measured: stat plus read plus sha256 of the 40 KB config costs about 24 µs, less than today's read plus `JSON.parse` at about 59 µs (spike, G1).
 5. **Environment facts are not defaults.** Values that depend on the machine are detected at read time and reported with provenance `detected`, never written into the tracked project file (section 8).
 6. **Command values come from the trusted root.** A `command` value is read from the main checkout's project file (or the global file), never from a linked worktree's copy. Today this holds only in call sites (`src/runner/merge.mjs:1216`, `:1246`, `src/runner/worktree.mjs:143` read from the repository root, not the candidate worktree); under Config it is a rule of the snapshot: `snapshot` takes the main checkout root for command keys whatever root the caller passes. A fixture pins that a worker's edit to its worktree's config does not change what the merge gate or the worktree setup executes.
 7. **Snapshots handed to Node are plain data.** Objects built for JavaScript have no prototype and are created with define semantics, so no key, `__proto__` included, can change an object's prototype (YAML Document section 10).
@@ -188,7 +202,7 @@ gateBypass:
 
 | Line | Written by | Content | Rule |
 |---|---|---|---|
-| `# @fgos:doc` | Config, from the schema's `description` | what the key does, its allowed values and its standard value | rewritten only when the schema's `x-fgos-version` changes, and only by `doctor --fix` or `fgos config refresh-docs`, never as part of another write |
+| `# @fgos:doc` | Config, from the schema's `description`, `enum` and bounds and the standard file's value | what the key does, its allowed values and its standard value | rewritten only when the rendered line differs after the schema's `$id` revision or the standard value changed, and only by `doctor --fix` or `fgos config refresh-docs`, never as part of another write |
 | `# @fgos:why [<actor>]` | whoever set the value | why the key holds this value | required on every value a config file holds, since a file holds only values that differ from the standard (section 3); kept verbatim; never rewritten by Config |
 | any other `#` line | a person | free notes | kept verbatim |
 
@@ -239,12 +253,12 @@ Holder-lock no longer reads config. Commit `a620881e7` (2026-10-22, "move the No
 |---|---|
 | `show [--path <p>]` | the effective snapshot with provenance; secret references shown as references |
 | `standard [--path <p>]` | the release's standard configuration with its `@fgos:doc` lines, ready to copy an entry from |
-| `explain <path>` | the schema node: description, type, enum or bounds, default, scope, owner, and where the current value comes from |
+| `explain <path>` | the schema node: description, type, enum or bounds, standard value, scope, owner, and where the current value comes from |
 | `check` | validate both files; no write |
 | `set <path> <value> --reason <text>` / `unset <path> --reason <text>` | one transaction (section 6); `<path>` uses YAML Document's path text form (keys joined by `.`, a key containing `.`, `[`, `]` or a quote written bracket-quoted as `["a.b"]`), so no key is ever addressed by accident |
 | `patch <file> --reason <text>` | several edits in one transaction on one source |
 | `migrate [--global]` | JSON to YAML (section 13) |
-| `refresh-docs` | rewrite `@fgos:doc` lines whose schema `x-fgos-version` changed |
+| `refresh-docs` | rewrite `@fgos:doc` lines whose rendered text differs from the schema and standard (after an `$id` revision or standard change) |
 
 Doctor checks, registered in `src/setup/checks.mjs` as the install/setup/doctor gate requires: `config-parse` (both files parse under `strict-config`), `config-schema` (validation of the effective value against the section schemas), `config-legacy-shadowed`, `config-format-legacy-json`, `config-doc-drift` (fix: refresh), `config-comment-missing-doc` (fix: render), `config-comment-missing-why` (warning, no fix), `config-unknown-key` (warning), `config-redundant-value` (warning, fix: remove), `config-key-in-wrong-file` (fix: move to the accounts or token file), `config-global-permissions` (fix: chmod 0600 on the global, accounts and token files). `fgos setup` calls `init` for a missing project or global file and creates `~/.fgos/private/` with the token file when missing; `doctor --fix` applies the fixes it reported (redundant values, keys in the wrong file, permissions, doc drift). Doctor also reports `config.json.bak-*` or other files directly under `~/.fgos` that hold an account pool or a token (`config-secret-outside-private`, fix: move under `private/`); one exists on the owner's machine today (`~/.fgos/config.json.bak-20261021-llmaccounts`).
 
@@ -298,7 +312,7 @@ Owner decision 2026-10-22: native door.
 
 ## 15. Acceptance
 
-1. `init` creates a file with no standard value in it; every key a door writes carries `# @fgos:doc` (doc, values, standard value) and `# @fgos:why`; running `refresh-docs` twice leaves the bytes unchanged the second time and never touches `@fgos:why` or free notes; `fgos config standard` prints the complete standard with its `@fgos:doc` lines and no account, token or detected value.
+1. `init` creates a file with no standard value in it; every key a door writes carries `# @fgos:doc` (doc, values, standard value) and `# @fgos:why`; running `refresh-docs` twice leaves the bytes unchanged the second time and never touches `@fgos:why` or free notes; `fgos config standard` prints the complete standard with its `@fgos:doc` lines and no account, token or detected value; every standard file validates against its schema.
 2. Editing one deep value keeps every other byte identical, comments included.
 3. Two writers from one revision: one commits, the other gets `config-write-conflict`; no torn file.
 4. Read, check and doctor without `--fix` never create or modify a file; missing is not malformed; a malformed file never becomes an empty object.
@@ -334,7 +348,7 @@ Owner decision 2026-10-22: native door.
 
 1. **What to read first?** This spec and `docs/platform/yaml-document/spec.md`; the inventory report for today's readers and writers.
 2. **What kind of work?** A new foundation component that replaces `src/config/`, the bypass readers, the write-on-read and the hand-written merges.
-3. **What contract does it touch?** The config files of every project using fgOS, the new `~/.fgos/private` files and their readers (the gateway token reader in `gateway.rs`, the lease readers in `provider-capacity.mjs` and `llm-accounts.mjs`), the setup and doctor registry, the Holder-lock registry (two new locks), the section schemas (JSON Schema, one validator crate), the confinement hidden set (G6), the addon ABI marker, Seat Binding §5.1.
+3. **What contract does it touch?** The config files of every project using fgOS, the new `~/.fgos/private` files and their readers (the gateway token reader in `gateway.rs`, the lease readers in `provider-capacity.mjs` and `llm-accounts.mjs`), the setup and doctor registry, the Holder-lock registry (two new locks), the section schemas and standard files (JSON Schema, one validator crate), the confinement hidden set (G6), the addon ABI marker, Seat Binding §5.1.
 4. **How much risk?** High: every component reads config, and projects outside this repository carry these files. The equivalence check, the conflict rule, the deferred global migration and the machine-file moves on the owner's machines carry it.
 5. **What proof means done?** The acceptance list as Rust tests with golden fixtures; one Node wiring proof per door; `npm test` and `cargo test --workspace` green.
 6. **What learning is left?** Decisions below and in `distribution.md` and `seat-binding.md`; gate evidence in the spike report.
@@ -352,3 +366,4 @@ Owner decision 2026-10-22: native door.
 - **2026-10-22: signed.** The owner reviewed and signed this spec as a whole after the standard and private-directory revision and its review, together with the YAML Document spec.
 - **2026-10-23: section schemas are JSON Schema draft 2020-12, authored as YAML.** Owner (10:54): config files stay YAML so people can edit them and keep comments; the schema must not invent a syntax, standard fields matter, and syntax and validator should be the best existing ones, which developers can maintain. Replaces the custom descriptor dialect (own types, `values`, `<any>` path segment, own value checker) with `type`, `enum`, `minimum`/`maximum`, `default`, `description`, `properties`, `additionalProperties`, `required`, `$defs`/`$ref`, plus annotations `x-fgos-scope`, `-sensitivity`, `-file`, `-merge`, `-absent`, `-suggestion`, `-justification`, `-owner`, `-version`. Reason: no reinvented dialect; the same dialect as the packages' contracts and the gateway's OpenAPI 3.1; an existing validator crate does the checking (chosen separately by the owner after a supply-chain review, adopted only after sign-off). Config keeps only loading, a small annotation lint, scope and placement, the snapshot, the write transaction, the comment grammar and redaction. Validation runs on the effective value, not on a lone file.
 - **2026-10-23: corrections found by the Slice B plan.** Section 10 replaced by the settled fact (`a620881e7` removed every config read from Holder-lock; acceptance 11 adjusted); the registration count is 14, not 15 (15 and 17 came from `rg` also matching the function definition and two error strings); only `src/terminal-control/config.mjs:40` still has a `sectionOf` copy; the first standard's rule A (G-B2, 2026-10-23 10:40) recorded in section 4.
+- **2026-10-23 11:45: shape and values are separate files; annotations reduced to the minimum.** Owner. `core/config-schema/<section>.schema.yaml` holds shape and meaning only (JSON Schema 2020-12); `core/config-standard/<section>.yaml` holds the release's standard values as a normal config file in the `@fgos:` format, validated by the schema like a project or global file; `fgos config standard` prints the standard files; precedence stays project over global over standard. Reason: a human-readable standard set that people can open, copy from or edit, while developers maintain shape in the schema and values in the standard. The JSON Schema `default` keyword is not used (the standard file is the one source of standard values, so nothing can drift; the lint refuses it). The annotations `x-fgos-version`, `-owner`, `-justification` and `-suggestion` are removed, leaving `x-fgos-scope`, `-sensitivity`, `-file`, `-merge` and `-absent`: the revision is the schema's `$id` (`urn:fgos:config-schema:<section>:v<N>`), the owner and the written justification of section 3 rule 1 live in `$comment`, and a setup suggestion is a value, so it is not schema (only the `invariantChecks` command ever used it; `init` takes such a value from setup code and writes it with `[setup:suggested]`). Supersedes the annotation list and the `default` row of the 10:54 decision. Validator pick recorded: `jsonschema` 0.60.0, conditional on the source review.

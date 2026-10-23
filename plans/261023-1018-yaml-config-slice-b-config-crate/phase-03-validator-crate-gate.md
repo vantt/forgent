@@ -4,7 +4,7 @@ Depends on 01. Suggested executor: sonnet for the conformance probe and the reco
 
 ## Context
 
-Owner decision 2026-10-23 (spec section 4): section schemas are JSON Schema draft 2020-12 authored as YAML, and validation uses an existing validator crate, "the validator crate". The owner chose it separately, after a supply-chain review: `plans/reports/research-261023-1109-json-schema-validator-crate-choice.md` (read it first; this plan does not repeat its content or name the crate before the owner's sign-off). This phase does not re-open the choice. It proves the chosen crate fits how Config uses it, records the exact pin, and asks for the adoption sign-off in the decision-question template. No custom type dialect and no custom value checker are built here or later.
+Owner decision 2026-10-23 (spec section 4): section schemas are JSON Schema draft 2020-12 authored as YAML, and validation uses an existing validator crate, "the validator crate". The owner chose it separately, after a supply-chain review: `plans/reports/research-261023-1109-json-schema-validator-crate-choice.md` (read it first; this plan does not repeat its content or name the crate before the owner's sign-off). The owner's pick (2026-10-23 11:45) is `jsonschema` 0.60.0, conditional on the source review `plans/reports/review-261023-1145-jsonschema-supply-chain-review.md` (in progress when this plan was amended): read that report's verdict first, and treat a failed or open review as the decision question's option C, not as something to patch around. This phase does not re-open the choice otherwise. It proves the chosen crate fits how Config uses it, records the exact pin, and asks for the adoption sign-off in the decision-question template. No custom type dialect and no custom value checker are built here or later.
 
 ## Files it may touch
 
@@ -13,9 +13,9 @@ Scratch only until sign-off: `.fgos/runtime/tmp/validator-probe/` (a standalone 
 ## Conformance probe (what Config needs from the crate; each is one probe case with a verdict)
 
 1. Draft 2020-12 is supported (`$schema`, `$defs`, `$ref`, `additionalProperties`, `required`, `enum`, `minimum`/`maximum`, `type` as a list).
-2. Unknown `x-fgos-*` keywords are ignored as annotations and never change a result.
-3. `default` is an annotation only: validation neither applies nor requires it.
-4. Offline: no network, no file read, no remote `$ref` resolution; local `$ref` and `$defs` across the bundled set work (one composite schema built by Config from the section files).
+2. Unknown `x-fgos-*` keywords, `$comment` and a non-resolvable `$id` (`urn:fgos:config-schema:<section>:v<N>`) are ignored as annotations and never change a result or trigger a fetch.
+3. A schema with no `default` keyword validates a value exactly as one with it would (nothing in Config relies on `default`; the lint refuses it).
+4. Offline: no network, no file read, no remote `$ref` resolution; local `$ref` and `$defs` work, and the composite root reaches every section schema by its `$id` through resources registered in memory (one composite schema built by Config from the section files, no retriever).
 5. Errors expose the keyword, the instance path and the schema path as data, so Config can drop the message text (which can quote a value, spec section 9).
 6. Compile once, validate many; time on the 40 KB effective config and on the largest expected catalog value, informational only.
 7. Bounded: recursion depth and `$ref` cycles end with an error, never a stack overflow or a hang (one cycle case, one 32-deep case).
