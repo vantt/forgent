@@ -1,0 +1,1614 @@
+{
+ "scope": "w2-g2-census",
+ "commit": "cffe725b9",
+ "verdicts": [
+  {
+   "id": "F-replay",
+   "verdict": "APPROVE",
+   "reason": "Own rerun of join.py --rescan in a scratch clone detached at pin 3e2d05af: join.json, residue.json, post-pin-literals.json byte-identical to bade6b6b3 bytes; same stdout counts.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py"
+  },
+  {
+   "id": "F-exhaustive",
+   "verdict": "APPROVE",
+   "reason": "1,126 rows, 1,126 unique ids, set-equal to register nonBehavioralCensusSites; residue.json id set == join rows with status judgment-required (187); 646+293+187=1126.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json#rows[*].id"
+  },
+  {
+   "id": "F-pin-drift",
+   "verdict": "REWORK",
+   "reason": "Artifacts are pinned to 3e2d05af but landed in bade6b6b3 (parent 5fe778624); src/runner/worktree.mjs (+2) and test/scripts/check-evidence-relocation.test.mjs (+4) changed in between, so 38 rows (pc-d-1081/1082, 36 rows in check-evidence-relocation) carry stale currentLine/owning-proof lines and sourceSha256 at the commit that holds them. join.py takes the pin from HEAD with no --pin flag, so a replay at bade6b6b3/cffe725b9 is not byte-identical (classification unchanged: 646/293/187). Rerun at the landed commit or add an explicit pin argument.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py:24 (pin = git rev-parse HEAD); join.json#sourceCommit"
+  },
+  {
+   "id": "F-postpin-dynamic",
+   "verdict": "REWORK",
+   "reason": "post-pin-literals.json re-enumerates only class 4/5/6 literal entries, never dynamicConstructions, although 1,073/1,126 G2 sites are documentation-cued dynamic sites. Recomputing the step-07-final-verify.py dynamic delta at the pin gives 132 current new dynamic sites not in the step-07 list (37 files; 112 in files absent from the register, mostly imported packages/config and packages/yaml-doc code; roles 86 fixture-literal, 32 default-root, 13 reader e.g. bin/fgos.mjs:3869-3890, packages/config/rust/src/files.rs:122-128, src/runner/dispatch/config.mjs:365, src/setup/tier-ladder-comment.mjs:14). Post-pin coverage claim is incomplete.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py:150-172 (rescan block, entries only); /tmp/fgos-work/w2-g2-census/dyn-delta-3e2d05af8.json"
+  },
+  {
+   "id": "F-postpin-literal-count",
+   "verdict": "APPROVE",
+   "reason": "84 current new-literal sites, 16 not in step-07 newLiteralSites reproduced; 3 parse.v1.json rows really reach golden_parse.rs parse_matches_the_golden_cases via common/mod.rs fixture_cases -> read_json(\"fixtures/parse.v1.json\").",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json"
+  },
+  {
+   "id": "F-postpin-hardcoded-join",
+   "verdict": "REWORK",
+   "reason": "The 3 yaml rows are joined by a hard-coded filename branch with hard-coded test line 185 and loader line 28; golden_parse.rs:183 is #[test], 184 is fn, 185 is the body; 13 judgment rows carry owner but no per-row judgment need (only receipt prose). Low severity.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py:164-166; post-pin-literals.json#rows"
+  },
+  {
+   "id": "F-rust-proof-line",
+   "verdict": "REWORK",
+   "reason": "Rust test-start regex lets leading \\s* swallow the preceding newline, so 9 of 17 distinct Rust owning proofs (37 rows) point at the blank line before #[test] (e.g. mint.rs:156, inspect.rs:321, legacy_import.rs:164/214, scoped_commit_sync.rs:303). Containment unaffected; locator off by one. Low.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py:122-126"
+  },
+  {
+   "id": "F-ignored-child-proof",
+   "verdict": "REWORK",
+   "reason": "pc-d-0185/0186 name packages/git/rust/tests/recovery_matrix.rs:recovery_matrix_child as owning proof; it is #[ignore = \"subprocess of recovery_matrix_all_payload_kinds\"] and only runs when spawned by recovery_matrix_all_payload_kinds (line 512). Name the parent test as the owning proof.",
+   "locator": "join.json#rows[id=pc-d-0185,pc-d-0186]"
+  },
+  {
+   "id": "F-residue-custody-text",
+   "verdict": "REWORK",
+   "reason": "116 judgment-required rows carry custody=\"Same-file fixture helper joins explicit call sites in these tests\" with owningProofs=[] (95 with empty helperCallChain): a joined-custody claim on unjoined rows. Drop custody on residue or state the failed reason.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py:107-108; residue.json"
+  },
+  {
+   "id": "F-graded-all",
+   "verdict": "APPROVE",
+   "reason": "All 314 graded rows rechecked: register gradeRecord == memberId, admission REJECT/disposition preserve; 293 confirmed exactly when passage sha+presence and span hold at pin; every confirmed site line lies inside a passage occurrence (incl. 5 multi-occurrence rows). 21 drift rows correctly not carried over.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json#rows[gradeRecord]"
+  },
+  {
+   "id": "F-skip-conditional",
+   "verdict": "APPROVE",
+   "reason": "Owning tests with skip options checked: migrate-cutover-grant skip predicate false at pin (createGitScopedCommit exported), others are platform/bwrap environment skips; no test.skip/todo proofs.",
+   "locator": "test/event-store/migrate-cutover-grant.test.mjs:56,78,130"
+  },
+  {
+   "id": "pc-d-0403",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:42 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0409",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:61 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0847",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/conductor-case.test.mjs:138 -> test/workflow/conductor-case.test.mjs:a nested wave consumes the parent frame and an unknown remainder refuses the next write"
+  },
+  {
+   "id": "pc-d-0343",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/event-store/rollback-export.test.mjs:41 -> test/event-store/rollback-export.test.mjs:real import then fixture fence, v4 append and rollback export preserve Work and nested porting parity"
+  },
+  {
+   "id": "pc-d-0622",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/run-case-admission.test.mjs:131 -> test/runner/execution/run-case-admission.test.mjs:documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt"
+  },
+  {
+   "id": "pc-d-0497",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:95 -> test/runner/documentation-cutover-lease.test.mjs:scope root OIDs cover large subtrees and release records drift rather than refusing it"
+  },
+  {
+   "id": "pc-d-0397",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:29 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0648",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/run.test.mjs:2021 -> test/runner/execution/run.test.mjs:resume settles a pending runner record after the native commit completed"
+  },
+  {
+   "id": "pc-d-0504",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:122 -> test/runner/documentation-cutover-lease.test.mjs:committed freeze ignores forged disk copies, missing locks, environment tokens and clean"
+  },
+  {
+   "id": "pc-d-0247",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:174 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:pre-commit allows holder commit touching scoped paths"
+  },
+  {
+   "id": "pc-d-0525",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:163 -> test/runner/documentation-cutover-lease.test.mjs:corrupt committed sidecars fail closed for acquire and every Node gate"
+  },
+  {
+   "id": "pc-d-0275",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:566 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire"
+  },
+  {
+   "id": "pc-d-0915",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/workflow-runner.test.mjs:2189 -> test/workflow/workflow-runner.test.mjs:an integration conflict fails the workflow and preserves both branches"
+  },
+  {
+   "id": "pc-d-0521",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:154 -> test/runner/documentation-cutover-lease.test.mjs:admission reads the gated main and requires its held caller to belong to the same repository"
+  },
+  {
+   "id": "pc-d-0857",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/confined-nested-write.test.mjs:44 -> test/workflow/confined-nested-write.test.mjs:a nested `fgos run --writes` from a confined worker is refused as nested-write-from-confined-worker"
+  },
+  {
+   "id": "pc-d-0344",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/event-store/rollback-export.test.mjs:43 -> test/event-store/rollback-export.test.mjs:real import then fixture fence, v4 append and rollback export preserve Work and nested porting parity"
+  },
+  {
+   "id": "pc-d-0458",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/identity/mint-door.test.mjs:26 -> test/identity/mint-door.test.mjs:a minted work id comes through the native door, is accepted by the store and differs from the next one"
+  },
+  {
+   "id": "pc-d-0494",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:85 -> test/runner/documentation-cutover-lease.test.mjs:scope root OIDs cover large subtrees and release records drift rather than refusing it"
+  },
+  {
+   "id": "pc-d-0427",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/native-load.test.mjs:253 -> test/git/native-load.test.mjs:inspection leaves WAL absent; setup and mapping use the shared Rust config writer"
+  },
+  {
+   "id": "pc-d-0658",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/merge-land.test.mjs:22 -> test/runner/merge-land.test.mjs:a non-holder cannot land scoped additions, renames, deletions or type changes even through an explicit branch"
+  },
+  {
+   "id": "pc-d-0406",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:51 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0650",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/run.test.mjs:2042 -> test/runner/execution/run.test.mjs:resume settles a pending runner record after the native commit completed"
+  },
+  {
+   "id": "pc-d-0498",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:96 -> test/runner/documentation-cutover-lease.test.mjs:scope root OIDs cover large subtrees and release records drift rather than refusing it"
+  },
+  {
+   "id": "pc-d-0258",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:421 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:CLI release and non-holder owner abandon each commit one legal sidecar transition"
+  },
+  {
+   "id": "pc-d-0645",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/run.test.mjs:2018 -> test/runner/execution/run.test.mjs:resume settles a pending runner record after the native commit completed"
+  },
+  {
+   "id": "pc-d-0523",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:161 -> test/runner/documentation-cutover-lease.test.mjs:corrupt committed sidecars fail closed for acquire and every Node gate"
+  },
+  {
+   "id": "pc-d-0246",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:147 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:both commit hooks observe the real main-checkout borrowed description"
+  },
+  {
+   "id": "pc-d-0311",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/event-store/migrate.test.mjs:34 -> test/event-store/migrate.test.mjs:HEAD inventory, check-only parity, anchored cache and explicit baseline use real tracked bytes"
+  },
+  {
+   "id": "pc-d-0551",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/bind.test.mjs:28 -> test/runner/execution/bind.test.mjs:seat choice and doctor dry binds ignore a held documentation lease in every checkout"
+  },
+  {
+   "id": "pc-d-0910",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/workflow-runner.test.mjs:1913 -> test/workflow/workflow-runner.test.mjs:six seats on a pool with fewer provider families start without a waiver and report the shared families"
+  },
+  {
+   "id": "pc-d-0662",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/merge-land.test.mjs:31 -> test/runner/merge-land.test.mjs:a non-holder cannot land scoped additions, renames, deletions or type changes even through an explicit branch"
+  },
+  {
+   "id": "pc-d-0868",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/core-workflow-seats.test.mjs:113 -> test/workflow/core-workflow-seats.test.mjs:a units file may declare seats but never a seat tier"
+  },
+  {
+   "id": "pc-d-0509",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:130 -> test/runner/documentation-cutover-lease.test.mjs:committed freeze ignores forged disk copies, missing locks, environment tokens and clean"
+  },
+  {
+   "id": "pc-d-0313",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/event-store/migrate.test.mjs:49 -> test/event-store/migrate.test.mjs:real import is deterministic, preserves nested bytes, replaces unfenced stale legacy ref and does not cut over main"
+  },
+  {
+   "id": "pc-d-0425",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/native-load.test.mjs:251 -> test/git/native-load.test.mjs:inspection leaves WAL absent; setup and mapping use the shared Rust config writer"
+  },
+  {
+   "id": "pc-d-0803",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/verbs/worktree-remove.test.mjs:153 -> test/verbs/worktree-remove.test.mjs:CLI adapter removes a provisioned, delivered worktree and reports a missing --delivered-to as a usage error"
+  },
+  {
+   "id": "pc-d-0263",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:433 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:CLI release and non-holder owner abandon each commit one legal sidecar transition"
+  },
+  {
+   "id": "pc-d-0419",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:95 -> test/git/legacy-event-adapter.test.mjs:every legacy event change borrows main-checkout authority through native validation"
+  },
+  {
+   "id": "pc-d-0388",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:14 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0649",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/run.test.mjs:2026 -> test/runner/execution/run.test.mjs:resume settles a pending runner record after the native commit completed"
+  },
+  {
+   "id": "pc-d-0407",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:54 -> test/git/legacy-event-adapter.test.mjs:temporary Work declaration admits exact legacy events on main only"
+  },
+  {
+   "id": "pc-d-0899",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/workflow-runner.test.mjs:950 -> test/workflow/workflow-runner.test.mjs:a step after a panel step is handed the report of every panelist and of the synthesizer"
+  },
+  {
+   "id": "pc-d-0220",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/identity/rust/tests/mint.rs:169 -> packages/identity/rust/tests/mint.rs:a_claim_starts_after_the_highest_number_the_documents_already_carry"
+  },
+  {
+   "id": "pc-d-0189",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:142 -> packages/git/rust/tests/scoped_commit_sync.rs:hook_tree_tampering_reports_real_effect"
+  },
+  {
+   "id": "pc-d-0216",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/identity/rust/tests/mint.rs:161 -> packages/identity/rust/tests/mint.rs:a_claim_starts_after_the_highest_number_the_documents_already_carry"
+  },
+  {
+   "id": "pc-d-0187",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:109 -> packages/git/rust/tests/scoped_commit_sync.rs:literal_scoped_commit_real_hook_and_replay"
+  },
+  {
+   "id": "pc-d-0168",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:153 -> packages/event-store/rust/tests/legacy_import.rs:legacy_import_dirty_multiple_porting_and_moved_head_refuse"
+  },
+  {
+   "id": "pc-d-0721",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:110 -> test/scripts/check-evidence-relocation.test.mjs:--before regenerates and enforces the classified consumer table"
+  },
+  {
+   "id": "pc-d-0241",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:63 -> test/e2e/documentation-cutover-lease-hooks.test.mjs:both commit hooks observe the real main-checkout borrowed description"
+  },
+  {
+   "id": "pc-d-0836",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/conductor-case.test.mjs:36 -> test/workflow/conductor-case.test.mjs:two writing dispatches into one case with overlapping writes: the second is refused at reservation, before anything exists"
+  },
+  {
+   "id": "pc-d-0885",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/units-runner.test.mjs:123 -> test/workflow/units-runner.test.mjs:an out-of-scope file left uncommitted on a writer does not hold back the clean writer built on its branch"
+  },
+  {
+   "id": "pc-d-0605",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/legacy-seat-read.test.mjs:20 -> test/runner/execution/legacy-seat-read.test.mjs:golden: a pre-fence panel record (three role-keyed panelists and a synthesizer) reads as seats"
+  },
+  {
+   "id": "pc-d-0570",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:33 -> test/runner/execution/git-core-adapters.test.mjs:captured baseline, custody-backed resume and commit-only retry retain resolver and producer writes"
+  },
+  {
+   "id": "pc-d-0898",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/workflow-runner.test.mjs:113 -> test/workflow/workflow-runner.test.mjs:a step after a panel step is handed the report of every panelist and of the synthesizer"
+  },
+  {
+   "id": "pc-d-0882",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/units-runner.test.mjs:123 -> test/workflow/units-runner.test.mjs:an out-of-scope file left uncommitted on a writer does not hold back the clean writer built on its branch"
+  },
+  {
+   "id": "pc-d-0855",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/confined-nested-write.test.mjs:37 -> test/workflow/confined-nested-write.test.mjs:a nested `fgos run --writes` from a confined worker is refused as nested-write-from-confined-worker"
+  },
+  {
+   "id": "pc-d-0815",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/workflow/case-verbs.test.mjs:46 -> test/workflow/case-verbs.test.mjs:a holder workflow keeps its recorded checkout through resume, answer and integration from main"
+  },
+  {
+   "id": "pc-l-0029",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/event-store/rollback-export.test.mjs:34 -> test/event-store/rollback-export.test.mjs:real import then fixture fence, v4 append and rollback export preserve Work and nested porting parity"
+  },
+  {
+   "id": "pc-l-0063",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/setup/identity-checks.test.mjs:95 -> test/setup/identity-checks.test.mjs:ids row passes on a clean registry and names each repeated id, title clash and file number"
+  },
+  {
+   "id": "pc-l-0055",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/scripts/knowledge-migration.test.mjs:68 -> test/scripts/knowledge-migration.test.mjs:knowledge-migration - apply moves file and updates store currentPath and aliases"
+  },
+  {
+   "id": "pc-l-0060",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/setup/identity-checks.test.mjs:89 -> test/setup/identity-checks.test.mjs:ids row passes on a clean registry and names each repeated id, title clash and file number"
+  },
+  {
+   "id": "pc-l-0018",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/identity/rust/tests/mint.rs:161 -> packages/identity/rust/tests/mint.rs:a_claim_starts_after_the_highest_number_the_documents_already_carry"
+  },
+  {
+   "id": "pc-l-0017",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/git/rust/tests/inspect.rs:379 -> packages/git/rust/tests/inspect.rs:inspect_merge_facts_for_land_consumers"
+  },
+  {
+   "id": "pc-l-0019",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/identity/rust/tests/mint.rs:162 -> packages/identity/rust/tests/mint.rs:a_claim_starts_after_the_highest_number_the_documents_already_carry"
+  },
+  {
+   "id": "pc-l-0021",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "packages/identity/rust/tests/mint.rs:168 -> packages/identity/rust/tests/mint.rs:a_claim_starts_after_the_highest_number_the_documents_already_carry"
+  },
+  {
+   "id": "pc-l-0045",
+   "verdict": "APPROVE",
+   "reason": "Sampled mechanical join: site expression inside owning test callback/helper chain in its own test file at pin (seed 20261023).",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:45 -> test/scripts/check-evidence-relocation.test.mjs:--before passes a consistent tracked fixture"
+  },
+  {
+   "id": "pc-l-0025",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/phase08-fixture.mjs:12"
+  },
+  {
+   "id": "pc-l-0026",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/phase08-fixture.mjs:13"
+  },
+  {
+   "id": "pc-l-0030",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/forgentx-runner.json:92"
+  },
+  {
+   "id": "pc-l-0031",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/forgentx-runner.json:113"
+  },
+  {
+   "id": "pc-l-0032",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/forgentx-runner.json:135"
+  },
+  {
+   "id": "pc-l-0033",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/forgentx-runner.json:154"
+  },
+  {
+   "id": "pc-l-0034",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/forgentx-runner.json:175"
+  },
+  {
+   "id": "pc-l-0035",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/global-runner.json:101"
+  },
+  {
+   "id": "pc-l-0036",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/global-runner.json:112"
+  },
+  {
+   "id": "pc-l-0037",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/global-runner.json:123"
+  },
+  {
+   "id": "pc-l-0038",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/global-runner.json:133"
+  },
+  {
+   "id": "pc-l-0039",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/fixtures/seat-binding-config/global-runner.json:143"
+  },
+  {
+   "id": "pc-l-0042",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/bind-tier-composition.test.mjs:1"
+  },
+  {
+   "id": "pc-l-0043",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:16"
+  },
+  {
+   "id": "pc-l-0044",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:17"
+  },
+  {
+   "id": "pc-l-0056",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/setup/doctor-fresh-run.test.mjs:6"
+  },
+  {
+   "id": "pc-l-0077",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "src/setup/registrations.mjs:6376"
+  },
+  {
+   "id": "pc-l-0078",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "src/setup/workflow-case-checks.mjs:2"
+  },
+  {
+   "id": "pc-d-0159",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "apps/fgctl/tests/git_wal_activation_gate.rs:25"
+  },
+  {
+   "id": "pc-d-0160",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "apps/fgctl/tests/git_wal_activation_gate.rs:26"
+  },
+  {
+   "id": "pc-d-0161",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:29"
+  },
+  {
+   "id": "pc-d-0162",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:31"
+  },
+  {
+   "id": "pc-d-0163",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:31"
+  },
+  {
+   "id": "pc-d-0164",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:33"
+  },
+  {
+   "id": "pc-d-0165",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/event-store/rust/tests/legacy_import.rs:34"
+  },
+  {
+   "id": "pc-d-0203",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:455"
+  },
+  {
+   "id": "pc-d-0204",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:473"
+  },
+  {
+   "id": "pc-d-0205",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:529"
+  },
+  {
+   "id": "pc-d-0213",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/git/rust/tests/scoped_commit_sync.rs:1493"
+  },
+  {
+   "id": "pc-d-0214",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "packages/identity/rust/tests/golden.rs:8"
+  },
+  {
+   "id": "pc-d-0229",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/convention/definition-files.test.mjs:11"
+  },
+  {
+   "id": "pc-d-0231",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/convention/seat-id.test.mjs:16"
+  },
+  {
+   "id": "pc-d-0234",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:17"
+  },
+  {
+   "id": "pc-d-0235",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:17"
+  },
+  {
+   "id": "pc-d-0236",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:18"
+  },
+  {
+   "id": "pc-d-0237",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0238",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0283",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/e2e/documentation-cutover-lease-hooks.test.mjs:792"
+  },
+  {
+   "id": "pc-d-0330",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/phase08-fixture.mjs:15"
+  },
+  {
+   "id": "pc-d-0331",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/phase08-fixture.mjs:15"
+  },
+  {
+   "id": "pc-d-0349",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/topologies.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0350",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/event-store/topologies.test.mjs:24"
+  },
+  {
+   "id": "pc-d-0355",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:11"
+  },
+  {
+   "id": "pc-d-0356",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:14"
+  },
+  {
+   "id": "pc-d-0357",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:15"
+  },
+  {
+   "id": "pc-d-0358",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:15"
+  },
+  {
+   "id": "pc-d-0359",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:17"
+  },
+  {
+   "id": "pc-d-0360",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:20"
+  },
+  {
+   "id": "pc-d-0361",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0362",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0363",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0364",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:23"
+  },
+  {
+   "id": "pc-d-0365",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:23"
+  },
+  {
+   "id": "pc-d-0366",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:23"
+  },
+  {
+   "id": "pc-d-0367",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0368",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0369",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:26"
+  },
+  {
+   "id": "pc-d-0370",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:28"
+  },
+  {
+   "id": "pc-d-0371",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:29"
+  },
+  {
+   "id": "pc-d-0372",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:30"
+  },
+  {
+   "id": "pc-d-0373",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:33"
+  },
+  {
+   "id": "pc-d-0374",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:36"
+  },
+  {
+   "id": "pc-d-0375",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:36"
+  },
+  {
+   "id": "pc-d-0376",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:38"
+  },
+  {
+   "id": "pc-d-0377",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:38"
+  },
+  {
+   "id": "pc-d-0378",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:38"
+  },
+  {
+   "id": "pc-d-0379",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:38"
+  },
+  {
+   "id": "pc-d-0380",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:39"
+  },
+  {
+   "id": "pc-d-0381",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/cutover-grant.test.mjs:59"
+  },
+  {
+   "id": "pc-d-0396",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: expression unbound (contextLocatorIsBound=false).",
+   "locator": "test/git/legacy-event-adapter.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0423",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/native-load.test.mjs:179"
+  },
+  {
+   "id": "pc-d-0424",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/git/native-load.test.mjs:179"
+  },
+  {
+   "id": "pc-d-0433",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:10"
+  },
+  {
+   "id": "pc-d-0434",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:11"
+  },
+  {
+   "id": "pc-d-0435",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:18"
+  },
+  {
+   "id": "pc-d-0436",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:19"
+  },
+  {
+   "id": "pc-d-0437",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:20"
+  },
+  {
+   "id": "pc-d-0438",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:21"
+  },
+  {
+   "id": "pc-d-0439",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0440",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:28"
+  },
+  {
+   "id": "pc-d-0441",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/githooks/event-layout.test.mjs:29"
+  },
+  {
+   "id": "pc-d-0442",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:135"
+  },
+  {
+   "id": "pc-d-0443",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:151"
+  },
+  {
+   "id": "pc-d-0444",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: expression unbound (contextLocatorIsBound=false).",
+   "locator": "test/helpers/failover-fixture.mjs:151"
+  },
+  {
+   "id": "pc-d-0445",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:155"
+  },
+  {
+   "id": "pc-d-0446",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:157"
+  },
+  {
+   "id": "pc-d-0447",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:181"
+  },
+  {
+   "id": "pc-d-0448",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:182"
+  },
+  {
+   "id": "pc-d-0449",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:183"
+  },
+  {
+   "id": "pc-d-0450",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:188"
+  },
+  {
+   "id": "pc-d-0451",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:191"
+  },
+  {
+   "id": "pc-d-0452",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:195"
+  },
+  {
+   "id": "pc-d-0453",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:202"
+  },
+  {
+   "id": "pc-d-0454",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/failover-fixture.mjs:202"
+  },
+  {
+   "id": "pc-d-0455",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/helpers/identity-env.mjs:5"
+  },
+  {
+   "id": "pc-d-0462",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/dispatch/worker-env-case-context.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0463",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/dispatch/worker-env-case-context.test.mjs:23"
+  },
+  {
+   "id": "pc-d-0467",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:20"
+  },
+  {
+   "id": "pc-d-0468",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:20"
+  },
+  {
+   "id": "pc-d-0469",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:21"
+  },
+  {
+   "id": "pc-d-0470",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:24"
+  },
+  {
+   "id": "pc-d-0471",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:24"
+  },
+  {
+   "id": "pc-d-0479",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:37"
+  },
+  {
+   "id": "pc-d-0480",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/documentation-cutover-lease.test.mjs:37"
+  },
+  {
+   "id": "pc-d-0548",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/account-pin.test.mjs:21"
+  },
+  {
+   "id": "pc-d-0596",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:141"
+  },
+  {
+   "id": "pc-d-0597",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:144"
+  },
+  {
+   "id": "pc-d-0598",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:144"
+  },
+  {
+   "id": "pc-d-0599",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:145"
+  },
+  {
+   "id": "pc-d-0600",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:145"
+  },
+  {
+   "id": "pc-d-0601",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:146"
+  },
+  {
+   "id": "pc-d-0602",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:146"
+  },
+  {
+   "id": "pc-d-0603",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/execution/git-core-adapters.test.mjs:153"
+  },
+  {
+   "id": "pc-d-0618",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: expression unbound (contextLocatorIsBound=false).",
+   "locator": "test/runner/execution/run-case-admission.test.mjs:83"
+  },
+  {
+   "id": "pc-d-0678",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: expression unbound (contextLocatorIsBound=false).",
+   "locator": "test/runner/merge.test.mjs:404"
+  },
+  {
+   "id": "pc-d-0683",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/provider-pool-lease.test.mjs:31"
+  },
+  {
+   "id": "pc-d-0684",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/runner/provider-pool-lease.test.mjs:31"
+  },
+  {
+   "id": "pc-d-0692",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/fgctl-upgrade.test.mjs:127"
+  },
+  {
+   "id": "pc-d-0693",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/help-routes.test.mjs:31"
+  },
+  {
+   "id": "pc-d-0694",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/help-routes.test.mjs:32"
+  },
+  {
+   "id": "pc-d-0695",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/help-routes.test.mjs:32"
+  },
+  {
+   "id": "pc-d-0696",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/release-tree.test.mjs:40"
+  },
+  {
+   "id": "pc-d-0697",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/release-tree.test.mjs:42"
+  },
+  {
+   "id": "pc-d-0698",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/rust-host/release-tree.test.mjs:44"
+  },
+  {
+   "id": "pc-d-0701",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:15"
+  },
+  {
+   "id": "pc-d-0702",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:15"
+  },
+  {
+   "id": "pc-d-0703",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:16"
+  },
+  {
+   "id": "pc-d-0704",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/scripts/check-evidence-relocation.test.mjs:17"
+  },
+  {
+   "id": "pc-d-0754",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/seat-binding/golden-cases.helper.mjs:7"
+  },
+  {
+   "id": "pc-d-0755",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/seat-binding/golden-cases.helper.mjs:7"
+  },
+  {
+   "id": "pc-d-0756",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/seat-binding/golden-cases.helper.mjs:10"
+  },
+  {
+   "id": "pc-d-0757",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/session-identity/attempt-writer-id.test.mjs:15"
+  },
+  {
+   "id": "pc-d-0758",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/setup/doctor-fresh-run.test.mjs:3"
+  },
+  {
+   "id": "pc-d-0775",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-checks.test.mjs:99"
+  },
+  {
+   "id": "pc-d-0776",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-checks.test.mjs:100"
+  },
+  {
+   "id": "pc-d-0777",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-checks.test.mjs:107"
+  },
+  {
+   "id": "pc-d-0778",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-checks.test.mjs:120"
+  },
+  {
+   "id": "pc-d-0779",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:49"
+  },
+  {
+   "id": "pc-d-0780",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:50"
+  },
+  {
+   "id": "pc-d-0781",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:51"
+  },
+  {
+   "id": "pc-d-0782",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:76"
+  },
+  {
+   "id": "pc-d-0783",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:137"
+  },
+  {
+   "id": "pc-d-0784",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:228"
+  },
+  {
+   "id": "pc-d-0785",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:243"
+  },
+  {
+   "id": "pc-d-0786",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:245"
+  },
+  {
+   "id": "pc-d-0787",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:269"
+  },
+  {
+   "id": "pc-d-0788",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-conversion.test.mjs:281"
+  },
+  {
+   "id": "pc-d-0789",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-fence.test.mjs:53"
+  },
+  {
+   "id": "pc-d-0790",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-fence.test.mjs:53"
+  },
+  {
+   "id": "pc-d-0791",
+   "verdict": "REWORK",
+   "reason": "Source file deleted at pin (5a33989fa removed seat-binding conversion); blocker wrongly says shared fixture/helper/test-boundary and locator names a non-existent file with no last-present commit. State \"source removed\" and cite the deleting commit.",
+   "locator": "test/setup/seat-binding-fence.test.mjs:57"
+  },
+  {
+   "id": "pc-d-0793",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/util/session-identity.test.mjs:22"
+  },
+  {
+   "id": "pc-d-0805",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/advisory-m-contracts.test.mjs:126"
+  },
+  {
+   "id": "pc-d-0818",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:57"
+  },
+  {
+   "id": "pc-d-0819",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:60"
+  },
+  {
+   "id": "pc-d-0820",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:68"
+  },
+  {
+   "id": "pc-d-0821",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:70"
+  },
+  {
+   "id": "pc-d-0822",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:75"
+  },
+  {
+   "id": "pc-d-0823",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:80"
+  },
+  {
+   "id": "pc-d-0824",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:85"
+  },
+  {
+   "id": "pc-d-0825",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/case-verbs.test.mjs:91"
+  },
+  {
+   "id": "pc-d-0833",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/conductor-case.test.mjs:25"
+  },
+  {
+   "id": "pc-d-0834",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/conductor-case.test.mjs:26"
+  },
+  {
+   "id": "pc-d-0869",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/playbook-proposer.test.mjs:37"
+  },
+  {
+   "id": "pc-d-0870",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/playbook-proposer.test.mjs:38"
+  },
+  {
+   "id": "pc-d-0877",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/stale-approval-reapproval.test.mjs:30"
+  },
+  {
+   "id": "pc-d-0878",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: fixture/helper outside a test callback or non-fixture role.",
+   "locator": "test/workflow/stale-approval-reapproval.test.mjs:31"
+  },
+  {
+   "id": "pc-d-0924",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3868"
+  },
+  {
+   "id": "pc-d-0925",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3863"
+  },
+  {
+   "id": "pc-d-0926",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3870"
+  },
+  {
+   "id": "pc-d-0927",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3872"
+  },
+  {
+   "id": "pc-d-0928",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3873"
+  },
+  {
+   "id": "pc-d-0929",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3874"
+  },
+  {
+   "id": "pc-d-0931",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3881"
+  },
+  {
+   "id": "pc-d-0933",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "bin/fgos.mjs:3891"
+  },
+  {
+   "id": "pc-d-1001",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/runner/dispatch/config.mjs:417"
+  },
+  {
+   "id": "pc-d-1097",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:69"
+  },
+  {
+   "id": "pc-d-1098",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:81"
+  },
+  {
+   "id": "pc-d-1099",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:81"
+  },
+  {
+   "id": "pc-d-1100",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:85"
+  },
+  {
+   "id": "pc-d-1101",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:30"
+  },
+  {
+   "id": "pc-d-1102",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:96"
+  },
+  {
+   "id": "pc-d-1103",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:102"
+  },
+  {
+   "id": "pc-d-1104",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:106"
+  },
+  {
+   "id": "pc-d-1105",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:111"
+  },
+  {
+   "id": "pc-d-1106",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:111"
+  },
+  {
+   "id": "pc-d-1107",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-checks.mjs:114"
+  },
+  {
+   "id": "pc-d-1108",
+   "verdict": "APPROVE",
+   "reason": "Residue item has file+line locator and context; judgment need: graded passage drift.",
+   "locator": "src/setup/seat-binding-conversion.mjs:139"
+  }
+ ],
+ "summary": {
+  "approve": 231,
+  "rework": 33,
+  "sample": {
+   "seed": 20261023,
+   "size": 66,
+   "strata": "inventory x direct/helper x js/rs, proportional, min 4"
+  },
+  "allChecked": {
+   "graded": 314,
+   "residue": 187,
+   "ids": 1126
+  },
+  "replayAtPin": "byte-identical (3 artifacts)",
+  "replayAtLandedHead": "38 rows line drift, statuses unchanged",
+  "top": [
+   "post-pin coverage omits 132 dynamic doc-cued sites (13 reader)",
+   "artifacts pinned to 3e2d05af, stale lines at landed bade6b6b3 / no --pin",
+   "27 source-absent residue rows carry wrong judgment need",
+   "recovery_matrix_child is an #[ignore] subprocess test",
+   "116 residue rows carry joined-custody text",
+   "Rust proof line off-by-one (37 rows)"
+  ]
+ }
+}

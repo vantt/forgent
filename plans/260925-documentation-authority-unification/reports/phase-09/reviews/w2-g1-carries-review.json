@@ -1,0 +1,474 @@
+{
+ "scope": "w2-g1-carries",
+ "commit": "cffe725b9",
+ "verdicts": [
+  {
+   "id": "reference-000126",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#0054-rul11-tùm-lum-không-phải-nặng-gom-trong-phạm-vi-việc-đang-làm-supersede-0036"
+  },
+  {
+   "id": "reference-000127",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#0062-rul104-tốt-hơn-không-to-hơn-thêm-clean-code-và-hexagonal-supersede-0061"
+  },
+  {
+   "id": "reference-000130",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định"
+  },
+  {
+   "id": "reference-000135",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định"
+  },
+  {
+   "id": "dynamic-018749",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#unheaded-block-69"
+  },
+  {
+   "id": "reference-004034",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "reference-004040",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "reference-004047",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "reference-004048",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "dynamic-018738",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "dynamic-018742",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "dynamic-018743",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption; docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+  },
+  {
+   "id": "dynamic-018755",
+   "verdict": "APPROVE",
+   "reason": "Carried byte-identical. The legacy docs/specs/platform-foundations.md from Business Rules to EOF (L62-557) equals the candidate L385-880, and the work-state retired section (L1364-EOF) equals retired-decision-history.md L23-EOF. Binding digest, ancestry, sha and neighbours all recompute. The patched test passes on a scratch copy with the legacy specs deleted.",
+   "locator": "docs/platform/platform-foundations.md#unheaded-block-69; docs/platform/platform-foundations.md#0036-khoá-rul11-tùm-lum-không-phải-nặng-tùm-lum-không-phải-nặng"
+  },
+  {
+   "id": "reference-000064",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#74-attestation"
+  },
+  {
+   "id": "reference-002372",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#74-attestation"
+  },
+  {
+   "id": "reference-000235",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#74-attestation"
+  },
+  {
+   "id": "reference-000236",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#8-producer-enforcement"
+  },
+  {
+   "id": "reference-003892",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#55-role; docs/platform/work-state/contracts/knowledge-registry.md#141-unit-harness"
+  },
+  {
+   "id": "reference-003893",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#135-apply"
+  },
+  {
+   "id": "reference-003894",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#74-attestation"
+  },
+  {
+   "id": "reference-003895",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#73-document-events"
+  },
+  {
+   "id": "reference-003896",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#143-producer-gate-harness"
+  },
+  {
+   "id": "reference-003897",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#72-role-registry"
+  },
+  {
+   "id": "reference-003898",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#72-role-registry"
+  },
+  {
+   "id": "reference-003899",
+   "verdict": "APPROVE",
+   "reason": "The cited sections (5.x, 6.x, 7.1-7.4, 8, 8.1, 8.2, 13.5, 14.x) are verbatim from docs/architect/knowledge-registry-redesign.md: every section body is an exact match. The comment-only patch keeps the section numbers, and the binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md#73-document-events"
+  },
+  {
+   "id": "reference-000023",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-000025",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-000046",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "author-s4-a20431be6e7a6997",
+   "verdict": "APPROVE",
+   "reason": "The decision/outcome sections in non-transitioning-records.md match the legacy work-state.md section bodies exactly, and STR70a stays proposed. The binding recomputes.",
+   "locator": "docs/platform/work-state/contracts/non-transitioning-records.md#ghi-quyết-định-decision; docs/platform/work-state/contracts/non-transitioning-records.md#ghi-kết-quả-dự-đoánthực-tế-outcome"
+  },
+  {
+   "id": "reference-002327",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-002329",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-002354",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-000232",
+   "verdict": "REWORK",
+   "reason": "Holder cites a test that does not exist (test/cli/fgos-return-worktree-guard.test.mjs; the live return proofs are test/cli/fgos-return.test.mjs). It also misses the sentence's real origin, docs/history/tsk-ikd-return-main-worktree-guard/RESEARCH.md:26 (commit 25a0f005e). The quoted rule is conserved and the bin/fgos.mjs patch is fine.",
+   "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md:15 (#session-participation-and-merge-isolation)"
+  },
+  {
+   "id": "reference-003709",
+   "verdict": "REWORK",
+   "reason": "Holder names Seat Binding as docs/platform/seat-binding/spec.md, which does not exist; the only seat-binding doc is docs/specs/seat-binding.md. Module absence is correct (deleted in 3133ed474), and nothing was resurrected.",
+   "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md:55 (#retired-provider-policy-pointer)"
+  },
+  {
+   "id": "reference-003726",
+   "verdict": "APPROVE",
+   "reason": "Bound to the existing verbatim 0026 narrative (rules 1-4 and 'Lớp còn thiếu' present) and to the conserved holder; the binding recomputes. The name-drift correction is explicit.",
+   "locator": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity; docs/platform/runner/contracts/conserved-dispatch-doctrine.md#native-first-reasoning"
+  },
+  {
+   "id": "reference-003727",
+   "verdict": "APPROVE",
+   "reason": "The holder quotes the maintained header verbatim and does not revive FlowDefinition. The comment-only patch and the binding recompute.",
+   "locator": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md#operation-prompt-templates"
+  },
+  {
+   "id": "reference-000161",
+   "verdict": "APPROVE",
+   "reason": "The 5b row is byte-identical to the legacy distribution.md. The setup-only creator clause is reconciled with the registered gateway-token-configured fix (fixGatewayTokenConfigured, src/setup/registrations.mjs:2954), which is a justified, conserving qualification. The binding recomputes.",
+   "locator": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#machine-token-and-startup-refusal"
+  },
+  {
+   "id": "reference-000182",
+   "verdict": "APPROVE",
+   "reason": "Same holder as reference-000161. The exclusive-writer sentence is preserved verbatim and qualified by the existing doctor --fix. The binding recomputes.",
+   "locator": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#machine-token-and-startup-refusal"
+  },
+  {
+   "id": "author-s4-08912b8301b10321",
+   "verdict": "APPROVE",
+   "reason": "vendored-yaml-parser.md carries the 2026-10-16 decision bullet byte-identical to docs/specs/distribution.md; only the title and metadata are authored. The binding recomputes.",
+   "locator": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md#upgrade-and-advisory-procedure"
+  },
+  {
+   "id": "reference-000209",
+   "verdict": "APPROVE",
+   "reason": "The holder conserves the client-only baseUrl observation, and the 'no bind field' claim is verified (no bind in fgos-gateway-api-v1.yaml). This is an authored restatement, since the source is the code comment itself. Low note: 'old R5 client contract' overstates; R5 never stated the baseUrl rule.",
+   "locator": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md#reachable-on-network"
+  },
+  {
+   "id": "reference-002291",
+   "verdict": "APPROVE",
+   "reason": "Legacy runtime-identity-and-activation.md §5 (L300-434, 116 lines) is a byte-identical substring of release-manifest.md. The binding recomputes. See the separate link finding.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules; docs/platform/packaging-distribution/contracts/release-manifest.md#release-tree-canonicalization-1"
+  },
+  {
+   "id": "reference-002292",
+   "verdict": "APPROVE",
+   "reason": "The pipeline, transaction and walking-skeleton lines are verbatim from legacy packaging sources. The authored qualifiers are fact-checked (install.lock at store.rs:25-26), and the binding recomputes.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding; docs/platform/packaging-distribution/contracts/activation-binding.md#walking-skeleton-evidence"
+  },
+  {
+   "id": "reference-002294",
+   "verdict": "APPROVE",
+   "reason": "Same as reference-002291: §5 is carried verbatim and the binding recomputes.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules; docs/platform/packaging-distribution/contracts/release-manifest.md#release-tree-canonicalization-1"
+  },
+  {
+   "id": "reference-002295",
+   "verdict": "REWORK",
+   "reason": "The authored holder says workspace.rs resolves the root with `git rev-parse --path-format=absolute --git-common-dir`. workspace.rs actually resolves through the Git component (fgos_git::GitDriver::open_at) and runs no rev-parse. The legacy git-common-dir rule (docs/specs/distribution.md:433-436) is about scripts/fgos-shell-integration.sh, but the holder states it as workspace.rs implementation truth. Carry the legacy shell-helper rule verbatim and describe workspace.rs as resolving through the Git component.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md:573 (#git-common-directory-discovery)"
+  },
+  {
+   "id": "patch:AGENTS.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line. The three doc tests pass on a scratch post-retirement copy (5+2+7).",
+   "locator": "reports/phase-09/carries/pointer-patches.json#AGENTS.md"
+  },
+  {
+   "id": "patch:test/docs/rul11-anchor-phrase.test.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line. The three doc tests pass on a scratch post-retirement copy (5+2+7).",
+   "locator": "reports/phase-09/carries/pointer-patches.json#test/docs/rul11-anchor-phrase.test.mjs"
+  },
+  {
+   "id": "patch:test/docs/rul104-anchor-phrase.test.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line. The three doc tests pass on a scratch post-retirement copy (5+2+7).",
+   "locator": "reports/phase-09/carries/pointer-patches.json#test/docs/rul104-anchor-phrase.test.mjs"
+  },
+  {
+   "id": "patch:test/docs/decisions-corpus-retired.test.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line. The three doc tests pass on a scratch post-retirement copy (5+2+7).",
+   "locator": "reports/phase-09/carries/pointer-patches.json#test/docs/decisions-corpus-retired.test.mjs"
+  },
+  {
+   "id": "patch:core/skills/_shared/executor-dispatch-fallback.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#core/skills/_shared/executor-dispatch-fallback.md"
+  },
+  {
+   "id": "patch:.agents/skills/_shared/executor-dispatch-fallback.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#.agents/skills/_shared/executor-dispatch-fallback.md"
+  },
+  {
+   "id": "patch:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+  },
+  {
+   "id": "patch:core/skills/fgos-clarifying/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#core/skills/fgos-clarifying/SKILL.md"
+  },
+  {
+   "id": "patch:.agents/skills/fgos-clarifying/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#.agents/skills/fgos-clarifying/SKILL.md"
+  },
+  {
+   "id": "patch:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#plugins/fgOS/skills/fgos-clarifying/SKILL.md"
+  },
+  {
+   "id": "patch:domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+  },
+  {
+   "id": "patch:.agents/skills/fgos-coding-knowledge/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#.agents/skills/fgos-coding-knowledge/SKILL.md"
+  },
+  {
+   "id": "patch:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
+  },
+  {
+   "id": "patch:bin/fgos.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#bin/fgos.mjs"
+  },
+  {
+   "id": "patch:src/state/knowledge-registry.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#src/state/knowledge-registry.mjs"
+  },
+  {
+   "id": "patch:src/runner/dispatch/mechanism.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#src/runner/dispatch/mechanism.mjs"
+  },
+  {
+   "id": "patch:src/runner/dispatch/operation-prompt-templates.mjs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#src/runner/dispatch/operation-prompt-templates.mjs"
+  },
+  {
+   "id": "patch:apps/fgos-gateway/src/gateway.rs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#apps/fgos-gateway/src/gateway.rs"
+  },
+  {
+   "id": "patch:apps/fgos-gateway/web/src/lib/network.ts",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#apps/fgos-gateway/web/src/lib/network.ts"
+  },
+  {
+   "id": "patch:packages/distribution/rust/src/canonical.rs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#packages/distribution/rust/src/canonical.rs"
+  },
+  {
+   "id": "patch:packages/distribution/rust/src/verify.rs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#packages/distribution/rust/src/verify.rs"
+  },
+  {
+   "id": "patch:packages/distribution/rust/src/init.rs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#packages/distribution/rust/src/init.rs"
+  },
+  {
+   "id": "patch:packages/distribution/rust/src/workspace.rs",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#packages/distribution/rust/src/workspace.rs"
+  },
+  {
+   "id": "patch:docs/backlog.md",
+   "verdict": "APPROVE",
+   "reason": "beforeSha256 matches the bytes at cffe725b9. GNU patch --fuzz=0 forward reaches expectedAfterSha256, and both rollbackDiff and reverse-forward restore the original. forward/rollback sha256 match and applied=false. The change is comment, pointer or read-destination only; generated surfaces match their canonical deltas line for line.",
+   "locator": "reports/phase-09/carries/pointer-patches.json#docs/backlog.md"
+  },
+  {
+   "id": "finding:retired-history-inbound-links",
+   "verdict": "REWORK",
+   "reason": "Restoring the legacy 0032 layout removed the '## N. ADR ...' anchors, which breaks 6 inbound fragments: architecture-map.md:100,102,126,140 (#8-adr-0012..., #9-adr-0013...) and work-state/contracts/cli-io-contract.md:31,397 (#7-adr-0011...). cli-io-contract.md is in D1's writable set; architecture-map.md needs a patch spec. Line 30's working in-page link [0012](#8-adr-0012-...) became the legacy dead link 0012-typed-edge-model-supersedes-deps-parent-separation.md. The clickable '## 14. Related Files' section was dropped, so related files now appear only in the metadata fence (documentation rule).",
+   "locator": "docs/platform/work-state/decisions/retired-decision-history.md:30; docs/platform/architecture-map.md:100; docs/platform/work-state/contracts/cli-io-contract.md:31"
+  },
+  {
+   "id": "finding:release-manifest-duplicate-and-dead-link",
+   "verdict": "REWORK",
+   "reason": "The verbatim §5 copy duplicates the components.legacyNode paragraph that already exists at L254. The new copy at L393 carries the legacy-relative link ../host-invocation-routing/legacy-cli-transition.md, which resolves to a nonexistent path (L254 keeps the working ../../../architect/... link). Fix the destination or point to the existing paragraph; the receipt admits link destinations were not proven.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md:393"
+  },
+  {
+   "id": "binding-recompute:all",
+   "verdict": "APPROVE",
+   "reason": "Recomputed 1,287 bindings independently (75 claim bindings, the 44 shard conservedClaims equal to claim-carries, 1,009 unitCarries, 121 refresh rows and their additionalBindings). The method is sha256(compact sorted 4-key JSON + LF), plus extractor textDigest, a Python-computed ancestry, full content and prev/next anchor+digest. 0 mismatches.",
+   "locator": "ledger/decisions/s11-preflip-carries.json; reports/phase-09/carries/claim-carries.json; binding-refresh.json"
+  },
+  {
+   "id": "binding-refresh:git-before-after",
+   "verdict": "APPROVE",
+   "reason": "All 121 rows have before equal to the f534aeaea^ shard row and after equal to the cffe725b9 shard row. No unlisted row changed (the only extra change is the top-level correctionSession in 9 shards), and no review fields were carried. All 57 register changedBindings rows made stale by D1 have refreshed ledger rows; the register copy is left to G0fix.",
+   "locator": "reports/phase-09/carries/binding-refresh.json"
+  },
+  {
+   "id": "document-operations:coverage",
+   "verdict": "APPROVE",
+   "reason": "All 16 docs match before/after sha256. Every changed unit in every doc has a unitCarries row (0 uncovered). Across all ledger shards, 0 rows still bind a vanished unit in these docs.",
+   "locator": "reports/phase-09/carries/document-operations.json"
+  },
+  {
+   "id": "protected-text",
+   "verdict": "APPROVE",
+   "reason": "In platform-foundations.md, L1-380 are unchanged apart from the removed 3-line candidate-only RUL3 note (superseded by the fuller legacy RUL3 at L389; no ledger binding). D-ADR0035/0054/0062, the 0036/0061 narratives and the RUL11/RUL104 Business Rules lines are byte-identical to legacy, and RUL104 equals test/docs/rul104-law.txt. Each target has one retired marker. Both 0032 topics are present (runner file untouched). No identity file was touched, and every change is inside the writable list.",
+   "locator": "docs/platform/platform-foundations.md:381-880"
+  }
+ ],
+ "summary": {
+  "items": 74,
+  "APPROVE": 69,
+  "REWORK": 5,
+  "claims": {
+   "checked": 44,
+   "REWORK": 3
+  },
+  "pointerPatches": {
+   "checked": 24,
+   "REWORK": 0
+  },
+  "bindingsRecomputed": 1287,
+  "refreshRows": 121,
+  "unitCarries": 1009,
+  "sample": "all items checked; no sampling",
+  "topFindings": [
+   "retired-decision-history layout restore broke 6 inbound fragments and 1 in-page link",
+   "activation-binding git-common-dir holder states false workspace.rs implementation",
+   "two nonexistent cited paths in conserved-dispatch-doctrine.md",
+   "release-manifest duplicated legacyNode paragraph with dead relative link"
+  ],
+  "gateVerdict": "G1 not met until the 5 REWORK items are fixed; mechanics (hashes, patches, coverage, protected text) all pass"
+ }
+}

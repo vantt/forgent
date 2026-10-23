@@ -1,0 +1,804 @@
+{
+ "scope": "w2-g6-preserve",
+ "commit": "cffe725b9",
+ "verdicts": [
+  {
+   "id": "replay-proof-py",
+   "verdict": "APPROVE",
+   "reason": "proof.py run twice at pin 3e2d05af8 in scratch clone: exit 0, stdout identical, all 4 artifacts byte-identical to each other and to delivered (proof.json sha 6c20d4b9...)",
+   "locator": "P/reports/phase-09/preserve-premise/proof.py"
+  },
+  {
+   "id": "replay-verify-py",
+   "verdict": "APPROVE",
+   "reason": "verify.py exit 0: 7 artifacts double-replay byte-identical, 5413 ids, 27 zero-edge batches, 73/73 G7 retired-engine paths covered",
+   "locator": "P/reports/phase-09/preserve-premise/verify.py"
+  },
+  {
+   "id": "identity-conservation",
+   "verdict": "APPROVE",
+   "reason": "4804+609=5413 unique final preserve identities equal record-derived member set; 38 retire-with-tree excluded and physically removed",
+   "locator": "proof.json#counts; retire-with-tree.json"
+  },
+  {
+   "id": "judgments-index",
+   "verdict": "APPROVE",
+   "reason": "1134 open rows (152+92+2+888), each with owner and blocker",
+   "locator": "judgments.json"
+  },
+  {
+   "id": "negative-probes",
+   "verdict": "REWORK",
+   "reason": "Doer probes 1 and 3 are the same call premise(True,True,False,None,False); none exercises historical_evidence(). Reviewer probes through the real predicate: false retained pointer with an unrelated far-away \"e.g.\" -> preserve-source-confirmed-history; navigation row in a file whose H1 says \"Bee\" -> preserve-source-confirmed-history. Only the mismatched-passage probe parks. Receipt claim that probes reject navigation-as-history is unsupported.",
+   "locator": "proof.py negativeDecisionProbes; historical_evidence() external/example branch"
+  },
+  {
+   "id": "evidence-external-example-whole-file",
+   "verdict": "REWORK",
+   "reason": "Branch searches the whole source (not the passage) for e.g./for example/ví dụ/#..Bee..; 416/447 such rows have the marker outside the unit; 29 fgOS-owned live pointers whose target is physically moved (exact successor exists) are confirmed as history, contradicting the receipt rule that retained-path premises fail when the target disappears",
+   "locator": "proof.py historical_evidence (re.search(..., source))"
+  },
+  {
+   "id": "wrapper-proposals-152",
+   "verdict": "APPROVE",
+   "reason": "preserve-with-dated-note matches L12-35(3) (uniform successor note for history wrappers); successors present post-cut: runner/spec.md (runner area successor of docs/specs/runner.md) and h-aabefc85f0c9.md:25 holds the exact CoordinationSession section; note placed outside literal snapshot. Caveat: runner/spec.md says Canonical: No at pin, so \"Current successor\" wording depends on the authority flip",
+   "locator": "history-wrapper-proposals.json"
+  },
+  {
+   "id": "wrapper-uniformity",
+   "verdict": "REWORK",
+   "reason": "77 post-cut \"retired in 2180b4e...; see docs/specs/runner.md CoordinationSession\" lines: 66 proposed, 10 confirmed as plain history without a successor note (classifier keys on the word \"history\" in the record reason / one sentence form), 1 mislabeled literal carriage. Violates L12-35(3) \"uniformly across all wrappers\"; those lines dangle after step 6",
+   "locator": "proof.py wrapper predicate; rows f05646,f05655,f05661,f05671,f05677,f05693,f05720,f05730,f05742,f06391,f06167"
+  },
+  {
+   "id": "pin-drift",
+   "verdict": "REWORK",
+   "reason": "Proof is pinned to 3e2d05af8; 90 rows sit in sources changed by cffe725b9 and 18 confirmed/reachability rows no longer bind there (17 source-confirmed, 1 reachability). Refresh at F is declared Lead custody; G6 cannot be met on this pin",
+   "locator": "proof.json#sourceCommit; git diff 3e2d05af8 cffe725b9"
+  },
+  {
+   "id": "f00106",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/routing-handoff-contract.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00106] AGENTS.md:13"
+  },
+  {
+   "id": "f00117",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/routing-handoff-contract.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00117] AGENTS.md:60"
+  },
+  {
+   "id": "f00148",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because '# own `examp' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00148] apps/fgos-gateway/Cargo.toml:44"
+  },
+  {
+   "id": "f00156",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00156] apps/fgos-gateway/src/gateway.rs:2"
+  },
+  {
+   "id": "f00158",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00158] apps/fgos-gateway/src/gateway.rs:40"
+  },
+  {
+   "id": "f00161",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00161] apps/fgos-gateway/src/gateway.rs:188"
+  },
+  {
+   "id": "f00162",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00162] apps/fgos-gateway/src/gateway.rs:254"
+  },
+  {
+   "id": "f00163",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/contracts/fgos-gateway-api-v1.yaml (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00163] apps/fgos-gateway/src/gateway.rs:555"
+  },
+  {
+   "id": "f00187",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/ui-spec/screens/S03-task-detail.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00187] apps/fgos-gateway/web/src/screens/TaskDetail.tsx:9"
+  },
+  {
+   "id": "f00189",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/ui-spec/modals/M03-add-edit-item.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00189] apps/fgos-gateway/web/src/screens/TaskDetail.tsx:487"
+  },
+  {
+   "id": "f00191",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/ui-spec/screens/S02-taskboard.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00191] apps/fgos-gateway/web/src/screens/Taskboard.tsx:9"
+  },
+  {
+   "id": "f00193",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/ui-spec/modals/M03-add-edit-item.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00193] apps/fgos-gateway/web/src/screens/Taskboard.tsx:439"
+  },
+  {
+   "id": "f00477",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/id-systems-audit.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00477] core/skills/_shared/citation-format.md:34"
+  },
+  {
+   "id": "f00478",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/id-systems-audit.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f00478] core/skills/_shared/citation-format.md:51"
+  },
+  {
+   "id": "f03758",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/distribution-vision.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f03758] docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md:129"
+  },
+  {
+   "id": "f07697",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/routing-handoff-contract.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f07697] docs/platform/runner/contracts/routing-handoff.md:17"
+  },
+  {
+   "id": "f07698",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/platform-foundations.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f07698] docs/platform/runner/contracts/routing-handoff.md:23"
+  },
+  {
+   "id": "f07701",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/platform-foundations.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f07701] docs/platform/runner/contracts/routing-handoff.md:112"
+  },
+  {
+   "id": "f08033",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/io-contract.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08033] docs/platform/work-state/contracts/cli-io-contract.md:15"
+  },
+  {
+   "id": "f08044",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/architecture-map.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08044] docs/platform/work-state/contracts/cli-io-contract.md:439"
+  },
+  {
+   "id": "f08047",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/io-contract.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08047] docs/platform/work-state/contracts/cli-io-contract.md:449"
+  },
+  {
+   "id": "f08069",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/io-contract.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08069] docs/platform/work-state/spec.md:16"
+  },
+  {
+   "id": "f08071",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/coexistence.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08071] docs/platform/work-state/spec.md:33"
+  },
+  {
+   "id": "f08076",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/coexistence.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08076] docs/platform/work-state/spec.md:711"
+  },
+  {
+   "id": "f08077",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/coexistence.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08077] docs/platform/work-state/spec.md:1071"
+  },
+  {
+   "id": "f08079",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/coexistence.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08079] docs/platform/work-state/spec.md:1173"
+  },
+  {
+   "id": "f08084",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/io-contract.md (moved by the cutover, successor exists) confirmed as history only because 'ví dụ' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08084] docs/platform/work-state/spec.md:1204"
+  },
+  {
+   "id": "f08634",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/operator-runbook-herdr-cockpit.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08634] plugins/fgOS/skills/terminal/SKILL.md:20"
+  },
+  {
+   "id": "f08665",
+   "verdict": "REWORK",
+   "reason": "live pointer to docs/routing-handoff-contract.md (moved by the cutover, successor exists) confirmed as history only because 'e.g.' appears elsewhere in the file; premise fails post-cut -> owned park/repoint",
+   "locator": "proof.json#rows[f08665] src/runner/dispatch/assignment-runner.mjs:301"
+  },
+  {
+   "id": "f00515",
+   "verdict": "REWORK",
+   "reason": "source file is deleted by the physical move; the composed existing target carries a repointed form, so the preserved text is not reachable and, as relative link from the new location, would not resolve; result should not be reachability-unchanged",
+   "locator": "proof.json#rows[f00515] docs/README.md:28"
+  },
+  {
+   "id": "f00521",
+   "verdict": "REWORK",
+   "reason": "source file is deleted by the physical move; the composed existing target carries a repointed form, so the preserved text is not reachable and, as relative link from the new location, would not resolve; result should not be reachability-unchanged",
+   "locator": "proof.json#rows[f00521] docs/README.md:41"
+  },
+  {
+   "id": "f00525",
+   "verdict": "REWORK",
+   "reason": "source file is deleted by the physical move; the composed existing target carries a repointed form, so the preserved text is not reachable and, as relative link from the new location, would not resolve; result should not be reachability-unchanged",
+   "locator": "proof.json#rows[f00525] docs/README.md:55"
+  },
+  {
+   "id": "f01225",
+   "verdict": "REWORK",
+   "reason": "source file is deleted by the physical move; the composed existing target carries a repointed form, so the preserved text is not reachable and, as relative link from the new location, would not resolve; result should not be reachability-unchanged",
+   "locator": "proof.json#rows[f01225] docs/doc-governance.md:471"
+  },
+  {
+   "id": "f08411",
+   "verdict": "REWORK",
+   "reason": "source file is deleted by the physical move; the composed existing target carries a repointed form, so the preserved text is not reachable and, as relative link from the new location, would not resolve; result should not be reachability-unchanged",
+   "locator": "proof.json#rows[f08411] docs/transitional-switchboard.md:114"
+  },
+  {
+   "id": "f05646",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05646] docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md:23"
+  },
+  {
+   "id": "f05655",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05655] docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md:23"
+  },
+  {
+   "id": "f05661",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05661] docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md:23"
+  },
+  {
+   "id": "f05671",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05671] docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md:23"
+  },
+  {
+   "id": "f05677",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05677] docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md:23"
+  },
+  {
+   "id": "f05693",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05693] docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md:23"
+  },
+  {
+   "id": "f05720",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05720] docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md:23"
+  },
+  {
+   "id": "f05730",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05730] docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md:23"
+  },
+  {
+   "id": "f05742",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f05742] docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md:23"
+  },
+  {
+   "id": "f06391",
+   "verdict": "REWORK",
+   "reason": "CoordinationSession history-wrapper line pointing to docs/specs/runner.md with no dated successor note proposal (siblings at same position got h-aabefc85f0c9.md note)",
+   "locator": "proof.json#rows[f06391] docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md:35"
+  },
+  {
+   "id": "f06167",
+   "verdict": "REWORK",
+   "reason": "line 23 is wrapper framing before \"## Literal Snapshot\", not inside carriage; record reason \"inside literal carriage\" is wrong and the proof accepts it because it checks only that the declaration appears in the prefix; needs the same dated-note proposal as siblings",
+   "locator": "proof.json#rows[f06167] docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md:23"
+  },
+  {
+   "id": "f07526",
+   "verdict": "REWORK",
+   "reason": "\"Canonical architecture moved to: docs/architect/.../dispatch-control-plane.md\" is navigation, and it states something false once the path is removed; accepted via literal-carriage-declaration",
+   "locator": "proof.json#rows[f07526] docs/platform/proposals/dispatch-control-plane-redesign.md:29"
+  },
+  {
+   "id": "f03468",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03468] docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md:197"
+  },
+  {
+   "id": "f03907",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03907] docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md:14"
+  },
+  {
+   "id": "f01152",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f01152] docs/distillery/sources/beehive.md:910"
+  },
+  {
+   "id": "f06416",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06416] docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:877"
+  },
+  {
+   "id": "f04415",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04415] docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md:124"
+  },
+  {
+   "id": "f03417",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03417] docs/id-systems-audit.md:49"
+  },
+  {
+   "id": "f06598",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06598] docs/platform/documentation/history/id-systems-audit.md:59"
+  },
+  {
+   "id": "f04416",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04416] docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md:128"
+  },
+  {
+   "id": "f00568",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00568] docs/architecture-map.md:745"
+  },
+  {
+   "id": "f07750",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07750] docs/platform/runner/decisions/h-36d872fbb0e5.md:1156"
+  },
+  {
+   "id": "f00617",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00617] docs/backlog.md:129"
+  },
+  {
+   "id": "f07748",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07748] docs/platform/runner/decisions/h-36d872fbb0e5.md:1145"
+  },
+  {
+   "id": "f03824",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03824] docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md:74"
+  },
+  {
+   "id": "f07725",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07725] docs/platform/runner/decisions/h-36d872fbb0e5.md:781"
+  },
+  {
+   "id": "f07734",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07734] docs/platform/runner/decisions/h-36d872fbb0e5.md:974"
+  },
+  {
+   "id": "f07721",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07721] docs/platform/runner/decisions/h-36d872fbb0e5.md:545"
+  },
+  {
+   "id": "f07977",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07977] docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md:21"
+  },
+  {
+   "id": "f06955",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06955] docs/platform/host-invocation-routing/contracts/operation-request-outcome.md:15"
+  },
+  {
+   "id": "f07965",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07965] docs/platform/ui-spec/architecture/screens/S01-sign-in.md:21"
+  },
+  {
+   "id": "f07201",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07201] docs/platform/packaging-distribution/history/distribution-baseline.md:11"
+  },
+  {
+   "id": "f04517",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04517] docs/platform/agent-coordination/history/README.md:9"
+  },
+  {
+   "id": "f07959",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07959] docs/platform/ui-spec/architecture/modals/M02-approve-merge.md:21"
+  },
+  {
+   "id": "f07434",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07434] docs/platform/proposals/architecture-advisory-panel.md:9"
+  },
+  {
+   "id": "f04676",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04676] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:58"
+  },
+  {
+   "id": "f04748",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04748] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:121"
+  },
+  {
+   "id": "f05068",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f05068] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:281"
+  },
+  {
+   "id": "f07028",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07028] docs/platform/host-invocation-routing/intent-preservation-ledger.md:83"
+  },
+  {
+   "id": "f04986",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04986] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:240"
+  },
+  {
+   "id": "f04752",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04752] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:123"
+  },
+  {
+   "id": "f04900",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04900] docs/platform/agent-coordination/history/documentation-migration/source-inventory.md:197"
+  },
+  {
+   "id": "f00389",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00389] archive/plans/260915-code-implementation-track-policy/plan.md:215"
+  },
+  {
+   "id": "f00324",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00324] archive/plans/260910-1243-confinement-authority-implementation/plan.md:266"
+  },
+  {
+   "id": "f00341",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00341] archive/plans/260910-1700-rust-host-r1-kernel/plan.md:392"
+  },
+  {
+   "id": "f00336",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00336] archive/plans/260910-1700-rust-host-r1-kernel/plan.md:391"
+  },
+  {
+   "id": "f00360",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00360] archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md:41"
+  },
+  {
+   "id": "f00349",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00349] archive/plans/260910-1700-rust-host-r1-kernel/plan.md:398"
+  },
+  {
+   "id": "f03513",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03513] docs/knowledge/decisions-index/decision-record.md:31"
+  },
+  {
+   "id": "f03527",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03527] docs/knowledge/decisions-index/decision-record.md:38"
+  },
+  {
+   "id": "f03522",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03522] docs/knowledge/decisions-index/decision-record.md:35"
+  },
+  {
+   "id": "f03485",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03485] docs/knowledge/decisions-index/decision-record.md:17"
+  },
+  {
+   "id": "f06540",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06540] docs/platform/component-boundary.md:282"
+  },
+  {
+   "id": "f04582",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04582] docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md:273"
+  },
+  {
+   "id": "f07417",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07417] docs/platform/proposals/README.md:64"
+  },
+  {
+   "id": "f05685",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f05685] docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md:57"
+  },
+  {
+   "id": "f05626",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f05626] docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md:197"
+  },
+  {
+   "id": "f07870",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07870] docs/platform/system-architecture/architecture/roadmap.md:237"
+  },
+  {
+   "id": "f07888",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f07888] docs/platform/system-architecture/architecture/roadmap.md:275"
+  },
+  {
+   "id": "f06480",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06480] docs/platform/architecture-map.md:653"
+  },
+  {
+   "id": "f06271",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06271] docs/platform/agent-coordination/history/retired-engine/legacy/README.md:222"
+  },
+  {
+   "id": "f03445",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03445] docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md:62"
+  },
+  {
+   "id": "f03557",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03557] docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md:61"
+  },
+  {
+   "id": "f03226",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03226] docs/explanation/mode-gate-tiny-small-skip-load.md:71"
+  },
+  {
+   "id": "f06814",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f06814] docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:256"
+  },
+  {
+   "id": "f04141",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04141] docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md:60"
+  },
+  {
+   "id": "f03372",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03372] docs/how-to/run-a-coordination-session.md:266"
+  },
+  {
+   "id": "f08147",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f08147] docs/reading-map.md:157"
+  },
+  {
+   "id": "f04225",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04225] docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md:17"
+  },
+  {
+   "id": "f00733",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00733] docs/distillery/comparison-matrix.md:25"
+  },
+  {
+   "id": "f04408",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04408] docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md:25"
+  },
+  {
+   "id": "f00846",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f00846] docs/distillery/comparison-matrix.md:140"
+  },
+  {
+   "id": "f04382",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f04382] docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md:29"
+  },
+  {
+   "id": "f03232",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03232] docs/explanation/opportunistic-checks-regression-root-cause-bisection.md:43"
+  },
+  {
+   "id": "f03922",
+   "verdict": "APPROVE",
+   "reason": "stratified sample: evidence binds to the passage (dated/provenance/source-table/carriage) or target present post-cut; premise holds",
+   "locator": "proof.json#rows[f03922] docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md:11"
+  }
+ ],
+ "summary": {
+  "approve": 68,
+  "rework": 50,
+  "gateG6": "not met (agrees with receipt)",
+  "sample": {
+   "seed": 20261023,
+   "stratumA_confirmedHistory": [
+    "f03468",
+    "f03907",
+    "f01152",
+    "f06416",
+    "f04415",
+    "f03417",
+    "f06598",
+    "f04416",
+    "f00568",
+    "f07750",
+    "f00617",
+    "f07748",
+    "f03824",
+    "f07725",
+    "f07734",
+    "f07721",
+    "f07977",
+    "f06955",
+    "f07965",
+    "f07201",
+    "f04517",
+    "f07959",
+    "f07434",
+    "f04676",
+    "f04748",
+    "f05068",
+    "f07028",
+    "f04986",
+    "f04752",
+    "f04900",
+    "f00389",
+    "f00324",
+    "f00341",
+    "f00336",
+    "f00360",
+    "f00349",
+    "f03513",
+    "f03527",
+    "f03522",
+    "f03485",
+    "f06540",
+    "f04582",
+    "f07417",
+    "f05685",
+    "f05626",
+    "f07526",
+    "f07870",
+    "f07888",
+    "f06480",
+    "f06271"
+   ],
+   "stratumB_reachability": [
+    "f03445",
+    "f03557",
+    "f03226",
+    "f06814",
+    "f04141",
+    "f03372",
+    "f08147",
+    "f04225",
+    "f00733",
+    "f04408",
+    "f00846",
+    "f04382",
+    "f03232",
+    "f03922"
+   ],
+   "size": 64
+  },
+  "replay": "byte-identical twice + equals delivered",
+  "reviewerProbes": {
+   "P1 false retained pointer": "accepted (fail)",
+   "P2 mismatched passage": "parked (pass)",
+   "P3 navigation under Bee H1": "accepted (fail)"
+  },
+  "falseConfirmations": {
+   "externalExampleWholeFile": 29,
+   "reachabilityOnDeletedSource": 5,
+   "missedWrappers": 10,
+   "mislabeledCarriage": 1,
+   "sampleCarriagePointer": 1
+  }
+ }
+}

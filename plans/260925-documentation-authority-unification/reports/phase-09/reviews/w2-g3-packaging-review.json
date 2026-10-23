@@ -1,0 +1,222 @@
+{
+ "scope": "w2-g3-packaging",
+ "commit": "cffe725b9",
+ "reviewedCommit": "f534aeaea",
+ "verdicts": [
+  {
+   "id": "dropped-001",
+   "verdict": "APPROVE",
+   "reason": "The full Dev / Source Activation body (legacy runtime-identity 902-927) is restored verbatim and the settled-facts row is carried. The status cell is honestly requalified as 'selected design, unimplemented'; code has no activationKind (only RuntimeIdentityInfo host 'dev-source'). The binding digest, ancestry and compact+LF hash recompute.",
+   "locator": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:371-404,423; plans/260925-documentation-authority-unification/dropped-claims-register.json entries[0].preflipDisposition"
+  },
+  {
+   "id": "dropped-002",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (version-pair matching implemented, range intersection kept as design).",
+   "locator": "register entries[1].preflipDisposition"
+  },
+  {
+   "id": "dropped-003",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (lifecycle chain kept as vocabulary, not persisted states).",
+   "locator": "register entries[2].preflipDisposition"
+  },
+  {
+   "id": "dropped-004",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (layout tree illustrative; Cargo.toml workspace membership and registry.rs confirmed).",
+   "locator": "register entries[3].preflipDisposition"
+  },
+  {
+   "id": "dropped-005",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (class/mechanism axes kept as policy).",
+   "locator": "register entries[4].preflipDisposition"
+  },
+  {
+   "id": "dropped-006",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (framed JSON-RPC codec confirmed (frame_codec.rs)).",
+   "locator": "register entries[5].preflipDisposition"
+  },
+  {
+   "id": "dropped-007",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (transport neutrality kept as future design).",
+   "locator": "register entries[6].preflipDisposition"
+  },
+  {
+   "id": "dropped-008",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (linker formula kept as design; registry.rs validates duplicates).",
+   "locator": "register entries[7].preflipDisposition"
+  },
+  {
+   "id": "dropped-009",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (adapter delegation kept as migration design).",
+   "locator": "register entries[8].preflipDisposition"
+  },
+  {
+   "id": "dropped-010",
+   "verdict": "APPROVE",
+   "reason": "The prior owner-reviewed 'superseded by decision' verdict is kept unchanged (priorIndependentDispositionPreserved). Its rationale (coordinator 30-day window succeeds the installed-default trigger) is sound. The anchor digest recomputes at cffe725b9.",
+   "locator": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-...; register entries[9]"
+  },
+  {
+   "id": "dropped-011",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (two-runtime cost structural, no benchmark claimed).",
+   "locator": "register entries[10].preflipDisposition"
+  },
+  {
+   "id": "dropped-012",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (scope guidance, not runtime gate).",
+   "locator": "register entries[11].preflipDisposition"
+  },
+  {
+   "id": "dropped-013",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (dated rejection reasons).",
+   "locator": "register entries[12].preflipDisposition"
+  },
+  {
+   "id": "dropped-014",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (manual procedure; Parked variant confirmed in contracts.rs:239).",
+   "locator": "register entries[13].preflipDisposition"
+  },
+  {
+   "id": "dropped-015",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (manual rollback policy).",
+   "locator": "register entries[14].preflipDisposition"
+  },
+  {
+   "id": "dropped-016",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (placeholder budgets marked UNPROVEN).",
+   "locator": "register entries[15].preflipDisposition"
+  },
+  {
+   "id": "dropped-017",
+   "verdict": "APPROVE",
+   "reason": "The earlier reviewed restore is kept and the target is unchanged (contentChanged false). The digest, ancestry and binding hash recompute at cffe725b9. The rationale is honest about what is design and what is implemented (dated gate policy, no suite-run claim).",
+   "locator": "register entries[16].preflipDisposition"
+  },
+  {
+   "id": "G3-ties",
+   "verdict": "APPROVE",
+   "reason": "No tie is flagged, and I find none. Each of 002-017 already has a reviewed verdict that the rationale does not reverse. 001 follows the owner statement that the drop was unintended.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/carries/dropped-dispositions.json"
+  },
+  {
+   "id": "G0-9d97a24e",
+   "verdict": "APPROVE",
+   "reason": "spec.md#unheaded-block-89 (Data Dictionary 563-589) is byte-identical to current legacy distribution.md#unheaded-block-5, and it carries the provider-capacity state and account-locks rows. 'supersede' is correct. The hash recomputes.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json registryGaps[2]"
+  },
+  {
+   "id": "G0-c87924f5",
+   "verdict": "APPROVE",
+   "reason": "spec.md#unheaded-block-85 frontmatter is identical to current legacy block-1. The supersede names the metadata date correction, and the digest and hash recompute.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json registryGaps[4]"
+  },
+  {
+   "id": "G0-9881ddf7",
+   "verdict": "APPROVE",
+   "reason": "spec.md:361 now links ../../architect/workspace-topology.md (resolves), consistent with block-79 and L10-18. The digest and hash recompute.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json claims[344]"
+  },
+  {
+   "id": "G0-249083ed",
+   "verdict": "APPROVE",
+   "reason": "spec.md:492 restores the legacy docs/architect topology destination; the digest and hash recompute.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json claims[366]"
+  },
+  {
+   "id": "G0-891db485",
+   "verdict": "APPROVE",
+   "reason": "setup-doctor-registry.md#unheaded-block-30 (188-218) equals current legacy distribution.md#unheaded-block-9. lock-fences and predecessorKillWaitMs are gone. src has neither; lock-dirs and terminal-dir are registered fixes.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json registryGaps[5]"
+  },
+  {
+   "id": "G0-83a4a913",
+   "verdict": "APPROVE",
+   "reason": "activation-binding.md#unheaded-block-19 (190-198) is byte-identical to current legacy runtime-identity#unheaded-block-54 (Windows LockFileEx). The stale lock-driver-unavailable text is removed.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json claims[12]"
+  },
+  {
+   "id": "PKG-newer-legacy-carried",
+   "verdict": "APPROVE",
+   "reason": "All 27 non-heading units of current docs/specs/distribution.md are present verbatim by digest. The named items are all carried: git-addon-unavailable npm refusal (matches src/native/door.mjs:14,35), 5h, identity-project-id/machine-id, 7c/7d, executor-skills-installed, tier-fallback, RUL107 and Windows LockFileEx. The only architect units not carried verbatim are redirect banners, link rebasings and the requalified dev-source status cell.",
+   "locator": "docs/platform/packaging-distribution/spec.md:211-251,535-545,573-589,759-780"
+  },
+  {
+   "id": "PKG-removed-code",
+   "verdict": "APPROVE",
+   "reason": "lock.predecessorKillWaitMs, lock-fences, lock-predecessor-kill-wait, state-root and capability-rigor-ceiling now appear only in dated history or explicitly removed wording. 5g drops the lock config key, and the fixed 2000 ms wait is stated.",
+   "locator": "spec.md:576,775,777; verification/install-and-release-proof.md:165-183"
+  },
+  {
+   "id": "PKG-doctor-registry-code-truth",
+   "verdict": "REWORK",
+   "reason": "spec.md row 7 says it 'names every registered check'. It still lists model-policy-tier-coverage, which was removed at 720891630 and is not registered anywhere in src. It omits 8 registered checks: documentation-cutover-lease, git-land-recovery, git-mutation-one-door, identity-ids-unique, seat-binding-config, seat-binding-route, workflow-case-binding-sentinel and workflow-case-bindings. Row 7b omits the fixes git-driver-directories, git-land-recovery, git-publication-refspecs, git-wal-dir and workflow-case-bindings. The sibling setup-doctor-registry.md already lists all of these, so the area contradicts itself. The rows are inherited verbatim from legacy, which has the same drift. The brief asked for verification against src.",
+   "locator": "docs/platform/packaging-distribution/spec.md:579-580 (also docs/specs/distribution.md row 7/7b)"
+  },
+  {
+   "id": "PKG-release-manifest-duplicate",
+   "verdict": "REWORK",
+   "reason": "The new '## Canonical Release Tree Rules' (316-453) is a 135-line verbatim copy of the same file's 'Retained ... Source Detail §5 ReleaseManifest' (180-315): 13 units have identical digests, so one contract now has two authorities that can drift. The copy also brings in a broken link at line 393, '../host-invocation-routing/legacy-cli-transition.md', which resolves to a path that does not exist (copied from the legacy-relative path without rebasing). Fix: move the retained subsection under the live heading, or relabel it and bind the canonical.rs/verify.rs pointers to it. Do not copy.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md:316-453 (broken link :393)"
+  },
+  {
+   "id": "PKG-activation-binding-duplicate",
+   "verdict": "REWORK",
+   "reason": "The new 'Init Pipeline And Root Binding' and 'Walking Skeleton Evidence' (activation-binding.md 482-570) duplicate 6 complete units of architecture/runtime-identity-and-activation.md (267-342) verbatim. Two holders now carry the same normative pipeline. Bind the init.rs pointer to the existing passage, or move it, and leave one holder.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md:482-570 vs architecture/runtime-identity-and-activation.md:267-342"
+  },
+  {
+   "id": "PKG-spec-legacy-setup-duplicate",
+   "verdict": "REWORK",
+   "reason": "The new '## Legacy Setup Scenario' in spec.md (211-243) is a verbatim duplicate of setup-doctor-registry.md#unheaded-block-30. No conserved claim or pointer patch binds it, and neither the receipt nor document-operations explains why.",
+   "locator": "docs/platform/packaging-distribution/spec.md:211-243"
+  },
+  {
+   "id": "PKG-bindings-mechanics",
+   "verdict": "APPROVE",
+   "reason": "I recomputed every binding with the declared compact+LF 4-key recipe and the scripts/generate-doc-inventory.mjs textDigest at cffe725b9. 1087/1087 s11 rows, 122/122 rows in the 9 touched shards and 17/17 register bindings match digest, hash and heading ancestry. unitCarries covers all units of the 7 changed packaging files (466/466, none extra). All 945 ledger rows that target packaging-distribution resolve.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json; touched s4/s5/s7/s10 shards"
+  },
+  {
+   "id": "PKG-receipt-recipe-statement",
+   "verdict": "REWORK",
+   "reason": "receipt.md 'Binding Recipe' says the phase-08 register 'has no bindingHashEncoding field at this pin'. It does: 10 occurrences at 3e2d05af8, f534aeaea~1 and cffe725b9, under changedBindings and pendingChangedSinceStep0. The recipe used matches it, so only the statement is wrong. Low severity.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/carries/receipt.md#binding-recipe"
+  }
+ ],
+ "summary": {
+  "approve": 27,
+  "rework": 5,
+  "sampling": "all items checked (<=60); mechanical bindings checked exhaustively, no sampling",
+  "blockingReworks": [
+   "PKG-release-manifest-duplicate (incl. broken link)",
+   "PKG-doctor-registry-code-truth",
+   "PKG-activation-binding-duplicate",
+   "PKG-spec-legacy-setup-duplicate"
+  ],
+  "lowReworks": [
+   "PKG-receipt-recipe-statement"
+  ],
+  "observations": [
+   "Topology links in the area are mixed: spec.md and the README table point to ../../architect/workspace-topology.md, while README:250, runtime-identity:181 and repository-runtime-layout:197,268 point to the system-architecture copy. Decide which to keep before the flip retires docs/architect.",
+   "Legacy distribution.md has the same doctor row 7/7b drift; the main lane should fix it too, or G9 will re-import it.",
+   "Frozen gate artifacts now hold stale packaging digests: step-08-preflip-gates.json 114 and review-batches.json 57. Expected after D1, but G9 must show that each one has a successor row.",
+   "setup-doctor-registry/spec 'two lock directories' side-effect text omits <stateRoot>/terminal (inherited from legacy).",
+   "Out of scope: the added link in work-state/decisions/retired-decision-history.md:30 (0012-typed-edge-model-...md) does not resolve.",
+   "g0-b1-review.json does not exist under reviews/; b1 rows were taken from w1-review-notes.md."
+  ],
+  "method": "node extractMarkdownConservationUnits textDigest; python recompute of sha256(compact sorted JSON+LF); unit-level diff vs current legacy at cffe725b9; registerCheck/registerFix extraction from src"
+ }
+}

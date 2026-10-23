@@ -21,3 +21,11 @@
 - same file :55 (reference-003709) cites nonexistent docs/platform/seat-binding/spec.md (only docs/specs/seat-binding.md) -> seat-binding has no platform holder (same gap as D2b).
 - release-manifest.md:393 duplicate legacyNode paragraph (also line 254) with dead relative link (same as G3 #1).
 - SYSTEMIC: runner area drifted too: docs/platform/runner/decisions/h-36d872fbb0e5.md missing 0048/0049 supersession notes, still names withStateTx vs legacy docs/specs/runner.md -> runner re-sync like packaging (G9/D1b).
+## G6 preserve (w2-g6-preserve-review, 68/50) -> D4b
+- Negative probes don't exercise historical_evidence(); probes 1==3. Write real probes (live pointer + unrelated "e.g." far away must NOT confirm; nav row in file titled "Bee" must NOT confirm).
+- "example/external framing" marker searched whole-file, not passage (416/447 outside passage): 29 fgOS-owned live pointers falsely confirmed history (AGENTS.md:13,:60 -> docs/routing-handoff-contract.md; gateway .rs/Cargo.toml -> docs/contracts/fgos-gateway-api-v1.yaml; TaskDetail.tsx/Taskboard.tsx -> docs/ui-spec; io-contract.md, coexistence.md, distribution-vision.md) -> park/repoint.
+- 5 rows "reachability unchanged" but source file deleted by move (f00515, f00521, f00525, f01225, f08411: docs/README.md, docs/doc-governance.md, docs/transitional-switchboard.md).
+- Dated-note uniform per L12-35(3): 10 wrappers missed (f05646-f05742 nine rows; f06391 live playbook); f06167 labelled inside literal carriage but is before "## Literal Snapshot" -> check position.
+- f07526 "Canonical architecture moved to: docs/architect/..." navigation line becomes false -> repoint.
+- Stale pin: 90 rows in files changed 3e2d05af8..cffe725b9; 18 no longer bind -> refresh at final pin F (and add --pin).
+- 152 history-wrapper proposals sound (preserve-with-dated-note).

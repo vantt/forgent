@@ -1,0 +1,336 @@
+{
+ "batch": "g0-b5",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "id": "claim_6d48b5e2bda8133502dbddf0a30bccfe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "65524cc23397a074aafd94d61c9f0f2b62c74367f5882335660fd013d0c49839",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-49",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical move (digest 51ad15b7) of the \"The foundation owns:\" list into the candidate vision, under Foundation Responsibilities, with the same ancestry."
+  },
+  {
+   "id": "claim_4296d0ed22dd9201b6018ac71f024915",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "5d5b4e6a1a0192dae9f45ac5ca8606777f0cc2955b523eed157afe2cd25f1cd9",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-50",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical lead-in \"Domain, organization, or lifecycle integrations own:\" under Domain And Integration Responsibilities; its list follows directly at block 51."
+  },
+  {
+   "id": "claim_899e837dd759dc01afff5c6dd8a322bd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "855731d97fa82514b2830be3b78509db47e9088d92cdc95678d02a2888a2bd92",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-51",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical nine-item domain/integration ownership list, in the same section and right after its lead-in."
+  },
+  {
+   "id": "claim_b394376d1521888e01f83eb33d0d1a8d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "6598d468af01d36fd92598d840eefb6003ea1a6356ae92516eef0456ab2100b9",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-52",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical lead-in under Rejected Interpretations. The list that follows was rewritten (block 53, with history pointer block 54); that list is owned by other claims, not by this lead-in."
+  },
+  {
+   "id": "claim_07c68665d6b19d67c6b26491297ed6ba",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "9f6501db1e036b8dcaa1e80306354bd03f9d697c2b83aa01a0f93b07c33eea8a",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-55",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical Protocol Model paragraph under Consequences For Downstream Design / Protocol Model."
+  },
+  {
+   "id": "claim_8578eb3520660abdf596e07df634658f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "989b544fbdd0bdc4b5d079918a5e498b385602b9f229c94134409341cc172ba3",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-56",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical Assignment paragraph under the same subsection."
+  },
+  {
+   "id": "claim_39494662eed59b83a66e63b9a2163226",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "7a8d7d5df9e7175e283fe0a433544c37d7451145c1355b95d7a4eee7a745805f",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-57",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical Planning Materialization paragraph under the same subsection."
+  },
+  {
+   "id": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "49033e9d4f06d325b812f08ada0d1e4961726714cc12e2f3e86194c069da0c8c",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-58",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Byte-identical Extension Design paragraph under the same subsection."
+  },
+  {
+   "id": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+   "bindingSha256": "4ca4784f0367ae4aeed84206576baad914d7030014bdfa6e41dcea2693fe315c",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "unheaded-block-62",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Only change: \"V-001 through V-012\" became \"V-013\". V-013 exists in both the candidate (line 255) and the legacy HEAD, so the guard covers more decisions, not fewer. Same section. The rationale still cites the old block-56 digest a4f4f7bd (cosmetic)."
+  },
+  {
+   "id": "claim_4ff3a12817bb891341b26283460beea0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+   "bindingSha256": "b28062b39f1ca542aece05385aac9ae89b8db8f2d419714fc81944f6af1bb51e",
+   "targetOwner": "docs/platform/agent-coordination/vision.md",
+   "targetAnchor": "open-design-questions-under-this-vision",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Supersede bound to the section heading. The heading digest covers the section payload and the following block (generate-doc-inventory.mjs:633), so later edits to the section invalidate it. The section restates the undecided questions with current status (blocks 59-62) and keeps \"answered beneath this Vision without reopening\". The rationale cites a stale heading digest 4c62eb43 (cosmetic)."
+  },
+  {
+   "id": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "43019769e2fe0b5d6e492fa1d65bb194b379c201ef5ff00324334fcc9622a605",
+   "targetOwner": "docs/architecture-manifest.json",
+   "targetAnchor": "file-block",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "declared: sha256(sorted compact JSON + LF of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry})",
+   "reason": "Whole-file supersede on the same manifest. contract/map/layers/rules/components/domains are unchanged. The files map only drops modules deleted from disk (all 12 verified absent), adds new modules and reclassifies some by code. The binding uses the declared refreshed encoding."
+  },
+  {
+   "id": "claim_15308eb4847ddd38be79bd87bd69a0b6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "16857155307da3a8b7bab0125a708eb866290bbcb7123ceffff238e73ca7477d",
+   "targetOwner": "docs/specs/confinement-authority.md",
+   "targetAnchor": "unheaded-block-140",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "docs/specs/confinement-authority.md#unheaded-block-140 (section 13.1, credentialStore recipe). The text is a valid supersede of the historical item list, but the bound unit sits in a legacy spec whose candidate docs/platform/agent-confinement/spec.md has no section 13.1 at all, even though that candidate's section 14 (line 602) points to section 13.1. No ledger claim carries current digest 5364ce63 into the candidate, so this claim lands in a retiring file at flip. Carry section 13.1 into the candidate (or have G9 recompose it), then rebind there."
+  },
+  {
+   "id": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+   "bindingSha256": "e1674a7ba1302089d47f2a661a4524c0db1c0d0bee5a79a5b2322146d6ed8550",
+   "targetOwner": "docs/specs/confinement-authority.md",
+   "targetAnchor": "unheaded-block-144",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Section 13.2 supersede. The dropped \"home kept when pending/ is full\" clause is replaced by the stronger \"non-redundant copies are never dropped to make room\". The bound legacy unit f0b5e6c1 is carried byte-identically into docs/platform/agent-confinement/spec.md#unheaded-block-70 by reviewed claim_19c1aba2, so the chain into the candidate holds."
+  },
+  {
+   "id": "claim_04703f011b22383992b94545055b9e56",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+   "bindingSha256": "e1674a7ba1302089d47f2a661a4524c0db1c0d0bee5a79a5b2322146d6ed8550",
+   "targetOwner": "docs/specs/confinement-authority.md",
+   "targetAnchor": "unheaded-block-144",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Only change: the pending cap went from per account to per login store (one store per account, or per stores/<cli>). Same section 13.2; the chain into the candidate holds through reviewed claim_19c1aba2 (block 70)."
+  },
+  {
+   "id": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+   "bindingSha256": "43019769e2fe0b5d6e492fa1d65bb194b379c201ef5ff00324334fcc9622a605",
+   "targetOwner": "docs/architecture-manifest.json",
+   "targetAnchor": "file-block",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "declared: sha256(sorted compact JSON + LF of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry})",
+   "reason": "Whole-file manifest supersede. Only the files map differs; every removed entry is a module deleted from disk. Declared refreshed encoding."
+  },
+  {
+   "id": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+   "bindingSha256": "43019769e2fe0b5d6e492fa1d65bb194b379c201ef5ff00324334fcc9622a605",
+   "targetOwner": "docs/architecture-manifest.json",
+   "targetAnchor": "file-block",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "declared: sha256(sorted compact JSON + LF of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry})",
+   "reason": "Whole-file manifest supersede. Only the files map differs; every removed entry is a module deleted from disk. Declared refreshed encoding."
+  },
+  {
+   "id": "claim_7cfb055e3f10b99944ffec46ce877653",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+   "bindingSha256": "3d397bfc9ea573333b6cef07e968d8431774595c65360d10f2d6d9d5f10b3ead",
+   "targetOwner": "docs/platform/holder-lock/spec.md",
+   "targetAnchor": "unheaded-block-1",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Holder-lock metadata header superseded in the platform spec itself. Implementation status changed to Implemented, the identity link was renamed and Last reviewed was bumped; the purpose, status, owner, source and contracts lines are kept."
+  },
+  {
+   "id": "claim_b2a51d5d39832d330879947bdbbcb227",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+   "bindingSha256": "ec0c9278b6f88a6aa9c8c047c2106122b137c21ddb69f6b3efe1a179089f90c5",
+   "targetOwner": "docs/platform/observe/spec.md",
+   "targetAnchor": "owns",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "\"### Owns\" heading carried to docs/platform/observe/spec.md under the same \"1. Overview & Boundaries\" ancestry; the section digest differs only because of the updated payload (block 5)."
+  },
+  {
+   "id": "claim_a7278e1567e5432cfb079506cf2f5050",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+   "bindingSha256": "2c6be09e183c061d9972579d254c90af9a6c38a913aabe1df809687c25fa781c",
+   "targetOwner": "docs/specs/observe.md",
+   "targetAnchor": "unheaded-block-3",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "partial-carry bound to the legacy docs/specs/observe.md#unheaded-block-3. Its sibling predecessor of the same legacy block (claim_bf1888a0, registryGaps/2) is bound to the candidate docs/platform/observe/spec.md#unheaded-block-5. The remainder still names \"primary target 36f5428d\", not the current bound digest 8ab1ac2f, and A34Accepted=false. No ledger claim carries 8ab1ac2f onward. Rebind to the candidate block 5 and refresh the remainder pointer; the partial-carry residual still needs A34 acceptance before cutover."
+  },
+  {
+   "id": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+   "bindingSha256": "da6d2b6c04406bea6428a52e64ff72fa4d970a5eb6758fb7871ebfd266304c38",
+   "targetOwner": "docs/platform/observe/spec.md",
+   "targetAnchor": "unheaded-block-5",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "Observe \"Owns\" list superseded in the candidate block 5. Changes: two friction verbs added (A40 correction with code evidence), the lock moved to the holder-lock kernel lock, and the identity link was renamed; all other bullets are kept verbatim."
+  },
+  {
+   "id": "claim_57f11d837272b3f9781b376ef1665c81",
+   "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+   "bindingSha256": "5f13e4f0e033f1b6ba1c97798920219e83732e65be519bec819b7f81b8e85e24",
+   "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+   "targetAnchor": "unheaded-block-10",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "writer.id/writer.source trust-level text carried into cli-io-contract.md section 2 / Writer Source Trust Levels. Only the identity spec path and the crate name (fgos-session-identity -> fgos-identity) changed; all four source levels and the unresolved non-empty rule are kept."
+  },
+  {
+   "id": "claim_f5365b8e40fb58c75adc56a574263242",
+   "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+   "bindingSha256": "fd13622d7e44c781d3513c40ea051233716f6a7a91787831f200de112170936e",
+   "targetOwner": "docs/io-contract.md",
+   "targetAnchor": "unheaded-block-5",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "bindingEncoding": "legacy undeclared: sha256(json.dumps(sort_keys=True, default separators, ensure_ascii=False), no LF, of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup})",
+   "reason": "partial-carry bound to the legacy docs/io-contract.md#unheaded-block-5. The same lineage (claim_57f11d83, d3828696) is bound to the candidate docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10. The remainder names \"primary target d3828696\", not the bound 9f779327, and A34Accepted=false. No ledger claim carries 9f779327 onward. Rebind to the candidate block 10 and refresh the remainder pointer; the residual still needs A34 acceptance."
+  }
+ ]
+}
