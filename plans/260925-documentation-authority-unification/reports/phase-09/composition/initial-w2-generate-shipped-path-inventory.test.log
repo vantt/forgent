@@ -1,0 +1,120 @@
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+✖ commit reads preserve unusual paths and ignore uncommitted content (1121.907023ms)
+✔ classifyContractScope: distinguishes consumer, repo-local, and mixed contracts (0.825029ms)
+✔ extractPathReferences: extracts core/ conventions and avoids truncated junk (3.436614ms)
+✔ extractPathReferences: handles fenced prose and multiline commands without gluing fake tokens (R1) (1.170574ms)
+✔ table-driven path grammar, negative glued tokens, and positive counterexamples (R1 residual) (4.981979ms)
+✖ deterministic generation: generating inventory twice produces identical results (47.27472ms)
+✖ CLI: outputs JSON and Markdown files correctly (117.252743ms)
+✖ classifyPathAttributes: deterministically differentiates referenceKind, existenceStatus, sourceRole, resolutionStatus (29.108034ms)
+✖ repository inventory: detects nonexistent examples and never labels them safe rewrite targets (41.63624ms)
+✖ environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit (45.574727ms)
+✔ fail closed on absent, empty, or non-commit treeish input (241.415969ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 5
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1839.214481
+
+✖ failing tests:
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:92:1
+✖ commit reads preserve unusual paths and ignore uncommitted content (1121.907023ms)
+  Error: Explicit commit/treeish "HEAD" must resolve to a valid git commit: Command failed: cargo build --locked -p fgos-node-addon
+      at resolveCommitSha (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:68:11)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d2b-brief/post-move/test/scripts/generate-shipped-path-inventory.test.mjs:95:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:353:1
+✖ deterministic generation: generating inventory twice produces identical results (47.27472ms)
+  Error: Explicit commit/treeish "HEAD" must resolve to a valid git commit: Command failed: cargo build --locked -p fgos-node-addon
+      at resolveCommitSha (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:68:11)
+      at generateInventory (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:632:21)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d2b-brief/post-move/test/scripts/generate-shipped-path-inventory.test.mjs:356:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:394:1
+✖ CLI: outputs JSON and Markdown files correctly (117.252743ms)
+  AssertionError [ERR_ASSERTION]: CLI failed: error: could not find `Cargo.toml` in `/tmp/fgos-work/w2-d2b-brief/post-move` or any parent directory
+  Error: Explicit commit/treeish "HEAD" must resolve to a valid git commit: Command failed: cargo build --locked -p fgos-node-addon
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d2b-brief/post-move/test/scripts/generate-shipped-path-inventory.test.mjs:406:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:428:1
+✖ classifyPathAttributes: deterministically differentiates referenceKind, existenceStatus, sourceRole, resolutionStatus (29.108034ms)
+  Error: Explicit commit/treeish "HEAD" must resolve to a valid git commit: Command failed: cargo build --locked -p fgos-node-addon
+      at resolveCommitSha (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:68:11)
+      at classifyPathAttributes (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:367:17)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d2b-brief/post-move/test/scripts/generate-shipped-path-inventory.test.mjs:430:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:502:1
+✖ repository inventory: detects nonexistent examples and never labels them safe rewrite targets (41.63624ms)
+  Error: Explicit commit/treeish "HEAD" must resolve to a valid git commit: Command failed: cargo build --locked -p fgos-node-addon
+      at resolveCommitSha (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:68:11)
+      at generateInventory (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/generate-shipped-path-inventory.mjs:632:21)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d2b-brief/post-move/test/scripts/generate-shipped-path-inventory.test.mjs:505:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/generate-shipped-path-inventory.test.mjs:557:1
+✖ environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit (45.574727ms)
+  Error: Command failed: cargo build --locked -p fgos-node-addon
+      at genericNodeError (node:internal/errors:985:15)
+      at wrappedFn (node:internal/errors:539:14)
+      at checkExecSyncError (node:child_process:925:11)
+      at execFileSync (node:child_process:961:15)
+      at guardedChildProcessCall (file:///tmp/fgos-work/w2-d2b-brief/post-move/src/holder-lock/hot-guard.mjs:45:20)
+      at ensureGitAddon (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/lib/git-addon-stage.mjs:40:3)
+      at ensureGitAddon (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/git-addon.mjs:25:10)
+      at ensureScriptAddon (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/lib/git-ports.mjs:19:5)
+      at openPort (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/lib/git-ports.mjs:24:3)
+      at inspectRepo (file:///tmp/fgos-work/w2-d2b-brief/post-move/scripts/lib/git-ports.mjs:29:10) {
+    status: 101,
+    signal: null,
+    output: [ null, null, null ],
+    pid: 2246,
+    stdout: null,
+    stderr: null
+  }

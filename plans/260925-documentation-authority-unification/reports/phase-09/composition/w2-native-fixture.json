@@ -1,0 +1,15 @@
+{
+  "releasePath": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+  "files": [
+    {
+      "path": "libexec/native/fgos.node",
+      "sha256": "412b90334f418cedebd6d94b09892bdccebfb1ff6c6be3b2c1ac4fdf50c28c79"
+    },
+    {
+      "path": "bin/fgos",
+      "sha256": "e5c11264dccd561e5fd2747c3ffd5640edb9b60da50671b93118eee4910e15dd"
+    }
+  ],
+  "descriptor": "native-addon.json",
+  "source": "Reuse carries/replay-focused-proofs.py actual shipped addon/host fixture; production digest/ABI/path checks remain enabled. Does not certify Rust checkout freshness."
+}

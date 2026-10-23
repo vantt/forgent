@@ -1,0 +1,18 @@
+✔ dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin, core, domains, scripts, config, or non-history docs (181.040627ms)
+✔ dead vocabulary guard: cfg.models and .models are removed from src/runner/dispatch (11.944214ms)
+✔ dead vocabulary guard: .fgos/config.json does not contain runner.models or rigorOverrides (0.290886ms)
+✔ dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable instructions (2.797998ms)
+✔ dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier, and capabilities.*.overrides is rejected (D19) (14.932483ms)
+✔ dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced (47.613256ms)
+✔ dead vocabulary guard: Request-to-Run P1 retired symbols do not appear in src or config (33.523658ms)
+✔ dead vocabulary guard: Request-to-Run P2 retired symbols (DemandFacts, matchCapability, deriveForm, retired facades) do not appear in src, bin, core, domains, or AGENTS.md (48.714595ms)
+✔ dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, CoordinationProtocol, DemandFacts, readOnlyRedirects, matchCapability, deriveForm, retired facades) do not appear in docs/specs, core, domains, AGENTS.md, or README.md (69.177874ms)
+✔ dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names (149.866287ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 769.817266

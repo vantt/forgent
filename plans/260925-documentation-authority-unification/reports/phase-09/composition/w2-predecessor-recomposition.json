@@ -1,0 +1,306 @@
+{
+  "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "nineteenPriorDeferrals": [
+    {
+      "path": "apps/fgos-gateway/Cargo.toml",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:apps/fgos-gateway/Cargo.toml",
+      "historicalAfterSha256": "9832d57aadf63d96a416e0be28574b0f2fdee4c0a12b71178223b1fc63118006",
+      "currentAfterSha256": "2a2b52c7eeff282c9a4756c777383d72b0ee05d66a987a27b7920a986d8fcbca"
+    },
+    {
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
+      "reason": "Existing YAML Document migration changed context; eight exact path operands preserved/rebound, no parse changes."
+    },
+    {
+      "path": "core/skills/_shared/catchup-self-recovery.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "47260927356224b244adab9dfe2318f3817c5b182ea69f3def67935281bee370",
+      "approvedBeforeSha256": "47260927356224b244adab9dfe2318f3817c5b182ea69f3def67935281bee370",
+      "predecessor": {
+        "patchSpecId": "file:core/skills/_shared/catchup-self-recovery.md",
+        "expectedAfterSha256": "f577b3eb9e4e85c6f26ab532558bb5b5bb85f4847640e0867336132fe99f6b52",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "core/skills/_shared/executor-dispatch-fallback.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "1ddb25179a37b27b49feaaa52c8c8d7c367a9f522607a9caf7abedbe78ef1f29",
+      "approvedBeforeSha256": "1ddb25179a37b27b49feaaa52c8c8d7c367a9f522607a9caf7abedbe78ef1f29",
+      "predecessor": {
+        "patchSpecId": "file:core/skills/_shared/executor-dispatch-fallback.md",
+        "expectedAfterSha256": "76fd746e7ce273e701faaaa9ff8af7c2b1130c378f8bc48b0b12724b519fb1a4",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "core/skills/fgos-clarifying/SKILL.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "approvedBeforeSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "predecessor": {
+        "patchSpecId": "file:core/skills/fgos-clarifying/SKILL.md",
+        "expectedAfterSha256": "0a404dea2c5f640b85f5b841060740a2da63a439f7c4be924fbdfde6ce852cec",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "core/skills/fgos-indexing/SKILL.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "approvedBeforeSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "predecessor": {
+        "patchSpecId": "file:core/skills/fgos-indexing/SKILL.md",
+        "expectedAfterSha256": "359f85a6d35c81cd241dac79c74ce13dc162043eadb8d668bbf5dd2c7546aaf0",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "approvedBeforeSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "predecessor": {
+        "patchSpecId": "file:core/skills/fgos-researching/SKILL.md",
+        "expectedAfterSha256": "b3b6a1663bcc9e5030abbb90c5bc56d6948ba4dadd076e3d3d052df28d71f84c",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/component-boundary.md",
+      "historicalAfterSha256": "0d62cf70c2d770b3d92ad0c8d7ce7c1d3632277a1acd197260c1b0ed291e395e",
+      "currentAfterSha256": "e3022a5e0e36893e0d44970f5dbca3dfdfe773e08d359b8c40243f5351637e27"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/git/spec.md",
+      "historicalAfterSha256": "b492e68b2123e2f51156ee6681c462ad0928ade78aba62ad0846c773dccea47c",
+      "currentAfterSha256": "c93d5c92ade79d0cf72340ca61696ee613321ae14d84c64a937f6bd476f45e15"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/holder-lock/spec.md",
+      "historicalAfterSha256": "14e63a70def4e3ffccbaa6d81e5331f8fa7bbd25bca9a8dc96e5d1a8e2dfc3fe",
+      "currentAfterSha256": "578c4936dd2a7a92e113a3873d820d8c1f1e992c082c52d709a1688c695322cc"
+    },
+    {
+      "path": "domains/coding/AGENTS.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+      "approvedBeforeSha256": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/AGENTS.md",
+        "expectedAfterSha256": "c2403e052525e5767c4a437d9aef46cbc3cb2c493df349c3ac423991bbcd1128",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "approvedBeforeSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "expectedAfterSha256": "40655c4105eb9a9e81b3d1e4db9a2b7a68d110bdb0d55fe049fd6f911d14fb2e",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "approvedBeforeSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "expectedAfterSha256": "70f31f7c19e1b5de9c6314d12a30c7b6c3d748369224971a78fb104df8f406e0",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "approvedBeforeSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "expectedAfterSha256": "e2bed3b8d4f399bdfaf98bd507b8a7875866706564b4f301dc6a83f37964eda8",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "approvedBeforeSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "expectedAfterSha256": "6bb5b3300486467f8820ca60b0f90889e8d1d9f287e9b61031bbcb22ae7fdb02",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "status": "approved-bytes-still-exact",
+      "currentSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "approvedBeforeSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "predecessor": {
+        "patchSpecId": "file:domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "expectedAfterSha256": "e4c17844903280abcf34e24d6b41f7ce4dd16ba45a3a8cb346ab07196803d08c",
+        "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+      }
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:src/setup/registrations.mjs",
+      "historicalAfterSha256": "3c83ed8b3e9451257b883760839fd0a36ea2a4961c49ae718b59985b8260e492",
+      "currentAfterSha256": "9501bf6734e31b6cc0ff59925b09871dc36ee93f795cdc958e9b51f12b855f91"
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
+      "historicalAfterSha256": "67bfa7f0b61ed54474315b3b610f4d29c938c71a9b7bed8d5d3547874f80f4de",
+      "currentAfterSha256": "03ec239425055ec84a72b252d24aa5d0e5af82eb89c2cf0c62cee3db0431a646"
+    },
+    {
+      "path": "test/runner/worktree.test.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:test/runner/worktree.test.mjs",
+      "historicalAfterSha256": "eab415b2a5fb87d49bbed6bb22a287f7f90912a2e16a01d1a2e478b27f33b428",
+      "currentAfterSha256": "4c107acf174418be06e74e6c21b98e3a9eef10415bd8fd79335beab68129ea88"
+    }
+  ],
+  "allCurrentDrift": [
+    {
+      "path": "apps/fgos-gateway/Cargo.toml",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:apps/fgos-gateway/Cargo.toml",
+      "historicalAfterSha256": "9832d57aadf63d96a416e0be28574b0f2fdee4c0a12b71178223b1fc63118006",
+      "currentAfterSha256": "2a2b52c7eeff282c9a4756c777383d72b0ee05d66a987a27b7920a986d8fcbca"
+    },
+    {
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
+      "reason": "Existing YAML Document migration changed context; eight exact path operands preserved/rebound, no parse changes."
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/component-boundary.md",
+      "historicalAfterSha256": "0d62cf70c2d770b3d92ad0c8d7ce7c1d3632277a1acd197260c1b0ed291e395e",
+      "currentAfterSha256": "e3022a5e0e36893e0d44970f5dbca3dfdfe773e08d359b8c40243f5351637e27"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/git/spec.md",
+      "historicalAfterSha256": "b492e68b2123e2f51156ee6681c462ad0928ade78aba62ad0846c773dccea47c",
+      "currentAfterSha256": "c93d5c92ade79d0cf72340ca61696ee613321ae14d84c64a937f6bd476f45e15"
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
+      "historicalAfterSha256": "f9f207545ea8ddc8d4a15f799f00793bdf18b252548106d8ed6bd21dacb8103c",
+      "currentAfterSha256": "cde1b8dbca8c60c70e6078b383943da95d6fc48bb0b43809361d270985d98515"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/holder-lock/spec.md",
+      "historicalAfterSha256": "14e63a70def4e3ffccbaa6d81e5331f8fa7bbd25bca9a8dc96e5d1a8e2dfc3fe",
+      "currentAfterSha256": "578c4936dd2a7a92e113a3873d820d8c1f1e992c082c52d709a1688c695322cc"
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:docs/platform/runner/README.md",
+      "historicalAfterSha256": "3bb054facbb2f939839a97d377b67c21fd0aefe917c22e907dfb36c44aa12c01",
+      "currentAfterSha256": "526cb7d1c0d5e4cf82dc0f7a94462e69443ac9a9893d90425650feb604930561"
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:src/cli/command-registry.mjs",
+      "historicalAfterSha256": "d6dcdc703c9726bca2a6004c80325ce0138174631256be9b77c095bcbb849d0e",
+      "currentAfterSha256": "2855d62d5849ed36b8ccc1bdfe99bd71a750d43e031a9cb4cf0e5662d374fa92"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:src/runner/worktree.mjs",
+      "historicalAfterSha256": "b7542b37bc6145c346400501393df4dec064c47a24d66b4b40785cebcc652847",
+      "currentAfterSha256": "193773ec31567a8ecc55410abdc2354ba154bcca529d0704116303aff778ec12"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:src/setup/registrations.mjs",
+      "historicalAfterSha256": "3c83ed8b3e9451257b883760839fd0a36ea2a4961c49ae718b59985b8260e492",
+      "currentAfterSha256": "9501bf6734e31b6cc0ff59925b09871dc36ee93f795cdc958e9b51f12b855f91"
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
+      "historicalAfterSha256": "67bfa7f0b61ed54474315b3b610f4d29c938c71a9b7bed8d5d3547874f80f4de",
+      "currentAfterSha256": "03ec239425055ec84a72b252d24aa5d0e5af82eb89c2cf0c62cee3db0431a646"
+    },
+    {
+      "path": "test/runner/worktree.test.mjs",
+      "status": "recomposed-current-bytes",
+      "specId": "w2:predecessor:test/runner/worktree.test.mjs",
+      "historicalAfterSha256": "eab415b2a5fb87d49bbed6bb22a287f7f90912a2e16a01d1a2e478b27f33b428",
+      "currentAfterSha256": "4c107acf174418be06e74e6c21b98e3a9eef10415bd8fd79335beab68129ea88"
+    }
+  ],
+  "blockers": [
+    {
+      "scope": "unfinished-park",
+      "path": "docs/platform/system-overview/spec.md",
+      "rowIds": [
+        "f07928",
+        "f07929"
+      ],
+      "partialSpecId": "w2:description:system-overview-partial",
+      "reason": "D1 knowledge-registry.md carries identity/lifecycle/role/attestation, not complete enduser-docs-authoring.md or enduser-docs-index.md contracts. No approved exact live holders exist for those two sources. Full carry plus independent placement acceptance is needed; neither a root law nor the registry proposal substitutes for it."
+    },
+    {
+      "scope": "unfinished-park",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "rowIds": [
+        "f07855",
+        "f07859",
+        "f07861",
+        "f07862",
+        "f07863",
+        "f07864",
+        "f07866",
+        "f07867"
+      ],
+      "partialSpecId": "w2:description:architecture-intent-self-route",
+      "reason": "D1 did not author/accept live holders for system vision, Step 09/10 proposals, component authority map, intent ledger, coordination-session or flow-definition evidence. Exact mirrors remain carriage/history. The vision status packet is conditional, not independent authority acceptance. Do not silently redirect live Related/evidence links to history or rename old design intent into a current engine claim."
+    },
+    {
+      "scope": "unfinished-park",
+      "path": "docs/transitional-switchboard.md",
+      "specId": "w2:status-partial:docs/transitional-switchboard.md",
+      "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
+    },
+    {
+      "scope": "unfinished-park",
+      "path": "docs/platform/documentation/switchboard.md",
+      "specId": "w2:status-partial:docs/platform/documentation/switchboard.md",
+      "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
+    }
+  ]
+}
