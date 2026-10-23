@@ -25,6 +25,48 @@ test('one combined load reports both crate versions and Node-API line', () => {
   assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
+test('ports.v1.json names only operations the loaded addon answers, and each port refuses an unlisted name by name', { skip: process.platform === 'win32' }, () => {
+  // The listing is what an addon port dispatches; a name the port does not serve is refused with
+  // its own "unknown ... method" cause, and every other answer (including a refusal of the empty
+  // arguments) proves the name is dispatched. No Rust source is parsed.
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/git/contracts/ports.v1.json', import.meta.url), 'utf8'));
+  const unknownMethod = /unknown[- ].*method/;
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ports-'));
+  const repo = path.join(temp, 'repo');
+  let publication;
+  try {
+    execFileSync('git', ['init', '-q', '--initial-branch=trunk', repo]);
+    fs.mkdirSync(path.join(repo, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });
+    fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
+    fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+    const open = (port, ...rest) => new addon[`Git${port}`](temp, repo, repo, ...rest);
+    // Arguments each port reads before it dispatches on the name.
+    const prelude = {
+      Refs: { name: 'refs/heads/ports', operationId: 'ports' },
+      Sync: { operationId: 'ports' },
+      Remote: { remoteGrant: { name: 'origin', pinnedUrl: path.join(temp, 'nowhere') }, mappings: [], operationId: 'ports' },
+      RepositoryConfig: { ownedPath: path.join(temp, 'owned') },
+    };
+    publication = new addon.GitPublication(temp, repo, repo, 'refs/fgos/events/fixture', 'fixture');
+    const ports = {
+      Inspect: open('Inspect'), RepositoryConfig: open('RepositoryConfig'), Publication: publication,
+      ...Object.fromEntries(['Refs', 'Worktree', 'ScopedCommit', 'Sync', 'SafeRestore', 'Remote', 'Recovery', 'Land'].map(name => [name, open(name, 'fixture')])),
+    };
+    assert.deepEqual(Object.keys(contract.ports).sort(), Object.keys(ports).sort());
+    for (const [name, port] of Object.entries(ports)) {
+      if (name === 'Land') { for (const operation of contract.ports.Land) assert.equal(typeof port[operation], 'function', `Land.${operation}`); continue; }
+      const args = prelude[name] ?? {};
+      for (const operation of contract.ports[name]) {
+        try { port.call(operation, args, []); } catch (error) { assert.doesNotMatch(error.message, unknownMethod, `${name}.${operation}`); }
+      }
+      assert.throws(() => port.call('noSuchOperation', args, []), unknownMethod, `${name} refuses an unlisted name`);
+    }
+    for (const name of contract.functions) assert.equal(typeof addon[name], 'function', name);
+  } finally {
+    publication?.close();
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
 test('a second physical addon copy refuses at load, while a child owns its own marker', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-copy-'));
   try {
