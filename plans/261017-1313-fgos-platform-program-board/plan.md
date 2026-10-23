@@ -42,7 +42,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | SEAT, SEAT-TRIM | `lead:SEAT` | `claude-lcpq@design-lap` | `design-lap` |
 | MAIL | `lead:MAIL` | `claude-rgvd@fg-server` (đã nhận vai 10-23 11:10) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
 | HARDEN | `lead:HARDEN` | chưa ghi (phiên `forgent-a8`) | `fg-server2`? |
-| TEST | `lead:TEST` | chưa ghi (phiên `forgent-f8`) | `fg-server2`? |
+| TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
 | WORK | `lead:WORK` | chưa ghi (phiên `forgent-cd`) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
