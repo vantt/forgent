@@ -188,6 +188,7 @@ fn the_release_profiles_unwind_so_the_guard_can_catch() {
         "Cargo.toml",
         "apps/fgos-gateway/Cargo.toml",
         "packages/yaml-doc/rust/Cargo.toml",
+        "packages/git/node-addon/Cargo.toml",
     ];
     for manifest in manifests {
         let text = std::fs::read_to_string(format!("{root}/{manifest}")).unwrap_or_default();
