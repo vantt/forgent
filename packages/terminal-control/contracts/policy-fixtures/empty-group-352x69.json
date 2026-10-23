@@ -1,5 +1,6 @@
 {
   "name": "empty-group-352x69",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [{ "tabId": "t1", "area": { "x": 0, "y": 0, "width": 352, "height": 69 }, "panes": [] }],

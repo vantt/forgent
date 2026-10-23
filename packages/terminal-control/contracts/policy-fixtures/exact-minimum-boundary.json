@@ -1,5 +1,6 @@
 {
   "name": "exact-minimum-boundary",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

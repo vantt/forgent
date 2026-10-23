@@ -96,6 +96,10 @@ pub struct AllocateRequest {
     pub key: String,
     pub group_key: String,
     pub display: Display,
+    /// How many panes the caller's batch opens in all, when it knows; the
+    /// placement policy uses it to size the batch's panes equally.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_size: Option<u32>,
     /// Working directory of the new pane's shell.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cwd: Option<String>,

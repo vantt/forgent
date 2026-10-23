@@ -74,7 +74,7 @@ test('terminal-control passes on defaults and prints every value with its source
   assert.equal(r.passed, true);
   assert.match(r.message, /allocationGraceMs=60000 \(default\)/);
   assert.match(r.message, /retainFailedPaneMs=null \(default\)/);
-  assert.match(r.message, /layout\.policy="measured-split" \(default\)/);
+  assert.match(r.message, /layout\.policy="even-split" \(default\)/);
   assert.match(r.message, /layout\.maxPanesPerTab=8 \(default\)/);
 });
 

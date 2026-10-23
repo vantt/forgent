@@ -334,7 +334,7 @@ export async function prepareTerminalAttempt(ctx) {
   const {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
-    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, anchorPaneId, terminalConfig,
+    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -410,7 +410,9 @@ export async function prepareTerminalAttempt(ctx) {
     }
     let slot;
     try {
-      slot = await tc.allocateAsync({ key, groupKey, display, cwd, env: {} });
+      // The batch size, when the caller knows it, lets the placement policy plan equal panes.
+      const groupSize = Number.isInteger(dispatchBatchSize) && dispatchBatchSize > 1 ? { groupSize: dispatchBatchSize } : {};
+      slot = await tc.allocateAsync({ key, groupKey, display, cwd, env: {}, ...groupSize });
     } catch (err) {
       throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
         `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);

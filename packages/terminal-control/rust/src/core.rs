@@ -408,7 +408,7 @@ impl<'a> Core<'a> {
             group_key: request.group_key.clone(),
             tabs,
             group_panes,
-            request: PlaceRequest { label: request.display.label.clone() },
+            request: PlaceRequest { label: request.display.label.clone(), group_size: request.group_size },
             limits: self.config.limits,
         };
         match self.policy.place(&input) {

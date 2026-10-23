@@ -16,7 +16,7 @@ const GRACE_MARGIN_MS = 30000;
 export const DEFAULT_TERMINAL_CONFIG = Object.freeze({
   allocationGraceMs: 60000,
   retainFailedPaneMs: null,
-  layout: Object.freeze({ policy: 'measured-split', minCols: 80, minRows: 20, maxPanesPerTab: 8 }),
+  layout: Object.freeze({ policy: 'even-split', minCols: 80, minRows: 20, maxPanesPerTab: 8 }),
 });
 
 /** Every setting, as its dotted path in the `terminal` section. */
