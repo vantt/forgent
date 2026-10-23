@@ -72,7 +72,19 @@
       "properties": {
         "error": { "type": "string", "description": "The human message." },
         "reason": { "type": "string", "description": "The stable code." },
-        "candidates": { "type": "array", "items": { "type": "string" }, "description": "The names the caller may have meant (not-found), the sessions a name matches (ambiguous), the roles the session holds (role-not-held); empty otherwise." }
+        "candidates": {
+          "type": "array",
+          "description": "The sessions the caller may have meant (not-found), the sessions a name matches (ambiguous), the live sessions holding the role (role-not-held); empty otherwise. Consumers ignore unknown fields: a later rung adds machine and fetchedAt, and the liveness value remote.",
+          "items": {
+            "type": "object",
+            "required": ["id", "handle", "liveness"],
+            "properties": {
+              "id": { "type": "string", "description": "<machine-id>/<local id>." },
+              "handle": { "type": "string" },
+              "liveness": { "enum": ["alive", "unknown"] }
+            }
+          }
+        }
       }
     },
     "outcome": {

@@ -1399,7 +1399,11 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     assert!(String::from_utf8_lossy(&near.stderr).contains("[not-found]"));
     let refusal: serde_json::Value = serde_json::from_slice(&near.stdout).expect("a --json refusal is JSON");
     assert_eq!(refusal["reason"], "not-found");
-    assert_eq!(refusal["candidates"], serde_json::json!([a.as_str()]));
+    let candidates = refusal["candidates"].as_array().unwrap();
+    assert_eq!(candidates.len(), 1);
+    assert_eq!(candidates[0]["id"], "fg-server-abc234/alpha");
+    assert_eq!(candidates[0]["handle"], a.as_str());
+    assert!(["alive", "unknown"].contains(&candidates[0]["liveness"].as_str().unwrap()));
     assert!(refusal["error"].as_str().unwrap().contains(&a));
     assert!(refusal.get("contract").is_none());
     let _ = fs::remove_dir_all(&state);

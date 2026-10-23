@@ -39,7 +39,7 @@ pub use current::{current_session, machine_info, session_info, set_alias, Curren
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 #[cfg(feature = "provider")]
 #[cfg(feature = "directory")]
-pub use refusal::Refusal;
+pub use refusal::{Candidate, Liveness, Refusal};
 #[cfg(feature = "provider")]
 pub use provider::{
     IdentityProvider, IdentityRequest, ProjectAction, SessionAction, Verb, writer_answer,

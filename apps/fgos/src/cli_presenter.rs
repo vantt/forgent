@@ -77,8 +77,9 @@ pub fn present_error(err: &ProviderError) -> i32 {
 
 /// A typed refusal as one stdout line of JSON, the failure channel for a
 /// caller that asked for `--json`: `error` is the human message (the same
-/// string stderr carries), `reason` the stable code, `candidates` the names
-/// or sessions it concerns (empty when none). It carries no `contract`, so
+/// string stderr carries), `reason` the stable code, `candidates` the sessions
+/// it concerns (`{id, handle, liveness}`; empty when none). It carries no
+/// `contract`, so
 /// it never passes for a success envelope (docs/io-contract.md: the error
 /// path is not wrapped; success and failure differ by exit code).
 pub fn refusal_json(refusal: &fgos_identity::Refusal) -> String {

@@ -6,7 +6,11 @@ Branch `ident/library-doors-role-drop` (base 0fc44d12e). Four commits, one per i
 
 ```rust
 // fgos_identity::Refusal (also fgos_identity::refusal::Refusal; provider re-exports it)
-pub struct Refusal { pub reason: &'static str, pub detail: String, pub candidates: Vec<String> }
+pub struct Refusal { pub reason: &'static str, pub detail: String, pub candidates: Vec<Candidate> }
+#[derive(Serialize)] #[serde(rename_all = "camelCase")]
+pub struct Candidate { pub id: String /* full id */, pub handle: String, pub liveness: Liveness }
+#[derive(Serialize)] #[serde(rename_all = "camelCase")]
+pub enum Liveness { Alive, Unknown }   // also Listed.liveness (JSON text unchanged: "alive" | "unknown")
 impl Refusal { pub const EXIT: i32 = 65; }
 
 // fgos_identity::current
@@ -41,14 +45,14 @@ Debug build is about 2x. All far inside 50 ms p95. The bench was a throwaway tes
 
 ## Items
 
-1. Typed candidates: `Refusal.candidates` filled for `not-found` (close names) and `ambiguous` (`handle (id)`), and for `role-not-held` (roles held); empty otherwise. Owning proof: `unknown_names_are_not_found_with_the_close_candidates`, `a_role_held_twice_is_ambiguous_and_lists_both` in `tests/directory.rs`.
+1. Typed candidates: `Refusal.candidates` are `Candidate {id, handle, liveness}` objects: `not-found` the live sessions whose handle or role contains the query, `ambiguous` the sessions matched, `role-not-held` the live sessions that do hold the role (empty when nobody); empty otherwise. `Listed.liveness` is now the same `Liveness` enum. Spec section 5 states the mailbox maps `not-found`/`ambiguous` to its `unknown-name`/`ambiguous-name`, and notes the I4 additions (`machine`, `fetchedAt`, liveness `remote`) without implementing them. Owning proof: `unknown_names_are_not_found_with_the_close_candidates`, `a_role_held_twice_is_ambiguous_and_lists_both` in `tests/directory.rs`.
 2. `register_current` / `current_session`; the provider's `--register` calls it (no second copy). Proof: `tests/register_current.rs` (own file: it sets the session id in the env).
 3. `fgos identity session --drop-role lead:<LANE>` (identity.write). Refusals `role-not-held`, `not-registered`, `invalid-role`. Registered in projector, `command-routes.json` (`subcommand_flags.session`), command registry; drift and route tests green. Owning proof `a_session_drops_only_its_own_role_and_it_then_resolves_not_found`; one CLI wiring step in the existing directory CLI test. Backlog row `p-q4vcrihcxb` set to done.
 4. Refusals as data under `--json`: stdout gets one line `{"error": <message>, "reason": <code>, "candidates": [...]}`; exit 65 and stderr unchanged. Declared as `definitions.refusal` in both contracts, spec section 5 with an example, CHANGELOG. Owning wiring proof: the CLI directory test (not-found with candidates); the machine CLI test now asserts the reason on stdout instead of empty stdout.
 
 ## Decision to confirm (item 4)
 
-The requested convention does not exist. `docs/io-contract.md` says the error path is NOT wrapped in the `fgos.v1` envelope (stderr plus exit code), the native presenter only emits success envelopes, and the single stdout failure precedent is `dispatch decide`'s unwrapped `{error, errorClass}`. I did not invent an envelope-wrapped failure: the shape reuses the precedent's `error` key (message), adds `reason` and `candidates`, and has no `contract` key so it never reads as a success envelope. `candidates` is always present (`[]` when none) for a stable shape. The shape lives in one function, `cli_presenter::refusal_json`, so a change is one edit. Only typed refusals are covered; argument-projection errors (unknown flag) stay stderr/exit 1.
+The requested convention does not exist. `docs/io-contract.md` says the error path is NOT wrapped in the `fgos.v1` envelope (stderr plus exit code), the native presenter only emits success envelopes, and the single stdout failure precedent is `dispatch decide`'s unwrapped `{error, errorClass}`. I did not invent an envelope-wrapped failure: the shape reuses the precedent's `error` key (message), adds `reason` and `candidates`, and has no `contract` key so it never reads as a success envelope. `candidates` is always present (`[]` when none) for a stable shape, as `[{id, handle, liveness}]`. The shape lives in one function, `cli_presenter::refusal_json`, so a change is one edit. Only typed refusals are covered; argument-projection errors (unknown flag) stay stderr/exit 1.
 
 ## Verification
 

@@ -15,7 +15,7 @@
 use crate::current::{current_session, os_record};
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use crate::project;
-use crate::refusal::Refusal;
+use crate::refusal::{Candidate, Liveness, Refusal};
 use crate::resolve::terminal_head;
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
@@ -101,7 +101,7 @@ pub struct Listed {
     pub registered_at: String,
     pub roles: Vec<String>,
     /// `alive`, or `unknown` when nothing can prove it dead.
-    pub liveness: &'static str,
+    pub liveness: Liveness,
 }
 
 impl Listed {
@@ -114,8 +114,24 @@ impl Listed {
             clone: entry.clone.clone(),
             registered_at: entry.registered_at.clone(),
             roles: entry.roles.clone(),
-            liveness: if verdict == Verdict::Alive { "alive" } else { "unknown" },
+            liveness: liveness_of(verdict),
         }
+    }
+}
+
+fn liveness_of(verdict: Verdict) -> Liveness {
+    if verdict == Verdict::Alive {
+        Liveness::Alive
+    } else {
+        Liveness::Unknown
+    }
+}
+
+fn candidate_of(row: &Row) -> Candidate {
+    Candidate {
+        id: row.entry.id.clone(),
+        handle: row.entry.handle.clone(),
+        liveness: liveness_of(row.verdict),
     }
 }
 
@@ -390,7 +406,7 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
         });
     }
     let Scan { rows, .. } = scan(root, judge)?;
-    let Some(row) = rows.into_iter().find(|row| row.entry.id == own_id) else {
+    let Some(row) = rows.iter().find(|row| row.entry.id == own_id) else {
         return Err(Refusal {
             candidates: Vec::new(),
             reason: "not-registered",
@@ -399,12 +415,16 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
     };
     if !row.entry.roles.iter().any(|held| held == role) {
         return Err(Refusal {
-            candidates: row.entry.roles.clone(),
+            candidates: rows
+                .iter()
+                .filter(|other| other.verdict != Verdict::Dead && other.entry.roles.iter().any(|held| held == role))
+                .map(candidate_of)
+                .collect(),
             reason: "role-not-held",
             detail: format!("{} does not hold {role}; it holds: {}", row.entry.handle, join(&row.entry.roles)),
         });
     }
-    let mut entry = row.entry;
+    let mut entry = row.entry.clone();
     entry.roles.retain(|held| held != role);
     store(root, &entry, true)?;
     Ok(Listed::of(&entry, row.verdict))
@@ -423,7 +443,8 @@ pub fn drop_current_role(
 
 /// The live session `query` names: a handle, or a role alias `lead:<LANE>`.
 /// Exactly one, else `ambiguous` or `not-found` with the candidates in the
-/// detail (the codes the mailbox uses for its names).
+/// detail and in `Refusal::candidates` (Identity's own codes; the mailbox maps
+/// them to its names).
 pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal> {
     let query = query.trim();
     let live = scan(root, judge)?
@@ -459,15 +480,27 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
             Err(Refusal {
                 reason: "not-found",
                 detail: format!("no live session is named {query:?}; candidates: {}", join(&names)),
-                candidates: names,
+                candidates: live
+                    .iter()
+                    .filter(|row| {
+                        !query.is_empty()
+                            && if is_role {
+                                row.entry.roles.iter().any(|role| role.contains(query))
+                            } else {
+                                row.entry.handle.contains(query)
+                            }
+                    })
+                    .map(candidate_of)
+                    .collect(),
             })
         }
         many => {
             let ids: Vec<String> = many.iter().map(|row| format!("{} ({})", row.entry.handle, row.entry.id)).collect();
+            let candidates = many.iter().map(|row| candidate_of(row)).collect();
             Err(Refusal {
                 reason: "ambiguous",
                 detail: format!("{query:?} names {} live sessions: {}", many.len(), join(&ids)),
-                candidates: ids,
+                candidates,
             })
         }
     }
