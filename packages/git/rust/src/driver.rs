@@ -2398,14 +2398,7 @@ impl Inspect for GitDriver {
         }
         let mut input = Vec::new();
         for path in paths {
-            if path.is_empty()
-                || path.len() > 4096
-                || path.contains(&0)
-                || path.starts_with(b"/")
-                || path
-                    .split(|b| *b == b'/')
-                    .any(|p| p == b".." || p == b"." || p.is_empty())
-            {
+            if invalid_literal_path(path) {
                 return Err(refusal("invalid-literal-path"));
             }
             input.extend_from_slice(revision.as_str().as_bytes());
@@ -2497,6 +2490,37 @@ impl Inspect for GitDriver {
             return Err(refusal("unexpected-path-output"));
         }
         Ok(result)
+    }
+
+    fn read_paths_at_many(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<Vec<PathRead>>> {
+        // One process answers a bounded group, so a walk page costs a few
+        // processes however many commits it holds. Anything the group cannot
+        // answer (a refused root, a failed or oversized process) is re-asked
+        // one revision at a time, which owns the refusal and cause mapping.
+        const GROUP: usize = 64;
+        let mut all = Vec::with_capacity(reads.len());
+        for group in reads.chunks(GROUP) {
+            match self.read_path_group(repo, group, max_blob_bytes)? {
+                Some(answers) => all.extend(answers),
+                None => {
+                    for (revision, paths) in group {
+                        all.push(Inspect::read_paths_at(
+                            self,
+                            repo,
+                            revision,
+                            paths,
+                            max_blob_bytes,
+                        )?);
+                    }
+                }
+            }
+        }
+        Ok(all)
     }
 
     fn configured_fetch_refspecs(
@@ -2615,6 +2639,144 @@ pub(crate) fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> 
             })
         })
         .collect()
+}
+
+/// A path that is not a plain relative literal inside a tree.
+fn invalid_literal_path(path: &[u8]) -> bool {
+    path.is_empty()
+        || path.len() > 4096
+        || path.contains(&0)
+        || path.starts_with(b"/")
+        || path
+            .split(|b| *b == b'/')
+            .any(|p| p == b".." || p == b"." || p.is_empty())
+}
+
+/// One `cat-file --batch -Z` object: `None` for a missing object, otherwise its
+/// type and content, with the unread remainder.
+type BatchObject<'a> = (Option<(&'a [u8], &'a [u8])>, &'a [u8]);
+fn next_batch_object(rest: &[u8], format: ObjectFormat) -> Result<BatchObject<'_>> {
+    let end = rest
+        .iter()
+        .position(|b| *b == 0)
+        .ok_or_else(|| refusal("invalid-path-header"))?;
+    let header = &rest[..end];
+    let rest = &rest[end + 1..];
+    if header.ends_with(b" missing") {
+        return Ok((None, rest));
+    }
+    let fields: Vec<_> = header.split(|b| *b == b' ').collect();
+    if fields.len() != 3 {
+        return Err(refusal("invalid-path-header"));
+    }
+    Oid::parse(
+        std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-object-oid"))?,
+        format,
+    )
+    .map_err(|_| refusal("invalid-object-oid"))?;
+    let size = std::str::from_utf8(fields[2])
+        .ok()
+        .and_then(|s| s.parse::<usize>().ok())
+        .ok_or_else(|| refusal("invalid-object-size"))?;
+    if size >= rest.len() || rest[size] != 0 {
+        return Err(refusal("invalid-object-size"));
+    }
+    Ok((Some((fields[1], &rest[..size])), &rest[size + 1..]))
+}
+
+impl GitDriver {
+    /// Answers `reads` through one `cat-file --batch -Z` process. `Ok(None)`
+    /// means the group needs the per-revision read: a root that is not a
+    /// commit or tree, a failed process, or an absent path in a repository whose
+    /// layout can hide objects. Every refusal of the request itself is an `Err`.
+    fn read_path_group(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Option<Vec<Vec<PathRead>>>> {
+        if max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
+            return Err(refusal("invalid-path-read-bounds"));
+        }
+        let mut input = Vec::new();
+        for (revision, paths) in reads {
+            Oid::parse(revision.as_str(), repo.object_format())
+                .map_err(|_| refusal("object-format-mismatch"))?;
+            if paths.len() > 4096 {
+                return Err(refusal("invalid-path-read-bounds"));
+            }
+            if paths.iter().any(|path| invalid_literal_path(path)) {
+                return Err(refusal("invalid-literal-path"));
+            }
+            // The bare revision answers whether the root exists and what it is,
+            // which a path lookup cannot tell apart from an absent path.
+            input.extend_from_slice(revision.as_str().as_bytes());
+            input.push(0);
+            for path in paths {
+                input.extend_from_slice(revision.as_str().as_bytes());
+                input.push(b':');
+                input.extend_from_slice(path);
+                input.push(0);
+            }
+        }
+        if input.is_empty() {
+            return Ok(Some(Vec::new()));
+        }
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke_input(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["cat-file", "--batch", "-Z"],
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+            &input,
+        )?;
+        if !out.success {
+            return Ok(None);
+        }
+        let format = repo.object_format();
+        let mut rest = out.stdout.as_slice();
+        let mut answers = Vec::with_capacity(reads.len());
+        for (_, paths) in reads {
+            let (root, after) = next_batch_object(rest, format)?;
+            rest = after;
+            if !matches!(root, Some((kind, _)) if kind == b"commit" || kind == b"tree") {
+                return Ok(None);
+            }
+            let mut answer = Vec::with_capacity(paths.len());
+            for path in paths {
+                let (object, after) = next_batch_object(rest, format)?;
+                rest = after;
+                let value = match object {
+                    None if repo.layout.promisor || repo.layout.alternates => return Ok(None),
+                    None => PathValue::Absent,
+                    Some((kind, content)) => match kind {
+                        b"blob" if content.len() > max_blob_bytes => {
+                            PathValue::Error(refusal("blob-too-large"))
+                        }
+                        b"blob" => PathValue::Blob(content.to_vec()),
+                        b"tree" => PathValue::NotABlob(ObjectType::Tree),
+                        b"commit" => PathValue::NotABlob(ObjectType::Commit),
+                        b"tag" => PathValue::NotABlob(ObjectType::Tag),
+                        _ => return Err(refusal("invalid-object-type")),
+                    },
+                };
+                answer.push(PathRead {
+                    path: path.clone(),
+                    value,
+                });
+            }
+            answers.push(answer);
+        }
+        if !rest.is_empty() {
+            return Err(refusal("unexpected-path-output"));
+        }
+        Ok(Some(answers))
+    }
 }
 
 #[cfg(test)]

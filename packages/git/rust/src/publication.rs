@@ -1894,6 +1894,14 @@ impl<F: FileSystem> Inspect for PublicationPort<'_, F> {
     ) -> Result<Vec<PathRead>> {
         Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)
     }
+    fn read_paths_at_many(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<Vec<PathRead>>> {
+        Inspect::read_paths_at_many(self.driver, repo, reads, max_blob_bytes)
+    }
 
     fn walk_commits(
         &self,
