@@ -40,7 +40,7 @@ function call(fn) {
   }
 }
 // serde_json's map representation does not preserve JavaScript insertion order.
-// Legacy view revisions depend on that order: parse the authenticated raw line.
+// Legacy view revisions depend on that order: parse the authenticated raw line (the read carries no parsed copy).
 function historical(result, key) {
   return { ...result, [key]: result[key].map(record => ({ ...record, event: JSON.parse(record.raw) })) };
 }
@@ -69,6 +69,9 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
   const views = new WeakMap();
+  // The legacy history this store's last read returned, as the raw records native sent. The next read names its
+  // digest, and native sends the records again only when they changed; each read still gets its own parsed events.
+  let legacyHeld = null;
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
@@ -92,8 +95,12 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
     read({ streams, cursor = null, folded = [], project = true, checkpoint }, heldRanks) {
       const ranks = outsideGate(heldRanks);
       const retained = JSON.stringify(folded);
-      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded), checkpoint }, ranks, hotLockDepth()));
-      const { sequencePrefix, ...result } = historical(response.result, 'legacy');
+      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded), checkpoint,
+        legacyHeld: legacyHeld?.digest }, ranks, hotLockDepth()));
+      const { legacyUnchanged, ...answer } = response.result;
+      if (legacyUnchanged) answer.legacy = legacyHeld.records.map(record => ({ ...record, provenance: { ...record.provenance } }));
+      else legacyHeld = answer.cursor.legacyDigest ? { digest: answer.cursor.legacyDigest, records: answer.legacy } : null;
+      const { sequencePrefix, ...result } = historical(answer, 'legacy');
       // Preserve independent snapshots and use the exact bytes native verified,
       // including when a caller supplied objects with custom JSON serialization.
       result.sequence = (sequencePrefix ? JSON.parse(retained).slice(0, sequencePrefix) : []).concat(result.sequence);

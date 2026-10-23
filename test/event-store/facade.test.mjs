@@ -187,3 +187,36 @@ test('write admission is asked of Git outside the gate and never by a read; a ga
   const fresh = fixture(t);
   assert.equal(fresh.store.append('project', [event], {}, 'fixture', []).events.length, 1);
 });
+
+test('a repeat read is not sent the legacy history it already holds, and each read still gets its own events', { skip: process.platform !== 'linux' }, t => {
+  const { store, repo, git } = fixture(t);
+  const line = (seq) => JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq, type: 'work.add', payload: { id: `item-${seq}`, title: 'legacy' }, v: 4 }) + '\n';
+  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), line(1) + line(2));
+  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'tracked legacy');
+  const sent = [];
+  const original = addon.EventStore.prototype.read;
+  addon.EventStore.prototype.read = function spiedRead(...args) {
+    const response = original.apply(this, args);
+    sent.push({ records: response.result.legacy.length, unchanged: response.result.legacyUnchanged });
+    return response;
+  };
+  t.after(() => { addon.EventStore.prototype.read = original; });
+
+  const first = store.read({ streams: ['project'] }, []);
+  const second = store.read({ streams: ['project'], cursor: first.cursor, folded: first.sequence }, []);
+  assert.deepEqual(sent, [{ records: 2, unchanged: false }, { records: 0, unchanged: true }]);
+  assert.deepEqual(second.legacy, first.legacy, 'the caller sees the same legacy history');
+  assert.notEqual(second.legacy[0].event, first.legacy[0].event, 'and gets events of its own');
+  second.legacy[0].event.payload.title = 'changed by a caller';
+  second.legacy[0].provenance.line = 99;
+  const third = store.read({ streams: ['project'], cursor: second.cursor, folded: second.sequence }, []);
+  assert.equal(third.legacy[0].event.payload.title, 'legacy', 'a caller that edits its copy never alters a later read');
+  assert.equal(third.legacy[0].provenance.line, 1);
+
+  // A moved legacy history is sent in full, whatever the caller held.
+  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), line(1) + line(2) + line(3));
+  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'more legacy');
+  const moved = store.read({ streams: ['project'], cursor: third.cursor, folded: third.sequence }, []);
+  assert.equal(moved.legacy.length, 3);
+  assert.deepEqual(sent.at(-1), { records: 3, unchanged: false });
+});

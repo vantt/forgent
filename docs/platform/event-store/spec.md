@@ -1182,3 +1182,11 @@ Dated clarification; section 15 gains the checkpoint above, and the rest changes
 - Section 10 (seal): a tip the receipt certified is not walked again before the segment is published, because a walk from a certified commit finds nothing; the read-back of the published bytes is one Git process; the walk after publication is unchanged.
 - Sections 11 and 18 (legacy reads): the legacy files of one commit, whether the pinned legacy ref's or the consumer inventory at HEAD, are read through one Git process however many files it holds, not one process per file.
 
+
+## Repeat reads in one process (2026-10-23)
+
+Dated clarification with no protocol change: a process that reads the same store again pays for what changed, not for the history it already holds.
+
+- Section 11 (repeat read): each prepared store keeps the answer of its last complete read (one that deferred nothing) together with the inputs it came from: the ordered tips of every event ref and mirror, the legacy refs, the own local files and the legacy files of the current HEAD. A later read observes all of those again from the real store, on every call, and returns the remembered answer only when each of them is identical and the caller holds exactly the history that answer covers (same cursor, same events). Any difference, a moved or replaced ref, a changed local file, another HEAD commit with other legacy files, or a caller holding another history, reads normally and replaces the memo. There is no time or call-count rule and nothing is skipped that could differ: the cost of a repeat read is the real observations (one ref listing and the HEAD reads) and no walk, certification, ordering or fold.
+- Section 11 (legacy history): the legacy events one HEAD commit, one set of legacy refs and one query give are parsed, ordered and digested once per process (the answer is content-addressed, like the fence and the inventory above). A caller that names the digest of the legacy history it already holds is not sent it again; the Node facade keeps the raw records of its last read and still returns each caller events parsed for that read alone.
+- The read answer no longer carries `fullOrder` across the Node boundary: nothing in Node used it, and it grew with the legacy history.
