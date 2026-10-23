@@ -1,0 +1,102 @@
+{
+ "version": 1,
+ "authority": "L12-137",
+ "gates": [
+  {
+   "gateId": "changed-binding-independent-review",
+   "g": "G0",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "L12-96-uncomposed-duty",
+   "g": "G1",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "non-behavioral-census-join",
+   "g": "G2",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "dropped-claims-register",
+   "g": "G3",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "git-one-door-census-widening",
+   "g": "G4",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "retention-L11-23-L11-25",
+   "g": "G5",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "step3-step4-preserve-premise-review",
+   "g": "G6",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "composition-independent-review",
+   "g": "G7",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "L12-129-archive-ref-and-checkout",
+   "g": "G8",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "source-context-and-post-pin-recomposition",
+   "g": "G9",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "final-code-holder-land-rehearsal",
+   "g": "G10",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  },
+  {
+   "gateId": "cutover-release-with-docs-lease",
+   "g": "G11",
+   "status": "unmet",
+   "evidence": [],
+   "commit": null,
+   "pin": null
+  }
+ ]
+}
