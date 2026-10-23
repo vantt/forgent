@@ -66,12 +66,14 @@ Temporary `console.count` in the worktree (reverted, not committed), the five Gi
 
 | File | Before | After | Budget |
 |---|---|---|---|
-| `src/setup/git-checks.mjs` | 171 | **191** | <= 150, **not met** |
+| `src/setup/git-checks.mjs` | 171 | **167** | <= 150 asked; coordinator limit 172 (met), target 160 (167) |
 | `src/setup/terminal-control-checks.mjs` | 149 | 138 | <= 140, met |
 | `src/setup/registrations.mjs` | | -13 net (8 +, 21 -) | -12 |
 | `bin/fgos.mjs` | | 0 net (one line replaced, two lines) | +1 |
 
-`git-checks.mjs` misses its budget because the binding message rule (one sentence with a next step, facts under `detail`) put three row helpers and their sentences in the file (+20 lines net). About 70 lines of the file are unchanged fix and recovery code. I did not move that code to another file to meet the number, because that file is not in this phase's Files list. Options for the owner: accept 191, or a later change moves the fix half into its own module.
+`git-checks.mjs` was 191 after the first pass and was trimmed in a later commit (one row builder, one read path, shared Recovery port and driver-directory step); the two journal fixes below added 7 lines. No fix behaviour changed.
+
+Journal row after review: the message always ends with the retained-Land warning, also when the row fails; a failed Land listing becomes `warning: Land candidate scan failed: <cause>` and no longer hides the WAL findings (a missing addon keeps its info path).
 
 Delta over the phase: src+bin +109 / -113 (net -4); test +95 / -53 (net +42, of which +37 are new cases listed below).
 

@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { checkGit, compatibleGitContracts } from '../../src/setup/git-checks.mjs';
+import { checkGit, compatibleGitContracts, fixLandRecovery } from '../../src/setup/git-checks.mjs';
+import { fixture as landFixture } from '../git/land-fixture.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
@@ -92,3 +93,33 @@ test('the native-locks row fails with one sentence naming the runbook and keeps 
     assert.equal(result.detail.nativeLocks.length, 1);
   });
 });
+
+async function withLandJournal(body) {
+  const f = landFixture();
+  const prior = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = f.options.stateRoot;
+  try { return await body(f); } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; f.close(); }
+}
+
+test('a failing journal row still ends its message with the retained Land warning', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
+  const first = f.port();
+  await first.prepare({ operationId: 'retained-one', request: f.request });
+  first.close();
+  fixLandRecovery(f.repo, f.loader, f.options);
+  const second = f.port();
+  await second.prepare({ operationId: 'pending-two', request: f.request });
+  second.close();
+  const row = checkGit(f.repo, 'git-operation-journal', f.loader, f.options);
+  assert.equal(row.passed, false);
+  assert.match(row.message, /1 Git operation\(s\) unresolved.*; warning: retained Land candidates: retained-one \(/);
+}));
+
+test('a failed Land listing is a warning in the journal row and does not hide the WAL findings', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
+  const land = f.port();
+  await land.prepare({ operationId: 'pending-only', request: f.request });
+  land.close();
+  const broken = { ...f.options, repoPath: path.join(f.temp, 'no-such-repo') };
+  const row = checkGit(f.repo, 'git-operation-journal', f.loader, broken);
+  assert.equal(row.passed, false);
+  assert.match(row.message, /1 Git operation\(s\) unresolved.*; warning: Land candidate scan failed: /);
+}));

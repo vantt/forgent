@@ -59,13 +59,14 @@ export function checkGit(cwd, kind, loaderOptions, portOptions) {
         const fenceMissing = journal.initialized && facts.activationFence === false;
         const landWarning = journal.initialized && !fenceMissing ? retainedLandWarning(cwd, loaderOptions, portOptions) : null;
         // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
-        return row([
+        const verdict = row([
           fenceMissing && 'git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)',
           !journal.initialized && 'the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)',
           journal.initialized && !journal.complete && 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`',
           journal.errors.length && `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\``,
           journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land operations`,
         ], landWarning ?? 'the Git WAL is readable with no unresolved operation', { journal, retainedLand: landWarning });
+        return landWarning && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${landWarning}` } : verdict;
       }
       case 'git-native-locks': return row([facts.nativeLocks.length && `${facts.nativeLocks.length} native Git lock(s) present and never removed by fgOS; follow the runbook in docs/platform/git/spec.md section 11`], 'no native Git locks detected', { nativeLocks: facts.nativeLocks });
       default: throw new Error(`unknown Git check: ${kind}`);
@@ -149,7 +150,13 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
 }
 /** Land candidates a finished Land still holds: read-only, a warning never a failure (they wait for Work's acknowledgement reader). */
 function retainedLandWarning(cwd, loaderOptions, portOptions, now = Date.now()) {
-  const { candidates, complete } = recoveryPort(cwd, loaderOptions, portOptions).listRetainedLand();
+  let listing;
+  try { listing = recoveryPort(cwd, loaderOptions, portOptions).listRetainedLand(); }
+  catch (err) { // a failed listing must not hide the WAL findings; a missing addon keeps its own info path
+    if (err.code === 'git-addon-not-shipped') throw err;
+    return `warning: Land candidate scan failed: ${nativeError(err).cause}`;
+  }
+  const { candidates, complete } = listing;
   if (!candidates.length) return complete ? null : 'warning: Land candidate scan incomplete';
   const rows = candidates.map(c => `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`})`);
   return `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.`;
