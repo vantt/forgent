@@ -240,14 +240,17 @@ test('a stale FGOS_LOCK_FD with no descriptor open falls through to the probe: f
   }
 });
 
-test('with no usable host binary the hook still refuses while the kernel lists a holder of the lock file', { skip }, async () => {
+test('with no usable host binary the hook refuses the commit at the writer identity step, whether or not a holder keeps the lock', { skip }, async () => {
   const repoRoot = initRepoWithHook();
   const fgosDir = path.join(repoRoot, '.fgos');
   const holder = await holdLockInChild('main-checkout', { fgosDir });
   try {
     const refused = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-nohost', FGOS_HOST_BIN: path.join(repoRoot, 'no-such-host') });
     assert.notEqual(refused.status, 0);
-    assert.match(refused.stderr, /fgOS is writing the main checkout right now/);
+    // The lock cannot be asked of a host that is not there (no fgOS process can hold it either); the identity step is what stops the commit.
+    assert.match(refused.stderr, /commit refused: cannot resolve the writer identity \(host-missing\)/);
+    assert.match(refused.stderr, /FGOS_HOST_BIN=.*no-such-host/);
+    assert.doesNotMatch(refused.stderr, /fgOS is writing the main checkout right now/);
   } finally {
     holder.child.kill('SIGKILL');
     await holder.exited;

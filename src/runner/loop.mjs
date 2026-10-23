@@ -97,7 +97,8 @@ import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
-import { classify, generateId } from '../intake/classify.mjs';
+import { classify } from '../intake/classify.mjs';
+import { mintWorkId } from '../util/identity-mint.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
@@ -221,7 +222,7 @@ export function acquireRunnerLock(dir) {
     }
   }
   const holders = lockHolders('runner', params);
-  const holderPid = holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  const holderPid = holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
   return { acquired: false, holderPid, lockPath };
 }
 
@@ -718,9 +719,9 @@ function sanitizeTitleForLog(title) {
 // the real verify later), deps/refs empty. discoveredFrom is non-blocking
 // provenance (excluded from the cycle-check by design). Every write goes
 // through queue.enqueue (the serialized write door) — never a raw addWork —
-// and generateId is computed INSIDE the serialized callback so back-to-back
-// discoveries never collide on an id. The same callback also re-scans the
-// current view for a prior item with discoveredFrom === item.id and a
+// and the id is minted INSIDE the serialized callback, before any state write
+// (minting is an in-process draw). The
+// same callback also re-scans the current view for a prior item with discoveredFrom === item.id and a
 // case/whitespace-insensitive matching title (review-fix S10, P2 finding):
 // the same worker output repeating a block, or a re-dispatched item
 // re-emitting a block it already captured, is recognized as already-captured
@@ -759,7 +760,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           log(`fgos-runner: discovery-report for "${item.id}" ("${sanitizeTitleForLog(block.title)}") already captured, skipped (idempotent)`);
           return;
         }
-        const id = generateId(block.title, Object.keys(view));
+        const id = mintWorkId();
         const derived = classify(block.title);
         const domainObj = getDomain(item.domain);
         const validKinds = classificationVocabulary(domainObj, 'kind');

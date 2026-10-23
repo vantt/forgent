@@ -405,18 +405,64 @@
   "identity": {
     "selector": "identity",
     "route_kind": "native",
-    "operation_id": "session-identity.resolve",
-    "owner_path": "packages/session-identity/rust",
+    "operation_id": "identity.writer",
+    "owner_path": "packages/identity/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "accepted_flags": [
-      "dir",
-      "fgos-dir",
-      "help",
-      "json",
-      "pid"
-    ]
+    "subcommand_flags": {
+      "list": [
+        "dir",
+        "help",
+        "json",
+        "project",
+        "prune"
+      ],
+      "machine": [
+        "alias",
+        "dir",
+        "help",
+        "json"
+      ],
+      "mint": [
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "release"
+      ],
+      "project": [
+        "dir",
+        "handle",
+        "help",
+        "init",
+        "json",
+        "new"
+      ],
+      "resolve": [
+        "dir",
+        "help",
+        "json",
+        "query"
+      ],
+      "session": [
+        "dir",
+        "fgos-dir",
+        "help",
+        "json",
+        "pid",
+        "register",
+        "role",
+        "take"
+      ],
+      "writer": [
+        "dir",
+        "fgos-dir",
+        "help",
+        "json",
+        "pid"
+      ]
+    }
   },
   "init": {
     "selector": "init",

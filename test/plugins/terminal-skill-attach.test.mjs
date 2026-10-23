@@ -23,6 +23,7 @@ let scratch;
 let fake;
 let binDir;
 let allocationsDir;
+let renameArgs;
 
 // The fake reports shell_pid 100 for every pane; the ownership guard needs the pane's
 // shell to be an ancestor of the script, so the wrapper reports this process instead,
@@ -52,6 +53,12 @@ before(async () => {
   scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-terminal-skill-'));
   fake = createFakeHerdr(path.join(scratch, 'herdr'));
   installShims();
+  // A project root whose capability query reports a pane-labeling provider, so the script never
+  // reads this checkout's own .fgos/ (a worker worktree has none) or bootstraps a config into it.
+  const projectRoot = path.join(scratch, 'project');
+  fs.mkdirSync(path.join(projectRoot, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(projectRoot, 'bin', 'fgos.mjs'), 'console.log(JSON.stringify({ capability: "pane-labeling" }, null, 1));\n');
+  renameArgs = ['tsk-x', projectRoot];
   allocationsDir = () => {
     const root = path.join(harness.stateRoot, 'terminal', 'herdr');
     const [incarnation] = fs.existsSync(root) ? fs.readdirSync(root) : [];
@@ -86,7 +93,6 @@ function run(script, args, env = {}) {
   });
 }
 
-const renameArgs = ['tsk-x', repo];
 const records = () => {
   const dir = allocationsDir();
   return dir && fs.existsSync(dir)
@@ -106,6 +112,17 @@ test('rename.sh attaches the caller pane and labels it through the port', () => 
   assert.ok(rename, 'a pane rename reached herdr');
   assert.match(rename[3], /^tsk-x/);
   assert.equal(fake.closedPaneIds().length, 0);
+});
+
+test('rename.sh without FGOS_SESSION_ID keys and labels the pane with the writer id the activated host resolves', () => {
+  const pane = openPane('host-id');
+  const r = run('terminal/rename.sh', renameArgs, { HERDR_PANE_ID: pane, FGOS_SESSION_ID: '', CODEX_THREAD_ID: 'codex-thread-skill' });
+  assert.equal(r.status, 0, r.stderr);
+  const record = JSON.parse(fs.readFileSync(path.join(allocationsDir(), 'codex-thread-skill.json'), 'utf8'));
+  assert.equal(record.paneId, pane);
+  const rename = fake.calls().find((c) => c[0] === 'pane' && c[1] === 'rename' && c[2] === pane);
+  assert.ok(rename, 'a pane rename reached herdr');
+  assert.match(rename[3], /fg\.ssid:codex-thread-skill/);
 });
 
 test('rename.sh without herdr does nothing and exits 0', () => {

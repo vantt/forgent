@@ -423,8 +423,7 @@ test('fgos run help names --input and --verify', () => {
 });
 
 // The raise doors: no door of this release can attest a person, so `fgos run` raises nothing. A tier above the
-// one a seat resolves to, a persona or capability the person typed that resolves above it, and an accepted
-// dependence are refused by name before any unit run exists; at or below the resolved tier everything works.
+// one a seat resolves to, and an accepted dependence, are refused by name before any unit run exists; at or below the resolved tier everything works.
 const setRunnerConfig = (tmp, patch) => {
   const file = path.join(tmp, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -448,35 +447,19 @@ test('fgos run --override with a tier at or below the resolved tier still runs, 
   assert.equal(record.bindings['producer/1'][0].binding.provenance.tier.source, 'override');
 });
 
-test('fgos run --persona whose seat tier is above what the seat resolves to without it is refused by name', () => {
+test('fgos run --capability and --persona are the unit\'s own declarations: a committed tier above the default binds, as in a unit file', () => {
   const tmp = setupTestRepo();
   fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
   setRunnerConfig(tmp, (runner) => ({
     ...runner,
-    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], personas: { 'test-voice': { tier: 'flagship' } } } },
+    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship', personas: { 'test-voice': { tier: 'frontier' } } } },
   }));
-  const refused = failCli(['Check it', '--capability', 'docs:write', '--persona', 'test-voice', '--dir', tmp], tmp);
-  assert.match(refused, /tier-escalation-unauthorized/);
-  assert.match(refused, /persona/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-  // The same persona the person did not choose at the door (a unit file) is the project's own taste.
-  const unitFile = path.join(tmp, 'persona-unit.yaml');
-  fs.writeFileSync(unitFile, 'id: u-persona\nobjective: Test\ncapability: docs:write\npersona: test-voice\nwrites: []\n');
-  const own = execFileSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
-  assert.equal(unitRecordOf(tmp, own).bindings['producer/1'][0].binding.tier, 'flagship');
-});
-
-test('fgos run --capability whose tier is above the one the door would have run is refused by name', () => {
-  const tmp = setupTestRepo();
-  setRunnerConfig(tmp, (runner) => ({
-    ...runner,
-    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship' } },
-  }));
-  const refused = failCli(['Check it', '--capability', 'docs:write', '--dir', tmp], tmp);
-  assert.match(refused, /tier-escalation-unauthorized/);
-  assert.match(refused, /capability/);
-  assert.deepEqual(unitRunsOf(tmp), []);
+  const byCapability = unitRecordOf(tmp, runCli(['Check it', '--capability', 'docs:write', '--dir', tmp], tmp)).bindings['producer/1'][0].binding;
+  assert.equal(byCapability.tier, 'flagship');
+  assert.match(byCapability.provenance.tier.source, /docs:write/);
+  const byPersona = unitRecordOf(tmp, runCli(['Check it', '--capability', 'docs:write', '--persona', 'test-voice', '--dir', tmp], tmp)).bindings['producer/1'][0].binding;
+  assert.equal(byPersona.tier, 'frontier');
 });
 
 test('fgos run --override that accepts a dependence is refused at the door, whatever origin it names', () => {

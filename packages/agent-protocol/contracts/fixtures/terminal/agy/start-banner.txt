@@ -1,0 +1,13 @@
+agy
+
+
+      ▄▀▀▄        Antigravity CLI 1.4.2
+     ▀▀▀▀▀▀       user@example.com (Google AI Pro)
+    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)
+   ▄▀▀    ▀▀▄     /work/project
+  ▄▀▀      ▀▀▄
+
+
+ ┃ Meet Gemini 4 Argon
+ ┃ A new model is available. Pick it any time in /model.
+ ┃ esc to dismiss

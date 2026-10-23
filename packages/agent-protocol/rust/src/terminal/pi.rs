@@ -9,4 +9,5 @@ pub const PROFILE: Profile = Profile {
     enter_gap_ms: 300,
     submit_by_prompt_door: true,
     trust_markers: &[],
+    start_banners: &[],
 };

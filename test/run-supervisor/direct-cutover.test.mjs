@@ -158,10 +158,9 @@ test('awaitSettledResult returns null for a supervisor that is gone and an attem
   assert.equal(result, null);
 });
 
-test('a real run carries the configured kill grace and kill wait in its envelope and keeps the secrets in the side file only', { skip, timeout: 60_000 }, async () => {
+test('a real run carries the configured kill grace and the lock kill wait in its envelope and keeps the secrets in the side file only', { skip, timeout: 60_000 }, async () => {
   const project = createProject({ agent: { runMs: 300 }, dispatch: { gateKillGraceMs: 2345 } });
   const config = JSON.parse(fs.readFileSync(path.join(project.repoDir, '.fgos', 'config.json'), 'utf8'));
-  config.lock = { predecessorKillWaitMs: 3456 };
   config.runner.executors.noisy.invocations[0].env.API_KEY = 'sk-live-secret-9';
   writeProjectConfig(project.repoDir, config);
   const run = startRun(project, project.unitFile('envelope-real'));
@@ -170,7 +169,7 @@ test('a real run carries the configured kill grace and kill wait in its envelope
   const [dir] = project.attemptDirs();
   const envelope = readJson(path.join(dir, 'envelope.json'));
   assert.equal(envelope.deadlines.gateKillGraceMs, 2345);
-  assert.equal(envelope.deadlines.killWaitMs, 3456);
+  assert.equal(envelope.deadlines.killWaitMs, 2000, 'the envelope carries the one kill wait the lock uses');
   assert.ok(envelope.steps.every((s) => s.env.PATH && s.env.FGOS_STATE_ROOT && s.env.HOME), 'every step starts with the variables the Node payload reads');
   assert.doesNotMatch(fs.readFileSync(path.join(dir, 'envelope.json'), 'utf8'), /sk-live-secret-9/);
   assert.equal(readJson(path.join(dir, 'protected', 'attempt-secrets.json')).env.API_KEY, 'sk-live-secret-9');

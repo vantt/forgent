@@ -7,7 +7,8 @@
 //! A [`Handle`] owns the open file description that carries the lock.
 //! Releasing it closes the description and settles exclusive Linux copies.
 //! On POSIX nothing here ever calls
-//! `LOCK_UN`: a borrowed copy of the description may share the lock. On
+//! `LOCK_UN` on a holder's description (a probe description private to one
+//! call is unlocked before its close): a borrowed copy of the description may share the lock. On
 //! Windows no other process can share a lock, so every successful lock is
 //! undone explicitly through [`LockDriver::before_close`] (see [`Locked`]).
 
@@ -28,8 +29,8 @@ use serde_json::{json, Value};
 use crate::driver::{self, LockDriver, TryLock};
 use crate::predecessor::{self, Admit};
 
-/// Default bound on waiting for a killed predecessor domain to be signaled
-/// (`lock.predecessorKillWaitMs`).
+/// Bound on waiting for a killed predecessor domain to be signaled; the one
+/// value every caller uses.
 pub const DEFAULT_KILL_WAIT_MS: u64 = 2000;
 
 /// The descriptor slot a borrowed description is handed to.
@@ -183,7 +184,29 @@ pub struct Handle {
     /// Lagged per-spawn scan floor and latest successful proof start.
     /// Release alone decides whether any description copy remains.
     #[cfg_attr(not(unix), allow(dead_code))]
-    since: std::sync::Mutex<(Option<fgos_process::facts::CreationMark>, Option<fgos_process::facts::CreationMark>)>,
+    since: Marks,
+}
+
+/// The per-spawn scan floor and the start of the latest successful proof.
+type Marks = std::sync::Mutex<(Option<fgos_process::facts::CreationMark>, Option<fgos_process::facts::CreationMark>)>;
+
+/// Lagged scan floor for fork-inherited copies; release settles transfers.
+#[cfg_attr(not(unix), allow(dead_code))]
+fn floor_of(marks: &Marks) -> Option<fgos_process::facts::CreationMark> {
+    marks.lock().ok().and_then(|since| since.0)
+}
+
+/// Advance the per-spawn floor by one successful proof.
+#[cfg_attr(not(unix), allow(dead_code))]
+fn advance(marks: &Marks, started: Option<fgos_process::facts::CreationMark>) {
+    if let Ok(mut since) = marks.lock() {
+        // Keep the previous proof's start: a fork not yet visible during
+        // this proof must remain eligible for the next drain.
+        if started.is_some_and(|new| since.1.is_none_or(|old| new.at > old.at)) {
+            since.0 = since.1;
+            since.1 = started;
+        }
+    }
 }
 
 impl Drop for Handle {
@@ -227,23 +250,14 @@ impl Handle {
         predecessor::clear(&predecessor::record_path(&self.resource.path), Duration::from_millis(self.kill_wait_ms))
     }
 
-    /// Lagged scan floor for fork-inherited copies; release settles transfers.
     #[cfg_attr(not(unix), allow(dead_code))]
     fn since(&self) -> Option<fgos_process::facts::CreationMark> {
-        self.since.lock().ok().and_then(|since| since.0)
+        floor_of(&self.since)
     }
 
-    /// Advance the per-spawn floor by one successful proof.
     #[cfg_attr(not(unix), allow(dead_code))]
     fn proven_alone_at(&self, started: Option<fgos_process::facts::CreationMark>) {
-        if let Ok(mut since) = self.since.lock() {
-            // Keep the previous proof's start: a fork not yet visible during
-            // this proof must remain eligible for the next drain.
-            if started.is_some_and(|new| since.1.is_none_or(|old| new.at > old.at)) {
-                since.0 = since.1;
-                since.1 = started;
-            }
-        }
+        advance(&self.since, started);
     }
 
     /// Record the process domain this holder is about to create, before it
@@ -304,32 +318,18 @@ impl BorrowedHandle<'static> {
     /// # Safety
     /// `fd` must come from an acquired holder-lock handle, and that owner must
     /// remain borrowed until the synchronous operation and all copies end.
-    /// On Linux `reach_floor_ticks` must be an actual boot-tick observation
-    /// taken before the owner opened this fresh description, never at handover.
-    /// `protected_roots` must name every live sibling borrow domain; the caller
-    /// must prevent new borrows while a drain's root snapshot is active.
+    /// `since` is the mark the owner took before it locked this description,
+    /// never one taken at handover: older fork copies would then fall outside
+    /// every borrowed drain. `protected_roots` must name every live sibling
+    /// borrow domain; the caller must prevent new borrows while a drain's root
+    /// snapshot is active.
     pub unsafe fn from_acquired_description(
         fd: std::os::fd::RawFd,
         resource: Resource,
         kill_wait_ms: u64,
-        reach_floor_ticks: Option<u64>,
+        since: Option<fgos_process::facts::CreationMark>,
         protected_roots: Vec<u32>,
     ) -> Result<Self, BorrowError> {
-        // The Node bridge retains the real observation taken before opening
-        // this acquired description. Never substitute a handover-time floor:
-        // older fork copies would then fall outside every borrowed drain.
-        #[cfg(target_os = "linux")]
-        let floor = {
-            let ticks = reach_floor_ticks.ok_or_else(|| BorrowError::InvalidSpec("lock-reach-history-missing".into()))?;
-            let now = fgos_process::facts::creation_mark().ok_or_else(|| BorrowError::InvalidSpec("lock-reach-clock-unreadable".into()))?;
-            if ticks > now.ticks { return Err(BorrowError::InvalidSpec("lock-reach-floor-invalid".into())); }
-            // A cross-process observation has no trustworthy Instant or young
-            // PID-allocation window. Retain its actual boot ticks and disable
-            // that optimization; at is unused when last_pid is None.
-            Some(fgos_process::facts::CreationMark { ticks, last_pid: None, at: now.at })
-        };
-        #[cfg(not(target_os = "linux"))]
-        let floor = { let _ = reach_floor_ticks; None };
         use std::os::fd::{BorrowedFd, FromRawFd, IntoRawFd};
         let file = unsafe { BorrowedFd::borrow_raw(fd) }
             .try_clone_to_owned()
@@ -342,7 +342,7 @@ impl BorrowedHandle<'static> {
             mode: Mode::Ex,
             kill_wait_ms,
             terminate_grace_ms: 3000,
-            since: std::sync::Mutex::new((floor, floor)),
+            since: std::sync::Mutex::new((since, since)),
         };
         let loan = Self {
             handle,
@@ -496,10 +496,8 @@ pub struct BorrowOutcome {
     pub leftovers_killed: u32,
 }
 
-/// Environment marker of a watched borrow: unique per run, inherited by every
-/// descendant of the child.
 #[cfg(unix)]
-const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
+use fgos_process::containment::{watch_token, WATCH_ENV};
 
 /// Explicit I/O and execution bound for [`run_borrowed_io`].
 #[derive(Debug, Clone)]
@@ -998,7 +996,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
-    let watch_token = format!("{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_nanos()));
+    let watch_token = watch_token();
     if watch {
         explicit.env.insert(WATCH_ENV.to_string(), watch_token.clone());
     }
@@ -1022,7 +1020,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         let (mut out_open, mut err_open) = (true, true);
         // Wake on pipe activity or on the root's exit instead of sleeping in
         // fixed steps; without a process descriptor, wake at least every 1 ms.
-        let exit_fd = exit_descriptor(pid);
+        let exit_fd = fgos_process::control::exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
                 return Err(BorrowError::Deadline { termination: Termination::KilledAfterGrace });
@@ -1134,25 +1132,6 @@ fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: 
             Some(false) => return Ok(false),
             None => return Ok(true),
         }
-    }
-}
-
-/// A descriptor that becomes readable when child `pid` exits (Linux pidfd).
-/// `None` where the kernel has none; callers then poll in short steps.
-#[cfg(unix)]
-fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
-    #[cfg(target_os = "linux")]
-    {
-        use std::os::fd::FromRawFd;
-        // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
-        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
-        // SAFETY: a non-negative result is a new descriptor owned by nobody else.
-        (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = pid;
-        None
     }
 }
 
@@ -1314,7 +1293,7 @@ pub fn probe(resource: &Resource) -> io::Result<Probe> {
     };
     let answer = match drv.try_lock(&file, Mode::Sh)? {
         TryLock::Locked => {
-            drop(Locked::new(drv, &file));
+            drv.unlock_private(&file);
             Probe::Free
         }
         TryLock::WouldBlock => Probe::Held,
@@ -1334,12 +1313,163 @@ pub fn guarantee(dir: &Path) -> Guarantee {
     driver::current().guarantee(dir)
 }
 
+/// A lock a Node process took on a description it opened itself, kept as a
+/// duplicate of that description beside the marks that bound which processes
+/// can hold a copy. Node keeps its own descriptor for stdio and close; the
+/// duplicate lets the drain and the release settle run here, in process.
+/// Dropping it closes the duplicate and never settles: only
+/// [`release_description`] does, and only a lock Node itself closed first.
+#[cfg(unix)]
+#[derive(Debug)]
+pub struct NodeLock {
+    file: Option<File>,
+    mode: Mode,
+    kill_wait_ms: u64,
+    since: Marks,
+}
+
+/// Result of [`lock_fd`].
+#[cfg(unix)]
+#[derive(Debug)]
+pub enum LockFd {
+    /// The kernel lock is held on the caller's description and the
+    /// predecessor domain is empty.
+    Acquired(NodeLock),
+    /// Someone else holds it, or the predecessor domain could not be emptied.
+    /// A kernel lock taken here stays on the caller's description: the
+    /// caller closes it.
+    Held {
+        /// Which of the two conditions failed.
+        reason: HeldReason,
+        /// The predecessor domain for `PredecessorDomainNotEmpty`.
+        domain: Option<Value>,
+    },
+    /// The wait elapsed.
+    Timeout {
+        /// Milliseconds waited.
+        waited_ms: u64,
+    },
+    /// The driver cannot lock this description.
+    Unavailable {
+        /// Named reason.
+        reason: UnavailableReason,
+        /// Human detail.
+        detail: String,
+    },
+}
+
+/// Lock the description open on `fd` in `mode` and apply the predecessor rule
+/// of the file behind it, as [`acquire`] does for a file this port opened.
+/// The creation mark is taken before the lock, so no process created earlier
+/// can hold a copy of the description.
+///
+/// # Safety
+/// `fd` must be an open lock file descriptor that stays open for the whole
+/// call and that no other thread closes meanwhile.
+#[cfg(unix)]
+pub unsafe fn lock_fd(fd: std::os::fd::RawFd, mode: Mode, wait: Wait, kill_wait_ms: u64, predecessor_kinds: &[String]) -> LockFd {
+    use std::os::fd::BorrowedFd;
+    let drv = driver::current();
+    let unavailable = |reason, detail: String| LockFd::Unavailable { reason, detail };
+    if !drv.supported() {
+        return unavailable(UnavailableReason::UnsupportedPlatform, drv.unsupported_detail().to_string());
+    }
+    let file = match unsafe { BorrowedFd::borrow_raw(fd) }.try_clone_to_owned() {
+        Ok(owned) => File::from(owned),
+        Err(err) => return unavailable(UnavailableReason::IoError, format!("duplicate fd {fd}: {err}")),
+    };
+    let opened_after = fgos_process::facts::creation_mark();
+    match drv.file_guarantee(&file) {
+        Ok(g) if !g.usable() => return unavailable(UnavailableReason::UnsupportedFilesystem, g.notes.join("; ")),
+        Ok(_) => {}
+        Err(err) => return unavailable(UnavailableReason::IoError, format!("fstatfs fd {fd}: {err}")),
+    }
+    match lock_description(&file, mode, wait) {
+        Ok(DescriptionLock::Locked) => {}
+        Ok(DescriptionLock::Held) => return LockFd::Held { reason: HeldReason::KernelLockHeld, domain: None },
+        Ok(DescriptionLock::Timeout { waited_ms }) => return LockFd::Timeout { waited_ms },
+        Err(err) => return unavailable(UnavailableReason::IoError, format!("flock fd {fd}: {err}")),
+    }
+    let record = match drv.description_path(&file) {
+        Ok(path) => predecessor::record_path(&path),
+        Err(err) => return unavailable(UnavailableReason::IoError, format!("cannot name the lock file behind fd {fd}: {err}")),
+    };
+    if let Some(domain) = predecessor::disallowed_kind(&record, predecessor_kinds) {
+        return LockFd::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
+    }
+    match predecessor::admit(&record, Duration::from_millis(kill_wait_ms)) {
+        Admit::Proceed => LockFd::Acquired(NodeLock { file: Some(file), mode, kill_wait_ms, since: std::sync::Mutex::new((opened_after, opened_after)) }),
+        Admit::NotEmpty { domain } => LockFd::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) },
+    }
+}
+
+#[cfg(unix)]
+impl NodeLock {
+    /// The lagged scan floor: the mark before which no other process held a copy.
+    pub fn since(&self) -> Option<fgos_process::facts::CreationMark> {
+        floor_of(&self.since)
+    }
+
+    /// Whether the duplicate is still open (not released or handed over).
+    pub fn is_open(&self) -> bool {
+        self.file.is_some()
+    }
+
+    /// Close the duplicate without settling; the description lives on in every
+    /// process that still holds a copy.
+    pub fn close(&mut self) {
+        drop(self.file.take());
+    }
+
+    /// Record a completed handoff while this holder still excludes successors:
+    /// `lock_path` must still be the file this description locks, and the
+    /// recorded domain must be empty.
+    pub fn clear_domain(&self, lock_path: &Path) -> io::Result<()> {
+        let file = self.file.as_ref().ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "the lock is closed"))?;
+        if self.mode != Mode::Ex || borrowed_check(file, lock_path, Some("lease:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, "clear requires the held exclusive description"));
+        }
+        predecessor::clear(&predecessor::record_path(lock_path), Duration::from_millis(self.kill_wait_ms))
+    }
+}
+
+/// Settle the description of a lock Node closed its own descriptor of: close
+/// the duplicate and, on Linux for an exclusive lock, end every escaped copy
+/// and prove the lock gone, as [`release`] does for a [`Handle`].
+#[cfg(unix)]
+pub fn release_description(lock: &mut NodeLock) -> Release {
+    let Some(file) = lock.file.take() else { return Release::Released { killed: 0 } };
+    #[cfg(target_os = "linux")]
+    if lock.mode == Mode::Ex {
+        return driver::flock::settle_release(file, Duration::from_millis(lock.kill_wait_ms));
+    }
+    drop(file);
+    Release::Released { killed: 0 }
+}
+
+/// After the borrowing child `child_pid` exited: end whatever else still
+/// holds the lock's description, apart from this process and the sibling
+/// domains in `protected_roots`, and advance the lock's marks on success.
+#[cfg(target_os = "linux")]
+pub fn drain_borrowed_description(lock: &NodeLock, child_pid: u32, protected_roots: &[u32]) -> Result<u32, driver::Leftovers> {
+    let (Some(file), Some(floor)) = (lock.file.as_ref(), lock.since()) else {
+        return Err(driver::Leftovers { killed: 0, foreign: false, pids: Vec::new() });
+    };
+    let started = fgos_process::facts::creation_mark();
+    let owner = std::process::id();
+    let drained = driver::flock::drain_description(file, Some(child_pid), owner, Duration::from_millis(lock.kill_wait_ms), driver::flock::Reach::Since(floor), protected_roots);
+    if drained.is_ok() {
+        advance(&lock.since, started);
+    }
+    drained
+}
+
 #[cfg(all(test, target_os = "linux"))]
 mod proof_tests {
     use super::*;
 
     #[test]
-    fn ffi_handover_retains_the_acquisition_floor_and_refuses_missing_history() {
+    fn ffi_handover_retains_the_marks_the_owner_took_before_it_locked() {
         use std::os::fd::AsRawFd;
         let path = std::env::temp_dir().join(format!("fgos-ffi-reach-{}", std::process::id()));
         let resource = Resource::new("proof", &path);
@@ -1348,18 +1478,42 @@ mod proof_tests {
             Acquire::Acquired(h) => h,
             other => panic!("{other:?}"),
         };
-        let missing = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, None, vec![]) };
-        assert!(matches!(missing, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-history-missing"));
-        let future = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(u64::MAX), vec![]) };
-        assert!(matches!(future, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-floor-invalid"));
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(floor.ticks), vec![]) }.unwrap();
-        assert_eq!(loan.as_ref().since().unwrap().ticks, floor.ticks);
-        assert_eq!(loan.as_ref().since().unwrap().last_pid, None);
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, owner.since(), vec![]) }.unwrap();
+        // The mark a lock carries is the full creation mark, never one rebuilt at handover.
+        let carried = loan.as_ref().since().unwrap();
+        assert!(carried.ticks >= floor.ticks);
+        assert_eq!(carried, owner.since().unwrap());
+        assert!(carried.last_pid.is_some());
         validate_quiescent(loan.as_ref()).unwrap();
         drop(loan);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
         drop(owner);
         assert_eq!(probe(&resource).unwrap(), Probe::Free);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn the_guarantee_of_a_local_directory_names_the_flock_driver_and_a_usable_exclusion() {
+        let g = guarantee(&std::env::temp_dir());
+        assert_eq!(g.driver, "flock");
+        assert!(g.usable(), "{g:?}");
+        assert_eq!(g.to_json()["holders"], "kernel");
+    }
+
+    #[test]
+    fn a_handover_over_a_description_that_is_not_the_holders_is_refused_by_name() {
+        use std::os::fd::AsRawFd;
+        let (path, resource, file, mut lock) = node_lock("loan-mismatch");
+        // A second description of the same file is a sibling: it can neither hold the lock nor be lent as the holder's.
+        let sibling = open_lock_file(&path).unwrap();
+        let refused = unsafe { BorrowedHandle::from_acquired_description(sibling.as_raw_fd(), resource.clone(), 2000, lock.since(), vec![]) };
+        assert_eq!(refused.unwrap_err().to_string(), "lock-resource-replaced");
+        // The holder's own description is accepted and its marks travel with it.
+        let loan = unsafe { BorrowedHandle::from_acquired_description(file.as_raw_fd(), resource, 2000, lock.since(), vec![]) }.unwrap();
+        assert_eq!(loan.as_ref().since(), lock.since());
+        drop(loan);
+        drop(file);
+        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
         std::fs::remove_file(path).unwrap();
     }
 
@@ -1377,7 +1531,7 @@ mod proof_tests {
         let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), owner.file())]).unwrap();
         // Cross a real clock tick: a handover-time floor would miss this copy.
         std::thread::sleep(Duration::from_millis(30));
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor.ticks), vec![]) }.unwrap();
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor), vec![]) }.unwrap();
         let result = validate_quiescent(loan.as_ref());
         child.kill().unwrap();
         child.wait().unwrap();
@@ -1386,6 +1540,50 @@ mod proof_tests {
         drop(loan);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
         drop(owner);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    fn node_lock(name: &str) -> (PathBuf, Resource, File, NodeLock) {
+        use std::os::fd::AsRawFd;
+        let path = std::env::temp_dir().join(format!("fgos-node-lock-{name}-{}", std::process::id()));
+        let file = open_lock_file(&path).unwrap();
+        let lock = match unsafe { lock_fd(file.as_raw_fd(), Mode::Ex, Wait::Try, 2000, &[]) } {
+            LockFd::Acquired(lock) => lock,
+            other => panic!("{other:?}"),
+        };
+        let resource = Resource::new("proof", &path);
+        (path, resource, file, lock)
+    }
+
+    #[test]
+    fn a_lock_on_a_descriptor_the_caller_opened_holds_until_the_caller_closes_and_settles() {
+        use std::os::fd::AsRawFd;
+        let (path, resource, file, mut lock) = node_lock("plain");
+        assert!(lock.since().unwrap().last_pid.is_some(), "the full creation mark is taken per acquire");
+        assert_eq!(probe(&resource).unwrap(), Probe::Held);
+        // A second description of the same file is refused while the first is held.
+        let other = open_lock_file(&path).unwrap();
+        assert!(matches!(unsafe { lock_fd(other.as_raw_fd(), Mode::Ex, Wait::Try, 2000, &[]) }, LockFd::Held { reason: HeldReason::KernelLockHeld, .. }));
+        drop(file);
+        // The caller's close alone does not release: the duplicate still carries the lock.
+        assert_eq!(probe(&resource).unwrap(), Probe::Held);
+        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
+        assert_eq!(probe(&resource).unwrap(), Probe::Free);
+        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn settling_a_released_node_lock_ends_a_copy_that_escaped_to_a_child() {
+        let (path, resource, file, mut lock) = node_lock("escaped");
+        // Hand the description to a child the way a spawn with the descriptor mapped does, then lose track of it.
+        let request = MappedSpawn { argv: vec!["sleep".into(), "30".into()], env: vec![], clear_env: false, cwd: None, process_group: false, stdio: [MappedStdio::Null; 3] };
+        let mut escaped = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &file)]).unwrap();
+        drop(file);
+        assert_eq!(probe(&resource).unwrap(), Probe::Held);
+        assert!(matches!(release_description(&mut lock), Release::Released { killed } if killed >= 1), "the escaped copy is ended");
+        escaped.wait().unwrap();
+        assert_eq!(probe(&resource).unwrap(), Probe::Free);
         std::fs::remove_file(path).unwrap();
     }
 

@@ -69,6 +69,12 @@ pub trait LockDriver: Sync {
     /// description, and a borrowed copy may still share it). Windows: an
     /// explicit unlock, safe because no other process can share the lock.
     fn before_close(&self, file: &File);
+    /// Unlock a description opened for one short check and never shared,
+    /// borrowed or handed on, right before it is closed. A child forked by
+    /// another thread in between keeps a copy of the description until it
+    /// execs, and the copy would keep the lock; unlocking first ends the
+    /// lock for every copy. Never call it on a holder's description.
+    fn unlock_private(&self, file: &File);
     /// Whether `file`, locked just now, is still the file at `path` (a lock
     /// file replaced between open and lock is retried by the port).
     fn same_file(&self, file: &File, path: &Path) -> bool;

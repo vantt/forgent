@@ -41,7 +41,7 @@ fn test_observe_dependency_boundary() {
             "fgos-git",
             "fgos-holder-lock",
             "fgos-host-runtime",
-            "fgos-session-identity",
+            "fgos-identity",
             "fgos-yaml-doc",
         ],
         "fgos-observe must not depend on domain/substrate crates directly"

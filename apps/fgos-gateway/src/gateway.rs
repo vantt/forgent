@@ -1121,18 +1121,21 @@ async fn get_session_slots(
 }
 
 /// `POST /v1/runner/tick`: one bounded `fgos-runner --once` cycle
-/// (`bin/fgos-runner.mjs`), the headless half of 0014's orchestration scope
+/// (the release's `fgos-runner` shim beside the resolved host, so the runner's lock and
+/// identity calls run on a supported channel), the headless half of 0014's orchestration scope
 /// (D-contract's own `/runner/tick` doc). Deliberately a single one-shot
 /// spawn with no PID persistence or crash-recovery bookkeeping — CONTEXT.md
 /// D6 defers that supervision design, not the ability to trigger one bounded
-/// run. `fgos-runner.mjs` resolves its own repo root from the process's
-/// current working directory (not a `--dir` flag, unlike `fgos.mjs`), so
+/// run. The runner resolves its own repo root from the process's
+/// current working directory (not a `--dir` flag, unlike `fgos`), so
 /// this spawns with `current_dir(root)` instead of appending `--dir`.
 async fn post_runner_tick(State(state): State<AppState>) -> Result<Json<Value>, GatewayError> {
     let root = state.root.clone();
     let result = tokio::task::spawn_blocking(move || {
-        let output = std::process::Command::new("node")
-            .arg(root.join("bin/fgos-runner.mjs"))
+        let host = herdr_fgos_common::fgos::resolve_fgos(&root)
+            .map_err(|err| GatewayError::unexpected(format!("resolving fgos failed: {err}")))?;
+        let shims = host.parent().map_or_else(|| root.clone(), Path::to_path_buf);
+        let output = std::process::Command::new(shims.join("fgos-runner"))
             .arg("--once")
             .current_dir(&root)
             .stdin(Stdio::null())

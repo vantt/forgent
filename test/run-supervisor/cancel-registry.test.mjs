@@ -118,6 +118,7 @@ test('3. SIGTERM exits 143', { skip, timeout: 240_000 }, async () => {
   assert.equal(code, 143, run.stderr());
   assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGTERM');
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
+  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 60_000, what: 'the attempt to close' });
 });
 
 test('4. a signal with nothing handed over writes no cancel file and leaves at once', async () => {

@@ -1,7 +1,6 @@
 {
   "contract": { "id": "state-root-vectors", "version": 1 },
   "description": "Shared vectors for the single state-root resolution. Each vector gives the complete environment of the resolving process (a variable not listed is unset) and the expected result. Paths use `/`; a vector with platforms [\"windows\"] compares path components instead.",
-  "route": "internal-route.state-root.v1.json",
   "vectors": [
     { "name": "fgos-state-home-wins", "env": { "FGOS_STATE_HOME": "/custom/state", "XDG_STATE_HOME": "/xdg", "HOME": "/home/u" }, "expect": { "stateRoot": "/custom/state", "lockRoot": "/custom/state/locks", "source": "fgos-state-home" } },
     { "name": "fgos-state-home-verbatim-no-suffix", "env": { "FGOS_STATE_HOME": "/custom/fgos-here" }, "expect": { "stateRoot": "/custom/fgos-here", "lockRoot": "/custom/fgos-here/locks", "source": "fgos-state-home" } },

@@ -145,11 +145,10 @@ import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from 
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
-import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
-import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
-import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2132,11 +2131,10 @@ registerCheck({
 });
 
 // Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
-// of both lock directories, the borrow vectors, who holds each lock, the
-// cutover fences, the predecessor kill wait and the one state root. Bodies
-// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
-// directories; the `lock-fences` fix is the cutover step and acts only in a
-// workspace whose activated release already runs these locks.
+// of both lock directories (with the state root and the fixed kill wait it
+// prints), the borrow vectors, and who holds each lock (with the hot records
+// of the state store). Bodies live in holder-lock-checks.mjs. The
+// `lock-dirs` fix creates the two lock directories.
 registerCheck({
   id: 'lock-kernel-semantics',
   description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
@@ -2149,30 +2147,9 @@ registerCheck({
 });
 registerCheck({
   id: 'lock-holders',
-  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',
+  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, no predecessor domain is left running, and the state and porting-events hot records parse and their holder can be judged',
   check: (cwd) => checkLockHolders(cwd),
 });
-registerCheck({
-  id: 'lock-fences',
-  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',
-  check: (cwd) => checkLockFences(cwd),
-});
-registerCheck({
-  id: 'lock-record-unreadable',
-  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',
-  check: (cwd) => checkLockRecordUnreadable(cwd),
-});
-registerCheck({
-  id: 'lock-predecessor-kill-wait',
-  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',
-  check: (cwd) => checkLockPredecessorKillWait(cwd),
-});
-registerCheck({
-  id: 'state-root',
-  description: 'Node and the Rust host resolve the same state root and lock root',
-  check: (cwd) => checkStateRoot(cwd),
-});
-registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
 // Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
@@ -2221,7 +2198,6 @@ registerCheck({
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
 registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
-registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md D2): the two role-by-intelligence capability slots --
@@ -6301,6 +6277,25 @@ registerCheck({
   id: 'writer-identity-resolvable',
   description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
   check: (cwd) => checkWriterIdentityResolvable(cwd),
+});
+
+registerCheck({
+  id: 'identity-machine-id',
+  description: 'this machine has an id minted by the Identity component (the base of every machine and session handle); absent only warns, `fgos doctor --fix` mints it',
+  check: (cwd) => checkIdentityMachineId(cwd),
+});
+registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
+
+registerCheck({
+  id: 'identity-project-id',
+  description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
+  check: (cwd) => checkIdentityProjectId(cwd),
+});
+
+registerCheck({
+  id: 'identity-ids-unique',
+  description: 'no two backlog rows share an id, no D-ADR number is headed with two different titles and no two decision files share a number; ids that travel between machines come from `fgos identity mint <kind>`, and a repeat here means one was written by hand',
+  check: (cwd) => checkIdentityIdsUnique(cwd),
 });
 
 /**

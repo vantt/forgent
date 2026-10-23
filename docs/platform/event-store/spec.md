@@ -16,7 +16,7 @@ Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, s
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
 - docs/platform/holder-lock/spec.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - docs/platform/component-boundary.md
 - docs/platform/git/spec.md (Publication port, section 4; combined addon, owner decision Q1)
 - plans/261016-1306-main-checkout-single-door-hot-lock/plan.md (4.3-S)
@@ -109,7 +109,8 @@ Readiness: once section 26 is signed, this spec is the contract for starting imp
 |---|---|
 | The envelope v4, canonical serialization and event hash; the v3 legacy reading rule | What an event means; reducers and views of each domain |
 | The stream registry: type, scope, `sealOnWrite`, schema version | Which domain owns which type (the consumer registers it) |
-| The machine id and the store id (section 5) | Writer identity (Session Identity) |
+| The store id (section 5) | Writer identity (Session Identity) |
+| The machine id (section 5): minting, reading and the one validity check | Identity (`packages/identity/rust`); Event Store depends on the crate without its host provider |
 | Open logs: location, append, batch framing, `fsync`, recovery of uncommitted batches, per-stream sequence and its high-water mark | Business preconditions and the Work critical section (the consumer, under its own gate) |
 | Sealing: rotation, git object layout, compare-and-swap ref update (through the Git component's Publication port), receipt, recovery | Locks as a mechanism (holder-lock); Event Store only declares its two lock rows |
 | Reading: the reader protocol, verification, dedupe, deterministic order, cursors | Claims, leases, worker slots (runtime) |
@@ -151,7 +152,7 @@ Rank order today (`docs/platform/holder-lock/spec.md:114-126`): `main-checkout` 
 
 | Identity | Meaning | Source |
 |---|---|---|
-| Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the setup fix as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
+| Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the Identity component (`fgos doctor --fix`, fix `identity-machine-id`) as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`, checked in one place, `fgos_identity::machine::valid_machine_id`; Event Store reads it through that crate and keeps only this ref-name rule (the per-clone override) and its own error codes. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
 | Store id (`origin`) | Ordering identity of one open root; one per clone | Minted at first append, random 128-bit, written once to `<eventOpenRoot>/store.json` with the machine id at creation. Moving the clone moves the file, so the store keeps its id |
 | Stream | One sequence space inside a store: `project`, `local`, or `branch:<branch-key>` | Scope of the registered type; branch key below |
 | Project consumer stream (clarification, 2026-10-20) | `project:<name>`: a `project`-scope sequence space of its own for one consumer, for example `project:porting` (plan D9; Work keeps `project`). It has its own `seq` and open log but is sealed onto the same `refs/fgos/events/<machine-id>` and shared exactly like `project`. `<name>` follows the branch-key slug grammar | Declared by the consumer's registry entry; no protocol change |
@@ -497,7 +498,7 @@ Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twic
 
 ## 17. Node to Rust route and latency budget
 
-**Route** (owner decision 2026-10-17 15:13; packaging amended by Git G0 owner decision Q1, 2026-10-17): the route is an N-API addon, loaded by the Node payload. It is the one combined N-API addon that links both `fgos-event-store` and `fgos-git` and exports both facades (`docs/platform/git/spec.md` section 4), so a Node process holds one in-process instance of each crate; a second, separate addon load of either crate in the same process fails closed. Seal and sync reach the Git Publication port through this same load. The combination changes packaging only, not the route rule below. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/session-identity/spec.md` section 5).
+**Route** (owner decision 2026-10-17 15:13; packaging amended by Git G0 owner decision Q1, 2026-10-17): the route is an N-API addon, loaded by the Node payload. It is the one combined N-API addon that links both `fgos-event-store` and `fgos-git` and exports both facades (`docs/platform/git/spec.md` section 4), so a Node process holds one in-process instance of each crate; a second, separate addon load of either crate in the same process fails closed. Seal and sync reach the Git Publication port through this same load. The combination changes packaging only, not the route rule below. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/identity/spec.md` section 5).
 
 - The per-call host facade (`fgos internal event-store ...` per call, like `lock-fd`) is excluded, because it spawns inside the gate.
 - A persistent pipe to a running host is not available, because no host runs on the plain CLI path and no daemon is dedicated to Event Store.
@@ -562,7 +563,7 @@ Each item is deleted in the cutover change (section 18), with every consumer mov
 | Tracked stale view and backups | `.fgos/state.json`, two `events.jsonl.backup-*` | Views are never tracked; backups are not truth |
 | Event duty of the `.fgos` checkpoint adapter | plan 4.3 P03 `checkpointMainFgos` | No event file needs a checkpoint; the adapter stays null for events |
 
-Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-rejected` guard. Other tracked `.fgos` files (config, distribution, docs index) still exist; an inventory of their consumers decides as a separate item (council: P1, synthesizer, critic). `getMainFgosDir` (`src/state/runtime-coordination.mjs:14`) stays for cache, claims and locks; it is no longer on the event path.
+Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-rejected` guard. Other tracked `.fgos` files (config, distribution, docs index) still exist, and `.fgos/project.json` (the Identity component's project id, tracked on purpose so every clone reads the same id; it passes the strip rules unchanged and is never an event file); an inventory of their consumers decides as a separate item (council: P1, synthesizer, critic). `getMainFgosDir` (`src/state/runtime-coordination.mjs:14`) stays for cache, claims and locks; it is no longer on the event path.
 
 ## 20. Relations to other work
 
@@ -593,7 +594,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
-Setup fixes: `event-store-machine-id` (mint `<stateRoot>/machine-id` when missing); `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700).
+Setup fixes: `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`), never by Event Store; `events migrate` calls the same mint when the id is missing.
 
 Doctor checks, registered in `src/setup/registrations.mjs`:
 

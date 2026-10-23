@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
   SEAT_ROLES, resolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf, checkerSeatsOf,
-  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier,
+  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
 } from '../../../src/runner/execution/seat-resolver.mjs';
 import { CHECKER_SEATS, VALID_CHECKER_SEATS, MODEL_POLICY_TIERS } from '../../../src/runner/dispatch/config.mjs';
 import { isVerdictSeat } from '../../../src/runner/dispatch/agent-result-claim-contract.mjs';
@@ -124,4 +124,9 @@ test('admission counts launches from the same seats the run binds', () => {
 test('a seat tier from a file source is refused by name; a registered definition keeps it', () => {
   assert.throws(() => assertNoSeatTier([{ seat: 'a', role: 'producer', tier: 'frontier' }], 'a units file'), /cannot carry seats\[\]\.tier/);
   assert.doesNotThrow(() => assertNoSeatTier([{ seat: 'a', role: 'producer' }], 'a units file'));
+});
+
+test('a unit record written when a door could choose selectors still replays: the field is ignored', () => {
+  const record = { unit: { id: 'u' }, seatSchema: 1, seats: [], selectors: { capability: 'docs:write', persona: 'p' } };
+  assert.deepEqual(bindSeatOf(record, 'producer/1'), { seat: 'producer/1', role: 'producer', posture: PRODUCER_POSTURE });
 });

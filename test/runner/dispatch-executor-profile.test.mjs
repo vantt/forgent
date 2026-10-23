@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { committedConfigDir } from '../helpers/committed-config.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -186,7 +187,7 @@ test('the real repository config still loads -- every existing executor stays va
   // A3 is only meaningful if it holds against the config actually in use, not
   // only against synthetic fixtures. The real file nests the runner section
   // under a `runner` key, which is what loadRunnerConfigFromDir unwraps.
-  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const cfg = loadRunnerConfigFromDir(committedConfigDir());
   assert.ok(Object.keys(cfg.executors).length > 0, 'the repository config declares executors');
 });
 
@@ -319,7 +320,7 @@ test('Phase C: the real repository config declares identity/supports on "claude"
   // The phase's own close criterion: "resolvable end-to-end for at least
   // one real executor" -- a synthetic fixture alone would not prove this,
   // only the actual live config declaring it for real does.
-  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const cfg = loadRunnerConfigFromDir(committedConfigDir());
   const { executor } = resolveExecutorAndOverrides(cfg, 'claude');
   assert.ok(executor.identity, '"claude" must declare a real identity block');
   assert.equal(executor.identity.trustDomain, 'local-operator');
@@ -385,7 +386,7 @@ test('Phase D: placementPolicy and readOnlyRedirects are retired and rejected at
     }),
     (err) => err instanceof RunnerConfigError && /retired|removed/.test(err.message),
   );
-  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const cfg = loadRunnerConfigFromDir(committedConfigDir());
   assert.equal(cfg.readOnlyExecutorRedirects, undefined);
   assert.equal(cfg.placementPolicy, undefined);
   assert.equal(cfg.executors?.claude?.readOnlyRedirect, undefined);

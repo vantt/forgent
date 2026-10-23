@@ -47,7 +47,7 @@ try {
   assert.equal(lease.result,'acquired');
   const target = git(main,'rev-parse','HEAD');
   try {
-    const native = createGitSync({stateRoot:resolveStateRoot({fgosDir:path.join(main,'.fgos')}).stateRoot,repoPath:tree,trustedMain:main,writer:record.gitWriter});
+    const native = createGitSync({stateRoot:resolveStateRoot().stateRoot,repoPath:tree,trustedMain:main,writer:record.gitWriter});
     const started = native.start({operationId:'resume-order',target,message:'sync'},[lease.handle]);
     assert.equal(started.state,'conflicted-open');
     record.sync = {ref:'main',sha:target,status:'conflicted',operationId:'resume-order',conflicts:['a'],scopeAdded:['a']};

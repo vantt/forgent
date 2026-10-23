@@ -19,7 +19,7 @@ function lockParams(fgosDir, cwd) {
 /** The first pid the kernel lists as holding the lock, or null where holders cannot be listed. */
 function holderPidOf(params) {
   const holders = lockHolders(LOCK_NAME, params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
 }
 
 /**
@@ -85,7 +85,7 @@ export function dispatchCwdHolder(fgosDir, cwd) {
   // A lock file never created was never taken: nothing to look at.
   if (!fs.existsSync(lockPath)) return null;
   const holders = lockHolders(LOCK_NAME, params);
-  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0], lockPath } : null;
+  if (holders.kind === 'list') return holders.holders.length > 0 ? { pid: holders.holders[0].pid, lockPath } : null;
   return probe(LOCK_NAME, params).result === 'free' ? null : { pid: null, lockPath };
 }
 

@@ -245,20 +245,42 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
     let waited = wait_child(&child, &job, control);
     let emptied = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
     finish(keeper_stdin);
-    let exit_code = match waited {
-        Ok(code) => code,
-        Err(err) => return Err(BorrowError::Wait(err)),
-    };
-    let mut outcome = BorrowOutcome { exit: Some(exit_code as i32), signal: None, leftovers_killed: 0 };
-    match emptied {
-        Ok(killed) => {
-            predecessor::remove_record(&record);
-            outcome.leftovers_killed = killed;
-            Ok(outcome)
-        }
+    settle(waited, emptied, || predecessor::remove_record(&record))
+}
+
+/// A leftover that could not be killed outranks a failed wait (the port's
+/// error precedence); the record is removed only once the domain is empty.
+fn settle(waited: io::Result<u32>, emptied: Result<u32, Vec<u32>>, remove_record: impl FnOnce()) -> Result<BorrowOutcome, BorrowError> {
+    let killed = match emptied {
         // The record stays: the domain is not empty, and the next contender
         // must judge it.
-        Err(pids) => Err(BorrowError::LeftoverNotKilled { outcome, pids }),
+        Err(pids) => {
+            let exit = waited.as_ref().ok().map(|code| *code as i32);
+            return Err(BorrowError::LeftoverNotKilled { outcome: BorrowOutcome { exit, signal: None, leftovers_killed: 0 }, pids });
+        }
+        Ok(killed) => killed,
+    };
+    remove_record();
+    let exit_code = waited.map_err(BorrowError::Wait)?;
+    Ok(BorrowOutcome { exit: Some(exit_code as i32), signal: None, leftovers_killed: killed })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_leftover_that_cannot_be_killed_outranks_a_failed_wait_and_keeps_the_record() {
+        let mut removed = false;
+        let failed_wait = Err(io::Error::other("wait failed"));
+        let error = settle(failed_wait, Err(vec![4242]), || removed = true).unwrap_err();
+        assert!(matches!(error, BorrowError::LeftoverNotKilled { ref pids, .. } if pids == &[4242]));
+        assert!(error.to_string().starts_with("borrow-leftover-not-killed"));
+        assert!(!removed);
+        let mut removed = false;
+        let error = settle(Err(io::Error::other("wait failed")), Ok(1), || removed = true).unwrap_err();
+        assert!(matches!(error, BorrowError::Wait(_)));
+        assert!(removed);
     }
 }
 

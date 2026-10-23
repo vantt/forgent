@@ -25,6 +25,7 @@ import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
 import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { fgosDirFromRoot } from '../runner/paths.mjs';
 import { deriveUnitState, unitDirOfAssignment } from '../runner/execution/unit-state.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
@@ -43,8 +44,7 @@ function listed(items) {
   return items.length > MAX_LISTED ? `${head}; and ${items.length - MAX_LISTED} more` : head;
 }
 
-const fgosDirOf = (repoRoot) => path.join(path.resolve(repoRoot), '.fgos');
-const assignmentsRootOf = (repoRoot) => path.join(fgosDirOf(repoRoot), 'assignments');
+const assignmentsRootOf = (repoRoot) => path.join(fgosDirFromRoot(repoRoot), 'assignments');
 
 /** `fgos internal <route> --protocol 1 --probe`: the parsed answer line, or `{ error }` saying why not. */
 function probeRoute(bin, route) {
@@ -71,7 +71,7 @@ function probeRoute(bin, route) {
 function resolveBin(repoRoot, override) {
   if (override) return { bin: override };
   try {
-    return { bin: hostBin({ fgosDir: fgosDirOf(repoRoot) }) };
+    return { bin: hostBin({ fgosDir: fgosDirFromRoot(repoRoot) }) };
   } catch (err) {
     return { error: err.message };
   }
@@ -111,12 +111,17 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
   if (error) return { passed: false, message: `no host binary to ask for the containment driver: ${error}` };
   const answer = probeRoute(bin, 'supervise');
   if (answer.error) return { passed: false, message: `${bin} did not report its containment driver: ${answer.error}` };
-  const { driver, level, escapes = [], error: driverError } = answer.containment ?? {};
+  const { driver, level, escapes = [], error: driverError, selectedBecause } = answer.containment ?? {};
   const escapeText = escapes.length > 0 ? `; escapes: ${listed(escapes)}` : '';
   if (level === 'kernel') return { passed: true, message: `${driver}, level kernel${escapeText}` };
   if (level === 'best-effort') {
     if (platform === 'linux') {
-      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here (no bwrap, or user namespaces are disabled), so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };
+      if (selectedBecause?.startsWith('containment-mount-refused:')) {
+        const line = selectedBecause.slice('containment-mount-refused:'.length).trim();
+        return { passed: true, message: warn(`${driver}, level best-effort: a host mount cannot be remounted (${line}); unmount or fix it, then restart long-running fgOS processes (gateway, supervisors), which keep the answer they probed at start, to get kernel containment${escapeText}`) };
+      }
+      const reason = selectedBecause ? `(${selectedBecause})` : '(no bwrap, or user namespaces are disabled)';
+      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here ${reason}, so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };
     }
     return { passed: true, message: info(`${driver}, level best-effort${escapeText}`) };
   }
@@ -387,7 +392,7 @@ export function fixLegacyAttemptsStuck(repoRoot, { door, ...judgeOptions }) {
  * unit is judged by `deriveUnitState` over the adopt probe.
  */
 export function checkUnitsAwaitingResume(repoRoot, { bin: binOverride } = {}) {
-  const fgosDir = fgosDirOf(repoRoot);
+  const fgosDir = fgosDirFromRoot(repoRoot);
   const unitDirs = new Set();
   for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
     const unitDir = unitDirOfAssignment(fgosDir, assignmentId);

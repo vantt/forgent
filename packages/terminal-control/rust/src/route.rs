@@ -41,6 +41,7 @@ pub const DEFAULT_LIMITS: Limits = Limits { min_cols: 80, min_rows: 20, max_pane
 /// Ready timeout of a round plus 30 s.
 pub const DEFAULT_ALLOCATION_GRACE_MS: u64 = 60_000;
 pub const DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS: u64 = 5_000;
+pub const DEFAULT_SHELL_READY_TIMEOUT_MS: u64 = 10_000;
 
 fn line(result: &str, fields: Value) -> String {
     let mut map = Map::new();
@@ -141,6 +142,7 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Option<String>), String>
         limits,
         allocation_grace_ms: number("allocationGraceMs", DEFAULT_ALLOCATION_GRACE_MS)?,
         launch_identify_timeout_ms: number("launchIdentifyTimeoutMs", DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS)?,
+        shell_ready_timeout_ms: number("shellReadyTimeoutMs", DEFAULT_SHELL_READY_TIMEOUT_MS)?,
     };
     Ok((core, policy))
 }

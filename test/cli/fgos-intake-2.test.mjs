@@ -232,12 +232,12 @@ test('add with no flags at all is rejected as validation (missing --title), exit
 });
 
 
-test('add omitting --id auto-generates a collision-free tsk-<hash> id from --title, exit 0', () => {
+test('add omitting --id mints a tsk-<10 base32> id, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['add', '--title', 'Auto id from title', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   const generatedId = envelopeData(result.stdout).id;
-  assert.match(generatedId, /^tsk-[0-9a-z]{3,8}$/, `generated id "${generatedId}" should match generateId's tsk-<hash> shape`);
+  assert.match(generatedId, /^tsk-[a-z2-7]{10}$/, `generated id "${generatedId}" should be a minted tsk-<10 base32> id`);
   assert.equal(stateView(cwd).work[generatedId].title, 'Auto id from title');
 });
 

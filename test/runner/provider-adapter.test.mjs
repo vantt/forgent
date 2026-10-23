@@ -6,6 +6,7 @@
 // 3. Produces equivalent argv to legacy resolveExecutorCommand across the full 12-executor × 3-tier matrix.
 
 import '../helpers/process-tmp-root.mjs';
+import { committedConfigDir } from '../helpers/committed-config.mjs';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -104,7 +105,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapter-home-'));
     process.env.HOME = tempHomeDir;
     throwawayDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapter-fgosDir-'));
-    cfg = loadRunnerConfigFromDir(process.cwd());
+    cfg = loadRunnerConfigFromDir(committedConfigDir());
   });
 
   after(() => {
@@ -580,7 +581,7 @@ describe('Phase E step 1: resolveVerifiedProviderArgs production binder', () => 
   });
 
   test('the real production call site (resolveExecutorCommand) uses ProviderAdapter for every claude-family executor in the live repository config, with zero divergence', () => {
-    const cfg = loadRunnerConfigFromDir(process.cwd());
+    const cfg = loadRunnerConfigFromDir(committedConfigDir());
     const originalWrite = process.stderr.write;
     const captured = [];
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
@@ -603,7 +604,7 @@ describe('Phase E step 1: resolveVerifiedProviderArgs production binder', () => 
   });
 
   test('a non-claude provider family (e.g. openai-codex) never even attempts ProviderAdapter rendering at the resolveExecutorCommand call site', () => {
-    const cfg = loadRunnerConfigFromDir(process.cwd());
+    const cfg = loadRunnerConfigFromDir(committedConfigDir());
     const originalWrite = process.stderr.write;
     const captured = [];
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };

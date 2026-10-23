@@ -201,6 +201,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
     // --- the fake herdr ---------------------------------------------------------------------------
     calls() { return readLines(path.join(herdrDir, 'calls.log')).map((l) => l.replace(/\t+$/, '').replaceAll('\t', ' ')); },
     callsStarting(prefix) { return project.calls().filter((c) => c.startsWith(prefix)); },
+    paneRuns() { return project.callsStarting('pane run').filter((c) => !c.includes("printf '%s%s\\n' fgos-ok-")); },
     sent() { return readLines(path.join(herdrDir, 'sent.jsonl')).map((l) => JSON.parse(l)); },
     setVerdict(kind) { fs.writeFileSync(path.join(herdrDir, 'explain.json'), JSON.stringify(VERDICTS[kind])); },
     setFlag(flag, on = true) { const file = path.join(herdrDir, flag); if (on) fs.writeFileSync(file, ''); else fs.rmSync(file, { force: true }); },

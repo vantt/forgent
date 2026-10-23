@@ -2,60 +2,35 @@
 // holder-lock component (docs/platform/holder-lock/spec.md, "Setup, doctor
 // and activation"). `registrations.mjs` registers them; the bodies live here.
 //
-// Every check reads; only the two fixes write. `lock-dirs` creates
-// `<fgosDir>/locks` and `<lockRoot>`. `lock-fences` is the cutover step
-// (check stopped -> place fences -> check stopped) and acts only in a
-// workspace whose own activated release already takes these locks as kernel
-// locks: fencing a workspace that still runs the old lock code would stop it.
+// Every check reads; the one fix, `lock-dirs`, creates `<fgosDir>/locks` and
+// `<lockRoot>`.
 //
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, `info:` is informational, anything else passes.
 
 import fs from 'node:fs';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import path from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
-import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, descriptionHolders, lockTransport, routeEnv, ROUTE_CALL_TIMEOUT_MS } from '../holder-lock/driver.mjs';
-import { startHold, waitReadySync, releaseHold } from '../holder-lock/hold-transport.mjs';
-import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
-import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
+import { hostBin, guaranteeFor, doorTwoProcessProbe } from '../holder-lock/driver.mjs';
+import { fileHolders, predecessorState } from '../holder-lock/index.mjs';
+import { PROTOCOL, DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { resolveStateRoot, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
-import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
-import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { hotPaths, readHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
+import { fgosDirFromRoot } from '../runner/paths.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../config/global-config.mjs';
-
-/** Largest `lock.predecessorKillWaitMs` doctor accepts: past a minute a dead holder's
- * leftovers are not "being killed" any more, and every contender would wait that long. */
-export { MAX_KILL_WAIT_MS };
 
 const BORROW_VECTORS_TIMEOUT_MS = 30_000;
-const PREDECESSOR_STATE_TIMEOUT_MS = 10_000;
-/** The kernel drops a dead holder's lock at once; this only covers a racing fork in the caller. */
-const PROBE_FREE_WAIT_MS = 500;
-const PROBE_POLL_MS = 5;
-/** A probe file this old belongs to a probe that died before it removed it (its child sleeps 60 s). */
-const STALE_PROBE_MS = 120_000;
-const PROBE_PREFIX = '.semantics-probe-';
 const MAX_LISTED = 5;
-const REGISTRY_IN_PAYLOAD = path.join('packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
-/** argv[0] basenames and argv entries that name a fgOS payload (same set as the host's quiesce scan). */
-const FGOS_BINARIES = new Set(['fgos', 'fgos-runner', 'fgos-gateway']);
-const FGOS_SCRIPTS = [/(^|\/)bin\/fgos\.mjs$/, /(^|\/)scripts\/run-tests\.mjs$/];
 
 const warn = (text) => `warning: ${text}`;
 
 function listed(items) {
   const head = items.slice(0, MAX_LISTED).join('; ');
   return items.length > MAX_LISTED ? `${head}; and ${items.length - MAX_LISTED} more` : head;
-}
-
-export function fgosDirOf(repoRoot) {
-  return path.join(path.resolve(repoRoot), '.fgos');
 }
 
 function isDirectory(dir) {
@@ -66,19 +41,18 @@ function isDirectory(dir) {
   }
 }
 
-/** The machine lock root, or `{ error }` naming why it cannot be resolved. */
-function machineLockRoot(fgosDir) {
+/** The machine state root and lock root with what decided them, or `{ error }` naming why it cannot be resolved. */
+function machineLockRoot() {
   try {
-    return { lockRoot: resolveStateRoot({ fgosDir }).lockRoot };
+    return resolveStateRoot();
   } catch (err) {
     return { error: err.message };
   }
 }
 
 /** Both lock directories this workspace uses, workspace first. */
-function lockDirs(repoRoot) {
-  const fgosDir = fgosDirOf(repoRoot);
-  const machine = machineLockRoot(fgosDir);
+function lockDirs(repoRoot, machine = machineLockRoot()) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
   return [
     { label: 'workspace', dir: path.join(fgosDir, LOCKS_DIR) },
     machine.error ? { label: 'machine', error: machine.error } : { label: 'machine', dir: machine.lockRoot },
@@ -88,137 +62,6 @@ function lockDirs(repoRoot) {
 // ---------------------------------------------------------------------
 // lock-kernel-semantics
 // ---------------------------------------------------------------------
-
-function sweepStaleProbes(dir) {
-  let entries;
-  try {
-    entries = fs.readdirSync(dir);
-  } catch {
-    return;
-  }
-  for (const name of entries) {
-    if (!name.startsWith(PROBE_PREFIX) || !name.endsWith('.lock')) continue;
-    const file = path.join(dir, name);
-    try {
-      if (Date.now() - fs.statSync(file).mtimeMs > STALE_PROBE_MS) fs.rmSync(file, { force: true });
-    } catch {
-      // another sweeper removed it
-    }
-  }
-}
-
-function sharedTry(bin, file) {
-  const fd = fs.openSync(file, fs.constants.O_RDWR);
-  try {
-    return runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS }).result;
-  } finally {
-    fs.closeSync(fd);
-  }
-}
-
-function waitExit(child) {
-  if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
-  return new Promise((resolve) => { child.once('exit', () => resolve()); });
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => { setTimeout(resolve, ms); });
-}
-
-/**
- * The two-process probe of packages/holder-lock/rust/src/semantics.rs, from
- * Node: lock a fresh probe file, hand the locked description to a `sleep`
- * child at fd 3 and close this process's copy, so the child is the only
- * holder. A second description must then see the lock held, and free once
- * the child is dead. Resolves with the wall time in ms; rejects naming the
- * half that failed. The probe file is removed either way.
- */
-export async function twoProcessProbe(dir, bin) {
-  if (lockTransport() === 'hold') return holdTwoProcessProbe(dir, bin);
-  const started = Date.now();
-  sweepStaleProbes(dir);
-  const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
-  let child = null;
-  try {
-    const fd = fs.openSync(file, fs.constants.O_RDWR | fs.constants.O_CREAT, 0o600);
-    try {
-      const line = runLockRouteSync({ bin, args: ['--try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
-      if (line.result !== 'acquired') throw new Error(`a fresh probe file answered ${line.result}${line.reason ? ` (${line.reason})` : ''}${line.detail ? `: ${line.detail}` : ''}`);
-      child = spawn('sleep', ['60'], { stdio: ['ignore', 'ignore', 'ignore', fd] });
-      await new Promise((resolve, reject) => {
-        child.once('spawn', resolve);
-        child.once('error', (err) => reject(new Error(`holder child program \`sleep\` could not be started: ${err.message}`)));
-      });
-    } finally {
-      fs.closeSync(fd);
-    }
-    const whileAlive = sharedTry(bin, file);
-    child.kill('SIGKILL');
-    await waitExit(child);
-    if (whileAlive !== 'held') throw new Error(`a lock held by a live child was seen as ${whileAlive}`);
-    const deadline = Date.now() + PROBE_FREE_WAIT_MS;
-    for (;;) {
-      const after = sharedTry(bin, file);
-      if (after === 'free') break;
-      if (Date.now() >= deadline) throw new Error(`the lock was still ${after} ${PROBE_FREE_WAIT_MS} ms after its holder child died`);
-      await sleep(PROBE_POLL_MS);
-    }
-    return Date.now() - started;
-  } finally {
-    if (child && child.exitCode === null && child.signalCode === null) {
-      child.kill('SIGKILL');
-      await waitExit(child);
-    }
-    fs.rmSync(file, { force: true });
-  }
-}
-
-function pathProbe(bin, file) {
-  return runLockRouteSync({ bin, args: ['--probe', file], timeoutMs: ROUTE_CALL_TIMEOUT_MS }).result;
-}
-
-/**
- * The same probe on the hold transport (Windows): a `lock-hold` helper takes
- * the lock in its own process, a fresh path-based probe must see it held, and
- * once the helper is terminated the lock must be free.
- */
-async function holdTwoProcessProbe(dir, bin) {
-  const started = Date.now();
-  sweepStaleProbes(dir);
-  const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
-  fs.writeFileSync(file, '', { flag: 'a' });
-  let hold = null;
-  try {
-    hold = startHold({ bin, lockPath: file, wait: { kind: 'try' }, killWaitMs: DEFAULT_KILL_WAIT_MS, env: routeEnv() });
-    const { line } = waitReadySync(hold, bin, ROUTE_CALL_TIMEOUT_MS * 2);
-    if (!line) {
-      hold = null;
-      throw new Error('the lock-hold helper did not answer');
-    }
-    if (line.result !== 'acquired') throw new Error(`a fresh probe file answered ${line.result}${line.reason ? ` (${line.reason})` : ''}${line.detail ? `: ${line.detail}` : ''}`);
-    const whileAlive = pathProbe(bin, file);
-    releaseHold(hold);
-    hold = null;
-    if (whileAlive !== 'held') throw new Error(`a lock held by a live helper was seen as ${whileAlive}`);
-    const deadline = Date.now() + PROBE_FREE_WAIT_MS;
-    for (;;) {
-      const after = pathProbe(bin, file);
-      if (after === 'free') break;
-      if (Date.now() >= deadline) throw new Error(`the lock was still ${after} ${PROBE_FREE_WAIT_MS} ms after its holder helper died`);
-      await sleep(PROBE_POLL_MS);
-    }
-    return Date.now() - started;
-  } finally {
-    if (hold) {
-      try {
-        releaseHold(hold);
-      } catch {
-        // the probe already failed; the helper dies with this process
-      }
-    }
-    fs.rmSync(file, { force: true });
-  }
-}
 
 function guaranteeShape(guarantee) {
   return JSON.stringify({ driver: guarantee.driver, exclusion: guarantee.exclusion, borrow: guarantee.borrow, holders: guarantee.holders });
@@ -238,22 +81,17 @@ export function guaranteeRefusal(label, dir, guarantee) {
 
 /**
  * For `<fgosDir>/locks` and `<lockRoot>`: the driver's guarantee through
- * `lock-fd --guarantee`, then the two-process probe on that same mount.
+ * door, then the two-process probe on that same mount.
  * `kernel` with a green probe passes; a platform with no driver
  * (`unsupported`) and a network filesystem (`none`) fail by name; a missing
  * directory warns (setup creates it).
  */
 export async function checkLockKernelSemantics(repoRoot) {
-  let bin;
-  try {
-    bin = hostBin({ fgosDir: fgosDirOf(repoRoot) });
-  } catch (err) {
-    return { passed: false, message: `cannot ask the holder-lock driver: ${err.message}` };
-  }
   const failures = [];
   const warnings = [];
   const passes = [];
-  for (const { label, dir, error } of lockDirs(repoRoot)) {
+  const machine = machineLockRoot();
+  for (const { label, dir, error } of lockDirs(repoRoot, machine)) {
     if (error) {
       failures.push(`${label} lock root unresolved: ${error}`);
       continue;
@@ -264,7 +102,7 @@ export async function checkLockKernelSemantics(repoRoot) {
     }
     let guarantee;
     try {
-      guarantee = guaranteeFor(path.join(dir, 'guarantee.lock'), { fgosDir: fgosDirOf(repoRoot) });
+      guarantee = guaranteeFor(path.join(dir, 'guarantee.lock'));
     } catch (err) {
       failures.push(`${label} ${dir}: ${err.message}`);
       continue;
@@ -276,13 +114,15 @@ export async function checkLockKernelSemantics(repoRoot) {
       continue;
     }
     try {
-      await twoProcessProbe(dir, bin);
+      doorTwoProcessProbe(dir);
       passes.push(`${label} ${dir} ${shape}, two-process probe green`);
     } catch (err) {
       failures.push(`${label} ${dir} ${shape}: two-process probe failed: ${err.message}`);
     }
   }
-  const all = [...failures, ...warnings, ...passes].join('; ');
+  // The two fixed facts of the lock layer stay visible: the state root the locks live under and the predecessor kill wait.
+  const facts = [machine.error ? null : `stateRoot ${machine.stateRoot} (${machine.source})`, `killWaitMs ${DEFAULT_KILL_WAIT_MS} (fixed)`].filter(Boolean);
+  const all = [...failures, ...warnings, ...passes, ...facts].join('; ');
   if (failures.length > 0) return { passed: false, message: all };
   if (warnings.length > 0) return { passed: true, message: warn(all) };
   return { passed: true, message: all };
@@ -300,7 +140,7 @@ export async function checkLockKernelSemantics(repoRoot) {
 export function checkLockBorrowVectors(repoRoot) {
   let bin;
   try {
-    bin = hostBin({ fgosDir: fgosDirOf(repoRoot) });
+    bin = hostBin({ fgosDir: fgosDirFromRoot(repoRoot) });
   } catch (err) {
     return { passed: false, message: `cannot run the borrow vectors: ${err.message}` };
   }
@@ -388,66 +228,15 @@ const LOCK_FILES = {
   'provider-account': ({ lockRoot }) => (lockRoot ? subdirs(path.join(lockRoot, 'provider-account')).flatMap((dir) => filesIn(dir, (name) => name.endsWith('.lock'))) : []),
 };
 
-/** The registry rows this release cut over, with every lock file of each that exists. */
+/**
+ * The registry rows that have a lock file to scan (a row of `LOCK_FILES`),
+ * with every lock file of each that exists. Rows without one (`attempt`,
+ * `event-seal`, `event-append`) are not scanned here.
+ */
 export function cutOverLockFiles({ fgosDir, lockRoot }) {
-  const rows = loadLockRegistry().locks.filter(isCutOverLock);
-  return rows.map((lock) => {
-    const enumerate = LOCK_FILES[lock.name];
-    if (!enumerate) throw new Error(`lock "${lock.name}" of release ${lock.owner} has no lock-file enumeration in holder-lock-checks.mjs`);
-    return { lock: lock.name, files: enumerate({ fgosDir, lockRoot }) };
-  });
-}
-
-function readProc(pid, name) {
-  try {
-    return fs.readFileSync(`/proc/${pid}/${name}`);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Why `pid` may hold lock `lockName`, or null when nothing says so: a child
- * of a `runBorrowed` call of that lock (FGOS_LOCK_FD names it), a process
- * the host started (FGOS_STATE_ROOT pin), or an argv naming a fgOS payload.
- */
-export function holderOrigin(pid, lockName) {
-  const environ = readProc(pid, 'environ');
-  if (environ) {
-    const vars = environ.toString('utf8').split('\0');
-    if (vars.some((entry) => entry.startsWith(`${LOCK_FD_ENV}=${lockName}:`))) return 'borrowed';
-    if (vars.some((entry) => entry.startsWith(`${STATE_ROOT_ENV}=`))) return 'fgos-host';
-  }
-  const cmdline = readProc(pid, 'cmdline');
-  if (cmdline) {
-    const argv = cmdline.toString('utf8').split('\0').filter(Boolean);
-    if (argv.length > 0 && FGOS_BINARIES.has(path.basename(argv[0]))) return 'fgos-payload';
-    if (argv.some((arg) => FGOS_SCRIPTS.some((re) => re.test(arg)))) return 'fgos-payload';
-  }
-  return null;
-}
-
-/** The parent pid of `pid` from /proc, or null. The comm field may hold spaces, so the row is cut after its last `)`. */
-function parentPidOf(pid) {
-  const stat = readProc(pid, 'stat');
-  if (!stat) return null;
-  const text = stat.toString('utf8');
-  const fields = text.slice(text.lastIndexOf(')') + 2).split(' ');
-  const ppid = Number(fields[1]);
-  return Number.isInteger(ppid) && ppid > 0 ? ppid : null;
-}
-
-/**
- * A holder of an attempt lock that is not itself a fgOS process but whose parent is: the bwrap
- * monitor the supervisor (or the gate) started carries the same lock description, and it is as much
- * a member of the attempt as they are. Only a parent that holds the same lock counts, so a monitor
- * left behind after both are gone is still named.
- */
-function isAttemptMember(pid, holderPids, lockName) {
-  // Only the bwrap monitor qualifies: a leaked lock fd in the agent or its descendants must still be named.
-  if (String(readProc(pid, 'comm') ?? '').trim() !== 'bwrap') return false;
-  const parent = parentPidOf(pid);
-  return parent !== null && holderPids.includes(parent) && holderOrigin(parent, lockName) !== null;
+  return loadLockRegistry().locks
+    .filter((lock) => lock.name in LOCK_FILES)
+    .map((lock) => ({ lock: lock.name, files: LOCK_FILES[lock.name]({ fgosDir, lockRoot }) }));
 }
 
 /** The `attempt.lock` files of attempts that are not closed. Closed attempts hold nothing. */
@@ -455,45 +244,27 @@ function attemptLockFiles(fgosDir) {
   return listOpenAttemptDirs(path.join(fgosDir, 'assignments')).flatMap((dir) => existing(path.join(dir, 'attempt.lock')));
 }
 
-function cmdlineOf(pid) {
-  const raw = readProc(pid, 'cmdline');
-  return raw ? raw.toString('utf8').split('\0').filter(Boolean).join(' ').slice(0, 200) : '<unreadable>';
-}
-
 /**
  * A `windows-job` record is judged by the host (one read-only contender-view
  * pass, never a kill): `empty` and `absent` are no problem, anything else
  * warns with the domain and the reason the host names.
  */
-function windowsJobProblem(lockFile, recordPath, record, fgosDir) {
-  let bin;
+function windowsJobProblem(lockFile, recordPath, record) {
+  let out;
   try {
-    bin = hostBin({ fgosDir });
+    out = predecessorState(lockFile);
   } catch (err) {
-    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host cannot judge it: ${err.message}`;
-  }
-  const res = spawnSync(bin, ['internal', 'lock-fd', '--protocol', String(PROTOCOL), '--predecessor-state', lockFile], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: PREDECESSOR_STATE_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-    maxBuffer: 1024 * 1024,
-  });
-  let out = null;
-  try {
-    out = JSON.parse(String(res.stdout ?? '').split('\n').find((line) => line.trim() !== '') ?? '');
-  } catch {
-    out = null;
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${err.message})`;
   }
   if (out?.result !== 'predecessor') {
-    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${res.error?.message ?? `exit ${res.status}`})`;
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${JSON.stringify(out?.result)})`;
   }
   if (out.state === 'empty' || out.state === 'absent') return null;
   return `${recordPath}: windows-job domain ${JSON.stringify(out.domain ?? record.domainId)} is ${out.state} (${out.reason ?? 'no reason named'}); the next holder ends it, or an acquire answers held (predecessor-domain-not-empty)`;
 }
 
 /** `null` when the predecessor record is absent or names an empty domain; otherwise why it does not. */
-function predecessorProblem(lockFile, fgosDir) {
+function predecessorProblem(lockFile) {
   const recordPath = `${lockFile}.predecessor.json`;
   let raw;
   try {
@@ -509,10 +280,58 @@ function predecessorProblem(lockFile, fgosDir) {
     return `${recordPath} is not JSON: ${raw.slice(0, 120)}`;
   }
   if (record?.v !== 1) return `${recordPath} has unknown version ${JSON.stringify(record?.v)}: ${raw.slice(0, 120)}`;
-  if (record.domainKind === 'windows-job') return windowsJobProblem(lockFile, recordPath, record, fgosDir);
+  if (record.domainKind === 'windows-job') return windowsJobProblem(lockFile, recordPath, record);
   const verdict = judge(record.domainId);
   if (verdict === 'dead') return null;
   return `${recordPath}: ${record.domainKind} domain ${JSON.stringify(record.domainId)} is not empty (${verdict}); the next holder kills it, or an acquire answers held (predecessor-domain-not-empty)`;
+}
+
+// ---------------------------------------------------------------------
+// hot records (judged beside their reclaim lock files, by lock-holders)
+// ---------------------------------------------------------------------
+
+/** The hot resources of the state store, by registry name (contracts/hot-lock.v1.json). */
+const HOT_RESOURCES = ['state', 'porting-events'];
+/** How long a record the judge cannot place may sit before it is worth a warning. */
+export const UNKNOWN_JUDGE_GRACE_MS = 5 * 60 * 1000;
+
+function recordAgeMs(recordPath, now) {
+  try {
+    return now - fs.statSync(recordPath).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Why a hot record needs a person, or `null` when it is absent or healthy.
+ * A record that does not parse is a problem at once; a parsed record whose
+ * holder the judge answers `unknown` for longer than the grace is one too (a
+ * live holder answers `unknown` only when the process table or its namespace
+ * cannot be read, so a young record is just a busy holder).
+ */
+function hotRecordProblem(resource, fgosDir, now) {
+  const { record: recordPath } = hotPaths(fgosDir, resource);
+  let seen;
+  try {
+    seen = readHotRecord(recordPath);
+  } catch (err) {
+    return `${resource}: ${recordPath} cannot be read (${err.code ?? err.message})`;
+  }
+  if (seen.state === 'absent') return null;
+  if (seen.state === 'retry') return `${resource}: ${recordPath} is open by another process (sharing violation, ${seen.code}); stop that process`;
+  if (seen.state === 'unreadable') return `${resource}: ${recordPath} does not parse (${JSON.stringify(seen.raw.slice(0, 80))})`;
+  if (judgeHotRecord(seen.record) !== 'unknown') return null;
+  const age = recordAgeMs(recordPath, now);
+  if (age <= UNKNOWN_JUDGE_GRACE_MS) return null;
+  return `${resource}: ${recordPath} names pid ${seen.record.pid} that cannot be judged here, for ${Math.round(age / 60000)} min`;
+}
+
+/** The hot records of this workspace that need a person, each with the one way out. Never repaired here. */
+function hotRecordProblems(fgosDir, now) {
+  return HOT_RESOURCES.map((resource) => ({ resource, problem: hotRecordProblem(resource, fgosDir, now) }))
+    .filter((entry) => entry.problem)
+    .map(({ resource, problem }) => `${problem}; once the holder is confirmed gone, run: fgos lock fence ${resource}`);
 }
 
 /**
@@ -522,9 +341,9 @@ function predecessorProblem(lockFile, fgosDir) {
  * `predecessor.json` naming a domain that is not empty warns with the
  * domain. A platform that cannot list holders is informational.
  */
-export function checkLockHolders(repoRoot) {
-  const fgosDir = fgosDirOf(repoRoot);
-  const machine = machineLockRoot(fgosDir);
+export function checkLockHolders(repoRoot, { now = Date.now() } = {}) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
+  const machine = machineLockRoot();
   const notes = machine.error ? [`machine locks not scanned: ${machine.error}`] : [];
   let rows;
   try {
@@ -542,251 +361,27 @@ export function checkLockHolders(repoRoot) {
   for (const { lock, files: lockFiles } of scanned) {
     for (const file of lockFiles) {
       files += 1;
-      const problem = predecessorProblem(file, fgosDir);
+      const problem = predecessorProblem(file);
       if (problem) predecessors.push(`${lock}: ${problem}`);
-      const holders = descriptionHolders(file);
+      const holders = fileHolders(lock, file);
       if (holders.kind !== 'list') {
         unlistable.push(`${lock} ${file}: ${holders.reason}`);
         continue;
       }
-      if (holders.pids.length > 0) held += 1;
-      for (const pid of holders.pids) {
-        if (!holderOrigin(pid, lock) && !(lock === 'attempt' && isAttemptMember(pid, holders.pids, lock))) foreign.push(`${lock} ${file} held by pid ${pid} (${cmdlineOf(pid)}), not a fgOS process nor a borrowed child`);
+      if (holders.holders.length > 0) held += 1;
+      for (const holder of holders.holders) {
+        // Rust decides the origin; an attempt member is only meaningful under the attempt lock.
+        if (holder.origin === 'foreign' || (holder.origin === 'attempt-member' && lock !== 'attempt')) foreign.push(`${lock} ${file} held by pid ${holder.pid} (${holder.cmdline}), not a fgOS process nor a borrowed child`);
       }
     }
   }
-  const problems = [...foreign, ...predecessors];
+  const problems = [...foreign, ...predecessors, ...hotRecordProblems(fgosDir, now)];
   const summary = `${files} lock file(s) of ${rows.length} locks, ${held} held`;
   if (problems.length > 0) return { passed: true, message: warn(`${listed(problems)} (${summary})`) };
   if (unlistable.length > 0 && unlistable.length === files) {
     return { passed: true, message: `info: holders not listable here: ${listed(unlistable)} (${summary})${notes.length ? `; ${notes.join('; ')}` : ''}` };
   }
   return { passed: true, message: `${summary}, every holder a fgOS process or a borrowed child${notes.length ? `; ${notes.join('; ')}` : ''}` };
-}
-
-// ---------------------------------------------------------------------
-// lock-fences
-// ---------------------------------------------------------------------
-
-/**
- * The workspace's Git listing the fences need, read through Inspect:
- * holder-lock sits below Git and never lists worktrees or branches itself.
- * Empty outside a repository.
- */
-export function workspaceListing(repoRoot) {
-  const inspect = createGitInspect(gitPortOptions(repoRoot));
-  if (inspect.resolveRepo().notARepository) return { worktrees: [], branches: [] };
-  const worktrees = [];
-  let cursor;
-  do {
-    const page = inspect.listWorktrees({ cursor, maxEntries: 4096 });
-    for (const row of page.entries) worktrees.push(Buffer.from(row.path).toString('utf8'));
-    cursor = page.nextCursor;
-  } while (cursor);
-  const branches = inspect.listBranches({ prefix: 'refs/heads/' }).map((ref) => ref.slice('refs/heads/'.length));
-  return { worktrees, branches };
-}
-
-/**
- * Every legacy lock path of the registry carries its cutover fence. A
- * missing fence warns and names the fix; an old lock file still present
- * is named, because it blocks the fix.
- */
-export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProviderRuntimeDir() } = {}) {
-  let status;
-  try {
-    status = fenceStatus({ fgosDir: fgosDirOf(repoRoot), workspaceRoot: path.resolve(repoRoot), ...workspaceListing(repoRoot), providerRuntimeDir });
-  } catch (err) {
-    return { passed: false, message: `cannot read the fence status: ${err.message}` };
-  }
-  // Channels without a controller activation or WAL have never crossed C5.
-  const activatedPath = path.join(fgosDirOf(repoRoot), 'installation/activation.json');
-  const main = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
-  const common = fs.existsSync(path.join(main, '.git')) ? path.join(main, '.git') : main;
-  if (!fs.existsSync(activatedPath) && !fs.existsSync(path.join(repoRoot, 'fgos/git')) && !fs.existsSync(path.join(common, 'fgos/git'))) {
-    status.targets = status.targets.filter(target => !(target.managedBy === 'fgctl' && target.state === 'absent'));
-    status.controllerMissing = status.targets.filter(target => target.managedBy === 'fgctl' && !target.fenced).map(target => target.path);
-  }
-  if (status.complete && status.controllerMissing.length === 0) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
-  if (status.complete) {
-    return { passed: false, message: 'git-fence-missing: the new fgctl places the activation fence during a WAL-capable activation' };
-  }
-  const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
-  const activated = activatedHolderLockRelease(repoRoot);
-  const fixable = fixableTargets(status, activated);
-  const next = fixable.length > 0
-    ? 'stop every fgOS process of this workspace, then run fgos doctor --fix'
-    : `the fix waits for this release to be activated here (${activated.reason ?? 'the activated release does not yet take every one of these locks'})`;
-  return {
-    passed: true,
-    message: warn(`${status.missing.length} of ${status.targets.filter(target => target.managedBy !== 'fgctl').length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
-  };
-}
-
-/**
- * The missing fences the activated release can already stand behind: those
- * of registry owners whose rows its own registry carries. A fence placed
- * before the release that takes the lock as a kernel lock is active would
- * stop that very release from upgrading (an older `fgctl` meets the
- * tombstone at its own lock path).
- */
-function fixableTargets(status, activated) {
-  const owners = activated.owners ?? [];
-  const missing = new Set(status.missing);
-  return status.targets.filter((target) => missing.has(target.path) && owners.includes(target.owner));
-}
-
-/**
- * The release the workspace's own activation runs, when its payload takes
- * this release's locks as kernel locks (it ships the lock registry); null
- * with the reason otherwise. `owners` lists the registry owners whose locks
- * that payload's registry names.
- */
-export function activatedHolderLockRelease(repoRoot) {
-  const activationPath = path.join(fgosDirOf(repoRoot), 'installation', 'activation.json');
-  let activation;
-  try {
-    activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-  } catch (err) {
-    return { release: null, reason: `no readable activation at ${activationPath} (${err.code ?? err.message})` };
-  }
-  if (activation?.status !== 'ready' || typeof activation.releasePath !== 'string') {
-    return { release: null, reason: `activation at ${activationPath} is not ready` };
-  }
-  let manifest;
-  try {
-    manifest = JSON.parse(fs.readFileSync(path.join(activation.releasePath, 'manifest.json'), 'utf8'));
-  } catch (err) {
-    return { release: null, reason: `the activated release ${activation.releasePath} has no readable manifest (${err.code ?? err.message})` };
-  }
-  const payloadRoot = manifest?.components?.legacyNode?.root;
-  if (typeof payloadRoot !== 'string' || !fs.existsSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD))) {
-    return { release: null, reason: `the activated release ${activation.releasePath} still runs the old lock code (no ${REGISTRY_IN_PAYLOAD} in its payload); activate this release first` };
-  }
-  let owners;
-  try {
-    const payloadRegistry = JSON.parse(fs.readFileSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD), 'utf8'));
-    owners = [...new Set(payloadRegistry.locks.map((lock) => lock.owner))];
-  } catch (err) {
-    return { release: null, reason: `the activated release ${activation.releasePath} has no readable lock registry (${err.code ?? err.message})` };
-  }
-  return { release: activation.releasePath, reason: null, owners };
-}
-
-/**
- * The cutover step for this workspace: check that every fgOS process has
- * stopped, place the fences, check again (fences.mjs `fenceCutover`). Acts
- * only when the workspace's activated release already runs holder-lock.
- * Blockers mean nothing is placed; they are listed so a person can stop them.
- */
-export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRuntimeDir(), excludePids, hostBin: bin } = {}) {
-  const workspaceRoot = path.resolve(repoRoot);
-  const fgosDir = fgosDirOf(repoRoot);
-  let status;
-  let listing;
-  try {
-    listing = workspaceListing(repoRoot);
-    status = fenceStatus({ fgosDir, workspaceRoot, ...listing, providerRuntimeDir });
-  } catch (err) {
-    return { changed: false, message: `cannot read the fence status: ${err.message}` };
-  }
-  if (status.complete && status.controllerMissing.length > 0) {
-    return { changed: false, message: 'fences not placed: only the new fgctl may place the activation fence during a WAL-capable activation' };
-  }
-  if (status.complete) return { changed: false, message: `all ${status.targets.length} legacy lock path(s) already fenced` };
-  const activated = activatedHolderLockRelease(repoRoot);
-  if (!activated.release) return { changed: false, message: `fences not placed: ${activated.reason}` };
-  const owners = [...new Set(fixableTargets(status, activated).map((target) => target.owner))];
-  if (owners.length === 0) return { changed: false, message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first' };
-  let result;
-  try {
-    result = fenceCutover({ workspaces: [{ root: workspaceRoot, worktrees: listing.worktrees }], fgosDir, workspaceRoot, ...listing, providerRuntimeDir, owners, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
-  } catch (err) {
-    return { changed: false, message: `fences not placed: ${err.message}` };
-  }
-  const blockers = (scan) => scan.blockers.map((b) => (b.kind === 'process' ? `pid ${b.pid} (${String(b.cmdline ?? '').slice(0, 120)}, ${b.matched})` : `${b.count} unreadable process entries`));
-  switch (result.status) {
-    case 'placed':
-      return { changed: result.fences.placed.length > 0, message: `placed ${result.fences.placed.length} fence(s), ${result.fences.skipped.length} already there` };
-    case 'placed-then-blocked':
-      return { changed: true, message: `placed ${result.fences.placed.length} fence(s); fgOS processes started meanwhile and now fail against them, stop them: ${listed(blockers(result.after))}` };
-    case 'blocked':
-      return { changed: false, message: `fences not placed: fgOS processes still running, stop them first: ${listed(blockers(result.before))}` };
-    case 'needs-attest':
-      return { changed: false, message: `fences not placed: this platform cannot scan for running fgOS processes (${result.before.detail ?? 'no detail'}); confirm nothing runs and place them through fenceCutover with attested` };
-    default:
-      return { changed: false, message: `fences not placed: ${result.status}: old lock still present at ${listed(result.fences?.paths ?? [])}` };
-  }
-}
-
-// ---------------------------------------------------------------------
-// lock-predecessor-kill-wait
-// ---------------------------------------------------------------------
-
-function killWaitOf(config) {
-  const section = config?.lock;
-  if (!section || typeof section !== 'object' || Array.isArray(section)) return undefined;
-  return section.predecessorKillWaitMs;
-}
-
-/**
- * `lock.predecessorKillWaitMs` after the config merge (project over global):
- * its value and source. Not a positive integer, or above MAX_KILL_WAIT_MS,
- * fails by name; absent passes with the default.
- */
-export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {
-  let project;
-  let global;
-  try {
-    project = readSharedConfig(path.resolve(repoRoot));
-    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();
-  } catch (err) {
-    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}` };
-  }
-  const fromProject = killWaitOf(project);
-  const fromGlobal = killWaitOf(global);
-  const [value, source] = fromProject !== undefined ? [fromProject, 'project'] : fromGlobal !== undefined ? [fromGlobal, 'global'] : [undefined, 'default'];
-  if (value === undefined) return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)` };
-  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {
-    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}` };
-  }
-  return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${value} (${source})` };
-}
-
-// ---------------------------------------------------------------------
-// state-root
-// ---------------------------------------------------------------------
-
-/**
- * `stateRoot`, `lockRoot` and their source as Node resolves them, next to
- * what the Rust host answers for the same environment. A difference fails.
- * When the root is pinned, the host's answer without the pin is shown too.
- */
-export function checkStateRoot(repoRoot, { env = process.env } = {}) {
-  const fgosDir = fgosDirOf(repoRoot);
-  let node;
-  let host;
-  try {
-    node = resolveStateRoot({ env, fgosDir });
-    host = runStateRootRoute({ fgosDir, env });
-  } catch (err) {
-    return { passed: false, message: `cannot resolve the state root: ${err.message}` };
-  }
-  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;
-  // Two spellings of one directory (a trailing slash in a pin) are the same root.
-  const same = (a, b) => path.resolve(a) === path.resolve(b);
-  if (!same(node.stateRoot, host.stateRoot) || !same(node.lockRoot, host.lockRoot)) {
-    return { passed: false, message: `Node and the host disagree: Node ${describe(node)}; host ${describe(host)}` };
-  }
-  if (node.source !== 'pinned') return { passed: true, message: describe(node) };
-  const { [STATE_ROOT_ENV]: _pin, ...unpinned } = env;
-  let natural = null;
-  try {
-    natural = runStateRootRoute({ fgosDir, env: unpinned });
-  } catch {
-    natural = null;
-  }
-  return { passed: true, message: `${describe(node)}${natural ? `; without the pin the host resolves ${describe(natural)}` : ''}` };
 }
 
 // ---------------------------------------------------------------------

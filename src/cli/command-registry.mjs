@@ -993,26 +993,108 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'identity',
-    invoke: 'fgos identity',
-    description: 'Read-only: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). Single authority: the Rust crate fgos-session-identity (docs/platform/session-identity/spec.md).',
-    parameters: {
-      type: 'object',
-      properties: {
-        pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-        'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+    invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint]',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    subcommands: {
+      writer: {
+        description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
+            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity writer', 'fgos identity writer --pid 4242 --fgos-dir .fgos'],
       },
-      required: [],
+      machine: {
+        description: 'This machine: {id, handle, alias}. The id is minted once per machine by `fgos doctor --fix`; the handle is the alias when one is set, else the id without its suffix. Exit 65 [machine-id-missing] when no id was minted yet.',
+        parameters: {
+          type: 'object',
+          properties: {
+            alias: { type: 'string', description: 'Set the machine alias (a lowercase handle of at most 40 characters). Changes the handle only, never the id.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity machine --json', 'fgos identity machine --alias fg-server'],
+      },
+      session: {
+        description: 'This session: {id, handle}. The id is <machine-id>/<local id>; the handle is <cli>-<4 characters>@<machine-handle> and never changes for the same session, so it can be pasted on the board. `--register` (the only way a session enters the local directory; hooks and a plain read never do) records it with the process facts of its agent head, the highest ancestor holding a terminal; `--role lead:<LANE>` also claims that role (and registers), refused with [role-held] while another live session holds it unless `--take` moves it. A second live session with the same handle is refused [handle-in-use]. Exit 65 [machine-id-missing] without a machine id, [unresolved] when the caller cannot be told from any other.',
+        parameters: {
+          type: 'object',
+          properties: {
+            pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
+            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+            register: { type: 'boolean', description: 'Record this session in the local directory of the machine (refreshes an existing entry).' },
+            role: { type: 'string', description: 'A role alias `lead:<LANE>` (lane: A-Z first, then A-Z, 0-9, hyphen; at most 16). Implies --register.' },
+            take: { type: 'boolean', description: 'With --role: move the role from the live session that holds it.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity session --json', 'fgos identity session --register', 'fgos identity session --role lead:MAIL --take'],
+      },
+      resolve: {
+        description: 'The one live session a handle (`claude-4f2a@fg-server`) or a role alias (`lead:MAIL`) names in the local directory of this machine: {id, handle, cli, projectId, clone, registeredAt, roles, liveness}. Exit 65 [not-found] or [ambiguous] with the candidates in the message; a session whose head process is dead is never returned.',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'A session handle or a role alias (positional).' },
+          },
+          positional: ['query'],
+          required: ['query'],
+        },
+        examples: ['fgos identity resolve claude-4f2a@fg-server --json', 'fgos identity resolve lead:MAIL'],
+      },
+      list: {
+        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
+        parameters: {
+          type: 'object',
+          properties: {
+            project: { type: 'boolean', description: 'Only the sessions of this repository\'s project id.' },
+            prune: { type: 'boolean', description: 'Remove the entries proven dead before listing (the rule of every write); an entry of unknown liveness is kept and shown.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --prune'],
+      },
+      project: {
+        description: 'This project: {id, handle, createdAt} read from the tracked file .fgos/project.json of the main checkout, so every clone, machine and linked worktree prints the same id. `--init` mints it once (main checkout only; refused when the file exists or the remote default branch already tracks it) and prints the commit command; nothing mints it automatically. `--new` mints a different id on purpose, to split a fork. Exit 65 [project-id-missing] when no id was minted yet.',
+        parameters: {
+          type: 'object',
+          properties: {
+            init: { type: 'boolean', description: 'Mint the project id once. Refused when the file exists, in a linked worktree, or when the remote default branch already tracks it.' },
+            new: { type: 'boolean', description: 'Mint a different project id on purpose (a fork split), replacing the file.' },
+            handle: { type: 'string', description: 'The project handle for --init or --new (a lowercase handle of at most 40 characters); default: the slug of the folder name.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity project --json', 'fgos identity project --init', 'fgos identity project --init --handle forgent'],
+      },
+      mint: {
+        description: 'A new id that travels between machines (docs/platform/identity/spec.md, section 4a). `work` gives `tsk-<10 base32>` and `backlog` gives `p-<10 base32>`, random and written nowhere. `d-adr` gives the next `D-ADR####` and `decision-file` the next `####`, claimed from the counter ref `refs/fgos/seq/<kind>` on the project\'s origin (the repository\'s own ref without one) so two machines never get the same number; run it in the repository. Prints {kind, id, number?}. A claim needs the network: exit 65 [sequence-unreachable] claims nothing, [sequence-contended] after 5 refused claims in a row. `--release <number>` gives a sequence number back, only while it is still the counter\'s tip.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'The id kind (positional).', enum: ['work', 'backlog', 'd-adr', 'decision-file'] },
+            release: { type: 'number', description: 'Give this sequence number back instead of claiming one (d-adr and decision-file only).' },
+          },
+          positional: ['kind'],
+          required: ['kind'],
+        },
+        examples: ['fgos identity mint work --json', 'fgos identity mint d-adr --json', 'fgos identity mint d-adr --release 73'],
+      },
     },
-    examples: ['fgos identity', 'fgos identity --pid 4242 --fgos-dir .fgos'],
+    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity list --json', 'fgos identity mint work --json'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
+  }),
   {
     name: 'gate-check',
     invoke: 'fgos gate-check',

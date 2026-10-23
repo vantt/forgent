@@ -141,7 +141,7 @@ pub(super) fn driver_for(preferred: &str, bwrap: Option<PathBuf>) -> Result<Box<
     // with bwrap can still run a `linux-pgroup` envelope.
     #[cfg(target_os = "linux")]
     let driver: Box<dyn ContainmentDriver> = match preferred {
-        "linux-pgroup" => Box::new(LinuxPgroup),
+        "linux-pgroup" => Box::new(LinuxPgroup::default()),
         "linux-gate" if bwrap.is_some() => Box::new(BwrapPidns::new(bwrap.clone().unwrap())),
         _ => select(&SelectEnv { bwrap }).map_err(|e| e.to_string())?,
     };

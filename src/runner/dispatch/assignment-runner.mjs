@@ -73,15 +73,14 @@ import {
   releaseRunControl,
   settleRunControl,
   isRunControlCurrent,
-  isProcessAlive,
   readMarker,
   publishMarkerOnce,
   fsyncFileBestEffort,
   fsyncDirBestEffort,
   buildRunControlHolder,
   inspectRunControl,
-  resolveHolderLiveness,
 } from './run-lock.mjs';
+import { resolveHolderLiveness } from './process-identity.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, agentArgsWithoutPrompt } from './transport.mjs';
 import {
   acquireAttemptLocks,
@@ -895,7 +894,7 @@ function admitRunAttempt(
             const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
             if (pidMatch) {
               const stagedPid = parseInt(pidMatch[1], 10);
-              if (isProcessAlive(stagedPid)) {
+              if (resolveHolderLiveness({ pid: stagedPid }) !== 'dead') {
                 continue;
               }
             }
@@ -1803,7 +1802,7 @@ export async function executeAssignment(assignment, opts = {}) {
     // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
     // and was not before is reported on the result.
     const strayWatch = supervised ? watchWritesOutsideWorkspace({ repoRoot: root, cwd }) : null;
-    const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
+    const attemptStepEnv = supervised ? attemptStepEnvOf() : null;
     if (supervised) {
       attemptLocks = acquireAttemptLocks({
         executorId, capability: compiledPlan.capability,
@@ -1889,7 +1888,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
       // The attempt's writer id is a pure function of its id, so a resume of the attempt sees the same one.
       // `parentWriterId` is the controller's own, so a writer can be traced from the agent back to it.
-      const attemptWriterId = mintAttemptWriterId(launchCommandId, { bin: attemptHost.hostBin });
+      const attemptWriterId = mintAttemptWriterId(launchCommandId);
       let parentWriterId = null;
       try { parentWriterId = String(resolveWriterIdentity(fgosDir).id); } catch { /* no controller identity: the lineage stays empty */ }
       const attemptIdentity = { writerId: attemptWriterId, parentWriterId };

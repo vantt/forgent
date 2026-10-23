@@ -1,0 +1,30 @@
+[package]
+name = "fgos-identity"
+version.workspace = true
+edition.workspace = true
+
+[features]
+# The host provider (`fgos identity`) is the only part that needs the host
+# runtime. Libraries that only read or mint ids (Event Store, the node addon)
+# depend with `default-features = false` and never pull it in.
+default = ["provider"]
+provider = ["dep:fgos-host-runtime", "dep:fgos-holder-lock", "dep:fgos-convention", "dep:fgos-git"]
+
+[dependencies]
+fgos-durable-file = { path = "../../durable-file/rust" }
+# The process-tree adapter reads `/proc` through the L0 process crate, so it is not optional.
+fgos-process = { path = "../../process/rust" }
+fgos-host-runtime = { path = "../../host-runtime/rust", optional = true }
+fgos-holder-lock = { path = "../../holder-lock/rust", optional = true }
+fgos-convention = { path = "../../convention/rust", optional = true }
+fgos-git = { path = "../../git/rust", optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
+
+
+[dev-dependencies]
+fgos-convention = { path = "../../convention/rust" }
