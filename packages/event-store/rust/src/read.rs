@@ -82,6 +82,8 @@ pub struct ReadMemo {
 }
 struct Last {
     origin: String,
+    streams: BTreeSet<String>,
+    project: bool,
     tips: Vec<Tip>,
     legacy_refs: BTreeMap<String, Oid>,
     local: Vec<Envelope>,
@@ -113,6 +115,13 @@ impl ReadMemo {
         let guard = self.lock();
         let last = guard.as_ref()?;
         if last.origin != req.origin
+            || last.project != req.project
+            || last.streams
+                != req
+                    .streams
+                    .iter()
+                    .map(|s| s.as_str().to_owned())
+                    .collect::<BTreeSet<_>>()
             || last.cursor != *req.cursor
             || last.tips != observed.tips
             || last.legacy_refs != *observed.legacy_refs
@@ -145,13 +154,15 @@ impl ReadMemo {
     }
     fn remember(
         &self,
-        origin: &str,
+        req: &ReadRequest<'_>,
         observed: &Observed<'_>,
         legacy: &Arc<LegacyView>,
         answer: &ReadResult,
     ) {
         *self.lock() = Some(Last {
-            origin: origin.into(),
+            origin: req.origin.into(),
+            streams: req.streams.iter().map(|s| s.as_str().to_owned()).collect(),
+            project: req.project,
             tips: observed.tips.to_vec(),
             legacy_refs: observed.legacy_refs.clone(),
             local: observed.local.to_vec(),
@@ -789,7 +800,7 @@ fn read_from(
             legacy_refs: &legacy_refs,
             local: &local,
         };
-        memo.remember(req.origin, &observed, &legacy_view, &answer);
+        memo.remember(req, &observed, &legacy_view, &answer);
     }
     Ok(answer)
 }

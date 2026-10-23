@@ -266,6 +266,28 @@ fn a_caller_that_holds_another_history_than_the_memo_gets_a_full_read() {
     assert!(!answer.memoized);
     assert_eq!(answer.sequence.len(), 5);
     assert!(matches!(answer.fold, Fold::RebuildRequired { .. }));
+
+    // A different stream query is another question, never answered from the memo.
+    let other = [StreamId::parse("project:porting").unwrap()];
+    let mismatched = read_with_view(
+        &p,
+        &f.repo,
+        ReadRequest {
+            layout: &f.layout,
+            origin: &reader(),
+            streams: &other,
+            cursor: &first.cursor,
+            folded: &first.sequence,
+            project: true,
+        },
+        None,
+        Some(Memoized {
+            memo: &memo,
+            legacy_held: None,
+        }),
+    )
+    .unwrap();
+    assert!(!mismatched.memoized);
 }
 
 #[test]
