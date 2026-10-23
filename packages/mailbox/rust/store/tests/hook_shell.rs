@@ -50,6 +50,7 @@ impl Head {
             parent_relation: fgos_process::facts::relation_of(ProcId(std::process::id())).unwrap(),
             parent_exe: Some(shell),
             parent_argv0: Some("/bin/sh".to_string()),
+            parent_comm: Some("sh".to_string()),
             grandparent: Some(self.record()),
         }
     }
@@ -914,6 +915,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
             parent_relation: fgos_process::facts::relation_of(ProcId(std::process::id())).unwrap(),
             parent_exe: Some("/opt/codex/bin/codex".into()),
             parent_argv0: Some("codex".to_string()),
+            parent_comm: Some("codex".to_string()),
             grandparent: None,
         })
     };

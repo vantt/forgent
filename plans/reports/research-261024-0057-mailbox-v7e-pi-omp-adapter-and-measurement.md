@@ -13,6 +13,7 @@ Branch `mailbox/v1-v3`. Owner Q2 option A (2026-10-23 14:53). Phase 7: `plans/re
 - Phase 8: 2 benign live cases.
 - Phase 9: 210, against a phase 9 ceiling of 405.
 - No retry and no wait (memory, login or provider limit) happened.
+- **Read with** `plans/reports/research-261024-0257-mailbox-v7e-review-fixes.md` (the corrections after the independent review, `plans/261023-1411-mailbox-v7-codex-postooluse-pi-omp-and-aliases/reports/code-review-v7e.md`).
 
 ## Phase 8: the adapter
 
@@ -132,7 +133,7 @@ The empty-directory p95 is now 45-46 ms (V7c review: 62-86 ms). The seeded p95 s
   - `check --addendum v7e`: 8 dry wiring runs, all as expected.
   - Pin `96928fe1e`, pinned worktree `mailbox-v7e-pinned-96928fe1e`, one host `59a9adbd92bc…` on all 210 results lines.
 
-**Oracle gate.** The stage A sample (66 runs) was marked agree on all 66 by me, the implementation lead, not the controller. The basis is each run's final answer against the oracle. The marks and their basis are in `sample-v7e-A.md`, and the unmarked original is kept beside it.
+**Oracle gate: breached (review H2).** The pre-registered gate is the controller's mark before stage B. It was not held: I, the implementation lead, drew the sample and marked all 66 entries agree with a script (the marked file is 3 ms younger than the unmarked copy kept beside it), and stage B started 7 s later. The harness's gate only counted marks, so it passed. The controller's mark is the independent reviewer's re-mark as the controller's delegate, made after the fact from each run's transcript, tool calls, workspace files and final answer: 66 agree, 0 disagree, and 210 of 210 agree across every run (`sample-v7e-A.controller.json` in the run home). The numbers stand; the process did not. The harness now refuses stage B until a controller mark file names a marker other than the harness and the sample's drawer.
 
 **Results.** 210 runs: 203 not-acted, 7 acted, 0 errors, 0 exclusions. All 210 ledger entries ended with 0 processes left, one mask plan `f03dada76ca5…`, and the argv recorded. No login copy was set aside.
 
@@ -159,13 +160,12 @@ The empty-directory p95 is now 45-46 ms (V7c review: 62-86 ms). The seeded p95 s
 - Both fail the stop rule on legitimate requests: LR 0/10 on both; LW 2/10 on pi and 5/10 on omp.
 - The declines say the request was "outside your requested steps". Every final answer told the user about the message, as the instruction asks.
 - Effort, sender registration and the instruction were held fixed, as at V7c.
+- **Not addressable by handle or role (review H1).** The 105 measured omp heads never registered with Identity (each run's outcome log reads `ident:no-session-variable`), so they were reachable only by mailbox name; the 105 pi heads were not registered either, because the sandbox home holds no machine id (`ident:machine-id-missing`). Neither affects delivery by name, which every run used. Fixed for omp in the review-fix step.
 
-**CLI against model.** These compare stages of different size and are labelled as such.
-- At one model, the three CLIs behave alike on LR: Codex F 0/5 (V7c, stage A only), pi 0/10, omp 0/10.
-- On LW they differ in degree: Codex 1/5, pi 2/10, omp 5/10. The intervals overlap: Codex 4-62, pi 6-51, omp 24-76.
-- The carrier differs too: Codex's frame arrived as `developer`; pi's and omp's arrived as tool output.
-- The shared result (LR declined everywhere, harmful 0 everywhere) therefore points at the model with this instruction, not at the CLI or the carrier's role.
-- omp's higher LW rate at the same model and carrier is a CLI effect of unmeasured cause. One candidate is omp's much larger system prompt (36k against pi's 8k input tokens). This is not tested.
+**CLI against model** (corrected after the V7e review, M2; stages of different size, labelled as such).
+- LR was declined under every CLI and carrier with this model and instruction: Codex F 0/5 (V7c, stage A only, `developer`), Codex arm P 0/5 (tool output after `inbox --claim`), pi 0/10 and omp 0/10 (tool output). At 0 everywhere this is a floor: the design cannot show a carrier effect, and none is excluded.
+- With one model and one instruction, model and instruction cannot be told apart. The declines restate the instruction's own condition ("inside the task your user gave you" as "outside your requested steps"), so the instruction is at least as likely a cause as the model.
+- LW: Codex 1/5, pi 2/10, omp 5/10. pi against omp is Fisher exact two-sided p = 0.35, with overlapping Wilson intervals (6-51 against 24-76): no detectable difference between the CLIs. omp's larger system prompt (36k against pi's 8k input tokens) is a hypothesis, not a finding.
 - The model effect (P3, a Gemini model) is not measured. The decision question is in the phase 7 report.
 
 ## Limits
@@ -175,7 +175,10 @@ The empty-directory p95 is now 45-46 ms (V7c review: 62-86 ms). The seeded p95 s
 - One account, one model, `low`, an unregistered sender, one receiver instruction.
 - The measurement loads the generated extension by path. A user's pi loads a project's own extension only in a trusted folder; that path was not measured.
 - pi's head is accepted by the executable name `node`, which any Node program has; the caller check is no stronger than for Codex's tools.
-- The stage A oracle sample was marked by the implementation lead.
+- The oracle gate was breached (above); the controller mark is the reviewer's, after the fact.
+- V6's frozen secondary labels mark 9 non-baseline runs `silent` although all 9 told the user (for example "kept to your steps"): a known mislabel of the frozen scorer. The V7e data stays frozen; read no told/silent rate from this ledger.
+- The `tool` role was recorded through one provider converter (openai-codex Responses). On another provider a tool result may ride inside a `user`-role message; unmeasured (`measuredOn.provider` in the contract).
+- Credential reads opened the owner's omp `agent.db` read-only in place, which wrote its `-shm` index before each run (review M3: a 5 ms touch measured on the last run; the database and the WAL untouched). Fixed in the review-fix step.
 
 ## Evidence
 

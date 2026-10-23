@@ -23,6 +23,7 @@ import {
   maskPlan,
   maskPlanSha256,
   materializeAccountLogin,
+  piOmpInstall as confinedPiOmpInstall,
   prepareConfinedRun,
   readAccountCredential,
   settleCopy,
@@ -520,13 +521,10 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
   assert.equal(flag(await zeroModel('run-features-on', ['features', 'list'], withoutOff), 'apps'), 'true', 'the falsifier: connectors are on by default');
 });
 
-/** pi's launcher and managed install, and omp's binary and natives, when installed here. */
+/** pi's and omp's installs (the confined launch's one definition), when installed here. */
 function piOmpInstall() {
-  const piBin = path.join(HOME, '.pi', 'agent', 'bin', 'pi');
-  const omp = path.join(HOME, '.local', 'bin', 'omp');
-  return fs.existsSync(piBin) && fs.existsSync(omp)
-    ? { piBin, piAllow: [path.join(HOME, '.pi', 'agent', 'bin'), path.join(HOME, '.pi', 'agent', 'install')], omp, natives: path.join(HOME, '.omp', 'natives') }
-    : null;
+  const install = confinedPiOmpInstall();
+  return install.installed ? { ...install, piBin: install.pi } : null;
 }
 
 /** A scratch OAuth credential in the account shape: never a real token. */
@@ -537,7 +535,7 @@ test('a confined pi or omp run cannot read the real account stores, starts from 
   const install = piOmpInstall();
   if (!install) return t.skip('pi and omp are not installed');
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-piomp-'));
-  const masks = maskPlan({ allow: [...install.piAllow, install.omp, install.natives, path.dirname(path.dirname(process.execPath))] });
+  const masks = maskPlan({ allow: [...install.allow, path.dirname(path.dirname(process.execPath))] });
   // Every account store of both CLIs, by the real paths the owner's accounts use.
   const stores = Object.fromEntries([
     ...['.pi/accounts', '.omp/profiles'].flatMap((dir) => (fs.existsSync(path.join(HOME, dir)) ? fs.readdirSync(path.join(HOME, dir)).map((a) => [`${dir}/${a}`, path.join(HOME, dir, a)]) : [])),
@@ -603,19 +601,40 @@ test('an omp login copy is compared by its credential rows: rows a run adds leav
   kept.close();
 });
 
-test('the account credential is read from the profile store read-only, and a store with no credential or no database refuses the launch', () => {
+test('the account credential is read from a scratch copy of the profile store, so the owner\'s database, WAL and index keep their bytes, mtimes and inodes; a store with no credential or no database refuses the launch', () => {
   const profile = makeFixtureDir('mbx-omp-profile-');
-  assert.throws(() => readAccountCredential(profile), /never logged in/);
+  const scratchDir = makeFixtureDir('mbx-login-read-');
+  assert.throws(() => readAccountCredential(profile, scratchDir), /never logged in/);
   fs.mkdirSync(path.join(profile, 'agent'));
-  const db = new DatabaseSync(path.join(profile, 'agent', 'agent.db'));
-  db.exec('CREATE TABLE auth_credentials (id INTEGER PRIMARY KEY, provider TEXT, credential_type TEXT, data TEXT, disabled_cause TEXT)');
-  db.close();
-  assert.throws(() => readAccountCredential(profile), /holds no openai-codex credential/);
-  const rw = new DatabaseSync(path.join(profile, 'agent', 'agent.db'));
-  rw.prepare('INSERT INTO auth_credentials (provider, credential_type, data) VALUES (?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'A', refresh: 'R', expires: 5, accountId: 'X' }));
-  rw.prepare('INSERT INTO auth_credentials (provider, credential_type, data, disabled_cause) VALUES (?, ?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'OLD' }), 'revoked');
-  rw.close();
-  const before = sha256(path.join(profile, 'agent', 'agent.db'));
-  assert.deepEqual(readAccountCredential(profile), { type: 'oauth', access: 'A', refresh: 'R', expires: 5, accountId: 'X' });
-  assert.equal(sha256(path.join(profile, 'agent', 'agent.db')), before, 'the source store is never written');
+  const file = path.join(profile, 'agent', 'agent.db');
+  // The owner's omp keeps its store open in WAL mode, so a -wal and a -shm file exist beside it.
+  const owner = new DatabaseSync(file);
+  owner.exec('PRAGMA journal_mode = WAL; CREATE TABLE auth_credentials (id INTEGER PRIMARY KEY, provider TEXT, credential_type TEXT, data TEXT, disabled_cause TEXT)');
+  assert.throws(() => readAccountCredential(profile, scratchDir), /holds no openai-codex credential/);
+  owner.prepare('INSERT INTO auth_credentials (provider, credential_type, data) VALUES (?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'A', refresh: 'R', expires: 5, accountId: 'X' }));
+  owner.prepare('INSERT INTO auth_credentials (provider, credential_type, data, disabled_cause) VALUES (?, ?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'OLD' }), 'revoked');
+  const dir = path.dirname(file);
+  // Every file of the store directory, by name, inode, mtime and bytes.
+  const stamp = () => fs.readdirSync(dir).sort().map((n) => {
+    const st = fs.statSync(path.join(dir, n), { bigint: true });
+    return { n, ino: st.ino, mtimeNs: st.mtimeNs, sha: sha256(path.join(dir, n)) };
+  });
+  const credential = { type: 'oauth', access: 'A', refresh: 'R', expires: 5, accountId: 'X' };
+  // While the owner's omp holds the store open: its rows sit in the WAL.
+  assert.deepEqual(stamp().map((e) => e.n), ['agent.db', 'agent.db-shm', 'agent.db-wal']);
+  let before = stamp();
+  assert.deepEqual(readAccountCredential(profile, scratchDir), credential, 'the newest live row, read with the WAL\'s rows');
+  assert.deepEqual(stamp(), before, 'no file of the open store was written, replaced or touched');
+  // At rest (the owner's omp closed): only agent.db is left.
+  owner.close();
+  before = stamp();
+  assert.deepEqual(before.map((e) => e.n), ['agent.db']);
+  assert.deepEqual(readAccountCredential(profile, scratchDir), credential);
+  assert.deepEqual(stamp(), before, 'no file appeared beside the store at rest');
+  assert.deepEqual(fs.readdirSync(scratchDir), [], 'the copy is removed');
+  // The falsifier: a read-only open of the store in place writes beside it.
+  const inPlace = new DatabaseSync(file, { readOnly: true });
+  inPlace.prepare('SELECT count(*) FROM auth_credentials').get();
+  inPlace.close();
+  assert.notDeepEqual(stamp(), before, 'an in-place read-only open creates the owner\'s -wal and -shm');
 });

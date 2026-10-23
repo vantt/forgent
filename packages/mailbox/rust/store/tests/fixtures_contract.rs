@@ -508,11 +508,17 @@ fn every_drained_cli_names_its_hook_topology_shell_head_executables_and_output_b
     assert_eq!(codex.head_executables, vec!["codex".to_string()]);
     // pi's head runs node (its launcher execs the release through
     // `#!/usr/bin/env node`); omp's runs its own binary.
-    for (adapter, exe) in [(Adapter::Pi, "node"), (Adapter::Omp, "omp")] {
+    // pi's `node` is any Node program's executable, so a pi head must also
+    // name itself `pi`, Identity's rule for a pi session.
+    for (adapter, exe, comm) in [
+        (Adapter::Pi, "node", Some("pi")),
+        (Adapter::Omp, "omp", None),
+    ] {
         let facts = tested.facts(adapter).unwrap();
         assert_eq!(facts.topology, Topology::Direct);
         assert_eq!(facts.hook_shell, None);
         assert_eq!(facts.head_executables, vec![exe.to_string()]);
+        assert_eq!(facts.head_comm.as_deref(), comm);
         assert!(!facts.stop_delivers);
     }
     assert!(!tested.contains(Adapter::Agy) && tested.facts(Adapter::Agy).is_none());

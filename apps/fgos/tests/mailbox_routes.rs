@@ -812,10 +812,14 @@ fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
     );
 }
 
-#[test]
-fn a_pi_or_omp_extension_call_registers_its_head_from_the_payload() {
-    for (cli, exe) in [("pi", "node"), ("omp", "omp")] {
-        let scene = Scene::new(&format!("{cli}-head"));
+/// A live pi or omp head running the extension's hook call with `payload`,
+/// alive until dropped: for pi, Node titled `pi` (the real head runs the
+/// `node` executable and names itself `pi`); for omp, a shell under the file
+/// name `omp` (omp's own binary).
+struct ExtensionHead(std::process::Child);
+
+impl ExtensionHead {
+    fn start(scene: &Scene, cli: &str, key: &str) -> Self {
         let mut payload: serde_json::Value = serde_json::from_slice(
             &fs::read(repo_root().join(format!(
                 "packages/mailbox/contracts/fixtures/hooks/{cli}/post-tool-use.json"
@@ -823,19 +827,34 @@ fn a_pi_or_omp_extension_call_registers_its_head_from_the_payload() {
             .unwrap(),
         )
         .unwrap();
-        payload["session_id"] = serde_json::Value::from(WRITER);
-        // The extension starts the hook from inside the CLI's own process.
-        let mut child = Command::new(cli_like(&scene.root, exe))
-            .args(["-c", "\"$0\" \"$@\"; :"])
+        payload["session_id"] = serde_json::Value::from(key);
+        let hook = ["hook", "mailbox", "--cli", cli, "--event", "post-tool-use"];
+        let mut command = if cli == "pi" {
+            let mut node = Command::new("node");
+            node.args([
+                "-e",
+                "process.title = 'pi'; const [bin, ...args] = process.argv.slice(1); \
+                 require('child_process').spawnSync(bin, args, { input: require('fs').readFileSync(0), stdio: ['pipe', 'ignore', 'ignore'] }); \
+                 setTimeout(() => {}, 60000);",
+            ])
             .arg(fgos_bin())
-            .args(["hook", "mailbox", "--cli", cli, "--event", "post-tool-use"])
+            .args(hook);
+            node
+        } else {
+            let mut sh = Command::new(cli_like(&scene.root, "omp"));
+            sh.args(["-c", "\"$0\" \"$@\"; sleep 60"])
+                .arg(fgos_bin())
+                .args(hook);
+            sh
+        };
+        let mut child = command
             .current_dir(scene.main())
             .env_clear()
             .env("PATH", std::env::var_os("PATH").unwrap_or_default())
             .env("HOME", scene.home())
             .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
             .spawn()
             .unwrap();
         child
@@ -844,14 +863,84 @@ fn a_pi_or_omp_extension_call_registers_its_head_from_the_payload() {
             .unwrap()
             .write_all(&serde_json::to_vec(&payload).unwrap())
             .unwrap();
-        let out = child.wait_with_output().unwrap();
-        assert_eq!(out.status.code(), Some(0), "{cli}: {out:?}");
-        assert!(out.stdout.is_empty(), "{cli}: a registering call is quiet");
+        Self(child)
+    }
+
+    fn pid(&self) -> u32 {
+        self.0.id()
+    }
+}
+
+impl Drop for ExtensionHead {
+    fn drop(&mut self) {
+        let _ = self.0.kill();
+        let _ = self.0.wait();
+    }
+}
+
+#[test]
+fn a_pi_or_omp_head_registers_with_identity_under_its_own_cli_and_is_reached_by_handle_and_by_role()
+{
+    for cli in ["pi", "omp"] {
+        let scene = Scene::new(&format!("{cli}-head"));
+        let root = identity_root(&scene);
+        let head = ExtensionHead::start(&scene, cli, WRITER);
+        let entries = || {
+            fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here)
+                .map(|listed| listed.sessions)
+                .unwrap_or_default()
+        };
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(20);
+        while (entries().is_empty() || !scene.mailbox_dir().join("record/snapshot.json").exists())
+            && std::time::Instant::now() < deadline
+        {
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
         assert!(
             scene.head_name().starts_with(&format!("main-{cli}")),
             "{cli}: {}",
             scene.head_name()
         );
+        let outcome =
+            fs::read_to_string(scene.mailbox_dir().join("hook-outcome.json")).unwrap_or_default();
+        let listed = entries();
+        assert_eq!(
+            listed.len(),
+            1,
+            "{cli}: Identity knows the head; outcome {outcome}"
+        );
+        let entry = &listed[0];
+        assert!(
+            entry.handle.starts_with(&format!("{cli}-")),
+            "{cli}: the handle names the CLI from the head's ancestry: {}",
+            entry.handle
+        );
+        // The head takes a role through Identity's own door.
+        let with_role = fgos_identity::directory::Entry::new(
+            entry.id.clone(),
+            entry.handle.clone(),
+            entry.cli.clone(),
+            None,
+            None,
+            vec!["lead:PIOMP".to_string()],
+            fgos_identity::current::os_record(head.pid()),
+        );
+        fgos_identity::directory::register(
+            &root,
+            with_role,
+            true,
+            &fgos_process::facts::judge_here,
+        )
+        .unwrap();
+        for to in [entry.handle.as_str(), "lead:PIOMP"] {
+            let out = send_to(&scene, to, false);
+            assert_eq!(out.status.code(), Some(0), "{cli} {to}: {out:?}");
+            let text = String::from_utf8_lossy(&out.stdout);
+            assert!(
+                text.contains(&format!(" for {}", scene.head_name())),
+                "{cli} {to}: {text}"
+            );
+        }
     }
 }
 

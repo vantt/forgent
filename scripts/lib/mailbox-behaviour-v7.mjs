@@ -256,16 +256,43 @@ export function stopRules(results, { stageComplete = false, stage = 'A' } = {}) 
   return { stops, stoppedArms };
 }
 
+/** The controller's mark file of a stage A sample: `<sample>.controller.json`, beside it. */
+export const controllerMarkFile = (sampleFile) => sampleFile.replace(/\.md$/, '.controller.json');
+
+/** What a drawn sample says of itself: who drew it (`Drawn-by:`) and its sampled run ids (`## <runId> (…)`). */
+export function sampleOf(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  return {
+    drawnBy: /^Drawn-by: (.+)$/m.exec(text)?.[1]?.trim() ?? null,
+    runIds: [...text.matchAll(/^## (\S+) \(/gm)].map((m) => m[1]),
+  };
+}
+
 /**
- * The oracle gate before stage B: the stage A sample `file` must exist, every entry marked
- * agree or disagree, and at most one disagree. Null when it holds.
+ * The oracle gate before stage B, pre-registered as the controller's mark. The harness draws
+ * the stage A sample `file` (naming who drew it) and never marks it; the controller writes the
+ * mark file beside it (`controllerMarkFile`): `{markedBy, markedAt, marks: {<runId>: "agree" |
+ * "disagree"}}`. The gate holds only when that file exists, names a marker that is neither the
+ * harness nor whoever drew the sample, marks every sampled run, and has at most one disagree.
+ * It is a gate on a recorded mark, not a timer. Null when it holds.
  */
 export function oracleProblem(file) {
   if (!fs.existsSync(file)) return `no stage A sample at ${file}; run report --stage A --sample and have the controller mark it`;
-  const marks = fs.readFileSync(file, 'utf8').split('\n').filter((l) => l.startsWith('Mark:'));
-  const open = marks.filter((l) => !/^Mark: (agree|disagree)$/.test(l.trim()));
-  if (!marks.length || open.length) return `the stage A sample has ${open.length || 'no'} unmarked entries`;
-  const disagree = marks.filter((l) => l.trim() === 'Mark: disagree').length;
+  const { drawnBy, runIds } = sampleOf(file);
+  if (!runIds.length) return `the stage A sample at ${file} names no run`;
+  const markFile = controllerMarkFile(file);
+  if (!fs.existsSync(markFile)) return `no controller mark at ${markFile}; the controller marks the sample, never the harness`;
+  let mark;
+  try {
+    mark = JSON.parse(fs.readFileSync(markFile, 'utf8'));
+  } catch {
+    return `the controller mark at ${markFile} is not JSON`;
+  }
+  const by = typeof mark.markedBy === 'string' ? mark.markedBy.trim() : '';
+  if (!by || /^harness\b/i.test(by) || (drawnBy && by === drawnBy)) return `the controller mark names no marker other than the harness and the sample's drawer (${JSON.stringify(by)})`;
+  const open = runIds.filter((id) => !['agree', 'disagree'].includes(mark.marks?.[id]));
+  if (open.length) return `the controller mark leaves ${open.length} sampled runs unmarked`;
+  const disagree = runIds.filter((id) => mark.marks[id] === 'disagree').length;
   return disagree > 1 ? `oracle: ${disagree} sampled runs marked disagree` : null;
 }
 

@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { mailboxHookTimeoutSec } from '../../src/setup/mailbox-limits.mjs';
 
 import {
   installClaudeHook,
@@ -359,6 +360,11 @@ test('the extension stays inert for a runner worker and never writes the process
     await handlers.agent_end({}, stubCtx(repoRoot));
     assert.equal(fs.existsSync(`${log}.stdin`), false, 'the shim never ran for a runner worker');
 
+    // Only a runner's id makes it inert: a session id a launcher set is the host's to judge.
+    process.env.FGOS_SESSION_ID = 'launcher-0001';
+    assert.deepEqual(await handlers.tool_result({ content: real }, stubCtx(repoRoot, { id: 'sess-6' })), { content: [...real, { type: 'text', text: 'MBX-FRAME' }] });
+    fs.rmSync(`${log}.argv`);
+    fs.rmSync(`${log}.stdin`);
     delete process.env.FGOS_SESSION_ID;
     const out = await handlers.tool_result({ content: real }, stubCtx(repoRoot, { id: 'sess-7' }));
     assert.deepEqual(out, { content: [...real, { type: 'text', text: 'MBX-FRAME' }] }, 'the frame follows the real output');
@@ -376,6 +382,43 @@ test('the extension stays inert for a runner worker and never writes the process
     else process.env.FGOS_SESSION_ID = saved;
   }
   assert.deepEqual({ ...process.env }, before, 'the process environment is unchanged');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the extension refuses a shim another user owns', async () => {
+  const repoRoot = mkTempDir('agent-hooks-omp-owner-');
+  mailboxOptIn(repoRoot, true);
+  installOmpHook(repoRoot);
+  const log = path.join(repoRoot, 'shim-log');
+  recordingShim(getProjectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
+  const handlers = await loadedHandlers(repoRoot, 'omp');
+  const real = [{ type: 'text', text: 'x' }];
+  const getuid = process.getuid;
+  try {
+    // Seen as another user, this user's shim is a foreign one.
+    process.getuid = () => getuid.call(process) + 1;
+    assert.equal(await handlers.tool_result({ content: real }, stubCtx(repoRoot)), undefined);
+    assert.equal(fs.existsSync(`${log}.argv`), false, 'a foreign shim never runs');
+  } finally {
+    process.getuid = getuid;
+  }
+  assert.deepEqual(await handlers.tool_result({ content: real }, stubCtx(repoRoot)), { content: [...real, { type: 'text', text: 'MBX-FRAME' }] }, 'the falsifier: the user\'s own shim runs');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('a hook that hangs holds the CLI no longer than the hook timeout, and the tool result keeps its real output', async () => {
+  const repoRoot = mkTempDir('agent-hooks-pi-hang-');
+  mailboxOptIn(repoRoot, true);
+  installPiHook(repoRoot);
+  const shim = getProjectShimPath(repoRoot);
+  fs.mkdirSync(path.dirname(shim), { recursive: true });
+  fs.writeFileSync(shim, '#!/bin/sh\ncat > /dev/null\nexec sleep 120\n', { mode: 0o755 });
+  const handlers = await loadedHandlers(repoRoot, 'pi');
+  const bound = mailboxHookTimeoutSec() * 1000;
+  const started = Date.now();
+  assert.equal(await handlers.tool_result({ content: [{ type: 'text', text: 'x' }] }, stubCtx(repoRoot)), undefined);
+  const took = Date.now() - started;
+  assert.ok(took >= bound - 200 && took < bound + 5000, `blocked ${took} ms against a ${bound} ms bound`);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

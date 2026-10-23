@@ -67,6 +67,20 @@ export const ACCOUNT_LOGINS = Object.freeze({
   omp: { copyPath: (home, profile) => path.join(home, '.omp', 'profiles', profile, 'agent', 'agent.db'), digest: 'credentials' },
 });
 
+/**
+ * pi's and omp's installs, as a confined run binds them back read-only (`allow`): pi's launcher
+ * and its managed install (the launcher reads `install/current-version`), omp's binary and its
+ * unpacked natives (`PI_NATIVES_DIR` points there, so nothing is unpacked into a run). Nothing
+ * else of `~/.pi` or `~/.omp`: no account, profile, session or settings. The one definition of
+ * those paths.
+ */
+export function piOmpInstall(home = os.homedir()) {
+  const pi = path.join(home, '.pi', 'agent', 'bin', 'pi');
+  const omp = path.join(home, '.local', 'bin', 'omp');
+  const natives = path.join(home, '.omp', 'natives');
+  return { pi, omp, natives, allow: [path.join(home, '.pi', 'agent', 'bin'), path.join(home, '.pi', 'agent', 'install'), omp, natives], installed: exists(pi) && exists(omp) };
+}
+
 /** A launch refused before any CLI started. */
 export class ConfinedLaunchError extends Error {
   constructor(message) {
@@ -187,17 +201,33 @@ export const maskArgs = ({ hidden, bindBack }) => [...hidden.flatMap((d) => ['--
 /** The bwrap arguments that make each hidden tmpfs read-only, last, once every mount point inside it exists. */
 export const maskSealArgs = ({ hidden }) => hidden.flatMap((d) => ['--remount-ro', d]);
 
-/** The account's `provider` OAuth credential in an omp profile store, read-only (its WAL honoured): `{type, ...data}`. */
-export function readAccountCredential(profileDir, provider = ACCOUNT_PROVIDER) {
+/**
+ * The account's `provider` OAuth credential in an omp profile store: `{type, ...data}`. The
+ * owner's database is never opened in place: even a read-only SQLite open of a WAL database
+ * writes its `-shm` index (measured on the V7e runs). `agent.db` and a `-wal` beside it are
+ * copied with a plain file copy into a fresh directory under `scratch`, the copy is read and
+ * the directory removed; the source files keep their bytes, mtimes and inodes.
+ */
+export function readAccountCredential(profileDir, scratch, provider = ACCOUNT_PROVIDER) {
   const file = path.join(profileDir, 'agent', 'agent.db');
   if (!exists(file)) throw new ConfinedLaunchError(`no login store at ${file}; the account was never logged in`);
-  const db = new DatabaseSync(file, { readOnly: true });
+  fs.mkdirSync(scratch, { recursive: true });
+  const dir = fs.mkdtempSync(path.join(scratch, 'login-read-'));
   try {
-    const row = db.prepare('SELECT credential_type, data FROM auth_credentials WHERE provider = ? AND disabled_cause IS NULL ORDER BY id DESC LIMIT 1').get(provider);
-    if (!row) throw new ConfinedLaunchError(`the login store at ${file} holds no ${provider} credential`);
-    return { type: row.credential_type, ...JSON.parse(row.data) };
+    fs.chmodSync(dir, 0o700);
+    const copy = path.join(dir, 'agent.db');
+    fs.copyFileSync(file, copy);
+    if (exists(`${file}-wal`)) fs.copyFileSync(`${file}-wal`, `${copy}-wal`);
+    const db = new DatabaseSync(copy, { readOnly: true });
+    try {
+      const row = db.prepare('SELECT credential_type, data FROM auth_credentials WHERE provider = ? AND disabled_cause IS NULL ORDER BY id DESC LIMIT 1').get(provider);
+      if (!row) throw new ConfinedLaunchError(`the login store at ${file} holds no ${provider} credential`);
+      return { type: row.credential_type, ...JSON.parse(row.data) };
+    } finally {
+      db.close();
+    }
   } finally {
-    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 }
 

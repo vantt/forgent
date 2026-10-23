@@ -121,3 +121,32 @@ fn every_adapter_word_is_a_cli_the_core_accepts() {
         assert_eq!(adapter.cli().unwrap().as_str(), adapter.word());
     }
 }
+
+#[test]
+fn every_channel_a_tested_cli_delivers_through_has_the_output_shape_it_was_recorded_injecting() {
+    use fgos_mailbox::adapters::TestedClis;
+    let tested = TestedClis::embedded();
+    let mut delivering = 0;
+    for adapter in ADAPTERS {
+        let Some(facts) = tested.facts(adapter) else {
+            continue;
+        };
+        for (event, delivers) in [
+            (HookEvent::Stop, facts.stop_delivers),
+            (
+                HookEvent::PostToolUse,
+                facts.post_tool_use_max_bytes.is_some(),
+            ),
+        ] {
+            if delivers {
+                delivering += 1;
+                assert!(
+                    adapter.shape(event).is_some(),
+                    "{} delivers at {event:?} with no recorded shape",
+                    adapter.word()
+                );
+            }
+        }
+    }
+    assert!(delivering >= 5, "every tested CLI delivers somewhere");
+}

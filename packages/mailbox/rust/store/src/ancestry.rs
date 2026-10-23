@@ -1,9 +1,10 @@
 //! The hook entry's ancestry, read through process facts (spec §6.1): the
-//! parent's record, place in the tree, executable and invoked path, and the
+//! parent's record, place in the tree, executable, invoked path and command
+//! name, and the
 //! grandparent's record. The one place the store reads the process table
 //! for the caller check and the head finders.
 use crate::head::Ancestry;
-use fgos_process::facts::{identity_of, relation_of, view_of, ScanFilter};
+use fgos_process::facts::{command_name_of, identity_of, relation_of, view_of, ScanFilter};
 use fgos_process::ProcId;
 
 /// The ancestry of `pid`, read now; `None` when its parent's record or
@@ -28,6 +29,7 @@ pub fn ancestry_of(pid: u32) -> Option<Ancestry> {
         parent_relation,
         parent_exe,
         parent_argv0,
+        parent_comm: command_name_of(ProcId(parent)),
         grandparent,
     })
 }

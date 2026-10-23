@@ -222,17 +222,10 @@ function confinedMasks(dry) {
   return confined.maskPlan({ allow });
 }
 
-/**
- * pi's and omp's installs as a confined run binds them back, read-only: pi's launcher and its
- * managed install (the launcher reads `install/current-version`), omp's binary and its unpacked
- * natives (`PI_NATIVES_DIR` points there, so nothing is unpacked into a run). Nothing else of
- * `~/.pi` or `~/.omp`: no account, profile, session or settings.
- */
-function piOmpInstall() {
-  const home = os.homedir();
-  const allow = [path.join(home, '.pi', 'agent', 'bin'), path.join(home, '.pi', 'agent', 'install'), path.join(home, '.local', 'bin', 'omp'), path.join(home, '.omp', 'natives')];
-  return { allow, pi: path.join(home, '.pi', 'agent', 'bin', 'pi'), omp: path.join(home, '.local', 'bin', 'omp'), natives: path.join(home, '.omp', 'natives') };
-}
+const piOmpInstall = () => confined.piOmpInstall();
+
+/** Who runs the harness: the operator's session id (the first identity variable set), else the OS user. */
+const operator = () => live.ID_VARS.concat('PI_SESSION_ID').map((v) => process.env[v]).find(Boolean) ?? `user:${os.userInfo().username}`;
 
 /** The scripted task of a dry pi or omp run: the frozen task's four commands, then the final answer. */
 const DRY_TASK_CALLS = ['ls', 'until [ -f go1.txt ]; do sleep 2; done', 'ls | wc -l > summary.txt', 'until [ -f go2.txt ]; do sleep 2; done'];
@@ -325,7 +318,7 @@ function context({ dry, stage = null }) {
   // pi's and omp's login: the account's Codex login, read fresh from its omp profile at every
   // start (a scratch one, and the recording endpoint as the provider, for a dry run).
   const pairAccount = (cli) => addendum?.pairs?.find((p) => p.cli === cli)?.account;
-  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cli))), profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
+  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cli)), path.join(base, 'login-read')), profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
   if (dry) {
     const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
     return {
@@ -381,7 +374,7 @@ function context({ dry, stage = null }) {
       for (const waited = Date.now(); ;) {
         let fresh;
         try {
-          fresh = confined.accountLoginFreshness(confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cell.cli))));
+          fresh = confined.accountLoginFreshness(confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cell.cli)), path.join(base, 'login-read')));
         } catch (error) {
           return `login: ${error.message}`;
         }
@@ -557,10 +550,11 @@ function cmdReportAddendum({ stage, sample, dry, compare }) {
   say(MEASURE.report({ results, compare, addendum, stage }));
   if (!sample) return;
   const bodies = readData().bodies;
-  const lines = [`# Sample, ${ADDENDUM_NAME}${stage ? `, stage ${stage}` : ''}`, '', 'Mark each run agree or disagree with the oracle.', ''];
+  // The drawer is named; the controller marks in the mark file beside the sample, never here.
+  const lines = [`# Sample, ${ADDENDUM_NAME}${stage ? `, stage ${stage}` : ''}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, '', `The controller marks each run agree or disagree with the oracle in ${path.basename(v7.controllerMarkFile(`${MEASURE.sample}.md`))} beside this file: {"markedBy": …, "markedAt": …, "marks": {"<runId>": "agree" | "disagree"}}.`, ''];
   for (const cell of MEASURE.cells()) {
     for (const r of score.sampleOf(cell, results.filter((x) => x.cell === cell.id && (!stage || x.stage === stage)), addendum.seed)) {
-      lines.push(`## ${r.runId} (${cell.id}): ${r.outcome}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[cell.variant].body])}`, '', `Claimed: ${r.claimRan}; carried by: ${(r.roleRecord ?? []).join(', ') || '-'}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '', 'Mark: agree / disagree', '');
+      lines.push(`## ${r.runId} (${cell.id}): ${r.outcome}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[cell.variant].body])}`, '', `${r.claimRan === undefined ? '' : `Claimed: ${r.claimRan}; `}carried by: ${(r.roleRecord ?? []).join(', ') || '-'}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '');
     }
   }
   const file = path.join(base, `${MEASURE.sample}${stage ? `-${stage}` : ''}.md`);
@@ -1108,7 +1102,7 @@ async function cmdLiveCase(cli, dry) {
   const versionProblem = live.versionProblem(cli, binary.version, CONTRACTS);
   if (versionProblem) die(versionProblem);
   const pair = v7e.PAIRS.find((p) => p.cli === cli);
-  const credential = dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pair.account));
+  const credential = dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pair.account), path.join(base, 'login-read'));
   if (!dry && confined.accountLoginFreshness(credential) !== 'fresh') die('login near expiry: stale; wait for the owner\'s omp sessions to refresh it');
   const install = piOmpInstall();
   const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
@@ -1290,7 +1284,7 @@ async function cmdRecordFixtures(cli) {
   ];
   // Every path, standalone or after `--flag=`, is replaced: none may name the machine's user.
   const runLine = (r) => `\`${cli} ${r.argv.slice(1).map((a) => a.replace(/(^|=)\/.*$/, '$1<path>')).join(' ')}\` (exit ${r.exit.code})`;
-  const source = `recorded ${new Date().toISOString().slice(0, 10)} from ${cli} ${version} on this machine by test/live/mailbox-behaviour.live.mjs record-fixtures, with no model: the Codex provider pointed at the recording endpoint (scripts/lib/mailbox-role-recorder.mjs) under the confined launch, the product's generated extension of an opted-in project loaded by path, and a capture shim in the shim's place answering a canary frame at each tool result; dump run ${runLine(first)}; second run ${runLine(second)}${sub ? `; subagent run ${runLine(sub)} (the recorder answered with a task call and a wait)` : ''}; the canary frame reached the provider as ${first.canary.map((c) => c.carriers.join(' ')).join(', ')}; the hook processes saw ${Object.entries(needed.first[0].env).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none of the identity variables'}; the tool process saw ${Object.entries(first.toolEnv[0] ?? {}).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none'}${sub ? `; the subagent's PostToolUse carried subagent true and its own session id` : `; ${cli} has no subagent tool, so the subagent vectors are synthesized`}`;
+  const source = `recorded ${new Date().toISOString().slice(0, 10)} from ${cli} ${version} on this machine by test/live/mailbox-behaviour.live.mjs record-fixtures, with no model: the Codex provider pointed at the recording endpoint (scripts/lib/mailbox-role-recorder.mjs) under the confined launch, the product's generated extension of an opted-in project loaded by path, and a capture shim in the shim's place answering a canary frame at each tool result; dump run ${runLine(first)}; second run ${runLine(second)}${sub ? `; subagent run ${runLine(sub)} (the recorder answered with a task call and a wait)` : ''}; the canary frame reached the provider as ${first.canary.map((c) => c.carriers.map((k) => k.replace(/:$/, '')).join(' ')).join(', ')}; the hook processes saw ${Object.entries(needed.first[0].env).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none of the identity variables'}; the tool process saw ${Object.entries(first.toolEnv[0] ?? {}).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none'}${sub ? `; the subagent's PostToolUse carried subagent true and its own session id` : `; ${cli} has no subagent tool, so the subagent vectors are synthesized`}`;
   for (const [name, value] of Object.entries(files)) writeJson(path.join(out, name), value);
   writeJson(path.join(out, 'env.json'), env);
   writeJson(path.join(out, 'vectors.json'), { cli, source, vectors });

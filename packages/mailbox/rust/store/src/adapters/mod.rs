@@ -101,6 +101,10 @@ pub struct AdapterFacts {
     /// Executable basenames accepted at a direct head position; may be
     /// empty under one shell hop, where the head finder binds the head.
     pub head_executables: Vec<String>,
+    /// The command name a direct head must also carry, where its executable
+    /// is not specific to the CLI (`pi` on `node`: Identity's rule for a pi
+    /// session); `None` where the executable alone names the CLI.
+    pub head_comm: Option<String>,
     /// The bound of a `PostToolUse` drain's output; `None`: no drain at
     /// that event, only at Stop and `inbox --claim`.
     pub post_tool_use_max_bytes: Option<u64>,
@@ -151,6 +155,8 @@ struct RawFacts {
     hook_topology: String,
     hook_shell: Option<String>,
     head_executables: Vec<String>,
+    #[serde(default)]
+    head_comm: Option<String>,
     post_tool_use_context_max_bytes: Option<u64>,
     channels: RawChannels,
 }
@@ -215,6 +221,10 @@ impl ChannelRole {
 struct RawMeasured {
     versions: Vec<String>,
     platform: String,
+    /// The provider converter a channel role was recorded through, where the
+    /// CLI routes to several (pi, omp): the role holds for that one only.
+    #[serde(rename = "provider", default)]
+    _provider: Option<String>,
 }
 
 /// The CLIs an adapters contract lists under `testedAgainst`, with the
@@ -387,6 +397,7 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         topology,
         hook_shell,
         head_executables: raw.head_executables,
+        head_comm: raw.head_comm,
         post_tool_use_max_bytes: raw.post_tool_use_context_max_bytes,
         stop_delivers: raw.channels.stop.deliver,
     })

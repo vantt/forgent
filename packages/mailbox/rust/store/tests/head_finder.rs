@@ -72,11 +72,27 @@ fn facts(adapter: Adapter) -> AdapterFacts {
 /// An ancestry whose parent runs `exe` invoked as `argv0`, under
 /// `grandparent`.
 fn ancestry(parent: Record, exe: &str, argv0: &str, grandparent: Option<Record>) -> Ancestry {
+    // A plain binary's command name is its file name.
+    let comm = Path::new(exe)
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned());
+    titled(parent, exe, argv0, comm.as_deref(), grandparent)
+}
+
+/// An ancestry whose parent runs `exe` and named itself `comm`.
+fn titled(
+    parent: Record,
+    exe: &str,
+    argv0: &str,
+    comm: Option<&str>,
+    grandparent: Option<Record>,
+) -> Ancestry {
     Ancestry {
         parent,
         parent_relation: relation_of(ProcId(std::process::id())).unwrap(),
         parent_exe: Some(exe.into()),
         parent_argv0: Some(argv0.to_string()),
+        parent_comm: comm.map(String::from),
         grandparent,
     }
 }
@@ -307,9 +323,17 @@ fn a_direct_head_must_run_one_of_the_adapters_head_executables() {
     let child = spawn("sleep", &["30"]);
     let record = record_of(child.0.id());
     let at = |exe: &str| ancestry(record.clone(), exe, exe, None);
+    // pi's head names itself `pi` on the `node` executable.
+    let own_head = |adapter: Adapter, exe: &str| {
+        if adapter == Adapter::Pi {
+            titled(record.clone(), exe, "node", Some("pi"), None)
+        } else {
+            at(exe)
+        }
+    };
     for (adapter, own) in heads {
         let facts = facts(adapter);
-        let head = payload_head::find_head(&at(own), &facts).unwrap();
+        let head = payload_head::find_head(&own_head(adapter, own), &facts).unwrap();
         assert_eq!(head.record, record);
         assert_eq!(head.own_suffix, None);
         let others = heads
@@ -329,6 +353,28 @@ fn a_direct_head_must_run_one_of_the_adapters_head_executables() {
                 Err(NoHead::WrongExecutable),
                 "{} {wrong}",
                 adapter.word()
+            );
+        }
+        if adapter == Adapter::Pi {
+            // Any other Node program (an npm script, an MCP server) runs the
+            // same executable under its own command name: refused.
+            for comm in [Some("node"), Some("npm"), None] {
+                assert_eq!(
+                    payload_head::find_head(
+                        &titled(record.clone(), own, "node", comm, None),
+                        &facts
+                    ),
+                    Err(NoHead::WrongExecutable),
+                    "pi head named {comm:?}"
+                );
+            }
+            // Named `pi` on another executable is refused too.
+            assert_eq!(
+                payload_head::find_head(
+                    &titled(record.clone(), "/usr/bin/zsh", "zsh", Some("pi"), None),
+                    &facts
+                ),
+                Err(NoHead::WrongExecutable)
             );
         }
         // A real ancestry: the entry's parent is a shell, not the CLI.
@@ -401,17 +447,32 @@ fn a_codex_pi_or_omp_entry_resolves_its_writer_from_the_payload_and_its_head_at_
     ] {
         let facts = facts(adapter);
         let resolve = resolver_for(adapter, &facts, &env, &hook);
-        let resolved = resolve(
-            payload.as_bytes(),
-            &ancestry(record.clone(), exe, exe, None),
-        )
-        .unwrap_or_else(|e| panic!("{}: {e:?}", adapter.word()));
+        let at = if adapter == Adapter::Pi {
+            titled(record.clone(), exe, "node", Some("pi"), None)
+        } else {
+            ancestry(record.clone(), exe, exe, None)
+        };
+        let resolved = resolve(payload.as_bytes(), &at)
+            .unwrap_or_else(|e| panic!("{}: {e:?}", adapter.word()));
         assert_eq!(resolved.writer, writer(), "{}", adapter.word());
         assert_eq!(resolved.head.record, record, "{}", adapter.word());
         assert_eq!(
-            resolve(b"{}", &ancestry(record.clone(), exe, exe, None)).unwrap_err(),
+            resolve(b"{}", &at).unwrap_err(),
             NoHead::NoWriter,
             "{}: a payload without a session names no writer",
+            adapter.word()
+        );
+        // An entry whose own environment names another session is a tool
+        // process piping someone else's payload: refused.
+        let piped = HookEnv {
+            session_env: Some("00000000-0000-4000-8000-00000000ffff".to_string()),
+            ..env.clone()
+        };
+        let resolve = resolver_for(adapter, &facts, &piped, &hook);
+        assert_eq!(
+            resolve(payload.as_bytes(), &at).unwrap_err(),
+            NoHead::WriterMismatch,
+            "{}",
             adapter.word()
         );
     }

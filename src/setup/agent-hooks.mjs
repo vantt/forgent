@@ -340,7 +340,10 @@ export function checkAgyHook(cwd) {
  * at the end of a run it only lets the host register the head. It never writes the process
  * environment and does nothing for a runner worker (`FGOS_SESSION_ID` `att-…`). The shim is the
  * first `.fgos/installation/bin/fgos` walking up from the session's directory, used only when it
- * is a regular file this user owns and no one else may write. Any failure is swallowed.
+ * is a regular file this user owns and no one else may write. Any failure is swallowed. The call
+ * is synchronous, as the guards' calls are: the CLI waits for it at every tool result, bounded by
+ * the hook timeout (`mailbox.hook.budgetMs` rounded up, plus 2 s), past which the hook is killed
+ * and the tool result passes unchanged.
  */
 function mailboxExtensionPart(cli) {
   const timeoutMs = mailboxHookTimeoutSec() * 1000;

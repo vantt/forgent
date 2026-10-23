@@ -84,11 +84,17 @@ fn head_ref(record: &Record) -> Option<HeadRef> {
 }
 
 /// The head's key as Identity takes it: the session-id variable Identity
-/// names `cli` by, and the key's value.
+/// names `cli` by, and the key's value. pi and omp share one variable,
+/// `PI_SESSION_ID`, which Identity names by the neutral `pi`; Identity labels
+/// an omp head `omp` from its process ancestry (`HeadRef`).
 fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
+    let family = match cli.as_str() {
+        "omp" => "pi",
+        other => other,
+    };
     let source = ENV_ORDER
         .iter()
-        .find(|var| cli_of(var, key.as_str()) == cli.as_str())?;
+        .find(|var| cli_of(var, key.as_str()) == family)?;
     Some(IdentityKey {
         source,
         value: key.as_str(),
@@ -356,11 +362,16 @@ mod tests {
         }
     }
 
-    fn view(key: &str, name: &str, head: fgos_process::facts::Record) -> super::HeadView {
+    fn view(
+        key: &str,
+        name: &str,
+        cli: &str,
+        head: fgos_process::facts::Record,
+    ) -> super::HeadView {
         super::HeadView {
             key: WriterKey::new(key).unwrap(),
             name: serde_json::from_value(serde_json::json!(name)).unwrap(),
-            cli: Cli::new("pi").unwrap(),
+            cli: Cli::new(cli).unwrap(),
             liveness: fgos_mailbox_core::Liveness::Alive,
             head,
         }
@@ -371,7 +382,8 @@ mod tests {
     ) {
         let root = state_root("omp");
         let omp = Omp::start("omp");
-        let pi = Cli::new("pi").unwrap();
+        // The omp adapter binds its heads under the CLI `omp`.
+        let pi = Cli::new("omp").unwrap();
         // The omp head sorts last among this record's two heads.
         let mut head = bound("zz-omp-session", None);
         head.head.record = omp.record();
@@ -395,8 +407,8 @@ mod tests {
         assert!(neutral.starts_with("pi-"), "{neutral}");
 
         let heads = [
-            view("aa-pi-session", "forgent-pi-aa", self_record()),
-            view("zz-omp-session", "forgent-pi-zz", omp.record()),
+            view("aa-pi-session", "forgent-pi-aa", "pi", self_record()),
+            view("zz-omp-session", "forgent-omp-zz", "omp", omp.record()),
         ];
         match super::address(Some(&root), &handle, &heads) {
             super::Addressed::Head { key, .. } => assert_eq!(key.as_str(), "zz-omp-session"),

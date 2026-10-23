@@ -70,7 +70,7 @@ What the table shows:
   - stored (it is part of the tool's result in the session);
   - mid-step;
   - the same on both CLIs;
-  - provider-neutral, because every API has a tool-result carrier. It reaches the provider as tool output, the lowest-authority carrier, and the same carrier that held the frame in V7c arm P (`custom_tool_call_output` after `inbox --claim`).
+  - available on every provider, since every API has a tool-result carrier (corrected after the V7e review, M2: its role was recorded through the openai-codex Responses converter only; on another provider a tool result may ride inside a `user`-role message, unmeasured). It reaches the provider as tool output, the lowest-authority carrier, and the same carrier that held the frame in V7c arm P (`custom_tool_call_output` after `inbox --claim`).
 
 ## Method for phase 8, and the hard gate
 
@@ -137,7 +137,7 @@ The planted server was a stdio MCP server (`test/live/mailbox-mcp-probe-server.m
     - pi: its `auth.json`;
     - omp: an `agent.db` holding only that credential, through omp's own `auth import` with the private home as `HOME`.
   - The guard compares pi's copy by bytes and omp's by its credential rows, because omp writes usage rows into the same database on every run.
-  - No file of the owner's is written.
+  - No credential row of the owner's is written. **Corrected after the V7e review (M3):** the read-only open of the owner's `agent.db` wrote its `-shm` index (a 5 ms touch, measured once; the database and the WAL untouched). The store is now copied to scratch and the copy is read.
   - Tests:
     - `a confined pi or omp run cannot read the real account stores, starts from its bound-back binary, and its copied account holds no sessions`;
     - `an omp login copy is compared by its credential rows: …`;

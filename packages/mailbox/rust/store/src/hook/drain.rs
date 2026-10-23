@@ -262,16 +262,14 @@ pub fn begin(
     let (Some(cli), Some(facts)) = (call.adapter.cli(), tested.facts(call.adapter)) else {
         return quiet(QuietReason::Untested);
     };
-    // A channel that delivers needs the shape its CLI was recorded injecting;
-    // one that does not (a pi or omp Stop) only registers, and needs none.
+    // A channel that delivers has the shape its CLI was recorded injecting
+    // (`adapters.rs` holds every tested CLI to it); one that does not (a pi
+    // or omp Stop) only registers, and has none.
     let delivers = match call.event {
         HookEvent::Stop => facts.stop_delivers,
         HookEvent::PostToolUse => facts.post_tool_use_max_bytes.is_some(),
     };
     let shape = call.adapter.shape(call.event);
-    if delivers && shape.is_none() {
-        return quiet(QuietReason::Untested);
-    }
     if payload
         .session
         .as_deref()
@@ -316,7 +314,7 @@ pub fn begin(
     // A channel that takes no mail ends here, after the registration and
     // before the first-Stop reset and the cap, so a CLI whose Stop takes no
     // mail never reads or writes its Stop-block count. Every path past this
-    // point delivers, so its shape was required above.
+    // point delivers, with its CLI's shape.
     let Some(shape) = shape.filter(|_| delivers) else {
         return after(
             if call.event == HookEvent::Stop {

@@ -104,6 +104,10 @@ fn under(parent: Record, exe: &str, argv0: &str, grandparent: Option<Record>) ->
         parent_relation: relation_of(ProcId(std::process::id())).unwrap(),
         parent_exe: Some(PathBuf::from(exe)),
         parent_argv0: Some(argv0.to_string()),
+        // A plain binary's command name is its file name.
+        parent_comm: std::path::Path::new(exe)
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned()),
         grandparent,
     }
 }

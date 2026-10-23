@@ -88,6 +88,9 @@ pub struct Ancestry {
     pub parent_exe: Option<PathBuf>,
     /// The path the parent was invoked as (`argv[0]`).
     pub parent_argv0: Option<String>,
+    /// The parent's kernel command name (`/proc/<pid>/comm`), which a process
+    /// may set for itself: pi runs the `node` executable and names itself `pi`.
+    pub parent_comm: Option<String>,
     /// The parent's parent, when it could be read.
     pub grandparent: Option<Record>,
 }
@@ -108,8 +111,10 @@ pub enum Topology {
 /// or why there is none:
 ///
 /// - `Direct`: the parent, when its executable's file name is one of
-///   `facts.head_executables` (otherwise `WrongExecutable`: a subreaper or
-///   a pane process never stands for a head);
+///   `facts.head_executables` and, where the contract names a `headComm`,
+///   its command name is that name (otherwise `WrongExecutable`: a
+///   subreaper, a pane process or another program on the same executable,
+///   such as any Node process for pi, never stands for a head);
 /// - `OneShellHop`: the grandparent, when the parent runs the resolved
 ///   `facts.hook_shell` and was invoked as exactly that path (otherwise
 ///   `WrongTopology`: a tool's login shell is refused unless it is
@@ -125,7 +130,13 @@ pub fn head_position<'a>(
                 .as_deref()
                 .and_then(Path::file_name)
                 .and_then(|name| name.to_str());
-            if name.is_some_and(|name| facts.head_executables.iter().any(|e| e == name)) {
+            let comm_holds = facts
+                .head_comm
+                .as_deref()
+                .is_none_or(|want| ancestry.parent_comm.as_deref() == Some(want));
+            if comm_holds
+                && name.is_some_and(|name| facts.head_executables.iter().any(|e| e == name))
+            {
                 Ok(&ancestry.parent)
             } else {
                 Err(NoHead::WrongExecutable)
