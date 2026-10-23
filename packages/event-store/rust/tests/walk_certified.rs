@@ -7,6 +7,7 @@ use fgos_event_store::{
 };
 use reader_support::*;
 use std::collections::BTreeSet;
+
 #[test]
 fn c4_covered_seal_does_not_prune_unseen_origin_below_merge_and_promote() {
     let f = Fixture::new();
@@ -110,5 +111,38 @@ fn bounded_walk_terminates_and_lost_certificates_only_lengthen_it() {
             .unwrap()
             .events,
         short.events
+    );
+}
+
+#[test]
+fn walk_reads_sealed_commits_in_groups_not_one_git_read_per_commit() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let mut tip = None;
+    for seq in 1..=130 {
+        tip = Some(seal(
+            &p,
+            &f.repo,
+            tip.into_iter().collect(),
+            &[event('a', seq, 1)],
+            "test-aa",
+        ));
+    }
+    let counting = CountingPort::new(&p);
+    let got = walk(
+        &counting,
+        &f.repo,
+        &[tip.unwrap()],
+        &Positions::new(),
+        &BTreeSet::new(),
+    )
+    .unwrap();
+    assert_eq!(got.events.len(), 130);
+    assert_eq!(counting.single.get(), 0, "no per-commit read remains");
+    assert_eq!(
+        counting.many.get(),
+        3,
+        "130 commits are read in ceil(130/64) groups"
     );
 }

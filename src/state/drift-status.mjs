@@ -12,8 +12,7 @@
 // CONTEXT.md): every field here is recomputed fresh from git refs on each
 // call. `lastSyncedTip` in particular is `git merge-base` re-run live, not
 // a stored "last-known-synced-tip" file — avoids a second state-consistency
-// surface next to `events.jsonl`, which is already known fragile under
-// concurrency (tsk-3wq).
+// surface next to Work's own view cache.
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { isResolvedStatus } from './frontier.mjs';
 

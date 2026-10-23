@@ -617,7 +617,7 @@ pub fn require_lock_scope_platform() -> Result<()> {
 }
 
 mod scoped_commit;
-pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, CommitResult, CutoverGrant, LegacyEventLayout};
+pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, CommitResult, CutoverGrant};
 /// Literal Git path, independent of the declaration grammar. JSON strings
 /// round-trip UTF-8, including star, tab and newline; staging uses NUL input.
 pub(crate) fn literal_repo_path(path: &str) -> Result<()> {

@@ -301,29 +301,6 @@ export const FRESH_PROJECT_RUNNER_CONFIG = {
 };
 
 /**
- * Seat binding keys are the project config's: the global file is read by every fgOS release on the
- * machine, and an older one refuses a capability key it does not know. A global file that carries one
- * is an error naming the project config, not a value that silently fills a gap in every project.
- */
-function refuseGlobalSeatBindingKeys(globalConfig) {
-  const runner = globalConfig?.runner;
-  if (!runner || typeof runner !== 'object') return;
-  const refuse = (keyPath) => {
-    throw new RunnerConfigError(
-      `~/.fgos/config.json runner.${keyPath} is a project setting: put it in the project's .fgos/config.json, never in the global config (older fgOS releases on this machine refuse it).`,
-    );
-  };
-  if (runner.defaults !== undefined) refuse('defaults');
-  if (runner.patterns?.seatBinding !== undefined) refuse('patterns.seatBinding');
-  for (const [name, entry] of Object.entries(runner.capabilities ?? {})) {
-    if (!entry || typeof entry !== 'object') continue;
-    for (const key of SEAT_BINDING_CAPABILITY_KEYS) {
-      if (entry[key] !== undefined) refuse(`capabilities.${name}.${key}`);
-    }
-  }
-}
-
-/**
  * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
  * schema (`sanitizeGlobalLayer`, one function for the whole global layer). It drops the retired
  * `runner.rigorToTier` key and any `runner.modelPolicies.<provider>` tier key not in
@@ -348,10 +325,9 @@ let warnedGlobalRigorToTier = false;
 
 /**
  * `runner.rigorToTier` no longer exists: rigor sets checker count and independence, never a tier. The
- * global file of a machine that has not re-run setup still carries it, and every older release on
- * that machine still requires it, so the file is left alone and the key is dropped in memory here,
- * once per process with a note on stderr. A project file that carries it is refused instead
- * (`assertProjectConverted`).
+ * owner's global file still carries it, so the file is left alone and the key is dropped in memory
+ * here, once per process with a note on stderr. A project file that carries it is refused by
+ * `validateRunnerConfigShape`. This stays until that global key is removed by hand.
  */
 function dropRetiredGlobalKeys(globalConfig) {
   if (!globalConfig?.runner || !Object.hasOwn(globalConfig.runner, 'rigorToTier')) return globalConfig;
@@ -365,7 +341,6 @@ function dropRetiredGlobalKeys(globalConfig) {
 
 function sanitizeGlobalLayer(rawGlobalConfig) {
   const globalConfig = dropRetiredGlobalKeys(rawGlobalConfig);
-  refuseGlobalSeatBindingKeys(globalConfig);
   const modelPolicies = globalConfig?.runner?.modelPolicies;
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
     return globalConfig;
@@ -401,25 +376,6 @@ function sanitizeGlobalLayer(rawGlobalConfig) {
 }
 
 /**
- * The project layer must be in the seat-binding schema before anything reads or writes it: no
- * `runner.rigorToTier` (a retired key), and the `runner.patterns.seatBinding` marker an older
- * release refuses (the validator reads its value). A project file in the old shape is refused by name and left untouched; `fgos setup`
- * converts it. A project file with no `runner` section is a fresh one: the loader has nothing to
- * convert, and the first-run writer puts the marker in. Checked on the project layer alone, so a
- * machine whose global file still carries `rigorToTier` keeps loading (`sanitizeGlobalLayer`).
- */
-function assertProjectConverted(parsed, sharedPath) {
-  const runner = parsed?.runner;
-  if (!runner || typeof runner !== 'object' || Array.isArray(runner) || Object.keys(runner).length === 0) return;
-  const retired = Object.hasOwn(runner, 'rigorToTier');
-  if (!retired && runner.patterns?.seatBinding !== undefined) return;
-  throw new RunnerConfigError(
-    `${sharedPath}#runner is not in the seat-binding schema (${retired ? 'it still carries "rigorToTier", which no longer exists' : 'it has no runner.patterns.seatBinding.schema'}): run \`fgos setup\` to convert it; nothing was changed.`,
-    { code: 'config-not-converted' },
-  );
-}
-
-/**
  * Resolve+validate the runner section of the shared project config file at
  * `dir` (`.fgos/config.json`'s `runner` key, the sole config source since
  * tsk-5hv D1 retired the legacy fallback). Its content is merged against
@@ -443,7 +399,6 @@ export function loadRunnerConfigFromDir(dir) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
   rejectProjectProviderAccountInventory(parsed, sharedPath);
-  assertProjectConverted(parsed, sharedPath);
   const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalLayer });
   const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
@@ -490,7 +445,6 @@ export function ensureRunnerConfigForDir(dir) {
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
     rejectProjectProviderAccountInventory(parsed, sharedPath);
-    assertProjectConverted(parsed, sharedPath);
     const existingRunner = parsed.runner ?? {};
     const { merged, addedKeys } = mergeConfigDefaults(existingRunner, Object.keys(existingRunner).length === 0 ? FRESH_PROJECT_RUNNER_CONFIG : DEFAULT_RUNNER_CONFIG);
     let projectShared = parsed;
@@ -1852,8 +1806,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (cfg.defaults !== undefined) validateRunnerDefaultsShape(cfg.defaults, `${sourceLabel} defaults`);
   if ('rigorToTier' in cfg) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) declares retired "rigorToTier": rigor no longer chooses a tier (declare "tier" per capability, role, persona or seat); run \`fgos setup\` to convert the config.`,
-      { code: 'config-not-converted' },
+      `runner config (${sourceLabel}) declares retired "rigorToTier": rigor no longer chooses a tier; delete the key and declare "tier" per capability, role, persona or seat.`,
     );
   }
   validateProviderAccountInventory(cfg, sourceLabel);

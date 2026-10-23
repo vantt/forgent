@@ -8,7 +8,7 @@
 //! with the main checkout's file.
 
 use crate::errors::Error;
-use crate::provider::Refusal;
+use crate::refusal::Refusal;
 use crate::text::{iso_utc_now, random_hex128, slug};
 use fgos_git::{GitDriver, Inspect, OperationError, PathValue, RefValue, RepoHandle, TrunkFact};
 use serde::{Deserialize, Serialize};
@@ -146,6 +146,7 @@ pub fn remote_tracks(driver: &GitDriver, repo: &RepoHandle) -> Result<bool, Oper
 fn main_root(repo: &RepoHandle) -> Result<(PathBuf, bool), Refusal> {
     let canonical = |path: &Path| {
         fs::canonicalize(path).map_err(|e| Refusal {
+            candidates: Vec::new(),
             reason: "project-root-unreadable",
             detail: format!("{}: {e}", path.display()),
         })
@@ -161,6 +162,7 @@ fn main_root(repo: &RepoHandle) -> Result<(PathBuf, bool), Refusal> {
 /// The Git driver and the repository containing `dir`.
 pub(crate) fn open_repository(driver_dir: &Path, dir: &Path) -> Result<(GitDriver, RepoHandle), Refusal> {
     let git = |e: OperationError| Refusal {
+        candidates: Vec::new(),
         reason: "git-read-failed",
         detail: e.cause,
     };
@@ -168,6 +170,7 @@ pub(crate) fn open_repository(driver_dir: &Path, dir: &Path) -> Result<(GitDrive
     match driver.resolve_repo(dir, dir).map_err(git)? {
         fgos_git::ResolveRepo::Repository(repo) => Ok((driver, repo)),
         fgos_git::ResolveRepo::NotARepository => Err(Refusal {
+            candidates: Vec::new(),
             reason: "not-a-repository",
             detail: format!("{} is not inside a git repository", dir.display()),
         }),
@@ -209,10 +212,12 @@ pub fn project_info(driver_dir: &Path, dir: &Path) -> Result<ProjectInfo, Refusa
     let (root, _) = main_root(&repo)?;
     read(&root).map(ProjectInfo::from).map_err(|e| match e {
         Error::Missing(_) => Refusal {
+            candidates: Vec::new(),
             reason: "project-id-missing",
             detail: "no project id yet; run `fgos identity project --init` once on one machine, commit, and pull elsewhere".into(),
         },
         e => Refusal {
+            candidates: Vec::new(),
             reason: "project-id-unreadable",
             detail: e.to_string(),
         },
@@ -231,6 +236,7 @@ pub fn project_init(
     let (root, linked) = main_root(&repo)?;
     if linked {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "linked-worktree",
             detail: format!("the project id is minted on the main checkout ({}), never in a linked worktree", root.display()),
         });
@@ -240,17 +246,20 @@ pub fn project_init(
             Err(Error::Missing(_)) => {}
             _ => {
                 return Err(Refusal {
+                    candidates: Vec::new(),
                     reason: "project-id-exists",
                     detail: format!("{FILE} already exists; `--new` replaces it on purpose (a fork split)"),
                 })
             }
         }
         let tracked = remote_tracks(&driver, &repo).map_err(|e| Refusal {
+            candidates: Vec::new(),
             reason: "git-read-failed",
             detail: e.cause,
         })?;
         if tracked {
             return Err(Refusal {
+                candidates: Vec::new(),
                 reason: "project-id-on-remote",
                 detail: format!("the remote default branch already tracks {FILE}; pull it instead of minting a second id"),
             });
@@ -262,21 +271,25 @@ pub fn project_init(
             .file_name()
             .and_then(|name| handle_from_name(&name.to_string_lossy()))
             .ok_or_else(|| Refusal {
+                candidates: Vec::new(),
                 reason: "invalid-handle",
                 detail: "the folder name gives no handle; pass `--handle <name>`".into(),
             })?,
     };
     if let Some(code) = handle_problem(&handle) {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "invalid-handle",
             detail: format!("handle {handle:?} is not a project handle ({code})"),
         });
     }
     let minted = mint(&root, &handle, fork).map_err(|e| Refusal {
+        candidates: Vec::new(),
         reason: "project-write-failed",
         detail: e.to_string(),
     })?;
     let project = minted.ok_or_else(|| Refusal {
+        candidates: Vec::new(),
         reason: "project-id-exists",
         detail: format!("{FILE} appeared while minting; read it with `fgos identity project`"),
     })?;

@@ -4,6 +4,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+fgos-event-store = { path = "../../event-store/rust" }
+fgos-git = { path = "../../git/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-host-runtime = { path = "../../host-runtime/rust" }
 fgos-observe = { path = "../../observe/rust" }
 tokio = { workspace = true }

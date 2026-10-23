@@ -232,7 +232,7 @@ export function resolveContentRoot(stateRoot, id, docsRef) {
 }
 
 // Well-known FILE paths under `.fgos/` (state.json, tool-status.local.json,
-// the truncation-guard mark, diagnostic logs...) moved to
+// diagnostic logs...) moved to
 // src/state/fgos-file-registry.mjs (kernel layer, tsk phase-03): this
 // module (infra) reads git, so a domain/kernel-layer caller
 // importing FGOS_FILE/resolveFgosFile from here would violate the

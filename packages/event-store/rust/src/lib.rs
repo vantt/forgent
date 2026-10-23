@@ -13,6 +13,7 @@ pub mod locks;
 pub mod open_read;
 pub mod rotate;
 
+pub mod checkpoint;
 pub mod cursor;
 pub mod order;
 pub mod read;
@@ -29,9 +30,10 @@ pub mod reconcile;
 pub mod refspec;
 pub mod sync;
 
+mod commit_memo;
 mod fence;
 
-pub mod export;
 pub mod diagnostics;
+pub mod export;
 
 pub mod legacy_import;

@@ -117,6 +117,7 @@ fn main() {
                     machine: "test-aa2345",
                     remote: "origin",
                     no_push: false,
+                    opportunistic: false,
                     held_ranks: &[],
                     hot_lock_depth: 0,
                 },

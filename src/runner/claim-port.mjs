@@ -1,8 +1,7 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: main checkout mutex around the .fgos checkpoint only
-// (repo-locks.mjs), the worker-slot ceiling check + acquireClaim in one state
+// Centralizes: the worker-slot ceiling check + acquireClaim in one state
 // transaction (runtime claim only — tsk-40m retired the durable
 // moveWork(to:'doing') claim-time write entirely; doing is derived purely from
 // the active-claim overlay), optional worktree creation with correct baseRef for leaf items.
@@ -15,9 +14,7 @@ import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { withMainCheckout } from './repo-locks.mjs';
-import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
-import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
+import { LockScope } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -51,15 +48,12 @@ function latestTodoReleaseTrigger(events, id) {
 }
 
 // category (R4, store.mjs's categoryOf contract): 'not-found' mirrors
-// StoreError's own not-found convention ('validation'); 'lock-held'
-// reuses 'lock-timeout' (events.mjs's own category for the
-// same "couldn't get exclusive access" class) — without this, an uncategorized
+// StoreError's own not-found convention ('validation') — without this, an uncategorized
 // ClaimError falls through categoryOf to 'unexpected' and crashes the whole
 // runOnce drain-run instead of a graceful per-item halt (same failure mode
 // store.mjs's own EXIT_CODES comment documents for WorktreeError/MergeError).
 const CLAIM_ERROR_CATEGORY = Object.freeze({
   'not-found': 'validation',
-  'lock-held': 'lock-timeout',
   'deps-not-merged': 'validation',
   // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,
   // expected outcome, so the runner must halt this one item gracefully
@@ -95,32 +89,14 @@ export class ClaimError extends Error {
  * @param {string} [opts.worktreeDir] - custom worktree directory (for runner)
  * @returns {Object} claim result with worktree info if isolated
  */
-export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false, waitMs } = {}) {
+export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
   // Everything that needs a child process happens before the state lock: the
   // checkout's HEAD is read once, here, and that one answer is both the commit
   // a fresh worktree forks from and the commit recorded on the claim.
   const head = currentHead(repoRoot);
   const scope = new LockScope('claim');
 
-  // Work truncation/timing policy runs before any Git lock. The native
-  // checkpoint borrows main 50 without releasing the caller's authority.
-  const preparedCheckpoint = prepareMainFgosCheckpoint(dir, repoRoot);
-
-  // The main checkout mutex (rank 50) is held only for the `.fgos` checkpoint.
-  // The ceiling check below no longer leans on it: it runs inside the `state`
-  // transaction, so two claims for the last slot still cannot both pass.
-  try {
-    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot, { prepared: preparedCheckpoint }), { fgosDir: dir, waitMs });
-  } catch (err) {
-    if (err instanceof HolderLockError && err.code === 'lock-held') {
-      throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });
-    }
-    throw err;
-  }
-
-  // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
-  // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
-  // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
+  // readRawEvents(dir) is the one door that reads the whole Work history, through the Event Store facade.
   const rawEvents = readRawEvents(dir);
   const durableView = foldEvents(rawEvents);
   const claims = readClaims(dir);
@@ -241,7 +217,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   // claim write are one `state` transaction: no other durable write or claim
   // can land between the read and the claim file being written.
   const runtimeClaim = withMainState(dir, (tx) => {
-    const freshDurableView = foldEvents(readRawEvents(dir));
+    const freshDurableView = tx.view;
     const freshStatus = freshDurableView.work[id]?.status;
     if (freshStatus !== expectedStatus) {
       throw new ClaimError(
@@ -252,7 +228,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     const freshRevision = getItemDurableRevision(freshDurableView, id);
 
     if (!isPotentialStaleClaimReclaim) {
-      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir)), { ceiling, excludeId: id });
+      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir, tx)), { ceiling, excludeId: id });
       if (!room.allowed) {
         throw new ClaimError(
           'worker-slot-ceiling',

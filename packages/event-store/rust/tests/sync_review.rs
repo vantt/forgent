@@ -349,6 +349,7 @@ fn unpublished_summary_rejects_mismatched_layout_before_opening_its_lock() {
             machine: &a.machine,
             remote: "origin",
             no_push: true,
+            opportunistic: false,
             held_ranks: &[],
             hot_lock_depth: 0,
         },

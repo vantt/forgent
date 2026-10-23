@@ -364,6 +364,7 @@ test('show on a fresh item with no logs yet returns every key present but empty/
   assert.equal(data.friction, null);
   assert.equal(data.settlement, null);
   assert.equal(data.learning, null);
+  assert.deepEqual(data.conflicts, []);
 });
 
 

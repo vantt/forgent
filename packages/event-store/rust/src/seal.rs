@@ -182,7 +182,12 @@ pub(crate) fn seal_guarded(
                 return Err(moved("receipted own ref disappeared"));
             }
             let tips: Vec<_> = tip.iter().cloned().collect();
-            let walked = if let Some(tip) = &tip {
+            // A tip the receipt certified was fully verified by the walk that
+            // wrote it, so walking from it again would find nothing.
+            let walked = if let Some(tip) = tip
+                .as_ref()
+                .filter(|t| !prior.certified.contains(t.as_str()))
+            {
                 let w = walk::walk_verified(
                     &port,
                     repo,

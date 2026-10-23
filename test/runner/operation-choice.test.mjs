@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -49,6 +50,11 @@ const runOnce = (options) => {
 };
 
 // Outside /tmp: a confined worker sees a private tmpfs there, not these files.
+// The store directory of a fixture repository: the Event Store opens from `<repo>/.fgos`.
+function storeOf(root) {
+  return path.join(root, '.fgos');
+}
+
 function mkTempDir() {
   return fs.realpathSync.native(makeFixtureDir('fgos-op-choice-test-'));
 }
@@ -60,6 +66,7 @@ function initRepo(dir) {
   fs.writeFileSync(path.join(dir, 'README.md'), '# test\n');
   execFileSync('git', ['add', '.'], { cwd: dir });
   execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: dir });
+  activateGitFixture(dir);
 }
 
 const PROJECT_ROOT = process.cwd();
@@ -1062,14 +1069,14 @@ test('Step 06 executing.review-item evidenceRefs must be bound to provided conte
 test('driver loop runOnce: validate-plan no-evidence keeps Work in planning without advancing stage', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-noev');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nProposed plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-noev',
     title: 'Test no evidence driver loop',
     workflowStep: 'planning',
@@ -1087,23 +1094,23 @@ test('driver loop runOnce: validate-plan no-evidence keeps Work in planning with
   const executorScript = writeNoEvidenceExecutor(tempDir);
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-noev'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-noev'];
   assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan failed keeps Work in planning without advancing stage', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-fail');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nProposed plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-fail',
     title: 'Test failed driver loop',
     workflowStep: 'planning',
@@ -1121,23 +1128,23 @@ test('driver loop runOnce: validate-plan failed keeps Work in planning without a
   const executorScript = writeFailingExecutor(tempDir);
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-fail'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-fail'];
   assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan reported READY advances Work from planning to executing', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-ready');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nProposed plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-ready',
     title: 'Test ready driver loop',
     workflowStep: 'planning',
@@ -1155,9 +1162,9 @@ test('driver loop runOnce: validate-plan reported READY advances Work from plann
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'Plan validated' });
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-ready'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-ready'];
   assert.equal(item.workflowStep, 'executing');
 });
 
@@ -1185,7 +1192,7 @@ test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch d
 test('executeAssignment rejects execution of an undeclared operation (Finding 3)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
 
   const invalidAsgn = {
     assignmentId: 'asgn_invalid_op',
@@ -1209,7 +1216,7 @@ test('executeAssignment rejects execution of an undeclared operation (Finding 3)
 test('executeAssignment re-checks legality after loading persisted assignment.json (Finding 4)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
 
   const asgnId = 'asgn_persisted_check';
   const asgnDir = path.join(tempDir, '.fgos', 'assignments', asgnId);
@@ -1262,14 +1269,14 @@ test('chooseStageOperation accepts domain passed as object without throwing or w
 test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "decompose" and does not create children (Finding 1 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-decomp');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan with split.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-decomp',
     title: 'Test decompose driver loop',
     workflowStep: 'planning',
@@ -1296,9 +1303,9 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
   });
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const view = listWork(tempDir);
+  const view = listWork(storeOf(tempDir));
   const rootItem = view.work['tsk-driver-decomp'];
   assert.equal(rootItem.workflowStep, 'planning');
 
@@ -1309,14 +1316,14 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
 test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "need-human" and does not park item (Finding 1 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-human');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan needing human.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-human',
     title: 'Test human driver loop',
     workflowStep: 'planning',
@@ -1338,9 +1345,9 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
   });
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-human'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-human'];
   assert.equal(item.status, 'todo');
   assert.equal(item.workflowStep, 'planning');
 });
@@ -1348,14 +1355,14 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
 test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker self-claim alone STOPS in planning (Finding P2 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-unrecorded');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan without constraints section.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-unrecorded',
     title: 'Test unrecorded constraints driver loop',
     workflowStep: 'planning',
@@ -1378,23 +1385,23 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   });
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-unrecorded'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-unrecorded'];
   assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: a confined validate-plan worker cannot modify the dirty-before plan.md and Work does not advance', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-recorded');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan with constraints.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-recorded',
     title: 'Test recorded constraints driver loop',
     workflowStep: 'planning',
@@ -1417,9 +1424,9 @@ test('driver loop runOnce: a confined validate-plan worker cannot modify the dir
   });
   const cfg = runnerConfigFor(executorScript);
 
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const item = listWork(tempDir).work['tsk-driver-recorded'];
+  const item = listWork(storeOf(tempDir)).work['tsk-driver-recorded'];
   assert.equal(item.workflowStep, 'planning');
 
   // The round runs as a Unit: its worker is confined read-only, so the edit it tried never
@@ -1598,7 +1605,7 @@ test('Step 06 executing.scoped-subtask requires verified confidence (changed-fil
 test('Step 06 Cell 6.6 buildAssignment declares expectedFiles for scoped-subtask and persists it into assignment.json; omitted declaration defaults to empty array', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['scoped-subtask']);
 
   const declared = buildAssignment({
@@ -1835,7 +1842,7 @@ test('a settled findings verdict on mutating work stops with a findings reason',
 test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['scoped-subtask']);
   fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
 
@@ -1991,7 +1998,7 @@ test('Step 06 Herdr and visibility tracking fields do not alter confidence ladde
 test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies plan.md constraints via work and repoRoot (Finding P2 fix)', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-resume-constraints');
   fs.mkdirSync(docsDir, { recursive: true });
@@ -2966,7 +2973,7 @@ test('Positive test: valid structured review-item claim with real findings tied 
 test('executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-iso');
@@ -2976,7 +2983,7 @@ test('executeAssignment reports read-only validate-plan mutations as a warning, 
   fs.writeFileSync(planPath, originalPlanContent);
   execSync(`git add ${planPath} && git commit -m "initial plan"`, { cwd: tempDir, stdio: 'ignore' });
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-iso-val',
     title: 'Test isolation for validate-plan',
     workflowStep: 'planning',
@@ -2992,7 +2999,7 @@ test('executeAssignment reports read-only validate-plan mutations as a warning, 
   });
 
   const assignment = buildAssignment({
-    work: listWork(tempDir).work['tsk-iso-val'],
+    work: listWork(storeOf(tempDir)).work['tsk-iso-val'],
     stage: 'planning',
     operation: 'validate-plan',
   });
@@ -3028,9 +3035,9 @@ test('executeAssignment reports read-only validate-plan mutations as a warning, 
 
   // Work, the consumer, does not advance on it.
   const interpreted = interpretAssignmentRunResult({
-    choice: { operation: 'validate-plan', assignment, work: listWork(tempDir).work['tsk-iso-val'] },
+    choice: { operation: 'validate-plan', assignment, work: listWork(storeOf(tempDir)).work['tsk-iso-val'] },
     runResult,
-    work: listWork(tempDir).work['tsk-iso-val'],
+    work: listWork(storeOf(tempDir)).work['tsk-iso-val'],
     repoRoot: tempDir,
   });
   assert.equal(interpreted.canAdvanceEdge, false);
@@ -3154,14 +3161,14 @@ test('Finding 3 negative test: resolve-question reported with whitespace answer 
 test('Finding 1 regression test: valid validate-plan NOT READY RunResult causes next driver action to be shape-plan', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-notready');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nProposed plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-driver-notready',
     title: 'Test NOT READY driver loop',
     workflowStep: 'planning',
@@ -3184,9 +3191,9 @@ test('Finding 1 regression test: valid validate-plan NOT READY RunResult causes 
   const cfg = runnerConfigFor(executorScript);
 
   // First pass: runs validate-plan and stores assignment & run result
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg });
 
-  const itemAfterFirst = listWork(tempDir).work['tsk-driver-notready'];
+  const itemAfterFirst = listWork(storeOf(tempDir)).work['tsk-driver-notready'];
   assert.equal(itemAfterFirst.workflowStep, 'planning', 'Work must remain in planning stage');
 
   // Second pass: chooseStageOperation must choose shape-plan, not validate-plan
@@ -3343,7 +3350,7 @@ test('Finding 4 negative test: review-item evidenceRefs present but findings/rep
 test('Finding 3: chooseStageOperation ignores stale stored READY result when plan.md modified after assignment run', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-stale');
@@ -3396,7 +3403,7 @@ test('Finding 3: chooseStageOperation ignores stale stored READY result when pla
 test('Finding 3: chooseStageOperation ignores stale stored READY result when plan.md modified after assignment run in worktree', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const id = 'tsk-stale-wt-ready';
@@ -3455,7 +3462,7 @@ test('Finding 3: chooseStageOperation ignores stale stored READY result when pla
 test('Finding 3: chooseStageOperation ignores latest non-validate assignment result on same Work id', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-nonval');
@@ -3808,14 +3815,14 @@ test('P2 fix: stale validate-plan check does not crash when lastRunResult is pro
 test('Finding 1 regression test: Assignment-backed validate-plan with returned children or verdictPayload cannot create child Work', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-val-children');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-val-no-children',
     title: 'Test validate-plan cannot decompose',
     workflowStep: 'planning',
@@ -3871,7 +3878,7 @@ test('Finding 1 regression test: Assignment-backed validate-plan with returned c
   });
 
   const cfg = runnerConfigFor(executorScript);
-  const work = listWork(tempDir).work['tsk-val-no-children'];
+  const work = listWork(storeOf(tempDir)).work['tsk-val-no-children'];
   const choice = {
     operation: 'validate-plan',
     dispatch: 'assignment',
@@ -3888,7 +3895,7 @@ test('Finding 1 regression test: Assignment-backed validate-plan with returned c
   assert.equal(outcome.canAdvanceEdge, true);
 
   // Check store state: no child work items added
-  const currentStore = listWork(tempDir);
+  const currentStore = listWork(storeOf(tempDir));
   const children = Object.values(currentStore.work).filter((w) => w.parent === 'tsk-val-no-children');
   assert.equal(children.length, 0);
 });
@@ -4399,7 +4406,7 @@ test('Fix validate-plan NOT READY verdict with em dash: interpretAssignmentRunRe
 test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is decompose creates children and advances Work', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-med-decomp');
@@ -4414,7 +4421,7 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
     },
   ];
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-med-decomp',
     title: 'Test medium decompose driver loop',
     workflowStep: 'planning',
@@ -4459,9 +4466,9 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
   const cfg = runnerConfigFor(executorScript);
 
   const callerVerdict = { verdict: 'decompose', reason: 'Split into subtasks', children };
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg, callerVerdict });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg, callerVerdict });
 
-  const view = listWork(tempDir);
+  const view = listWork(storeOf(tempDir));
   const parentItem = view.work['tsk-med-decomp'];
   assert.equal(parentItem.workflowStep, 'executing');
 
@@ -4473,14 +4480,14 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
 test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is pass-through advances Work', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-med-pass');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: medium\nMedium pass-through plan.\n');
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-med-pass',
     title: 'Test medium pass-through driver loop',
     workflowStep: 'planning',
@@ -4525,9 +4532,9 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
   const cfg = runnerConfigFor(executorScript);
 
   const callerVerdict = { verdict: 'pass-through', reason: 'Single piece implementation' };
-  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg, callerVerdict });
+  await runOnce({ dir: storeOf(tempDir), repoRoot: tempDir, config: cfg, callerVerdict });
 
-  const parentItem = listWork(tempDir).work['tsk-med-pass'];
+  const parentItem = listWork(storeOf(tempDir)).work['tsk-med-pass'];
   assert.equal(parentItem.workflowStep, 'executing');
 });
 
@@ -4825,7 +4832,7 @@ function choosePlanning(tempDir, work, extra = {}) {
 test('stored validate-plan result with a matching plan content hash is consumable cross-pass (same-content positive)', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-consume';
@@ -4846,7 +4853,7 @@ test('stored validate-plan result with a matching plan content hash is consumabl
 test('stored validate-plan result whose claim lives only under the confined worker-output outbox is consumable cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/confined-claim';
@@ -4868,7 +4875,7 @@ test('stored validate-plan result whose claim lives only under the confined work
 test('stored validate-plan result whose confined claim bytes were edited after settle is not consumed', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/confined-claim-tamper';
@@ -4889,7 +4896,7 @@ test('stored validate-plan result whose confined claim bytes were edited after s
 test('stored validate-plan result whose plan content hash mismatches the current plan.md is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-mismatch';
@@ -4913,7 +4920,7 @@ test('stored validate-plan result whose plan content hash mismatches the current
 test('stored validate-plan result recorded without a plan content hash is not consumed when plan.md exists', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-missing';
@@ -4934,7 +4941,7 @@ test('stored validate-plan result recorded without a plan content hash is not co
 test('tampered stored validate-plan result with a schema-broken agentClaim is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-tampered-claim';
@@ -4962,7 +4969,7 @@ test('tampered stored validate-plan result with a schema-broken agentClaim is ne
 test('cross-pass does not consume a byte-bound reviewer v2 claim missing assessment.verdict', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
   const docsRef = 'docs/history/reviewer-missing-assessment';
   const { asgnDir } = seedStoredValidatePlanResult(tempDir, {
@@ -4982,7 +4989,7 @@ test('cross-pass does not consume a byte-bound reviewer v2 claim missing assessm
 test('tampered stored validate-plan result whose recorded evidence refs point at missing files is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-dead-refs';
@@ -5010,7 +5017,7 @@ test('tampered stored validate-plan result whose recorded evidence refs point at
 test('in-memory validate-plan result carrying a mismatched plan content hash is not consumed even when its settle time postdates the plan edit', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/hash-inmemory';
@@ -5051,7 +5058,7 @@ test('in-memory validate-plan result carrying a mismatched plan content hash is 
 test('F2d(a): a phantom run dir the runner never dispatched is never consumed cross-pass even when fully self-consistent', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f2d-phantom';
@@ -5101,7 +5108,7 @@ test('F2d(a): a phantom run dir the runner never dispatched is never consumed cr
 test('F2c: a stored result recorded without the claim-bytes binding is not consumable (fail closed)', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f2c-no-binding';
@@ -5124,7 +5131,7 @@ test('F2c: a stored result recorded without the claim-bytes binding is not consu
 test('F2c: a schema-valid verdict flip inside the stored result.json is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f2c-flip';
@@ -5149,7 +5156,7 @@ test('F2c: a schema-valid verdict flip inside the stored result.json is never co
 test('F4b: mixed live+ghost evidence refs resolving inside the run tree are never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f4b-mixed';
@@ -5219,7 +5226,7 @@ test('F2d(b): interpretation never satisfies the report gate from a sibling run\
 test('F2d(c): a member whose runId was corrupted is skipped at the scan — a planted out-tree report never satisfies the gate', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f2dc-spoof';
@@ -5258,7 +5265,7 @@ test('F2d(c): a member whose runId was corrupted is skipped at the scan — a pl
 test('F2d(c): a runId-less member cannot relocate its evidence via runtime.stdoutLog — scoping stays pinned to the dispatched run dir', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/f2dc-pin';
@@ -5300,7 +5307,7 @@ test('F2d(c): a runId-less member cannot relocate its evidence via runtime.stdou
 test('P4a: a planted pinned-dir report plus result.json-only field edits cannot forge a READY verdict — evidence derives from the settle-bound set', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/p4a-plant';
@@ -5343,7 +5350,7 @@ test('P4a: a planted pinned-dir report plus result.json-only field edits cannot 
 test('P4a: a settle-bound report edited after settle fails the byte binding — the member is skipped, never consumed', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/p4a-drift';
@@ -5365,7 +5372,7 @@ test('P4a: a settle-bound report edited after settle fails the byte binding — 
 test('P4a: a confidence/status flip in result.json is never authoritative — an empty settle set derives no-evidence even with a planted report present', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/p4a-flip';
@@ -5397,7 +5404,7 @@ test('P4a: a confidence/status flip in result.json is never authoritative — an
 test('S3a: an exitCode field flip on a settle-classified failed run never re-derives it to done/reported — the settle verdict stands', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   // Honest settle shape: the process wrote a valid READY claim + substantive
@@ -5426,7 +5433,7 @@ test('S3a: an exitCode field flip on a settle-classified failed run never re-der
 test('S3b: deleting runtime.exitCode cannot erase a settle-classified failure', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/s3b-exit-delete';
@@ -5451,7 +5458,7 @@ test('S3b: deleting runtime.exitCode cannot erase a settle-classified failure', 
 test('S3e: a timed-out run whose exitCode flips 124 -> 0 stays failed — the timeout is never erased by one field', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/s3e-timeout';
@@ -5476,7 +5483,7 @@ test('S3e: a timed-out run whose exitCode flips 124 -> 0 stays failed — the ti
 test('reviewer LOW: a stored failed result from a read-only dirty mutation never re-derives upward — the unpersisted dirty signal cannot be manufactured post-settle', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/s3-dirty-mutation';
@@ -5505,7 +5512,7 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
 test('cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, reports a correlated mutation and does not advance Work, not silently downgraded to no-evidence', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r6-dirty-mutation-persisted';
@@ -5552,7 +5559,7 @@ test('cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, r
 test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly derives false -- unchanged dirty files never block a legitimate reported verdict', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r6-dirty-unchanged';
@@ -5582,7 +5589,7 @@ test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly 
 test('R6/G3: an evidence.json written before this field existed (no mutatedDirtyBeforeFiles key) fails safe to hasDirtyBeforeMutation: false', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r6-legacy-no-key';
@@ -5616,7 +5623,7 @@ test('R6/G3: an evidence.json written before this field existed (no mutatedDirty
 test('R6/G3: a malformed (non-array) mutatedDirtyBeforeFiles fails safe to hasDirtyBeforeMutation: false rather than throwing', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r6-malformed-field';
@@ -5646,7 +5653,7 @@ test('R6/G3: a malformed (non-array) mutatedDirtyBeforeFiles fails safe to hasDi
 test('ADR-006 R7 (P02.4 mutation backfill): findLatestAssignmentRunResult re-derives mutation from the operation when assignment.json predates the field -- a genuinely read-only validate-plan result is not misclassified as mutating', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r7-mutation-backfill';
@@ -5764,7 +5771,7 @@ test('ADR-006 R5: findLatestAssignmentRunResult filters candidates by the stampe
 test('ADR-007 §3: an inline Assignment with a READY-looking claim on a planning Work is never picked up by the cross-pass filter -- the driver falls back to requesting a real validate-plan run instead of advancing the edge', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r2-inline-non-driving';
@@ -5791,7 +5798,7 @@ test('ADR-007 §3: an inline Assignment with a READY-looking claim on a planning
 test('ADR-007 §3 regression: a declared validate-plan READY result (provenance.kind: "declared") still advances the edge unmodified', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r2-declared-regression';
@@ -5810,7 +5817,7 @@ test('ADR-007 §3 regression: a declared validate-plan READY result (provenance.
 test('ADR-007 §3: an inline Assignment\'s RunResult fed directly into chooseStageOperation\'s own lastRunResult parameter is ignored, not just when discovered via the internal cross-pass scan', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
 
   const docsRef = 'docs/history/r2-inline-direct-injection';
@@ -5906,7 +5913,7 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
 test('chooseStageOperation consumes fully-bound contract-corrupt RunResults as no-evidence and fails closed', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
-  initStore(tempDir);
+  initStore(storeOf(tempDir));
   seedTaskSpecs(tempDir, ['validate-plan']);
 
   const validClassification = {

@@ -98,7 +98,7 @@ test('fgos doctor lists every check when a domain workflow cannot be parsed', (t
   const { project, write, compile } = makeDomainProject(t);
   compile();
   write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps: [\n');
-  const run = spawnSync(process.execPath, [path.join(root, 'bin', 'fgos.mjs'), 'doctor', '--json'], { cwd: project, encoding: 'utf8', env: { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' } });
+  const run = spawnSync(process.execPath, [path.join(root, 'bin', 'fgos.mjs'), 'doctor', '--json'], { cwd: project, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;
   assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id));

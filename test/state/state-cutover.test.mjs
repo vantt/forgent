@@ -1,17 +1,20 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import '../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 // The runtime claims and the event log share one state transaction: a live
 // holder is never taken over, a nested transaction is refused, and the
 // delivered gate takes its git evidence before the lock and retries when the
 // branch moves while it waits.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
-import { addWork, initStore, listWork, resolveWriterLogPath } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { addWork, initStore, listWork, } from '../../src/state/store.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim, readClaim, withMainState } from '../../src/state/runtime-coordination.mjs';
 import { withStateTx, HotLockError } from '../../src/state/hot-lock.mjs';
 import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
@@ -20,7 +23,7 @@ const STORE_URL = new URL('../../src/state/store.mjs', import.meta.url).href;
 const SAMPLE = { kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' };
 
 function tmpFgosDir(prefix) {
-  return path.join(fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix))), '.fgos');
+  return initializeWorkRepository(fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix))));
 }
 
 test('a claim never takes over a live state-lock holder: it times out and leaves the claims untouched', async () => {
@@ -56,6 +59,7 @@ test('a state transaction opened inside another is refused at once, whatever the
 
 test('the delivered gate retries when the item branch gains its plan while the move waits for the lock', async () => {
   const repoRoot = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-retry-')));
+  initializeWorkRepository(repoRoot);
   const git = (...args) => execFileSync('git', args, { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
   git('init', '-q', '-b', 'main');
   git('config', 'user.email', 'test@example.com');
@@ -66,7 +70,7 @@ test('the delivered gate retries when the item branch gains its plan while the m
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
   addWork(dir, { id: 'heavy', title: 'Heavy', ...SAMPLE, risk: 'heavy' });
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id: 'heavy', from: 'todo', to: 'doing' } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id: 'heavy', from: 'todo', to: 'doing' } }, dir);
 
   const holder = await holdStateLockInChild(dir);
   const child = spawn(process.execPath, ['--input-type=module', '-e', `

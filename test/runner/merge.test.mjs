@@ -392,41 +392,6 @@ test('landRunnerItem merges cleanly, verify passes, and commits — outcome "mer
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
-// Event files due for a checkpoint are Work's to commit, through its declared
-// checkpoint before Land starts: Land publishes exactly the verified
-// candidate, and nothing is swept into the merge commit (Git spec §8 store
-// exclusion; the legacy event adapter's "no implicit sweep").
-test('landRunnerItem commits due .fgos event files through the checkpoint before Land, never inside the merge commit', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'events'), { recursive: true });
-  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n');
-  const shardRel = '.fgos/events/writer-a-20260101T000000Z.jsonl';
-  fs.writeFileSync(path.join(repoRoot, shardRel), '{"id":"e1"}\n');
-
-  const headBefore = headOf(repoRoot);
-  const saved = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  let result;
-  try {
-    result = await landItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
-  } finally {
-    if (saved !== undefined) process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = saved;
-  }
-  assert.equal(result.outcome, 'merged', JSON.stringify(result));
-
-  const newCommitSubjects = git(repoRoot, ['log', '--first-parent', '--format=%s', `${headBefore}..HEAD`]).trim().split('\n');
-  assert.equal(newCommitSubjects.length, 2, 'the checkpoint commit, then the merge commit');
-  assert.match(newCommitSubjects[1], /fallback events checkpoint/);
-  assert.match(newCommitSubjects[0], /^merge fgw\/demo-item into main$/);
-  assert.match(git(repoRoot, ['ls-tree', '-r', '--name-only', 'HEAD^1', '--', shardRel]), /writer-a-20260101T000000Z\.jsonl/, 'the shard is committed by the checkpoint before the land');
-  assert.doesNotMatch(git(repoRoot, ['diff', '--name-only', 'HEAD^1', 'HEAD']), /\.fgos\//, 'the merge commit itself carries no event file');
-  assert.equal(isWorkingTreeClean(repoRoot), true);
-});
-
 test('landRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
   const repoRoot = initRepo();
   fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');

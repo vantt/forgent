@@ -21,6 +21,26 @@ export function eventStoreConfig(config = {}) {
   if (typeof result.remote !== 'string' || !/^[A-Za-z0-9_-]+$/.test(result.remote)) throw invalid('remote');
   return result;
 }
-export function readEventStoreConfig(root, globalConfigPath) {
-  return eventStoreConfig(mergeWithGlobalConfig(readSharedConfig(root), globalConfigPath));
+/**
+ * The Event Store config of the project at `root`, merged over the global config.
+ *
+ * The shared file is hand edited, so a half-typed edit is an ordinary state. A file that exists but does not
+ * parse never yields the defaults for a publish decision: a caller that reports on or acts for the user
+ * (`strict`: the `events` verbs, doctor) gets the `event-store-config` error with the parse message; any other
+ * caller (the write path and the lifecycle triggers) gets a config that never pushes (`sync.intervalSec` 0),
+ * so a trigger still seals and never publishes against the user's real setting.
+ */
+export function readEventStoreConfig(root, globalConfigPath, { strict = false } = {}) {
+  let shared;
+  let parsed = true;
+  try {
+    shared = readSharedConfig(root);
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    if (strict) throw Object.assign(new Error(`event-store-config: ${error.message}`), { code: 'event-store-config' });
+    shared = {};
+    parsed = false;
+  }
+  const config = eventStoreConfig(mergeWithGlobalConfig(shared, globalConfigPath));
+  return parsed ? config : { ...config, sync: { intervalSec: 0 } };
 }

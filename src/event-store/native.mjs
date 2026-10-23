@@ -40,7 +40,7 @@ function call(fn) {
   }
 }
 // serde_json's map representation does not preserve JavaScript insertion order.
-// Legacy view revisions depend on that order: parse the authenticated raw line.
+// Legacy view revisions depend on that order: parse the authenticated raw line (the read carries no parsed copy).
 function historical(result, key) {
   return { ...result, [key]: result[key].map(record => ({ ...record, event: JSON.parse(record.raw) })) };
 }
@@ -69,22 +69,38 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));
   const views = new WeakMap();
+  // The legacy history this store's last read returned, as the raw records native sent. The next read names its
+  // digest, and native sends the records again only when they changed; each read still gets its own parsed events.
+  let legacyHeld = null;
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
     // null means this clone has no local store identity yet (no append).
     get ownOrigin() { return call(() => native.ownOrigin); },
+    /** Settle the store's write admission (the legacy-migration check) outside the gate, where Git may be asked.
+     * It never refuses by itself: the append that needs the answer raises it. */
+    admitWrites(heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      call(() => native.admitWrites(ranks, hotLockDepth()));
+    },
     append(stream, events, cursor, writer, heldRanks) {
       available();
       const ranks = ranksOf(heldRanks);
       return call(() => native.append(stream, events, cursor, writer, ranks));
     },
     readInGate(origin, stream, cursorSeq) { return call(() => native.readInGate(origin, stream, cursorSeq)); },
-    read({ streams, cursor = null, folded = [], project = true }, heldRanks) {
+    /** `checkpoint: { path, reuse }` names the consumer's cache file of the history a complete read folded: a read
+     * that holds no retained history of its own continues from it (`reuse`), and every read replaces it when it
+     * certified new commits. A file that does not match the store is ignored; the answer never depends on it. */
+    read({ streams, cursor = null, folded = [], project = true, checkpoint }, heldRanks) {
       const ranks = outsideGate(heldRanks);
       const retained = JSON.stringify(folded);
-      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded) }, ranks, hotLockDepth()));
-      const { sequencePrefix, ...result } = historical(response.result, 'legacy');
+      const response = call(() => native.read({ streams, cursor, folded: retained, project, view: views.get(folded), checkpoint,
+        legacyHeld: legacyHeld?.digest }, ranks, hotLockDepth()));
+      const { legacyUnchanged, ...answer } = response.result;
+      if (legacyUnchanged) answer.legacy = legacyHeld.records.map(record => ({ ...record, provenance: { ...record.provenance } }));
+      else legacyHeld = answer.cursor.legacyDigest ? { digest: answer.cursor.legacyDigest, records: answer.legacy } : null;
+      const { sequencePrefix, ...result } = historical(answer, 'legacy');
       // Preserve independent snapshots and use the exact bytes native verified,
       // including when a caller supplied objects with custom JSON serialization.
       result.sequence = (sequencePrefix ? JSON.parse(retained).slice(0, sequencePrefix) : []).concat(result.sequence);
@@ -107,9 +123,10 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.promote({ branch, throughSeq, cursor, writer, ts }, ranks, hotLockDepth()));
     },
-    sync({ remote = 'origin', noPush = false } = {}, heldRanks) {
+    /** `opportunistic` tries the seal lock and returns `{ busy: true }` instead of waiting when another process holds it. */
+    sync({ remote = 'origin', noPush = false, opportunistic = false } = {}, heldRanks) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.sync(remote, noPush, ranks, hotLockDepth()));
+      return call(() => native.sync(remote, noPush, ranks, hotLockDepth(), opportunistic));
     },
     maintenance(heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -162,7 +179,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
     && typeof native.eventStoreBranchKey === 'function'
-    && ['read', 'append', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 /** Decode an explicit legacy inventory through the crate's frozen ordering rule. */

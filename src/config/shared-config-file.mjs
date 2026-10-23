@@ -32,7 +32,7 @@ export function readSharedConfig(dir) {
     try {
       return JSON.parse(raw);
     } catch (err) {
-      throw new Error(`cannot parse shared config at "${sharedPath}": ${err.message}`);
+      throw new SyntaxError(`cannot parse shared config at "${sharedPath}": ${err.message}`);
     }
   }
   return {};
@@ -110,7 +110,8 @@ export function writeSharedConfig(dir, config) {
 
 /**
  * `readSharedConfig` that degrades to `{}` instead of throwing on a file that
- * is present but not valid JSON.
+ * is present but not valid JSON. A file that cannot be read at all (permissions,
+ * a directory in its place) is not a half-typed edit and still throws.
  *
  * The shared config is explicitly an edit-the-file-by-hand surface, so a
  * half-typed edit is an ordinary state, not an exceptional one. A reader that
@@ -126,7 +127,8 @@ export function writeSharedConfig(dir, config) {
 export function readSharedConfigOrEmpty(dir) {
   try {
     return readSharedConfig(dir);
-  } catch {
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
     return {};
   }
 }

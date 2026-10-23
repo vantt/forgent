@@ -996,7 +996,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'identity',
     invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint]',
-    description: 'Read-only unless --alias, --init, --new, --register, --role, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1031,10 +1031,11 @@ export const COMMAND_REGISTRY = [
             register: { type: 'boolean', description: 'Record this session in the local directory of the machine (refreshes an existing entry).' },
             role: { type: 'string', description: 'A role alias `lead:<LANE>` (lane: A-Z first, then A-Z, 0-9, hyphen; at most 16). Implies --register.' },
             take: { type: 'boolean', description: 'With --role: move the role from the live session that holds it.' },
+            'drop-role': { type: 'string', description: 'Remove the role alias `lead:<LANE>` from this session only; refused [role-not-held] when this session does not hold it and [not-registered] when it has no entry. Afterwards `resolve lead:<LANE>` is [not-found] unless another session holds it. Cannot be combined with --register or --role.' },
           },
           required: [],
         },
-        examples: ['fgos identity session --json', 'fgos identity session --register', 'fgos identity session --role lead:MAIL --take'],
+        examples: ['fgos identity session --json', 'fgos identity session --register', 'fgos identity session --role lead:MAIL --take', 'fgos identity session --drop-role lead:MAIL'],
       },
       resolve: {
         description: 'The one live session a handle (`claude-4f2a@fg-server`) or a role alias (`lead:MAIL`) names in the local directory of this machine: {id, handle, cli, projectId, clone, registeredAt, roles, liveness}. Exit 65 [not-found] or [ambiguous] with the candidates in the message; a session whose head process is dead is never returned.',
@@ -1508,7 +1509,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'rebuild',
     invoke: 'fgos rebuild',
-    description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
+    description: 'Rebuild every registered consumer view (Work, porting) from the Event Store. Prints a per-consumer summary (counts, revision, cover), never the views.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
     touchesState: true,
@@ -1517,18 +1518,23 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'repair',
-    invoke: 'fgos repair',
-    description: 'Repair a truncated final line in .fgos/events.jsonl (the common crash-mid-append shape); backs up the original log first.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos repair'],
+  withSubcommands({
+    name: 'events',
+    invoke: 'fgos events <sync|status|export|migrate>',
+    description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
+    subcommands: {
+      sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' } }, required: [] } },
+      status: { description: 'Inspect integrity and publication state: refs, streams, unsealed events, deferred and missing predecessors.', examples: ['fgos events status'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' } }, required: [] } },
+      export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
+      migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
+    },
+    examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export', 'fgos events migrate --check'],
     touchesState: true,
-    requiresExistingStore: true,
-    externalEffect: false,
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'rollup',
     invoke: 'fgos rollup',
@@ -1551,7 +1557,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'show',
     invoke: 'fgos show',
-    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
+    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning) and the conflicts recorded against it (acknowledged on one machine, never applied here). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
     parameters: {
       type: 'object',
       properties: {

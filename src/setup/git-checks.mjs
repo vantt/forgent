@@ -148,7 +148,7 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
     return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Land operations: ${recovered.join(', ')}`, kept.length && `warning: Land operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };
   });
 }
-/** Land candidates a finished Land still holds: read-only, a warning never a failure (they wait for Work's acknowledgement reader). */
+/** Land candidates a finished Land still holds: read-only, a warning never a failure (the release sweep of a Land command frees one whose result Work recorded). */
 function retainedLandWarning(cwd, loaderOptions, portOptions, now = Date.now()) {
   let listing;
   try { listing = recoveryPort(cwd, loaderOptions, portOptions).listRetainedLand(); }
@@ -159,7 +159,7 @@ function retainedLandWarning(cwd, loaderOptions, portOptions, now = Date.now()) 
   const { candidates, complete } = listing;
   if (!candidates.length) return complete ? null : 'warning: Land candidate scan incomplete';
   const rows = candidates.map(c => `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`})`);
-  return `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.`;
+  return `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today: the next approve, sync-root or promote-to-component releases a candidate whose result Work recorded, and one with no recorded result stays. Never delete the worktree or pins by hand.`;
 }
 
 export function compatibleGitContracts(versions, floor) {

@@ -5,6 +5,8 @@
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -32,7 +34,6 @@ import {
   withHome,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -63,7 +64,7 @@ function declareExecutor(cwd, id, fields) {
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true);
@@ -73,7 +74,7 @@ test('tool-registry-configured passes when no tool-capable executor is declared 
 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
@@ -86,7 +87,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
@@ -224,9 +225,8 @@ test('config-not-stale passes when the existing config already has every default
       terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
-      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
-      eventStore: { remote: 'origin' },
+      eventStore: EVENT_STORE_DEFAULTS,
     });
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);
@@ -1061,7 +1061,7 @@ test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leav
       writeProjectConfig(dir, { runner: { rigorToTier } });
       const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(passed, false);
-      assert.match(message, /project config contains retired key "runner\.rigorToTier".*fgos setup/);
+      assert.match(message, /project config contains retired key "runner\.rigorToTier".*delete the key/);
       assert.doesNotMatch(message, /global/);
     });
   } finally {

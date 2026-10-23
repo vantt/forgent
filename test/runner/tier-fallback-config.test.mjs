@@ -174,20 +174,6 @@ test('the schema marker is {schema: 1} inside patterns and nothing else', () => 
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
 });
 
-test('a key of the new schema in the global layer is refused and the message names the project config', () => {
-  for (const [globalRunner, where] of [
-    [{ defaults: { tier: 'standard' } }, 'defaults'],
-    [{ patterns: { seatBinding: { schema: 1 } } }, 'patterns.seatBinding'],
-    [{ capabilities: { 'code:*': { tier: 'advanced' } } }, 'capabilities.code:*.tier'],
-    [{ capabilities: { 'code:*': { maxTier: 'advanced' } } }, 'capabilities.code:*.maxTier'],
-    [{ capabilities: { 'code:*': { roles: { reviewer: { tier: 'advanced' } } } } }, 'capabilities.code:*.roles'],
-    [{ capabilities: { 'code:*': { personas: {} } } }, 'capabilities.code:*.personas'],
-    [{ capabilities: { 'code:*': { seats: {} } } }, 'capabilities.code:*.seats'],
-  ]) {
-    refusedLoad(runnerWith(), new RegExp(`~/\\.fgos/config\\.json runner\\.${where.replace(/[.*]/g, '\\$&')}.*project's \\.fgos/config\\.json`), globalRunner);
-  }
-});
-
 test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; rigorToTier is dropped', () => {
   const { cfg } = loadRunner(runnerWith(), {
     maxTier: 'flagship',

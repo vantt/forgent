@@ -13,6 +13,7 @@ import { listWork, addDecision, recordFriction, StoreError } from '../../state/s
 import {
   landRunnerItem,
   acknowledgeLand,
+  landAcknowledgement,
   isAlreadyMerged,
   performCatchUp,
   buildOwnFileSet,
@@ -109,7 +110,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // spec §9, M4). A retained candidate never negates that result.
   const releaseLand = (landSettlement, event, state) => {
     if (!landSettlement) return;
-    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-decision:${id}:${event.seq}`)) {
+    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, landAcknowledgement(event))) {
       process.stderr.write(`fgos: warning: "${id}" is ${state}; its Land candidate was retained (${warning}).\n`);
     }
   };
@@ -120,6 +121,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         rationale: `fgos sync-root ${id} — records the unpublished result so Land can release its candidate`,
         id,
         kind: 'engine',
+        landOperationIds: [result.landSettlement.operationId],
       });
       releaseLand(result.landSettlement, event, 'not synced');
     }
@@ -218,9 +220,10 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // a design decision, and any synced root could reach `done` with
       // no retrospective document behind it.
       kind: 'engine',
+      ...(result.landSettlement ? { landOperationIds: [result.landSettlement.operationId] } : {}),
     });
     releaseLand(result.landSettlement, event, 'synced');
-    return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
+    return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand, promotion: result.promotion };
   };
 
   if (item.parent) {

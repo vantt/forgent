@@ -246,9 +246,10 @@ nằm trong định nghĩa Workflow (`domains/<domain>/workflows/*.yaml`,
 không tra bước nào cả: tầng Work tra operation/skill/executor của bước rồi TRUYỀN
 vào (xem spec Runner).
 
-Phiên bản view: `VIEW_SCHEMA_VERSION` = 4 (view không còn `stage`). Snapshot cũ lệch
-phiên bản → fold lại từ đầu log; reader Rust (`packages/work-state/rust`) chỉ đọc đúng
-phiên bản 4 và bỏ qua view cũ.
+Phiên bản view: `VIEW_SCHEMA_VERSION` = 6 (view không còn `stage`; thêm `origins`, bỏ `precondition`
+khỏi payload đã fold). Snapshot cũ lệch phiên bản → fold lại từ đầu log; reader Rust
+(`packages/work-state/rust`) chỉ đọc đúng phiên bản của writer Node (một test Rust đối
+chiếu hằng số với `src/state/replay.mjs`) và bỏ qua view cũ.
 
 **MỘT đường đọc dữ liệu cũ** (`src/state/replay.mjs`, `foldLegacyStage`/`canonicalStep`):
 sự kiện `work.add`/`work.edit` mang `stage`, và sự kiện `work.stage` (một binary cũ ở

@@ -5,6 +5,7 @@
 //! host's CLI tests.
 
 use fgos_identity::directory::{self, Entry, MAX_ENTRIES};
+use fgos_identity::refusal::{Candidate, Liveness};
 use fgos_identity::{ProcStat, ProcessTree};
 use fgos_process::facts::{Record, Verdict};
 use fgos_process::ProcId;
@@ -68,7 +69,7 @@ fn two_sessions_resolve_by_handle_and_by_role() {
 
     let by_handle = directory::resolve(&root, "claude-aaaa@fg", &alive).unwrap();
     assert_eq!(by_handle.id, "fg-abc234/aaaa");
-    assert_eq!(by_handle.liveness, "alive");
+    assert_eq!(by_handle.liveness, Liveness::Alive);
     assert_eq!(directory::resolve(&root, "lead:IDENT", &alive).unwrap().handle, "claude-bbbb@fg");
     assert_eq!(directory::list(&root, None, false, &alive).unwrap().sessions.len(), 2);
 }
@@ -82,9 +83,14 @@ fn unknown_names_are_not_found_with_the_close_candidates() {
     let by_handle = directory::resolve(&root, "claude-aaa", &alive).unwrap_err();
     assert_eq!(by_handle.reason, "not-found");
     assert!(by_handle.detail.contains("claude-aaaa@fg"), "{}", by_handle.detail);
+    assert_eq!(
+        by_handle.candidates,
+        [Candidate { id: "fg-abc234/aaaa".into(), handle: "claude-aaaa@fg".into(), liveness: Liveness::Alive }]
+    );
     let by_role = directory::resolve(&root, "lead:MA", &alive).unwrap_err();
     assert_eq!(by_role.reason, "not-found");
     assert!(by_role.detail.contains("lead:MAIL"), "{}", by_role.detail);
+    assert_eq!(by_role.candidates.iter().map(|c| c.handle.as_str()).collect::<Vec<_>>(), ["claude-aaaa@fg"]);
     assert_eq!(directory::resolve(&root, "", &alive).unwrap_err().reason, "not-found");
 }
 
@@ -104,6 +110,10 @@ fn a_role_held_twice_is_ambiguous_and_lists_both() {
     let refusal = directory::resolve(&root, "lead:MAIL", &alive).unwrap_err();
     assert_eq!(refusal.reason, "ambiguous");
     assert!(refusal.detail.contains("claude-aaaa@fg") && refusal.detail.contains("claude-bbbb@fg"));
+    assert_eq!(refusal.candidates.len(), 2);
+    let mut ids: Vec<&str> = refusal.candidates.iter().map(|c| c.id.as_str()).collect();
+    ids.sort();
+    assert_eq!(ids, ["fg-abc234/aaaa", "fg-abc234/bbbb"]);
 }
 
 #[test]
@@ -130,8 +140,8 @@ fn a_session_without_a_terminal_ancestor_is_unknown_and_prune_never_removes_it()
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &alive).unwrap();
 
     let before = directory::list(&root, None, false, &alive).unwrap();
-    assert_eq!(before.sessions.iter().map(|s| s.liveness).collect::<Vec<_>>(), ["unknown", "alive"]);
-    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &alive).unwrap().liveness, "unknown");
+    assert_eq!(before.sessions.iter().map(|s| s.liveness).collect::<Vec<_>>(), [Liveness::Unknown, Liveness::Alive]);
+    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &alive).unwrap().liveness, Liveness::Unknown);
 
     let nothing_dead = directory::list(&root, None, true, &alive).unwrap();
     assert_eq!(nothing_dead.pruned, 0, "unknown may be a live headless agent");
@@ -172,6 +182,30 @@ fn a_role_held_by_a_live_session_is_refused_unless_taken() {
     assert_eq!(directory::resolve(&root, "lead:MAIL", &alive).unwrap().handle, "claude-bbbb@fg");
     let former = directory::resolve(&root, "claude-aaaa@fg", &alive).unwrap();
     assert!(former.roles.is_empty(), "the role moved, it was not copied");
+}
+
+#[test]
+fn a_session_drops_only_its_own_role_and_it_then_resolves_not_found() {
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL", "lead:IDENT"]), false, &alive).unwrap();
+    directory::register(&root, entry("bbbb", Some(20), &["lead:HARDEN"]), false, &alive).unwrap();
+
+    let after = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap();
+    assert_eq!(after.roles, ["lead:IDENT"]);
+    assert_eq!(directory::resolve(&root, "lead:MAIL", &alive).unwrap_err().reason, "not-found");
+    assert_eq!(directory::resolve(&root, "lead:IDENT", &alive).unwrap().handle, "claude-aaaa@fg");
+
+    let not_held = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap_err();
+    assert_eq!(not_held.reason, "role-not-held");
+    assert!(not_held.candidates.is_empty(), "nobody holds lead:MAIL now");
+    // Another live session's role is out of reach: the caller names only itself.
+    let foreign = directory::drop_role(&root, "fg-abc234/aaaa", "lead:HARDEN", &alive).unwrap_err();
+    assert_eq!(foreign.reason, "role-not-held");
+    assert_eq!(foreign.candidates.iter().map(|c| c.handle.as_str()).collect::<Vec<_>>(), ["claude-bbbb@fg"], "the holder is named");
+    assert_eq!(directory::resolve(&root, "lead:HARDEN", &alive).unwrap().handle, "claude-bbbb@fg");
+    assert_eq!(directory::drop_role(&root, "fg-abc234/cccc", "lead:MAIL", &alive).unwrap_err().reason, "not-registered");
+    assert_eq!(directory::drop_role(&root, "fg-abc234/aaaa", "MAIL", &alive).unwrap_err().reason, "invalid-role");
 }
 
 #[test]

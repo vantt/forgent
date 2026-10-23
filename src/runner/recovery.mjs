@@ -47,8 +47,8 @@
  *                          as `verify-miss` (a transient condition is
  *                          exactly what a retry is for).
  *   - worktree-fail      — isolated branch/worktree setup or teardown failed.
- *   - corrupt-log        — the event log failed to parse (readEvents threw
- *                          EventLogError('corrupt-log')); never auto-repaired.
+ *   - corrupt-log        — the event history failed to read or verify (the Event
+ *                          Store refused it); never auto-repaired.
  *   - reject-returned    — the item bounced awaiting-approval -> todo with a reason
  *                          (D5 rejection edge); re-entering the frontier is
  *                          bounded by anti-loop's MAX_VISITS, not by this

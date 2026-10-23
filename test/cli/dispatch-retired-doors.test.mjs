@@ -23,8 +23,8 @@ function mkStore() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
   const fgosDir = path.join(root, '.fgos');
   fs.mkdirSync(fgosDir);
-  initStore(fgosDir);
   activateGitFixture(root);
+  initStore(fgosDir);
   addWork(fgosDir, {
     id: 'cand1', title: 'x', kind: 'task', status: 'todo', domain: 'coding',
     workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'true',

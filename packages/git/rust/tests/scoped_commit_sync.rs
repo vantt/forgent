@@ -112,7 +112,6 @@ fn literal_scoped_commit_real_hook_and_replay() {
         writes: vec!["[literal]".into()],
         message: "consumer message\n\nbody\n".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     let result = f
         .driver
@@ -149,7 +148,6 @@ fn hook_tree_tampering_reports_real_effect() {
         writes: vec!["a".into()],
         message: "commit".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     let result = f
         .driver
@@ -324,7 +322,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         writes: vec!["a".into()],
         message: "noop".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -356,7 +353,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
             CheckpointRequest {
                 files: vec![".fgos/events.jsonl".into()],
                 message: "refuse".into(),
-                legacy_events: None
             },
             "fixture",
             "bad-checkpoint"
@@ -370,7 +366,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
             CheckpointRequest {
                 files: vec!["a".into()],
                 message: "consumer checkpoint".into(),
-                legacy_events: None,
             },
             "fixture",
             "checkpoint",
@@ -418,7 +413,6 @@ fn baseline_only_cutover_commits_the_event_fence() {
                 legacy_ref_oid: legacy,
                 seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
             }),
-            legacy_events: None,
         };
         let result = f
             .driver
@@ -443,9 +437,18 @@ fn baseline_only_cutover_commits_the_event_fence() {
 
 /// Construct real durable interruption states under the fixture's held custody.
 fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
-    interrupted_resources(f, id, phase, sync, false)
+    interrupted_resources(f, id, phase, sync, false, None)
 }
-fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: bool) -> wal::Chain {
+/// `stored_request` replaces the serialized request the intent persists, to
+/// reproduce what an earlier release wrote.
+fn interrupted_resources(
+    f: &Fixture,
+    id: &str,
+    phase: u8,
+    sync: bool,
+    legacy: bool,
+    stored_request: Option<String>,
+) -> wal::Chain {
     use wal::*;
     struct Held<'a>(&'a Handle);
     impl PublicationAuthority for Held<'_> {
@@ -465,7 +468,6 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         writes: vec!["a".into()],
         message: "interrupted".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     fs::write(f.tree.join("a"), "interrupted producer").unwrap();
     git(&f.tree, &["add", "a"]);
@@ -484,7 +486,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
             worktree: baseline.worktree.clone(),
             baseline: serde_json::to_string(&baseline).unwrap(),
-            request: serde_json::to_string(&request).unwrap(),
+            request: stored_request.unwrap_or_else(|| serde_json::to_string(&request).unwrap()),
             paths: vec!["a".into()],
             tree,
             cutover_grant: None,
@@ -546,7 +548,6 @@ fn fresh_commit(f: &Fixture, id: &str) {
         writes: vec!["fresh".into()],
         message: "fresh".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -580,7 +581,6 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
                 writes: vec!["fresh".into()],
                 message: "fresh".into(),
                 cutover_grant: None,
-                legacy_events: None,
             };
             assert_eq!(
                 f.driver
@@ -630,6 +630,35 @@ fn explicit_recovery_observes_signed_commit_or_closes_unknown_without_replaying(
     }
 }
 #[test]
+fn recovery_reconciles_an_attempt_stored_with_the_retired_legacy_events_field() {
+    for committed in [false, true] {
+        let f = Fixture::new();
+        // Exactly what the previous release persisted for an event-file commit.
+        let stored = serde_json::json!({
+            "writes": ["a"],
+            "message": "interrupted",
+            "cutoverGrant": null,
+            "legacyEvents": { "exactPaths": [".fgos/events/shard.jsonl"] },
+        })
+        .to_string();
+        assert!(serde_json::from_str::<CommitRequest>(&stored).is_err());
+        interrupted_resources(&f, "interrupted", 2, false, false, Some(stored));
+        if committed {
+            git(&f.tree, &["commit", "-qm", "interrupted"]);
+        }
+        let outcome = f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
+            .unwrap();
+        assert!(if committed {
+            matches!(outcome, wal::Outcome::Commit { .. })
+        } else {
+            matches!(outcome, wal::Outcome::CommitRejected { .. })
+        });
+        fresh_commit(&f, "fresh");
+    }
+}
+#[test]
 fn recovery_preserves_attempt_while_native_index_lock_exists() {
     let f = Fixture::new();
     interrupted(&f, "interrupted", 2, false);
@@ -665,7 +694,6 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
             writes: vec!["a".into()],
             message: "bounded".into(),
             cutover_grant: None,
-            legacy_events: None,
         };
         let id = format!("bounded-{n}");
         let result = f
@@ -812,7 +840,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
     use std::os::unix::fs::MetadataExt;
     for (phase, residue) in [(0, false), (2, false), (0, true), (2, true)] {
         let mut f = Fixture::new();
-        interrupted_resources(&f, "dead", phase, false, true);
+        interrupted_resources(&f, "dead", phase, false, true, None);
         drop(f.lease.take());
         git(
             &f.main,
@@ -864,7 +892,6 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                     writes: vec!["fresh".into()],
                     message: "fresh".into(),
                     cutover_grant: None,
-                    legacy_events: None,
                 },
                 "fixture",
                 "new-checkout",
@@ -1130,7 +1157,6 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
                     writes: vec!["a".into()],
                     message: "new".into(),
                     cutover_grant: None,
-                    legacy_events: None,
                 },
                 "fixture",
                 "new",
@@ -1497,7 +1523,6 @@ fn nested_request() -> CommitRequest {
         writes: vec!["deep/er/file".into()],
         message: "nested\n".into(),
         cutover_grant: None,
-        legacy_events: None,
     }
 }
 fn objects_of_commit(f: &Fixture, base: &str) -> u64 {

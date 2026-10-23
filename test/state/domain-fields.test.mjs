@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/domain-fields.test.mjs — decision record 0027, D6 (docs/
 // decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-
 // workflow-model-d1-d3.md's "Ngoài phạm vi supersede D1-D3" paragraph; full
@@ -17,7 +19,6 @@
 // fieldSchema is added to the real `coding` domain — coding has no need for
 // one today, this is purely infrastructure for a future domain.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -29,7 +30,7 @@ import { foldEvents } from '../../src/state/replay.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-domain-fields-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-domain-fields-')));
 }
 
 function sampleWork(id, overrides = {}) {

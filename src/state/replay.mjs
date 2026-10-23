@@ -1,40 +1,34 @@
 // replay.mjs — fold the event log into the current state view (per D3: the
 // view is always rebuildable from the log, never the truth itself).
 //
-// PURE: no fs import for writing, no Date.now() anywhere in the fold logic —
-// every timestamp in the resulting view comes from the event's own `ts`
-// field. `rebuildView` reads the log through `readEvents` (events.mjs), the
-// one read path shared with the rest of the state layer; it does not write.
+// PURE: no fs, no Date.now() anywhere in the fold logic — every timestamp in
+// the resulting view comes from the event's own `ts` field. Reading events is
+// the Event Store's job (src/event-store); this module only folds an ordered
+// array a consumer hands it.
 //
-// Deterministic: folding the same ordered event array (or rebuilding from
-// the same log) twice always yields deep-equal views.
+// Deterministic: folding the same ordered event array twice always yields
+// deep-equal views.
 
-import fs from 'node:fs';
-import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './event-log.mjs';
 import { DEFAULTS } from './work.mjs';
 import { getDomain, resolveWorkflow, stepForPhase } from './domain-registry.mjs';
 import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
-// tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 4;
+// Shape version of the folded view. A cached view stamped with another version is refolded, never trusted.
+export const VIEW_SCHEMA_VERSION = 7;
 
-// array `.push`ed onto in place (only `decisions`) or reassigned via a
-// `{...oldValue, ...patch}` spread (every other container: work, gates,
-// settlements, learnings, decisionsById, outcomes, discovery, tools, and any
-// future one applyEvent adds) — never mutated two levels deep in place. A
-// generic ONE-LEVEL shallow clone of each top-level key is therefore
-// sufficient to protect a seed view's own nested references: `foldEvents`
-// only ever needs to guarantee its OWN `view` object (and each of its direct
-// children) is a fresh reference, never that every nested object is.
+// Containers are copied for incremental replay. Work handlers mutate item
+// fields, so clone those items as well to keep the caller's seed immutable.
 function cloneTopLevel(seedView) {
   const out = {};
   for (const [key, value] of Object.entries(seedView)) {
     if (Array.isArray(value)) out[key] = [...value];
-    else if (value && typeof value === 'object') out[key] = { ...value };
+    else if (value && typeof value === 'object') {
+      out[key] = key === 'work'
+        ? Object.fromEntries(Object.entries(value).map(([id, item]) => [id, { ...item }]))
+        : { ...value };
+    }
     else out[key] = value;
   }
   return out;
@@ -60,7 +54,7 @@ function foldLegacyStage(target, item) {
 }
 
 /**
- * Fold an ordered array of events (as returned by `readEvents`) into a state
+ * Fold an ordered array of events (as the Event Store reader returns them) into a state
  * view: `{ work: { [id]: workItem }, decisions: [...] }`. Unknown event
  * types are ignored rather than rejected, so the log can grow new event
  * types over time without breaking replay of older logs.
@@ -73,18 +67,83 @@ function foldLegacyStage(target, item) {
  * fold into a view shaped the same way. This module declares no default of
  * its own.
  *
- * `seedView` (tsk-49e, optional): when supplied, folding starts from a
+ * `seedView` (optional): when supplied, folding starts from a
  * shallow clone of it (`cloneTopLevel`, above) instead of an empty view —
  * `events` is then expected to be only the events NOT already folded into
- * `seedView`, e.g. the incremental-snapshot read path in `rebuildView`
- * below. Omitting it is byte-identical to every pre-tsk-49e caller.
+ * `seedView`, e.g. an incremental refold from a cursor. Omitting it folds
+ * from an empty view.
  */
 export function foldEvents(events, seedView) {
   const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
   for (const event of events) {
+    const condition = event.payload?.precondition;
+    const before = view.work[event.payload?.id];
+    const beforeStatus = before?.status;
+    // Whether the writer had seen every event that precedes this one in the order: every other stream's
+    // highest earlier seq is covered by `seen`, and its own stream's earlier events are its causal
+    // predecessors. Judged before this event is registered, so it covers exactly the events before it.
+    const streamKey = event.origin && event.stream ? `${event.origin}:${event.stream}` : null;
+    const unseenEarlier = Object.entries(view.streamHeads ?? {}).some(([key, seq]) => key !== streamKey && (event.seen?.[key] ?? 0) < seq);
+    if (streamKey) {
+      view.streamHeads ??= {};
+      view.streamHeads[streamKey] = Math.max(view.streamHeads[streamKey] ?? 0, event.seq ?? 0);
+    }
+    if (condition && event.origin && event.h) {
+      const id = event.payload.id;
+      const item = view.work[id];
+      let reason;
+      if (condition.exists !== undefined && !!item !== condition.exists) reason = 'existence';
+      else if (condition.expectedStatus !== undefined && item?.status !== condition.expectedStatus) reason = 'expected-status';
+      else if (condition.capacity && Object.values(view.work).filter(w => w.status === condition.capacity.status).length >= condition.capacity.max) reason = 'capacity';
+      if (reason) {
+        // When the writer had seen everything that precedes this event, the events before it are exactly
+        // the view it decided on, so every acknowledged precondition holds again and a failure is a local
+        // bug that stops the fold. Otherwise an event the writer had not seen sorts earlier, flips which
+        // concurrent write applies, and the failure is a recorded conflict on every clone, never a throw.
+        if (!unseenEarlier) {
+          throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
+        }
+        const against = reason === 'capacity'
+          ? Object.keys(view.work).sort().filter(key => view.work[key].status === condition.capacity.status)
+            .map(key => view.preconditionHeads?.[key]?.status).find(head => head && head.origin !== event.origin && (event.seen?.[`${head.origin}:${head.stream}`] ?? 0) < head.seq)
+          : view.preconditionHeads?.[id]?.[reason === 'existence' ? 'existence' : 'status'];
+        view.conflicts ??= [];
+        view.conflicts.push({ h: event.h, id, origin: event.origin, reason, against: against?.h ?? null });
+        continue;
+      }
+    }
     applyEvent(view, event);
+    if (condition && event.origin && event.h) {
+      const id = event.payload.id;
+      const after = view.work[id];
+      const head = { h: event.h, origin: event.origin, stream: event.stream, seq: event.seq };
+      view.preconditionHeads ??= {};
+      const heads = { ...view.preconditionHeads[id] };
+      if (!!before !== !!after) heads.existence = head;
+      if (beforeStatus !== after?.status) heads.status = head;
+      view.preconditionHeads[id] = heads;
+    }
   }
   return view;
+}
+
+/** The events that took effect. The fold records an event whose precondition failed as a conflict and does not
+ * apply it, so it is not a durable record: idempotence lookups and Land releases read through here. */
+export function appliedEvents(events, view) {
+  if (!view.conflicts?.length) return events;
+  const conflicted = new Set(view.conflicts.map(conflict => conflict.h));
+  return events.filter(event => !conflicted.has(event.h));
+}
+
+/** The conflicts the fold recorded against item `id`. */
+export function conflictsFor(view, id) {
+  return (view.conflicts ?? []).filter(conflict => conflict.id === id);
+}
+
+// A write-time precondition decides whether the event applies; it is not part of the record it leaves behind.
+function withoutPrecondition(payload) {
+  const { precondition, ...record } = payload ?? {};
+  return record;
 }
 
 function applyEvent(view, event) {
@@ -92,7 +151,7 @@ function applyEvent(view, event) {
     case 'work.add': {
       const item = event.payload;
       if (item && typeof item === 'object' && typeof item.id === 'string') {
-        const normalized = { ...item };
+        const { precondition, ...normalized } = item;
         if (normalized.tier !== undefined) {
           if (normalized.size === undefined) {
             normalized.size = normalized.tier;
@@ -446,7 +505,7 @@ function applyEvent(view, event) {
         if (!view.outcomes) {
           view.outcomes = {};
         }
-        view.outcomes[id] = { ...view.outcomes[id], ...event.payload };
+        view.outcomes[id] = { ...view.outcomes[id], ...withoutPrecondition(event.payload) };
       }
       break;
     }
@@ -546,7 +605,7 @@ function applyEvent(view, event) {
       const raw = event.payload ?? {};
       const id = raw.id;
       // tsk-397 D16 renamed the coding roleGraph's 'human-advisor' role to
-      // 'advisor'. events.jsonl is append-only and already carries real
+      // 'advisor'. The event history is append-only and already carries real
       // pre-rename 'human-advisor' handoffs (e.g. seq 18440, tsk-1yf) --
       // without this normalization, replay reconstructs a `holder` value
       // the new vocabulary rejects (WorkValidationError on any later write
@@ -608,7 +667,7 @@ function applyEvent(view, event) {
         }
         view.discovery[id] = [
           ...(view.discovery[id] ?? []),
-          { ...event.payload, ts: event.ts },
+          { ...withoutPrecondition(event.payload), ts: event.ts },
         ];
       }
       break;
@@ -689,7 +748,7 @@ function applyEvent(view, event) {
         }
         view.parkResolutions[id] = [
           ...(view.parkResolutions[id] ?? []),
-          { ...event.payload, ts: event.ts },
+          { ...withoutPrecondition(event.payload), ts: event.ts },
         ];
       }
       break;
@@ -731,296 +790,15 @@ function applyEvent(view, event) {
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
     // is now declared directly in `runner.executors.<id>` (config-edited,
     // never event-sourced). Historical events of either type already in
-    // `.fgos/events.jsonl` fall through to `default` below and are skipped,
+    // the store fall through to `default` below and are skipped,
     // same forward-compatible "unknown type, not an error" treatment any
     // other retired event type gets.
     default:
       // Forward-compatible: an event type this view does not (yet) know how
-      // to fold is skipped, not an error — readEvents already guarantees
-      // every line parsed as valid JSON.
+      // to fold is skipped, not an error — the reader already guarantees
+      // every event parsed as valid JSON.
       break;
   }
-}
-
-// tsk-49e: state.json's own sibling `snapshot` field (written by
-// store.mjs's refreshView) — {size, mtimeMs, lastLine} as of the last
-// successful full read. Returns the persisted view directly (zero bytes of
-// `logPath` read) when the log is byte-for-byte unchanged since that
-// snapshot; folds only the NEW bytes onto it when the log has safely grown
-// past it (verified via readLastLineBefore); returns null (falls back to a
-// full read) on any doubt at all — a wrong-in-doubt design that can only
-// ever cost a slower call, never a wrong view. See docs/history/
-// tsk-49e-incremental-read-snapshot/RESEARCH.md for why mtime+size (not a
-// content hash of the whole prefix) is the right signal here, and why the
-// last-line fingerprint is proven safe against all 3 known log-rewrite
-// paths (repairTruncatedLastLine, fixEventsJsonlContiguity --fix, git's own
-// merge=union driver).
-function tryIncrementalRebuild(logPath) {
-  const viewPath = resolveFgosFile(path.dirname(logPath), FGOS_FILE.STATE);
-  let persisted;
-  try {
-    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
-  } catch {
-    return null;
-  }
-  if (!persisted || typeof persisted !== 'object') return null;
-  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
-  const snap = persisted.snapshot;
-  if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
-
-  let stat;
-  try {
-    stat = fs.statSync(logPath);
-  } catch {
-    return null;
-  }
-
-  // Destructured only to exclude these two sibling fields (revision/
-  // snapshot) from the returned view shape -- everything else in
-  // `persisted` IS the real view, per writeView's own "additive sibling
-  // field, never folded back" pattern (see viewRevision's own doc comment).
-  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
-
-  if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
-    return savedView; // untouched since the snapshot -- zero-read shortcut
-  }
-  if (stat.size <= snap.size) return null; // shrank, or same-size-different-mtime rewrite -- never safe to trust the prefix
-
-  const stillThere = readLastLineBefore(logPath, snap.size) === snap.lastLine;
-  if (!stillThere) return null; // prefix was rewritten (or the check itself failed) -- fall back, never guess
-
-  const newEvents = readEventsFromByte(logPath, snap.size);
-  return foldEvents(newEvents, savedView);
-}
-
-/**
- * Read every event from `logPath` (via `readEvents`) and fold it into a
- * fresh state view. This is the `fgos rebuild` primitive: rebuilding twice
- * from the same log must produce deep-equal views (D3 determinism) —
- * including via the tsk-49e snapshot fast path above, which is why that
- * path is tried FIRST here but always falls back to this exact full-read
- * shape on any doubt, never a partial or best-effort result.
- */
-export function rebuildView(logPath) {
-  const fast = tryIncrementalRebuild(logPath);
-  if (fast) return fast;
-  const events = readEvents(logPath);
-  return foldEvents(events);
-}
-
-// Tầng A/T3 (TA-D3/TA-D7/TA-D12/TA-D13): reads events, alongside their own
-// raw line text, from one file — a SINGLE fs.readFileSync (tsk-3jh/tsk-49e's
-// own dedupe discipline: never read the same file twice for data already in
-// hand), parsed once via `parseEventLines` (the same corrupt-log fail-closed
-// core `readEvents` itself calls) so both the parsed events and their exact
-// raw line text come from the one buffer. A missing file (never written
-// yet) contributes nothing, same as `readEvents`.
-function readFileWithRawLines(filePath) {
-  let raw;
-  try {
-    raw = fs.readFileSync(filePath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return [];
-    throw err;
-  }
-  const events = parseEventLines(raw, filePath);
-  if (events.length === 0) return [];
-  const lines = raw.split('\n');
-  if (lines[lines.length - 1] === '') lines.pop();
-  return events.map((ev, i) => ({ ev, raw: lines[i] }));
-}
-
-// The file-membership half of discovery, shared by the full read
-// (`readAllEventsFromDir`) and the incremental fast path (T4,
-// `tryIncrementalRebuildFromDir`) below: baseline-0 (tagged `''`, always
-// listed even if the physical file doesn't exist yet) plus every
-// `*.jsonl` file directly under `${dir}/events/` (non-recursive, so a
-// future `archive/` is structurally never included).
-function discoverEventFilePaths(dir) {
-  const result = [{ file: '', path: path.join(dir, 'events.jsonl') }];
-  const eventsDirPath = path.join(dir, 'events');
-  let files = [];
-  try {
-    files = fs
-      .readdirSync(eventsDirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-  }
-  for (const file of files) result.push({ file, path: path.join(eventsDirPath, file) });
-  return result;
-}
-
-/**
- * The multi-file discovery step (TA-D2's read side): `dir` is the same
- * `.fgos`-shaped directory `rebuildView`'s callers resolve `events.jsonl`
- * from. Discovers baseline-0 (`${dir}/events.jsonl`, frozen legacy content
- * per TA-D12 — never appended to once a writer file exists) plus every
- * `*.jsonl` file directly under `${dir}/events/` (`discoverEventFilePaths`
- * above), merges them into the TA-D7 total order `(ts, file, seq)` —
- * baseline-0 sorts under the empty-string file tag, which is always
- * lexicographically first on a tie — then dedupes: TA-D9 (per T1)'s
- * content-hash `h` is a new-format event's identity; baseline-0 lines
- * predate `h` and dedupe by their own raw line text instead (same
- * precedent `events-jsonl-contiguity.mjs`'s `fixContiguity` already uses).
- * First occurrence in total order wins. No compaction exists yet (that's
- * T6) to ever actually produce a duplicate today — this is the mechanism
- * T6 lands on top of, per TA-D13.
- */
-export function readAllEventsFromDir(dir) {
-  const tagged = [];
-  for (const { file, path: filePath } of discoverEventFilePaths(dir)) {
-    for (const entry of readFileWithRawLines(filePath)) tagged.push({ ...entry, file });
-  }
-
-  tagged.sort((a, b) => {
-    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
-  });
-
-  const seen = new Set();
-  const result = [];
-  for (const { ev, raw } of tagged) {
-    const key = typeof ev.h === 'string' && ev.h ? `h:${ev.h}` : `line:${raw}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push(ev);
-  }
-  return result;
-}
-
-/**
- * Tầng A/T4 (TA-D4/TA-D8): the multi-file incremental fast path.
- * `persisted.snapshot` now anchors on `{ files: { [fileTag]: { size,
- * lastLine } }, maxTs }` instead of tsk-49e's single `{size, mtimeMs,
- * lastLine}` — no `mtimeMs` here on purpose: with `maxTs` as an
- * independent, structurally-checked freshness gate (below), the boundary
- * fingerprint (`lastLine`) plus size already proves the recorded prefix is
- * untouched, and `maxTs` closes the one thing a per-file boundary check
- * alone cannot see: a REWRITE that happens to preserve one file's own
- * length while changing its content (fixContiguity's resequencing is the
- * known example) can no longer slip through, because a real rewrite always
- * changes SOME line's `ts` relative to the recorded prefix and any new event
- * this path would fold must have `ts` strictly greater than the last
- * confirmed `maxTs` — a rewritten line replayed here would violate that.
- *
- * Every check below is wrong-in-doubt: any mismatch returns `null`,
- * `rebuildViewFromDir` then falls back to a full discovery + fold, and the
- * only cost is a slower read — never a wrong view (same guarantee tsk-49e's
- * original single-file version gives).
- */
-function tryIncrementalRebuildFromDir(dir) {
-  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
-  let persisted;
-  try {
-    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
-  } catch {
-    return null;
-  }
-  if (!persisted || typeof persisted !== 'object') return null;
-  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
-  const snap = persisted.snapshot;
-  if (!snap || typeof snap.files !== 'object' || snap.files === null || typeof snap.maxTs !== 'string') return null;
-
-  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
-
-  const currentFiles = discoverEventFilePaths(dir);
-  const currentFileNames = new Set(currentFiles.map((f) => f.file));
-  const snapFileNames = Object.keys(snap.files);
-  // Membership must match EXACTLY (a file appeared, or one the snapshot
-  // recorded is gone from discovery) -- either is a structural change this
-  // path never guesses through.
-  if (currentFileNames.size !== snapFileNames.length) return null;
-  for (const name of snapFileNames) {
-    if (!currentFileNames.has(name)) return null;
-  }
-
-  const newEventsTagged = [];
-  for (const { file, path: filePath } of currentFiles) {
-    const snapEntry = snap.files[file];
-    if (!snapEntry || typeof snapEntry.size !== 'number' || (snapEntry.lastLine !== null && typeof snapEntry.lastLine !== 'string')) return null;
-
-    let stat;
-    try {
-      stat = fs.statSync(filePath);
-    } catch {
-      if (snapEntry.size > 0) return null; // recorded as non-empty, now gone entirely -- doubt
-      continue; // both "absent/empty" then and now -- consistent, nothing to add
-    }
-
-    if (stat.size === snapEntry.size) continue; // unchanged since the snapshot
-    if (stat.size < snapEntry.size) return null; // shrank -- never safe to trust the prefix
-
-    if (snapEntry.size > 0) {
-      const stillThere = readLastLineBefore(filePath, snapEntry.size) === snapEntry.lastLine;
-      if (!stillThere) return null; // prefix was rewritten (or the check itself failed)
-    }
-
-    for (const ev of readEventsFromByte(filePath, snapEntry.size)) newEventsTagged.push({ ev, file });
-  }
-
-  if (newEventsTagged.length === 0) return savedView; // every file byte-identical to its snapshot -- zero-read shortcut
-
-  // TA-D8: fast path only when EVERY new event's ts is STRICTLY greater
-  // than maxTs -- a tie or a violation is a doubt, never guessed through.
-  for (const { ev } of newEventsTagged) {
-    if (typeof ev.ts !== 'string' || !(ev.ts > snap.maxTs)) return null;
-  }
-
-  newEventsTagged.sort((a, b) => {
-    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
-  });
-
-  return foldEvents(newEventsTagged.map((t) => t.ev), savedView);
-}
-
-/**
- * `rebuildView`'s multi-file counterpart: tries the T4 incremental fast
- * path first, falling back to a full discovery + fold on any doubt.
- */
-export function rebuildViewFromDir(dir) {
-  const fast = tryIncrementalRebuildFromDir(dir);
-  if (fast) return fast;
-  return foldEvents(readAllEventsFromDir(dir));
-}
-
-/**
- * The write side of T4's anchor: `{files: {[fileTag]: {size, lastLine}},
- * maxTs}`, built from a cheap per-file stat + tail-read pass — never a
- * full-content read, so this stays cheap regardless of how large any one
- * file has grown. `maxTs` is derived from each file's own last line (safe
- * because a single writer's own file is always append-ordered by ts) rather
- * than trusted from the caller, so it is correct even the very first time
- * this runs (no prior snapshot to carry forward).
- */
-export function buildSnapshotFromDir(dir) {
-  const files = {};
-  let maxTs = '';
-  for (const { file, path: filePath } of discoverEventFilePaths(dir)) {
-    let stat;
-    try {
-      stat = fs.statSync(filePath);
-    } catch {
-      files[file] = { size: 0, lastLine: null };
-      continue;
-    }
-    const lastLine = stat.size > 0 ? readLastLineBefore(filePath, stat.size) : null;
-    files[file] = { size: stat.size, lastLine };
-    if (lastLine) {
-      try {
-        const ts = JSON.parse(lastLine).ts;
-        if (typeof ts === 'string' && ts > maxTs) maxTs = ts;
-      } catch {
-        // malformed last line -- ignore for maxTs purposes; readEvents
-        // elsewhere is what actually fails loudly on real corruption.
-      }
-    }
-  }
-  return { files, maxTs };
 }
 
 /**
@@ -1029,11 +807,11 @@ export function buildSnapshotFromDir(dir) {
  * sha256 hex digest of `JSON.stringify(view)` — so a consumer can tell "did
  * the folded state change?" without re-folding the log or diffing the view.
  *
- * PURE and deterministic by the same guarantee `rebuildView` gives: the view
+ * PURE and deterministic by the same guarantee `foldEvents` gives: the view
  * carries no `Date.now()`/wall-clock value (every timestamp comes from an
- * event's own `ts`), so the same log always hashes to the same revision. The
+ * event's own `ts`), so the same events always hash to the same revision. The
  * caller passes the folded view itself — this function never re-folds. It is
- * computed over the view EXACTLY as `rebuildView` returns it, so it must be
+ * computed over the view EXACTLY as `foldEvents` returns it, so it must be
  * called on that pure shape (the on-disk `state.json` stamps this hash as a
  * sibling field; it is never folded back into the view a rebuild returns).
  */

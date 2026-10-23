@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/retrospective-doors.test.mjs — tsk-1lv-5 (CONTEXT.md D7/D9/
 // D11): the 4-door check (freshness/impact/routing/doc-deferral) running
 // inside the existing `retrospective` batch sweep. Split across the four
@@ -5,7 +7,6 @@
 // integration (`fgos retrospective` logs advisory friction, never blocks
 // the delivered -> retrospective transition).
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -27,7 +28,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-retro-doors-'));
+  return path.dirname(initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-retro-doors-'))));
 }
 
 function run(cwd, args) {
