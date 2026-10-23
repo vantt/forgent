@@ -5,21 +5,21 @@
 //! --init|--new`, `identity session --register`, `identity list --prune` and
 //! `identity mint <kind>` write (`identity.write`).
 
-use crate::directory::{self, Entry};
-use crate::errors::Error;
-use crate::machine;
+use crate::current::{current_session, machine_info, os_pid_facts, session_info, set_alias};
+pub use crate::current::{MachineInfo, SessionInfo};
+use crate::directory;
 use crate::mint;
 use crate::proc_tree::os_process_tree;
 use crate::project;
+pub use crate::refusal::Refusal;
 use crate::resolve::{resolve, WriterIdentity};
-use crate::session::{self, PidFacts};
-use fgos_process::facts::{judge_here, Record};
+use crate::session::PidFacts;
+use fgos_process::facts::judge_here;
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
     ProviderOutcome,
 };
-use serde::Serialize;
 use std::borrow::Cow;
 use std::future::Future;
 use std::path::{Path, PathBuf};
@@ -153,21 +153,6 @@ impl IdentityRequest {
     }
 }
 
-/// The answer is a refusal, not a result: the CLI prints `detail` and exits
-/// with [`Refusal::EXIT`].
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Refusal {
-    pub reason: &'static str,
-    pub detail: String,
-    /// The names the caller may have meant (`not-found`) or the sessions the
-    /// name matches (`ambiguous`); empty for every other refusal.
-    pub candidates: Vec<String>,
-}
-
-impl Refusal {
-    pub const EXIT: i32 = 65;
-}
-
 fn default_caller_pid() -> u32 {
     #[cfg(unix)]
     {
@@ -193,108 +178,6 @@ fn resolve_identity(request: &IdentityRequest) -> WriterIdentity {
         caller_pid(request),
         request.fgos_dir.as_deref(),
     )
-}
-
-/// This machine as `identity machine` prints it.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct MachineInfo {
-    pub id: String,
-    pub handle: String,
-    pub alias: Option<String>,
-}
-
-/// The alias only counts when it follows the Convention `machine-handle` rule;
-/// a hand-edited alias that does not is ignored and the derived handle shows.
-fn checked_alias(state_root: &Path) -> Option<String> {
-    let alias = machine::read_alias(state_root).ok().flatten()?;
-    alias_problem(&alias).is_none().then_some(alias)
-}
-
-fn alias_problem(alias: &str) -> Option<&'static str> {
-    let rule = fgos_convention::rules::packaged_rules().identifier("machine-handle");
-    rule.expect("the Convention contract carries the machine-handle kind")
-        .check(alias)
-        .err()
-}
-
-pub fn machine_info(state_root: &Path) -> Result<MachineInfo, Refusal> {
-    let id = machine::read(state_root).map_err(|e| match e {
-        Error::Missing(_) => Refusal {
-            candidates: Vec::new(),
-            reason: "machine-id-missing",
-            detail: "no machine id yet; run `fgos doctor --fix` to mint it".into(),
-        },
-        e => Refusal {
-            candidates: Vec::new(),
-            reason: "machine-id-unreadable",
-            detail: e.to_string(),
-        },
-    })?;
-    let alias = checked_alias(state_root);
-    Ok(MachineInfo {
-        handle: machine::handle(&id, alias.as_deref()),
-        id,
-        alias,
-    })
-}
-
-/// `identity machine --alias <name>`: the alias changes the handle only.
-pub fn set_alias(state_root: &Path, alias: &str) -> Result<MachineInfo, Refusal> {
-    if let Some(code) = alias_problem(alias) {
-        return Err(Refusal {
-            candidates: Vec::new(),
-            reason: "invalid-alias",
-            detail: format!("alias {alias:?} is not a machine handle ({code})"),
-        });
-    }
-    let info = machine_info(state_root)?;
-    machine::write_alias(state_root, alias).map_err(|e| Refusal {
-        candidates: Vec::new(),
-        reason: "alias-write-failed",
-        detail: e.to_string(),
-    })?;
-    Ok(MachineInfo {
-        handle: alias.to_owned(),
-        alias: Some(alias.to_owned()),
-        ..info
-    })
-}
-
-/// A session as `identity session` prints it, and as bare `identity` embeds it.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct SessionInfo {
-    pub id: String,
-    pub handle: String,
-}
-
-fn os_pid_facts(pid: u32) -> Option<PidFacts> {
-    let tuple = fgos_process::facts::identity_of(fgos_process::ProcId(pid))?;
-    Some(PidFacts {
-        boot_id: tuple.boot_id,
-        start_time: tuple.start_time,
-    })
-}
-
-fn info_of(local: &session::Local, machine: &MachineInfo) -> SessionInfo {
-    SessionInfo {
-        id: session::full_id(&machine.id, local),
-        handle: session::handle(local, &machine.handle),
-    }
-}
-
-/// The session of a resolved writer on this machine; `None` when the caller
-/// cannot be told from any other.
-pub fn session_info(
-    identity: &WriterIdentity,
-    machine: &MachineInfo,
-    facts: &dyn Fn(u32) -> Option<PidFacts>,
-) -> Option<SessionInfo> {
-    Some(info_of(&session::local(identity, facts)?, machine))
-}
-
-/// The process facts of `pid` as a liveness record.
-fn os_record(pid: u32) -> Option<Record> {
-    fgos_process::facts::identity_of(fgos_process::ProcId(pid)).map(|tuple| tuple.to_record())
 }
 
 fn state_root() -> PathBuf {
@@ -427,38 +310,24 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             Ok(value.expect("project answers always serialize"))
         }
         Verb::Mint { kind, release } => mint_answer(&root, kind, *release),
-        Verb::Session(action) => {
-            let machine = machine_info(&root)?;
-            let identity = resolve_identity(request);
-            let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
-                candidates: Vec::new(),
-                reason: "unresolved",
-                detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
-            })?;
-            let info = info_of(&local, &machine);
-            match action {
-                SessionAction::Read => Ok(serde_json::to_value(info).expect("SessionInfo always serializes")),
-                SessionAction::Register { role, take } => {
-                    let cwd = std::env::current_dir().ok();
-                    let project_id = cwd
-                        .as_deref()
-                        .and_then(|dir| project::project_info(&root, dir).ok())
-                        .map(|project| project.id);
-                    let tree = os_process_tree();
-                    let entry = Entry::new(
-                        info.id,
-                        info.handle,
-                        local.cli.to_owned(),
-                        project_id,
-                        cwd.map(|dir| dir.display().to_string()),
-                        role.iter().cloned().collect(),
-                        directory::head_liveness(tree.as_ref(), caller_pid(request), &os_record),
-                    );
-                    let listed = directory::register(&root, entry, *take, &judge_here)?;
-                    Ok(serde_json::to_value(listed).expect("Listed always serializes"))
-                }
+        Verb::Session(action) => match action {
+            SessionAction::Read => {
+                let current = current_session(&root, caller_pid(request), request.fgos_dir.as_deref())?;
+                Ok(serde_json::to_value(current.info).expect("SessionInfo always serializes"))
             }
-        }
+            SessionAction::Register { role, take } => {
+                let cwd = std::env::current_dir().ok();
+                let listed = directory::register_current(
+                    &root,
+                    caller_pid(request),
+                    request.fgos_dir.as_deref(),
+                    cwd.as_deref(),
+                    &role.iter().cloned().collect::<Vec<_>>(),
+                    *take,
+                )?;
+                Ok(serde_json::to_value(listed).expect("Listed always serializes"))
+            }
+        },
         Verb::Resolve { query } => {
             let listed = directory::resolve(&root, query, &judge_here)?;
             Ok(serde_json::to_value(listed).expect("Listed always serializes"))

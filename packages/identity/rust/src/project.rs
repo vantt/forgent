@@ -8,7 +8,7 @@
 //! with the main checkout's file.
 
 use crate::errors::Error;
-use crate::provider::Refusal;
+use crate::refusal::Refusal;
 use crate::text::{iso_utc_now, random_hex128, slug};
 use fgos_git::{GitDriver, OperationError, PathValue, RefValue, RepoHandle, TrunkFact};
 use serde::{Deserialize, Serialize};

@@ -12,12 +12,14 @@
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
 
-use crate::proc_tree::ProcessTree;
-use crate::provider::Refusal;
+use crate::current::{current_session, os_record};
+use crate::proc_tree::{os_process_tree, ProcessTree};
+use crate::project;
+use crate::refusal::Refusal;
 use crate::resolve::terminal_head;
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
-use fgos_process::facts::{Record, Verdict};
+use fgos_process::facts::{judge_here, Record, Verdict};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs;
@@ -337,6 +339,40 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
         store(root, &holder, true)?;
     }
     Ok(Listed::of(&merged, merged.verdict(judge)))
+}
+
+/// Registers the session the process `caller_pid` is, from the real env and
+/// OS process tree: resolves its full id and handle, the project of
+/// `clone_dir` (none when it is not a registered project), the agent head's
+/// liveness record, and calls [`register`] with `roles` (and `take`).
+///
+/// The cost is bounded for a hook on the first tool call of a head: no
+/// network, no lock (the entry is a create-once file named by the handle),
+/// one durable write, and a directory scan of at most [`MAX_ENTRIES`] files.
+/// The CLI's `identity session --register` is this function.
+pub fn register_current(
+    state_root: &Path,
+    caller_pid: u32,
+    fgos_dir: Option<&Path>,
+    clone_dir: Option<&Path>,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    let project_id = clone_dir
+        .and_then(|dir| project::project_info(state_root, dir).ok())
+        .map(|project| project.id);
+    let tree = os_process_tree();
+    let entry = Entry::new(
+        current.info.id,
+        current.info.handle,
+        current.local.cli.to_owned(),
+        project_id,
+        clone_dir.map(|dir| dir.display().to_string()),
+        roles.to_vec(),
+        head_liveness(tree.as_ref(), caller_pid, &os_record),
+    );
+    register(state_root, entry, take, &judge_here)
 }
 
 /// The live session `query` names: a handle, or a role alias `lead:<LANE>`.

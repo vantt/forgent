@@ -94,14 +94,14 @@ pub fn random(kind: RandomKind) -> io::Result<String> {
     ))
 }
 
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 pub use sequence::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 mod sequence {
     use super::SequenceKind;
     use crate::project::open_repository;
-    use crate::provider::Refusal;
+    use crate::refusal::Refusal;
     use crate::text::random_bytes;
     use fgos_git::{OperationError, RepoHandle, SequencePush};
     use std::fs;
