@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c0d898ef4267045ad74355ea20553807735861ceb1e8af49f3ea9228b1b36a69",
+  "payloadDigest": "e32a5864bdaac1b57f7adfaffcc70cc65a1b642b61315d61f0f7fb8d7674067b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -303,7 +303,7 @@
     "packages/git/rust/src/lib.rs": "dbdaf859c6624c2ae576f62fcf45961be1d6a70cf8308d3339ade19c9d9bdd8a",
     "packages/git/rust/src/native_lock.rs": "94ea0e46e34acdec4de3f40552b33a6cd8f2c4656d524dd9b1539a6cd2d55abb",
     "packages/git/rust/src/objects.rs": "ba519abbf01327819f9f2fb5cf42f05633e108cc6741e26e00b289f54b064b9c",
-    "packages/git/rust/src/publication.rs": "2c5ee3b18e54cb8aaf3059959cb3f9f270dbe35d6c50bbb76220f4a18e649ba6",
+    "packages/git/rust/src/publication.rs": "5c4d03b39a165ff82c025814cbb057076bdb4d8ffc1a3e01377a09c78936987d",
     "packages/git/rust/src/recovery.rs": "a8245f0cf573ccb51cac4373e2ee3566c1d48bafb6142fadc5c5302efe18f073",
     "packages/git/rust/src/refs.rs": "311fb6961e6962d2d5e8761f0da20e90133d367cce8e1ab693b3dd4553af400d",
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
@@ -322,6 +322,7 @@
     "packages/git/rust/tests/land.rs": "65e2b20885fde345be123cff10d437fcb69a73d6f8c723b223cb210212b733f6",
     "packages/git/rust/tests/land_crash_matrix.rs": "585fc55c1faa87a3e85185b6d90ed135066891b5f0502d66e13097e361736714",
     "packages/git/rust/tests/publication.rs": "6dfe848b3cc247dfcbc3b270ddde01248446ce5eb855b0f1d2ef9bc7ac4014d7",
+    "packages/git/rust/tests/publication_children.rs": "fffb99d197d27a32b1e3b1b49251d741be57cb8a1e3c0ac8026e6a640bffc5e2",
     "packages/git/rust/tests/recovery_matrix.rs": "a36515c02dc3150d723217efc08ce41e6284e95cf5bfdbc7994563a559981718",
     "packages/git/rust/tests/refs_remote.rs": "4965eaea84acdcfee9d30cefcc46ffc06026c68f47f95f6b9ecd6b5812ce64a5",
     "packages/git/rust/tests/repository_config.rs": "71d201335b087e0dae4080e147421618693940a2007f7c6819f10b1a3dc8202a",
@@ -1936,6 +1937,20 @@
     {
       "path": "packages/git/rust/tests/inspect.rs",
       "line": 5,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication_children.rs",
+      "line": 19,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication_children.rs",
+      "line": 79,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
