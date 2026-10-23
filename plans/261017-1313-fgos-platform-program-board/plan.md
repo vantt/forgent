@@ -47,6 +47,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
+| RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:10) | `fg-server` |
 | DOC | `lead:DOC` | chưa ghi | ? |
 
 ## Các luồng
