@@ -75,7 +75,47 @@
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "2. Entry Points"
-      ]
+      ],
+      "bindingSha256": "816adcc3041b71a2231a7df87a3b57cbd024a3bd115bcae87a825be10fb9ee27",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+          "startLine": 36,
+          "endLine": 51,
+          "ancestry": [
+            "Spec: Packaging-Distribution",
+            "2. Entry Points"
+          ]
+        },
+        "previous": {
+          "anchor": "2-entry-points",
+          "unitKind": "heading",
+          "title": "2. Entry Points",
+          "textDigest": "b957a77f0e576cd94b809c6f976e1b8b24e9b50a53d1fb521faea2b2dc819b6a",
+          "startLine": 34,
+          "endLine": 34,
+          "ancestry": [
+            "Spec: Packaging-Distribution",
+            "2. Entry Points"
+          ]
+        },
+        "next": {
+          "anchor": "3-install-channels",
+          "unitKind": "heading",
+          "title": "3. Install Channels",
+          "textDigest": "12f8ca716708329f330c1e0197de47fad7fd28c2b4a7e042be16cfae276c052a",
+          "startLine": 53,
+          "endLine": 53,
+          "ancestry": [
+            "Spec: Packaging-Distribution",
+            "3. Install Channels"
+          ]
+        },
+        "content": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1` | Implemented preview | The Windows counterpart of `install.sh` (PowerShell 5.1 or later, no administrator rights, no `PATH` change): installs `fgctl.exe` for `x86_64-pc-windows-msvc` with the same `FGCTL_VERSION` / `FGCTL_INSTALL_DIR` / `FGCTL_ASSET_BASE_URL` / `FGCTL_TARGET` semantics and a mandatory `SHA256SUMS` check (rule RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell) in `docs/specs/distribution.md`). |\n| `fgctl init` | Implemented preview | Initializes a project/workspace from a release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the committed pin > the latest GitHub release; a downloaded asset is checksum-verified against `SHA256SUMS` before staging (rule RUL15 (fgctl init downloads a checksum-verified release when no source is given) in `docs/specs/distribution.md`). |\n| `fgos` launcher | Implemented preview | One `fgos` (`fgos.cmd` on Windows) written next to `fgctl` by `fgos doctor --fix` (which `fgctl init` runs): it walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so each project runs its own activated release with no absolute path and no rc edit. A different `fgos` found first on `PATH` is reported, never overwritten. See distribution spec RUL17 (one fgos on PATH runs each project's own activated fgos). |\n| `fgctl upgrade` | Implemented preview | Moves a workspace activation to a new release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release (checksum-verified against `SHA256SUMS` when downloaded), records the previous release for rollback, and updates `.fgos/distribution.json` (including `releaseVersion` when downloaded). |\n| `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |\n| `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: \"rust\"` and the activated `artifactDigest`. |\n| `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |\n| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |\n| `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |\n| local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |\n| `fgos doctor` | Implemented | Reports environment checks without writing by default. |\n| `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |\n| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |"
+      }
     },
     {
       "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",

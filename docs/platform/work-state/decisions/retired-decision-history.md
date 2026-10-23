@@ -27,7 +27,7 @@ Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (ts
 
 ### 0002 — Mô hình việc phẳng
 
-> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**
+> **Một phần đã supersede bởi [0012](#0012--mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời):**
 > "deps và parent tách rời có chủ đích" nay đọc là "tách rời về lưu trữ và ngữ
 > nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive". Phần còn lại của
 > record này (mô hình việc phẳng, một FSM, "epic" là item thường) vẫn hiện hành.
@@ -192,6 +192,8 @@ Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
+<a id="7-adr-0011-explicit-version-for-every-contract"></a>
+
 ### 0011 — Version tường minh cho mọi contract
 
 #### Bối cảnh
@@ -245,6 +247,8 @@ version tường minh trong định danh của chính nó, theo mẫu `<name>/v<
   ngay từ v1, không hoãn "để sau".
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+<a id="8-adr-0012-unified-typed-edge-graph-model"></a>
 
 ### 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
 
@@ -322,6 +326,8 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   `waits-for`).
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+<a id="9-adr-0013-report-not-write-channel-for-discovered-from"></a>
 
 ### 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
 
@@ -1009,3 +1015,11 @@ một lần chạy thật, agent thật, theo đúng hướng dẫn, trên item 
 lộ ra khoảng cách đó. Nơi khoảng cách này lặp lại (một hành vi bắt buộc
 nhưng không gì kiểm tra khi bị bỏ sót), hướng sửa đúng là chuyển bảo
 đảm vào engine, không phải viết prose mạnh hơn.
+
+## Related Files
+
+- [Work-state portal](../README.md)
+- [Work-state specification](../spec.md)
+- [CLI I/O contract](../contracts/cli-io-contract.md)
+- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)
+- [Architecture map](../../architecture-map.md)

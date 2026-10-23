@@ -262,7 +262,7 @@ Drift classes:
 | Managed config differs from default | local `fgos doctor` | Schema-aware merge if registered as safe. |
 | Mutable state/log/cache differs | N/A | Excluded from release drift. |
 
-`fgctl init`, `fgctl repair`, and `fgctl upgrade` use one pipeline:
+`fgctl init`, `fgctl repair`, and `fgctl upgrade` use one pipeline. `packages/distribution/rust/src/init.rs` implements it using static preflight, never candidate execution before ready publication. The retained design below is qualified by [Activation binding](../contracts/activation-binding.md):
 
 ```txt
 select/acquire release
@@ -307,6 +307,8 @@ artifact.
 ```
 
 #### 14. Walking Skeleton
+
+This retained proof-slice design is not current implementation certification. Its preflight line means static `fgctl` preflight, its install-lock spelling is superseded by `<stateRoot>/locks/install.lock`, and its Node-first sketch is superseded by the native-first release boundaries in [Activation binding](../contracts/activation-binding.md).
 
 The first proof slice should be deliberately small:
 

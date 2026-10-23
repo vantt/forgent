@@ -1,0 +1,5 @@
+{
+  "status": "pass",
+  "bindingsVerified": 2328,
+  "recipe": "Python json.dumps sort_keys=True, ensure_ascii=False, compact separators, UTF-8, one LF"
+}

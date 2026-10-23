@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "status": "completed-in-permitted-scope",
+  "authorSession": "fgos-run_unit-run-17927673e1bf0d",
+  "sourceHead": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+  "authority": "candidate-only; pending independent review; no gate acceptance or authority cutover",
+  "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w2-d1b-brief.md",
+  "verification": {
+    "status": "pass",
+    "sourceUnits": 1057,
+    "refreshedBindings": 1271,
+    "bindingsVerified": 2328,
+    "fullPlacementWitnesses": 2328,
+    "registrations": {
+      "Check": 135,
+      "Fix": 32
+    },
+    "incomingLinks": 6,
+    "protectedSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+    "authority": "candidate-only; no gate accepted",
+    "drift": {
+      "scanner": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+      "scannerSha256": "1d808194e878e34e1cf0cbbe057c14d6c3262ecfae9d305393622518305c96e7",
+      "redirectedScannerSha256": "3eb38e5f9952874e7081d16b39b73ace680789f8b06b5d6209381d50fd862aba",
+      "modifications": [
+        "absolute extractor import",
+        "repository root",
+        "scratch destination only"
+      ],
+      "sourceHead": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+      "counts": [
+        {
+          "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+          "currentUnits": 170,
+          "changedSinceInventory": 7,
+          "changedSinceFinal": 0,
+          "missingCurrent": 0,
+          "missingChangedSinceInventory": 0,
+          "missingChangedSinceFinal": 0
+        },
+        {
+          "sourcePath": "docs/specs/distribution.md",
+          "currentUnits": 43,
+          "changedSinceInventory": 27,
+          "changedSinceFinal": 4,
+          "missingCurrent": 0,
+          "missingChangedSinceInventory": 0,
+          "missingChangedSinceFinal": 0
+        },
+        {
+          "sourcePath": "docs/specs/runner.md",
+          "currentUnits": 517,
+          "changedSinceInventory": 148,
+          "changedSinceFinal": 0,
+          "missingCurrent": 0,
+          "missingChangedSinceInventory": 0,
+          "missingChangedSinceFinal": 0
+        },
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "currentUnits": 327,
+          "changedSinceInventory": 36,
+          "changedSinceFinal": 0,
+          "missingCurrent": 0,
+          "missingChangedSinceInventory": 0,
+          "missingChangedSinceFinal": 0
+        }
+      ],
+      "fullScratchResult": "/tmp/fgos-work/w2-d1b/legacy-drift.json",
+      "fullResultSha256": "97d1d5f76a0b572d76a3a091d8e5d731704572b8bf4e7a37d461cef437b7d264",
+      "otherSourcesNotClaimed": true
+    }
+  },
+  "independentPython": {
+    "status": "pass",
+    "bindingsVerified": 2328,
+    "recipe": "Python json.dumps sort_keys=True, ensure_ascii=False, compact separators, UTF-8, one LF"
+  },
+  "sourceUnitDispositions": {
+    "current-source-content-present": 968,
+    "structural-heading-adaptation": 40,
+    "adapted-or-retired-legacy-clause": 47,
+    "current-source-content-in-candidate-envelope": 2
+  },
+  "refreshedShardCount": 16,
+  "bindingHashChanges": 775,
+  "placementOnlyChanges": 496,
+  "bindingHashEncoding": "sha256(UTF-8(compact JSON with sorted keys targetAncestry,targetAnchor,targetOwner,targetUnitDigest + LF))",
+  "receiptSentenceCorrection": {
+    "supersedes": "plans/260925-documentation-authority-unification/reports/phase-09/carries/receipt.md:65",
+    "correction": "At the author/review pins only the top-level field was absent; ten row-level declarations existed. At this source HEAD a top-level field and five row-level declarations exist. The old historical receipt was not rewritten outside scope.",
+    "snapshots": [
+      {
+        "pin": "f534aeaea",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+        "sha256": "e802359cdfb7d7c2c0ba294f443c7804879e3087af7c1b652deb840cb355546d",
+        "topLevelDeclaration": false,
+        "occurrences": 10
+      },
+      {
+        "pin": "cffe725b9",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+        "sha256": "e802359cdfb7d7c2c0ba294f443c7804879e3087af7c1b652deb840cb355546d",
+        "topLevelDeclaration": false,
+        "occurrences": 10
+      },
+      {
+        "pin": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json",
+        "sha256": "fc9f4ec40796f8d4dd9e1455e1affd5ce7b8e28c7b507d506b6221f13632a053",
+        "topLevelDeclaration": true,
+        "occurrences": 6
+      }
+    ]
+  },
+  "tests": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos TMPDIR=/tmp/fgos-work/w2-d1b node --test test/docs/decisions-corpus-retired.test.mjs",
+      "status": "pass",
+      "tests": 7,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/decisions-test.log",
+      "qualification": "retained-source corpus proof, not authority cutover"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos TMPDIR=/tmp/fgos-work/w2-d1b node --test test/scripts/generate-doc-inventory.test.mjs",
+      "status": "timeout",
+      "timeoutSeconds": 120,
+      "completedVerdict": false,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/inventory-test.log",
+      "qualification": "Native toolchain preparation completed some builds; no test verdict; not green. Existing test helper populated ignored native build caches."
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    }
+  ],
+  "restrictions": {
+    "repositoryGitWrites": false,
+    "fgosCliAgainstRepository": false,
+    "broadTestSuite": false,
+    "lifecycleVerbs": false,
+    "protectedKnowledgeRegistryUntouched": true,
+    "oldReceiptUntouched": true,
+    "oldScannerOutputUntouched": true
+  },
+  "needsWrites": [],
+  "remainingOwnerDuties": [
+    "Independent review of refreshed bindings and semantic dispositions",
+    "Cross-owner frozen-register projections",
+    "Any acceptance, authority cutover, or source retirement"
+  ],
+  "files": [
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "sha256": "cbb528586fda89ed19393f9bcfeb7e20be3e8c0c25d4d76f99ab1766ec6d69fe"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sha256": "147fce502ec077641d82aa5524e459ffbb4ac69da31b3669554b961834a4bfd6"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sha256": "eee8d9a91bfcfb08f80af0e3ec3e9bfe3478ad1648964967251922612f622b6b"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sha256": "80d791013143b4177b05e0e6635ab6d3b0688cd61dcef894d93c8bede2f07d43"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sha256": "d6781784842b07918f9f3d40d9b0eaff037263b315bb46e5a35f5273bead23f2"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "sha256": "cfc3f750f213f1259f778832ed67df308f7282e4ce6987f366b9fef199ee915a"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "sha256": "c9087a371a17e3bff3e79e246374b54abfe903c18e3a5ecaa851fa769f634999"
+    },
+    {
+      "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "sha256": "32ddac5bf30096e86861caa0582f69d902f150fe4f862924fc56924208b3f73b"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sha256": "348fb00440ab449972706c129caffff1e7316a4156f70a7909e720425a412c46"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "sha256": "847229780cddd8c71a337f8aaaf50b05314d2d77fda8af4f22df9a17d47042c7"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "sha256": "b7f4e590dbb6b10579466a589e26c5dd161c43c0841a4cefe39bdf20a9caf501"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "sha256": "8cd3d1f086ac202a56281644f15ab979b552dd031302f9cf1ee77e2402eca3d1"
+    },
+    {
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "sha256": "f95ab4d190bae56685e9f1255f1623027d48489f77b322a55531dbaa45c49a31"
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "sha256": "87b5663b1492d2b8205e6887a2b1550a1416d659b7a09d9691efb49e360f5c14"
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "sha256": "8fad2d269f635ce4a00093500daeb8825e95765d65e133479da4821f7aa5238e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "sha256": "379ea3bec90a6c0b6ae877ba000d6aaa54a9c8e63966719fbb8e55dd8310542d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+      "sha256": "cbd49ed2e300e1fdef69f199c52b25f97ef2bd888b6349ce931f45aaf126d87c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "sha256": "ec0fac789b9eba5abd8ed67143d08fae2f9737d23401e77516b44c1bb88c5e3f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "sha256": "07df4ca1d1a26a0cc162b978f5104fe70f51c884a293b30b04d7e04d750a83d0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "sha256": "964e198fa8ee327d426bd4413cde1bcd7a06d558e2b6ef2d9fe8abb6118c295f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "sha256": "1ced061c89ef5ea9f99939e2ba428196f33fbcf93dfe45b60604ab6cc97ab932"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "sha256": "9c4fa90eb1b66353bafd0c6970a986915ebf3b5238387802e1e04eb6fcaab4cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "sha256": "6980f89faa46c695c8a5a9ab142f24a1e0aef8d1f4329af6c9790a18fcdf55d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "sha256": "969fc6720b53092a6160147315c8c6587e818307564170bd7a19ea9a93de5ed7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "sha256": "08b08b0fd37caf08dbb6b5f16e2a6f5240d7432efe8839028dde6a60541b522e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "sha256": "66ffd2df3b912892e97162c03ff87c0db05d73f44f022eeb427a1b82ea4f9b7f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "sha256": "1726024facd5a32e8b31e3c7ec9fed0f6440d6593a45b45105a6d52753a9c528"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "sha256": "5c26f85476bae517f6c0730d2e57cb1fab1e562d4a45ee9ea3be6f9345288b8a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-assignment-predecessor.json",
+      "sha256": "acb16546811ae7f129d384f0ea6fce3dbd0010716f7d96d8d7a09820bba58b21"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-r03-assignment-predecessors.json",
+      "sha256": "03ccc32fd28817a9662159650a52eb5bdfaa604b9978ac0e5055b12472518613"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-runner-predecessors.json",
+      "sha256": "d82337272016418b23bb38f5925931e4751232932d8f8308adf42e2b3d243417"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "sha256": "b77579ad440997057147f4d98c2fafec2f15cf3af9930bf320d1d04a8f61a06c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/adjudications.json",
+      "sha256": "fba07f497fa763744d89309b8b2cf4eafb4d35b3cc49f0f2a50ac22548811508"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/binding-refresh.json",
+      "sha256": "e61d79e2185d561af746a7f04ae8221e7aaf82d9a8f5c9a84ac83fef2d87182e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/carrier-renders.json",
+      "sha256": "dd1443d766f59ab7f7128a107c756e05c3ae41d7b9dc954f315cc48c2fd1b209"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/decisions-test.log",
+      "sha256": "800a2e087cb4fa3df64913529b91fb627853016fd00ee107b904caa9f3c0a9d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/inventory-test.log",
+      "sha256": "3f935ed601e148c993cba784b5dcd70f306331b19a8dc600c4e3473231c38871"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/legacy-drift-four-sources.json",
+      "sha256": "822f3180cbe4f1069122a0f49200e603059e9099aab1121a16b2c7583846f061"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/map-carriage.mjs",
+      "sha256": "ef11457bd580a7faa81ef93596ef26ee3fba107131283c1ec7a8b77964003745"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/python-hashes.json",
+      "sha256": "babe3dcf3f1648bc78e26946db8d03fadf5bec9c0aaa70ae96651acf12b60d07"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/rebuild-carriers.mjs",
+      "sha256": "4bcd8a546e9170cc4287a1c300bf97ab70ca737973cde3836ff312d46a01a6b8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/receipt.md",
+      "sha256": "d2aae29ba205abb7a5017c93dffe40a7cf0684da9eff8ce0dd2d79e24c3eda9d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/refresh-bindings.mjs",
+      "sha256": "e9935a1efbb8e36fd55c7414fef3f80254fc5cd517ed4719b4d811735b5c241b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/verification.json",
+      "sha256": "0ec3f83e41ddbbce57a19aa43306ad7e06b2e4fdf7a917dc118b49c47df09546"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/verify-binding-hashes.py",
+      "sha256": "5fad25e2c384d6c8e60198324e852a12c85d51fe14a9b0b7d0075be0991b8ff8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/verify-resync.mjs",
+      "sha256": "3e0ac72833d6e8b636f6b73445a9776c0564e6e6e698f1234ddc175921ae0f4c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/write-receipt.mjs",
+      "sha256": "7f9c40b062009da8f9f647bf9f77f4987682ea1501b98b8788fe85545f5b6596"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ The complete verbatim Native-First rules, their 0033 narrowing, the no-extra-jud
 
 “A session worktree is structurally the wrong place for a merge-into-main to happen.” This exact quoted rule survives in `bin/fgos.mjs`'s return guard; the supposedly quoted full sentence was not present in `docs/specs/runner.md` at this pin and no removal from that document was found by `git log -S`. Its current behavior is conserved here rather than pretending an old paragraph was found.
 
-`approve` refuses every linked worktree, registered session included. `return` is different: a registered `fgos session start` worktree may perform its own progress check (`aheadCount` and verify); its `.fgos` is a symlink to the shared store. An unregistered worktree cannot return a main-source item. A session can therefore participate in work without becoming the merge-into-main checkout. See `bin/fgos.mjs` return, `src/verbs/merge/approve.mjs`, `src/runner/session.mjs` and `test/cli/fgos-return-worktree-guard.test.mjs`.
+`approve` refuses every linked worktree, registered session included. `return` is different: a registered `fgos session start` worktree may perform its own progress check (`aheadCount` and verify); its `.fgos` is a symlink to the shared store. An unregistered worktree cannot return a main-source item. A session can therefore participate in work without becoming the merge-into-main checkout. See `bin/fgos.mjs` return, `src/verbs/merge/approve.mjs` and `src/runner/session.mjs`. The quoted sentence's recorded origin is [the return-guard research](../../../history/tsk-ikd-return-main-worktree-guard/RESEARCH.md), line 26; it is not the name of a test file.
 
 ## Operation Prompt Templates
 
@@ -49,4 +49,4 @@ Discovery and rendering remain owned by `src/runner/dispatch/operation-prompt-te
 
 ## Retired Provider-Policy Pointer
 
-The former `src/runner/dispatch/assignment-policy.mjs` citation to `docs/history/executor-policy-dispatch-seams/` never had that directory as a live authority. That module is now absent. H2a/H2b/RT1/F1 historical evidence remains evidence, not a new live policy owner. Current seat choice belongs to Seat Binding (`docs/platform/seat-binding/spec.md`); no pointer patch to a deleted module is applied or invented.
+The former `src/runner/dispatch/assignment-policy.mjs` citation to `docs/history/executor-policy-dispatch-seams/` never had that directory as a live authority. That module is now absent. H2a/H2b/RT1/F1 historical evidence remains evidence, not a new live policy owner. Current seat choice belongs to [Seat Binding](../../seat-binding/spec.md); no pointer patch to a deleted module is applied or invented.

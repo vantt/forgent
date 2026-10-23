@@ -1,1 +1,38 @@
-{"version":1,"shard":"s7-step09-n1-r03-assignment-predecessors","authorSession":"codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19","sources":["docs/platform/agent-coordination/contracts/assignment-run-runresult.md","docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"],"claims":[],"registryGaps":[{"claimId":"claim_1e367448a5e9807953df6f9b2ef44e43","sourcePath":"docs/platform/agent-coordination/contracts/assignment-run-runresult.md","sourceUnitDigest":"30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b","claimKind":"contract","disposition":"supersede","targetOwner":"docs/platform/agent-coordination/contracts/assignment-run-runresult.md","targetAnchor":"unheaded-block-10","targetUnitDigest":"3a9ab1486af4fec2e01a8706a54ff99e69ffef566fc5159eccf0ea8dd8dbc2d8","rationale":"Citation-only Lead correction at 1b3302680be9ba9559d431cbef4c83cacca91216; exact committed before/after occurrence and native matcher bind predecessor to claim_71946ae4195a82ae48ed8687182a5ba8. Retain old identity as gap. No identity transplant or approval carry.","reviewStatus":"pending","authoredBy":"codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19"},{"claimId":"claim_1a0fd8e46885b7343da2f7c6cae17f2d","sourcePath":"docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md","sourceUnitDigest":"997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237","claimKind":"decision","disposition":"supersede","targetOwner":"docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md","targetAnchor":"unheaded-block-5","targetUnitDigest":"5247ba7e74bc97221d21e9d31e58d1313cfd5f7f9deb7aa9735905c7e1f26228","rationale":"Citation-only Lead correction at 1b3302680be9ba9559d431cbef4c83cacca91216; exact committed before/after occurrence and native matcher bind predecessor to claim_a452409dbfc7f36e75f6f53b2b292c20. Retain old identity as gap. No identity transplant or approval carry.","reviewStatus":"pending","authoredBy":"codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19"}]}
+{
+  "version": 1,
+  "shard": "s7-step09-n1-r03-assignment-predecessors",
+  "authorSession": "codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19",
+  "sources": [
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+    "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+  ],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_1e367448a5e9807953df6f9b2ef44e43",
+      "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sourceUnitDigest": "30b918ac51a8585cee1ad129b9b746895ed9169caf2719a8420fba1e2899608b",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "3a9ab1486af4fec2e01a8706a54ff99e69ffef566fc5159eccf0ea8dd8dbc2d8",
+      "rationale": "Citation-only Lead correction at 1b3302680be9ba9559d431cbef4c83cacca91216; exact committed before/after occurrence and native matcher bind predecessor to claim_71946ae4195a82ae48ed8687182a5ba8. Retain old identity as gap. No identity transplant or approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19"
+    },
+    {
+      "claimId": "claim_1a0fd8e46885b7343da2f7c6cae17f2d",
+      "sourcePath": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "sourceUnitDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "5247ba7e74bc97221d21e9d31e58d1313cfd5f7f9deb7aa9735905c7e1f26228",
+      "rationale": "Citation-only Lead correction at 1b3302680be9ba9559d431cbef4c83cacca91216; exact committed before/after occurrence and native matcher bind predecessor to claim_a452409dbfc7f36e75f6f53b2b292c20. Retain old identity as gap. No identity transplant or approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179234b4520bb6@2026-10-19"
+    }
+  ]
+}

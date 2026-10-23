@@ -1,0 +1,141 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling memchr v2.8.3
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling itoa v1.0.18
+   Compiling version_check v0.9.5
+   Compiling serde_json v1.0.151
+   Compiling cfg-if v1.0.4
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.189
+   Compiling serde v1.0.229
+   Compiling rustix v1.1.4
+   Compiling bitflags v2.13.2
+   Compiling linux-raw-sys v0.12.1
+   Compiling cpufeatures v0.2.17
+   Compiling regex-syntax v0.8.11
+   Compiling unicode-segmentation v1.13.3
+   Compiling once_cell v1.21.4
+   Compiling thiserror v2.0.20
+   Compiling libloading v0.8.9
+   Compiling fgos-write-scope v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/git/write-scope)
+   Compiling generic-array v0.14.7
+   Compiling ryu-js v1.0.2
+   Compiling napi-build v2.2.4
+   Compiling semver v1.0.28
+   Compiling napi-sys v2.4.0
+   Compiling fgos-node-addon v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/git/node-addon)
+   Compiling aho-corasick v1.1.5
+   Compiling convert_case v0.6.0
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling regex-automata v0.4.18
+   Compiling fgos-durable-file v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/durable-file/rust)
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/process/rust)
+   Compiling fgos-event-store v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/event-store/rust)
+   Compiling ctor v0.2.9
+   Compiling regex v1.13.1
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/holder-lock/rust)
+   Compiling napi-derive-backend v1.0.75
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/identity/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/canonical-json/rust)
+   Compiling napi v2.16.17
+   Compiling napi-derive v2.16.13
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/git/rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 47.63s
+   Compiling serde_json v1.0.151
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling arraydeque v0.5.1 (/home/vantt/projects/forgentX-p9-w1-d1/packages/yaml-doc/third-party/arraydeque-0.5.1)
+   Compiling pin-project-lite v0.2.17
+   Compiling crc32fast v1.5.1
+   Compiling tinyvec_macros v0.1.1
+   Compiling simd-adler32 v0.3.10
+   Compiling syn v3.0.5
+   Compiling adler2 v2.0.1
+   Compiling filetime v0.2.29
+   Compiling semver v1.0.28
+   Compiling xattr v1.6.1
+   Compiling tinyvec v1.13.2
+   Compiling tar v0.4.46
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+   Compiling miniz_oxide v0.9.1
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling unicode-normalization v0.1.25
+   Compiling indexmap v2.14.2
+   Compiling flate2 v1.1.10
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling tokio-macros v2.7.2
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/process/rust)
+   Compiling fgos-agent-protocol v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/agent-protocol/rust)
+   Compiling tokio v1.53.1
+   Compiling thiserror v2.0.20
+   Compiling saphyr-parser v0.2.2 (/home/vantt/projects/forgentX-p9-w1-d1/packages/yaml-doc/third-party/saphyr-parser-0.2.2)
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/holder-lock/rust)
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/yaml-doc/rust)
+   Compiling serde v1.0.229
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/git/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/canonical-json/rust)
+   Compiling fgos-terminal-control v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/terminal-control/rust)
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/host-runtime/rust)
+   Compiling fgos-convention v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/convention/rust)
+   Compiling fgos-seat-binding v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/seat-binding/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/identity/rust)
+   Compiling fgos-distribution v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/distribution/rust)
+   Compiling fgos-observe v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/observe/rust)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/run-supervisor/rust)
+   Compiling fgos-work-state v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/work-state/rust)
+   Compiling fgos-run-result v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/packages/run-result/rust)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgentX-p9-w1-d1/apps/fgos)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 01s

@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "sourceUnits": 1057,
+  "refreshedBindings": 1271,
+  "bindingsVerified": 2328,
+  "fullPlacementWitnesses": 2328,
+  "registrations": {
+    "Check": 135,
+    "Fix": 32
+  },
+  "incomingLinks": 6,
+  "protectedSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+  "authority": "candidate-only; no gate accepted",
+  "drift": {
+    "scanner": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+    "scannerSha256": "1d808194e878e34e1cf0cbbe057c14d6c3262ecfae9d305393622518305c96e7",
+    "redirectedScannerSha256": "3eb38e5f9952874e7081d16b39b73ace680789f8b06b5d6209381d50fd862aba",
+    "modifications": [
+      "absolute extractor import",
+      "repository root",
+      "scratch destination only"
+    ],
+    "sourceHead": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+    "counts": [
+      {
+        "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "currentUnits": 170,
+        "changedSinceInventory": 7,
+        "changedSinceFinal": 0,
+        "missingCurrent": 0,
+        "missingChangedSinceInventory": 0,
+        "missingChangedSinceFinal": 0
+      },
+      {
+        "sourcePath": "docs/specs/distribution.md",
+        "currentUnits": 43,
+        "changedSinceInventory": 27,
+        "changedSinceFinal": 4,
+        "missingCurrent": 0,
+        "missingChangedSinceInventory": 0,
+        "missingChangedSinceFinal": 0
+      },
+      {
+        "sourcePath": "docs/specs/runner.md",
+        "currentUnits": 517,
+        "changedSinceInventory": 148,
+        "changedSinceFinal": 0,
+        "missingCurrent": 0,
+        "missingChangedSinceInventory": 0,
+        "missingChangedSinceFinal": 0
+      },
+      {
+        "sourcePath": "docs/specs/work-state.md",
+        "currentUnits": 327,
+        "changedSinceInventory": 36,
+        "changedSinceFinal": 0,
+        "missingCurrent": 0,
+        "missingChangedSinceInventory": 0,
+        "missingChangedSinceFinal": 0
+      }
+    ],
+    "fullScratchResult": "/tmp/fgos-work/w2-d1b/legacy-drift.json",
+    "fullResultSha256": "97d1d5f76a0b572d76a3a091d8e5d731704572b8bf4e7a37d461cef437b7d264",
+    "otherSourcesNotClaimed": true
+  }
+}

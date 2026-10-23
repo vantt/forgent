@@ -206,8 +206,8 @@ Added in candidate — complete source units from `docs/specs/distribution.md` a
   fill-missing-only merge adds; `<stateRoot>/terminal` is created with mode 0700 (the
   `terminal-dir` fix).
 - **Side effects:** the caller's own shell profile file(s), local project
-  config file, global config file (`~/.fgos/config.json`), and the two lock
-  directories may be created or modified; nothing outside the caller's own
+  config file, global config file (`~/.fgos/config.json`), the two lock
+  directories and `<stateRoot>/terminal` may be created or modified; nothing outside the caller's own
   environment is touched, and no network access happens.
 - **Afterwards:** the caller sees exactly what changed — which profile
   file(s) gained the source line (or already had it), which project config

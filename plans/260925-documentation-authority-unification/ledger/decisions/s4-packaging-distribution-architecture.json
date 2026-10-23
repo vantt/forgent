@@ -3936,7 +3936,50 @@
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation"
-      ]
+      ],
+      "bindingSha256": "77cdf4d3d4c3ae69c5998b672919cb04d49b744f6d8d9013d08cbb05621cea1b",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "10091961d72f5052ef0355d73033bdd6e6653df594f6393e50c3e6155bdc0cce",
+          "startLine": 142,
+          "endLine": 153,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "runtime-identity-and-activation-1",
+          "unitKind": "heading",
+          "title": "Runtime Identity And Activation",
+          "textDigest": "54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd",
+          "startLine": 140,
+          "endLine": 140,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "461b6eb88c2114010dd0f6de1c5c3e420ebe54ede0b3db61fc12cafce456a99a",
+          "startLine": 155,
+          "endLine": 162,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "content": "```txt\nLegacy status: Promoted architecture/contract source\nPromoted to:\n- docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md\n- docs/platform/packaging-distribution/contracts/release-manifest.md\n- docs/platform/packaging-distribution/contracts/activation-binding.md\n- docs/platform/packaging-distribution/contracts/distribution-pin.md\nCurrent reader entry: docs/platform/packaging-distribution/README.md\nUse this legacy file for: Source detail until contract extraction is complete\nDo not use this legacy file for: Current implementation status without checking implementation alignment\nLast reviewed: 2026-09-13\n```"
+      }
     },
     {
       "claimId": "claim_a8c8bb05d3b2183c26cfb7f502c66ac3",
@@ -3953,7 +3996,50 @@
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation"
-      ]
+      ],
+      "bindingSha256": "9ff3959fd6d57c78fa60198cf7c8502afdaac9af10fad4aedde45eb713fb53af",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "461b6eb88c2114010dd0f6de1c5c3e420ebe54ede0b3db61fc12cafce456a99a",
+          "startLine": 155,
+          "endLine": 162,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "10091961d72f5052ef0355d73033bdd6e6653df594f6393e50c3e6155bdc0cce",
+          "startLine": 142,
+          "endLine": 153,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "c04b3e9f7cf11dfba642005558dafc2bf67a1b96da1e475ed8634e4c9ddde1ad",
+          "startLine": 164,
+          "endLine": 168,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "content": "> Status: historical redirect. The active promoted runtime docs are\n> [runtime-identity-and-activation.md](runtime-identity-and-activation.md),\n> [repository-runtime-layout.md](../contracts/repository-runtime-layout.md),\n> [release-manifest.md](../contracts/release-manifest.md),\n> [activation-binding.md](../contracts/activation-binding.md),\n> [distribution-pin.md](../contracts/distribution-pin.md),\n> and [fgctl-and-local-fgos.md](fgctl-and-local-fgos.md).\n> Keep this file only as detailed source context."
+      }
     },
     {
       "claimId": "claim_26dac21a6c44a07abe3ff6c726462bca",
@@ -3970,7 +4056,50 @@
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation"
-      ]
+      ],
+      "bindingSha256": "bac60c3bb12908829388600ba30f36534cb5f90a62da826a54043b6c83040a3d",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "c04b3e9f7cf11dfba642005558dafc2bf67a1b96da1e475ed8634e4c9ddde1ad",
+          "startLine": 164,
+          "endLine": 168,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "461b6eb88c2114010dd0f6de1c5c3e420ebe54ede0b3db61fc12cafce456a99a",
+          "startLine": 155,
+          "endLine": 162,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-28",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 28",
+          "textDigest": "646813dad37dce5e09992cf8bf2aeddbb132e4620f1455dd55ec2060aa4a4b88",
+          "startLine": 170,
+          "endLine": 172,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "content": "**Status:** Historical architecture contract draft.\n**Date:** 2026-09-04.\n**Scope:** Project-local fgOS runtime identity, release records, per-workspace\nactivation binding, pinning, drift, rollback, quarantine, and the minimum\ncommand boundary needed for packaging/distribution and the Rust `fgos` CLI."
+      }
     },
     {
       "claimId": "claim_e7c16bc6110144f3672d8e3263df7c4b",
@@ -3987,7 +4116,51 @@
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation"
-      ]
+      ],
+      "bindingSha256": "f989a717ed69b2588d8d5afe9aa8c5ed09520ae4e848c3966619f531d625a0ef",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-28",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 28",
+          "textDigest": "646813dad37dce5e09992cf8bf2aeddbb132e4620f1455dd55ec2060aa4a4b88",
+          "startLine": 170,
+          "endLine": 172,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "c04b3e9f7cf11dfba642005558dafc2bf67a1b96da1e475ed8634e4c9ddde1ad",
+          "startLine": 164,
+          "endLine": 168,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation"
+          ]
+        },
+        "next": {
+          "anchor": "how-to-use-this-document",
+          "unitKind": "heading",
+          "title": "How To Use This Document",
+          "textDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
+          "startLine": 174,
+          "endLine": 174,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "content": "This document was the first contract draft before promotion into\n`docs/platform/packaging-distribution/**`. It deliberately kept shared\ngateway/web as a future constraint, not active delivery scope."
+      }
     },
     {
       "claimId": "claim_a194d0ab7320ba24239af2947b286713",
@@ -4026,7 +4199,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "How To Use This Document"
-      ]
+      ],
+      "bindingSha256": "7161005f2fa8530a700292a7bdd84cb1e8ad9d2928bb97f48f92fe37ecc06594",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-29",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 29",
+          "textDigest": "627342a16c82cf6723afcd338d1fb2e690df1999c4c86d1c9cd812cb48c4393a",
+          "startLine": 176,
+          "endLine": 177,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "previous": {
+          "anchor": "how-to-use-this-document",
+          "unitKind": "heading",
+          "title": "How To Use This Document",
+          "textDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
+          "startLine": 174,
+          "endLine": 174,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-30",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 30",
+          "textDigest": "08f3c84ed43e45ba91d0b87a6fc376c3b893ff12bd3ba9a56419aecf7e571dbb",
+          "startLine": 179,
+          "endLine": 192,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "content": "This document is intentionally detailed historical source context. Use the\npromoted platform docs as the working contract for new changes."
+      }
     },
     {
       "claimId": "claim_821b6180ae535904a105ff8c47fe5dff",
@@ -4044,7 +4263,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "How To Use This Document"
-      ]
+      ],
+      "bindingSha256": "37297247de6f33b4c5e619e88a1a46ab4f99ad1ba428be86370c583397befa14",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-30",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 30",
+          "textDigest": "08f3c84ed43e45ba91d0b87a6fc376c3b893ff12bd3ba9a56419aecf7e571dbb",
+          "startLine": 179,
+          "endLine": 192,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-29",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 29",
+          "textDigest": "627342a16c82cf6723afcd338d1fb2e690df1999c4c86d1c9cd812cb48c4393a",
+          "startLine": 176,
+          "endLine": 177,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "How To Use This Document"
+          ]
+        },
+        "next": {
+          "anchor": "historical-decisions-promoted-or-tracked",
+          "unitKind": "heading",
+          "title": "Historical Decisions Promoted Or Tracked",
+          "textDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
+          "startLine": 194,
+          "endLine": 194,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "Historical Decisions Promoted Or Tracked"
+          ]
+        },
+        "content": "Read it in layers:\n\n1. Read [Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md) first for root\n   topology, state classes, worktree behavior, and dirty-tree rules.\n2. Read the promoted\n   [runtime identity architecture](runtime-identity-and-activation.md)\n   for current runtime identity language.\n3. Read the promoted contracts for\n   [repository layout](../contracts/repository-runtime-layout.md),\n   [activation binding](../contracts/activation-binding.md),\n   [distribution pin](../contracts/distribution-pin.md),\n   and [release manifest](../contracts/release-manifest.md).\n4. Use the remaining sections here only to recover historical rationale or\n   details that the preservation audit points to."
+      }
     },
     {
       "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
@@ -4070,13 +4335,42 @@
       "additionalBindings": [
         {
           "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-          "targetAnchor": "unheaded-block-60",
+          "targetAnchor": "unheaded-block-61",
           "targetUnitDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
           "targetAncestry": [
             "Runtime Identity And Activation",
             "Settled Facts"
           ],
-          "bindingSha256": "120f8a805cb8e22758f7e041e71d63b3cc7a88b75c9df6b0862dbd688711d9f5"
+          "bindingSha256": "099d70d433c8862277a551422377dd3a318906d68b6d7a628f1947a1fb021477",
+          "placement": {
+            "selected": {
+              "anchor": "unheaded-block-61",
+              "unitKind": "unheaded-block",
+              "title": "Unheaded block 61",
+              "textDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
+              "startLine": 409,
+              "endLine": 428,
+              "ancestry": [
+                "Runtime Identity And Activation",
+                "Settled Facts"
+              ]
+            },
+            "previous": {
+              "anchor": "settled-facts",
+              "unitKind": "heading",
+              "title": "Settled Facts",
+              "textDigest": "0db9902d24279c5151c4666b47781fe64d4f6adc531991463246527ae155e4e7",
+              "startLine": 407,
+              "endLine": 407,
+              "ancestry": [
+                "Runtime Identity And Activation",
+                "Settled Facts"
+              ]
+            },
+            "next": null,
+            "content": "| Decision | Status |\n|---|---|\n| Runtime identity is digest-based, not PATH-based. | Settled for V1. |\n| `artifactDigest` is the digest of the canonical release tree manifest, not an archive digest. | Settled for V1. |\n| Release tree manifest uses normalized logical paths and refuses symlinks/case collisions in V1. | Settled for V1. |\n| Project commands enter through stable local shims under workspace `.fgos/installation/bin/`. | Settled for V1. |\n| Immutable release payloads live under a shared content-addressed machine/trust-domain release store, not under each worktree. | Settled for V1. |\n| Activation is per workspace via `.fgos/installation/activation.json`; there is no single repository-wide active runtime pointer in V1. | Settled for V1. |\n| Packaging release/activation state uses workspace installation roots and must not share a namespace with work coordination state. | Settled for V1. |\n| The project/team pin is tracked as `.fgos/distribution.json`; machine-local activation state remains ignored. | Settled for V1. |\n| `activation.json` is a durably published workspace binding, not a symlink, in V1. | Settled for V1. |\n| Install transaction state lives under the release store root's `installs/<activationId>.json`, not inside `activation.json`. | Settled for V1. |\n| Mutating invocations create lease files; `fgctl` may stage/verify during leases but refuses activation while a non-stale mutating lease exists. | Settled for V1. |\n| V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |\n| `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |\n| Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |\n| Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Selected V1 design conserved above; mechanism unimplemented, Plan C not a cutover prerequisite. |\n| `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |\n| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |\n| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |"
+          },
+          "reviewStatus": "pending"
         }
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
@@ -4085,7 +4379,7 @@
       "claimId": "claim_12d5dbb269ca537c8e1923d57274a43f",
       "sourceUnitDigest": "0266dc3bbac745ba6953a93d03d3ccb6a9cfb9c06d3dfc4f760b28f5b9224bcf",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-60",
+      "targetAnchor": "unheaded-block-61",
       "claimKind": "decision",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -4098,9 +4392,37 @@
         "Runtime Identity And Activation",
         "Settled Facts"
       ],
-      "bindingSha256": "120f8a805cb8e22758f7e041e71d63b3cc7a88b75c9df6b0862dbd688711d9f5",
+      "bindingSha256": "099d70d433c8862277a551422377dd3a318906d68b6d7a628f1947a1fb021477",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-61",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 61",
+          "textDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
+          "startLine": 409,
+          "endLine": 428,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Settled Facts"
+          ]
+        },
+        "previous": {
+          "anchor": "settled-facts",
+          "unitKind": "heading",
+          "title": "Settled Facts",
+          "textDigest": "0db9902d24279c5151c4666b47781fe64d4f6adc531991463246527ae155e4e7",
+          "startLine": 407,
+          "endLine": 407,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Settled Facts"
+          ]
+        },
+        "next": null,
+        "content": "| Decision | Status |\n|---|---|\n| Runtime identity is digest-based, not PATH-based. | Settled for V1. |\n| `artifactDigest` is the digest of the canonical release tree manifest, not an archive digest. | Settled for V1. |\n| Release tree manifest uses normalized logical paths and refuses symlinks/case collisions in V1. | Settled for V1. |\n| Project commands enter through stable local shims under workspace `.fgos/installation/bin/`. | Settled for V1. |\n| Immutable release payloads live under a shared content-addressed machine/trust-domain release store, not under each worktree. | Settled for V1. |\n| Activation is per workspace via `.fgos/installation/activation.json`; there is no single repository-wide active runtime pointer in V1. | Settled for V1. |\n| Packaging release/activation state uses workspace installation roots and must not share a namespace with work coordination state. | Settled for V1. |\n| The project/team pin is tracked as `.fgos/distribution.json`; machine-local activation state remains ignored. | Settled for V1. |\n| `activation.json` is a durably published workspace binding, not a symlink, in V1. | Settled for V1. |\n| Install transaction state lives under the release store root's `installs/<activationId>.json`, not inside `activation.json`. | Settled for V1. |\n| Mutating invocations create lease files; `fgctl` may stage/verify during leases but refuses activation while a non-stale mutating lease exists. | Settled for V1. |\n| V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |\n| `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |\n| Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |\n| Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Selected V1 design conserved above; mechanism unimplemented, Plan C not a cutover prerequisite. |\n| `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |\n| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |\n| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |"
+      }
     },
     {
       "claimId": "claim_66b58ad141eda076944d47edf360f2e1",
@@ -4139,7 +4461,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "1. Core Position"
-      ]
+      ],
+      "bindingSha256": "8ca08a732b3be9ba39a4234b79cb700f1da88c10888e9b734bf460280bc47661",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-31",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 31",
+          "textDigest": "f4738d29d59228f681a01636dbdb6b1078c7b5caae4741dbff9e435e2d73daf6",
+          "startLine": 198,
+          "endLine": 199,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "previous": {
+          "anchor": "1-core-position-1",
+          "unitKind": "heading",
+          "title": "1. Core Position",
+          "textDigest": "d8443cfa2f90ab369871a7afb68ef2e5c9552854977a85ca831db6fa3661f2a5",
+          "startLine": 196,
+          "endLine": 196,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-32",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 32",
+          "textDigest": "7f9fba2427a6cbead6bceb56c0311556d7b029a12b3fd0d041fa77b5f46c72bd",
+          "startLine": 201,
+          "endLine": 210,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "content": "The project-local fgOS runtime must be selected by a workspace activation\nbinding, not by whatever executable happens to be on `PATH`."
+      }
     },
     {
       "claimId": "claim_aaf3be3d5306a121c46039453a59cbd6",
@@ -4157,7 +4525,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "1. Core Position"
-      ]
+      ],
+      "bindingSha256": "6770f23f0799db95fd2e80996e64ea566f93c9aee94a9c20b75e0064d7223289",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-32",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 32",
+          "textDigest": "7f9fba2427a6cbead6bceb56c0311556d7b029a12b3fd0d041fa77b5f46c72bd",
+          "startLine": 201,
+          "endLine": 210,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-31",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 31",
+          "textDigest": "f4738d29d59228f681a01636dbdb6b1078c7b5caae4741dbff9e435e2d73daf6",
+          "startLine": 198,
+          "endLine": 199,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-33",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 33",
+          "textDigest": "c3de0f56b6d14690ce7995a6de111f721e00bd8f832910129de11eb41b6ea462",
+          "startLine": 212,
+          "endLine": 215,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "content": "```txt\nfgctl\n  acquires/stages/verifies immutable releases in the shared release store\n  prepares a workspace installation capsule\n  publishes a ready workspace activation binding\n\nlocal fgos\n  runs only after a ready workspace activation binding is known\n  owns project workflow semantics under that active identity\n```"
+      }
     },
     {
       "claimId": "claim_c37dcdbe6ae24c4921c70633185cd44c",
@@ -4175,7 +4589,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "1. Core Position"
-      ]
+      ],
+      "bindingSha256": "d3f0b9ea3680bafcd52fabd7f0fd529e9279ed8604bbfe104184e86c60e6c442",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-33",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 33",
+          "textDigest": "c3de0f56b6d14690ce7995a6de111f721e00bd8f832910129de11eb41b6ea462",
+          "startLine": 212,
+          "endLine": 215,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-32",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 32",
+          "textDigest": "7f9fba2427a6cbead6bceb56c0311556d7b029a12b3fd0d041fa77b5f46c72bd",
+          "startLine": 201,
+          "endLine": 210,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "1. Core Position"
+          ]
+        },
+        "next": {
+          "anchor": "2-runtime-lifecycle",
+          "unitKind": "heading",
+          "title": "2. Runtime Lifecycle",
+          "textDigest": "ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9",
+          "startLine": 217,
+          "endLine": 217,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "content": "Runtime identity is digest-based. The artifact identity is the digest of the\ncanonical release tree manifest, not the digest of a compressed archive.\nVersion/tag/channel are human-facing metadata and selection policy. They are\nnot the final proof of what is installed."
+      }
     },
     {
       "claimId": "claim_abc2a0de9c412207cb045053290a4e89",
@@ -4214,7 +4674,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "2. Runtime Lifecycle"
-      ]
+      ],
+      "bindingSha256": "f309f6045492f389d7a30c8dcc8a9db8739e0898f16a983597398e0dafbc13af",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-34",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 34",
+          "textDigest": "9f5f2a73781943935b3a9b8f540165d30dc6edd71a6f02f320511a328ba250e1",
+          "startLine": 219,
+          "endLine": 219,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "previous": {
+          "anchor": "2-runtime-lifecycle",
+          "unitKind": "heading",
+          "title": "2. Runtime Lifecycle",
+          "textDigest": "ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9",
+          "startLine": 217,
+          "endLine": 217,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-35",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 35",
+          "textDigest": "3c4c222ca843dec72aaa0e7795e528fd329fbd0385edad9eb0c6f80e39a1b5c1",
+          "startLine": 221,
+          "endLine": 229,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "content": "The install/upgrade/repair lifecycle is:"
+      }
     },
     {
       "claimId": "claim_6057d124ab44d29d90945fa60f209319",
@@ -4232,7 +4738,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "2. Runtime Lifecycle"
-      ]
+      ],
+      "bindingSha256": "1179d96261e2b1429514edb90e562bcf0a1c65c35495175abe5985d8c5970eeb",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-35",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 35",
+          "textDigest": "3c4c222ca843dec72aaa0e7795e528fd329fbd0385edad9eb0c6f80e39a1b5c1",
+          "startLine": 221,
+          "endLine": 229,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-34",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 34",
+          "textDigest": "9f5f2a73781943935b3a9b8f540165d30dc6edd71a6f02f320511a328ba250e1",
+          "startLine": 219,
+          "endLine": 219,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-36",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 36",
+          "textDigest": "101b41019955eaf805c687c04e44d477390b20ec7505b4ca1cdf8dadd919be33",
+          "startLine": 231,
+          "endLine": 232,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "content": "```txt\nacquire artifact\n  -> stage immutable payload\n  -> verify release manifest\n  -> prepare workspace installation capsule\n  -> publish ready workspace activation binding atomically\n  -> invoke active local fgos init / doctor --fix / doctor for projection/config repair\n  -> allow project-state mutation\n```"
+      }
     },
     {
       "claimId": "claim_659b692c5498f117fc6aeb1a67380a0d",
@@ -4250,7 +4802,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "2. Runtime Lifecycle"
-      ]
+      ],
+      "bindingSha256": "629b08d40ad19b17b36fc90196402b5d8e51246918f78e550cf64545bdd99355",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-36",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 36",
+          "textDigest": "101b41019955eaf805c687c04e44d477390b20ec7505b4ca1cdf8dadd919be33",
+          "startLine": 231,
+          "endLine": 232,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-35",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 35",
+          "textDigest": "3c4c222ca843dec72aaa0e7795e528fd329fbd0385edad9eb0c6f80e39a1b5c1",
+          "startLine": 221,
+          "endLine": 229,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-37",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 37",
+          "textDigest": "5b2c3b2fc2847d264ba4a59ec44331fee37fddd029c8a41c52449f9403e1a24f",
+          "startLine": 234,
+          "endLine": 239,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "content": "No project workflow command should mutate project state from a payload that has\nnot crossed the activation boundary."
+      }
     },
     {
       "claimId": "claim_7d62eb2a58328da0a2a9901c3a79533c",
@@ -4268,7 +4866,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "2. Runtime Lifecycle"
-      ]
+      ],
+      "bindingSha256": "7e2353604fe8f8935a73c73ca170a6bef8f9c7e82a697771bdfdbfe45c1f5050",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-37",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 37",
+          "textDigest": "5b2c3b2fc2847d264ba4a59ec44331fee37fddd029c8a41c52449f9403e1a24f",
+          "startLine": 234,
+          "endLine": 239,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-36",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 36",
+          "textDigest": "101b41019955eaf805c687c04e44d477390b20ec7505b4ca1cdf8dadd919be33",
+          "startLine": 231,
+          "endLine": 232,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "2. Runtime Lifecycle"
+          ]
+        },
+        "next": {
+          "anchor": "4-record-types",
+          "unitKind": "heading",
+          "title": "4. Record Types",
+          "textDigest": "e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083",
+          "startLine": 241,
+          "endLine": 241,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "content": "Candidate releases may run only bootstrap/preflight checks before activation.\nThey must not write host-visible projection paths such as `.agents/`, `.claude/`,\nor `AGENTS.md`. Projection materialization happens after the ready activation\nbinding exists, through the active local `fgos` command. If that tail fails, the\nactivation remains the selected runtime but the workspace is reported\n`ready-degraded` until `fgos doctor --fix` repairs it."
+      }
     },
     {
       "claimId": "claim_730ffda554a0b85dda9cf5813e028e29",
@@ -4629,7 +5273,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "4. Record Types"
-      ]
+      ],
+      "bindingSha256": "a1cb585e90f82916171a962b5edcc242e1fda0a10526c907197e7105779e49de",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-38",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 38",
+          "textDigest": "389e419e3ff43d610e1e5d0ca84209a28d2672a779a95ae709c85c6f498e316f",
+          "startLine": 243,
+          "endLine": 244,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "previous": {
+          "anchor": "4-record-types",
+          "unitKind": "heading",
+          "title": "4. Record Types",
+          "textDigest": "e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083",
+          "startLine": 241,
+          "endLine": 241,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-39",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 39",
+          "textDigest": "994b75de735a509782264820b22d732b35f3ee4f734ff39aab967420fdc08d4f",
+          "startLine": 246,
+          "endLine": 252,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "content": "Do not collapse all runtime facts into one ledger. Use separate records with\nseparate authority."
+      }
     },
     {
       "claimId": "claim_2a086421fe8b46ed8c0a7c2741704dac",
@@ -4647,7 +5337,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "4. Record Types"
-      ]
+      ],
+      "bindingSha256": "88d341d487dfbc351bf2e0c8eb3ac50279aacc7005d083389d1621f03e03fbc8",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-39",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 39",
+          "textDigest": "994b75de735a509782264820b22d732b35f3ee4f734ff39aab967420fdc08d4f",
+          "startLine": 246,
+          "endLine": 252,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-38",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 38",
+          "textDigest": "389e419e3ff43d610e1e5d0ca84209a28d2672a779a95ae709c85c6f498e316f",
+          "startLine": 243,
+          "endLine": 244,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "next": {
+          "anchor": "11-drift-repair-rollback-and-quarantine",
+          "unitKind": "heading",
+          "title": "11. Drift, Repair, Rollback, And Quarantine",
+          "textDigest": "c9e7d97572e0bbe68d393d6b5d54f1b9937eaeb8160902cb2b9ed24e5d209884",
+          "startLine": 254,
+          "endLine": 254,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "| Record | Mutability | Owner | Purpose |\n|---|---|---|---|\n| `ReleaseManifest` | Immutable, publisher-produced | Release build/publisher | Declares artifact identity, file digests, binaries, adapter contract, capabilities, state-schema compatibility, dependency closure. |\n| `WorkspaceActivationBinding` | Mutable, workspace-local | `fgctl` | Declares which release digest is ready for this workspace, plus workspace/work-state/repository identity, activation transaction, timestamp, and status. |\n| `Pin` | Mutable, git-tracked project policy | Semantic owner: packaging/distribution. Canonical writer: `fgctl`. External edits are tolerated input and validated fail-closed. | Declares desired version/channel/digest policy in `.fgos/distribution.json`. Selection input, not runtime proof. |\n| `ProjectionLedger` | Mutable, project-local | local `fgos init` / `fgos doctor --fix` under active identity | Records host-visible generated/projection paths, source digest, last materialized digest, ownership class, and repair policy. |\n| `MigrationJournal` | Append-only, project-local | local `fgos` under active identity | Records state-schema migration epoch, checkpoints/backups, reversibility, and compatibility facts. |"
+      }
     },
     {
       "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
@@ -4659,21 +5395,62 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/release-manifest.md:180-180#5-releasemanifest; SHA256 dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "targetUnitDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee",
+      "targetUnitDigest": "f63a5bb0bb232acc7d5c8b44fd161f425865b46daf6c4670aa50279b7a289555",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
-      "bindingSha256": "df06eccecadb2c995e6694ce2a1d74388378de2d44b43d009736f87e78b243fa",
+      "bindingSha256": "f181031f0acd1b0936dfe6eeff3c137cfd0574bbddf504e604b02510520a3fa5",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "5-releasemanifest",
+          "unitKind": "heading",
+          "title": "5. ReleaseManifest",
+          "textDigest": "f63a5bb0bb232acc7d5c8b44fd161f425865b46daf6c4670aa50279b7a289555",
+          "startLine": 184,
+          "endLine": 184,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-17",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 17",
+          "textDigest": "1a66f76971f4b7daec478cb6e1d1727e39465bebe870c458232eb7fd2687c56b",
+          "startLine": 182,
+          "endLine": 182,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-18",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 18",
+          "textDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
+          "startLine": 186,
+          "endLine": 187,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "#### 5. ReleaseManifest"
+      }
     },
     {
       "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
       "sourceUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-17",
+      "targetAnchor": "unheaded-block-18",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4682,17 +5459,59 @@
       "targetUnitDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "d8be0cc96347deafc779ca217f3151aaa5346cd116fcd7d1cb52cc7e93ffab6e"
+      "bindingSha256": "3e4ab7743ad655bf4a1b080d48f8d8a0dab81df75834c0eaa8c5a6a87668db64",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-18",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 18",
+          "textDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
+          "startLine": 186,
+          "endLine": 187,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "5-releasemanifest",
+          "unitKind": "heading",
+          "title": "5. ReleaseManifest",
+          "textDigest": "f63a5bb0bb232acc7d5c8b44fd161f425865b46daf6c4670aa50279b7a289555",
+          "startLine": 184,
+          "endLine": 184,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-19",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 19",
+          "textDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+          "startLine": 189,
+          "endLine": 193,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "The release manifest is the immutable statement of what an fgOS release\ncontains."
+      }
     },
     {
       "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
       "sourceUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-18",
+      "targetAnchor": "unheaded-block-19",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4701,17 +5520,59 @@
       "targetUnitDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "5da9e3d52c8f24acd6f6a1ccab9dbe0e2ce449e2c204eb74efbd9bed4ac932bc"
+      "bindingSha256": "8a9060ab770411f92e984f1b83b159c2da402ac13072968e65ce60ccc5b6804e",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-19",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 19",
+          "textDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+          "startLine": 189,
+          "endLine": 193,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-18",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 18",
+          "textDigest": "bac0a2990fcb00aa7b8a014d4397ba8c6cf36cfe401bfc85affe20105adaad07",
+          "startLine": 186,
+          "endLine": 187,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-20",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 20",
+          "textDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+          "startLine": 195,
+          "endLine": 200,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "The canonical artifact digest is computed from this release tree manifest, not\nfrom a `.zip`, `.tar.gz`, npm package archive, or transport wrapper. Archive\ndigests may still be recorded for download/integrity diagnostics, but they are\nnot runtime identity. Runtime identity must survive different compression\nformats, package transports, and mirror locations."
+      }
     },
     {
       "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
       "sourceUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-19",
+      "targetAnchor": "unheaded-block-20",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4720,17 +5581,59 @@
       "targetUnitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "f7ae569b878079eb5e43b6a981ce65253eb3a0e0e46ebc107a3976a1a6086249"
+      "bindingSha256": "cd1618705177689fe7e71788f994372fad0982c710d18fba4af1553b20b23274",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-20",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 20",
+          "textDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+          "startLine": 195,
+          "endLine": 200,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-19",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 19",
+          "textDigest": "d54d128a83d245d152077055d35030f291cd78b240184690839922bd087e8124",
+          "startLine": 189,
+          "endLine": 193,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-21",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 21",
+          "textDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+          "startLine": 202,
+          "endLine": 203,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "The digest formula is:\n\n```txt\nfileDigest = sha256(file bytes as emitted by the release build)\nartifactDigest = sha256(canonical-json(release tree manifest without artifactDigest))\n```"
+      }
     },
     {
       "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
       "sourceUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-20",
+      "targetAnchor": "unheaded-block-21",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4739,17 +5642,59 @@
       "targetUnitDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "98b990a50bb5a7c2130fed35dceb9e60b8cc326dcece218a4af57e053cb17e9f"
+      "bindingSha256": "acbe93ab02754904a5b574ef6c95b320554abf3fceda56a3f95c45f1ff84054a",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-21",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 21",
+          "textDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+          "startLine": 202,
+          "endLine": 203,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-20",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 20",
+          "textDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+          "startLine": 195,
+          "endLine": 200,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-22",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 22",
+          "textDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+          "startLine": 205,
+          "endLine": 256,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "The release build, not the installer, owns byte normalization. Install should\nnot rewrite line endings or file contents to make a digest pass."
+      }
     },
     {
       "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
       "sourceUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-21",
+      "targetAnchor": "unheaded-block-22",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4758,30 +5703,115 @@
       "targetUnitDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "6c9d8b5c29dabbbfdacbeb921a68af695374dde11080457ab93709de7b34d946"
+      "bindingSha256": "02035e1e0b9ca9497f938d23250a72792e9a2b77b057304fac603799fad61756",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-22",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 22",
+          "textDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+          "startLine": 205,
+          "endLine": 256,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-21",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 21",
+          "textDigest": "ead8dd03ae57188ef8d39dbaeb54e973410f426f88701f050dbb675f87ac8829",
+          "startLine": 202,
+          "endLine": 203,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-23",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 23",
+          "textDigest": "aad2499ab5fac41343725fb61ef7d0f19779219f668fbe293d98781e9c474523",
+          "startLine": 258,
+          "endLine": 258,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "content": "Minimum fields:\n\n```json\n{\n  \"schemaVersion\": 1,\n  \"artifactDigest\": \"sha256:...\",\n  \"digestKind\": \"release-tree-manifest\",\n  \"releaseVersion\": \"0.1.0\",\n  \"sourceRevision\": \"...\",\n  \"createdAt\": \"2026-09-04T00:00:00Z\",\n  \"target\": {\n    \"os\": \"linux\",\n    \"arch\": \"x64\",\n    \"libc\": \"glibc\"\n  },\n  \"entries\": {\n    \"fgos\": \"bin/fgos\",\n    \"fgosRunner\": \"bin/fgos-runner\"\n  },\n  \"components\": {\n    \"legacyNode\": {\n      \"root\": \"libexec/legacy-node\",\n      \"entry\": \"bin/fgos.mjs\",\n      \"digest\": \"sha256:...\"\n    },\n    \"runner\": {\n      \"path\": \"bin/fgos-runner\",\n      \"digest\": \"sha256:...\"\n    },\n    \"workshop\": {\n      \"skillsDigest\": \"sha256:...\",\n      \"agentsDigest\": \"sha256:...\",\n      \"proseDigest\": \"sha256:...\"\n    }\n  },\n  \"requires\": {\n    \"node\": \">=20 <23\",\n    \"git\": \">=2.39\"\n  },\n  \"adapter\": {\n    \"protocolVersion\": \"1\",\n    \"entry\": \"bin/fgos adapter\",\n    \"capabilities\": []\n  },\n  \"stateSchemas\": {\n    \"read\": [\"1\"],\n    \"write\": [\"1\"],\n    \"migrations\": []\n  },\n  \"files\": []\n}\n```"
+      }
     },
     {
       "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
       "sourceUnitDigest": "b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-22",
+      "targetAnchor": "unheaded-block-23",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "Source: docs/architect/packaging-distribution/runtime-identity-and-activation.md:369-369#unheaded-block-41 (current lines); unit SHA256 b22b5c1e8b0d30d63d4ecdff35d16e1b07c4e8f1dddb748e55fdc961c6f1e7ac.\nTarget: docs/platform/packaging-distribution/contracts/release-manifest.md:220-220#unheaded-block-17 (current lines); unit SHA256 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"Legacy CLI Transition\" (../host-invocation-routing/legacy-cli-transition.md) → \"Legacy CLI Transition\" (../../../architect/host-invocation-routing/legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/architect/host-invocation-routing/legacy-cli-transition.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-41 under docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-17; source context \"Runtime Identity And Activation / 5. ReleaseManifest\", target context \"Contract: Release Manifest / Retained Runtime Identity And Activation Source Detail / 5. ReleaseManifest\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-17 -> unheaded-block-22. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
-      "targetUnitDigest": "2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265",
+      "targetUnitDigest": "aad2499ab5fac41343725fb61ef7d0f19779219f668fbe293d98781e9c474523",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "1ddc6df2559bcae041fa349e48ce82b27f7605f9457187be855ccb81a7dbccb6"
+      "bindingSha256": "db6799070a3a85256164465de00e03698dd448d69cb42510eba2657c2af420e7",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-23",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 23",
+          "textDigest": "aad2499ab5fac41343725fb61ef7d0f19779219f668fbe293d98781e9c474523",
+          "startLine": 258,
+          "endLine": 258,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-22",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 22",
+          "textDigest": "04f33e62f1f152294e35b2d568d3efcec43f8efd6629e623ead9e34bc9f860f4",
+          "startLine": 205,
+          "endLine": 256,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "release-tree-canonicalization",
+          "unitKind": "heading",
+          "title": "Release Tree Canonicalization",
+          "textDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
+          "startLine": 260,
+          "endLine": 260,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "`components.legacyNode` names a payload **root** plus an **entry** inside it, not a single file (proposed 2026-09-10 by the host-invocation stream, see [Legacy CLI Transition](../../host-invocation-routing/legacy-cli-transition.md) §2): the legacy payload is the whole Node package as `package.json` `files` defines it, staged with its source-relative layout intact so `bin/fgos.mjs` needs no import changes, and `bin/fgos-runner.mjs` lives in the same root. The Rust host resolves `join(activeReleasePath, root, entry)` and nothing else. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"` — the same fields serve dogfood and a staged release."
+      }
     },
     {
       "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
@@ -4796,19 +5826,63 @@
       "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
-      "bindingSha256": "29c98d83bdfcc4a2f448b63032b256ddd3d0903411ecdfc589cc94373c628531",
+      "bindingSha256": "2245d65a44588082f4d902908f09b4832e198e5e1400f80a0cd3e682d2600336",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "release-tree-canonicalization",
+          "unitKind": "heading",
+          "title": "Release Tree Canonicalization",
+          "textDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
+          "startLine": 260,
+          "endLine": 260,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-23",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 23",
+          "textDigest": "aad2499ab5fac41343725fb61ef7d0f19779219f668fbe293d98781e9c474523",
+          "startLine": 258,
+          "endLine": 258,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-24",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 24",
+          "textDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
+          "startLine": 262,
+          "endLine": 262,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "##### Release Tree Canonicalization"
+      }
     },
     {
       "claimId": "claim_e53e994efd41de413243c7feb18609f5",
       "sourceUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-23",
+      "targetAnchor": "unheaded-block-24",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4817,18 +5891,63 @@
       "targetUnitDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "fca691219ec69e566804b12927f931ad5905a8be42a49f48a6d1eae2baa54cd8"
+      "bindingSha256": "e9fcf9db76148e2d4eb0a43a831af4b87d5fd1afd337aad05675b70f099af208",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-24",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 24",
+          "textDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
+          "startLine": 262,
+          "endLine": 262,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "release-tree-canonicalization",
+          "unitKind": "heading",
+          "title": "Release Tree Canonicalization",
+          "textDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
+          "startLine": 260,
+          "endLine": 260,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
+          "startLine": 264,
+          "endLine": 277,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "V1 uses a logical release file tree, not raw filesystem metadata."
+      }
     },
     {
       "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
       "sourceUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-24",
+      "targetAnchor": "unheaded-block-25",
       "claimKind": "decision",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4837,18 +5956,63 @@
       "targetUnitDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "b868adcdc1b987a1224796707ad839bb4a9d1fc529cfd7fba398116d647745dd"
+      "bindingSha256": "c5613c60b723e554c802bdbb44ef0ca03e85932d7897a532d51c9d5ea2e2398e",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
+          "startLine": 264,
+          "endLine": 277,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-24",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 24",
+          "textDigest": "7f7044001655743cdc702ec27b67e4ab6e1801cb4ea72c8b4ff3cc36fc80416f",
+          "startLine": 262,
+          "endLine": 262,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
+          "startLine": 279,
+          "endLine": 279,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "| Field / Rule | V1 Decision |\n|---|---|\n| Path root | All paths are relative to the release root. Absolute paths are invalid. |\n| Path separator | Always `/`, including on Windows. |\n| Path normalization | UTF-8 NFC normalization before ordering and digesting. |\n| Path order | Lexicographic byte order after normalization. |\n| Case collision | Refuse a release if two paths collide under case-insensitive comparison. |\n| File digest | SHA-256 of exact release-build bytes. |\n| Line endings | Included in file bytes. Build must normalize if needed; install must not rewrite. |\n| Executable bit | Included as `mode`, at least `755` vs `644`. |\n| Directory entries | Not hashed as separate entries; directories are inferred from file paths. |\n| Symlink | Refused in V1. Add explicit `kind: \"symlink\"` later only with relative, non-escaping targets. |\n| mtime / owner / group | Excluded from runtime identity. |\n| Archive digest | Optional `transportDigest`; never the runtime identity. |"
+      }
     },
     {
       "claimId": "claim_4486d8c871bc7cace22f5877da298119",
       "sourceUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-25",
+      "targetAnchor": "unheaded-block-26",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4857,18 +6021,63 @@
       "targetUnitDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "a91b0b6817a4ca842dd365f4da4fd5f1b3d1156c8e371182cb32292f22df08ca"
+      "bindingSha256": "ed143141e3c4e67b561f382d56d1f88532e12320694d984d4c8e54ba01e1691f",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
+          "startLine": 279,
+          "endLine": 279,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 25",
+          "textDigest": "b36d585b2b0651d5b9fd0cb39af3fa2430ab9f91154893fe4a4ba25d8fc10069",
+          "startLine": 264,
+          "endLine": 277,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+          "startLine": 281,
+          "endLine": 289,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "Each file entry should include an ownership class:"
+      }
     },
     {
       "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
       "sourceUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-26",
+      "targetAnchor": "unheaded-block-27",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4877,18 +6086,63 @@
       "targetUnitDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "17af4874aa27de99cc1c1e81dc447da5a5a760129acbcc71e5bb2e78646cf649"
+      "bindingSha256": "e2c3f45a00d72c39beda4a3978896ceed04c7c8a0998a23df237f67c78d90140",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+          "startLine": 281,
+          "endLine": 289,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-26",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 26",
+          "textDigest": "97cd2867dcc936f5efe7950bc065efc46379f62647e62718b515fb4bdde90b03",
+          "startLine": 279,
+          "endLine": 279,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-28",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 28",
+          "textDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+          "startLine": 291,
+          "endLine": 299,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "```json\n{\n  \"path\": \"bin/fgos\",\n  \"kind\": \"file\",\n  \"digest\": \"sha256:...\",\n  \"mode\": \"755\",\n  \"class\": \"immutable-entry\"\n}\n```"
+      }
     },
     {
       "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
       "sourceUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-27",
+      "targetAnchor": "unheaded-block-28",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4897,18 +6151,63 @@
       "targetUnitDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "b225d8016b28fd2d0b053ea3c22c4a9fcfe6ab73988bf749f0bd8236961c23bd"
+      "bindingSha256": "13067b71270f2e6c8a174e4c9d7bb8cc6167116d436a17566a9970d4810464cd",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-28",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 28",
+          "textDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+          "startLine": 291,
+          "endLine": 299,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-27",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 27",
+          "textDigest": "738abf5487f9f299c9278c6d13076bcb9385e942dabc5437420d0741ff129b3f",
+          "startLine": 281,
+          "endLine": 289,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-29",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 29",
+          "textDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+          "startLine": 301,
+          "endLine": 304,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "Initial classes:\n\n| Class | Meaning |\n|---|---|\n| `immutable-entry` | Public executable entry included in the release. |\n| `immutable-runtime` | Runtime implementation/provider file. |\n| `immutable-workshop-source` | Canonical skills, agents, or prose shipped with the runtime. |\n| `immutable-doc` | Shipped documentation/prose used by users or agents. |\n| `metadata` | Manifest or metadata file that participates in release identity. |"
+      }
     },
     {
       "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
       "sourceUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-28",
+      "targetAnchor": "unheaded-block-29",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4917,18 +6216,63 @@
       "targetUnitDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "79a55a45b75a8da5334bfbdf1f81cb4739f7523da78528babb20b68b3cbfed1f"
+      "bindingSha256": "ec737cfe5d839f63b805b0b9650c95669f6087dd05f87b8e17d101e6b314ca40",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-29",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 29",
+          "textDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+          "startLine": 301,
+          "endLine": 304,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-28",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 28",
+          "textDigest": "089a50e18972a630a340349ad3e33a2917b313ac50cb1a1a344a6b78e6096831",
+          "startLine": 291,
+          "endLine": 299,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-30",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 30",
+          "textDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+          "startLine": 306,
+          "endLine": 307,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "Generated workspace projections are not recorded as release-tree files at\ntheir projected workspace paths. The release manifest records their canonical\nsource material; `ProjectionLedger` records where that material was projected\ninside the workspace."
+      }
     },
     {
       "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
       "sourceUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-29",
+      "targetAnchor": "unheaded-block-30",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4937,18 +6281,63 @@
       "targetUnitDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "fb0ec155298b1cd95585bdcbcb7a704ccddcfffc4e70988c6a7db06f0fe318cf"
+      "bindingSha256": "780ede5e90119d4459c25241b10c6d68c839d3cd44cafbf6e629a82512c9b7c3",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-30",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 30",
+          "textDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+          "startLine": 306,
+          "endLine": 307,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-29",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 29",
+          "textDigest": "55012af631606c03d5fb4a9a0364f518b2e1e6c8144aef25ec3fd46db54cffdb",
+          "startLine": 301,
+          "endLine": 304,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-31",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 31",
+          "textDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
+          "startLine": 309,
+          "endLine": 318,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "content": "`files` may eventually contain every immutable release file and digest. The\nminimum useful fingerprint set is:"
+      }
     },
     {
       "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
       "sourceUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
-      "targetAnchor": "unheaded-block-30",
+      "targetAnchor": "unheaded-block-31",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4957,12 +6346,44 @@
       "targetUnitDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail",
+        "Canonical Release Tree Rules",
         "5. ReleaseManifest",
         "Release Tree Canonicalization"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "96b0332d71f2006d89fcb26ce90e84f71d4f22368682b37a38093adecdddb2e0"
+      "bindingSha256": "e2d91a6eb8d712e39e7ab6d72513db992e2eb95f87f505186820a9682b5a1c0a",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-31",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 31",
+          "textDigest": "32122ff0553fd6bc31cd9e5f77b680f47feb87399f7c1e0561c50e46730b49af",
+          "startLine": 309,
+          "endLine": 318,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-30",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 30",
+          "textDigest": "3d1ea331b51042a1bdaefa21bcc3b9736a3698b201646581d4c7e2210321b320",
+          "startLine": 306,
+          "endLine": 307,
+          "ancestry": [
+            "Contract: Release Manifest",
+            "Canonical Release Tree Rules",
+            "5. ReleaseManifest",
+            "Release Tree Canonicalization"
+          ]
+        },
+        "next": null,
+        "content": "- public entry binaries;\n- provider descriptors;\n- active host entry at `bin/fgos` whether implemented by Node first or Rust\n  later;\n- legacy Node payload;\n- runner;\n- adapter metadata/entry;\n- init/doctor registries;\n- skills, agents, prose source;\n- manifest files themselves."
+      }
     },
     {
       "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
@@ -6432,7 +7853,7 @@
       "claimId": "claim_c95bf4f07595cb9b849208efc61e76fb",
       "sourceUnitDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-54",
+      "targetAnchor": "unheaded-block-55",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6445,15 +7866,54 @@
         "Runtime Identity And Activation",
         "Dev / Source Activation"
       ],
-      "bindingSha256": "6c1ac16019984278c0dba22faadb2df9ba2f55e3daff92cfd35401dc48c0bd2d",
+      "bindingSha256": "0022232620f7d0bfaf080ac78d3d835507f25a6032b78011d7efeadc36fe3998",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-55",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 55",
+          "textDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
+          "startLine": 378,
+          "endLine": 379,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-54",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 54",
+          "textDigest": "6f845062783fb297127d85634103450fd3d63a9f33825b347bf3198ccb3d6684",
+          "startLine": 375,
+          "endLine": 375,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-56",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 56",
+          "textDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
+          "startLine": 381,
+          "endLine": 381,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "content": "fgOS self-development needs a dogfood path that does not require nested repos\nand does not pretend a source checkout is an immutable release."
+      }
     },
     {
       "claimId": "claim_865a8350c10fa2d9cc73ba3edb8b0520",
       "sourceUnitDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-55",
+      "targetAnchor": "unheaded-block-56",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6466,15 +7926,54 @@
         "Runtime Identity And Activation",
         "Dev / Source Activation"
       ],
-      "bindingSha256": "51b5e00873ed4c0b0f25bb6a0680ff4b8f60bc2b7d682abd1d34762f6ada8b47",
+      "bindingSha256": "82e6262ad954b4b95b65295d37d2ca0fe601855f06c5f45bebd17e2813696ddb",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-56",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 56",
+          "textDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
+          "startLine": 381,
+          "endLine": 381,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-55",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 55",
+          "textDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
+          "startLine": 378,
+          "endLine": 379,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-57",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 57",
+          "textDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
+          "startLine": 383,
+          "endLine": 388,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "content": "V1 supports an explicit dev activation kind:"
+      }
     },
     {
       "claimId": "claim_3b0ea2eb26b63bcfe3c447bcce51d96c",
       "sourceUnitDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-56",
+      "targetAnchor": "unheaded-block-57",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6487,15 +7986,54 @@
         "Runtime Identity And Activation",
         "Dev / Source Activation"
       ],
-      "bindingSha256": "f855cf265da372b869b50daaf8560c4fee26bd151187490b66b142a1ea9e2c8f",
+      "bindingSha256": "592f6387d4e699b9432c8308ed9209dcf09a413e14a1be4700e2b5d5a401d70c",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-57",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 57",
+          "textDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
+          "startLine": 383,
+          "endLine": 388,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-56",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 56",
+          "textDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
+          "startLine": 381,
+          "endLine": 381,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-58",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 58",
+          "textDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
+          "startLine": 390,
+          "endLine": 397,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "content": "```txt\nartifactDigest: dev:<sourceRevisionOrWorktreeId>\nactivationKind: dev-source\nactiveReleasePath: <source checkout path>\ndistributable: false\n```"
+      }
     },
     {
       "claimId": "claim_3b558cb40f932564057bd64e5d7e024b",
       "sourceUnitDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-57",
+      "targetAnchor": "unheaded-block-58",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6508,15 +8046,54 @@
         "Runtime Identity And Activation",
         "Dev / Source Activation"
       ],
-      "bindingSha256": "dfbd027cb6fd722465fe3cc81caa2d6a660f5592a7902305659525855da45137",
+      "bindingSha256": "307c9321753445e5b932601dfaef533bc46cd4b3664bc608b89a1e269a86f305",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-58",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 58",
+          "textDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
+          "startLine": 390,
+          "endLine": 397,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-57",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 57",
+          "textDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
+          "startLine": 383,
+          "endLine": 388,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-59",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 59",
+          "textDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
+          "startLine": 399,
+          "endLine": 401,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "content": "Dev activation rules:\n\n- must be explicit; never selected as an accidental PATH fallback;\n- skips immutable release file digest guarantees;\n- still reports runtime identity as `dev:*`;\n- still uses the same command authority, work-state root, projection ownership,\n  and state-schema compatibility rules;\n- is not valid for a distributable install package."
+      }
     },
     {
       "claimId": "claim_b4018a4e982ca86c1f265cfe32a05494",
       "sourceUnitDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-58",
+      "targetAnchor": "unheaded-block-59",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6529,9 +8106,49 @@
         "Runtime Identity And Activation",
         "Dev / Source Activation"
       ],
-      "bindingSha256": "7291ecb5199f8220ddffc0b2be0717120f0f859c0dc27d2ce01c6e5083e68a25",
+      "bindingSha256": "696a315f457b4163563d5bf1900f8ba8317a4079225be30a57d6fcf463503ced",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-59",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 59",
+          "textDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
+          "startLine": 399,
+          "endLine": 401,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-58",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 58",
+          "textDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
+          "startLine": 390,
+          "endLine": 397,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "next": {
+          "anchor": "dev-source-activation-restoration-stub",
+          "unitKind": "heading",
+          "title": "Dev Source Activation Restoration Stub",
+          "textDigest": "0e84c9dca4916a064f66e05f935741100f2b3754cdb295d2a3a64ab438e42b39",
+          "startLine": 403,
+          "endLine": 403,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation",
+            "Dev Source Activation Restoration Stub"
+          ]
+        },
+        "content": "This preserves dogfood without turning dogfood into the product mission and\nwithout solving self-development by nesting a product repo inside a workshop\nrepo."
+      }
     },
     {
       "claimId": "claim_bc6c80a5dbb5b49aa616db0b538022ba",
@@ -6543,16 +8160,61 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:254-254#11-drift-repair-rollback-and-quarantine; SHA256 825d187be82f486aaca968ce8ad77b74803e4d5067824980233f9fb4f8f18d0d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "targetUnitDigest": "825d187be82f486aaca968ce8ad77b74803e4d5067824980233f9fb4f8f18d0d",
+      "targetUnitDigest": "c9e7d97572e0bbe68d393d6b5d54f1b9937eaeb8160902cb2b9ed24e5d209884",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
       ],
-      "bindingSha256": "993e24ed0a12b7e57d2109bc959714f3bc9a9533f7fe0871562c1f397d960620",
+      "bindingSha256": "0055d13aeaa493e3880e97e8862818f6d1109ec1ed941d76220ac5d0466c9fcb",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "11-drift-repair-rollback-and-quarantine",
+          "unitKind": "heading",
+          "title": "11. Drift, Repair, Rollback, And Quarantine",
+          "textDigest": "c9e7d97572e0bbe68d393d6b5d54f1b9937eaeb8160902cb2b9ed24e5d209884",
+          "startLine": 254,
+          "endLine": 254,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-39",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 39",
+          "textDigest": "994b75de735a509782264820b22d732b35f3ee4f734ff39aab967420fdc08d4f",
+          "startLine": 246,
+          "endLine": 252,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "4. Record Types"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-40",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 40",
+          "textDigest": "12b5bcbf4641d713eb20b90aacb9103660ab51c676ef51c72deacdaf9e3735b1",
+          "startLine": 256,
+          "endLine": 263,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "#### 11. Drift, Repair, Rollback, And Quarantine"
+      }
     },
     {
       "claimId": "claim_822b8a0d68b2d83e3d093e45be2e77e8",
@@ -6570,7 +8232,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "400989a6c9fb523dacd129d88174224a8491b52bc15ca835b42edfcd9da64162",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-40",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 40",
+          "textDigest": "12b5bcbf4641d713eb20b90aacb9103660ab51c676ef51c72deacdaf9e3735b1",
+          "startLine": 256,
+          "endLine": 263,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "11-drift-repair-rollback-and-quarantine",
+          "unitKind": "heading",
+          "title": "11. Drift, Repair, Rollback, And Quarantine",
+          "textDigest": "c9e7d97572e0bbe68d393d6b5d54f1b9937eaeb8160902cb2b9ed24e5d209884",
+          "startLine": 254,
+          "endLine": 254,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-41",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 41",
+          "textDigest": "a147434c1168e52cbbcb08af34562a30766d1a54e85b2022d9af02bc18e14b50",
+          "startLine": 265,
+          "endLine": 265,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "Drift classes:\n\n| Drift | Detector | Allowed Automatic Action |\n|---|---|---|\n| Immutable release file digest mismatch | `fgctl verify` or local `fgos doctor` reporting active identity | Quarantine/refuse. Do not patch individual release files. |\n| Projection differs from generated baseline | local `fgos doctor` | `doctor --fix` may repair only when ownership and three-way comparison allow it. |\n| Managed config differs from default | local `fgos doctor` | Schema-aware merge if registered as safe. |\n| Mutable state/log/cache differs | N/A | Excluded from release drift. |"
+      }
     },
     {
       "claimId": "claim_28574a962da3d238b368e94888838811",
@@ -6582,13 +8290,59 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-129, under \"11. Drift, Repair, Rollback, And Quarantine\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-41. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "a4bb3aa70ebac2ed80da9d9aab6af6cc373eb41589b1a0ba0c45de20c9a9fc40",
+      "targetUnitDigest": "a147434c1168e52cbbcb08af34562a30766d1a54e85b2022d9af02bc18e14b50",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "5998e3498b70de5dfebcf594794e6a56bf9bd61d6869b2c6b60eb1535d2fdf36",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-41",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 41",
+          "textDigest": "a147434c1168e52cbbcb08af34562a30766d1a54e85b2022d9af02bc18e14b50",
+          "startLine": 265,
+          "endLine": 265,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-40",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 40",
+          "textDigest": "12b5bcbf4641d713eb20b90aacb9103660ab51c676ef51c72deacdaf9e3735b1",
+          "startLine": 256,
+          "endLine": 263,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-42",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 42",
+          "textDigest": "4858351982325a4ac8a61c370e58c5a13d57b596f8ab006631fad4ad44f535f7",
+          "startLine": 267,
+          "endLine": 277,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "`fgctl init`, `fgctl repair`, and `fgctl upgrade` use one pipeline. `packages/distribution/rust/src/init.rs` implements it using static preflight, never candidate execution before ready publication. The retained design below is qualified by [Activation binding](../contracts/activation-binding.md):"
+      }
     },
     {
       "claimId": "claim_c528c54251a8a068ed907a33f2231af0",
@@ -6606,7 +8360,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "255e1632f5999661cd0bc8b6b3952ed8dad7b7d1a15c8bc473d854654ec0dadb",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-42",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 42",
+          "textDigest": "4858351982325a4ac8a61c370e58c5a13d57b596f8ab006631fad4ad44f535f7",
+          "startLine": 267,
+          "endLine": 277,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-41",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 41",
+          "textDigest": "a147434c1168e52cbbcb08af34562a30766d1a54e85b2022d9af02bc18e14b50",
+          "startLine": 265,
+          "endLine": 265,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-43",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 43",
+          "textDigest": "3c79eca349037f63e9ed3dc5cf74a3a6b81e4f8e7c78a95e269fbdde577449f7",
+          "startLine": 279,
+          "endLine": 285,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "```txt\nselect/acquire release\n  -> stage\n  -> verify\n  -> run candidate preflight without host-visible projection writes\n  -> ensure workspace installation capsule and stable shims\n  -> publish workspace activation binding as ready\n  -> invoke active local fgos init\n  -> invoke active local fgos doctor --fix\n  -> invoke active local fgos doctor\n```"
+      }
     },
     {
       "claimId": "claim_9951c6bd4ccb66c41b615e5738a97d03",
@@ -6624,7 +8424,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "ea3edf379fe5c4e828f435fc28ed3c95766d36ffc6ee755dba8a3589315dae4f",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-43",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 43",
+          "textDigest": "3c79eca349037f63e9ed3dc5cf74a3a6b81e4f8e7c78a95e269fbdde577449f7",
+          "startLine": 279,
+          "endLine": 285,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-42",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 42",
+          "textDigest": "4858351982325a4ac8a61c370e58c5a13d57b596f8ab006631fad4ad44f535f7",
+          "startLine": 267,
+          "endLine": 277,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-44",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 44",
+          "textDigest": "db2ff2c8d78686ed9e68c7aca0a2a30e8171ba74d393b0a87254fb9789827fd9",
+          "startLine": 287,
+          "endLine": 288,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "They differ by selection input, not by having separate repair semantics. The\ntransaction reaches `complete` only after the active local init/fix/check tail\nfinishes. If the post-publish tail fails, the new binding remains authoritative\nbut the transaction is `ready-degraded` and local doctor reports the needed\nrepair. Candidate preflight failure before publish leaves the previous\nworkspace activation binding authoritative and gives the candidate no writer\nauthority."
+      }
     },
     {
       "claimId": "claim_96f22a8e9502051138cfd569f9d1284d",
@@ -6642,7 +8488,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "425bffac662861a1bfb29cc533ecfe643eb5bac2d954854bebadb34fd5683663",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-44",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 44",
+          "textDigest": "db2ff2c8d78686ed9e68c7aca0a2a30e8171ba74d393b0a87254fb9789827fd9",
+          "startLine": 287,
+          "endLine": 288,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-43",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 43",
+          "textDigest": "3c79eca349037f63e9ed3dc5cf74a3a6b81e4f8e7c78a95e269fbdde577449f7",
+          "startLine": 279,
+          "endLine": 285,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-45",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 45",
+          "textDigest": "b1d32ac950cf9f02e8d99ade148c86a0d8fcfe5192d1ed4c9fc4cff28f4ccdc3",
+          "startLine": 290,
+          "endLine": 296,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "Local `fgos doctor --fix` may not change active runtime identity or patch\nimmutable release files. Runtime repair stays `fgctl` authority."
+      }
     },
     {
       "claimId": "claim_94cacafd8c1528537a1a34e34c0d9a5a",
@@ -6660,7 +8552,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "48ae0baa5d572b1efeba9349689893d99096b243a52e19b82556b49d9e876d2e",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-45",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 45",
+          "textDigest": "b1d32ac950cf9f02e8d99ade148c86a0d8fcfe5192d1ed4c9fc4cff28f4ccdc3",
+          "startLine": 290,
+          "endLine": 296,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-44",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 44",
+          "textDigest": "db2ff2c8d78686ed9e68c7aca0a2a30e8171ba74d393b0a87254fb9789827fd9",
+          "startLine": 287,
+          "endLine": 288,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-46",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 46",
+          "textDigest": "7840c891652d9cd51adafd17d10e4ae80dcaa0a5736eecdb15d1939fcd4f2c1c",
+          "startLine": 298,
+          "endLine": 299,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "Rollback unit:\n\n```txt\nActivationRecord.previousArtifactDigest\n  + preserved release directory\n  + state-schema compatibility check\n```"
+      }
     },
     {
       "claimId": "claim_758a0cbdf10b65b416cb9d69f5a335f2",
@@ -6678,7 +8616,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "863e87ca54436e0d9dd3f9a6e24ef66c1043e9cb64451c149f31cb9b54320494",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-46",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 46",
+          "textDigest": "7840c891652d9cd51adafd17d10e4ae80dcaa0a5736eecdb15d1939fcd4f2c1c",
+          "startLine": 298,
+          "endLine": 299,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-45",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 45",
+          "textDigest": "b1d32ac950cf9f02e8d99ade148c86a0d8fcfe5192d1ed4c9fc4cff28f4ccdc3",
+          "startLine": 290,
+          "endLine": 296,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-47",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 47",
+          "textDigest": "b6807b0682c778d6ddc1647782ebbcfce2bc72d308d580c5ec617a3b5dec6bc7",
+          "startLine": 301,
+          "endLine": 307,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "content": "If rollback cannot safely write current state, it may still allow read-only\ndiagnostics if the old runtime declares read compatibility."
+      }
     },
     {
       "claimId": "claim_50f9705e563bfc2722ba75dba06b2b55",
@@ -6696,7 +8680,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "11. Drift, Repair, Rollback, And Quarantine"
-      ]
+      ],
+      "bindingSha256": "04fec0adae37b5dd23658513ee6fb05843aed2d812455183ad72bd05ed7093cc",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-47",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 47",
+          "textDigest": "b6807b0682c778d6ddc1647782ebbcfce2bc72d308d580c5ec617a3b5dec6bc7",
+          "startLine": 301,
+          "endLine": 307,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-46",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 46",
+          "textDigest": "7840c891652d9cd51adafd17d10e4ae80dcaa0a5736eecdb15d1939fcd4f2c1c",
+          "startLine": 298,
+          "endLine": 299,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "14-walking-skeleton",
+          "unitKind": "heading",
+          "title": "14. Walking Skeleton",
+          "textDigest": "cc31e38bc3c3353d260dd409d61ffbed70ff357320d45248825aae8117e19cbe",
+          "startLine": 309,
+          "endLine": 309,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "content": "Quarantine rule:\n\n```txt\nIf an immutable release payload fails identity verification, move or mark it as\nquarantined and refuse activation/use until `fgctl repair` reacquires a trusted\nartifact.\n```"
+      }
     },
     {
       "claimId": "claim_d00aa510f8e3a7395320c9636c3a5528",
@@ -6876,22 +8906,67 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:309-309#14-walking-skeleton; SHA256 47e5788489aaa121a477f7acf7281b6124aeb528c86bd34358ae2cb9ab1d8024. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "targetUnitDigest": "47e5788489aaa121a477f7acf7281b6124aeb528c86bd34358ae2cb9ab1d8024",
+      "targetUnitDigest": "cc31e38bc3c3353d260dd409d61ffbed70ff357320d45248825aae8117e19cbe",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "14. Walking Skeleton"
       ],
-      "bindingSha256": "9e5cf2f8deb2df014e39984c01a4b9daf5bfbd5c2c372ea59bb7bdc2160322cd",
+      "bindingSha256": "193bef90cfedc0175edb16a490db3e42aeeb7a024c4f9873fb3426e11ceed3f0",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "placement": {
+        "selected": {
+          "anchor": "14-walking-skeleton",
+          "unitKind": "heading",
+          "title": "14. Walking Skeleton",
+          "textDigest": "cc31e38bc3c3353d260dd409d61ffbed70ff357320d45248825aae8117e19cbe",
+          "startLine": 309,
+          "endLine": 309,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-47",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 47",
+          "textDigest": "b6807b0682c778d6ddc1647782ebbcfce2bc72d308d580c5ec617a3b5dec6bc7",
+          "startLine": 301,
+          "endLine": 307,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "11. Drift, Repair, Rollback, And Quarantine"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-48",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 48",
+          "textDigest": "83072f7e12567732616fe178ef749ddd5dd353a316b7e71035b5aeff45aeb767",
+          "startLine": 311,
+          "endLine": 311,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "content": "#### 14. Walking Skeleton"
+      }
     },
     {
       "claimId": "claim_c0afc8b40e3422d6dbd55aad9f6388bf",
       "sourceUnitDigest": "e0e1f0ad2950436a0eb71ae8be89f164c9f710e728b86458c733cdf4aa827c8c",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-48",
+      "targetAnchor": "unheaded-block-49",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6903,13 +8978,59 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "14. Walking Skeleton"
-      ]
+      ],
+      "bindingSha256": "5c886977a3ec30a2cdc84291bf62eb8131f8273e3d08273445118194314138d8",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-49",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 49",
+          "textDigest": "e0e1f0ad2950436a0eb71ae8be89f164c9f710e728b86458c733cdf4aa827c8c",
+          "startLine": 313,
+          "endLine": 313,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-48",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 48",
+          "textDigest": "83072f7e12567732616fe178ef749ddd5dd353a316b7e71035b5aeff45aeb767",
+          "startLine": 311,
+          "endLine": 311,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-50",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 50",
+          "textDigest": "178b806951b4e6718609d611a379b8469a5714cc9c2a815e9761fe4fcdd1e436",
+          "startLine": 315,
+          "endLine": 342,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "content": "The first proof slice should be deliberately small:"
+      }
     },
     {
       "claimId": "claim_a24422208854df7ad9c53b0a7f663e96",
       "sourceUnitDigest": "dc301a37d3747bdf01fa85cab79e39ac9bf39043008ad7893d1eb899d1283a6a",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-50",
+      "targetAnchor": "unheaded-block-51",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6921,7 +9042,53 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "14. Walking Skeleton"
-      ]
+      ],
+      "bindingSha256": "6646be4866c367d565affb23978406988728c9f631a2bf1dca90c433280e615d",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-51",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 51",
+          "textDigest": "dc301a37d3747bdf01fa85cab79e39ac9bf39043008ad7893d1eb899d1283a6a",
+          "startLine": 344,
+          "endLine": 347,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-50",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 50",
+          "textDigest": "178b806951b4e6718609d611a379b8469a5714cc9c2a815e9761fe4fcdd1e436",
+          "startLine": 315,
+          "endLine": 342,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "14. Walking Skeleton"
+          ]
+        },
+        "next": {
+          "anchor": "15-open-decisions",
+          "unitKind": "heading",
+          "title": "15. Open Decisions",
+          "textDigest": "3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976",
+          "startLine": 349,
+          "endLine": 349,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "content": "This proof does not need shared gateway/web. It only needs to prove that the\nRust `fgctl`, stable local shim, and local `fgos` payload can agree on runtime\nidentity. The first release tree may use the existing Node `fgos` host; Rust\n`fgos` can replace it later without changing packaging shape."
+      }
     },
     {
       "claimId": "claim_8c70ec6a92ebfe58cf460e88ce313aa8",
@@ -6948,7 +9115,7 @@
       "claimId": "claim_b19d5177a72889440523f68acc63caaa",
       "sourceUnitDigest": "f68459234edbfb4349e122e6f226f758838642e285654a94dce11e0230a9f884",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-51",
+      "targetAnchor": "unheaded-block-52",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6960,13 +9127,59 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "15. Open Decisions"
-      ]
+      ],
+      "bindingSha256": "e6c77b1cd05ee10a6e168ea9c2e504ef775379b067cadf02cb41b7c5847b14fd",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-52",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 52",
+          "textDigest": "f68459234edbfb4349e122e6f226f758838642e285654a94dce11e0230a9f884",
+          "startLine": 351,
+          "endLine": 354,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "previous": {
+          "anchor": "15-open-decisions",
+          "unitKind": "heading",
+          "title": "15. Open Decisions",
+          "textDigest": "3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976",
+          "startLine": 349,
+          "endLine": 349,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-53",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 53",
+          "textDigest": "41822b1f6683edd47fc34cd25c33ce061591aeea5f528e07bdc3baa02984ac76",
+          "startLine": 356,
+          "endLine": 370,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "content": "The `rust-host-r1-kernel` track (`plans/260910-1700-rust-host-r1-kernel/plan.md`,\nDecisions table, 2026-09-10) fixes V1 defaults for every item below so its\n`fgctl` cells can execute; a default becomes settled here only when the track's\nproof lands, and any override is recorded there first."
+      }
     },
     {
       "claimId": "claim_f293bbd03855e7b0ecb113520bd185b7",
       "sourceUnitDigest": "41822b1f6683edd47fc34cd25c33ce061591aeea5f528e07bdc3baa02984ac76",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "unheaded-block-52",
+      "targetAnchor": "unheaded-block-53",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -6978,7 +9191,51 @@
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "15. Open Decisions"
-      ]
+      ],
+      "bindingSha256": "b1257a4d37e9d814dd13585f4938878151412b7e5b3a272e7e60c64992ea7cfa",
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-53",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 53",
+          "textDigest": "41822b1f6683edd47fc34cd25c33ce061591aeea5f528e07bdc3baa02984ac76",
+          "startLine": 356,
+          "endLine": 370,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-52",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 52",
+          "textDigest": "f68459234edbfb4349e122e6f226f758838642e285654a94dce11e0230a9f884",
+          "startLine": 351,
+          "endLine": 354,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Retained Runtime Identity And Activation Source Detail",
+            "Runtime Identity And Activation",
+            "15. Open Decisions"
+          ]
+        },
+        "next": {
+          "anchor": "dev-source-activation",
+          "unitKind": "heading",
+          "title": "Dev / Source Activation",
+          "textDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+          "startLine": 373,
+          "endLine": 373,
+          "ancestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ]
+        },
+        "content": "1. Exact path encoding for the workspace installation capsule once\n   `TopologyContext` supplies the workspace roots.\n2. Exact release directory name: digest-only, version-plus-digest, or both.\n3. Exact stable shim implementation: Rust binary, shell/PowerShell script, or\n   platform-specific launcher. Host-invocation stream recommendation\n   (2026-09-10): a POSIX `sh` script (plus `.cmd` on Windows) for V1 — it must\n   exist before any Rust binary runs, `fgctl` can write it, and a person can\n   read it; a Rust shim only if a target lacks `sh` or the script's cost is\n   measured to matter.\n4. Exact `fgctl` acquisition UX for local path, tarball, and GitHub release\n   asset.\n5. Which candidate preflight checks are required before publishing activation.\n6. How long old release directories are retained and how GC respects leases\n   and rollback references.\n7. Exact quarantine location and user recovery command."
+      }
     },
     {
       "claimId": "claim_0036613efcab070084f6d6a219f0787d",

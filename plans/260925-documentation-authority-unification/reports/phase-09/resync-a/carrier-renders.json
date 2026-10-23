@@ -1,0 +1,30 @@
+[
+  {
+    "source": "docs/specs/runner.md",
+    "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+    "kind": "complete historical-section render",
+    "beforeSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+    "afterSha256": "348fb00440ab449972706c129caffff1e7316a4156f70a7909e720425a412c46"
+  },
+  {
+    "source": "docs/specs/runner.md",
+    "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "kind": "complete render retaining all non-selected bytes",
+    "sourceAnchors": [
+      "unheaded-block-93",
+      "unheaded-block-71"
+    ],
+    "beforeSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+    "afterSha256": "8cd3d1f086ac202a56281644f15ab979b552dd031302f9cf1ee77e2402eca3d1"
+  },
+  {
+    "source": "docs/specs/runner.md",
+    "target": "docs/platform/runner/architecture/h-69197b459754.md",
+    "kind": "complete render retaining all non-selected bytes",
+    "sourceAnchors": [
+      "unheaded-block-132"
+    ],
+    "beforeSha256": "9cda6915740d71be4816e63e5c5d2a217740fd0fa91c4d1128b83ccd86569ea7",
+    "afterSha256": "75b29fbca164757f33597b6b64d47960ef5ccb0e6f02ab3b0f2a265e6cee41b5"
+  }
+]
