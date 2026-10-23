@@ -1,0 +1,9 @@
+{
+  "sourcePin": "e158e672682f4b305230e099f72a1b10adda25e7",
+  "supersededCandidate": "4b8c7c8a6f56193382bc33e2b202025daaa62891",
+  "failure": "the usage amendment rests on dispositions that the committed decision shards use: split assertion; newly missing pilot directory JSON inputs",
+  "correction": "Retain all JSON in pilot/first-round and pilot/second-round, enumerated by unchanged owning test lines 668-675. No test or assertion changed.",
+  "evidence": "pilot-directory-missing-input-attempt.log.gz",
+  "previousRetainFiles": 391,
+  "previousTipBytes": 678689717
+}

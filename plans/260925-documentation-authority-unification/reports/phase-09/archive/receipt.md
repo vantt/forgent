@@ -1,73 +1,43 @@
-# Archive design and scratch rehearsal — receipt
+# Archive continuation receipt
 
-**Authored local candidate; G8 remains partial. No cutover, push, main merge or real-repository Git write.**
+**Task complete as a local design/rehearsal; G8 remains partial pending independent review and F.** Source pin: `e158e672682f4b305230e099f72a1b10adda25e7`. Authority: W2 D5b, L12-129/L12-137. Only `archive/**` changed; no source Git write, lifecycle call, product/test edit or real-repo pair accounting.
 
-Read first: [design](design.md), [manifest](manifest.json), [reader specs](reader-patches/README.md), [machine receipt](receipt.json). Pin: `cffe725b948f5a695728c8da08f114e7e97075d6`, not F.
+Read `design.md`, `manifest.json`, `verification.json`, `rehearsal.json`. The former D5 evidence remains recoverable at `c9826a369836eec9b6fedaa4e8fd49051852bac8`; obsolete expanded copies were removed here, not rewritten as successful evidence.
 
 ## Delivered
 
-- Exact partition: **573 files / 1,750,567,128 bytes** off tip; **6,090 files / 1,072,131,945 bytes** retained unchanged. Every plan/phase document, owner answer, small record, ledger/pilot shard and retained proof input stays. The removals include **313 standalone migration-only replay entrypoints**, conditional on final pre-flip acceptance, not permission to disable pending gates.
-- Fixed local ref: `refs/heads/archive/260925-records`, bound to the complete input tree. Main-side rows map path to blob id, size, SHA-256 and immutable archive commit. The separate 279-file prior-prune recovery table preserves original object custody; every blob is hash-verified and reachable from archive ancestry.
-- Every prior `scriptRefs` occurrence joined: **2,918**, including the **47 historical reader files / 135 joins**. New scan: 6,663 plan files, 550,597 code-like bodies, 19,111 conservative joins. Current product/tests retain their exact inputs; historical recipes get an explicit archive execution-context specification. Frozen script text, B pins and baselines are untouched.
-- Whole-file retirement specs carry exact preimage hashes, archive pin, expected absence and owning historical replay. No test or product module is retired. **320 historical-record contexts and 13,553 distinct enumeration candidate lines remain explicit review work**, not waived matches or a universal reachability proof.
+- **6,761 files partitioned:** archive 6,362 / 2,351,576,666 B; retain 399 / 493,743,978 B. No small-file threshold. Every retained row has a named reader/navigation reason; real alias, vocabulary, inventory and dropped-claim inputs are explicitly explained. Exact decision-directory JSON and both historical pilot rounds are retained; no blanket ledger/pilot retention.
+- **336 retirement specs** explicitly state “behaviour retired with the plan”, never themselves as owning proof. The reviewed ten current gate replayers plus eight newly found programs are `retire-at-final-pin`. Their temporary closure is 3,363 files / 1,291,609,949 B, kept until proofs/reviews freeze.
+- Main manifest: **6,573 B template** (6,611 B with the rehearsal archive commit installed). Full retained/reader audits are deterministic compressed archive-only objects: **1,657,100 B**. The main candidate contains **21,745 B** of archive-facing artifacts at measurement, not the full audit or bundle. Local design/evidence occupies approximately **3.9 MB**, down from the previous 14 MB.
+- Complete custody: 2,918 prior scriptRef occurrences; 47 historical readers / 135 joins; all six restored inputs retained; all 279 prior-prune recovery blobs reachable and hash-verified. Zero unresolved literal live readers; enumeration/semantic completeness remains a bounded review queue, not a universal reachability claim.
 
-## Actual local rehearsal
+## Real-disk rehearsal
 
-A `git clone --no-hardlinks --no-checkout` was created under `/tmp/fgos-work/archive/repo`, then the exact input pin checked out. Only that disposable clone received an archive ref, index changes and plumbing-created commits. No `git add`/`git commit` command was run anywhere.
+`stat -f`: `ext2/ext3 ef53 4096`; `findmnt`: **`/dev/nvme0n1p2`, ext4**. Scratch was addressed through `/tmp/fgos-work/w2-d5b-disk`, temporarily linked to scoped `archive/.scratch` on the real filesystem. Scratch is deleted after evidence capture; the small bundle preserves exact local refs/objects with the source commit as prerequisite. No other real repository was mutated.
 
-Final reduced commit: **`a2206bdff60f020a05184f0b016f130a1304f9c1`**, parent = archive commit. All 6,090 retained files were byte-verified; no `test/`, `scripts/`, `src/` or `packages/` source changed.
+| Variant | Tip bytes | Three actual detached-worktree adds (s) | Median |
+|---|---:|---|---:|
+| After final-pin acceptance, gates retired | 679,257,054 | 5.656 / 4.589 / 4.444 | 4.589 s |
+| Before final-pin acceptance, gates + inputs kept | 1,970,867,003 | 19.039 / 9.562 / 12.287 | 12.287 s |
 
-| Measure | Result |
-|---|---:|
-| Reduced tip logical bytes | **1,269,268,322** |
-| Plan bytes in that measured commit, including then-present design artifacts | 1,085,588,711 |
-| Detached worktree add, run 1 | 8.869 s |
-| Run 2 | 8.523 s |
-| Run 3 | 8.435 s |
-| Median | **8.523 s** |
+These are warm-cache local NVMe measurements, **not F acceptance**. The ~0.2 GB aspiration is not reached because retained owning readers still consume large inventory/ownership inputs.
 
-**Filesystem: tmpfs, warm-cache.** This is valid local timing of the named commit, not SSD/F/cutover acceptance. The conservative tip is still ~1.27 GB, not the ~0.2 GB aspiration. Later receipt/log/verification bytes and the final design wording are not falsely called measured; `rehearsal.json` lists exactly which artifacts its commit included. The final pin/filesystem must be measured again.
+LOCAL archive snapshot: `c2db4ec83419e01b5513d33157ed3edc77b9a11d`, ref `refs/heads/archive/260925-records`, containing the full source tree and all nine generated audit assets. Accounted reduced candidate: `bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88`; pre-freeze candidate: `8f7dcee88e85bed286e9da7097f5e7a2a24e1c58`. `audit/rehearsal.bundle` verifies with the source pin prerequisite and preserves these refs without writing the source repository's refs. Rebuild/review at F; never install an interim fixture id as a production pin.
 
-## Owning proofs, unchanged
+## Check A: negative before, green after
 
-Each file ran individually with:
+Removal fixture commit: **`ffab973828530caa61db9ade641e67178097323c`**. Both frozen reproduction recipes flag **3,409 removal commit/path pairs**, plus **209 preexisting pending pairs**. The clone-only exception-array update accounts each exact pair: before **3,618 unaccounted / exit 1**, after **0 unaccounted / 0 working violations / exit 0** in both recipes. `audit/pair-accounting.json.gz` contains every row. Prior pending pairs are labelled fixture-only simulation, not source approval.
 
-```sh
-env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN='<releasePath>/bin/fgos' node --test <file>
-```
+Only the original A slice is isolated because the unchanged owning reproduction test fails earlier in ownership. B/H/ownership are not claimed green. Recipe logic, B pins, allowlist, assertions and baselines are unchanged. The Lead must perform real exact-pair accounting after the actual removal commit exists, in both manifest exception arrays; none was written outside this scope.
 
-The explicitly allowed activation metadata supplied release `sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06`. Its real addon/helper was staged through the existing `native-addon.json` descriptor only in scratch, with digest checks and isolated HOME/state/tmp directories. No Rust-freshness or newly staged release claim.
+## Proof and exposed correction
 
-| Owning file (`test/scripts/`) | Baseline | Reduced |
-|---|---:|---:|
-| `doc-rationale-reproduction.test.mjs` | 5/8 | 5/8 |
-| `doc-runner-liveness.test.mjs` | 1/1 | 1/1 |
-| `generate-doc-inventory.test.mjs` | 97/97 | 97/97 |
-| `verify-phase-02.test.mjs` | 6/6 | 6/6 |
-| `check-doc-retirement.test.mjs` | 36/36 | 36/36 |
-| `check-evidence-relocation.test.mjs` | 41/41 | 41/41 |
-| `doc-review-format.test.mjs` | 25/25 | 25/25 |
-| `doc-restoration-proofs.test.mjs` | 5/5 | 5/5 |
-| `check-doc-constitution.test.mjs` | 65/65 | 65/65 |
-| `generate-shipped-path-inventory.test.mjs` | 11/11 | 11/11 |
-| **Total per side** | **292/295** | **292/295** |
+Ten unchanged owning test files per side: **293 cases, 291 pass / 2 fail / 0 skip**, same failing titles and assertion on both sides. The two failures are the fresh-reviewer ownership commands asserting `current.noNewDoubleOwnership`; this is an existing gap, not hidden by A-green. All other nine files pass, including constitution after the directory correction. Full stdout/stderr, command argv/exits and digests are under `audit/`.
 
-All 20 commands ran; zero skips/cancellations. **Not a green suite.** The same three failing titles and failure kinds occur on both final sides:
+The narrower-directory attempt exposed a real new constitution failure: its usage-amendment test reads `pilot/first-round/*.json` and `pilot/second-round/*.json`, not just current decisions. The design now retains all eight inputs. `audit/pilot-directory-correction.json` and `audit/pilot-directory-missing-input-attempt.log.gz` preserve the failed attempt. No test, assertion or production check was changed. One initial scanner invocation hit its 240-second timeout; reruns with sufficient time completed. The custody verifier caught the extra failure before this final successful parity replay.
 
-1. The symlink-output guard case reaches `ERR_MODULE_NOT_FOUND` rather than the expected unsafe-output diagnostic when the source checkout itself is under `/tmp/fgos-work`. The unmodified audit uses caller cwd in that guard. This is a location-sensitive baseline observation, not a production fix or a safety guarantee.
-2. Both frozen ownership command tests fail `assert(current.noNewDoubleOwnership)` in `audit-ownership.mjs` at this source pin. They do not reach `checks.mjs`; no successful B/accounting replay is claimed.
+`python3 -B .../archive/verify-design.py`: exit 0, full partition/digests, four negative probes (wrong digest/object/unsafe path/self-owning proof), bundle refs/digest, raw-log integrity, failure parity and both A receipts. `git diff --check`: exit 0. Scratch Git diff confirms no test/product/script/package/bin/app source changed. The actual activated release addon/helper was staged only in the clone through the existing descriptor; HOME/state/temp were isolated. This proves Node behaviour against that release, **not working-tree Rust freshness**.
 
-Final reduced logs contain **no ENOENT**. Matching pass counts alone were not used as proof: the first attempt had the same counts but failed on missing comparison baselines instead. That real archive regression was corrected by retaining both baselines and replaying the complete before/after files. Original failed logs, counts and timings remain under `attempts/initial/`; no assertion, baseline or frozen source was changed. See `test-comparison.json` and complete `test-logs/`.
+## Handoff / limits
 
-`python3 -B .../archive/verify-design.py`: exit 0. Exact partition/source hashes, every retirement preimage, all 2,918 prior joins, all 47/135 historical joins, six restored inputs and 279 reachable recovery blobs verified. Wrong digest, wrong object and unsafe path negative probes reject. This is the owning custody proof, not semantic approval of every retirement.
-
-## Constraints, gaps and handoff
-
-- Only `archive/**` is authored in the real workspace. Its HEAD/index/ref checks remain unchanged; no archive ref exists there. No lifecycle verb, real fgOS CLI invocation, `.fgos`/secret mutation, main landing, push, pair accounting or shared Lead-file write.
-- `npm test`, `scripts/run-tests.mjs`, Cargo workspace suite, installed docs-lease/G10 rehearsal and F timing were not run: prohibited or outside this assignment. Every requested individual owning file ran.
-- Impact analysis: **degraded/unqueried under the explicit no-fgOS-CLI boundary**; no graph impact or detect-changes result is invented. Direct code/history and digest/object evidence are retained. No public configuration, default, environment contract or infrastructure dependency changed.
-- No browser/service preview was launched inside this constrained records turn. The Markdown is ordinary repository content; preview remains Lead custody.
-- **Lead follow-up:** review historical-context and enumeration queues; confirm the post-freeze retirement schedule, especially Phase 09 gate replayers; resolve the baseline rationale failures with their existing owners; rebuild/re-enumerate/review at F; measure the final tree on the intended landing filesystem; obtain publication/real-merge approval. A smaller ~0.2 GB tip requires deliberate further retirement/repoint of still-live inventory inputs, not deletion here.
-- `needsWrites: []` for the scoped design/rehearsal deliverable. The three existing test failures are recorded as separate follow-ups, not an excuse to edit out-of-scope code or waive checks.
-
-**No G8 acceptance, all-green claim or final cutover readiness is asserted.**
+`audit/final-artifact-delta.json.gz` binds the final main-side artifact byte delta from the measured snapshot; completed receipts necessarily follow measurement. Final F measurement must include those bytes and every approved change. Full npm/Cargo suites were not run (npm suite prohibited); G10/G11, independent retirement/enumeration acceptance, F rescan, origin publish, main merge and real lease acquisition remain Lead/owner work. No gate is waived. Impact-analysis: degraded/unqueried under the explicit no-fgOS-CLI brief. Browser preview was deferred to avoid out-of-scope service state. `needsWrites=[]`.

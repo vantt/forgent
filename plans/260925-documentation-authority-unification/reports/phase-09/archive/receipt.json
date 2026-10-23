@@ -1,807 +1,105 @@
 {
-  "status": "authored-local-candidate; G8 partial, not accepted",
-  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "authority": [
-    "L12-129",
-    "L12-137",
-    "w2-d5-brief.md"
-  ],
+  "status": "local-design-and-rehearsal-complete; G8 partial pending independent review and F",
+  "inputCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
+  "authority": ["w2-d5b-brief.md", "L12-129", "L12-137"],
+  "scope": "plans/260925-documentation-authority-unification/reports/phase-09/archive/**",
   "needsWrites": [],
-  "workspaceWriteScope": "plans/260925-documentation-authority-unification/reports/phase-09/archive/**",
-  "archiveRef": "refs/heads/archive/260925-records",
-  "archiveCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "candidateCommit": "a2206bdff60f020a05184f0b016f130a1304f9c1",
+  "gateAccepted": false,
+  "previousEvidenceCommit": "c9826a369836eec9b6fedaa4e8fd49051852bac8",
   "counts": {
-    "planFiles": 6663,
-    "planBytes": 2822699073,
-    "archiveFiles": 573,
-    "archiveBytes": 1750567128,
-    "retainFiles": 6090,
-    "retainBytes": 1072131945,
-    "standaloneReplayRetirements": 313,
-    "unresolvedLiveSources": 0
-  },
-  "readerCoverage": {
+    "planFiles": 6761,
+    "planBytes": 2845320644,
+    "archiveFiles": 6362,
+    "archiveBytes": 2351576666,
+    "retainedFiles": 399,
+    "retainedBytes": 493743978,
+    "standaloneRetirementSpecs": 336,
+    "reviewedGatePrograms": 10,
+    "allCurrentGatePrograms": 18,
+    "temporaryGateFiles": 3363,
+    "temporaryGateBytes": 1291609949,
     "priorScriptRefOccurrences": 2918,
-    "historicalFiles": 47,
+    "historicalReaderFiles": 47,
     "historicalJoins": 135,
-    "retainedHistoricalRecordContexts": 320,
-    "enumerationOccurrences": 47100,
-    "distinctEnumerationCandidateLines": 13553,
-    "literalUnresolvedLiveSources": 0,
-    "semanticEnumerationReview": "pending; zero literal residue is not universal reachability"
+    "priorRecoveryBlobs": 279,
+    "restoredInputsRetained": 6,
+    "unresolvedLiteralLiveSources": 0
   },
-  "checkout": {
-    "logicalBytes": 1269268322,
-    "seconds": [
-      8.869302909006365,
-      8.523144954931922,
-      8.43490734603256
-    ],
-    "medianSeconds": 8.523144954931922,
-    "filesystem": "/tmp tmpfs; local warm-cache rehearsal, NOT production SSD/F acceptance",
-    "targetSeconds": 60,
-    "aspirationalTipBytes": 200000000,
-    "aspirationalSizeAttained": false
+  "mainSide": {
+    "templateManifestBytes": 6573,
+    "materializedManifestBytes": 6611,
+    "measuredArchiveFacingBytes": 21745,
+    "archiveOnlyCompressedAuditBytes": 1657100,
+    "retainedAuditInMainManifest": false,
+    "sizeThresholdRetention": false
+  },
+  "rehearsal": {
+    "filesystem": "/dev/nvme0n1p2 ext4",
+    "statFilesystemType": "ext2/ext3 ef53",
+    "warmCache": true,
+    "archiveRef": "refs/heads/archive/260925-records",
+    "archiveCommit": "c2db4ec83419e01b5513d33157ed3edc77b9a11d",
+    "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
+    "postFreezeCommit": "bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88",
+    "preFreezeCommit": "8f7dcee88e85bed286e9da7097f5e7a2a24e1c58",
+    "postFreezeTipBytes": 679257054,
+    "postFreezeRunsSeconds": [5.6556453770026565, 4.588815063005313, 4.444476593984291],
+    "postFreezeMedianSeconds": 4.588815063005313,
+    "preFreezeTipBytes": 1970867003,
+    "preFreezeRunsSeconds": [19.039110076031648, 9.562469732947648, 12.286731401924044],
+    "preFreezeMedianSeconds": 12.286731401924044,
+    "bundle": "audit/rehearsal.bundle",
+    "scratchPolicy": "Temporary /tmp/fgos-work/w2-d5b-disk symlink to scoped archive/.scratch on real disk; removed after evidence capture",
+    "measuredTreeNotFinalArtifactTree": true,
+    "finalDelta": "audit/final-artifact-delta.json.gz"
+  },
+  "accounting": {
+    "recipes": 2,
+    "sourceExceptionArraysChanged": false,
+    "removalPairsPerRecipe": 3409,
+    "preexistingPendingPairsPerRecipe": 209,
+    "preexistingPairAuthority": "fixture-only simulation, not source approval",
+    "beforeUnaccountedPairs": 3618,
+    "beforeExit": 1,
+    "afterUnaccountedPairs": 0,
+    "afterWorkingViolations": 0,
+    "afterExit": 0,
+    "recipeScope": "unchanged A slice; not B/H/ownership/full recipe acceptance",
+    "pairRows": "audit/pair-accounting.json.gz"
   },
   "proofs": {
     "custodyVerifierExit": 0,
-    "recoveryBlobsReachableAndHashed": 279,
-    "negativeProbes": [
-      {
-        "probe": "wrong digest",
-        "rejected": true
-      },
-      {
-        "probe": "wrong object",
-        "rejected": true
-      },
-      {
-        "probe": "unsafe path",
-        "rejected": true
-      }
-    ],
-    "owningFilesPerSide": 10,
-    "commands": 20,
-    "casesPerSide": 295,
-    "passedPerSide": 292,
-    "failedPerSide": 3,
-    "skippedPerSide": 0,
+    "negativeProbes": ["wrong digest", "wrong object", "unsafe path", "self-owning retired proof"],
+    "bundleVerified": true,
+    "testFilesPerSide": 10,
+    "casesPerSide": 293,
+    "passPerSide": 291,
+    "failPerSide": 2,
+    "skipPerSide": 0,
+    "newFailingTitles": 0,
+    "remainingFailure": "two ownership fresh-reviewer commands assert current.noNewDoubleOwnership on baseline and reduced trees",
     "allGreen": false,
-    "observedFailureParity": "same three titles and failure kinds; no final ENOENT",
+    "rustFreshness": "activated addon only, not working-tree Rust freshness",
     "releaseId": "sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
-    "rustFreshness": "not established; activated addon only"
+    "testLogsAndCommands": "audit/",
+    "exposedCorrection": "audit/pilot-directory-correction.json; eight pilot JSON inputs restored to retained set, unchanged constitution owning file passes"
   },
-  "commands": [
-    {
-      "argv": [
-        "git",
-        "clone",
-        "--no-hardlinks",
-        "--no-checkout",
-        "/home/vantt/projects/forgentX-p9-w1-d4",
-        "/tmp/fgos-work/archive/repo"
-      ],
-      "exit": 0,
-      "writes": "disposable clone only"
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/archive/build-design.py",
-        "--output-dir",
-        "plans/260925-documentation-authority-unification/reports/phase-09/archive"
-      ],
-      "exit": 0
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/archive/verify-design.py"
-      ],
-      "exit": 0
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py",
-        "--clone",
-        "/tmp/fgos-work/archive/repo",
-        "--release-path",
-        "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06"
-      ],
-      "exit": 0,
-      "note": "driver completion, not all-green tests; see all individual exits in test-results.json"
-    },
-    {
-      "argv": [
-        "git",
-        "diff",
-        "--check"
-      ],
-      "exit": 0
-    }
-  ],
-  "sourceRepositoryGuard": {
-    "HEAD": "cffe725b948f5a695728c8da08f114e7e97075d6",
-    "trackedDiffExit": 0,
-    "indexDiffExit": 0,
-    "archiveRefAbsentExit": 1,
-    "onlyAuthoredPrefix": "plans/260925-documentation-authority-unification/reports/phase-09/archive/",
-    "untrackedFilesAtCheck": 63
+  "sourceGuards": {
+    "gitIndexOrRefsWritten": false,
+    "productOrTestEdited": false,
+    "liveFgosStateAccessed": false,
+    "activationMetadataRead": "releasePath only for prescribed host",
+    "fgosCliInvokedAgainstSource": false,
+    "lifecycleInvoked": false,
+    "pairAccountingAppliedToSource": false
   },
-  "impactAnalysis": "degraded/unqueried under explicit no-fgOS-CLI brief; no graph result claimed",
+  "impactAnalysis": "degraded/unqueried under explicit no-fgOS-CLI brief",
   "unrun": [
-    "npm test and scripts/run-tests.mjs (prohibited)",
-    "Cargo workspace suite (outside records scope)",
-    "G10/G11 installed release holder/lease rehearsal (Lead)",
-    "F/production filesystem timing (future pin)"
-  ],
-  "deferred": [
-    "independent historical-context and enumeration review",
-    "approval of post-freeze replay retirement schedule",
-    "baseline rationale failures owned outside this turn",
-    "F reader rescan and final measured tree",
-    "origin publication and real main merge require separate cutover approval"
-  ],
-  "incidentEvidence": "attempts/initial/correction.json and preserved initial logs; missed audit baselines fixed, no proof weakened",
-  "measuredTreeExcludesFinalReceipt": true,
-  "postMeasurementArtifactDelta": [
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/correction.json",
-      "measuredBlobId": null,
-      "currentBlobId": "c2aee04ffdd8f2b34b668b2abc02d13ded40ec0f",
-      "currentSha256": "3d50440f46a1d02dae9a07d4715da89e9803d609b992e02219b7056c23218aaf",
-      "sizeDelta": 1610
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-doc-constitution.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "7c72755911d3422224e039e9faba4b8f5e06f9fc",
-      "currentSha256": "bd3e8351f17da8dd5b81c34b614abe5cb43d33f64124d9e6d212b79134931e0c",
-      "sizeDelta": 5825
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-doc-retirement.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "0d10230f7d6cbd9171b98a6981b9170d287f076a",
-      "currentSha256": "cbe3c88c0c972106a578d6c51df05e7ccadb8532a3e3284b550818bd933b2880",
-      "sizeDelta": 3436
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-evidence-relocation.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "cda119ed2c18401a9b5ce204a78288552c32f26c",
-      "currentSha256": "bf8d80774f7532e9b9089ad6dd70ec91e0e54d61765e44559b5e85bcff304e6c",
-      "sizeDelta": 2730
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-rationale-reproduction.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "6fec9cbe931227eabbe5d9814ed4efb3771dd0a6",
-      "currentSha256": "7f43165b4f0d794826887bf76b00690d64af796ef58ae5f87b045b161797ab6a",
-      "sizeDelta": 7302
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-restoration-proofs.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "22c90ff10164a55fbc7e63a3eae56490fad34f70",
-      "currentSha256": "1b913492f87b9f8f71cffe31c0c21b8d9745965423e93e2aa13abada0ad0288d",
-      "sizeDelta": 572
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-review-format.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "277352f68bebfd62d6dd37696ab17a9a461ec26e",
-      "currentSha256": "90b196c7054ce01ad173312d286581a7b5be4304cd2ed01db2a734e1623a0195",
-      "sizeDelta": 2048
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-runner-liveness.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "aa693b96dc98d8a914df2ad3f62be22adabf4f75",
-      "currentSha256": "a22d2b54963b1d190ffeba63a5a5e16016843af06f5fdc8a8ae1987a661e42a4",
-      "sizeDelta": 229
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-generate-doc-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "be13eae75359f7295bc4242c31ba8b278fc60180",
-      "currentSha256": "6d5c36c35b46bd1e4a0272d4e8c485901ede6691fee3bc8ef0d2dca167c4a63f",
-      "sizeDelta": 10924
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-generate-shipped-path-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "b24a270c3ce5de45592ffc5f78d094e64b9be346",
-      "currentSha256": "222b7a4e73a4d3ec6f42e9aad8200b159d1c5f1c3f30f9ab1e3fb474866c1d17",
-      "sizeDelta": 1238
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-verify-phase-02.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "91b7d7c97facf85b812823dff2143ba41c68a46d",
-      "currentSha256": "539186317d1d1c9d3dae94b07f3c3c1bb6a88bc7816a10ded8feb05a7ddd24cf",
-      "sizeDelta": 625
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-doc-constitution.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "7e3eb9df8f4d71262201111ff554c9412abfb23c",
-      "currentSha256": "c8a7bf6a8b413f646fd33954a514707c46c51a41efa81ef4a55918f6a78febf3",
-      "sizeDelta": 5825
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-doc-retirement.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "7fc26eef54011ae9dc2683da571b272d6cdc811b",
-      "currentSha256": "28452b881cfb8720097f61adcc69a38f42fda10e960426e9655e4a753bd6cc0d",
-      "sizeDelta": 3440
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-evidence-relocation.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "480af176484e0d51fb6c748d546e1d662607afa1",
-      "currentSha256": "ad589eae046862d555e62d96ffd6c99a9cac93528f1c94e396742d88847d1f43",
-      "sizeDelta": 2729
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-rationale-reproduction.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "0d3bca720b4e67d11c3f976b5464237c585c9fef",
-      "currentSha256": "cd8495ab28de473b001269caa1004d0f440ff6272ffb8fc73c42d1d033997bc2",
-      "sizeDelta": 7740
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-restoration-proofs.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "750506ba5bb06024e76eb9a618bbaba79a818402",
-      "currentSha256": "d2192218b7222983286ebb3ce10fbcef0e1daa3df619bc84f78e0a52372009b5",
-      "sizeDelta": 570
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-review-format.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "fae7a8c30cc43699036d49e954bed827e7934ac2",
-      "currentSha256": "49129ce9897403933187226057027548a27fab168e0eaa64ce5d3876a4c7346d",
-      "sizeDelta": 2051
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-runner-liveness.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "c0e445ffdc8b52a1342f16557337f19147731f9f",
-      "currentSha256": "02534cfcc474040e37a182dd29d526d74f4918f34ca89a40fa1041c5d35a7d30",
-      "sizeDelta": 227
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-generate-doc-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "62774704daf7561b3ad5106b755f132722299cbc",
-      "currentSha256": "ad8266d899933195e60475a293bf54c23d7893c4a0cc79b3360e29bd89942ba2",
-      "sizeDelta": 10921
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-generate-shipped-path-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "6aadfc659ba4a3db82b7ccb22df672bafc532bb8",
-      "currentSha256": "2104e59f5b5b9521735a2a77025c2e52aca95baee12d5a561f468306abe3316b",
-      "sizeDelta": 1238
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-verify-phase-02.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "144e38d2e34fa5d7065f16cbc55843f97bd49596",
-      "currentSha256": "f67b28d7ef4ea913b9977720fd7ecc1b36e50e996f47028c0eeb06508c024caf",
-      "sizeDelta": 623
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-results.json",
-      "measuredBlobId": null,
-      "currentBlobId": "c8a82fce51b6a70bf975cfc19c5409fa6ee5c8d1",
-      "currentSha256": "7389356f0e7bdbe568c35c60f7cee7d7158f9fcaecb2af8317704ba92f1f53df",
-      "sizeDelta": 16072
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
-      "measuredBlobId": "82a29c93ad7efa42eb6d115b6ed14f9509feb9de",
-      "currentBlobId": "a5c684265efbafc58a6ba34c5fc489ca9bc220be",
-      "currentSha256": "08ed0bd8f86333aa8bcbdeb9862dd25d833c977968903b1df9302b599dada407",
-      "sizeDelta": 153
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
-      "measuredBlobId": null,
-      "currentBlobId": "d93181b1ac504059a36ac4b32de00d8341a3bdff",
-      "currentSha256": "e91b82d23821ccf3f903e624193297637b79fe687c5fe63d7763582c4de628a7",
-      "sizeDelta": 7342
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal-commands.json",
-      "measuredBlobId": null,
-      "currentBlobId": "a26ec8ac05ee4bb59a955e430e979046231ac1ef",
-      "currentSha256": "42bce87786c43b67b0ab77caad76d1eaa2b7b2df0a91fa268d857b43a42e19cd",
-      "sizeDelta": 290699
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
-      "measuredBlobId": null,
-      "currentBlobId": "1bd276f5d6585f12c51a266a6ce0a56069f5f810",
-      "currentSha256": "319f578821bb2ab3c9b6992515cd5705044bcd01cd853604a73e9d256dd206a8",
-      "sizeDelta": 3360
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-comparison.json",
-      "measuredBlobId": null,
-      "currentBlobId": "9a6597cc7190d77651d7ec6fde16586435e3efc6",
-      "currentSha256": "5fba8507025adce2b13a7f4f0a52dea3c0e957e244730229099601ea92e092e1",
-      "sizeDelta": 10295
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-constitution.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "78269733f1ab4107c52738cc5ab4f82895bd1f3e",
-      "currentSha256": "38723e8812b3041060fec63dfdb9e084f8192d11352a592ce678058f38675cae",
-      "sizeDelta": 5827
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-retirement.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "4eee7db6b91a2030389a6d499498049bf9a45da8",
-      "currentSha256": "4cdbbf43e8af161ecd28adf5f8a82d00a965c5f3f0f193dcafed48f9194e6070",
-      "sizeDelta": 3437
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-evidence-relocation.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "d6e649aa730715decc459a3f7a3f268e089077aa",
-      "currentSha256": "19b40271b85dceab567261577880a6a583fab8b098c7164b8af7acfeae4de972",
-      "sizeDelta": 2739
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-rationale-reproduction.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "5b816fbd48c30bca19520e5674542853b86a7afb",
-      "currentSha256": "dc48394d5d66bf4877a4157680fee804a84db887699d83c251c9eee5c9152cfe",
-      "sizeDelta": 7310
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-restoration-proofs.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "8ccf38ca13f4489de07447ed4c453738d2728911",
-      "currentSha256": "98c5f5b6d020a5b24dd995b14b962286ab70e52894fcacbd2eada41aa1f92dd0",
-      "sizeDelta": 573
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-review-format.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "7782d4580f017f79ca6d0e85c0773ec84ce78f36",
-      "currentSha256": "7cb5ac432a8d753cbc6aaa9bcd9e5cf9bf9bf95afed27f6c872856bc24f6ed40",
-      "sizeDelta": 2057
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-runner-liveness.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "cc773c400c661060aa0183f4a7ff4d3884ff819b",
-      "currentSha256": "54fb3e0284dce608d74486ea74992501c5ddb36724476ad0c9cad58b98998e22",
-      "sizeDelta": 229
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-doc-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "410b5bbe0bd2493333e5ee7217f68f0a04b0101b",
-      "currentSha256": "832d9b0ec0d818c10998f5304eda288c6f6b31eaea63fa2bd3dcea784a8702af",
-      "sizeDelta": 10932
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-shipped-path-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "d3f0d0ff7016a758f23f56082c07d19833621fd1",
-      "currentSha256": "9ccfe87525c16b9195733c3378d194870ab0ca045737334f79904738358224f7",
-      "sizeDelta": 1240
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-verify-phase-02.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "a5798cbc0c44de4350ba7923c4acaac1a471ebb3",
-      "currentSha256": "429038e586b17751977d38c1601cf0ea2f15a8b1a9b30805393485a8fee276a2",
-      "sizeDelta": 625
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-constitution.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "101465bb4d08dd1f5fddf9b980292aacf24d1a1c",
-      "currentSha256": "f27b1c9f1dc414d57cf894f124a55e36e5a980daaf999de17f19b6a5913782bb",
-      "sizeDelta": 5825
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-retirement.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "2aa17f98fab8800e7be682951000bb16a1ed0a8c",
-      "currentSha256": "4b92393f6e5346a546cc74d78b7476bd5d289bb96777ee302312654bc94e107f",
-      "sizeDelta": 3437
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-evidence-relocation.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "97cd524364b635363e6c259bb76849238f16ec8b",
-      "currentSha256": "1bcc55c0dcb45bc879733b06d1800cf5137a7cfcb289cdb81ee79fda5c89440c",
-      "sizeDelta": 2724
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-rationale-reproduction.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "f04b1a01bf095e4eebe70a10e51ffe032258617a",
-      "currentSha256": "c717ab1f1968e8332d517b78a78f8a726c74fd7938f88e71a41a6828cd220129",
-      "sizeDelta": 7303
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-restoration-proofs.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "006f270058289771a80735ec994aa26789c69bbd",
-      "currentSha256": "108479e58f5a03db9a85a129dc9f30488889ffe50be360d9c42dc902c1afcafa",
-      "sizeDelta": 572
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-review-format.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "378cefe1b2c9d2b03a7844d67757ce23a9db451b",
-      "currentSha256": "944149e9641483f64046fc9f2f91af92ab2db43e5715c3d9552adf6ac156aaaf",
-      "sizeDelta": 2047
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-runner-liveness.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "56011bab16b99b71731be989eace95db1c431ac7",
-      "currentSha256": "dd6715a41a0771d9ee220daed2759d614a34b0a98d306335b2d6c400f028cc09",
-      "sizeDelta": 229
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-doc-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "689634ae03e4f183d0f0c0cc40bef2c66944fd72",
-      "currentSha256": "fa0af985f11c00f6e199d3afc3c4653bde5944daef75a788f7751d4ba41ccc2e",
-      "sizeDelta": 10926
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-shipped-path-inventory.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "c34443ebdd24fbc6725a597dc31e6b83af49cfd3",
-      "currentSha256": "92b3e9ba4aaa26755f048d5f3df3e6fbabb18e70bf22e8d7ae0981e36d36bbca",
-      "sizeDelta": 1239
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-verify-phase-02.test.mjs.log",
-      "measuredBlobId": null,
-      "currentBlobId": "8978666cefcb5075341214baee278dd7e4dde345",
-      "currentSha256": "9ea17568fd7be34d7df87dee51f9677001aa54a2013a88e04bcd68dd3171faaa",
-      "sizeDelta": 624
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-results.json",
-      "measuredBlobId": null,
-      "currentBlobId": "c7804b3094d32c7a295fafc36a202825791042cf",
-      "currentSha256": "cf21d2c0e6b4b6c47b007632ee197ce850db9f7c8f6c720680d3152ee002e191",
-      "sizeDelta": 16075
-    }
-  ],
-  "artifactDigests": [
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/correction.json",
-      "bytes": 1610,
-      "sha256": "3d50440f46a1d02dae9a07d4715da89e9803d609b992e02219b7056c23218aaf"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal-commands.json",
-      "bytes": 286824,
-      "sha256": "81f88b8980f1d62cfea521ead024f4e6814ca14a6ad4f724fccc399b65e85c43"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal.json",
-      "bytes": 2733,
-      "sha256": "965966fcd85b85e1735b5e60e01f5183342dc28a922eca204f5fb2f940366345"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-doc-constitution.test.mjs.log",
-      "bytes": 5825,
-      "sha256": "bd3e8351f17da8dd5b81c34b614abe5cb43d33f64124d9e6d212b79134931e0c"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-doc-retirement.test.mjs.log",
-      "bytes": 3436,
-      "sha256": "cbe3c88c0c972106a578d6c51df05e7ccadb8532a3e3284b550818bd933b2880"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-check-evidence-relocation.test.mjs.log",
-      "bytes": 2730,
-      "sha256": "bf8d80774f7532e9b9089ad6dd70ec91e0e54d61765e44559b5e85bcff304e6c"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-rationale-reproduction.test.mjs.log",
-      "bytes": 7302,
-      "sha256": "7f43165b4f0d794826887bf76b00690d64af796ef58ae5f87b045b161797ab6a"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-restoration-proofs.test.mjs.log",
-      "bytes": 572,
-      "sha256": "1b913492f87b9f8f71cffe31c0c21b8d9745965423e93e2aa13abada0ad0288d"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-review-format.test.mjs.log",
-      "bytes": 2048,
-      "sha256": "90b196c7054ce01ad173312d286581a7b5be4304cd2ed01db2a734e1623a0195"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-doc-runner-liveness.test.mjs.log",
-      "bytes": 229,
-      "sha256": "a22d2b54963b1d190ffeba63a5a5e16016843af06f5fdc8a8ae1987a661e42a4"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-generate-doc-inventory.test.mjs.log",
-      "bytes": 10924,
-      "sha256": "6d5c36c35b46bd1e4a0272d4e8c485901ede6691fee3bc8ef0d2dca167c4a63f"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-generate-shipped-path-inventory.test.mjs.log",
-      "bytes": 1238,
-      "sha256": "222b7a4e73a4d3ec6f42e9aad8200b159d1c5f1c3f30f9ab1e3fb474866c1d17"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/baseline-verify-phase-02.test.mjs.log",
-      "bytes": 625,
-      "sha256": "539186317d1d1c9d3dae94b07f3c3c1bb6a88bc7816a10ded8feb05a7ddd24cf"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-doc-constitution.test.mjs.log",
-      "bytes": 5825,
-      "sha256": "c8a7bf6a8b413f646fd33954a514707c46c51a41efa81ef4a55918f6a78febf3"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-doc-retirement.test.mjs.log",
-      "bytes": 3440,
-      "sha256": "28452b881cfb8720097f61adcc69a38f42fda10e960426e9655e4a753bd6cc0d"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-check-evidence-relocation.test.mjs.log",
-      "bytes": 2729,
-      "sha256": "ad589eae046862d555e62d96ffd6c99a9cac93528f1c94e396742d88847d1f43"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-rationale-reproduction.test.mjs.log",
-      "bytes": 7740,
-      "sha256": "cd8495ab28de473b001269caa1004d0f440ff6272ffb8fc73c42d1d033997bc2"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-restoration-proofs.test.mjs.log",
-      "bytes": 570,
-      "sha256": "d2192218b7222983286ebb3ce10fbcef0e1daa3df619bc84f78e0a52372009b5"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-review-format.test.mjs.log",
-      "bytes": 2051,
-      "sha256": "49129ce9897403933187226057027548a27fab168e0eaa64ce5d3876a4c7346d"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-doc-runner-liveness.test.mjs.log",
-      "bytes": 227,
-      "sha256": "02534cfcc474040e37a182dd29d526d74f4918f34ca89a40fa1041c5d35a7d30"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-generate-doc-inventory.test.mjs.log",
-      "bytes": 10921,
-      "sha256": "ad8266d899933195e60475a293bf54c23d7893c4a0cc79b3360e29bd89942ba2"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-generate-shipped-path-inventory.test.mjs.log",
-      "bytes": 1238,
-      "sha256": "2104e59f5b5b9521735a2a77025c2e52aca95baee12d5a561f468306abe3316b"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-logs/reduced-verify-phase-02.test.mjs.log",
-      "bytes": 623,
-      "sha256": "f67b28d7ef4ea913b9977720fd7ecc1b36e50e996f47028c0eeb06508c024caf"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/test-results.json",
-      "bytes": 16072,
-      "sha256": "7389356f0e7bdbe568c35c60f7cee7d7158f9fcaecb2af8317704ba92f1f53df"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/build-design.py",
-      "bytes": 19905,
-      "sha256": "c3f0a168a85695e69ae07e7556bed2bb32cb44f8a6caee5898128520593d4815"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
-      "bytes": 9593,
-      "sha256": "08ed0bd8f86333aa8bcbdeb9862dd25d833c977968903b1df9302b599dada407"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
-      "bytes": 2870938,
-      "sha256": "ff79d64aeb6a78ec03f0f22eb3b78bdaf5e4a9d9fc95d5c0e70a25b79dc033d8"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/prior-prune-recovery.json",
-      "bytes": 119711,
-      "sha256": "d84b0f4db5654975c8dab9ed80fe8e140f52ef8db9088714d3a30361ee7dee6f"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
-      "bytes": 3923,
-      "sha256": "1fac5ad2017043f9db8fcfa96894da2b37782fa86c7b2923684bd2583753a347"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/enumeration-review.json",
-      "bytes": 5571061,
-      "sha256": "0dce64da4d3c9ec6476cf93ecd6e5a6da7dd18b714a4151afef58f3df15879b1"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/historical-replay-specs.json",
-      "bytes": 119015,
-      "sha256": "85396c13a312235e77f9cf0681f415b76a755f6e16856878ce40a98206eeed03"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/prior-script-refs.json",
-      "bytes": 1994987,
-      "sha256": "1328283274e68f016e9bc723fd18e455a7ea6c8a08eccd38c1e64e85bfa307c3"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/reader-index.json",
-      "bytes": 1993182,
-      "sha256": "87b86df9d02414cdf168af04e806a35ed6f050a4a78ac31912dffdde621e78da"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/standalone-retirement-specs.json",
-      "bytes": 348847,
-      "sha256": "571ef68e3121038b89a07079632b29a47812b6c95b9848e56a660f8d11325a25"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
-      "bytes": 7342,
-      "sha256": "e91b82d23821ccf3f903e624193297637b79fe687c5fe63d7763582c4de628a7"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal-commands.json",
-      "bytes": 290699,
-      "sha256": "42bce87786c43b67b0ab77caad76d1eaa2b7b2df0a91fa268d857b43a42e19cd"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
-      "bytes": 3360,
-      "sha256": "319f578821bb2ab3c9b6992515cd5705044bcd01cd853604a73e9d256dd206a8"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py",
-      "bytes": 10582,
-      "sha256": "5233ccd72bfa46d0bd533e4a34d61cd56bf4026580c4c1dfbd808364cde12349"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/scan-receipt.json",
-      "bytes": 100256,
-      "sha256": "fa1de2e8e75aa72834eef7335bff4069a25b3a7cf8f363d333fc1a639e8f20f7"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-comparison.json",
-      "bytes": 10295,
-      "sha256": "5fba8507025adce2b13a7f4f0a52dea3c0e957e244730229099601ea92e092e1"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-constitution.test.mjs.log",
-      "bytes": 5827,
-      "sha256": "38723e8812b3041060fec63dfdb9e084f8192d11352a592ce678058f38675cae"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-doc-retirement.test.mjs.log",
-      "bytes": 3437,
-      "sha256": "4cdbbf43e8af161ecd28adf5f8a82d00a965c5f3f0f193dcafed48f9194e6070"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-check-evidence-relocation.test.mjs.log",
-      "bytes": 2739,
-      "sha256": "19b40271b85dceab567261577880a6a583fab8b098c7164b8af7acfeae4de972"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-rationale-reproduction.test.mjs.log",
-      "bytes": 7310,
-      "sha256": "dc48394d5d66bf4877a4157680fee804a84db887699d83c251c9eee5c9152cfe"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-restoration-proofs.test.mjs.log",
-      "bytes": 573,
-      "sha256": "98c5f5b6d020a5b24dd995b14b962286ab70e52894fcacbd2eada41aa1f92dd0"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-review-format.test.mjs.log",
-      "bytes": 2057,
-      "sha256": "7cb5ac432a8d753cbc6aaa9bcd9e5cf9bf9bf95afed27f6c872856bc24f6ed40"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-doc-runner-liveness.test.mjs.log",
-      "bytes": 229,
-      "sha256": "54fb3e0284dce608d74486ea74992501c5ddb36724476ad0c9cad58b98998e22"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-doc-inventory.test.mjs.log",
-      "bytes": 10932,
-      "sha256": "832d9b0ec0d818c10998f5304eda288c6f6b31eaea63fa2bd3dcea784a8702af"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-generate-shipped-path-inventory.test.mjs.log",
-      "bytes": 1240,
-      "sha256": "9ccfe87525c16b9195733c3378d194870ab0ca045737334f79904738358224f7"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/baseline-verify-phase-02.test.mjs.log",
-      "bytes": 625,
-      "sha256": "429038e586b17751977d38c1601cf0ea2f15a8b1a9b30805393485a8fee276a2"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-constitution.test.mjs.log",
-      "bytes": 5825,
-      "sha256": "f27b1c9f1dc414d57cf894f124a55e36e5a980daaf999de17f19b6a5913782bb"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-doc-retirement.test.mjs.log",
-      "bytes": 3437,
-      "sha256": "4b92393f6e5346a546cc74d78b7476bd5d289bb96777ee302312654bc94e107f"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-check-evidence-relocation.test.mjs.log",
-      "bytes": 2724,
-      "sha256": "1bcc55c0dcb45bc879733b06d1800cf5137a7cfcb289cdb81ee79fda5c89440c"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-rationale-reproduction.test.mjs.log",
-      "bytes": 7303,
-      "sha256": "c717ab1f1968e8332d517b78a78f8a726c74fd7938f88e71a41a6828cd220129"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-restoration-proofs.test.mjs.log",
-      "bytes": 572,
-      "sha256": "108479e58f5a03db9a85a129dc9f30488889ffe50be360d9c42dc902c1afcafa"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-review-format.test.mjs.log",
-      "bytes": 2047,
-      "sha256": "944149e9641483f64046fc9f2f91af92ab2db43e5715c3d9552adf6ac156aaaf"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-doc-runner-liveness.test.mjs.log",
-      "bytes": 229,
-      "sha256": "dd6715a41a0771d9ee220daed2759d614a34b0a98d306335b2d6c400f028cc09"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-doc-inventory.test.mjs.log",
-      "bytes": 10926,
-      "sha256": "fa0af985f11c00f6e199d3afc3c4653bde5944daef75a788f7751d4ba41ccc2e"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-generate-shipped-path-inventory.test.mjs.log",
-      "bytes": 1239,
-      "sha256": "92b3e9ba4aaa26755f048d5f3df3e6fbabb18e70bf22e8d7ae0981e36d36bbca"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-logs/reduced-verify-phase-02.test.mjs.log",
-      "bytes": 624,
-      "sha256": "9ea17568fd7be34d7df87dee51f9677001aa54a2013a88e04bcd68dd3171faaa"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/test-results.json",
-      "bytes": 16075,
-      "sha256": "cf21d2c0e6b4b6c47b007632ee197ce850db9f7c8f6c720680d3152ee002e191"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
-      "bytes": 759,
-      "sha256": "785eda7c1e90ab18423acef4516325e90c438ea8950d985a5754b67c2dffdcb3"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verify-design.py",
-      "bytes": 4603,
-      "sha256": "c506e23ca49932127ea78b7cec42ec825db0c3eb23827ae5ce81b049286193fd"
-    }
+    "npm test and scripts/run-tests.mjs: prohibited",
+    "Cargo workspace suite: records-only scope",
+    "G10/G11 lease/holder/release rehearsal: Lead",
+    "final-pin F reader review, full tree timing and acceptance",
+    "origin publication and main landing: not authorized",
+    "markdown browser preview: deferred to avoid out-of-scope service state"
   ]
 }

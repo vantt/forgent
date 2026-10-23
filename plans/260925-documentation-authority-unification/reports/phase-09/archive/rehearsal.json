@@ -1,64 +1,481 @@
 {
-  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "sourceCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
   "archiveRef": "refs/heads/archive/260925-records",
-  "archiveCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "candidateCommit": "a2206bdff60f020a05184f0b016f130a1304f9c1",
-  "candidateParent": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "candidateLogicalFiles": 16243,
-  "candidateLogicalBytes": 1269268322,
-  "candidatePlanFiles": 6106,
-  "candidatePlanBytes": 1085588711,
-  "runs": [
+  "archiveCommit": "c2db4ec83419e01b5513d33157ed3edc77b9a11d",
+  "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
+  "accountedCandidate": "bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88",
+  "preFreezeCandidate": "8f7dcee88e85bed286e9da7097f5e7a2a24e1c58",
+  "filesystemStat": "ext2/ext3 ef53 4096 122654446 9799283",
+  "findmnt": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
+  "physicalScratch": "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch",
+  "logicalScratch": "/tmp/fgos-work/w2-d5b-disk",
+  "warmCache": true,
+  "variants": [
     {
-      "run": 1,
-      "seconds": 8.869302909006365,
-      "path": "/tmp/fgos-work/archive/timed-worktree-1",
-      "exit": 0,
-      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
+      "variant": "after-final-pin-without-gates",
+      "commit": "bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88",
+      "files": 10547,
+      "tipBytes": 679257054,
+      "planFiles": 406,
+      "planBytes": 495380203,
+      "archiveTipBytes": 21745,
+      "runs": [
+        {
+          "run": 1,
+          "seconds": 5.6556453770026565,
+          "exit": 0
+        },
+        {
+          "run": 2,
+          "seconds": 4.588815063005313,
+          "exit": 0
+        },
+        {
+          "run": 3,
+          "seconds": 4.444476593984291,
+          "exit": 0
+        }
+      ],
+      "medianSeconds": 4.588815063005313
     },
     {
-      "run": 2,
-      "seconds": 8.523144954931922,
-      "path": "/tmp/fgos-work/archive/timed-worktree-2",
-      "exit": 0,
-      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
-    },
-    {
-      "run": 3,
-      "seconds": 8.43490734603256,
-      "path": "/tmp/fgos-work/archive/timed-worktree-3",
-      "exit": 0,
-      "commit": "a2206bdff60f020a05184f0b016f130a1304f9c1"
+      "variant": "before-final-pin-with-gates",
+      "commit": "8f7dcee88e85bed286e9da7097f5e7a2a24e1c58",
+      "files": 13910,
+      "tipBytes": 1970867003,
+      "planFiles": 3769,
+      "planBytes": 1786990152,
+      "archiveTipBytes": 21745,
+      "runs": [
+        {
+          "run": 1,
+          "seconds": 19.039110076031648,
+          "exit": 0
+        },
+        {
+          "run": 2,
+          "seconds": 9.562469732947648,
+          "exit": 0
+        },
+        {
+          "run": 3,
+          "seconds": 12.286731401924044,
+          "exit": 0
+        }
+      ],
+      "medianSeconds": 12.286731401924044
     }
   ],
-  "medianSeconds": 8.523144954931922,
-  "filesystem": "/tmp tmpfs; local warm-cache rehearsal, NOT production SSD/F acceptance",
-  "includedArtifactPaths": [
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal-commands.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/attempts/initial/rehearsal.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/build-design.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/prior-prune-recovery.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/enumeration-review.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/historical-replay-specs.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/prior-script-refs.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/reader-index.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/standalone-retirement-specs.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/scan-receipt.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/archive/verify-design.py"
+  "bundle": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/rehearsal.bundle",
+    "size": 1718847,
+    "sha256": "2bc10cbcb9feea4473d39d448b63301a037fe0cba7d987473b5d780a69410471",
+    "prerequisiteCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
+    "verifyExit": 0
+  },
+  "gatePrograms": 18,
+  "reviewedTen": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/replay-focused-proofs.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/finalize.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/replay-scans.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"
   ],
-  "excludedEvidencePaths": [
-    "test-logs/**",
-    "test-results.json",
-    "rehearsal.json (written after measurement)"
+  "temporaryGateFiles": 3363,
+  "retainedFilesVerified": 399,
+  "tests": [
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-rationale-reproduction.test.mjs.log.gz",
+      "sha256": "5029e5bf128d40c1c00e6bcddc31c7869407b58a9492f2cf0f788dbb4da3af00",
+      "summary": [
+        "ℹ tests 8",
+        "ℹ pass 6",
+        "ℹ fail 2",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (46821.813623ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (78948.60177ms)",
+        "✖ failing tests:",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (46821.813623ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (78948.60177ms)"
+      ]
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-runner-liveness.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-runner-liveness.test.mjs.log.gz",
+      "sha256": "df3b33638a3999226f1649d89e67f40352b98a5c1742fcb122b095197508317c",
+      "summary": [
+        "ℹ tests 1",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-doc-inventory.test.mjs.log.gz",
+      "sha256": "d3333c63af8bd577f7d95d37b0b694792225a335caa6b4f53918599139a92f84",
+      "summary": [
+        "ℹ tests 96",
+        "ℹ pass 96",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/verify-phase-02.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-verify-phase-02.test.mjs.log.gz",
+      "sha256": "00e5bda58458036e42ae7950e0dfdde5f2cba071d70863c89b2c00addc620f6d",
+      "summary": [
+        "ℹ tests 6",
+        "ℹ pass 6",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-doc-retirement.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-retirement.test.mjs.log.gz",
+      "sha256": "725599b1a846e72fa2a8fc649373a558390da2c439771f458d19c6a6cf396c0f",
+      "summary": [
+        "ℹ tests 36",
+        "ℹ pass 36",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-evidence-relocation.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-evidence-relocation.test.mjs.log.gz",
+      "sha256": "bef65b6738bbd2f37dd4290c61e79a6316dbe2b04bf2202bc1987a9cd2b17932",
+      "summary": [
+        "ℹ tests 41",
+        "ℹ pass 41",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-review-format.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-review-format.test.mjs.log.gz",
+      "sha256": "b906983fab5a8dc07aea94e58ec9e5e6b77760f62b966b6b77f8545ba5d3b8b5",
+      "summary": [
+        "ℹ tests 25",
+        "ℹ pass 25",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-restoration-proofs.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-restoration-proofs.test.mjs.log.gz",
+      "sha256": "eb3803e1930a66456107783ea6cd6916def94047013e36f81ea60d527a08ac04",
+      "summary": [
+        "ℹ tests 5",
+        "ℹ pass 5",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-constitution.test.mjs.log.gz",
+      "sha256": "e9c347d407c5b5297e058d4d99c1b3de630ab7c4112298b0ffb4b2e555beb3df",
+      "summary": [
+        "ℹ tests 65",
+        "ℹ pass 65",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-shipped-path-inventory.test.mjs.log.gz",
+      "sha256": "ddaab8db4c99428423a01082e05158b6ad3986a698168a70084d137da5638191",
+      "summary": [
+        "ℹ tests 10",
+        "ℹ pass 10",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-rationale-reproduction.test.mjs.log.gz",
+      "sha256": "aea96c50bf042e32fe50580fead8d81d4eb753364490ae39263f16db2c4ddc44",
+      "summary": [
+        "ℹ tests 8",
+        "ℹ pass 6",
+        "ℹ fail 2",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19602.406848ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (17690.576402ms)",
+        "✖ failing tests:",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19602.406848ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (17690.576402ms)"
+      ]
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-runner-liveness.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-runner-liveness.test.mjs.log.gz",
+      "sha256": "549eda6525f7d208ca12b1517e02a33addecc95f6d8dace31c9c2e42580bb69f",
+      "summary": [
+        "ℹ tests 1",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-doc-inventory.test.mjs.log.gz",
+      "sha256": "8b36c72b102c29b0a8dbb838a3efedd7e95eac5df34a8b29610e97d96251c506",
+      "summary": [
+        "ℹ tests 96",
+        "ℹ pass 96",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/verify-phase-02.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-verify-phase-02.test.mjs.log.gz",
+      "sha256": "5a33836d016edd84655deaaa0188c4988a6a4e49edeab3787d505f40f847bb3e",
+      "summary": [
+        "ℹ tests 6",
+        "ℹ pass 6",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-doc-retirement.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-retirement.test.mjs.log.gz",
+      "sha256": "cc9969fee6943626a70316e5d4baa490e387e6d74554f7036be7ee34ce8ba5b9",
+      "summary": [
+        "ℹ tests 36",
+        "ℹ pass 36",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-evidence-relocation.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-evidence-relocation.test.mjs.log.gz",
+      "sha256": "9b5763787048704ab8146c22f145f770c2ef0616703d64209055ee6f85a49276",
+      "summary": [
+        "ℹ tests 41",
+        "ℹ pass 41",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-review-format.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-review-format.test.mjs.log.gz",
+      "sha256": "bf5cf1a8b934c68b2c6a0b33e8e95378def95073e8c03728e3abac6744c2c12e",
+      "summary": [
+        "ℹ tests 25",
+        "ℹ pass 25",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-restoration-proofs.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-restoration-proofs.test.mjs.log.gz",
+      "sha256": "6cfce9a45109dd07f89dc20d01e9bedf2e62959945e67bcbfb5363984ce78ef8",
+      "summary": [
+        "ℹ tests 5",
+        "ℹ pass 5",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-constitution.test.mjs.log.gz",
+      "sha256": "e2e9a47c4600d22e5f4ca0072f3ece64ea58e81f4481e61f8a52befa38203f7d",
+      "summary": [
+        "ℹ tests 65",
+        "ℹ pass 65",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-shipped-path-inventory.test.mjs.log.gz",
+      "sha256": "8ff209f76e578b48d5b96bde4ade521c680894aa34805288df22121c519dbcef",
+      "summary": [
+        "ℹ tests 10",
+        "ℹ pass 10",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    }
   ],
-  "retainedBytesVerified": 6090,
-  "retirementSpecsApplied": 313,
-  "noProductOrTestSourceChanges": true,
+  "accounting": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "embeddedKey": "scripts",
+      "recipeSha256": "f5df994e910ea939ed7b6e2cbcd40c0c8e4903dd9f8a800eaad28fead61e7838",
+      "slice": "Exact A setup and const exceptions..historicalEqual; only A serialization added, H/B/ownership not invoked.",
+      "beforeExit": 1,
+      "beforeUnaccountedPairs": 3618,
+      "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
+      "removalPairs": 3409,
+      "preexistingPendingPairs": 209,
+      "afterExit": 0,
+      "afterAOk": true,
+      "afterUnaccountedPairs": 0,
+      "afterWorkingViolations": 0,
+      "noBPinOrAllowlistChange": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "embeddedKey": "readOnlyScripts",
+      "recipeSha256": "1c45d9750b1a503382ca74556258b6c477fa9e928eb9277aea7ee9f3423212d1",
+      "slice": "Exact A setup and const exceptions..historicalEqual; only A serialization added, H/B/ownership not invoked.",
+      "beforeExit": 1,
+      "beforeUnaccountedPairs": 3618,
+      "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
+      "removalPairs": 3409,
+      "preexistingPendingPairs": 209,
+      "afterExit": 0,
+      "afterAOk": true,
+      "afterUnaccountedPairs": 0,
+      "afterWorkingViolations": 0,
+      "noBPinOrAllowlistChange": true
+    }
+  ],
+  "measuredMainArtifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
+      "size": 6611,
+      "sha256": "ab5ed93bd771e0c08d8333195b0c911803d0f310444df638c9badc3e1a26f96e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
+      "size": 10109,
+      "sha256": "4fab37b0a857a5852d3331743f9a990bd3f7ea8c7370b842ee0b3bf661607b31"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
+      "size": 1044,
+      "sha256": "34b9795350ac1e2057c3029475589ef33f716ca63d401eb9e43d411195c4f906"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.json",
+      "size": 300,
+      "sha256": "8ce59535f5b49d13adf800e7d83c8e29561e653958734126d6d705fa664d22fe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+      "size": 241,
+      "sha256": "21128310b8ed9322f452ba97f220545ad0be1485540903d0d7f9121b11658e31"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
+      "size": 955,
+      "sha256": "e00fd706acac2981df0843794827e689c2de1dcbb7ac89ddadd96215a7c6de5d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
+      "size": 2485,
+      "sha256": "624a19e01f663b3206418e998c9fce7e047f70953f968448bbe193e53ed9baa0"
+    }
+  ],
+  "postMeasurementNote": "Receipt and rehearsal outputs are written after measured commits. Their exact delta must be added at F; no final-tree claim.",
   "releaseId": "sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
-  "rustFreshness": "activated native addon only; checkout Rust freshness not certified"
+  "rustFreshness": "activated addon only; working-tree Rust freshness not established",
+  "noSourceGitWrites": true,
+  "noProductOrTestSourceChange": true
 }

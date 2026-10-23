@@ -1,16 +1,17 @@
 {
-  "inputCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "inputCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
   "exit": 0,
-  "partitionFiles": 6663,
-  "movingFiles": 573,
-  "retainedFiles": 6090,
-  "retirementSpecs": 313,
+  "partitionFiles": 6761,
+  "movingFiles": 6362,
+  "retainedFiles": 399,
+  "retirementSpecs": 336,
+  "gatePrograms": 18,
+  "reviewedTen": 10,
   "historicalReaderFiles": 47,
   "historicalJoins": 135,
   "priorScriptRefOccurrences": 2918,
   "sixRestoredInputsRetained": true,
   "alreadyPrunedRecoveryBlobsVerified": 279,
-  "allRecoveryBlobsReachableFromArchiveCommit": true,
   "negativeProbes": [
     {
       "probe": "wrong digest",
@@ -23,7 +24,24 @@
     {
       "probe": "unsafe path",
       "rejected": true
+    },
+    {
+      "probe": "self-owning retired proof",
+      "rejected": true
     }
   ],
-  "limits": "Structural/digest/object custody only; no independent semantic retirement, enumeration or final-pin acceptance."
+  "mainManifestBytes": 6573,
+  "auditCompressedBytes": 1657100,
+  "rehearsalCustody": {
+    "bundleHeadsAndDigestVerified": true,
+    "testsPerSide": 10,
+    "baselineFailureParity": true,
+    "accountingRecipesGreen": 2,
+    "realDisk": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
+    "variantTipBytes": [
+      679257054,
+      1970867003
+    ]
+  },
+  "limits": "Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass."
 }

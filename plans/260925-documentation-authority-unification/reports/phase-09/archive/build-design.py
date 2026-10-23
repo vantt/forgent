@@ -3,7 +3,7 @@
 Run with python3 -B. No Git mutations. Deliberately conservative lexical joins
 reuse the L12-134 filename/body scan approach; no arbitrary reachability claim.
 """
-import argparse, collections, hashlib, json, pathlib, re, subprocess
+import argparse, collections, gzip, hashlib, json, pathlib, re, subprocess
 
 P = 'plans/260925-documentation-authority-unification/'
 A = P + 'reports/phase-09/archive/'
@@ -18,13 +18,15 @@ def main():
     opts = ap.parse_args()
     root = pathlib.Path(subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip())
     out = pathlib.Path(opts.output_dir).resolve()
-    if out != root / A.rstrip('/') and not str(out).startswith('/tmp/fgos-work/archive/'):
-        raise SystemExit('Output must be scoped archive directory or /tmp/fgos-work/archive/')
+    if out != root / A.rstrip('/') and not str(out).startswith('/tmp/fgos-work/'):
+        raise SystemExit('Output must be scoped archive directory or external scratch')
     out.mkdir(parents=True, exist_ok=True)
+    emitted_assets = []
     def emit(name, data):
-        dest = out / name
+        dest = out / 'audit' / (name.replace('/', '--') + '.gz')
+        emitted_assets.append(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+        dest.write_bytes(gzip.compress((json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n').encode(), mtime=0))
     def git(*args):
         return subprocess.check_output(['git', *args], cwd=root)
     pin = git('rev-parse', 'HEAD').decode().strip()
@@ -47,10 +49,15 @@ def main():
         if path in files:
             protected.add(path); reasons[path].add(why)
     for p, r in files.items():
-        if r['size'] < 1000000: keep(p, 'small record/source, subject to explicit standalone replay retirement')
-        if p.startswith(P + 'ledger/') or p.startswith(P + 'pilot/'):
-            keep(p, 'current ledger/pilot ownership and review-proof input')
-        if '/reports/phase-09/' in p: keep(p, 'current pre-flip record retained conservatively')
+        rel = p[len(P):]
+        if rel == 'plan.md' or re.fullmatch(r'phase-\d\d-[^/]+\.md', rel):
+            keep(p, 'plan navigation: entry plan and phase contracts, not product authority')
+        if pathlib.PurePosixPath(p).name in ('owner-answers.md', 'preflip-gate-status.json', 'preflip-execution-plan.md', 'progress.md') or p.endswith('-brief.md'):
+            keep(p, 'plan navigation: decisions, execution boundary, brief or gate status')
+        if p.endswith('.json') and p.startswith((P + 'ledger/decisions/', P + 'pilot/decisions/')):
+            keep(p, 'retained ownership.mjs and audit-ownership.mjs enumerate JSON inputs in these exact decision directories')
+        if p.endswith('.json') and p.startswith((P + 'pilot/first-round/', P + 'pilot/second-round/')):
+            keep(p, 'test/scripts/check-doc-constitution.test.mjs: the usage amendment rests on dispositions that the committed decision shards use; lines 668-675 enumerate JSON in both historical pilot rounds')
         if '/phase-02-doc-inventory.parts/' in p:
             keep(p, 'constructed/directory Phase 02 inventory input of retained verifier')
         if p in (P + 'reports/identity-registry.json', P + 'reports/phase-02-identity-registry.json'):
@@ -67,7 +74,14 @@ def main():
         P + 'reports/phase-06/step10-sync4d-reproduction.json',
         P + 'reports/phase-06/working-identity-registry.json',
     ]
-    for p in roots: keep(p, 'retained rationale/liveness owning proof and full entrypoint dependencies')
+    for p in roots: keep(p, 'test/scripts/doc-rationale-reproduction.test.mjs or doc-runner-liveness.test.mjs: retained owning proof entrypoint/input')
+    product_inputs = {
+        'alias-table.json': 'scripts/doc-alias-resolver.mjs DEFAULT_ALIAS_TABLE_PATH: current alias lookup input; test/scripts/doc-alias-resolver.test.mjs',
+        'claim-and-disposition-vocabulary.json': 'scripts/check-doc-constitution.mjs DEFAULT_VOCABULARY_PATH, verify-phase-02.mjs PHASE02_VOCAB and check-doc-inventory-gates.mjs: live classification vocabulary',
+        'shipped-path-conventions-inventory.json': 'scripts/verify-phase-01.mjs reads committed inventory; generate-doc-inventory.mjs reads pinned inventory blob; retain current input, not just historical object',
+        'dropped-claims-register.json': 'scripts/check-doc-inventory-gates.mjs DEFAULT_DROPPED_CLAIMS_REGISTER_PATH: current claim-disposition gate input',
+    }
+    for name, why in product_inputs.items(): keep(P + name, why)
     for p in files:
         if re.search(r'/review-request-step10-.*-(345f15d95|287a22d33)\.json$', p):
             keep(p, 'round3/4 rationale directory-filter input')
@@ -185,8 +199,8 @@ def main():
     moving = set(files) - protected
     # Retire standalone replay entrypoints (all bytes archived), transitively
     # including their importing/calling plan entrypoints. Retained current proof
-    # roots must never be retired. Small records with embedded recipes stay as
-    # historical evidence; their execution context is repointed in the reader index.
+    # roots must never be retired. Other records, small or large, go to the
+    # archive unless a retained reader or explicit navigation reason needs them.
     # Enumeration-only replay scripts can construct every input name. Do not
     # certify them by an empty literal result: archive their entrypoint too.
     enumerating_programs = {r['readerPath'] for r in enumerators if r['readerPath'] in sources}
@@ -197,7 +211,14 @@ def main():
             if isinstance(ref, dict):
                 rp = posixpath.normpath((pathlib.PurePosixPath(prune_path).parent / ref['readerPath'].split('#', 1)[0]).as_posix())
                 if rp in sources: historical_programs.add(rp)
-    retired = (enumerating_programs | historical_programs) & set(files) - live
+    gate_programs = {p for p in sources if p.startswith(P + 'reports/phase-09/')}
+    original_ten = {P + 'reports/phase-09/' + p for p in [
+        'carries/replay-focused-proofs.py', 'carries/verify-carries.mjs',
+        'census-join/join.py', 'census-join/test-locators.mjs',
+        'composition/compose.py', 'composition/finalize.py', 'composition/replay-scans.mjs',
+        'preserve-premise/physical-move.mjs', 'preserve-premise/proof.py', 'preserve-premise/verify.py']}
+    assert original_ten <= gate_programs
+    retired = (set(sources) & moving) | ((enumerating_programs | historical_programs) & set(files) - live)
     while True:
         new = {s for s in sources if s.startswith(P) and s not in live and (edges.get(s, set()) & (moving | retired))} - retired
         if not new: break
@@ -238,7 +259,11 @@ def main():
         patch_specs.append({'path': p, 'operation': 'archive-standalone-replay', 'beforeSha256': row['sha256'],
             'beforeBlobId': row['blobId'], 'expectedAfter': 'absent', 'archiveCommit': pin,
             'condition': 'after final-pin pre-flip proofs/reviews freeze; not a current gate waiver',
-            'owningProof': p + ' (migration-only replay entrypoint, conserved at archive commit); retained product and test roots are excluded',
+            'owningProof': None,
+            'behaviourDisposition': 'behaviour retired with the plan',
+            'behaviour': 'This standalone migration replay is no longer a maintained current-tip command; generic product behaviour and its owning tests are unchanged.',
+            'schedule': 'retire-at-final-pin' if p in gate_programs else 'retire-with-plan-after-acceptance',
+            'wasInReviewedTen': p in original_ten,
             'reasonTargets': sorted(edges[p] & (moving | retired))})
     record_readers = []
     for src, targets in sorted(edges.items()):
@@ -249,26 +274,39 @@ def main():
         else: action = 'historical-record-replay-context'
         record_readers.append({'readerPath': src, 'action': action,
             'targets': [{'path': p, **witnesses[(src,p)]} for p in sorted(hits)],
-            'owningProof': src if src in sources else 'embedded historical recipe; no automatic execution from a retained live root',
+            'owningProof': None if src in moving else (src if src in sources else 'embedded historical recipe; no automatic execution from a retained live root'),
+            'behaviourDisposition': 'behaviour retired with the plan' if src in moving else 'historical execution context repointed',
             'archiveCommit': pin})
     unresolved = [r for r in record_readers if r['action'] == 'UNRESOLVED-live-source']
-    manifest = {'contract': 'documentation-record-archive.v1', 'status': 'candidate-local-design-not-cutover-approval',
+    temporary = set(gate_programs)
+    while True:
+        grown = temporary | {dst for src in temporary for dst in edges.get(src, []) if dst in files}
+        if grown == temporary: break
+        temporary = grown
+    temporary -= protected
+    gate_retention = {'programs': sorted(gate_programs), 'reviewedTen': sorted(original_ten),
+        'temporaryInputs': sorted(temporary),
+        'schedule': 'Keep programs and their full conservative dependency closure until final-pin proofs and independent reviews freeze; only then retire. Not a gate waiver.'}
+    emit('gate-retention.json', gate_retention)
+    manifest = {'contract': 'documentation-record-archive.v2', 'status': 'candidate-local-design-not-cutover-approval',
         'inputCommit': pin, 'archiveRef': 'refs/heads/archive/260925-records', 'archiveCommit': pin,
-        'archiveRefPolicy': 'create-only at approved F; refuse a different existing target; publish only with cutover owner approval',
-        'pathBase': 'repository-relative', 'thresholdBytes': 1000000,
+        'archiveRefPolicy': 'create-only at approved F; archive snapshot includes source tree and generated audit assets; refuse a different existing target; publish only with cutover owner approval',
+        'pathBase': 'repository-relative', 'retentionPolicy': 'No size threshold: retained reader closure or explicit plan-navigation reason only',
         'recovery': {'bytes': 'git cat-file blob <blobId>', 'verify': 'size and sha256 must equal manifest; also verify archiveCommit:path -> blobId',
             'alreadyPruned': 'prior-prune-recovery.json carries original blobs not present in archiveCommit tree; ancestors keep them reachable'},
         'counts': {'planFiles': len(files), 'planBytes': sum(r['size'] for r in files.values()),
             'archiveFiles': len(moving), 'archiveBytes': sum(files[p]['size'] for p in moving),
             'retainFiles': len(protected), 'retainBytes': sum(files[p]['size'] for p in protected),
-            'standaloneReplayRetirements': len(retired), 'unresolvedLiveSources': len(unresolved)},
+            'standaloneReplayRetirements': len(retired), 'unresolvedLiveSources': len(unresolved),
+            'gateProgramsRetireAtFinalPin': len(gate_programs), 'reviewedTen': len(original_ten),
+            'temporaryGateFiles': len(temporary), 'temporaryGateBytes': sum(files[p]['size'] for p in temporary)},
         'records': [{**files[p], 'archiveCommit': pin} for p in sorted(moving)],
         'retained': [{**files[p], 'reasons': sorted(reasons[p])} for p in sorted(protected)],
         'sixRestoredInputs': sorted(restored),
         'limitations': ['Static and pin-bounded; all directory/enumeration residues require final-pin review, not arbitrary-program reachability proof.',
             'Retirement is a proposed cutover disposition, not independent acceptance or permission to disable current pre-flip gates.',
             'Current product inventory corpus is retained, so the ~0.2 GB aspirational tip is not claimed.']}
-    emit('manifest.json', manifest)
+    emit('partition.json', manifest)
     emit('reader-patches/standalone-retirement-specs.json', {'inputCommit':pin,'specs':patch_specs})
     emit('reader-patches/historical-replay-specs.json', {'inputCommit':pin,'historicalReaderFiles':len(set(r['readerPath'] for r in historical)),
         'readerTargetJoins':len(historical),'specification':'Repoint execution to archiveCommit checkout; recover absent inputs only by original manifest blob, size and digest. Do not alter frozen embedded script text or treat archive replay as current-code proof.', 'joins':historical})
@@ -280,13 +318,29 @@ def main():
         group = grouped_enumerators.setdefault(key, {'readerPath':e['readerPath'], 'text':e['text'], 'firstLocator':{'field':e['field'],'line':e['line']}, 'occurrences':0})
         group['occurrences'] += 1
     emit('reader-patches/enumeration-review.json', {'inputCommit':pin,'status':'review-required-not-completeness-proof',
-        'candidateOccurrences':len(enumerators), 'entries':list(grouped_enumerators.values()), 'retainedDirectorySets':['pilot/**','ledger/**','reports/phase-02-doc-inventory.parts/**','reports/phase-06/review-request-step10-.*-(345f15d95|287a22d33).json','reports/phase-06/review-step10-.*-345f15d95.md']})
+        'candidateOccurrences':len(enumerators), 'entries':list(grouped_enumerators.values()), 'retainedDirectorySets':['pilot/decisions/*.json','pilot/first-round/*.json','pilot/second-round/*.json','ledger/decisions/*.json','reports/phase-02-doc-inventory.parts/**','reports/phase-06/review-request-step10-.*-(345f15d95|287a22d33).json','reports/phase-06/review-step10-.*-345f15d95.md']})
     emit('prior-prune-recovery.json', {'inputCommit':pin,'records':[{'path':r['path'],'blobId':r['gitBlob'],'sha256':r['sha256'],'size':r['bytes'], 'sourceManifest':prune_path} for r in prune['inventory'] if r['action']=='remove']})
     emit('scan-receipt.json', {'inputCommit':pin,'planFilesScanned':len(files),'sourceFilesScanned':len(sources),'bytesScanned':scanned_bytes,
         'codeLikeBodiesScanned':bodies_count,'sourceTargetJoins':sum(map(len,edges.values())), 'enumerationCandidates':len(enumerators),
         'historicalJoins':len(historical),'priorScriptRefJoins':len(script_refs),'retainedProofRoots':sorted(live),
         'retainedEmbeddedReadRoots':embedded_roots,
         'unresolvedLiveSources':len(unresolved),'impactAnalysis':'degraded/unqueried: brief prohibits fgOS CLI; direct source/history scan only'})
+    # Only object descriptors remain in the main-side manifest. Full partition,
+    # retained reasons and scan audits belong on the archive snapshot, not main.
+    assets = []
+    for path in sorted(emitted_assets):
+        data = path.read_bytes()
+        assets.append({'path': A + 'audit/' + path.name,
+            'blobId': hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest(),
+            'sha256': hashlib.sha256(data).hexdigest(), 'size': len(data), 'encoding': 'gzip+utf8-json'})
+    header = {k: v for k, v in manifest.items() if k not in ('records', 'retained')}
+    header['sourceCommit'] = pin
+    header['archiveCommit'] = None
+    header['archiveCommitNote'] = 'Rehearsal records the augmented archive snapshot commit. At F install that approved id here before main landing.'
+    header['auditAssets'] = assets
+    header['inventoryAsset'] = A + 'audit/partition.json.gz'
+    header['mainSidePaths'] = [A + name for name in ('manifest.json', 'design.md', 'receipt.md', 'receipt.json', 'rehearsal.json', 'verification.json', 'reader-patches/README.md')]
+    (out / 'manifest.json').write_text(json.dumps(header, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(manifest['counts']))
 
 if __name__ == '__main__':

@@ -1,71 +1,62 @@
-# Conservative record archive — design and local rehearsal
+# Reader-justified archive design
 
-**Candidate, not cutover approval.** Read `receipt.md`, `manifest.json`, then `rehearsal.json`. Source pin: `cffe725b948f5a695728c8da08f114e7e97075d6`. This is the W1-close pin, **not F**. No source-repository ref, index or commit is written by this work.
+Candidate only under L12-129/L12-137; **not F, cutover permission or G8 acceptance**. Start with `manifest.json`, `verification.json`, `rehearsal.json`, then `receipt.md`. The source pin is `e158e672682f4b305230e099f72a1b10adda25e7`.
 
-## Authority and prior art
+## Reused authority and correction
 
-L12-129 selected an origin archive ref plus a real main merge, without rewriting history. L12-137 authorizes LOCAL pre-flip work only. The earlier prune (`ab4c65d17`) removed superseded intermediates, but the Lead measured its remaining 2.94 GB tree at 139.96 seconds. Repeating that prune without accounting for readers is not an archive design.
+The W2 D5b brief adopts moving the small-record tranche too. This replaces the earlier 1 MB heuristic, not any product contract. Reused: L12-134/135 lexical embedded-reader scan, original prune manifest custody, the six L12-133 restores, and the frozen reproduction recipes' **exact commit/path exception accounting**. Prior implementation `c9826a369` and its review are historical evidence; the old tmpfs timing is not real-disk acceptance. History searches covered `thresholdBytes`, `archive/260925-records`, `L12-129`, and `scriptRefs`. No removed product mechanism is resurrected.
 
-This design reuses the existing tree-prune manifest's blob/SHA/size custody, the L12-134 whole-plan embedded-source scan and L12-135's 47 historical reader files / 135 joins. It also retains L12-133's six restored source-witness files. No replacement inventory engine, filesystem interceptor, loader fallback, production flag or network fetch-on-read is introduced. Relevant history was inspected through `git log -G` on `scriptRefs`, `L12-129` and the archive name, and the original archive decision commit `3feda4d15`.
+## Retention, without a size threshold
 
-## Partition
+The partition has **6,761 files / 2,845,320,644 B** outside this archive directory:
 
-`manifest.json` partitions all **6,663 files / 2,822,699,073 bytes** of the existing plan at this pin, excluding this newly authored directory:
-
-| Disposition | Files | Logical bytes |
+| Final-pin disposition | Files | Bytes |
 |---|---:|---:|
-| Move off tip, exact bytes remain at archive commit | 573 | 1,750,567,128 |
-| Retain unchanged | 6,090 | 1,072,131,945 |
+| Archive | 6,362 | 2,351,576,666 |
+| Retain | 399 | 493,743,978 |
 
-The 573 moves comprise **260 bulk records and 313 standalone migration replay programs**. No test or product module moves. Small records stay, including historical Markdown/JSON carrying recipes; they are evidence, not executable entrypoints. Large records are not classified as regenerable.
+Every retained row has a reader or navigation reason in `audit/partition.json.gz`; no row is kept for being small. Conservative literal basename joins may over-retain output/provenance mentions; these are identified as reader-closure evidence, not a claim of arbitrary-program reachability.
 
-Retained without changing bytes:
+- `alias-table.json`: `scripts/doc-alias-resolver.mjs` loads the default alias lookup table.
+- `claim-and-disposition-vocabulary.json`: constitution, inventory gates and Phase 02 verifier consume the classification vocabulary.
+- `shipped-path-conventions-inventory.json`: Phase 01 verifier reads the committed inventory; inventory generation also reads the pinned historical blob. Keep the live file and its history, not just its old object id.
+- `dropped-claims-register.json`: inventory gates load the current claim-disposition register.
+- `plan.md`, phase contracts, briefs, owner answers, execution plan, progress and gate status: retained plan navigation/boundary. They are not product authority and their historical evidence links resolve through the archive inventory rather than implying every report remains at tip.
+- JSON files in `ledger/decisions/` and `pilot/decisions/`, both identity registries and all Phase 02 parts: retained ownership/audit/inventory consumers, including directory/constructed-name inputs. The unchanged constitution owning test additionally enumerates all JSON in `pilot/first-round/` and `pilot/second-round/` (lines 668–675); these eight inputs are retained explicitly. Other ledger/pilot files are not retained merely for their directory; they need a separate reader/navigation reason. `audit/pilot-directory-*` preserves the attempt that exposed this missing directory closure and the correction; no assertion was changed.
+- Frozen rationale manifests, selected embedded libraries/checks/audits, standalone liveness/rationale programs, audit baselines, round3/4 filtered review packs, and the six restored witnesses: current owning-proof inputs, unchanged except the **exception arrays** in the disposable accounting fixture.
 
-- `plan.md`, every phase document, owner answers, progress and small records;
-- every ledger/pilot shard and its directory-enumerating ownership/review consumers;
-- both published identity registries, the working identity registry and **all ten** Phase 02 inventory parts, including constructed-name consumers;
-- the two frozen rationale reproduction manifests, their selected libraries/audits/checks, the audit comparison baselines, the full retained standalone rationale/liveness dependencies, and the six restored round3/4 witness inputs;
-- current pre-flip records conservatively, except standalone migration-only entrypoints proposed for post-freeze retirement.
+No `test/`, product `scripts/`, `src/` or package source is retired. The roughly 0.2 GB whole-tip aspiration remains unattained because current tests/readers still consume large inventory/ownership inputs. Removing them would require a separately approved reader redesign, not false retirement.
 
-A retained file lists its retention reasons. Basename matches deliberately over-retain, including some output/fixture/provenance mentions. They never authorize removal. The Phase 02 inventory and the small-record population explain much of the remaining ~1.07 GB plan. **The ~0.2 GB aspirational whole-tip target is not attained by this conservative candidate.** Removing these retained inputs needs a separate product-owner-approved retirement/repoint design and its owning proofs, not a false fixture claim.
+## Retirement means the behaviour ends
 
-## Archive and main-side manifest
+All 336 standalone migration entrypoint specs state **“behaviour retired with the plan”**. They do not cite themselves as owning proof, nor pretend a product test proves an obsolete migration replay. Generic product behaviour remains owned by the unchanged product tests. Every spec binds the complete preimage blob/SHA and expected absence.
 
-Fix the name as **`refs/heads/archive/260925-records`**. In this rehearsal it points to `cffe725b948f5a695728c8da08f114e7e97075d6`, the complete pre-removal tree. At F rebuild this manifest, independently review it and bind the ref to that approved full tree. Create the ref only if absent or already equal; do not force a different archive target.
+The ten programs named by the review are explicitly tagged `retire-at-final-pin`, as are eight additional current Phase 09 programs discovered at this pin. They remain available, with their conservative transitive input closure, until their final proofs and independent reviews freeze. The temporary set is **3,363 files / 1,291,609,949 B** beyond permanent retention. Both pre-freeze and post-freeze tip variants are measured. Rehearsing the post-freeze removal does not authorize retiring an unmet gate.
 
-`documentation-record-archive.v1` uses repository-relative UTF-8 paths. `records` is a path-unique, path-sorted table; looking up `path` yields `{blobId, size, sha256, archiveCommit}`. Each field describes original **blob bytes**, not formatted JSON or filesystem blocks. `archiveRef` is a discoverability pointer; the full `archiveCommit` is the immutable pin. `retained` is the conservative partition audit, not a second authority. Git modes are recorded too. No symlink is followed.
+## Small main manifest; audit belongs to the archive
 
-Recovery is explicit, external scratch only:
+`manifest.json` is a small header with `{path, blobId, sha256, size, encoding}` object descriptors. The full archive partition, retained audit/reasons, retirement specs, 2,918 prior scriptRef joins, 47 historical readers / 135 joins, enumeration queue and 279 prior-prune recovery rows are deterministic gzip JSON assets. These assets are **archive-only** in the candidate main tree. Their compact local copies enable review before the runner commits this design; bulky previous artifacts are recoverable at `c9826a369` and the source pin rather than duplicated here.
 
-1. verify the approved ref's full commit id;
-2. verify `git rev-parse '<archiveCommit>:<path>'` equals `blobId` for a newly archived record;
-3. read `git cat-file blob <blobId>` into a caller-selected fresh scratch file;
-4. reject unless byte length and SHA-256 equal the manifest.
+The LOCAL rehearsal archive snapshot is the full source tree plus the generated audit assets, parented by the source pin. Thus both original record bytes and newly generated audit objects remain reachable. `rehearsal.json` records the actual archive commit; its measured main header installs that id. At F rebuild, review and install the approved archive id in the landing header. Never copy this interim id blindly.
 
-`prior-prune-recovery.json` separately records all **279 already-pruned blobs**. They are not falsely presented as paths in the archive tree: recover their exact blob ids from reachable archive ancestry. No historical output is silently substituted for a different version. Missing objects are an error, not an excuse to invent a generator.
+Recovery: verify the archive commit, fetch the inventory asset by its manifest blob id, verify compressed length/SHA, decompress JSON, then resolve the requested path to its original blob/SHA/size. Check `archiveCommit:path == blobId` for new moves before reading the blob. Previously pruned paths use their exact recovery blob and reachable ancestry, not a pretend path in the snapshot. Check recovered byte length and SHA. No automatic fallback, generator, loader or network dependency is added. Missing objects fail. The archive ref is create-only, refuses a conflicting target, and is published only with separate owner cutover approval; main still lands by real merge, never history rewrite.
 
-Publication and main integration remain owner/Lead work: publish the approved archive ref on origin, verify advertised commit and object recovery from an independent clone, then land the small manifest plus approved reader dispositions and removals through the real merge/Land door. Do not squash away or rewrite the archived ancestry. This worker performs none of those operations in the real repository.
+Historical recipes are executed only in their bound archive checkout with their original constraints. Execution-context repointing is not a claim that their frozen source became archive-aware or proves current code.
 
-## Readers and retirement semantics
+## Removal commit requires pair accounting
 
-Read `reader-patches/README.md`. The complete prior `scriptRefs` join has **2,918 occurrences** (2,783 string entries plus 135 historical-object entries), not merely the 47 historical files. Current product/test readers keep their exact inputs and remain unchanged.
+Check A uses first-parent/no-merges commit/path pairs, including deletions. Therefore after the removal commit exists, the Lead must append each actual out-of-allowlist `{commit,path,authority}` pair to **both** phase-06 manifest `checks.mjs` exception arrays (`scripts` / `readOnlyScripts`). Account the accounting commit itself if necessary. Keep recipe code, B pins, allowlist, baselines and assertions unchanged; never pre-account a guessed commit id.
 
-The new pin-bounded pass scans every regular plan blob, standalone code outside the plan, recursively decoded JSON/JSONL strings, Markdown fences/inline commands and code-like log text. Its 550,597 bodies yield 19,111 conservative source/target joins. Both halves matter: a zero literal result is never accepted as proof that a directory/glob reader reads nothing. Standalone plan programs with enumeration are conservatively proposed for archival too; retained directory sets are explicit. The selected embedded ownership/audit/checks read expressions are inspected separately so exception-accounting data are not mistaken for executable reads.
+`rehearse.py` performs this solely in the disposable clone. The exact removal fixture commit, removal pairs and preexisting pending pairs are named in `rehearsal.json` and `receipt.md`. It runs the unchanged A slice before accounting (red), appends exact pairs, then runs it again (green: zero unaccounted/working violations). Preexisting unaccounted commits are separately labelled **fixture-only simulation of pending Lead accounting**, not retroactive source approval. `audit/pair-accounting.json.gz` contains every row. Only A is isolated because the full owning reproduction test currently stops earlier in ownership; A-green is not B/H/ownership-green or a full recipe pass.
 
-The 313 deletion specs are **entrypoint retirement after final pre-flip acceptance**, not permission to bypass unmet gates. Their exact original source bytes live on the archive ref. Gate-specific migration replay stops being a maintained current-code command after the migration; the owning historical replay is named in every spec. Generic production behavior and all owning test files remain at tip. No assertion, B pin, baseline or test case is deleted or weakened.
+## Rehearsal boundary
 
-Retained records containing historical recipes are repointed by the main-side historical execution-context table. That is a **specification/data-level repoint**, not a claim that old source code has become an archive-aware program. Use the archive checkout for an intentional historical replay, recover previously pruned inputs by their old blob receipts, and retain that replay's original input/source constraints. Do not execute an old recipe at the reduced tip or describe an archive-snapshot success as current-code evidence. Frozen embedded script text is never edited.
+Scratch is addressed at `/tmp/fgos-work/w2-d5b-disk`, a temporary symlink to this writable archive directory's `.scratch`. This uses real NVMe/ext4 without writing another repository or an unapproved `/var/tmp` location. All clone Git writes are physically within the disposable scoped scratch; it is removed after evidence capture. The source Git index/refs, live `.fgos`, secrets, owner records and lifecycle are untouched. The activation metadata is read only for the prescribed release path.
 
-**Review limits:** zero unresolved *literal standalone* readers is only a bounded structural result. Enumeration candidates and 320 retained historical-record contexts remain an explicit review queue. There is no arbitrary-program reachability proof, final-pin census or independent per-entry retirement approval here. In particular, retiring Phase 09 gate replayers before their final proofs freeze is forbidden. The Lead must approve the retirement/repoint schedule together with those gates; until then G8 remains partial, not accepted.
+`stat -f` and `findmnt`, three actual `git worktree add --detach` runs per variant, logical tip bytes, exact measured main artifacts, accounting and unchanged single-file test results are in `rehearsal.json`. Warm-cache local timings are not F acceptance. `audit/rehearsal.bundle` preserves the exact LOCAL snapshot/candidate refs and new objects, with the source commit as prerequisite; it is archive-only, not part of the measured main tip. Import it only into a fresh disposable clone, never this repository. The last receipt/rehearsal outputs are necessarily later than their measured tree; the receipt reports that delta. Single tests use the prescribed activated host with its real addon/helper descriptor in scratch and isolated HOME/state. This does not certify working-tree Rust freshness.
 
-## Rehearsal and verification
+Final observed measurements and exact commit ids are in `rehearsal.json` and `receipt.md`, including the measured main-side artifact bytes. Completed receipt/rehearsal/verifier outputs are later, with their byte delta recorded separately. Ten unchanged owning files run per side; existing `audit-ownership.mjs` assertions of `current.noNewDoubleOwnership` remain an explicit baseline gap. A-green must not erase that ownership gap or hide any newly introduced missing-input failure.
 
-`rehearse.py` uses the already-created `git clone --no-hardlinks` under `/tmp/fgos-work/archive/`. It verifies every source digest, creates the local archive ref, applies exact whole-file deletion specs, installs the historical-context table, and creates a reduced commit with `write-tree`/`commit-tree`. No `git add` or `git commit` command is used. All 6,090 retained files are byte-verified; no `test/`, `scripts/`, `src/` or `packages/` path changes.
+Reproduce from this source pin with `python3 -B .../archive/build-design.py --output-dir .../archive`, then `python3 -B .../archive/verify-design.py`. For the disk rehearsal, create an empty `.scratch` here and the `/tmp/fgos-work/w2-d5b-disk` symlink to it, then run `python3 -B .../archive/rehearse.py --scratch /tmp/fgos-work/w2-d5b-disk --release-path <authorized-releasePath>`. Run only against a fresh scratch target; never import the evidence bundle into the real repository. All source mutations stay in this archive directory; scratch Git writes are disposable.
 
-Ten owning files run individually both before and after reduction, with the prescribed activated host. The release's actual addon/helper is staged only as untracked scratch fixtures through the existing `native-addon.json` descriptor; HOME, temporary directories and state root are isolated. This proves current Node behavior against that release's addon, not working-tree Rust freshness.
-
-The first rehearsal exposed two missing ownership audit baselines. `attempts/initial/` preserves that failed evidence. The design now derives the selected embedded programs' read inputs explicitly and retains both baselines. No test was changed to hide the error.
-
-Final checkout times and exact measured-tree sizes are in `rehearsal.json`: candidate `a2206bdff60f020a05184f0b016f130a1304f9c1`, **1,269,268,322 logical bytes**, runs **8.869 / 8.523 / 8.435 seconds**, median **8.523 seconds**. Three sequential `git worktree add --detach` runs use the reduced commit and are removed through Git after each measurement. `/tmp` is **tmpfs**, warm-cache: these are local numbers, not comparable SSD evidence or F acceptance. The measured commit includes the design/spec artifacts present at measurement; later receipt/test-log bytes are listed separately, not silently called measured.
-
-Re-run at F on the intended landing filesystem, with all final artifact bytes, current readers, review approvals, G11 release and G10 ownership rehearsal. Publication, real merge, production timing, full-suite/Cargo evidence and final cutover approval are deliberately not claimed.
+Impact-analysis: degraded/unqueried under the explicit no-fgOS-CLI brief. Full npm/Cargo suite, G10/G11, F rescan/review, origin publication, main landing and real lease acquisition remain unclaimed.
