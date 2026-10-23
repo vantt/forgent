@@ -1100,7 +1100,6 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     transportDeadlines: request.context.transportDeadlines,
     closeAlways: request.context.closeAlways,
     dispatchBatchKey: request.context.dispatchBatchKey,
-    dispatchBatchSize: request.context.dispatchBatchSize,
     // HIGH-1: herdr-spawn's own adapter (herdrSpawnInteractiveAdapter,
     // transport.mjs) reads `invocation.requirement ?? opts.requirement` to
     // decide whether `runHerdrRound` may take the confined bwrap-launcher

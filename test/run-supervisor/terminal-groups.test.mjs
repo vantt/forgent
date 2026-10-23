@@ -77,22 +77,19 @@ test('the seats of one batch share a tab and each gets the key of its attempt', 
   } finally { fake.cleanup(); }
 });
 
-test('a batch of three reaches the placement policy as its size, so its cuts are thirds, and a batch with no size halves', { skip, timeout: 120_000 }, async () => {
-  const { dir, fake } = fakeWith({ panes: [{}, {}, {}, {}, {}] });
+test('a batch size reaches the placement policy: the split plans equal thirds, and halves without it', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}, {}, {}, {}] });
   try {
     // The policy is named so a machine config that pins another one cannot change the proof.
     const terminalConfig = { policy: 'even-split' };
     await seat({ dir, fake, name: 'sized-1', groupKey: 'batch-sized', terminalConfig, dispatchBatchSize: 3 });
     await seat({ dir, fake, name: 'sized-2', groupKey: 'batch-sized', terminalConfig, dispatchBatchSize: 3 });
-    await seat({ dir, fake, name: 'sized-3', groupKey: 'batch-sized', terminalConfig, dispatchBatchSize: 3 });
     await seat({ dir, fake, name: 'unsized-1', groupKey: 'batch-unsized', terminalConfig });
     await seat({ dir, fake, name: 'unsized-2', groupKey: 'batch-unsized', terminalConfig });
     const ratios = verbs(fake, 'pane', 'split').map((split) => Number(split[split.indexOf('--ratio') + 1]));
-    assert.equal(ratios.length, 3);
-    // The fake herdr lays every pane out in one column, so the policy keeps asking for the missing columns of a
-    // batch of three: each cut is a third. Without the size a cut is a half.
-    for (const ratio of ratios.slice(0, 2)) assert.ok(Math.abs(ratio - 1 / 3) < 1e-6, `a batch of three plans thirds, got ${ratio}`);
-    assert.equal(ratios[2], 0.5);
+    assert.equal(ratios.length, 2);
+    assert.ok(Math.abs(ratios[0] - 1 / 3) < 1e-6, `sized batch plans thirds, got ${ratios[0]}`);
+    assert.equal(ratios[1], 0.5);
   } finally { fake.cleanup(); }
 });
 

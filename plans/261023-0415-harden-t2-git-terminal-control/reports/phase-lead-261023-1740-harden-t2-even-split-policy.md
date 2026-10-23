@@ -76,10 +76,3 @@ Test-cost: tests added 4 Rust + 1 Node, retired 0, new CLI/host spawns 0 (the No
 4. The spec links the layout review report, which exists in the main checkout but not on this branch until it merges.
 
 Status: DONE_WITH_CONCERNS
-
-## Follow-up: the batch size travels with the batch key
-
-`dispatchBatchSize` now follows `dispatchBatchKey` through every place that carries the key: `assignment-runner.mjs` (3 sites: the confinement-request context, the `prepareTerminalAttempt` call, the adapter call), `confinement/request.mjs`, `confinement/authority.mjs`, `cli.mjs` (2 sites), `herdr-round.mjs` -> allocate `groupSize`. A path with no size sends none.
-
-Finding: no production code creates `dispatchBatchKey`. It is an optional caller input of `executeAssignment`; when absent the group is the unit run id (`assignment-runner.mjs`). Fan-out (`fanout-batch.mjs`) and the loop (`loop.mjs`) start each unit as its own `fgos run`, so a three-unit wave opens three groups, not one tab, and has no key to attach a size to. A real three-column batch therefore also needs a producer: a shared batch key plus size handed from the wave to each unit run across the process boundary. That is a new mechanism, not plumbing; left to the owner.
-Proof: `terminal-groups.test.mjs` now runs a batch of three through `prepareTerminalAttempt` (cuts are thirds; a batch with no size halves). The middle hops (`assignment-runner`, `request`, `authority`, `cli`) have no test of the key either, and the python fake herdr has no `pane layout`, so a controller-level proof cannot see `groupSize`.

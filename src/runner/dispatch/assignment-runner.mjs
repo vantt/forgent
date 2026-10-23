@@ -1946,7 +1946,6 @@ export async function executeAssignment(assignment, opts = {}) {
               ?? effectiveAssignment.unitRunId
               ?? effectiveAssignment.provenance?.unitRunId
               ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
-            dispatchBatchSize: opts.dispatchBatchSize,
             controlToken,
             controlEpoch,
             launchCommandId,
@@ -2022,7 +2021,6 @@ export async function executeAssignment(assignment, opts = {}) {
             ?? effectiveAssignment.unitRunId
             ?? effectiveAssignment.provenance?.unitRunId
             ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
-          dispatchBatchSize: opts.dispatchBatchSize,
           anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
           terminalConfig: opts.terminalConfig,
           // The persisted contract does not name the role; the brief a pane worker reads has to
@@ -2194,7 +2192,6 @@ export async function executeAssignment(assignment, opts = {}) {
           agentType: opts.agentType,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
-          dispatchBatchSize: opts.dispatchBatchSize,
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
           effectiveContract: effectiveContract
