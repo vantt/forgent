@@ -33,7 +33,7 @@
       "input": { "key": "key", "pane": "driver pane id", "groupKey": "optional groupKey: the pane joins that group so its next pane opens beside it; defaults to the key", "display": "optional display" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"],
-      "rule": "the caller must run in the pane: the pane's shell (the driver's process.info shell pid) is the caller or one of the caller's ancestors, judged by the process tuples the OS reports now. The caller is named by the OS (the process the route was started by; in process, the process itself), never by the request. Anything unreadable, an unnamed caller or a shell that is not an ancestor is refused as unknown with a reason that starts pane-not-owned:. The check runs before the store is read, so a key already bound to the pane is no way around it. On Windows the OS gives no parent, so only a pane whose shell is the caller itself is taken."
+      "rule": "the caller must run in the pane: the pane's shell (the driver's process.info shell pid) is the caller or one of the caller's ancestors, judged by the process tuples the OS reports now. The caller is named by the OS (the process the route was started by; in process, the process itself), never by the request. Anything unreadable, an unnamed caller or a shell that is not an ancestor is refused as unknown with a reason that starts pane-not-owned:. The check runs before the store is read, so a key already bound to the pane is no way around it. Off Linux the OS gives no parent, so only a pane whose shell is the caller itself is taken."
     },
     "launch": {
       "input": {
