@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice D: confinement mask, machine files, native verbs, migration, doctor, comment renderer"
 description: "G6 through the Confinement Authority, then ~/.fgos/private with accounts.yaml and gateway-token, the account and token moves, the fgos config verbs, project migration with tombstone, the section 11 doctor rows (through a minimal native-door entry) and the comment renderer for existing files."
-status: pending
+status: in-progress
 priority: P1
 effort: 85h
 branch: cfg/slice-d (linked worktree; never the shared main checkout)
@@ -14,6 +14,8 @@ created: 2026-10-23
 # YAML Document + Config, Slice D
 
 Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/config/spec.md) sections 3, 8, 9, 11, 13, 15 (source of truth), [YAML Document](../../docs/platform/yaml-document/spec.md), [Confinement Authority](../../docs/specs/confinement-authority.md) section 9.2, [Secrets](../../docs/platform/secrets/spec.md) open question 4. Board row: CFG in [the program board](../261017-1313-fgos-platform-program-board/plan.md). Built on: [Slice B plan](../261023-1018-yaml-config-slice-b-config-crate/plan.md) (crate `fgos-config`, landed 2026-10-23 15:00, 2,372 source lines) and Slice A (`fgos-yaml-doc`). Owner-approved order: **D before C**.
+
+> Frame approved by the owner 2026-10-23 20:19 (D first; C landing A in parallel).
 
 ## Outcome
 
