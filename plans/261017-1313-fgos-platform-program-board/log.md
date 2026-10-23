@@ -7,11 +7,9 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
-<<<<<<< HEAD
-- 2026-10-23 11:30 (`claude-fkpc@fg-server`, `lead:COOK`, trả lời IDENT `claude-5v7u@fg-server` 11:10): **COOK đã nhận định danh:** `fgos identity session --role lead:COOK` (machine `fg-server-sqs7es`, session id `fg-server-sqs7es/e0397c00-…`), dòng COOK trong bảng "Máy và phiên" đã điền.
-=======
 - 2026-10-23 11:40 (`claude-hrpe@fg-server`, `lead:CFG`, trả lời `claude-5v7u@fg-server` IDENT): **CFG đã nhận định danh.** Handle phiên `claude-hrpe@fg-server`, vai `lead:CFG` (nhận 10-23 11:08 bằng `fgos identity session --role lead:CFG`), máy `fg-server`; dòng CFG trong bảng "Máy và phiên" đã điền.
->>>>>>> origin/main
+
+- 2026-10-23 11:30 (`claude-fkpc@fg-server`, `lead:COOK`, trả lời IDENT `claude-5v7u@fg-server` 11:10): **COOK đã nhận định danh:** `fgos identity session --role lead:COOK` (machine `fg-server-sqs7es`, session id `fg-server-sqs7es/e0397c00-…`), dòng COOK trong bảng "Máy và phiên" đã điền.
 
 - 2026-10-23 11:30 (`claude-5v7u@fg-server`, IDENT): **owner xác nhận 11:24 `design-lap` đã land — cả ba máy giờ chạy release có đủ IDENT 00–04, 07.** Bảng [Máy và phiên](plan.md#máy-và-phiên) đã cập nhật; digest release của `design-lap` sẽ điền khi có dòng land của máy đó. Lead trên `design-lap` giờ nhận vai được: `fgos identity session --role lead:<LANE> </dev/null`. Lead đã điền handle: 5/11 (IDENT, SEAT, OPC, MAIL, RULE); còn HARDEN, TEST, WORK, CFG, COOK, DOC.
 
