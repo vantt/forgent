@@ -28,16 +28,22 @@ fn test_observe_dependency_boundary() {
         .filter(|name| name.starts_with("fgos-"))
         .collect();
 
-    // Observe depends only on the host runtime and on three foundation crates
+    // Observe depends only on the host runtime and on four foundation crates
     // that sit below it: session identity (the single writer-identity
-    // authority), holder lock (the one kernel-lock port) and Git (its
-    // repository reads go through the Git component in-process); never on
-    // domain or substrate crates.
+    // authority), holder lock (the one kernel-lock port), Git (its
+    // repository reads go through the Git component in-process) and YAML
+    // Document (the one YAML reader); never on domain or substrate crates.
     let mut internal_fgos_deps = internal_fgos_deps;
     internal_fgos_deps.sort_unstable();
     assert_eq!(
         internal_fgos_deps,
-        vec!["fgos-git", "fgos-holder-lock", "fgos-host-runtime", "fgos-identity"],
+        vec![
+            "fgos-git",
+            "fgos-holder-lock",
+            "fgos-host-runtime",
+            "fgos-identity",
+            "fgos-yaml-doc",
+        ],
         "fgos-observe must not depend on domain/substrate crates directly"
     );
 }

@@ -19,6 +19,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -76,7 +77,7 @@ function setup(families = ['okay']) {
   }
   const prefer = families.map((executor) => ({ executor }));
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(repoRoot, {
     runner: {
       defaultExecutor: families[0],
       timeoutMs: 40000,
@@ -86,7 +87,7 @@ function setup(families = ['okay']) {
       capabilities: { 'docs:write': { prefer, rigor: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
     },
-  }, null, 2));
+  });
   return { repoRoot, worktreeDir };
 }
 

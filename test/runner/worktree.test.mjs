@@ -8,6 +8,7 @@ import { landRunnerItem } from '../../src/runner/merge.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   createWorktree,
   createClaimWorktree,
@@ -1386,7 +1387,7 @@ test('checkoutDirtyPaths returns empty array on invalid directory or git error',
 
 function writeRepoConfig(repoRoot, config) {
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify(config));
+  writeProjectConfig(repoRoot, config);
 }
 
 test('createWorktree runs the configured worktreeSetup commands inside the new worktree, in order, with FGOS_REPO_ROOT set', () => {

@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
 
 if (process.platform === 'win32') {
   test('POSIX shell integration is unsupported on Windows', { skip: 'POSIX shell integration (bash/zsh) is only supported on POSIX platforms' }, () => {});
@@ -257,10 +258,7 @@ test('fgos resolves tier 3 from the config-cache (bin.globalFgosPath) without sh
   const cachedBinPath = writePathStub(cachedBinDir, 'fgos', 'CACHED_GLOBAL_FGOS_MARKER');
   const cacheHome = mkTempDir('fgos-shell-integration-cache-home-');
   fs.mkdirSync(path.join(cacheHome, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cacheHome, '.fgos', 'config.json'),
-    JSON.stringify({ bin: { globalFgosPath: cachedBinPath } }, null, 2),
-  );
+  writeGlobalConfig(cacheHome, { bin: { globalFgosPath: cachedBinPath } });
 
   // A minimal real PATH (no cachedBinDir on it, no real fgos anywhere on
   // it) -- a pass here proves the cache was actually used, not a live
@@ -281,10 +279,7 @@ test('fgos self-heals past a stale config-cache entry (cached path no longer exi
   const repoRoot = setupRepoWithoutBin('fgos-shell-integration-tier3-stale-cache-');
   const cacheHome = mkTempDir('fgos-shell-integration-stale-cache-home-');
   fs.mkdirSync(path.join(cacheHome, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cacheHome, '.fgos', 'config.json'),
-    JSON.stringify({ bin: { globalFgosPath: '/nonexistent/stale-fgos-path' } }, null, 2),
-  );
+  writeGlobalConfig(cacheHome, { bin: { globalFgosPath: '/nonexistent/stale-fgos-path' } });
   const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
   writePathStub(pathStubDir, 'fgos', 'LIVE_PATH_FGOS_MARKER');
 

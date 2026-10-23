@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 import {
   DEFAULT_RUNNER_CONFIG,
@@ -40,11 +41,11 @@ function withMachine({ globalRunner = GLOBAL_RUNNER(), project }, fn) {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-layers-repo-'));
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
   const globalFile = path.join(home, '.fgos', 'config.json');
-  if (globalRunner) fs.writeFileSync(globalFile, `${JSON.stringify({ runner: globalRunner }, null, 2)}\n`);
+  if (globalRunner) writeGlobalConfig(home, { runner: globalRunner });
   const projectFile = path.join(repo, '.fgos', 'config.json');
   if (project) {
     fs.mkdirSync(path.dirname(projectFile), { recursive: true });
-    fs.writeFileSync(projectFile, `${JSON.stringify(project, null, 2)}\n`);
+    writeProjectConfig(repo, project);
   }
   const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE, write: process.stderr.write };
   const stderr = [];

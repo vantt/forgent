@@ -1,7 +1,7 @@
 ---
 phase: 0
 title: "Rename the component to Identity"
-status: pending
+status: completed
 priority: P1
 effort: "2h"
 dependencies: []

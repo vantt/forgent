@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture, evidence } from './land-fixture.mjs';
 import { createGitLand } from '../../src/git/land.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 test('Land binds actual consumer verification and returns an established receipt after an external ABA', async () => {
   const f = fixture(); try {
     const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'land', request: f.request });
@@ -76,7 +77,7 @@ test('unresolved target attempts never replay a CAS, even at the old tip', async
 });
 test('Land materializes tracked non-event store bytes stripped by worker allocation before verification', async () => {
   const f = fixture(); try {
-    fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{"base":true}\n'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'non-event store config'); f.request.target = f.git('rev-parse', 'HEAD');
+    fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); writeRawProjectConfig(f.repo, '{"base":true}\n'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'non-event store config'); f.request.target = f.git('rev-parse', 'HEAD');
     const p = f.port(); const request = { ...f.request, files: [{ path: '.fgos/config.json', bytes: [...Buffer.from('{"candidate":true}\n')] }] }; const { candidate: c } = await p.prepare({ operationId: 'store-bytes', request });
     assert.equal(fs.readFileSync(path.join(c.worktree, '.fgos/config.json'), 'utf8'), '{"candidate":true}\n'); assert.equal((await p.publish(evidence(c))).checkout, 'reconciled');
   } finally { f.close(); }
@@ -98,8 +99,8 @@ test('missing footprint fails safe while a return subtree leaves unrelated dirt 
 });
 test('an ignored store collision publishes once with a pending checkout and preserves its local bytes', async () => {
   const f = fixture(); try {
-    f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{"incoming":true}'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'incoming non-event config'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
-    fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), '.fgos/\n'); fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), 'keep local config');
+    f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); writeRawProjectConfig(f.repo, '{"incoming":true}'); f.git('add', '.fgos/config.json'); f.git('commit', '-qm', 'incoming non-event config'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
+    fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), '.fgos/\n'); writeRawProjectConfig(f.repo, 'keep local config');
     const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'ignored-store', request: f.request }); assert.equal((await p.publish(evidence(c))).checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, '.fgos/config.json'), 'utf8'), 'keep local config');
     const walDir = path.join(f.repo, '.git/fgos/git/operations/ignored-store');
     assert.match(fs.readFileSync(path.join(walDir, fs.readdirSync(walDir).filter(x => /^\d+\.json$/.test(x)).sort().at(-1)), 'utf8'), /pendingStoreCollision/);

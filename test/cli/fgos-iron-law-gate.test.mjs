@@ -17,6 +17,7 @@
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   assert,
   fs,
@@ -42,7 +43,7 @@ const GATED_MODULE = 'src/runner/iron-law-gate-probe.mjs';
 function writeIronLawLevel(cwd, level) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
   const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
-  fs.writeFileSync(configPath, `${JSON.stringify({ ...existing, ironLaw: { level } }, null, 2)}\n`);
+  writeProjectConfig(cwd, { ...existing, ironLaw: { level } });
   commitPending(cwd, `config: ironLaw.level = ${level}`);
 }
 

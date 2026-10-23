@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { globalConfigPath as globalConfigFile, writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
 
 import {
   loadGlobalConfig,
@@ -24,8 +25,8 @@ test('loadGlobalConfig returns {} when the global config file does not exist', (
 
 test('loadGlobalConfig parses an existing global config file', () => {
   const dir = mkTempDir('global-config-present-');
-  const configPath = path.join(dir, 'config.json');
-  fs.writeFileSync(configPath, JSON.stringify({ model: 'global-model' }));
+  const configPath = globalConfigFile(dir);
+  writeGlobalConfig(dir, { model: 'global-model' });
   const result = loadGlobalConfig(configPath);
   assert.deepEqual(result, { model: 'global-model' });
   fs.rmSync(dir, { recursive: true, force: true });
@@ -33,16 +34,16 @@ test('loadGlobalConfig parses an existing global config file', () => {
 
 test('loadGlobalConfig throws a clear error on invalid JSON, never silently returns {}', () => {
   const dir = mkTempDir('global-config-invalid-');
-  const configPath = path.join(dir, 'config.json');
-  fs.writeFileSync(configPath, '{ not valid json');
+  const configPath = globalConfigFile(dir);
+  writeRawGlobalConfig(dir, '{ not valid json');
   assert.throws(() => loadGlobalConfig(configPath), /cannot parse global config/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('mergeWithGlobalConfig: project value wins over global value for the same key', () => {
   const dir = mkTempDir('global-config-precedence-');
-  const globalConfigPath = path.join(dir, 'config.json');
-  fs.writeFileSync(globalConfigPath, JSON.stringify({ model: 'global-model', timeoutMs: 1000 }));
+  const globalConfigPath = globalConfigFile(dir);
+  writeGlobalConfig(dir, { model: 'global-model', timeoutMs: 1000 });
 
   const merged = mergeWithGlobalConfig({ model: 'project-model' }, globalConfigPath);
 
@@ -53,8 +54,8 @@ test('mergeWithGlobalConfig: project value wins over global value for the same k
 
 test('mergeWithGlobalConfig: global fills a key the project config never set, never invents new project keys', () => {
   const dir = mkTempDir('global-config-fill-');
-  const globalConfigPath = path.join(dir, 'config.json');
-  fs.writeFileSync(globalConfigPath, JSON.stringify({ retries: 3 }));
+  const globalConfigPath = globalConfigFile(dir);
+  writeGlobalConfig(dir, { retries: 3 });
 
   const merged = mergeWithGlobalConfig({}, globalConfigPath);
 
@@ -64,7 +65,7 @@ test('mergeWithGlobalConfig: global fills a key the project config never set, ne
 
 test('mergeWithGlobalConfig: no global config file means the project config passes through unchanged', () => {
   const dir = mkTempDir('global-config-none-');
-  const globalConfigPath = path.join(dir, 'config.json');
+  const globalConfigPath = globalConfigFile(dir);
 
   const projectConfig = { model: 'project-model' };
   const merged = mergeWithGlobalConfig(projectConfig, globalConfigPath);
@@ -123,7 +124,7 @@ test('describeConfigAwareness: active is "none" when neither project nor global 
 test('describeConfigAwareness: default globalConfigPath honors process.env.HOME set after module load, not a frozen value', () => {
   const homeDir = mkTempDir('global-config-home-override-');
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  writeRawGlobalConfig(homeDir, '{}');
   const projectDir = mkTempDir('global-config-home-override-project-');
 
   const prevHome = process.env.HOME;

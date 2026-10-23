@@ -1,0 +1,947 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "bytes-at-limit-strict",
+      "why": "spec section 8: input exactly 1 MiB passes the size check under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "#",
+          "count": 1048576,
+          "size": "at-input-limit"
+        }
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "bytes-over-limit-strict",
+      "why": "spec section 8: input one byte past 1 MiB is refused before anything else",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "#",
+          "count": 1048577,
+          "size": "over-input-limit"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "input-too-large"
+        }
+      }
+    },
+    {
+      "id": "bytes-at-limit-tool",
+      "why": "spec section 8: input exactly 8 MiB passes the size check under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "#",
+          "count": 8388608,
+          "size": "at-input-limit"
+        }
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "bytes-over-limit-tool",
+      "why": "spec section 8: input one byte past 8 MiB is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "#",
+          "count": 8388609,
+          "size": "over-input-limit"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "input-too-large"
+        }
+      }
+    },
+    {
+      "id": "size-before-utf8",
+      "why": "refusal order: byte size is judged before UTF-8",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "#",
+              "count": 1048576
+            }
+          },
+          {
+            "hex": "ff"
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "input-too-large"
+        }
+      }
+    },
+    {
+      "id": "invalid-utf8",
+      "why": "a byte that is not UTF-8 is refused at its position (here the fourth column of line 1)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "hex": "6b 3a 20 ff"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-utf8",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "invalid-utf8-line-3",
+      "why": "the position of an invalid byte counts lines, CRLF as one break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "hex": "61 3a 20 31 0d 0a 62 3a 20 32 0a c3 28"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-utf8",
+          "line": 3,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "bom-accepted",
+      "why": "a leading UTF-8 byte-order mark is accepted",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "﻿a: 1\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "flow-200000-strict",
+      "why": "spec section 8: 200 000 nested flow brackets are a named refusal at the 33rd, no stack overflow",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "[",
+          "count": 200000,
+          "min_bytes": 200000
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 33
+        }
+      }
+    },
+    {
+      "id": "flow-200000-tool",
+      "why": "spec section 8: 200 000 nested flow brackets are a named refusal at the 65th under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "[",
+          "count": 200000,
+          "min_bytes": 200000
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "flow-at-limit-strict",
+      "why": "depth 32 of flow brackets passes under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "[",
+              "count": 32
+            }
+          },
+          {
+            "generate": {
+              "unit": "]",
+              "count": 32
+            }
+          }
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "flow-over-limit-strict",
+      "why": "depth 33 of flow brackets is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "[",
+              "count": 33
+            }
+          },
+          {
+            "generate": {
+              "unit": "]",
+              "count": 33
+            }
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 33
+        }
+      }
+    },
+    {
+      "id": "flow-at-limit-tool",
+      "why": "depth 64 of flow brackets passes under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "[",
+              "count": 64
+            }
+          },
+          {
+            "generate": {
+              "unit": "]",
+              "count": 64
+            }
+          }
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "flow-over-limit-tool",
+      "why": "depth 65 of flow brackets is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "[",
+              "count": 65
+            }
+          },
+          {
+            "generate": {
+              "unit": "]",
+              "count": 65
+            }
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "flow-braces-nested-keys-strict",
+      "why": "braces count like brackets: a value that starts after a colon opens a collection",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{a: ",
+          "count": 40
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 129
+        }
+      }
+    },
+    {
+      "id": "flow-braces-over-limit-tool",
+      "why": "braces under tool: the 65th brace is refused",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{a: ",
+          "count": 70
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 257
+        }
+      }
+    },
+    {
+      "id": "flow-after-anchor",
+      "why": "an anchor before a bracket does not hide the collection from the count (the mapping of the key is level 1, so the 32nd bracket is level 33)",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "k: ",
+          "unit": "&a [",
+          "count": 40
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 131
+        }
+      }
+    },
+    {
+      "id": "flow-after-tag",
+      "why": "a tag before a bracket does not hide the collection from the count (the mapping of the key is level 1, so the 32nd bracket is level 33)",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "k: ",
+          "unit": "!!seq [",
+          "count": 40
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 227
+        }
+      }
+    },
+    {
+      "id": "flow-multiline-strict",
+      "why": "a flow collection that continues on the next line keeps counting",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "[",
+              "count": 20,
+              "separator": "",
+              "suffix": "\n"
+            }
+          },
+          {
+            "generate": {
+              "unit": "[",
+              "count": 20
+            }
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 2,
+          "column": 13
+        }
+      }
+    },
+    {
+      "id": "block-at-limit-strict",
+      "why": "spec section 8: 32 nested block mappings pass under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 32,
+          "separator": "\n",
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-over-limit-strict",
+      "why": "spec section 8: deep block indentation is refused at the 33rd level, named, no stack overflow",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 40,
+          "separator": "\n",
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 33,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "block-at-limit-tool",
+      "why": "spec section 8: 64 nested block mappings pass under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 64,
+          "separator": "\n",
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-over-limit-tool",
+      "why": "spec section 8: the 65th block level is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 70,
+          "separator": "\n",
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 65,
+          "column": 129
+        }
+      }
+    },
+    {
+      "id": "block-deep-indent-2000",
+      "why": "a very deep indentation from many lines is a refusal, not a stack overflow",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 2000,
+          "separator": "\n",
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 65,
+          "column": 129
+        }
+      }
+    },
+    {
+      "id": "block-cr-line-breaks-strict",
+      "why": "a lone CR is a line break: nesting is counted across CR-separated lines",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 40,
+          "separator": "\r",
+          "suffix": "\r"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 33,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "block-crlf-line-breaks-strict",
+      "why": "CRLF is one line break",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "{indent}k:",
+          "count": 40,
+          "separator": "\r\n",
+          "suffix": "\r\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 33,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "block-nested-sequences-strict",
+      "why": "nested dashes on one line each open a level",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "unit": "- ",
+          "count": 40,
+          "suffix": "a\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 1,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "block-sequence-in-mapping-same-indent",
+      "why": "a sequence at the indent of its parent key is one more level, and a key at that indent ends it",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "k:",
+          "- a",
+          "- b",
+          "j: 1"
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-sequence-items-with-keys",
+      "why": "mappings inside sequence items nest by their own indent",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "- a: 1",
+          "  b:",
+          "    c: 2",
+          "- a: 3"
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-plus-flow-strict",
+      "why": "block levels and flow brackets add up: 31 block levels plus 3 brackets refuse at the second bracket",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "",
+          "unit": "{indent}k:",
+          "count": 30,
+          "separator": "\n",
+          "suffix": "\n                                                            k: [[["
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 31,
+          "column": 65
+        }
+      }
+    },
+    {
+      "id": "block-multi-document-resets",
+      "why": "a document marker resets the nesting of the previous document",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "generate": {
+              "unit": "{indent}k:",
+              "count": 30,
+              "separator": "\n",
+              "suffix": "\n---\n"
+            }
+          },
+          {
+            "generate": {
+              "unit": "{indent}k:",
+              "count": 30,
+              "separator": "\n",
+              "suffix": "\n"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "plain-scalar-brackets",
+      "why": "a plain scalar holding brackets is not a collection",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: a[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "comment-brackets",
+      "why": "brackets in a comment are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\nk: 1 # [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "double-quoted-brackets",
+      "why": "brackets in a double-quoted scalar are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: \"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\"\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "single-quoted-brackets",
+      "why": "brackets in a single-quoted scalar are not counted, with a doubled quote inside",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: 'it''s [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[['\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "escaped-quote-brackets",
+      "why": "an escaped quote does not end a double-quoted scalar early",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: \"a\\\" [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ b\"\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "quoted-key-brackets",
+      "why": "brackets in a quoted key are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "\"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\": 1\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "multiline-quoted-brackets",
+      "why": "brackets on the continuation line of a quoted scalar are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: \"first\n  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n  last\"\nnext: 1\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-scalar-literal-brackets",
+      "why": "brackets in a literal block scalar body are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: |\n  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{\nnext: [a]\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-scalar-folded-chomp-brackets",
+      "why": "a folded block scalar with indicators and a comment skips its body",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: >-2 # note\n  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\nnext: 1\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-scalar-in-sequence-brackets",
+      "why": "a block scalar under a dash skips its body",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "- |\n  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n- b\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-scalar-body-blank-lines",
+      "why": "blank lines inside a block scalar body do not end it",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: |\n  a\n\n  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\nnext: 1\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "block-scalar-ends-on-dedent",
+      "why": "the first line at the parent indent ends the body and is scanned again: 2 block levels plus 31 brackets refuse at the 31st bracket",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "parts": [
+          {
+            "text": "a:\n  k: |\n    text\n  b: "
+          },
+          {
+            "generate": {
+              "unit": "[",
+              "count": 40
+            }
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded",
+          "line": 4,
+          "column": 36
+        }
+      }
+    },
+    {
+      "id": "pipe-in-plain-scalar",
+      "why": "a pipe that does not start a block scalar header is plain text",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: a | b\nother: |not a header [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "hash-inside-plain-scalar",
+      "why": "a hash without a leading space is part of the scalar, so brackets after it are plain text",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "key: a#[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "flow-with-quoted-brackets",
+      "why": "quoted brackets inside a flow collection are not counted",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "k: [a, \"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\", '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[', b]\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "flow-closes-before-block",
+      "why": "a flow collection that closes leaves block counting to the next line",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: [1, [2, [3]]]",
+          "b:",
+          "  c: {d: 1}"
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "alias-and-anchor-values",
+      "why": "anchors, aliases and tags before values are tokens, not collections",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: &x [1]",
+          "b: *x",
+          "c: !!str text"
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "document-marker-with-scalar",
+      "why": "text after a document marker is scanned as a value",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "--- [a, b]"
+        ]
+      },
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "id": "document-marker-block-scalar",
+      "why": "a block scalar opened on the marker line skips its body",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "--- |\n[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n"
+      },
+      "expect": {
+        "ok": true
+      }
+    }
+  ]
+}

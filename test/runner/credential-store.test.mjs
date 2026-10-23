@@ -9,6 +9,7 @@ import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/disp
 import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 import { buildConfinementRequest, validateConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
 
@@ -45,14 +46,14 @@ test('credentialStoreProblem names what is wrong with a declaration', () => {
 
 function writeConfig(executor) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-credential-store-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify({
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
     executors: { agent: { kind: 'agent', providerModel: 'claude', allowCrossProvider: true, ...executor } },
-  }));
+  });
   return { file, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
 }
 

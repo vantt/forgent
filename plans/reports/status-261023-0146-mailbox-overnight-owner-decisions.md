@@ -9,6 +9,9 @@ Phiên `f2c6f8ce`, lead lane MAIL. Toàn bộ mã nằm trên nhánh `mailbox/v1
 
 ## 1. Câu cần owner quyết
 
+**Owner đã trả lời 2026-10-23 11:07: 1A, 2A, 3A, 4A, 5a, 6a, 7a**, đúng như khuyến nghị. V6 bắt đầu.
+
+
 Mỗi câu đã có mặc định tạm, nên không câu nào đang chặn việc. Phần phân tích đầy đủ theo mẫu câu hỏi quyết định nằm trong plan được dẫn ở từng nhóm.
 
 ### V6: đo hành vi model qua hook thật ([plan V6](../261023-0049-mailbox-v6-behaviour-through-real-hook/plan.md), mục "Câu hỏi cho owner")
@@ -32,6 +35,10 @@ V6 chỉ chạy sau khi owner duyệt ngân sách.
 | **V5-Q2 Cài hook mặc định khi merge** | **a**: cài mặc định, nhưng chỉ khi mọi máy đã có release mang kind native | Máy còn release cũ sẽ chạy hook mà không giao được thư. |
 | **V5-Q3** (chỉ hỏi nếu p95 > 50 ms) | **a**: tối ưu phần tốn nhất | Đo ở phase 8. |
 
+### Một việc nhỏ cần owner cho phép (không gấp)
+
+Claude Code trên máy vừa tự cập nhật lên **2.1.309**, bản chưa có trong danh sách đã kiểm. Harness chạy trực tiếp vì vậy từ chối mọi case, cho tới khi ghi lại payload cho bản này. Việc ghi tốn khoảng 4 lần chạy `claude -p` haiku với nội dung lành tính. Em sẽ làm cùng lúc với bước đầu của V6 nếu owner duyệt V6. Nếu cần sớm hơn, owner nói một câu.
+
 ## 2. Trạng thái
 
 | Bậc | Trạng thái | Ghi chú |
@@ -40,8 +47,8 @@ V6 chỉ chạy sau khi owner duyệt ngân sách.
 | V2 lưu trữ | xong, đã review | ma trận SIGKILL 9 bước; hook không có thư 2,5 ms |
 | V3 payload hook | xong, đã review | Claude Code và Codex ghi thật; agy hoãn |
 | V4 demo trực tiếp | xong, đã review và sửa | D1–D3 đạt; D4 (Codex trực tiếp) kẹt ở phiên đang nghỉ |
-| V5 lệnh thật | đang làm phase 1–5 | |
+| V5 lệnh thật `fgos hook mailbox` | xong, đã review và sửa (`a629163f4`) | p95 khi không có thư: Claude 26,5 ms, Codex 38,1 ms. Hook chỉ được cài khi project bật `mailbox.enabled` (tạm, chờ V5-Q2). Trước khi merge cần OPC `forgent-35` duyệt diff Git và DIST duyệt shim mới. |
 | V6 đo hành vi | có plan, chờ owner duyệt ngân sách | |
 | V7 adapter Codex/agy, doctor, CHANGELOG | chưa lên plan | chờ kết quả V6 |
 
-Item tách ra cho lane khác: `tsk-hls` (workspace fmt), `tsk-5n3` (`convention check -- <path>`), `tsk-62b` (test khoá flaky), `tsk-2mo` (citation drift), `tsk-1lx` (gom `geteuid` và `unlinkat`). Lane IDENT đã mở với spec nháp.
+Item tách ra cho lane khác: `tsk-31k` (danh sách flag của host chứa cả tham số vị trí), `tsk-43x4` (Git tạo state root theo cwd khi thiếu `HOME`), `tsk-hls` (workspace fmt), `tsk-5n3` (`convention check -- <path>`), `tsk-62b` (test khoá flaky), `tsk-2mo` (citation drift), `tsk-1lx` (gom `geteuid` và `unlinkat`). Lane IDENT đã mở với spec nháp.

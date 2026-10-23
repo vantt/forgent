@@ -14,7 +14,6 @@ use std::path::PathBuf;
 pub enum ShellScript {
     Ready,
     PromptReadsFirstKey,
-    TypedAheadSkipsPrompt,
     LineModeRead,
     EchoOnly,
 }
@@ -54,7 +53,7 @@ impl MemPane {
             self.probe_count += 1;
             self.last_nonce = nonce.to_string();
             match self.script {
-                ShellScript::Ready | ShellScript::TypedAheadSkipsPrompt => {
+                ShellScript::Ready => {
                     self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
                 }
                 ShellScript::PromptReadsFirstKey => {

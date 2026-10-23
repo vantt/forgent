@@ -14,6 +14,7 @@ import { execFileSync } from 'node:child_process';
 import { executeExecutorCli, runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { collectExecutorProfileWarnings } from '../../src/setup/executor-profile-warnings.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // argv: <invocation marker> <prompt>. Writes "<marker>:<prompt>" so a test can
 // tell which invocation ran.
@@ -69,7 +70,7 @@ function fixtureRepo({ workerEnv, executorPatch = {}, capabilitiesPatch = {} } =
     },
   };
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(root, { runner });
   return { root, runner };
 }
 

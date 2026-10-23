@@ -17,6 +17,7 @@ import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 
 const EXPECTED_RUNNER_DEFAULT = {
@@ -211,7 +212,7 @@ test('ensureSharedConfigDefaults for the global layer writes the registered runn
 test('ensureSharedConfigDefaults leaves the marker out of a runner section that is already there: converting it is the conversion\'s job', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 1000 } }));
+  writeProjectConfig(dir, { runner: { timeoutMs: 1000 } });
   const { config } = ensureSharedConfigDefaults(dir);
   assert.equal(config.runner.patterns.seatBinding, undefined);
   assert.equal('rigorToTier' in config.runner, false);
@@ -246,10 +247,7 @@ test('ensureSharedConfigDefaults adds missing Workflow capabilities without touc
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   const tuned = { description: 'project taste', prefer: [{ executor: 'mine' }] };
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: { 'marketing:write': tuned } } }),
-  );
+  writeProjectConfig(dir, { runner: { capabilities: { 'marketing:write': tuned } } });
   const { config } = ensureSharedConfigDefaults(dir);
   assert.deepEqual(config.runner.capabilities['marketing:write'], tuned);
   assert.ok(config.runner.capabilities['marketing:research']);
@@ -263,7 +261,7 @@ test('setup adds a coding:plan slot beside a project bare-verb plan pool, and bi
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   const plan = { prefer: [{ executor: 'mine' }] };
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { plan } } }));
+  writeProjectConfig(dir, { runner: { capabilities: { plan } } });
   const { config } = ensureSharedConfigDefaults(dir);
   assert.deepEqual(config.runner.capabilities.plan, plan, 'the project entry is untouched');
   assert.equal(typeof config.runner.capabilities['coding:plan']?.description, 'string', 'the slot is still added');
@@ -493,10 +491,7 @@ test('gateway-token-configured fix is idempotent — an existing token is never 
   process.env.USERPROFILE = homeDir;
   try {
     fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-    fs.writeFileSync(
-      path.join(homeDir, '.fgos', 'config.json'),
-      JSON.stringify({ gateway: { port: 4170, token: 'already-set-token' } }),
-    );
+    writeGlobalConfig(homeDir, { gateway: { port: 4170, token: 'already-set-token' } });
     const fixResult = gatewayTokenConfiguredFix()();
     assert.equal(fixResult.changed, false);
     const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
@@ -1125,7 +1120,7 @@ test('doctor check runner-generated-paths accepts an absent or well-formed list 
   const tmpDir = mkTempDir();
   const fgosDir = path.join(tmpDir, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  const write = (runner) => fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner }, null, 2), 'utf8');
+  const write = (runner) => writeProjectConfig(tmpDir, { runner });
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-generated-paths');
   assert.ok(check, 'runner-generated-paths doctor check must be registered');
 
@@ -1157,11 +1152,7 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
   fs.mkdirSync(fgosDir, { recursive: true });
 
   // Missing runner.patterns entirely -> warning (passes)
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }, null, 2),
-    'utf8',
-  );
+  writeProjectConfig(tmpDir, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   assert.ok(check, 'runner-patterns-config doctor check must be registered');
   const missingRes = check.check(tmpDir);
@@ -1170,9 +1161,7 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
   assert.match(missingRes.message, /falling back to setup defaults/);
 
   // Present and valid
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(tmpDir, {
       runner: {
         patterns: {
           defaultRule: { mutatingMinRigor: 'standard' },
@@ -1186,17 +1175,13 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
           },
         },
       },
-    }, null, 2),
-    'utf8',
-  );
+    });
   const validRes = check.check(tmpDir);
   assert.equal(validRes.passed, true);
   assert.match(validRes.message, /valid/);
 
   // Invalid (non-cumulative checkers)
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(tmpDir, {
       runner: {
         patterns: {
           reviewed: {
@@ -1207,9 +1192,7 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
           },
         },
       },
-    }, null, 2),
-    'utf8',
-  );
+    });
   const invalidRes = check.check(tmpDir);
   assert.equal(invalidRes.passed, false);
   assert.match(invalidRes.message, /not cumulative/);
@@ -1221,7 +1204,7 @@ test('Event Store remote defaults to origin and setup preserves an explicit remo
   const temp = mkTempDir();
   try {
     fs.mkdirSync(path.join(temp, '.fgos'));
-    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ eventStore: { remote: 'upstream' } }));
+    writeProjectConfig(temp, { eventStore: { remote: 'upstream' } });
     ensureSharedConfigDefaults(temp);
     assert.equal(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).eventStore.remote, 'upstream');
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }

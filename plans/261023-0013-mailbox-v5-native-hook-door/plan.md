@@ -13,6 +13,8 @@ created: 2026-10-23
 
 # Mailbox V5: the native hook door and the product verbs
 
+> **Owner answered 2026-10-23 11:07:** Q1 **a** (the wake channel is built at V7, with the Codex adapter), Q2 **a** (install the mailbox hook rows by default at merge only after every machine has activated a release with the native kind; until then the `mailbox.enabled` opt-in on the branch stays), Q3 not needed (both CLIs met 50 ms after the shim fix).
+
 Planned on main `dfe2fd2d1`, 2026-10-23 00:13 Asia/Saigon, from branch `mailbox/v1-v3` at `9bb562808`. That branch is behind `origin/main`, and a V4 fix step runs on it before V5 starts. Read the spec on the branch: `git -C /home/vantt/projects/forgent-mailbox show HEAD:docs/platform/agent-mailbox/spec.md`. The sections that matter are §4.1, §5.1, §6.1, §6.2, §6.4, §7.1, §7.3–7.4, §8, §11, §12, §14 (the V5 row and its prerequisites), §15.8 and §17.
 
 Inputs:

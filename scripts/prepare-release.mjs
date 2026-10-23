@@ -69,12 +69,18 @@ export function updateCargoManifestText(text, baseVersion) {
     .join('\n');
 }
 
-// Sets the version of every path crate (a package block with no `source`).
-export function updateCargoLockText(text, baseVersion) {
+// Sets the version of every first-party path crate (a package block with no
+// `source`). A vendored third-party crate is a path crate too, but keeps its own
+// version: `vendored` holds its `name@version` pairs (see `vendoredCrates`).
+export function updateCargoLockText(text, baseVersion, vendored = new Set()) {
   return text
     .split('\n[[package]]\n')
     .map((block, index) => {
       if (index === 0 || /\nsource = /.test(`\n${block}`)) {
+        return block;
+      }
+      const id = /^name = "([^"]*)"\nversion = "([^"]*)"/.exec(block);
+      if (id && vendored.has(`${id[1]}@${id[2]}`)) {
         return block;
       }
       return block.replace(/^(name = "[^"]*"\nversion = )"[^"]*"/, `$1"${baseVersion}"`);
@@ -82,24 +88,51 @@ export function updateCargoLockText(text, baseVersion) {
     .join('\n[[package]]\n');
 }
 
-// Every Rust version literal in the repo that differs from `baseVersion`.
-export function findRustVersionDrift(root, baseVersion) {
-  const drift = [];
+// Third-party crates vendored as source under `packages/*/third-party/<name>-<version>/`,
+// as `name@version` pairs read from each copy's own manifest.
+export function vendoredCrates(root) {
+  const pairs = new Set();
+  const packagesDir = path.join(root, 'packages');
+  if (!fs.existsSync(packagesDir)) return pairs;
+  for (const pkg of fs.readdirSync(packagesDir)) {
+    const thirdParty = path.join(packagesDir, pkg, 'third-party');
+    if (!fs.existsSync(thirdParty)) continue;
+    for (const dir of fs.readdirSync(thirdParty)) {
+      const manifest = path.join(thirdParty, dir, 'Cargo.toml');
+      if (!fs.existsSync(manifest)) continue;
+      const text = fs.readFileSync(manifest, 'utf8');
+      const name = /^name\s*=\s*"([^"]+)"/m.exec(text);
+      const version = /^version\s*=\s*"([^"]+)"/m.exec(text);
+      if (name && version) pairs.add(`${name[1]}@${version[1]}`);
+    }
+  }
+  return pairs;
+}
+
+// Each Rust version file that exists, with its current and release text.
+function rustVersionUpdates(root, baseVersion) {
+  const vendored = vendoredCrates(root);
+  const updates = [];
   for (const [files, update] of [
     [RUST_VERSION_MANIFESTS, updateCargoManifestText],
-    [RUST_VERSION_LOCKFILES, updateCargoLockText],
+    [RUST_VERSION_LOCKFILES, (text, version) => updateCargoLockText(text, version, vendored)],
   ]) {
     for (const file of files) {
       const filePath = path.join(root, file);
       if (fs.existsSync(filePath)) {
         const text = fs.readFileSync(filePath, 'utf8');
-        if (update(text, baseVersion) !== text) {
-          drift.push(file);
-        }
+        updates.push({ file, filePath, text, next: update(text, baseVersion) });
       }
     }
   }
-  return drift;
+  return updates;
+}
+
+// Every Rust version literal in the repo that differs from `baseVersion`.
+export function findRustVersionDrift(root, baseVersion) {
+  return rustVersionUpdates(root, baseVersion)
+    .filter(({ text, next }) => text !== next)
+    .map(({ file }) => file);
 }
 
 export function updateChangelogText(text, tag, date) {
@@ -176,16 +209,8 @@ export function prepareRelease({
     [changelogPath, updateChangelogText(readText(changelogPath), tag, date)],
   ];
 
-  for (const [files, update] of [
-    [RUST_VERSION_MANIFESTS, updateCargoManifestText],
-    [RUST_VERSION_LOCKFILES, updateCargoLockText],
-  ]) {
-    for (const file of files) {
-      const filePath = path.join(root, file);
-      if (fs.existsSync(filePath)) {
-        updates.push([filePath, update(readText(filePath), baseVersion)]);
-      }
-    }
+  for (const { filePath, next } of rustVersionUpdates(root, baseVersion)) {
+    updates.push([filePath, next]);
   }
 
   if (!dryRun) {

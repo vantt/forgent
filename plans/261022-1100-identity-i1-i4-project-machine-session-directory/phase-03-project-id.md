@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Project id (rung I1)"
-status: pending
+status: completed
 priority: P2
 effort: "3h"
 dependencies: [0, 1]

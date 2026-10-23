@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Machine id and machine handle (rung I2)"
-status: pending
+status: completed
 priority: P1
 effort: "5h"
 dependencies: [0]

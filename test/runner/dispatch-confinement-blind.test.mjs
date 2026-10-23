@@ -32,6 +32,7 @@ import {
 import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
 import { checkConfinementBlindRead } from '../../src/setup/registrations.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
   if (os.platform() !== 'linux') return false;
@@ -79,7 +80,7 @@ function makeProject() {
   fs.mkdirSync(proj, { recursive: true });
   git(proj, 'init', '-q', '-b', 'main');
   write(path.join(proj, '.gitignore'), '.fgos/assignments/\n.fgos/workflow-runs/\n.fgos/dispatch-runs/\n.fgos/runtime/\n');
-  write(path.join(fgosDir, 'config.json'), '{}\n');
+  writeRawProjectConfig(proj, '{}\n');
   const repoFile = write(path.join(proj, 'src', 'file.txt'), 'REPO-FILE\n');
   git(proj, '-c', 'user.name=t', '-c', 'user.email=t@t', 'add', '-A');
   git(proj, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '-m', 'initial');

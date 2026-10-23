@@ -24,6 +24,7 @@ seedFileLocalBwrapRegistry();
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -94,7 +95,7 @@ function setupGitRepo() {
       },
     },
   };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(runnerConfig, null, 2));
+  writeProjectConfig(tmp, runnerConfig);
 
   // Create linked worktree
   const worktreeDir = makeFixtureDir('fgos-run-wt-');
@@ -389,7 +390,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     runner.executors['test-node-2'] = { ...runner.executors['test-node'], providerModel: 'node2' };
     runner.capabilities['docs:write'].prefer = [{ executor: 'test-node' }, { executor: 'test-node-2' }];
     runner.modelPolicies.node2 = runner.modelPolicies.node;
-    fs.writeFileSync(file, JSON.stringify(committed, null, 2));
+    writeProjectConfig(repoRoot, committed);
   }
   const record = {
     unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
@@ -486,7 +487,7 @@ test('mutating gate: a config committed after the bind refuses the write, whatev
   const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
   committed.runner.defaults.tier = 'advanced';
   committed.runner.modelPolicies.node.advanced = 'node-adv';
-  fs.writeFileSync(file, JSON.stringify(committed, null, 2));
+  writeProjectConfig(repoRoot, committed);
   assert.notEqual(seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest, configDigest);
   await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
 });
@@ -600,7 +601,7 @@ function reviewedConfig(repoRoot, executorNames) {
   cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard' };
   cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard' };
   cfg.runner.defaultExecutor = executorNames[0];
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
 }
 
 test('a reviewed run with a single provider family refuses the checker instead of self-reviewing', async () => {
@@ -1407,7 +1408,7 @@ function setGeneratedPaths(repoRoot, generatedPaths) {
   const configPath = path.join(repoRoot, '.fgos', 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   config.runner.generatedPaths = generatedPaths;
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  writeProjectConfig(repoRoot, config);
 }
 
 const SKILL_RENDERS = [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }];
@@ -1556,7 +1557,7 @@ function writeScopedWorker(repoRoot, { files, waitFor = null, summary = 'Wrote t
     executor.args = [script, '{prompt}'];
     for (const invocation of executor.invocations) invocation.args = [script, '{prompt}'];
   }
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
 }
 
 const gitIn = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -1826,7 +1827,7 @@ function withModelPolicies(repoRoot, families, patch = {}) {
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
   for (const family of families) cfg.runner.modelPolicies[family] = { standard: `${family}-std`, flagship: `${family}-flagship`, frontier: `${family}-frontier` };
   Object.assign(cfg.runner, patch);
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
 }
 
 function reviewedRun(repoRoot, worktreeDir, unitData, pattern = 'reviewed') {
@@ -1888,7 +1889,7 @@ test('a writing unit\'s verify child borrows the custody lease while it runs', {
   const settling = [path.join(repoRoot, 'settling-worker.mjs'), '{prompt}'];
   cfg.runner.executors.beta.args = settling;
   for (const invocation of cfg.runner.executors.beta.invocations) invocation.args = settling;
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
   const probe = path.join(repoRoot, 'verify-probe.json');
   const script = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(probe)}, JSON.stringify({ name: process.env.FGOS_LOCK_FD, ino: String(fs.fstatSync(3, { bigint: true }).ino) }))`;
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-custody', writes: ['docs'], verify: `node -e ${JSON.stringify(script)}` });
@@ -1930,7 +1931,7 @@ test('a verify declared on the capability is used when the unit names none', asy
   const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
   cfg.runner.capabilities['docs:write'].verify = 'node -e "process.exit(5)"';
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-cap' });
   assert.equal(res.outcome, 'findings');
   assert.ok(res.findings.some((f) => /exited 5/.test(f)));

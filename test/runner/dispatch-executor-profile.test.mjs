@@ -7,6 +7,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
 // is allowed to declare about itself, and the one combination that must be refused
@@ -22,14 +23,14 @@ import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/ru
 
 function loadWith(executorEntry) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-cfg-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify({
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, {
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 60000,
     executors: { sample: { kind: 'agent', ...executorEntry } },
-  }, null, 2));
+  });
   try {
     return loadRunnerConfig(file);
   } finally {
@@ -153,8 +154,8 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
   // resolver, whose blast radius impact analysis reports as HIGH, did not have to
   // be edited at all for this phase.
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-resolve-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify({
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, {
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -170,7 +171,7 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
         promptDelivery: 'file-pointer',
       },
     },
-  }, null, 2));
+  });
   try {
     const cfg = loadRunnerConfig(file);
     const resolved = resolveExecutorConfig(cfg, 'standard', 'profiled');
@@ -339,11 +340,11 @@ test('Phase C: the real repository config declares identity/supports on "claude"
 
 function loadRunnerConfigObject(cfgObject) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify({
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     ...cfgObject,
-  }, null, 2));
+  });
   try {
     return loadRunnerConfig(file);
   } finally {

@@ -1,0 +1,53 @@
+# Fuzz targets of the YAML Document crate (spec section 9; run as part of every parser upgrade).
+# Not a workspace member and not built by `cargo test --workspace`: the `[workspace]` table below
+# makes this directory its own root. Needs a nightly toolchain and `cargo install --locked
+# cargo-fuzz`; both are developer tools of the upgrade procedure, not an fgOS runtime dependency.
+[package]
+name = "fgos-yaml-doc-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+fgos-yaml-doc = { path = ".." }
+serde_json = "1"
+
+[workspace]
+
+# The workspace root's patch does not reach this root; the vendored parser bytes are the same.
+[patch.crates-io]
+saphyr-parser = { path = "../../third-party/saphyr-parser-0.2.2" }
+arraydeque = { path = "../../third-party/arraydeque-0.5.1" }
+
+[[bin]]
+name = "parse"
+path = "fuzz_targets/parse.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "edit_reparse"
+path = "fuzz_targets/edit_reparse.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "merge"
+path = "fuzz_targets/merge.rs"
+test = false
+doc = false
+bench = false
+
+# Writes the seed corpus from the golden fixtures.
+[[bin]]
+name = "seed"
+path = "src/bin/seed.rs"
+test = false
+doc = false
+bench = false

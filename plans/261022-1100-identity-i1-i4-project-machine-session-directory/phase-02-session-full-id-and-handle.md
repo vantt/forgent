@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Session full id and session handle (rung I3a)"
-status: pending
+status: completed
 priority: P1
 effort: "4h"
 dependencies: [1]
