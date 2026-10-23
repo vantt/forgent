@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Local directory, role aliases, resolve and list (rung I3b)"
-status: pending
+status: completed
 priority: P2
 effort: "5h"
 dependencies: [2, 3]
