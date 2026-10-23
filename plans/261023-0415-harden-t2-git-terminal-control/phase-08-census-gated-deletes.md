@@ -5,14 +5,14 @@ status: pending
 depends_on: [05]
 parallel: "with phase 07 (disjoint files)"
 effort: ~0.5d plus the owner-machine census answer
-net_size: "Node −12 / Rust −110 / tests −40 (estimate; Rust part only if both censuses read zero)"
+net_size: "Node −12 / Rust −110 / tests −40 (estimate; Rust part only if every machine's census reads zero)"
 ---
 
 # Phase 08 — Census-gated deletes
 
 ## Context
 
-Arbitration D8 (Q1–Q4 decided by the big lead), red-team "unsafe deletions" (the live `wal.rs:346-355` form is not touched; a census on both machines first), owner decision 1 (drains live one release; these were written 10-19, three releases ago). [plan.md](plan.md) D-T2-8 (census timing: the owner-machine census is asked in the owner batch **before** this phase merges; the guide re-runs it as a hard stop).
+Arbitration D8 (Q1–Q4 decided by the big lead), red-team "unsafe deletions" (the live `wal.rs:346-355` form is not touched; a census on every machine running fgOS first), owner decision 1 (drains live one release; these were written 10-19, three releases ago). [plan.md](plan.md) D-T2-8 (census timing: the owner-machine census is asked in the owner batch **before** this phase merges; the guide re-runs it as a hard stop).
 
 Writers: the legacy path-only resource set `worktree:<root>` for ScopedCommit/Sync was last written by builds before `869e789d7` (2026-10-19 18:15 +07), which introduced `worktree:<root>:custody:<lock>` (`scoped_commit.rs:325-337`). Compact ledger v1 is written by no current code (`wal.rs:2217` writes v2/v3). A census stays clean only while no release older than `869e789d7` runs against a repository: the census therefore also lists, per machine, the activated release of every workspace, and any release built before that commit (or any repository a pre-`869e789d7` checkout still runs fgOS from) blocks slices A and C. <!-- Updated: Red Team 2026-10-23 -->
 
@@ -39,7 +39,7 @@ It prints one line per WAL that has anything non-zero, then a `TOTAL` line. A pe
 
 **Dry run here, 2026-10-23 (main `576fdb076`, this exact script):** `TOTAL {"wals":565,"legacyScopedOrSync":0,"ledgerV1":0,"unreadable":0}`. This machine is clean for slices A and C; the lead re-runs the final script at phase time. Compacted pre-custody ScopedCommit/Sync receipts are not counted: a ledger receipt carries no resource set (`wal.rs:1788-1808`), and the only effect of deleting the legacy acceptance on such a receipt is that a same-id replay of a pre-10-19 run id answers `OperationIdConflict` (refuses, changes nothing); no flow replays a run id that old.
 
-**Rule (per slice, so one count never reverts another slice).** Over every **real** WAL on **both** machines (scratch lines are listed in the report but do not block), and with the scope of `find $HOME -xdev` extended by any repository on another mount that the owner lists in the answer:
+**Rule (per slice, so one count never reverts another slice).** Over every **real** WAL on **every machine running fgOS** (2026-10-23, OPC: three machines, `fg-server`, `fg-server2` and the owner's `design-lap`) (scratch lines are listed in the report but do not block), and with the scope of `find $HOME -xdev` extended by any repository on another mount that the owner lists in the answer:
 - slice A goes only if `legacyScopedOrSync == 0` and `unreadable == 0` everywhere and no workspace runs a release built before `869e789d7`;
 - slice C goes only if `ledgerV1 == 0` and `unreadable == 0` everywhere;
 - slice B is **not** census-gated: it goes only on a code proof that each field is never read (`rg` plus the writer commit that made it always present), because Land and Restore chains are retained by design and a census of them would be noise;
@@ -70,7 +70,7 @@ WORK overlap: `scoped_commit.rs`, `scoped_commit_sync.rs` — rebase rule.
 
 1. Run the census here; paste the output. The big lead sends the same command in the owner batch (read-only, ≈ 1 min); the answer is pasted in this phase's report before merge.
 2. Branch `harden/t2-p08-census-deletes` after phase 5 merged. Commit order: Q4 arms → Q3 sentence → slice B (if proved) on the phase branch; slices C and A (if allowed) on a second branch `harden/t2-p08-census-slices`, merged separately. Messages name behaviours, e.g. `refactor(git): drop the compact-receipt reader for a ledger version no repository holds` with the census line in the body.
-3. OPC review. Report: census lines (both machines), slices done/dropped, Δ.
+3. OPC review. Report: census lines (every machine), slices done/dropped, Δ.
 
 ## Verification (exact)
 
@@ -107,4 +107,4 @@ Revert the slice commits. The previous release reads everything these slices sto
 
 ## Done when
 
-Census lines from both machines in the report; each slice merged or dropped with its census evidence; spec §2 sentence in place; Q4 arms gone with their `rg` proof; OPC verdict recorded.
+Census lines from every machine in the report; each slice merged or dropped with its census evidence; spec §2 sentence in place; Q4 arms gone with their `rg` proof; OPC verdict recorded.
