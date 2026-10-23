@@ -17,6 +17,7 @@ are added as the phases that own them land.
 | `lint.v1.json` | `tests/golden_lint.rs` | cross-node and cross-file lint rules, `standard-invalid` |
 | `validate.v1.json` | `tests/golden_validate.rs` | the effective value against the section schemas: paths, `required` on the merge, null, order |
 | `meta.v1.json` | `tests/golden_meta.rs` | one failing section schema per meta-schema rule, plus passing ones |
+| `scope.v1.json` | `tests/golden_scope.rs` | which file may hold which key: scope, ancestors, wildcards, file placement |
 
 `json-schema-suite/` is the official JSON-Schema-Test-Suite (draft 2020-12), vendored verbatim for the
 keywords fgOS schemas use; see its README. It is run by `tests/validator_acceptance.rs` and is not

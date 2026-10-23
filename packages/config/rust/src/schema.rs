@@ -244,22 +244,31 @@ impl Schemas {
         }
     }
 
-    /// The one door from a config path to its schema node. The first segment names the section.
-    pub fn resolve(&self, path: &[Segment]) -> Option<Resolved<'_>> {
+    /// `at` followed through its `$ref` chain, its annotations taken into `inherited`.
+    pub(crate) fn enter<'a>(&'a self, at: At<'a>, inherited: &mut Inherited<'a>) -> Option<At<'a>> {
+        let chain = self.chain(at)?;
+        chain.iter().rev().for_each(|a| inherited.apply(a.node));
+        chain.into_iter().last()
+    }
+
+    /// The schema node of a config path with the annotations stated on the way down. The first
+    /// segment names the section.
+    pub(crate) fn locate(&self, path: &[Segment]) -> Option<(At<'_>, Inherited<'_>)> {
         let (Segment::Key(name), rest) = path.split_first()? else {
             return None;
         };
         let sec = self.sections.iter().position(|s| s.name == *name)?;
-        let mut at = self.root(sec);
         let mut inherited = Inherited::default();
-        for segment in std::iter::once(None).chain(rest.iter().map(Some)) {
-            if let Some(segment) = segment {
-                at = self.child(&at, segment)?;
-            }
-            let chain = self.chain(at)?;
-            chain.iter().rev().for_each(|a| inherited.apply(a.node));
-            at = chain.into_iter().last()?;
+        let mut at = self.enter(self.root(sec), &mut inherited)?;
+        for segment in rest {
+            at = self.enter(self.child(&at, segment)?, &mut inherited)?;
         }
+        Some((at, inherited))
+    }
+
+    /// The one door from a config path to its schema node.
+    pub fn resolve(&self, path: &[Segment]) -> Option<Resolved<'_>> {
+        let (at, inherited) = self.locate(path)?;
         Some(Resolved::of(at.node, &inherited))
     }
 

@@ -2,6 +2,17 @@
 //! never a value (spec section 9).
 use std::fmt;
 
+/// The rarely set parts of a refusal. Never a value of the input.
+#[derive(Clone, Default, PartialEq, Eq)]
+pub struct Detail {
+    /// The failing JSON Schema keyword and its schema location, for `config-schema`.
+    pub keyword: Option<String>,
+    pub schema_path: Option<String>,
+    /// For a key in the wrong place: the role of the file it belongs in (`global`, `project`,
+    /// `accounts`, `token`, `config`). The crate holds roles; mapping a role to a path is the caller's.
+    pub belongs_in: Option<String>,
+}
+
 #[derive(Clone, PartialEq, Eq)]
 pub struct ConfigRefusal {
     /// A closed id from `contracts/failure-codes.v1.json`.
@@ -12,8 +23,8 @@ pub struct ConfigRefusal {
     pub path: Option<String>,
     pub line: Option<u32>,
     pub column: Option<u32>,
-    /// JSON Schema location of the failing keyword, for `config-schema`.
-    pub schema_path: Option<String>,
+    /// What only some refusals carry, boxed once so the common refusal stays small.
+    pub detail: Option<Box<Detail>>,
 }
 
 impl ConfigRefusal {
@@ -25,8 +36,12 @@ impl ConfigRefusal {
             path: None,
             line: None,
             column: None,
-            schema_path: None,
+            detail: None,
         }
+    }
+
+    pub fn detail_mut(&mut self) -> &mut Detail {
+        self.detail.get_or_insert_with(Box::default)
     }
 
     /// A file that does not parse or breaks the profile: `config-parse` carrying the YAML refusal.
@@ -44,10 +59,13 @@ impl ConfigRefusal {
 impl fmt::Display for ConfigRefusal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.code)?;
+        let detail = self.detail.as_deref().cloned().unwrap_or_default();
         for (label, part) in [
             ("file", &self.file),
             ("path", &self.path),
-            ("schema", &self.schema_path),
+            ("keyword", &detail.keyword),
+            ("schema", &detail.schema_path),
+            ("belongs-in", &detail.belongs_in),
         ] {
             if let Some(part) = part {
                 write!(f, " {label}={part}")?;

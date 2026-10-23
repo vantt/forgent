@@ -20,7 +20,7 @@ pub mod grammar;
 pub mod lint;
 mod redact;
 pub mod schema;
-mod scope;
+pub mod scope;
 mod snapshot;
 pub mod standard;
 pub mod validate;

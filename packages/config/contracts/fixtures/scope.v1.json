@@ -1,0 +1,1858 @@
+{
+ "version": 1,
+ "about": "Owning cases of the scope judge: which file may hold which key. A case lists the refusals per source as [code, path, belongs_in, line, column]; a source not listed is not run. The schemas inline the shape the real sections will ship (gateway, secrets, bin, runner).",
+ "cases": [
+  {
+   "id": "scope-gateway-port-global-only",
+   "why": "section 3 rule 4: the whole gateway section is global-only; the same value is fine in the global file",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "gateway:",
+     "  port: 4170"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "gateway.port",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": [],
+    "accounts": [
+     [
+      "config-key-in-wrong-file",
+      "gateway.port",
+      "config",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-gateway-null-at-the-section",
+   "why": "rule 2: a null on a global-only section is refused where it sits",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "gateway: null"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "gateway",
+      "global",
+      1,
+      1
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-gateway-empty-map-at-the-section",
+   "why": "rule 2: an empty mapping on a global-only section is refused where it sits",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "gateway: {}"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "gateway",
+      "global",
+      1,
+      1
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-secrets-global-file",
+   "why": "rule 4: secrets.globalFile",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "secrets:",
+     "  globalFile: /x"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "secrets.globalFile",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-secrets-sources-list",
+   "why": "rule 4: secrets.sources; a list is refused as a whole",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "secrets:",
+     "  sources:",
+     "    - a"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "secrets.sources",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-secrets-declaration-consumers-through-a-wildcard",
+   "why": "rules 3 and 4: secrets.declarations.<name>.consumers is global-only, its sibling name is not",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "secrets:",
+     "  declarations:",
+     "    x:",
+     "      consumers: [a]",
+     "      name: y"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "secrets.declarations.x.consumers",
+      "global",
+      4,
+      7
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-secrets-declaration-name-is-allowed",
+   "why": "a sibling of a global-only key is not refused",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "secrets:",
+     "  declarations:",
+     "    x:",
+     "      name: y"
+    ]
+   },
+   "expect": {
+    "project": [],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-bin-star",
+   "why": "rule 4: every bin.* key",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "bin:",
+     "  globalFgosPath: /x"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "bin.globalFgosPath",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-bin-key-with-a-dot",
+   "why": "a path is segments, never a dotted string: a key holding a dot is one key",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "bin:",
+     "  a.b: /x"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "bin[\"a.b\"]",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-several-refusals-all-listed-in-path-order",
+   "why": "every refusal is listed, none stops the others",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "secrets:",
+     "  globalFile: /x",
+     "gateway:",
+     "  port: 1",
+     "bin:",
+     "  p: /x"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "bin.p",
+      "global",
+      6,
+      3
+     ],
+     [
+      "config-key-out-of-scope",
+      "gateway.port",
+      "global",
+      4,
+      3
+     ],
+     [
+      "config-key-out-of-scope",
+      "secrets.globalFile",
+      "global",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-ancestor-null-above-a-wildcard-key",
+   "why": "rule 2: null at an ancestor of runner.providers.<name>.endpoint hides it",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers: null"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-null-two-levels-up",
+   "why": "rule 2: any ancestor, not only the nearest",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner: null"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner",
+      "global",
+      1,
+      1
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-null-on-one-wildcard-entry",
+   "why": "rule 2: the entry itself is an ancestor of its global-only key",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai: null"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers.openai",
+      "global",
+      3,
+      5
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-scalar-and-list",
+   "why": "rule 2: a scalar or a list at an ancestor is refused too",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers: [a]"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-replaced-map",
+   "why": "rule 2: a replace-merged mapping at an ancestor overwrites the global-only entry",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai:",
+     "      model: m"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-leaf-merged-map",
+   "why": "a leaf-merged mapping takes the layer whole, like replace",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    x-fgos-merge: leaf",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai:",
+     "      model: m"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers",
+      "global",
+      2,
+      3
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-deep-map-is-not-refused",
+   "why": "a deep-merged mapping merges per key, so only the global-only key inside it is refused",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai:",
+     "      model: m",
+     "      endpoint: e"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers.openai.endpoint",
+      "global",
+      5,
+      7
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-ancestor-empty-deep-map-is-fine",
+   "why": "an empty deep mapping hides nothing",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai: {}"
+    ]
+   },
+   "expect": {
+    "project": [],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-wildcard-key-with-a-dot",
+   "why": "a wildcard entry whose key holds a dot is refused at its global-only key",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    a.b:",
+     "      endpoint: e"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.providers[\"a.b\"].endpoint",
+      "global",
+      4,
+      7
+     ]
+    ],
+    "global": []
+   }
+  },
+  {
+   "id": "scope-account-pool-in-config-files",
+   "why": "an account pool leaves the config files: refused by name, naming the accounts file",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  llmAccounts:",
+     "    a: b"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-in-wrong-file",
+      "runner.llmAccounts",
+      "accounts",
+      2,
+      3
+     ]
+    ],
+    "global": [
+     [
+      "config-key-in-wrong-file",
+      "runner.llmAccounts",
+      "accounts",
+      2,
+      3
+     ]
+    ],
+    "accounts": []
+   }
+  },
+  {
+   "id": "scope-provider-accounts-in-config-files",
+   "why": "the file wins over the scope: a provider's accounts are refused as the wrong file in project and global",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai:",
+     "      accounts: [a]"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-in-wrong-file",
+      "runner.providers.openai.accounts",
+      "accounts",
+      4,
+      7
+     ]
+    ],
+    "global": [
+     [
+      "config-key-in-wrong-file",
+      "runner.providers.openai.accounts",
+      "accounts",
+      4,
+      7
+     ]
+    ],
+    "accounts": []
+   }
+  },
+  {
+   "id": "scope-gateway-token-in-config-files",
+   "why": "the gateway token has its own file: refused by name, naming the token file",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "gateway:",
+     "  token: abc"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-in-wrong-file",
+      "gateway.token",
+      "token",
+      2,
+      3
+     ]
+    ],
+    "global": [
+     [
+      "config-key-in-wrong-file",
+      "gateway.token",
+      "token",
+      2,
+      3
+     ]
+    ],
+    "accounts": [
+     [
+      "config-key-in-wrong-file",
+      "gateway.token",
+      "token",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-legacy-json-project-file",
+   "why": "the legacy JSON project file is judged by the same function",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "{\"gateway\": {\"port\": 4170, \"token\": null}}"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "gateway.port",
+      "global",
+      1,
+      14
+     ],
+     [
+      "config-key-in-wrong-file",
+      "gateway.token",
+      "token",
+      1,
+      28
+     ]
+    ],
+    "global": [
+     [
+      "config-key-in-wrong-file",
+      "gateway.token",
+      "token",
+      1,
+      28
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-project-only-key-in-global-file",
+   "why": "x-fgos-scope: project-only is refused in the global file, naming the project role",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  localOnly: x"
+    ]
+   },
+   "expect": {
+    "project": [],
+    "global": [
+     [
+      "config-key-out-of-scope",
+      "runner.localOnly",
+      "project",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-config-key-in-accounts-file",
+   "why": "the accounts file holds its own keys only",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  providers:",
+     "    openai:",
+     "      model: m"
+    ]
+   },
+   "expect": {
+    "accounts": [
+     [
+      "config-key-in-wrong-file",
+      "runner.providers.openai.model",
+      "config",
+      4,
+      7
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope-accounts-file-keys-are-allowed-there",
+   "why": "accounts and the pools of providers sit in the accounts file whatever their scope",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  llmAccounts:",
+     "    a: b",
+     "  providers:",
+     "    openai:",
+     "      accounts: [a]"
+    ]
+   },
+   "expect": {
+    "accounts": []
+   }
+  },
+  {
+   "id": "scope-undescribed-keys-are-kept",
+   "why": "a key with no schema node is not refused for scope; only ancestors of global-only keys are",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "extra: 1",
+     "runner:",
+     "  nope: 1"
+    ]
+   },
+   "expect": {
+    "project": [],
+    "global": [],
+    "accounts": []
+   }
+  },
+  {
+   "id": "scope-empty-file",
+   "why": "an empty mapping has nothing to refuse",
+   "input": {
+    "schemas": {
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}",
+      "  token: {type: [string, 'null'], x-fgos-file: token, x-fgos-sensitivity: secret-value}"
+     ],
+     "secrets": [
+      "type: object",
+      "properties:",
+      "  globalFile: {type: string, x-fgos-scope: global-only}",
+      "  sources: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "  declarations:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        consumers: {type: array, x-fgos-scope: global-only, items: {type: string}}",
+      "        name: {type: string}"
+     ],
+     "bin": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "additionalProperties: {type: string}"
+     ],
+     "runner": [
+      "type: object",
+      "properties:",
+      "  llmAccounts: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  executor: {type: string}",
+      "  localOnly: {type: string, x-fgos-scope: project-only}",
+      "  providers:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        accounts: {type: array, x-fgos-scope: global-only, x-fgos-file: accounts, items: {type: string}}",
+      "        endpoint: {type: string, x-fgos-scope: global-only}",
+      "        model: {type: string}"
+     ]
+    },
+    "value": [
+     "{}"
+    ]
+   },
+   "expect": {
+    "project": [],
+    "global": [],
+    "accounts": []
+   }
+  }
+ ]
+}
