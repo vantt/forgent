@@ -142,19 +142,19 @@ It never says woken, idle or busy for a remote recipient, and it never gives a t
 
 **Who does what.** Identity owns signing and verification as library calls over bytes:
 
-- `sign(bytes) -> Signature {machine_id, key_id, sig}`;
-- `verify(bytes, &Signature, project) -> Result<MachineId, Refusal>`, checked against the project's list of trusted machines.
+- `sign(state_root, bytes) -> Result<Signature{machine_id, public_key, sig}, Refusal>`; the public key travels with the signature, so the receiver can pin it the first time it sees it;
+- `verify(state_root, bytes, &Signature) -> Result<Verified{machine_id, fingerprint, first_seen}, Refusal>`. Identity's I5 design, decided by the owner on 2026-10-23 16:58 as "1a 2b": each machine has an ed25519 key minted by `fgos doctor --fix`, and signing goes through `ssh-keygen -Y` in the namespace `fgos-identity`. Trust is per machine and pinned on first sight, in local user state, the way `known_hosts` works. A changed key is refused with `machine-key-changed`. There is no per-project trusted-machine list; the project binding lives in MAIL's signed bytes (`project`).
 
 MAIL builds the canonical bytes of 15.2.1 and calls these two functions. It designs no key, no algorithm and no trust list.
 
-**Cross-machine delivery stays OFF until I5 exists.** It is controlled by one proposed key, `mailbox.remote.enabled` (default off). The loader refuses `on` unless Identity reports that signing is available in this build. While the key is off:
+**Cross-machine delivery stays OFF until I5 exists.** It is controlled by one proposed key, `mailbox.remote.enabled` (default off). The loader refuses `on` unless this machine has a key (`fgos identity machine --json` reports a non-null `keyFingerprint`) and `ssh-keygen` is present. While the key is off:
 
 - `send` to an address on another machine is refused with `remote-disabled`, which is a new refusal reason. Nothing is recorded and no event is appended.
 - The consumer ingests nothing. `mailbox.*` events from other machines stay in history and are ignored, and `status` counts them.
 
 **With cross-machine on, a remote message is ingested only when all of these hold:**
 
-1. `sig` is present and `verify(canonical bytes, sig, this project's id)` returns `Ok(machine)`;
+1. `sig` is present and `verify(state_root, canonical bytes, sig)` returns `Ok(Verified{machine_id, ..})`. Identity's refusals `bad-signature`, `machine-key-changed`, `machine-key-missing` and `ssh-keygen-missing` all count as unverified;
 2. `machine` equals the machine part of `from` and the `origin` machine of the carrying ref;
 3. `project` equals this project's id;
 4. an inline `body` matches `body_sha256` and `body_bytes`.
@@ -319,3 +319,7 @@ Agreed with the IDENT lead on 2026-10-23: the mailbox hook registers its head th
 - A head keyed by pid (agy, later) takes Identity's local id `pid-<24 hex>` from `register_current` / `session()`. `resolve` never accepts or exposes a raw pid. A pid → local-id library call is added only once there is a caller.
 - `mailbox.remote.enabled` depends on an Identity query "signing is available in this build", which I5 will expose.
 - The Event Store gaps (Rust `rebuildModule`, the undefined "tell the consumers" step) also block IDENT I4. They are raised with ES as a need of two consumers (board log 12:30 and 12:45).
+
+## Open point after Identity I5 (2026-10-23 16:58)
+
+Pinning on first sight means a machine that can push to the repository and is seen first gets trusted, with no list to approve it in advance. The signature proves that the same machine keeps writing; it does not prove the machine belongs in the project. Whether MAIL adds its own allowlist of machine handles for accepting remote mail (a MAIL policy on top of Identity's pins, which needs nothing from Identity) is a question for the owner before X-rungs that enable remote delivery. Draft recommendation: yes. The `mailbox.remote.allowMachines` list is proposed with no default value, and the owner fills it in.

@@ -1201,6 +1201,7 @@ fn identity_command(args: &[&str]) -> Command {
     for key in [
         "FGOS_SESSION_ID",
         "CODEX_THREAD_ID",
+        "PI_SESSION_ID",
         "CLAUDE_CODE_SESSION_ID",
     ] {
         cmd.env_remove(key);

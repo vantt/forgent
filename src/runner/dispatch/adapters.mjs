@@ -109,8 +109,8 @@ export function currentDispatchDepth() {
  * whenever that guard is inherited; an inherited `OMP_PROFILE`/`PI_PROFILE` makes a child `omp`
  * ignore its own `PI_CODING_AGENT_DIR` (private home), and `OMPCODE=1` disables `herdr-omp-agent-state`.
  *
- * No session id crosses either: `FGOS_SESSION_ID`, `CLAUDE_CODE_SESSION_ID` and `CODEX_THREAD_ID` name
- * the caller, and a worker that inherited one would write as its parent. The worker's own writer id is
+ * No session id crosses either: `FGOS_SESSION_ID`, `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and `PI_SESSION_ID` (with
+ * `PI_SESSION_FILE`, which pi and omp both export) name the caller, and a worker that inherited one would write as its parent. The worker's own writer id is
  * minted from its attempt id (`mintAttemptWriterId`) and set by whoever launches it.
  *
  * Case authority is no more inherited than identity: `FGOS_CASE_ID` and `FGOS_CASE_RESERVATION` are
@@ -143,6 +143,8 @@ export function workerBaseEnv(baseEnv = process.env) {
     FGOS_CASE_RESERVATION: _caseReservation,
     CLAUDE_CODE_SESSION_ID: _claudeSessionId,
     CODEX_THREAD_ID: _codexThreadId,
+    PI_SESSION_ID: _piSessionId,
+    PI_SESSION_FILE: _piSessionFile,
     ...rest
   } = baseEnv;
   let stateRoot;

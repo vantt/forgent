@@ -56,5 +56,5 @@ pub use provider::{
 };
 pub use resolve::{
     env_identity, resolve, resolve_current, terminal_head, tree_identity, Source, WriterId, WriterIdentity, WriterKey,
-    ENV_ORDER, MAX_ID_LENGTH, REGISTRY_FILE,
+    pi_family_cli, ENV_ORDER, MAX_ID_LENGTH, PI_SESSION_VAR, REGISTRY_FILE,
 };

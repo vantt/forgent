@@ -357,7 +357,7 @@ fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves()
 #[test]
 fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing() {
     let root = machine_root();
-    let bad = fgos_identity::WriterKey { source: "PI_SESSION_ID", value: "s-1" };
+    let bad = fgos_identity::WriterKey { source: "OMP_SESSION_ID", value: "s-1" };
     assert_eq!(directory::register_writer(&root, None, &bad, std::process::id(), &[], false).unwrap_err().reason, "invalid-writer-key");
 
     let mut child = std::process::Command::new("true").spawn().unwrap();
