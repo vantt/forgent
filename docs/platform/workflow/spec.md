@@ -1,12 +1,3 @@
----
-area: workflow
-updated: 2026-10-20
-status: settled — owner duyệt 2026-10-19 12:32 (quyết định ở mục 17)
-sources: [agent-workflow-model-owner-direction, workflow-design-intent-and-current-state, agent-workflow-model-council-settled, agent-workflow-model-council-reopen, agent-workflow-model-focused-round, agent-workflow-model-independent-review]
-decisions: []
-coverage: partial
----
-
 # Spec: Workflow (guide, case, admission)
 
 ```txt
@@ -20,6 +11,19 @@ Last reviewed: 2026-10-23
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/work-state/contracts/knowledge-registry.md
+```
+
+Legacy source metadata (provenance only; not candidate coverage or promotion):
+
+```yaml
+---
+area: workflow
+updated: 2026-10-20
+status: settled — owner duyệt 2026-10-19 12:32 (quyết định ở mục 17)
+sources: [agent-workflow-model-owner-direction, workflow-design-intent-and-current-state, agent-workflow-model-council-settled, agent-workflow-model-council-reopen, agent-workflow-model-focused-round, agent-workflow-model-independent-review]
+decisions: []
+coverage: partial
+---
 ```
 
 > **Trạng thái: Settled — owner duyệt spec 2026-10-19 12:32 ("duyệt spec"), quyết định D-ADR0070 (workflow guide + admission ledger; lane AGENT-WF).** Luật mang id `RUL-WF-n` của khu vực này. Các quyết định owner đã trả lời riêng lẻ trước đó được đánh dấu **owner 2026-10-19** (mục 17). D-ADR0070 (workflow guide + admission ledger) supersede một phần 0048 §2 và 0049 §4 của [runner.md](../runner/spec.md); 0048 §3 và 0049 §1–3 giữ nguyên. Spec khoá hành vi. **Đã cài trên main** bởi plan [workflow-case-ledger-and-admission](../../../plans/261019-1238-workflow-case-ledger-and-admission/plan.md) (lane AGENT-WF; các merge `78b0921d2`, `c3f2567ab`, `b2017d58b`, `f5974213d`, 2026-10-19 đến 10-20): lõi F1–F7, F9, F11, F12; F13 và coding cutover (R2) chưa làm, ghi ở backlog. Hai chỗ cài khác chữ spec: `--activity` bắt buộc đi kèm `--case`; phép kiểm chéo writer id → attempt chưa xây, cửa kiểm reservation và case còn sống thay vào (mục 6, giao thức ngữ cảnh authority, bước 4). Mục 5.1 mô tả code trước cutover. Owner đã chọn ý tưởng tính năng 2026-10-19 12:35 ("đồng ý, chọn theo đề xuất"): F1–F7, F9, F11, F12 là lõi của cutover; F13 sau khi lõi land; F8, F14, F15, F16 hoãn; F10 không thuộc cutover này (mục 15).

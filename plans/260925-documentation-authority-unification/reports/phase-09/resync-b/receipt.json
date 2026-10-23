@@ -1,0 +1,469 @@
+{
+  "version": 1,
+  "status": "authoring-complete-independent-review-pending",
+  "head": "6d275ad81897089d5cac63f4ffc0311447a1c0a7",
+  "baselineHead": "7be0cbc52b872b2eae12f3bbba4a1a346754838f",
+  "baselineSourceBytesUnchanged": true,
+  "authorityCutover": false,
+  "gateAcceptance": false,
+  "approvalCarry": false,
+  "needsWrites": [],
+  "changedDocuments": [
+    {
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "beforeSha256": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+      "afterSha256": "691e69db53290609dc673c1aebe15ad1c165f9d86541dbabdb6fbcd9d1d1a7ae"
+    },
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "beforeSha256": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+      "afterSha256": "5feffde597de5d2bd666fbaf06096f3e1bf0e1f3059f07144f560a33cf644290"
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "beforeSha256": "7f706076d2ec787168a311fc77b84728c2e59ef7b6f95984b72ad5791bb0e95b",
+      "afterSha256": "bd26ff8474267ab4e565b56141bb25267f0d246a9b9207b60b5e22f2a1360580"
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "beforeSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "afterSha256": "51dc306ed3d1e37df50b86102fcef8e5deeb1ac7545f72e99747cd616ce5ac4d"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/README.md",
+      "beforeSha256": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+      "afterSha256": "7de6f1e0a46de1715ad8d38b882ca52e82ab32485e9f5e7e5ae8dfe5f7c10977"
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "c7cb30642e6f0b661cba21f79ded76a2388d010392181285bf925bfaf49f7443",
+      "afterSha256": "ea350dd5b2f6e0fa05bb6f208eb623a5f05f6469e129edb48c517c8e63954272"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "beforeSha256": "dadfff52aa1925ab33c1b0f0c6cc1ac404c8a94eba518d4f7713170758321dcc",
+      "afterSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0"
+    },
+    {
+      "path": "docs/platform/seat-binding/spec.md",
+      "beforeSha256": "889238fafc53603da579ac45f0a7a38019d6fd96135b22227cbd67526a598158",
+      "afterSha256": "5ccd9ec6346ae43f95ba9ad7da67699bb6de388a518648f105dfab3fcbcd22d2"
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "beforeSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "afterSha256": "a9cf64fb4b42aaefdff0b6e0a5fc0f875730f769acc4598ac29922a5cffe60bb"
+    },
+    {
+      "path": "docs/platform/work-state/contracts/knowledge-registry.md",
+      "beforeSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+      "afterSha256": "bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238"
+    },
+    {
+      "path": "docs/platform/workflow/spec.md",
+      "beforeSha256": "eca6ef9f7a0b1973fdc35d22c87d01cf126cf587209cc649888cb2559982d3f3",
+      "afterSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c"
+    },
+    {
+      "path": "docs/reading-map.md",
+      "beforeSha256": "df623495b2a5c1d0de40a66c9ef801091e88bdf76fb46effa4cdf4d0e8e2f54b",
+      "afterSha256": "059422bb8d487c6404cc992ee76c604ba3cde9bed02b49bc24d898fdfeeac740"
+    }
+  ],
+  "sourceBindings": 577,
+  "bindingRefresh": 1069,
+  "alreadySupersededHistoricalRowsResolved": 71,
+  "baselineMissingUnits": 594,
+  "baselineResolutionCounts": {
+    "explicit-adapted-binding": 561,
+    "exact-unit-digest": 33
+  },
+  "dispositions": {
+    "existing-literal-history": 367,
+    "equivalent-current-content": 169,
+    "candidate-metadata-adaptation": 7,
+    "retained-truth-correction": 13,
+    "dated-audit-framing": 1,
+    "post-retirement-edit-not-carried": 3,
+    "historical-link-adaptation": 1,
+    "live-direction-update": 1,
+    "post-retirement-edit-live-successor": 1,
+    "successor-link-adaptation": 1,
+    "retained-authority-correction": 1,
+    "retained-relocation-correction": 4,
+    "source-content-in-candidate-envelope": 4,
+    "entry-union-heading": 1,
+    "entry-union-transition-banner": 1,
+    "entry-union-current-source-delta": 1,
+    "area-map-successor-adaptation": 1
+  },
+  "literalHistoryWitnessFilesUnchanged": 13,
+  "files": [
+    {
+      "sourcePath": "docs/architect/agent-coordination/README.md",
+      "sourceSha256": "25468d205a0c4ba82dcd1e471d287ae70aa65d1370f9a239f1a0dcebe3e94dd1",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceSha256": "e45f4c8937f1af62c856999cb8d8bc9c3e52b72d61b0d97e44025d1ab587a63c",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "sourceSha256": "8d6d41fb3057b588fe98b721220460f5234ed94fcdd84f85f71e18f7d3e044f0",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceSha256": "d707faa742077635663d62a800aad7a0df5b5ceae6cd1e57eb1be14462fd342d",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/contracts/README.md",
+      "sourceSha256": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "sourceSha256": "5fb487cca0a93df82f800fc3d18ed3d8d3a59ed81aa8c178559aa240cd72d668",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "sourceSha256": "834724378ab76a15883687990dc90162b0920abb94fb15482982ca9feff84ac6",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/decisions/README.md",
+      "sourceSha256": "8c653d2ae5e9423ff8b1b6ff55130f803716a1c5b05c4362b95322edfbadaa0e",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sourceSha256": "cbcf0731416bfe4354b0107bf5cf50202229d4196f7f3c7edcc1d617be09558d",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "sourceSha256": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceSha256": "498cc57324b8246ca7ac4b8b6ec09e2e445087a67cd0c8afe48a4e5e092a53ca",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/agent-coordination/vision.md",
+      "sourceSha256": "88bb9210691f7c84ad706d9aca031b6bbdefc4c70d2e561b361f0c349e8e4300",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/component-boundary/README.md",
+      "sourceSha256": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "sourceSha256": "913cbbc9419fc059e5ce1dcaeb7d06d6d90d6e9d3ef45195c15cd59ff0359bf3",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/component-boundary/repo-layout-vision.md",
+      "sourceSha256": "07691b34374b874752010a5585020635cb3ff396c1719594a4b1980e2318e314",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/domainization/README.md",
+      "sourceSha256": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sourceSha256": "aec07ac49baa6fd8f02f07615fe250f6e606332a142f16117de90053485671bf",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/proposals/component-authority-boundary-map.md",
+      "sourceSha256": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/roadmap.md",
+      "sourceSha256": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "sourceSha256": "fe46bff47d74696f8f3784a340707738978f1e723e0911ecbe8e319fa0d6e4a1",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceSha256": "3d510bc773875ebfb6116894d3156304f2bc0710b827e01fb31bd7feefcb3ce7",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/decisions/index.md",
+      "sourceSha256": "082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceSha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceSha256": "7a6011177bf4dba3a0530e39501d321d75d6e8f0c4ccf12f3c43b0f76c21a203",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceSha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/observe.md",
+      "sourceSha256": "18c060c9b5f48321820772c44a21277f46aa6392eb67ab97f833ea03e5dc5274",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/platform-foundations.md",
+      "sourceSha256": "fbab4eff911938b23691f88e6d2e6200cac12fad0314f2d8760959f064cdbaa6",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceSha256": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/runner.md",
+      "sourceSha256": "b43408c78d213ae88352dd3a23d7fc4b2bb78256f25e4734974098295daa9b81",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "sourceSha256": "d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/system-overview.md",
+      "sourceSha256": "70cd094041f425dac24ac931eac690bb339b541ddeabd7299efe01b0195468f1",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceSha256": "f2b527e28dc122ae52f86001a90b93d401a1cb7b565ea9eb1b95eb6a1c34d0da",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    },
+    {
+      "sourcePath": "docs/specs/workflow.md",
+      "sourceSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "missingCurrent": 0,
+      "missingChanged": 0
+    }
+  ],
+  "scannerCounts": {
+    "postFinalPinFiles": 3,
+    "postInventoryPinFiles": 33,
+    "files": 33,
+    "filesWithUnprovenChange": 0,
+    "missingChangedUnits": 0
+  },
+  "tests": [
+    {
+      "test": "test/scripts/check-doc-candidate-status.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/check-doc-candidate-status.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w2-d7-focused/checkout",
+      "exit": 0,
+      "stdoutSha256": "d71dee8158a1f3445be8a9d06cdb99fa57615e2cc4537a5fe23a78bf66597f0d",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w2-d7-focused/01.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+    },
+    {
+      "test": "test/scripts/list-doc-anchors.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/list-doc-anchors.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w2-d7-focused/checkout",
+      "exit": 0,
+      "stdoutSha256": "1be3d05140514e785350b5416b82463b5289a3e6cd4ab03365f8d908c1c011f2",
+      "summary": [
+        "ℹ tests 3",
+        "ℹ pass 3",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w2-d7-focused/02.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+    }
+  ],
+  "independentHashCheck": {
+    "status": "pass",
+    "algorithm": "Python hashlib.sha256 over sorted four-key compact UTF-8 JSON plus LF; ensure_ascii=False",
+    "bindingsChecked": 1646,
+    "excludedSourcesHaveNoNewCarries": true
+  },
+  "metadataFindings": [
+    {
+      "type": "switchboard-route-conflict",
+      "path": "docs/reading-map.md",
+      "message": "the switchboard routes this document more than once (2 entries); the status is ambiguous"
+    }
+  ],
+  "newMetadataFindings": [],
+  "whitespace": {
+    "command": "git diff --check",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "scope": {
+    "trackedChangesMatchDeclaredDocuments": true,
+    "newFilesConfinedToShardAndReceiptDirectory": true,
+    "repositoryGitWrites": false,
+    "productionCodeEdits": false
+  },
+  "notRun": [
+    "fgOS CLI/capability query (forbidden)",
+    "broad Node/Rust suites (forbidden)",
+    "native rebuild/Rust freshness checks",
+    "authority or gate acceptance"
+  ],
+  "knownOutOfScopeIssue": "Pre-existing duplicate docs/reading-map.md switchboard route; reported, not required to complete this conservation assignment and not changed.",
+  "evidence": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/adjudications.json",
+      "sha256": "83752a06a4da2179d693bc2166696b01195048183d10f5406278ba56e70522b5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/anchors-test.log",
+      "sha256": "1be3d05140514e785350b5416b82463b5289a3e6cd4ab03365f8d908c1c011f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/baseline-resolution.json",
+      "sha256": "8c5d6c24dd44d6a33e98ff68f3bc39708cf9dae1ecdc2c82268772e0d944d159"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/candidate-status-test.log",
+      "sha256": "d71dee8158a1f3445be8a9d06cdb99fa57615e2cc4537a5fe23a78bf66597f0d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/independent-hash-check.json",
+      "sha256": "a3351c266bb67e3184a13ba8d239d54709c1a0d193245cf63f20f8ce0885de3d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/independent-hash-check.py",
+      "sha256": "dd693e0e82ed3ce240eb1f2373d8856c17841429611c8ee292f695ad5a6d16d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/legacy-drift.json",
+      "sha256": "1036520808f436631e5542c03b49ab7a65372bfb843c3fc0384f92680e5aae1f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/map-units.mjs",
+      "sha256": "82363679741614c8bc4e543695b26b70fdab83f395badb1ea78bb7c10676eb6e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/prepare-bindings.mjs",
+      "sha256": "4638fbdea10f2428a0b09268679fe81accd76e6b8f939d2bc2846cb388298d80"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/publish-bindings.mjs",
+      "sha256": "88518ca427dd3deb76d512f161d159ad3d41ca673c97d92da489228dc1a19f05"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/receipt.md",
+      "sha256": "d5d5b927ab08373d7c10eaa9c9ca3c53ec57b20dc708363dbe27a5719cb117e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/replay-scan.mjs",
+      "sha256": "b7708a5478b223664a0bdcf01b22fc06b947c96dad15958984eff3ccdeec2dc0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/scan-provenance.json",
+      "sha256": "b2e864b95d1878578e330945d17a1755f35925ffb44bc6620576dc97938a31b5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/test-results.json",
+      "sha256": "0aa3ff8e21689acc96e6368b7641dc38377d64ef6e530a154e2b6057553654a2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/units.mjs",
+      "sha256": "f6776107ea2eb7585ea1a7fba224999037e800c24ab347cb150dc22c77820639"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/verification.json",
+      "sha256": "758c7b954d0f1ca3f4ba18897f56815b9c96df5f7cbb95fb90a5dfdba41c3db6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/verify-resync.mjs",
+      "sha256": "9ef41bcf84f2105eec0bff77cd2d17e8869807fb1835b1fb7bf67538a88501b6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-b/write-receipt.py",
+      "sha256": "c58d01d04100f2ddf7206dedd1507fe8c946b7abf77f37c42df8d6d23dac25ac"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "sha256": "aa952bf956e81ecab1c133304ca9b281657634a82a3bb2244520638b67450ffb"
+    }
+  ]
+}

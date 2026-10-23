@@ -32,8 +32,10 @@ replaces individual decisions.
 
 ## Accepted Decisions
 
-The [foundation vision](../vision.md) distinguishes surviving principles from
-historical engine decisions. Current implementation evidence governs which
+The [foundation vision](../vision.md) records direction decisions V-001 through
+V-013 and distinguishes surviving principles from historical engine decisions.
+V-013's narrow Agent Mailbox exception leaves V-011 unchanged; it does not
+reinstate a general mailbox or the retired coordination engine. Current implementation evidence governs which
 parts of a retained ADR still apply; this index does not revive retired runtime.
 
 1. [ADR-001: Work Owns Delivery Lifecycle](ADR-001-work-lifecycle-authority.md)

@@ -1,0 +1,11 @@
+✔ lists heading and block anchors with the numbering prefix kept (4.548203ms)
+✔ accepts GitHub spelling of a heading with punctuation (0.318726ms)
+✔ the CLI prints anchors and checks one citation (0.974474ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 80.196873

@@ -12,7 +12,6 @@ Related:
 - src/setup/registrations.mjs
 ```
 
-Document type: Contract
 Owner: Work-state (existing `src/state/knowledge-registry.mjs` registry and projection boundary)
 Status: Live candidate holder for maintained registry rules, subject to the existing transitional switchboard; not a proposal snapshot.
 Canonical for: Framework/role vocabulary, durable document identity, lifecycle and attestation constraints consumed by the existing registry, CLI and producer skill. This does not claim the whole redesign, migration or resolver horizon is implemented.

@@ -1,12 +1,3 @@
----
-area: seat-binding
-updated: 2026-10-21
-status: implemented — owner duyệt toàn văn 2026-10-20 21:31 ("ok, duyệt spec Seat Binding"); quyết định D-ADR0072 (Seat Binding: one authority for agent seat choice) (mục 15); code land 2026-10-21, con trỏ thực thi ở mục 16. Các câu "trước Seat Binding" trong mục 1–12 mô tả code trước đợt; mục 13 là bằng chứng của bản duyệt; điều đợt triển khai chứng minh là sai nằm ở mục 17 (erratum).
-sources: [seat-binding-spec-draft-rev2-consolidated, seat-binding-spec-draft-rev1, seat-binding-council-synthesis, seat-binding-needs-and-mechanisms-inventory, model-family-tier-ladders]
-decisions: []
-coverage: full-target
----
-
 # Spec: Seat Binding (một authority cho câu hỏi "ghế này chạy bằng gì")
 
 ```txt
@@ -20,6 +11,19 @@ Last reviewed: 2026-10-23
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/work-state/contracts/knowledge-registry.md
+```
+
+Legacy source metadata (provenance only; not candidate coverage or promotion):
+
+```yaml
+---
+area: seat-binding
+updated: 2026-10-21
+status: implemented — owner duyệt toàn văn 2026-10-20 21:31 ("ok, duyệt spec Seat Binding"); quyết định D-ADR0072 (Seat Binding: one authority for agent seat choice) (mục 15); code land 2026-10-21, con trỏ thực thi ở mục 16. Các câu "trước Seat Binding" trong mục 1–12 mô tả code trước đợt; mục 13 là bằng chứng của bản duyệt; điều đợt triển khai chứng minh là sai nằm ở mục 17 (erratum).
+sources: [seat-binding-spec-draft-rev2-consolidated, seat-binding-spec-draft-rev1, seat-binding-council-synthesis, seat-binding-needs-and-mechanisms-inventory, model-family-tier-ladders]
+decisions: []
+coverage: full-target
+---
 ```
 
 > **Trạng thái: implemented (2026-10-21).** Spec này là hợp đồng của Seat Binding và code đã theo nó; câu nào nói "trước Seat Binding" mô tả code trước đợt chuyển đổi, và chỗ đợt triển khai chứng minh spec sai được sửa tại chỗ và ghi ở mục 17. Spec thay phần chọn ghế của RUL80 (an account is chosen first, then a CLI), RUL91 (a person may pin the provider account of a unit run), RUL98 (workflow start passes --timeout and --account to each Unit), RUL102 (a tier cell names its pool; one family has one executor), RUL103 (runner.maxTier caps every seat) và RUL106 (a seat walks a tier declared order and its cell entries) trong [runner.md](../runner/spec.md) (mục 15).

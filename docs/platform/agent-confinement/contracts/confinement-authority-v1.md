@@ -392,7 +392,8 @@ interface ConfinementRequestV1 {
     args: string[];
     env: Record<string, string>;
     adapter: string;
-    resourceBindings: RuntimeResourceBindingV1[];
+    // Login store invocation đọc; vắng khi nó không đọc store nào (runner.md RUL105).
+    credentialStore?: { use: string; homeEnv: string; files?: string[] };
     // Remote adapter dùng transport, không spawn command/args.
     transport?: { kind: 'http'; method: string; url: string;
       headers: Record<string, string>; body?: string };
@@ -580,9 +581,10 @@ tự đổi sang backend khác.
 Backend driver không được branch theo `executorId`, `providerModel`, Codex,
 Claude hay agent type khác. Nó chỉ nhận invocation, resolved semantic grants và
 control chuẩn. Provider adapter/normalizer chịu trách nhiệm diễn tả nhu cầu đặc
-thù thành binding chuẩn trước cửa, ví dụ bind resource `private-home` vào env
-`CODEX_HOME`; Authority resolve resource, còn backend chỉ áp dụng binding đã
-được duyệt. Nhờ vậy bỏ provider recipe mà không giấu recipe thành `if` trong
+thù thành khai báo chuẩn trước cửa, ví dụ
+`credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' }`; Authority resolve
+resource `private-home`, còn backend chỉ trỏ `homeEnv` vào đó và chép file của
+store đã duyệt. Nhờ vậy bỏ provider recipe mà không giấu recipe thành `if` trong
 driver.
 
 ### 6.6 `ConfinementAttestation`

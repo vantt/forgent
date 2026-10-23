@@ -1,0 +1,19 @@
+{
+  "scanner": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+  "scannerSha256": "b279de8381d4575ceee6f3bb0fda881a732878c39cea3baa2680949b214af5d8",
+  "replacements": [
+    [
+      "from '../../../../../scripts/generate-doc-inventory.mjs'",
+      "from \"file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/generate-doc-inventory.mjs\""
+    ],
+    [
+      "const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../../../..');",
+      "const root=\"/home/vantt/projects/forgentX-p9-w1-d1\";"
+    ],
+    [
+      "const R=P+'/reports/phase-09/late-areas';",
+      "const R=P+'/reports/phase-09/resync-b';"
+    ]
+  ],
+  "qualification": "Import/root/output plumbing only; scanner matching and counts unchanged."
+}

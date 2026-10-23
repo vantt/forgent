@@ -1,0 +1,95 @@
+{
+  "status": "pass",
+  "sourcePin": "6d275ad81897089d5cac63f4ffc0311447a1c0a7",
+  "sourceBindings": 577,
+  "rebindings": 1069,
+  "priorHistoricalRowsResolved": 71,
+  "historyFilesUnchanged": 13,
+  "dispositions": {
+    "existing-literal-history": 367,
+    "equivalent-current-content": 169,
+    "candidate-metadata-adaptation": 7,
+    "retained-truth-correction": 13,
+    "dated-audit-framing": 1,
+    "post-retirement-edit-not-carried": 3,
+    "historical-link-adaptation": 1,
+    "live-direction-update": 1,
+    "post-retirement-edit-live-successor": 1,
+    "successor-link-adaptation": 1,
+    "retained-authority-correction": 1,
+    "retained-relocation-correction": 4,
+    "source-content-in-candidate-envelope": 4,
+    "entry-union-heading": 1,
+    "entry-union-transition-banner": 1,
+    "entry-union-current-source-delta": 1,
+    "area-map-successor-adaptation": 1
+  },
+  "newLinks": [
+    {
+      "file": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "destination": "../spec.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên",
+      "resolved": "docs/platform/agent-confinement/spec.md"
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "destination": "work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+      "resolved": "docs/platform/work-state/contracts/knowledge-registry.md"
+    },
+    {
+      "file": "docs/platform/component-boundary.md",
+      "destination": "work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+      "resolved": "docs/platform/work-state/contracts/knowledge-registry.md"
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "destination": "../work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+      "resolved": "docs/platform/work-state/contracts/knowledge-registry.md"
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "destination": "../work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+      "resolved": "docs/platform/work-state/contracts/knowledge-registry.md"
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "destination": "../workflow/spec.md",
+      "resolved": "docs/platform/workflow/spec.md"
+    }
+  ],
+  "metadata": {
+    "counts": {
+      "files": 12,
+      "byStatus": {
+        "promoted": 0,
+        "candidate": 11,
+        "legacy-current": 1,
+        "non-authority": 0,
+        "unrouted": 0
+      },
+      "exemptUnrouted": 0,
+      "checked": 11,
+      "findings": 1,
+      "byType": {
+        "switchboard-route-conflict": 1
+      }
+    },
+    "findings": [
+      {
+        "type": "switchboard-route-conflict",
+        "path": "docs/reading-map.md",
+        "message": "the switchboard routes this document more than once (2 entries); the status is ambiguous"
+      }
+    ],
+    "newFindings": []
+  },
+  "scanner": {
+    "files": 33,
+    "missingCurrent": 0,
+    "missingChanged": 0
+  },
+  "limitations": [
+    "Author proof only; independent review pending.",
+    "Explicit-adapted-binding includes disposition witnesses; not every unit is literal or live carriage.",
+    "No runtime, Rust freshness, cutover or gate acceptance asserted."
+  ]
+}

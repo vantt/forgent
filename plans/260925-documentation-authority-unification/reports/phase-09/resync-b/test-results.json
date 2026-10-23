@@ -1,0 +1,50 @@
+[
+  {
+    "test": "test/scripts/check-doc-candidate-status.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/check-doc-candidate-status.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w2-d7-focused/checkout",
+    "exit": 0,
+    "stdoutSha256": "d71dee8158a1f3445be8a9d06cdb99fa57615e2cc4537a5fe23a78bf66597f0d",
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "scratchLog": "/tmp/fgos-work/w2-d7-focused/01.log",
+    "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+  },
+  {
+    "test": "test/scripts/list-doc-anchors.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/scripts/list-doc-anchors.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w2-d7-focused/checkout",
+    "exit": 0,
+    "stdoutSha256": "1be3d05140514e785350b5416b82463b5289a3e6cd4ab03365f8d908c1c011f2",
+    "summary": [
+      "ℹ tests 3",
+      "ℹ pass 3",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "scratchLog": "/tmp/fgos-work/w2-d7-focused/02.log",
+    "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "status": "pass",
+  "algorithm": "Python hashlib.sha256 over sorted four-key compact UTF-8 JSON plus LF; ensure_ascii=False",
+  "bindingsChecked": 1646,
+  "excludedSourcesHaveNoNewCarries": true
+}

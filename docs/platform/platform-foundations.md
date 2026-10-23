@@ -382,6 +382,73 @@ distill là phòng thí nghiệm compound đầu tiên.
 
 The following Business Rules and decision narratives are conserved verbatim from `docs/specs/platform-foundations.md` at `3e2d05af89313dbfbf0d26cd0de34f6b660d194b`. They are the candidate law/decision holder, not a new law or an implementation claim. The full locked L1–L10 source above and the transitional authority route are unchanged. Historical self-paths in the narratives retain their dated spelling.
 
+## Spec: Platform Foundations (luật nền)
+
+The operational projection below is carried from `docs/specs/platform-foundations.md`.
+Its dated “8 luật” count and source metadata are provenance, not a change to the
+locked laws above; Business Rules and decision narratives have one holder below.
+
+```yaml
+---
+area: platform-foundations
+updated: 2026-07-14
+sources: [phase-0-compound-learning-stack]
+decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9]
+coverage: full
+---
+```
+
+Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên mọi code của compound stack (state/FSM → routing → compound-learning). Người dùng: product owner (khóa và supersede luật) và mọi agent/reviewer thiết kế hay thẩm định artifact của forgent. Văn bản gốc đầy đủ (phát biểu, nguồn bằng chứng, hệ quả, ngưỡng xem lại): xem Pointers.
+
+## Entry Points & Triggers
+
+- Trước khi thiết kế bất kỳ artifact bền, store, hay interface mới → đọc luật nền; thiết kế phải khai các phân loại bắt buộc (RUL1 (Log hay State ngay lúc thiết kế), RUL8 (mọi artifact khai mức bền tường minh), RUL4 (mỗi interface chọn theo audience)).
+- Mở đầu mọi review thiết kế tầng state → câu hỏi "log hay state?" (RUL1 (Log hay State ngay lúc thiết kế)).
+- Ngưỡng xem lại có tên của một luật bị chạm → mở lại luật đó qua thao tác "sửa luật" bên dưới.
+- Nghiệm thu mỗi phase của compound stack → hỏi lại sáu câu hỏi (RUL6 (agent lạ trả lời được sáu câu hỏi)).
+
+## Data Dictionary
+
+| # | Element | Meaning | Values |
+|---|---------|---------|--------|
+| 1 | Physics của artifact | Phân loại bắt buộc lúc thiết kế cho mọi dữ liệu bền | `log` — append-only, tổ chức theo feature/phiên, trả lời "làm sao tới đây", không bao giờ overwrite · `state` — overwrite theo reality, tổ chức theo area, trả lời "đang ở đâu" |
+| 2 | Tầng memory | Tầng mà một cơ chế nhớ thuộc về | `lower` — cơ học/raw/chính xác, chỉ dùng hai-physics, không TTL, không tự quên · `higher` — nơi agent học pattern: 4 loại memory (working/episodic/semantic/procedural) + consolidation, human-gated |
+| 3 | Mức bền (5 cấp, nhãn chính thức tại `docs/platform-foundations.md` §L7) | Mức durability mọi artifact phải khai | đề xuất chờ duyệt · truth vĩnh viễn được commit · bằng chứng phiên, nén được · dựng lại được từ truth vĩnh viễn · chỉ tồn tại máy này |
+| 4 | Bậc trưởng thành (F0–F5) | Thang đo tiến hóa của platform, mỗi bậc có tiêu chí kiểm chứng | `F0` bare · `F1` lawful (luật thành văn, 6 câu trả lời bằng tay) · `F2` stateful (6 câu trả lời từ state) · `F3` routed (agent lạ tự tìm việc kế tiếp) · `F4` compounding (vòng predicted→actual chạy) · `F5` self-improving (học từ vận hành, human-gated) |
+| 5 | Ngưỡng xem lại | Điều kiện có tên mà khi chạm, luật phải được mở lại — luật không có ngưỡng là luật phân loại/acceptance, chỉ có thể thêm | điều kiện mô tả tường minh trong văn bản luật |
+| 6 | Changeset | Bản ghi thao tác ngữ nghĩa append-only, ghi cùng transaction với mutation, được commit — là truth mà mọi database view dựng lại từ đó | — |
+
+## Behaviors & Operations
+
+### Sửa/mở lại một luật
+
+- **Blocked when:** không có bằng chứng mới và không ngưỡng xem lại nào bị chạm — audit chỉ nêu lo ngại trừu tượng thì không mở luật.
+- **What changes:** quyết định gốc bị supersede bằng quyết định mới có D-ID; văn bản luật cập nhật trỏ D-ID mới. Không bao giờ sửa tại chỗ không dấu vết.
+- **Side effects:** thiết kế và spec đang dựa trên luật đó được rà lại.
+- **Afterwards:** người đọc chỉ thấy luật hiện hành; lịch sử nằm trong decision log.
+
+### Khai phân loại khi thiết kế artifact mới
+
+- **Runs when:** bất kỳ artifact bền, store, hay interface mới nào được thiết kế.
+- **Blocked when:** artifact không khai được physics (RUL1 (Log hay State ngay lúc thiết kế)), mức bền (RUL8 (mọi artifact khai mức bền tường minh)), hoặc — với interface — audience (RUL4 (mỗi interface chọn theo audience)): thiết kế đó là lỗi bị trả lại, không phải chi tiết để sau.
+- **What changes:** bản thiết kế mang các khai báo; reviewer thẩm định theo đúng các khai báo đó.
+- **Afterwards:** artifact vào đời với phân loại tra cứu được; file lai (vừa append vừa sửa) phải tách đôi.
+
+### Tuyên bố bậc trưởng thành
+
+- **Runs when:** một bậc F0–F5 được cho là đạt.
+- **Blocked when:** không có bằng chứng chạy thật (output benchmark/check) — "không tự phán".
+- **Afterwards:** bậc được ghi nhận kèm bằng chứng; roadmap đo bằng thang này, không bằng cảm giác.
+
+## Actors & Access
+
+| Capability | Product owner | Agent | Reviewer |
+|---|---|---|---|
+| Khóa / supersede luật | ✓ | — | — |
+| Đọc và tuân thủ luật | ✓ | ✓ | ✓ |
+| Trích luật theo ID (L1–L10) khi thẩm định | — | ✓ | ✓ |
+| Tuyên bố bậc F-ladder (kèm bằng chứng) | ✓ (chốt) | đề xuất | đề xuất |
+
 ## Business Rules
 
 - **RUL1 (Log hay State ngay lúc thiết kế).** Mọi mẩu dữ liệu bền khai là Log hoặc State ngay lúc thiết kế; không khai được là lỗi thiết kế (L1, per ca7de3cf).
