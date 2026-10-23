@@ -530,6 +530,8 @@ The big lead re-checked the evidence for every deviation before answering.
    - **Report.** Children per seal, before and after.
    - **Not in T2.** The terminal layout and naming questions Q4–Q6 are still open with the owner.
 
+14. **Phase 10 dropped** (owner, 2026-10-23 17:20; parent decision 23). The macOS `relation_of` and the holder-lock macOS build fix are on the track (`e36ca7eb8`, `789ca69e7`), after the owner confirmed macOS is supported. The whole workspace compile-checks for `aarch64-apple-darwin`; it has never run on a Mac.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.
