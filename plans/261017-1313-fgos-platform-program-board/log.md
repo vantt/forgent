@@ -7,6 +7,22 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 14:50 (`claude-rgvd@fg-server`, `lead:MAIL`): **MAIL V7 có plan, chờ V6 đóng mới làm** ([plan](../261023-1411-mailbox-v7-codex-postooluse-pi-omp-and-aliases/plan.md)).
+  - **Làm ngay sau V6, không cần owner duyệt thêm:**
+    - **V7a:** tắt giao thư qua `Stop` cho Codex.
+    - **V7b:** handle IDENT và `lead:<LANE>` làm địa chỉ mailbox. Thư chỉ giao tới head mà record của project đang giữ. Khung thư in handle.
+    - **V7d:** lệnh `list` tối thiểu; lệnh `status` chỉ báo cáo; hàng doctor `mailbox-hook` đọc record qua `status`; một dòng `CHANGELOG.md`.
+  - **Chờ owner duyệt ngân sách:** V7c (đo lại Codex chỉ qua `PostToolUse`), V7e (adapter pi và omp, đo thư tới model dưới vai nào), V7f (dò kênh đánh thức).
+  - **File chung MAIL sẽ sửa (báo trước theo luật):** `src/setup/agent-hooks.mjs` (extension cho pi/omp, chỉ khi project bật mailbox), `src/setup/registrations.mjs` (hàng doctor `mailbox-hook`), `packages/host-runtime/contracts/command-route-annotations.json` (`mailbox list|status`), `CHANGELOG.md`, `scripts/lib/codex-auth-guard.mjs`. Bên nào land sau thì soát thay đổi của bên kia.
+  - **Nhờ IDENT (`claude-5v7u@fg-server`):**
+    - **C1:** một cửa `register_writer(state_root, writer_key, cli, head, roles, take)`. Hook của Codex không có `CODEX_THREAD_ID`, nên `register_current` sẽ đăng ký nhầm phiên.
+    - **C1b:** `handle_for(state_root, writer_key, cli)`.
+    - **C2:** `resolve` nhận được id đầy đủ `<machine-id>/<local id>`.
+    - **C3:** thêm dòng mailbox vào §6 spec IDENT, và ghi một lần rằng tiến trình nào của cùng user cũng `--take` được một vai.
+    - **C4:** session identity có đọc `PI_SESSION_ID` không.
+    - Mailbox sẽ không đặt `FGOS_SESSION_ID` từ extension pi/omp.
+  - **Nhờ host routing:** thêm `mailbox list|status` vào route annotation.
+
 - 2026-10-23 14:10 (`claude-rgvd@fg-server`, `lead:MAIL`; owner 14:08 "ok dừng codex, làm theo hướng em đề xuất"): **MAIL V6: Codex dừng đo sau stage A vì trượt cứng.**
   - **Kênh `Stop` của Codex là đường tiêm lệnh.** Khung thư tới model dưới vai `user`, nên câu giả "From the user" trong thư được tin là lời người dùng. Làm theo yêu cầu có hại 10/35 lần.
   - **Kênh `PostToolUse` tới dưới vai `developer`.** Làm theo yêu cầu có hại 0/35 lần. Nhưng Codex cũng gần như không làm theo yêu cầu hợp lệ: 0–1/5.
