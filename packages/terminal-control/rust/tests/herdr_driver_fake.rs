@@ -1,9 +1,11 @@
 //! The herdr driver against a fake `herdr` binary (`FGOS_HERDR_BIN` style):
 //! argv per capability, absent and hung herdr, incarnation over a real socket.
 
+use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::driver::*;
-use fgos_terminal_control::port::{Refusal, ServerIncarnation};
+use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
+use fgos_terminal_control::port::{AnchorPane, Refusal, ServerIncarnation};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -55,6 +57,10 @@ impl Drop for Fake {
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.dir);
     }
+}
+
+fn core_config(fake: &Fake) -> CoreConfig {
+    CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 }
 }
 
 fn is_unsupported<T: std::fmt::Debug>(r: DriverResult<T>) -> bool {
@@ -399,8 +405,6 @@ mod incarnation {
 
     #[test]
     fn each_operation_runs_a_fixed_number_of_herdr_commands() {
-        use fgos_terminal_control::core::{Core, CoreConfig};
-        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
         use fgos_terminal_control::port::{AllocateRequest, Disposition, Display, LaunchSpec};
 
         let fake = Fake::new("count");
@@ -408,8 +412,7 @@ mod incarnation {
         let _listener = UnixListener::bind(&sock).unwrap();
         let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
-        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
-        let core = Core::new(&driver, &MeasuredSplit, config);
+        let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
         let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { label: key.into(), ..Default::default() }, cwd: None, env: Default::default() };
         let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
         // Commands herdr was asked to run by one operation; the probe at construction is not counted.
@@ -420,7 +423,8 @@ mod incarnation {
         };
 
         let counts = [
-            ("capabilities", ran(&|| drop(core.capabilities()))),
+            ("capabilities", ran(&|| drop(core.capabilities(None)))),
+            ("capabilities naming an anchor pane", ran(&|| drop(core.capabilities(Some("wS:p59X"))))),
             ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
             ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
             ("allocate beside two live panes", ran(&|| drop(core.allocate(&allocate("k5")).unwrap()))),
@@ -439,6 +443,7 @@ mod incarnation {
             counts,
             [
                 ("capabilities", 0),
+                ("capabilities naming an anchor pane", 1),
                 ("allocate into a new tab", 2),
                 ("allocate beside a live pane", 6),
                 ("allocate beside two live panes", 7),
@@ -458,8 +463,6 @@ mod incarnation {
 
     #[test]
     fn a_brief_sent_to_a_pane_whose_shell_holds_the_foreground_is_not_typed_and_nothing_runs() {
-        use fgos_terminal_control::core::{Core, CoreConfig};
-        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
         use fgos_terminal_control::port::{AllocateRequest, Display, SendOutcome};
 
         let fake = Fake::new("shell-fg");
@@ -468,8 +471,7 @@ mod incarnation {
         // The pane's shell is its only foreground process, and this fake's shell runs what is typed at it.
         let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
-        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
-        let core = Core::new(&driver, &MeasuredSplit, config);
+        let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
         core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, cwd: None, env: Default::default() }).unwrap();
 
         let typed = fake.dir.join("typed");
@@ -533,4 +535,24 @@ fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_sta
 
     let failing = Fake::new("agent-get-garbled").env("FAKE_HERDR_GARBLE", "1");
     assert!(is_unknown(failing.driver().activity("wS:p59Y")), "an unreadable answer is not \"no agent\"");
+}
+
+#[test]
+fn capabilities_say_whether_the_named_anchor_pane_resolves() {
+    let anchor = |fake: &Fake, named: Option<&str>| {
+        let driver = fake.driver();
+        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(named);
+        report.anchor_pane
+    };
+    let live = Fake::new("anchor-live");
+    assert_eq!(anchor(&live, None), AnchorPane::Absent);
+    assert_eq!(anchor(&live, Some("wS:p59X")), AnchorPane::Resolved);
+    assert!(live.calls().iter().filter(|c| c.starts_with("pane get")).count() == 1, "only the named pane is asked about");
+
+    let gone = Fake::new("anchor-gone").env("FAKE_HERDR_PANE_GONE", "1");
+    assert!(matches!(anchor(&gone, Some("ghost")), AnchorPane::Unresolvable { reason } if reason.contains("ghost")));
+
+    let absent = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
+    let report = Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(Some("wS:p59X"));
+    assert!(matches!(report.anchor_pane, AnchorPane::Unresolvable { reason } if reason.contains("not found")), "no herdr runs, and the pane is not claimed to resolve");
 }

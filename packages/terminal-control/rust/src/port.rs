@@ -176,6 +176,17 @@ pub struct CapabilitiesReport {
     pub driver: String,
     pub capabilities: Vec<String>,
     pub server_incarnation: Option<ServerIncarnation>,
+    pub anchor_pane: AnchorPane,
+}
+
+/// Whether the pane a caller named as its anchor can be resolved by the driver.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "state", rename_all = "lowercase")]
+pub enum AnchorPane {
+    /// The caller named none.
+    Absent,
+    Resolved,
+    Unresolvable { reason: String },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

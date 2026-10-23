@@ -81,6 +81,6 @@ test('the port lists the answers the core gives, and every named refusal is a ro
   assert.ok(port.operations.release.results.includes('unknown'));
   for (const result of ['unsupported', 'unknown']) assert.ok(port.operations['reconcile-scan'].results.includes(result), result);
   assert.ok('paneId' in port.results.scan.findings[0]);
-  assert.ok('defaults' in port.results.capabilities && 'policies' in port.results.capabilities);
+  for (const member of ['anchorPane', 'defaults', 'policies']) assert.ok(member in port.results.capabilities, member);
   for (const cause of Object.keys(port.configRefusals)) assert.ok(route.errorStdout.code.enum.includes(cause), cause);
 });

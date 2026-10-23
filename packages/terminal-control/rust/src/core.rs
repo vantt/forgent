@@ -657,11 +657,22 @@ impl<'a> Core<'a> {
         self.driver.label_pane(&record.pane_id, &display.label)
     }
 
-    pub fn capabilities(&self) -> CapabilitiesReport {
+    /// What the driver can do. `anchor_pane` is the pane the caller named as
+    /// its anchor, if any: the answer says whether the driver resolves it.
+    pub fn capabilities(&self, anchor_pane: Option<&str>) -> CapabilitiesReport {
+        let anchor_pane = match anchor_pane {
+            None => AnchorPane::Absent,
+            Some(pane) => match self.driver.pane_liveness(pane) {
+                Ok(PaneLiveness::Live) => AnchorPane::Resolved,
+                Ok(PaneLiveness::Gone) => AnchorPane::Unresolvable { reason: format!("pane {pane} does not exist") },
+                Err(refusal) => AnchorPane::Unresolvable { reason: refusal.to_string() },
+            },
+        };
         CapabilitiesReport {
             driver: self.driver.name().to_string(),
             capabilities: self.driver.capabilities().into_iter().map(String::from).collect(),
             server_incarnation: self.driver.server_incarnation().ok(),
+            anchor_pane,
         }
     }
 

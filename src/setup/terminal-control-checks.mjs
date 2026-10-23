@@ -7,32 +7,16 @@
 // anything else passes.
 
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 
 import { createTerminalControl, TerminalControlError } from '../terminal-control/client.mjs';
 import { resolveTerminalConfig, terminalConfigProblems, terminalRouteConfig } from '../terminal-control/config.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { READY_TIMEOUT_MS } from '../runner/dispatch/herdr-deadlines.mjs';
 
-/** `FGOS_HERDR_ANCHOR_PANE`, when set, must name a pane herdr can resolve: it is
- * the input of `attach`. Returns a failure message, a note to append, or `''`. */
-function checkAnchorPane(bin, env) {
-  const anchorPane = env.FGOS_HERDR_ANCHOR_PANE;
-  if (anchorPane === undefined) return { note: '' };
-  const trimmed = anchorPane.trim();
-  if (!trimmed) return { failure: 'FGOS_HERDR_ANCHOR_PANE is empty' };
-  try {
-    const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3000 });
-    let parsed;
-    try { parsed = JSON.parse(paneOut); } catch {}
-    if (parsed?.error) {
-      return { failure: `FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${parsed.error.message || parsed.error.code}` };
-    }
-    return { note: `; anchor pane "${trimmed}" verified` };
-  } catch (err) {
-    return { failure: `FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${err.message}` };
-  }
-}
+/** An empty `FGOS_HERDR_ANCHOR_PANE` is the variable's own shape, judged here; the route says whether a named pane resolves. */
+const anchorVerdict = (named, answer) => (named === '' ? { failure: 'FGOS_HERDR_ANCHOR_PANE is empty' }
+  : answer?.state === 'unresolvable' ? { failure: `FGOS_HERDR_ANCHOR_PANE="${named}" cannot be resolved: ${answer.reason}` }
+    : { note: answer?.state === 'resolved' ? `; anchor pane "${named}" verified` : '' });
 
 function incarnationText(incarnation) {
   return incarnation ? `server pid ${incarnation.pid} at ${incarnation.endpoint}` : 'no server incarnation readable';
@@ -50,7 +34,9 @@ function incarnationText(incarnation) {
 export function checkTerminalControl(repoRoot, { env = process.env, platform = process.platform, globalConfigPath, createClient } = {}) {
   const root = path.resolve(repoRoot);
   const herdrBin = resolveHerdrBin();
-  const client = (config) => createClient?.(config) ?? createTerminalControl({ herdrBin, config });
+  const anchorPane = env.FGOS_HERDR_ANCHOR_PANE?.trim();
+  const routeEnv = anchorPane ? { FGOS_HERDR_ANCHOR_PANE: anchorPane } : undefined;
+  const client = (config) => createClient?.(config, routeEnv) ?? createTerminalControl({ herdrBin, config, env: routeEnv });
   let explicit;
   try {
     resolveTerminalConfig(root, { globalConfigPath });
@@ -76,21 +62,17 @@ export function checkTerminalControl(repoRoot, { env = process.env, platform = p
   if (refused) problems.push(`the core refused the layout: ${refused}`);
   const answered = report.result === 'capabilities';
   const { driver, capabilities, serverIncarnation } = report;
-  const anchor = answered && capabilities.length > 0 ? checkAnchorPane(herdrBin, env) : { note: '' };
+  const anchor = answered && capabilities.length > 0 ? anchorVerdict(anchorPane, report.anchorPane) : { note: '' };
   if (anchor.failure) problems.push(`terminal-control driver ${driver} is available, but ${anchor.failure}`);
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
   if (!answered) return { passed: true, message: `warning: terminal-control answered ${report.result}${report.reason ? ` (${report.reason})` : ''}; direct mode is unaffected` };
   if (capabilities.length === 0) {
-    const why = platform === 'win32'
-      ? 'Windows has no herdr build, and terminal-control runs on herdr only'
-      : `herdr is not usable (${herdrBin})`;
+    const why = platform === 'win32' ? 'Windows has no herdr build, and terminal-control runs on herdr only' : `herdr is not usable (${herdrBin})`;
     return { passed: true, message: `warning: terminal mode unsupported: ${why}; direct mode unaffected` };
   }
   const shown = resolved.entries.map(({ name, value, source }) => `${name}=${JSON.stringify(value)} (${source})`).join(', ');
   const summary = `driver ${driver}, ${capabilities.length} capabilities (${capabilities.join(', ')}); ${incarnationText(serverIncarnation)}${anchor.note}; ${shown}`;
-  if (!capabilities.includes('layout.geometry')) {
-    return { passed: true, message: `info: ${summary}; this herdr cannot report pane geometry, so tabs fall back to the fixed split and only maxPanesPerTab applies` };
-  }
+  if (!capabilities.includes('layout.geometry')) return { passed: true, message: `info: ${summary}; this herdr cannot report pane geometry, so tabs fall back to the fixed split and only maxPanesPerTab applies` };
   return { passed: true, message: summary };
 }
 

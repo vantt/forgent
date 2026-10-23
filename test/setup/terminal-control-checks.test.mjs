@@ -189,26 +189,27 @@ test('terminal-control gives an info line, not a failure, when herdr cannot repo
   }
 });
 
-test('terminal-control keeps the FGOS_HERDR_ANCHOR_PANE diagnosis: empty and unresolvable fail, a resolvable pane is verified', { skip: !POSIX }, () => {
-  const anchorHerdr = path.join(scratch, 'herdr-anchor.sh');
-  fs.writeFileSync(anchorHerdr, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = get ]; then\n  if [ "$3" = valid-pane-42 ]; then echo '{"id":"valid-pane-42"}'; exit 0; fi\n  echo 'error: pane not found' >&2; exit 1\nfi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
-  const prevBin = process.env.FGOS_HERDR_BIN;
-  process.env.FGOS_HERDR_BIN = anchorHerdr;
-  try {
-    const empty = controlCheck({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: '   ' } });
-    assert.equal(empty.passed, false);
-    assert.match(empty.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
+test('terminal-control reports the anchor pane the route answers: empty and unresolvable fail, a resolvable pane is verified', { skip: !POSIX }, () => {
+  // The route's answer is the driver's (herdr_driver_fake owns it); this pins how the row reads it.
+  const asked = [];
+  const named = (pane, anchorPane) => controlCheck({
+    env: { FGOS_HERDR_ANCHOR_PANE: pane },
+    createClient: (config, env) => { asked.push(env); return { capabilities: () => ({ ...realClient(config).capabilities(), anchorPane }) }; },
+  });
 
-    const ghost = controlCheck({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: 'ghost-pane-999' } });
-    assert.equal(ghost.passed, false);
-    assert.match(ghost.message, /FGOS_HERDR_ANCHOR_PANE="ghost-pane-999" cannot be resolved/);
+  const empty = named('   ', { state: 'absent' });
+  assert.equal(empty.passed, false);
+  assert.match(empty.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
 
-    const valid = controlCheck({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: 'valid-pane-42' } });
-    assert.equal(valid.passed, true, valid.message);
-    assert.match(valid.message, /anchor pane "valid-pane-42" verified/);
-  } finally {
-    process.env.FGOS_HERDR_BIN = prevBin;
-  }
+  const ghost = named('ghost-pane-999', { state: 'unresolvable', reason: 'pane ghost-pane-999 does not exist' });
+  assert.equal(ghost.passed, false);
+  assert.match(ghost.message, /FGOS_HERDR_ANCHOR_PANE="ghost-pane-999" cannot be resolved: pane ghost-pane-999 does not exist/);
+
+  const valid = named('  valid-pane-42 ', { state: 'resolved' });
+  assert.equal(valid.passed, true, valid.message);
+  assert.match(valid.message, /anchor pane "valid-pane-42" verified/);
+  assert.deepEqual(asked.filter(Boolean), [{ FGOS_HERDR_ANCHOR_PANE: 'ghost-pane-999' }, { FGOS_HERDR_ANCHOR_PANE: 'valid-pane-42' }], 'the trimmed pane rides in the envelope env; an empty one is not sent');
+  assert.equal(controlCheck({ env: {} }).passed, true, 'no variable, no anchor line');
 });
 
 // ---- terminal-allocations ----------------------------------------------

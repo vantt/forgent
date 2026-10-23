@@ -219,7 +219,12 @@ fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, Strin
     Ok(config)
 }
 
-fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
+/// The pane the caller named as its anchor in the envelope's `env`, when it named one.
+fn anchor_pane(envelope: &Value) -> Option<&str> {
+    envelope.pointer("/env/FGOS_HERDR_ANCHOR_PANE").and_then(Value::as_str).map(str::trim).filter(|p| !p.is_empty())
+}
+
+fn dispatch(op: &str, core: &Core, request: &Value, anchor: Option<&str>) -> Result<Answer, String> {
     Ok(match op {
         "allocate" => answer(core.allocate(&whole::<AllocateRequest>(request)?), slot_answer),
         "attach" => {
@@ -298,11 +303,12 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
             answer(core.label(&key, &display), ok_answer)
         }
         "capabilities" => {
-            let report = core.capabilities();
+            let report = core.capabilities(anchor);
             ("capabilities".into(), json!({
                 "driver": report.driver,
                 "capabilities": report.capabilities,
                 "serverIncarnation": report.server_incarnation,
+                "anchorPane": report.anchor_pane,
                 "defaults": defaults(),
                 "policies": POLICY_NAMES,
             }))
@@ -389,7 +395,7 @@ pub fn main(args: &[String]) -> i32 {
     let request = envelope.get("request").cloned().unwrap_or_else(|| json!({}));
     let driver = HerdrDriver::new(herdr);
     let core = Core::new(&driver, policy.as_ref(), config);
-    match dispatch(op, &core, &request) {
+    match dispatch(op, &core, &request, anchor_pane(&envelope)) {
         Ok((result, fields)) => {
             let mut fields = fields;
             // `op` rides next to the result, as the contract's stdout shape says.
@@ -451,6 +457,14 @@ mod tests {
             assert!(refusal.message.starts_with(named), "{}", refusal.message);
         }
         assert!(core_config(&json!({ "config": { "minCols": 40, "minRows": 8 } })).is_ok(), "the floor itself is allowed");
+    }
+
+    #[test]
+    fn the_anchor_pane_comes_from_the_envelope_env_only() {
+        assert_eq!(anchor_pane(&json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": " w1:p2 " } })), Some("w1:p2"));
+        for none in [json!({}), json!({ "env": {} }), json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": "  " } }), json!({ "request": { "anchorPane": "w1:p2" } })] {
+            assert_eq!(anchor_pane(&none), None, "{none}");
+        }
     }
 
     #[test]
