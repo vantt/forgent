@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 const root=process.cwd(), plan='plans/260925-documentation-authority-unification';
-const scratch='/tmp/fgos-work/w2-g0fix-brief/extractors';
+const scratch='/tmp/fgos-work/w3-ledger-fix-brief/extractors';
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const input=JSON.parse(fs.readFileSync(0,'utf8'));
 const recipes=[['step10-round5-reproduction.json','scripts','step10-sync287-lib.mjs'],['step10-sync4d-reproduction.json','readOnlyScripts','lib.mjs']];
@@ -30,7 +30,9 @@ for(const [i,v] of (input.virtual??[]).entries()){
  catalog[v.path]={fileSha256:sha(v.content),units:a};
 }
 const bindingDigests=(input.bindingRows??[]).map(row=>{
- const keys=['targetOwner','targetAnchor','targetUnitDigest','targetAncestry'].sort();
- return sha(JSON.stringify(Object.fromEntries(keys.map(k=>[k,row[k]??null])))+'\n');
+ const payload=Object.fromEntries(['targetOwner','targetAnchor','targetUnitDigest','targetAncestry'].map(k=>[k,row[k]??null]));
+ if(row.targetAnchor==null&&(row.successorGroup||row.successorGroupMemberDigests)){payload.successorGroupMemberDigests=row.successorGroup?row.successorGroup.members.map(m=>m.unitDigest).sort():row.successorGroupMemberDigests;}
+ const keys=Object.keys(payload).sort();
+ return sha(JSON.stringify(Object.fromEntries(keys.map(k=>[k,payload[k]])))+'\n');
 });
 console.log(JSON.stringify({root,extractors:proofs,catalog,bindingDigests}));

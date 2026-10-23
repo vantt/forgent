@@ -1,6 +1,6 @@
 # Binding Hash And Residual Repair Receipt
 
-Status: **All scoped repairs applied and locally replayed; independent review pending.** No G0/G7/G9 approval or gate closure is asserted.
+Status: **Superseded authoring receipt; independent review pending.** The current HEAD proof and recipe migration are [ledgerfix/receipt.md](../ledgerfix/receipt.md), [verification.json](../ledgerfix/verification.json) and [recipe-migration.json](../ledgerfix/recipe-migration.json). The counts and original transitions below describe the earlier continuation, not current target bytes. No G0/G7/G9 approval or gate closure is asserted.
 
 Original authoring pin: `cffe725b948f5a695728c8da08f114e7e97075d6`. Continuation input: `a27d85d0a`; its pilot write restriction was explicitly lifted by the new assignment.
 
@@ -42,13 +42,13 @@ The prior runner RUL77–RUL97 rebinds, provider-capacity/two-line and pointer/s
 
 ## Historical Evidence And Current State
 
-The original `binding-proofs.json`, `binding-repairs.json`, `record-edits.json` and residual artifact retain their authoring-pin evidence. In particular, `outOfScopeProposalOnly=true` in residual row 14 describes the **old** scope restriction, not today's live state. Its bytes are retained so every existing residual reference remains valid.
+The original `binding-proofs.json`, `binding-repairs.json` and `record-edits.json` retain their authoring-pin evidence. The ledger-fix follow-up refreshes the residual artifact at current bytes and sets row 14 `outOfScopeProposalOnly=false`: the pilot binding is live, not a proposal. All 15 residual file-hash references and remainder citations are refreshed together.
 
 `needs-writes.json` now records resolution and the exact applied delta. The verifier authenticates the original pilot placement, replaces only that effective proof with the already-authored candidate placement in `binding-repairs.json`, and checks **every residual against the live decision record**. There is no proposal fallback. Original ledger edit evidence plus the two explicitly recorded pilot edits must reconstruct the complete current shards exactly.
 
-The one hash recipe remains SHA-256 of UTF-8, sorted-key compact JSON plus exactly one LF, containing exactly `{targetOwner,targetAnchor,targetUnitDigest,targetAncestry}`. Missing values encode as null; Unicode is not ASCII-escaped; arrays retain order. `successorGroup` is excluded, so group members are authenticated separately. D1's existing heading ancestry convention is preserved and checked explicitly.
+The final recipe is declared in `step-08-preflip-gates.json#bindingHashEncoding`: UTF-8 sorted-key compact JSON plus one LF; individuals contain `{targetOwner,targetAnchor,targetUnitDigest,targetAncestry}`. Ancestry is self-inclusive, including the heading's own title. Null-anchor groups add `successorGroupMemberDigests`, sorted with duplicate digests retained, so their hashes bind content. Members are also authenticated against current bytes. Parents-only ancestry is rejected.
 
-The credential-store binding remains the conditional after-state of `carry:credential-store-setup` after its named predecessor, not an applied live candidate unit. Final-pin application and independent delta review remain owed.
+The credential-store binding now resolves through the later applied current-holder overlay in `s14-resync-b.json`; its obsolete conditional `targetComposition` is removed from the live row and gate projection. The old composed-patch proof remains historical. Current full-unit/placement checks replace that conditional branch; independent delta review remains owed.
 
 ## Reproduce And Limits
 
@@ -56,6 +56,6 @@ The credential-store binding remains the conditional after-state of `carry:crede
 python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g0fix/verify.py
 ```
 
-The verifier writes scratch files only under `/tmp/fgos-work/w2-g0fix-brief/`. Compare stdout with `verification-result.json`. Full earlier commands and preparation-only correction history remain available in `receipt.json` at `a27d85d0a`; the continuation did not rerun the historical preparer.
+This entry point now delegates to the single current `ledgerfix/verify.py` proof, which checks HEAD's working tree, complete residual accounting, strict ancestry, group content and all stored hashes. Compare stdout with `../ledgerfix/verification.json`. Historical extractor scratch remains under `/tmp/fgos-work/w2-g0fix-brief/`; new authoring/replay scratch is under `/tmp/fgos-work/w3-ledger-fix-brief/`. Full earlier commands and preparation-only correction history remain available in `receipt.json` at `a27d85d0a`.
 
 No Git mutation, fgOS CLI, Work lifecycle verb, live state/secrets, activation, lease, pair accounting, owner-answer/progress/gate-status write or candidate-doc application occurred. No Node test file, full suite or Cargo workspace test ran; the brief prohibits full-suite commands and this change is records-only. `impact-analysis: degraded` under the no-CLI boundary; no production symbol changed. Browser preview/services were not launched because they could write outside the exact writable scope.

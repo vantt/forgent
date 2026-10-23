@@ -1,26 +1,27 @@
 {
   "status": "pass",
+  "evaluatedHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
   "sourceUnits": 1057,
   "refreshedBindings": 1271,
   "bindingsVerified": 2328,
   "fullPlacementWitnesses": 2328,
   "registrations": {
-    "Check": 135,
+    "Check": 143,
     "Fix": 32
   },
   "incomingLinks": 6,
-  "protectedSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+  "protectedSha256": "bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238",
   "authority": "candidate-only; no gate accepted",
   "drift": {
     "scanner": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
-    "scannerSha256": "1d808194e878e34e1cf0cbbe057c14d6c3262ecfae9d305393622518305c96e7",
-    "redirectedScannerSha256": "3eb38e5f9952874e7081d16b39b73ace680789f8b06b5d6209381d50fd862aba",
+    "scannerSha256": "b279de8381d4575ceee6f3bb0fda881a732878c39cea3baa2680949b214af5d8",
+    "redirectedScannerSha256": "9f344c0348453995bd5fc5a4f634960f96e6c17c700ef7fd0dc6edcaf5af176d",
     "modifications": [
       "absolute extractor import",
       "repository root",
       "scratch destination only"
     ],
-    "sourceHead": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+    "sourceHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
     "counts": [
       {
         "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
@@ -59,8 +60,8 @@
         "missingChangedSinceFinal": 0
       }
     ],
-    "fullScratchResult": "/tmp/fgos-work/w2-d1b/legacy-drift.json",
-    "fullResultSha256": "97d1d5f76a0b572d76a3a091d8e5d731704572b8bf4e7a37d461cef437b7d264",
+    "fullScratchResult": "/tmp/fgos-work/w3-ledger-fix-brief/resync/legacy-drift.json",
+    "fullResultSha256": "c332015dc36d0c76efcd9b58e06a546525b066839633b2b57a2bbdf70055e9d3",
     "otherSourcesNotClaimed": true
   }
 }

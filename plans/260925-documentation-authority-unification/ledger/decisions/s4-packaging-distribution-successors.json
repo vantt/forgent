@@ -624,13 +624,13 @@
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/0; file SHA256 2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f; residual SHA256 fb8094f747ba7323abdea0a2ce2e3a042671a348ff90cb84d4d6f9ac202f4b7b; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-36 SHA256 16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/0; file SHA256 5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c; residual SHA256 fb8094f747ba7323abdea0a2ce2e3a042671a348ff90cb84d4d6f9ac202f4b7b; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-36 SHA256 e41c078251321be786e2a9fae423f78776a8eb39d2d6ed5465d8cba377b58e1a. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
       "residualRef": {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
         "row": 0,
-        "fileSha256": "2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f",
+        "fileSha256": "5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c",
         "residualSha256": "fb8094f747ba7323abdea0a2ce2e3a042671a348ff90cb84d4d6f9ac202f4b7b",
-        "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
+        "targetUnitDigest": "e41c078251321be786e2a9fae423f78776a8eb39d2d6ed5465d8cba377b58e1a",
         "A34Accepted": false
       },
       "bindingSha256": "4d8b1d6af3e73e65ee861b4a45462234ed12817fe0782b5912f31de1f8396dbf",

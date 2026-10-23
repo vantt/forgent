@@ -1,20 +1,21 @@
 """Independent sorted-JSON + LF check; run with python3 -B. No writes."""
-import hashlib
 import json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'ledgerfix'))
+from bindings import digest, head
 
 base = Path('plans/260925-documentation-authority-unification')
 receipt = json.loads((base / 'reports/phase-09/resync-a/binding-refresh.json').read_text())
 source = json.loads((base / 'ledger/decisions/s13-resync-a.json').read_text())
-keys = ['targetOwner', 'targetAnchor', 'targetUnitDigest', 'targetAncestry']
 checked = 0
+evaluated_head = head()
 
 
 def check(row):
     global checked
-    payload = json.dumps({k: row[k] for k in keys}, sort_keys=True,
-                         ensure_ascii=False, separators=(',', ':')) + '\n'
-    actual = hashlib.sha256(payload.encode('utf-8')).hexdigest()
+    actual = digest(row)
     assert actual == row['bindingSha256'], (row['targetOwner'], row['targetAnchor'])
     checked += 1
 
@@ -27,5 +28,6 @@ for refresh in receipt['refresh']:
     check(current)
 for binding in source['sourceBindings']:
     check(binding)
-print(json.dumps({'status': 'pass', 'bindingsVerified': checked,
-                  'recipe': 'Python json.dumps sort_keys=True, ensure_ascii=False, compact separators, UTF-8, one LF'}, indent=2))
+assert head() == evaluated_head, 'HEAD moved during replay'
+print(json.dumps({'status': 'pass', 'evaluatedHead': evaluated_head, 'bindingsVerified': checked,
+                  'recipeSource': str(base / 'reports/phase-08/step-08-preflip-gates.json') + '#bindingHashEncoding'}, indent=2))

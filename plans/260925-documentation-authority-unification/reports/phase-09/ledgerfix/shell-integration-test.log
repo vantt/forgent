@@ -1,0 +1,32 @@
+✔ fgos resolves and invokes bin/fgos.mjs from the repo root (3894.175006ms)
+✔ fgos-runner resolves and invokes bin/fgos-runner.mjs from the repo root (119.98049ms)
+✔ fgos and fgos-runner still resolve and invoke correctly even when a leading-underscore helper function gets stripped from the shell (tsk-3k2: this is what a harness shell-function snapshot did in practice, reproduced live as "fgos:2: command not found: _fgos_repo_root") (270.483799ms)
+✔ from inside a linked worktree, fgos resolves to the MAIN checkout bin/fgos.mjs, not the worktree-local copy (430.50314ms)
+✔ the root is read from the .git layout on disk: from a nested directory of a linked worktree whose .git file names its gitdir relatively, bash and zsh both resolve the main checkout, exactly as git reports its common dir (638.062859ms)
+✔ a .git file that names no gitdir is not a repository: fgos and fgos-runner fail quietly with the not-a-git-repository error (39.402807ms)
+✔ fgos returns non-zero and prints an error to stderr outside any git repo (24.778136ms)
+✔ fgos-runner returns non-zero and prints an error to stderr outside any git repo (25.552075ms)
+✔ fgos resolves tier 2 (project-local node_modules/.bin/fgos) when the resolved root has no bin/fgos.mjs and no PATH install exists (347.272526ms)
+✔ fgos-runner resolves tier 2 (project-local node_modules/.bin/fgos-runner) the same way (86.971217ms)
+✔ fgos tier 2 walks up from a nested cwd to find node_modules/.bin/fgos at the repo root (106.648455ms)
+✔ fgos resolves tier 3 from the config-cache (bin.globalFgosPath) without shelling out to a live PATH lookup (120.117684ms)
+✔ fgos self-heals past a stale config-cache entry (cached path no longer exists on disk) by falling back to a live PATH probe (101.98996ms)
+✔ fgos falls back to a real PATH install when the resolved root has no bin/fgos.mjs (93.156629ms)
+✔ fgos-runner falls back to a real PATH install when the resolved root has no bin/fgos-runner.mjs (86.052899ms)
+✔ fgos falls back to a real PATH install under zsh, not just bash (regression: `type -P` is bash-only and silently breaks this branch under zsh) (78.911908ms)
+✔ fgos-runner falls back to a real PATH install under zsh, not just bash (87.201905ms)
+✔ fgos prints a clear error, not a raw Node stack, when the resolved root has no bin/fgos.mjs and no PATH install exists (4064.298681ms)
+✔ fgos auto-appends --dir "$root" when caller omits --dir (172.614186ms)
+✔ fgos preserves explicit --dir without overriding it (263.967649ms)
+✔ fgos prefers tier 0 (.fgos/installation/bin/fgos) over bin/fgos.mjs when executable (76.244904ms)
+✔ fgos tier 0 preserves explicit --dir (82.842104ms)
+✔ fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos exists but is not executable (159.212589ms)
+✔ fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos is a symlink escaping the installation root (173.645608ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11788.906896

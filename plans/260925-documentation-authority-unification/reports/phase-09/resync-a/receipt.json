@@ -7,27 +7,28 @@
   "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w2-d1b-brief.md",
   "verification": {
     "status": "pass",
+    "evaluatedHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
     "sourceUnits": 1057,
     "refreshedBindings": 1271,
     "bindingsVerified": 2328,
     "fullPlacementWitnesses": 2328,
     "registrations": {
-      "Check": 135,
+      "Check": 143,
       "Fix": 32
     },
     "incomingLinks": 6,
-    "protectedSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+    "protectedSha256": "bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238",
     "authority": "candidate-only; no gate accepted",
     "drift": {
       "scanner": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
-      "scannerSha256": "1d808194e878e34e1cf0cbbe057c14d6c3262ecfae9d305393622518305c96e7",
-      "redirectedScannerSha256": "3eb38e5f9952874e7081d16b39b73ace680789f8b06b5d6209381d50fd862aba",
+      "scannerSha256": "b279de8381d4575ceee6f3bb0fda881a732878c39cea3baa2680949b214af5d8",
+      "redirectedScannerSha256": "9f344c0348453995bd5fc5a4f634960f96e6c17c700ef7fd0dc6edcaf5af176d",
       "modifications": [
         "absolute extractor import",
         "repository root",
         "scratch destination only"
       ],
-      "sourceHead": "ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5",
+      "sourceHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
       "counts": [
         {
           "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
@@ -66,15 +67,16 @@
           "missingChangedSinceFinal": 0
         }
       ],
-      "fullScratchResult": "/tmp/fgos-work/w2-d1b/legacy-drift.json",
-      "fullResultSha256": "97d1d5f76a0b572d76a3a091d8e5d731704572b8bf4e7a37d461cef437b7d264",
+      "fullScratchResult": "/tmp/fgos-work/w3-ledger-fix-brief/resync/legacy-drift.json",
+      "fullResultSha256": "c332015dc36d0c76efcd9b58e06a546525b066839633b2b57a2bbdf70055e9d3",
       "otherSourcesNotClaimed": true
     }
   },
   "independentPython": {
     "status": "pass",
+    "evaluatedHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
     "bindingsVerified": 2328,
-    "recipe": "Python json.dumps sort_keys=True, ensure_ascii=False, compact separators, UTF-8, one LF"
+    "recipeSource": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#bindingHashEncoding"
   },
   "sourceUnitDispositions": {
     "current-source-content-present": 968,
@@ -338,5 +340,14 @@
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/write-receipt.mjs",
       "sha256": "7f9c40b062009da8f9f647bf9f77f4987682ea1501b98b8788fe85545f5b6596"
     }
-  ]
+  ],
+  "bindingHashEncodingSource": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#bindingHashEncoding",
+  "followup": {
+    "sourceHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
+    "receipt": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/receipt.json",
+    "registryCountCorrection": "143 checks = 135 literal + 8 loop-registered Git IDs; 32 fixes. The original 135-check equality claim was wrong.",
+    "shellDiscoveryCorrection": "Shell helper reads gitdir/commondir layout from disk with no Git child; rev-parse is the test oracle only.",
+    "historicalCarrierCorrection": "Historical source section 552ef3d6 is exact legacy direct-section bytes, not current truth.",
+    "fileManifestQualification": "The files manifest below records the original D1b authoring output, not current bytes. Current migration and verifiers own follow-up evidence."
+  }
 }

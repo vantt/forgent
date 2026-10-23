@@ -825,7 +825,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
       "reviewNote": "Authorized pilot continuation: candidate content-and-neighbour rebind and refreshed residual; independent review pending, no approval carry.",
-      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/14; file SHA256 2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f; residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957; source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/14; file SHA256 5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c; residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957; source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
       "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
       "targetAncestry": [
         "CLI I/O Contract",
@@ -835,7 +835,7 @@
       "residualRef": {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
         "row": 14,
-        "fileSha256": "2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f",
+        "fileSha256": "5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c",
         "residualSha256": "b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957",
         "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
         "A34Accepted": false

@@ -1,5 +1,6 @@
 {
   "status": "pass",
+  "evaluatedHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
   "bindingsVerified": 2328,
-  "recipe": "Python json.dumps sort_keys=True, ensure_ascii=False, compact separators, UTF-8, one LF"
+  "recipeSource": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#bindingHashEncoding"
 }

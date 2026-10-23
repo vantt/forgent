@@ -2,7 +2,9 @@
 
 Status: completed within the brief's writable scope; candidate-only. No gate accepted, legacy source retired, authority flipped, lifecycle verb run, or repository git write performed.
 
-Source HEAD: `ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5`.
+Original source HEAD: `ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5`.
+
+Follow-up at HEAD `7bd1293af0704f66c0a5a158024577eac94bdd21`: [ledger-fix receipt](../ledgerfix/receipt.md) supersedes the original registration-count, shell-discovery and fenced-carrier claims below. Current verification reads HEAD's working tree, not that original authoring pin; the historical binding-refresh `before` inputs remain unchanged.
 
 ## Read first / proof
 
@@ -14,12 +16,12 @@ Source HEAD: `ae9b9a6ef59ccfc3ce199e1492a5ebc8aaf7a5f5`.
 
 | Review duty | Resolution |
 |---|---|
-| Release-manifest duplicate §5 and dead link | One retained §5 under Canonical Release Tree Rules; removed the second 135-line copy and rebased Legacy CLI Transition. |
+| Release-manifest duplicate §5 and dead link | One retained §5 under Canonical Release Tree Rules; removed the second 135-line copy. Follow-up fixes the retained Legacy CLI Transition link to `host-invocation-routing/architecture/legacy-cli-transition.md`. |
 | Activation-binding duplicate pipeline / walking skeleton | One holder in runtime-identity architecture §11/§14; activation contract links there. Static-preflight qualification is preserved, as are the install-lock/native-first corrections. |
 | Distribution Legacy Setup Scenario duplicate | Spec now points to the complete scenario in setup-doctor-registry. The scenario is not lost. The side-effect enumeration also includes `<stateRoot>/terminal`. |
-| Data Dictionary 7/7b | Exact literal registration sets: **135 checks / 32 fixes** from `src/setup/registrations.mjs`. Removed retired `model-policy-tier-coverage`; retained relevant explanatory prose. Also caught omitted `identity-machine-id` fix beyond the review's listed omissions. |
+| Data Dictionary 7/7b | Complete registration sets: **143 checks / 32 fixes** from `src/setup/registrations.mjs` (135 literal check IDs plus eight loop-registered Git IDs). The original 135-check claim missed the loop and was incorrect. Removed retired `model-policy-tier-coverage`; retained relevant explanatory prose. Also caught omitted `identity-machine-id` fix beyond the review's listed omissions. |
 | Six incoming retired-history fragments | Explicit compatibility anchors for ADR0011/0012/0013 fix all four architecture-map and both CLI-contract links without editing architecture-map. Repaired the internal 0012 link; restored clickable Related Files. |
-| Activation implementation fact | Shell integration uses `git rev-parse --path-format=absolute --git-common-dir`; Rust workspace resolution uses `fgos_git::GitDriver::open_at` and typed topology. No false shell-exec claim about workspace.rs. |
+| Activation implementation fact | Shell integration reads `.git`/gitdir/commondir layout from disk without a Git child; only its test uses `git rev-parse` as an oracle. Rust workspace resolution uses `fgos_git::GitDriver::open_at` and typed topology. |
 | Two bad citations | Replaced nonexistent return-worktree test citation with the real research origin; Seat Binding links to the now-existing platform specification. |
 | Receipt encoding sentence | Corrected below, without rewriting a historical receipt outside this brief's writable list. |
 
@@ -29,14 +31,14 @@ The sentence in `carries/receipt.md:65` saying the frozen register has **no `bin
 
 This receipt supplies the correction; the original historical receipt and phase-08 register were not edited. No other owner's binding encoding was silently converted.
 
-Every new/rebound effective binding uses SHA-256 of UTF-8 compact JSON, keys sorted by the serializer, plus **exactly one LF**, with only these keys:
+Individual bindings use SHA-256 of UTF-8 compact JSON, keys sorted by the serializer, plus **exactly one LF**, with these keys (the final recipe adds a sorted member-digest list for group rows, as declared in [the gate register](../../phase-08/step-08-preflip-gates.json)):
 
 1. `targetAncestry`
 2. `targetAnchor`
 3. `targetOwner`
 4. `targetUnitDigest`
 
-Array order is retained; no BOM; no placement/review fields enter the hash. `verify-binding-hashes.py` independently recomputes this using Python's `sort_keys=True`, `ensure_ascii=False`, and compact separators. This catches serialization-order mistakes independently of the Node writer/verifier.
+Ancestry is self-inclusive, including a heading's own title. Array order is retained except the group digest list, which is sorted with duplicates retained; no BOM; no placement/review fields enter the hash. `verify-binding-hashes.py` independently recomputes this using Python's `sort_keys=True`, `ensure_ascii=False`, and compact separators. This catches serialization-order mistakes independently of the Node writer/verifier.
 
 ## Re-sync and conservation
 
@@ -74,6 +76,6 @@ python3 -B plans/260925-documentation-authority-unification/reports/phase-09/res
 - `git diff --check`: pass. No broad suite, Cargo workspace suite, setup/doctor/lifecycle action, or fgOS CLI against this repository was run. Fixture git writes were confined to the permitted `/tmp` test roots. The attempted inventory test also populated ignored native build caches through its existing helper; no tracked out-of-scope file changed.
 - Impact-analysis was not queried: the brief prohibits fgOS CLI calls against this repository, and no GitNexus tool is exposed in this worker. This is documentation/artifact work, not product-symbol editing; no blast-radius proof is claimed.
 
-`contracts/knowledge-registry.md` is untouched (SHA-256 `5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630`). No additional writable paths are requested. Independent review, cross-owner frozen-register projections and any gate/cutover acceptance remain with their owners.
+`contracts/knowledge-registry.md` is untouched relative to this follow-up's HEAD (SHA-256 `bd3c632640e5f26b23bdc84af29d44a6d564b6e6cbc84d4f7f140250e9379238`; its older author-pin hash was `5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630`). No additional writable paths are requested. Independent review, cross-owner frozen-register projections and any gate/cutover acceptance remain with their owners.
 
 The render/rebind scripts are authoring provenance, not the verification entry point. The carrier renderer is deliberately one-shot; use the two read-only replay commands above. No preview service was started under this restricted write scope.

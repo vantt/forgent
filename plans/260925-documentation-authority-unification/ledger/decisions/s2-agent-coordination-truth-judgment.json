@@ -8908,9 +8908,10 @@
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
       "targetUnitDigest": "b5288b6f94225cb832fcd635d42e51face82e815ebdbb0b6f196bc7d285a7b12",
       "targetAncestry": [
-        "Agent Coordination Foundation Vision"
+        "Agent Coordination Foundation Vision",
+        "Open Design Questions Under This Vision"
       ],
-      "bindingSha256": "e5cafdc99ae55a848359c2ec7ae314e846b6f7c1b275a3483cf594a053335ffc"
+      "bindingSha256": "60258c57535838b873ceb9b92395fdcf65ab9e41118c5086e875654b6b02b252"
     },
     {
       "claimId": "claim_ee6b9f0f588bbebae2e0b21f860de343",

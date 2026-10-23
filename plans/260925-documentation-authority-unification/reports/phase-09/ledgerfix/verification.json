@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "evaluatedHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
+  "evaluation": "current working-tree bytes at HEAD, not authoring pin targets",
+  "ledgerRowsRecomputed": 13560,
+  "storedBindingHashesVerified": 5001,
+  "currentStoredBindingsVerified": 4449,
+  "historicalBindingsResolvedByExplicitOverlay": 552,
+  "changedBindingsVerified": 257,
+  "groupRowsContentBound": 16,
+  "fullPlacementWitnessesVerified": 2505,
+  "nativeIdentityGapInputsVerified": 9,
+  "residualsVerified": 15,
+  "partialCarriesSwept": 27,
+  "authenticatedHistoricalSources": 18,
+  "dualExtractorAgreement": true,
+  "independentNodePythonHashes": true,
+  "hashMismatches": 0,
+  "currentTargetMismatches": 0,
+  "negativeProbesRejected": [
+    "legacy spaced JSON without LF recipe",
+    "parents-only heading ancestry even with a recomputed hash",
+    "changed group member digest changes binding hash",
+    "changed group member content is rejected",
+    "removed duplicate group member changes hash",
+    "stale live digest",
+    "wrong immediate neighbour",
+    "omitted residual source line",
+    "stale pilot residual target"
+  ],
+  "hashIndependentOverlayJoin": true,
+  "independentReview": "pending; no gate acceptance"
+}

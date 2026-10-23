@@ -11,7 +11,10 @@
     "continuationPilotEdits": "needs-writes.json#/appliedRecord and /additionalHashOnlyApplied",
     "continuationPilotRecordEditCount": 2,
     "continuationDecisionShard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
-    "registerFieldsOnly": ["changedBindings", "bindingHashEncoding"],
+    "registerFieldsOnly": [
+      "changedBindings",
+      "bindingHashEncoding"
+    ],
     "otherRegisterBytesUnchanged": true,
     "candidateDocsApplied": false,
     "reviewStatus": "pending; no approval carry"
@@ -36,7 +39,10 @@
     "originalLedgerIdList": "record-edits.json#/rows/*/id",
     "completeRegisterIdList": "recipe-migration.json#/rows/*/id",
     "completeResidualIdList": "partial-carry-residuals.json#/rows/*/id",
-    "continuation": ["claim_f5365b8e40fb58c75adc56a574263242", "claim_57f11d837272b3f9781b376ef1665c81"]
+    "continuation": [
+      "claim_f5365b8e40fb58c75adc56a574263242",
+      "claim_57f11d837272b3f9781b376ef1665c81"
+    ]
   },
   "reuse": [
     "Both unchanged frozen unitsOf extractors and the original authoring-pin witnesses",
@@ -45,16 +51,54 @@
     "Original ledger record edits, historical Git objects, and current credential carriage composition chain"
   ],
   "commands": [
-    {"command": "git status --short; git log -3 --oneline; read-only git log -S and git show", "exit": 0, "purpose": "Scope, prior art and immutable input authentication; no Git mutation"},
-    {"command": "First baseline stdout redirect before creating scratch directory", "exit": 1, "result": "No verifier ran and no repository file changed; created the permitted scratch directory and reran"},
-    {"command": "python3 -B <g0fix>/verify.py (baseline)", "exit": 0, "result": "Previous scoped replay confirmed the outstanding pilot blocker"},
-    {"command": "python3 -B <g0fix>/verify.py (first continuation pair); cmp", "exit": 0, "result": "Both replay outputs agreed; subsequent git diff --check found one trailing space in the authored verifier, corrected before final replay"},
-    {"command": "python3 -B <g0fix>/verify.py (final continuation run 1)", "exit": 0, "result": "All 257 live bindings agree; 0 pilot hash gaps; 0 needsWrites; 6 negative probes reject"},
-    {"command": "python3 -B <g0fix>/verify.py (final continuation run 2)", "exit": 0, "result": "Same result"},
-    {"command": "cmp /tmp/fgos-work/w2-g0fix-brief/continuation-{1,2}.json", "exit": 0, "result": "Byte-identical replay outputs"},
-    {"command": "patch --batch --fuzz=0 -p1 (two forward/rollback pairs per replay, disposable scratch)", "exit": 0, "result": "Whole-file SHA preimages/after-images and exact rollback verified"},
-    {"command": "git diff --check", "exit": 0},
-    {"command": "Read-only changed-path, unchanged-index and frozen-register scope assertions", "exit": 0}
+    {
+      "command": "git status --short; git log -3 --oneline; read-only git log -S and git show",
+      "exit": 0,
+      "purpose": "Scope, prior art and immutable input authentication; no Git mutation"
+    },
+    {
+      "command": "First baseline stdout redirect before creating scratch directory",
+      "exit": 1,
+      "result": "No verifier ran and no repository file changed; created the permitted scratch directory and reran"
+    },
+    {
+      "command": "python3 -B <g0fix>/verify.py (baseline)",
+      "exit": 0,
+      "result": "Previous scoped replay confirmed the outstanding pilot blocker"
+    },
+    {
+      "command": "python3 -B <g0fix>/verify.py (first continuation pair); cmp",
+      "exit": 0,
+      "result": "Both replay outputs agreed; subsequent git diff --check found one trailing space in the authored verifier, corrected before final replay"
+    },
+    {
+      "command": "python3 -B <g0fix>/verify.py (final continuation run 1)",
+      "exit": 0,
+      "result": "All 257 live bindings agree; 0 pilot hash gaps; 0 needsWrites; 6 negative probes reject"
+    },
+    {
+      "command": "python3 -B <g0fix>/verify.py (final continuation run 2)",
+      "exit": 0,
+      "result": "Same result"
+    },
+    {
+      "command": "cmp /tmp/fgos-work/w2-g0fix-brief/continuation-{1,2}.json",
+      "exit": 0,
+      "result": "Byte-identical replay outputs"
+    },
+    {
+      "command": "patch --batch --fuzz=0 -p1 (two forward/rollback pairs per replay, disposable scratch)",
+      "exit": 0,
+      "result": "Whole-file SHA preimages/after-images and exact rollback verified"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    {
+      "command": "Read-only changed-path, unchanged-index and frozen-register scope assertions",
+      "exit": 0
+    }
   ],
   "proofs": {
     "result": "verification-result.json",
@@ -95,5 +139,12 @@
     "verification-result.json": "8d57dc9030337c6c7e70da34600f444102e3d6f2271f0b61acfd496ece52263c",
     "verify.py": "24ec9447a72a8eced1c4980411477e5cc6e6a91c798fe8bc2a28463d93f26b5f"
   },
-  "independentAcceptance": false
+  "independentAcceptance": false,
+  "currentReplay": {
+    "sourceHead": "7bd1293af0704f66c0a5a158024577eac94bdd21",
+    "receipt": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/receipt.json",
+    "verification": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/verification.json",
+    "recipeMigration": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/recipe-migration.json",
+    "qualification": "Earlier receipt fields are historical continuation evidence. Current verifier reads HEAD, rejects parents-only ancestry, content-binds groups and verifies live residual row 14 with outOfScopeProposalOnly=false."
+  }
 }

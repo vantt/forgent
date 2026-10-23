@@ -92,10 +92,11 @@
       "targetUnitDigest": "7b8d6f910b416f05bc1a72a0c7e2dbb9b2457a52f89afea674fd93391f5d15b8",
       "targetAncestry": [
         "Observe Component Specification",
-        "1. Overview & Boundaries"
+        "1. Overview & Boundaries",
+        "Owns"
       ],
       "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "d421f24fa1ab9a8e0e2f560f81d20aa4d77cb002ae313e0cc0e706684f5013c0"
+      "bindingSha256": "a3a55a8da717217a6a55524f20c058552a5896c4e53a69be22a0b180c9a63a36"
     },
     {
       "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
@@ -398,7 +399,7 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry. W2 G0 correction: Use the candidate Owns block used by the native current-source sibling, retaining every historical changed source line in the refreshed residual. Full content and immediate neighbours: reports/phase-09/g0fix/binding-repairs.json. Historical prose above is not the current binding. Independent review pending; no approval carry. W2 partial-carry sweep refreshes the current-target-bound residual; complete verbatim line coverage and its historical source witness are in g0fix/partial-carry-residuals.json. Prior acceptance does not cover the changed target/residual.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/2; file SHA256 2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f; residual SHA256 1ba928f090a4e4ae56a4ba5796d2d9f181ecd18efecfa71bbcd260ba36abf970; source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target docs/platform/observe/spec.md#unheaded-block-5 SHA256 324fe8aa7e192344d1fef8804f9933cc1fc4707642443dd8fa9802400782ad23. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/2; file SHA256 5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c; residual SHA256 1ba928f090a4e4ae56a4ba5796d2d9f181ecd18efecfa71bbcd260ba36abf970; source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target docs/platform/observe/spec.md#unheaded-block-5 SHA256 324fe8aa7e192344d1fef8804f9933cc1fc4707642443dd8fa9802400782ad23. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
       "targetUnitDigest": "324fe8aa7e192344d1fef8804f9933cc1fc4707642443dd8fa9802400782ad23",
       "targetAncestry": [
         "Observe Component Specification",
@@ -409,7 +410,7 @@
       "residualRef": {
         "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
         "row": 2,
-        "fileSha256": "2e0ff11ffcc52e93b97d32e5bc310a9fc9f28c2009b26587f324b95fbab6b41f",
+        "fileSha256": "5e360c9c521cae0bfc207433bb7b96422d3606d21a4ddeed9528c2973568e20c",
         "residualSha256": "1ba928f090a4e4ae56a4ba5796d2d9f181ecd18efecfa71bbcd260ba36abf970",
         "targetUnitDigest": "324fe8aa7e192344d1fef8804f9933cc1fc4707642443dd8fa9802400782ad23",
         "A34Accepted": false
