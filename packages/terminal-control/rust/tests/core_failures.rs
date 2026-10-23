@@ -17,7 +17,6 @@ fn launch_spec() -> LaunchSpec {
         args: vec!["30".into()],
         cwd: "/tmp".into(),
         env: Default::default(),
-        activity: None,
         expect: None,
     }
 }
@@ -161,7 +160,8 @@ fn a_close_across_an_incarnation_change_is_kept_unknown() {
 }
 
 #[test]
-fn retain_closes_only_past_until_on_the_same_incarnation() {
+fn a_scan_reports_an_expired_retained_pane_with_its_pane_id_and_closes_nothing() {
+    // Doctor's scan only observes: a person closes the pane, so the finding must say which one.
     let driver = MemDriver::new(352, 69);
     let root = state_dir("retain");
     let now = Cell::new(1_000u64);
@@ -177,7 +177,13 @@ fn retain_closes_only_past_until_on_the_same_incarnation() {
     now.set(6_000);
     let findings = core.reconcile_scan(0).unwrap();
     assert_eq!(findings[0].kind, FindingKind::RetainExpired);
-    assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
+    assert!(
+        findings[0].detail.contains(&slot.pane_id),
+        "the finding names the pane to close: {:?}",
+        findings[0].detail
+    );
+    assert!(driver.calls("pane.close").is_empty(), "a scan never closes");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
 #[test]
@@ -228,8 +234,8 @@ fn send_and_read_reach_the_pane_of_the_key() {
     assert!(matches!(core.send("a", Some("late"), None, false).unwrap(), SendOutcome::ForegroundNotAgent { reason } if reason.contains("no live process")));
     assert_eq!(driver.calls("send.").len(), 2);
     assert_eq!(core.read("a", None, None).unwrap(), format!("screen of {}", slot.pane_id));
-    core.label("a", &Display { label: "new".into(), ..Display::default() }, None).unwrap();
-    assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} new", slot.pane_id)]);
+    core.label("a", &Display { title: Some("new".into()), ..Display::default() }).unwrap();
+    assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", slot.pane_id), format!("label.pane {} new", slot.pane_id)]);
 }
 
 #[test]
@@ -249,7 +255,7 @@ fn close_after_retain_does_not_pretend_to_close() {
     core.allocate(&request("a", "g")).unwrap();
     core.release("a", Disposition::Retain, Some(1)).unwrap();
     let out = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(out, ReleaseOutcome::KeptUnknown { .. }), "{out:?}");
+    assert!(matches!(&out, ReleaseOutcome::KeptUnknown { reason } if reason.contains("reported for a person to close")), "the refusal says who closes it: {out:?}");
     assert!(driver.calls("pane.close").is_empty());
 }
 
@@ -258,6 +264,7 @@ fn the_core_never_launches_into_an_attached_or_released_slot() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("launch-guards"));
     let own = core.allocate(&request("own", "g")).unwrap().slot;
+    run_caller_in(&driver, &own.pane_id);
     core.attach("att", &own.pane_id, None, None).unwrap();
     assert!(core.launch("att", &launch_spec()).is_err());
     core.release("own", Disposition::Retain, None).unwrap();
@@ -276,6 +283,53 @@ fn immediate_close_with_a_foreign_foreground_is_kept_without_a_release_marker() 
     driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
     assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::Released { disposition: Disposition::Close }));
     assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
+}
+
+#[test]
+fn a_pane_whose_foreground_process_only_shares_a_pid_with_the_launched_one_is_kept() {
+    // The cases above use foreign pids that were never launched. Here the foreground entry carries
+    // the launched command's pid, but the launched process is gone: a pid alone does not make the
+    // process in front the one this core started.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-pid-reuse"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
+    let stranger = child.id();
+    child.kill().unwrap();
+    child.wait().unwrap();
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess { pid: stranger, argv: vec!["vim".into()] }],
+        stranger,
+    );
+    let released = core.release("a", Disposition::Close, None).unwrap();
+    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
+}
+
+#[test]
+fn an_empty_foreground_list_proves_no_ownership() {
+    // A pane whose foreground cannot be listed shows no process of ours: closing it on the strength
+    // of "every listed process is ours" would close on no evidence at all.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-empty-foreground"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_foreground(&slot.pane_id, 900, vec![], 900);
+    let released = core.release("a", Disposition::Close, None).unwrap();
+    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
 #[test]
@@ -525,7 +579,7 @@ fn an_attached_pane_is_created_with_no_env() {
     driver.tabs.borrow_mut().push((tab.clone(), "ext".into()));
     driver.panes.borrow_mut().insert(
         pane.clone(),
-        MemPane::new(&pane, tab, driver.area, bare(500), vec![]),
+        MemPane::new(&pane, tab, driver.area, bare(std::process::id()), vec![]),
     );
 
     let tab_creates_before = driver.calls("tab.create").len();

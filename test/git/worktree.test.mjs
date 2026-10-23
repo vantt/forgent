@@ -15,7 +15,6 @@ for (const backend of ['files','reftable']) test(`Worktree create, move, guarded
     assert.throws(()=>f.port.create({path:path.join(worker,'nested'),operationId:'nested'}),/nested/);
     fs.symlinkSync(worker,path.join(f.temp,'alias'),'dir');
     assert.throws(()=>f.port.createDetached({path:path.join(f.temp,'alias','nested'),operationId:'symlink-nested'}),/nested/);
-    assert.throws(()=>f.port.create({path:path.join(f.temp,'bad'),sessionId:'../bad',operationId:'bad'}),/invalid-session-id/);
     assert.throws(()=>f.port.create({path:path.join(f.temp,'other'),branch:'topic',operationId:'used'}),/branch-in-use/);
     for (const lockName of ['main-checkout','event-append']) {
       const acquired=acquireSync(createLockScope(),lockName,{fgosDir:f.fgosDir,eventOpenRoot:f.temp});

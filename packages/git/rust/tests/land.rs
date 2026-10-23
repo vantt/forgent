@@ -6,7 +6,7 @@ fn real_merge_evidence_and_same_id_replay() {
     let f = Fixture::new();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "merge")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "merge", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
     let c = s.candidate().unwrap();
@@ -14,7 +14,7 @@ fn real_merge_evidence_and_same_id_replay() {
         git(&c.worktree, &["show", "-s", "--format=%P"]),
         format!("{} {}", f.request.target, f.request.source)
     );
-    let r = f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
+    let r = f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
     assert_eq!(r.operation_id, "merge");
     for record in wal::Wal::open(&f.repo)
         .unwrap()
@@ -37,7 +37,7 @@ fn real_merge_evidence_and_same_id_replay() {
     );
     let replay = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "merge")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "merge", &wal::OsFileSystem, 0)
         .unwrap();
     assert_eq!(
         serde_json::to_value(replay.receipt().unwrap()).unwrap(),
@@ -50,13 +50,13 @@ fn mismatch_and_candidate_edits_never_publish() {
     let f = Fixture::new();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "verify")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "verify", &wal::OsFileSystem, 0)
         .unwrap();
     let mut e = evidence(&s);
     e.tree_digest = "wrong".into();
     assert_eq!(
         f.driver
-            .publish_land(&f.repo, &mut s, &e)
+            .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
             .unwrap_err()
             .cause,
         "land-verification-mismatch"
@@ -65,7 +65,7 @@ fn mismatch_and_candidate_edits_never_publish() {
     fs::write(s.candidate().unwrap().worktree.join("a"), "tampered").unwrap();
     assert_eq!(
         f.driver
-            .publish_land(&f.repo, &mut s, &e)
+            .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
             .unwrap_err()
             .cause,
         "land-candidate-dirty"
@@ -78,11 +78,11 @@ fn dirty_nonoverlap_is_preserved_and_reported_lagging() {
     fs::write(f.main.join("b"), "keep local\n").unwrap();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "dirty")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "dirty", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
     let candidate = s.candidate().unwrap().candidate.clone();
-    let r = f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
+    let r = f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
     assert!(matches!(r.checkout, Checkout::Pending));
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), candidate, "the ref moves; only the checkout lags");
     assert_eq!(
@@ -102,7 +102,7 @@ fn dirty_own_paths_block_before_cas() {
         }
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &request, "fixture", "own")
+            .prepare_land(&f.repo, vec![], &request, "fixture", "own", &wal::OsFileSystem, 0)
             .unwrap();
         match case {
             "renamed" => {
@@ -116,7 +116,7 @@ fn dirty_own_paths_block_before_cas() {
         let e = evidence(&s);
         assert_eq!(
             f.driver
-                .publish_land(&f.repo, &mut s, &e)
+                .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
                 .unwrap_err()
                 .cause,
             "main-checkout-dirty-mid-merge",
@@ -133,11 +133,11 @@ fn slot_excludes_same_destination_through_verification() {
     let f = Fixture::new();
     let s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "first")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "first", &wal::OsFileSystem, 0)
         .unwrap();
     assert!(f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "second")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "second", &wal::OsFileSystem, 0)
         .err()
         .unwrap()
         .cause
@@ -165,6 +165,8 @@ fn held_custody_refuses_before_effect() {
             &f.request,
             "fixture",
             "order",
+            &wal::OsFileSystem,
+            0,
         )
         .err()
         .unwrap();
@@ -178,7 +180,7 @@ fn squash_has_one_parent() {
     f.request.squash = true;
     let s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "squash")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "squash", &wal::OsFileSystem, 0)
         .unwrap();
     assert_eq!(
         git(
@@ -193,7 +195,7 @@ fn land_candidate_excludes_worktree_lifecycle_changes() {
     let f = Fixture::new();
     let session = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "lifecycle")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "lifecycle", &wal::OsFileSystem, 0)
         .unwrap();
     let candidate = session.candidate().unwrap();
     let oid = Oid::parse(&candidate.candidate, f.repo.object_format()).unwrap();
@@ -248,15 +250,15 @@ fn staged_dirt_survives_publish_and_exact_old_recovery() {
         }
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "staged")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "staged", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&s);
         let result = f
             .driver
-            .publish_land_with_filesystem(&f.repo, &mut s, &e, &Stop(stop_at));
+            .publish_land(&f.repo, &mut s, &e, &Stop(stop_at), 0);
         let r = if stop_at.is_some() {
             assert!(result.is_err());
-            let retry = f.driver.publish_land(&f.repo, &mut s, &e).unwrap_err();
+            let retry = f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap_err();
             assert_eq!(retry.code, ResultCode::RecoveryRequired);
             assert_eq!(retry.cause, "land-recovery-required");
             drop(s);
@@ -302,12 +304,12 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
         }
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "cas")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "cas", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&s);
         let error = f
             .driver
-            .publish_land_with_filesystem(&f.repo, &mut s, &e, &Race(&f, lose))
+            .publish_land(&f.repo, &mut s, &e, &Race(&f, lose), 0)
             .unwrap_err();
         let chain = wal::Wal::open(&f.repo).unwrap().inspect("cas").unwrap();
         if lose {
@@ -316,7 +318,7 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
             assert_eq!(
                 serde_json::to_value(
                     f.driver
-                        .publish_land(&f.repo, &mut s, &e)
+                        .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
                         .unwrap_err()
                         .receipt
                         .unwrap()
@@ -327,7 +329,7 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
             drop(s);
             let replay = f
                 .driver
-                .prepare_land(&f.repo, vec![], &f.request, "fixture", "cas")
+                .prepare_land(&f.repo, vec![], &f.request, "fixture", "cas", &wal::OsFileSystem, 0)
                 .err()
                 .unwrap();
             assert_eq!(replay.cause, "land-cas-lost");
@@ -341,7 +343,7 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
             };
             assert!(f
                 .driver
-                .acknowledge_land(&f.repo, "fixture", "cas", "durable-loss")
+                .acknowledge_land(&f.repo, "fixture", "cas", "durable-loss", &wal::OsFileSystem)
                 .unwrap()
                 .is_empty());
             assert!(!candidate.exists());
@@ -350,7 +352,7 @@ fn cas_failure_uses_shared_refs_classification_and_loss_replays_as_error() {
             assert!(chain.outcome().is_none());
             assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
             assert_eq!(
-                f.driver.publish_land(&f.repo, &mut s, &e).unwrap_err().code,
+                f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap_err().code,
                 ResultCode::RecoveryRequired
             );
         }
@@ -366,7 +368,7 @@ fn invalid_file_is_rejected_before_candidate_allocation() {
     });
     assert_eq!(
         f.driver
-            .prepare_land(&f.repo, vec![], &req, "fixture", "invalid")
+            .prepare_land(&f.repo, vec![], &req, "fixture", "invalid", &wal::OsFileSystem, 0)
             .err()
             .unwrap()
             .cause,
@@ -380,7 +382,7 @@ fn failed_cas_at_candidate_and_checkout_switch_require_recovery() {
         let f = Fixture::new();
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "observed")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "observed", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&s);
         struct Race<'a> {
@@ -407,7 +409,7 @@ fn failed_cas_at_candidate_and_checkout_switch_require_recovery() {
         }
         let error = f
             .driver
-            .publish_land_with_filesystem(
+            .publish_land(
                 &f.repo,
                 &mut s,
                 &e,
@@ -416,6 +418,7 @@ fn failed_cas_at_candidate_and_checkout_switch_require_recovery() {
                     next: e.candidate.clone(),
                     switch,
                 },
+                0,
             )
             .unwrap_err();
         assert_eq!(
@@ -434,7 +437,7 @@ fn failed_cas_at_candidate_and_checkout_switch_require_recovery() {
             .is_none());
         assert_eq!(
             f.driver
-                .publish_land(&f.repo, &mut s, &e)
+                .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
                 .unwrap_err()
                 .cause,
             "land-recovery-required"
@@ -446,16 +449,16 @@ fn fresh_id_refuses_an_already_landed_source() {
     let f = Fixture::new();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "original")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "original", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
-    f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
+    f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
     drop(s);
     let mut req = f.request.clone();
     req.target = e.candidate;
     let error = f
         .driver
-        .prepare_land(&f.repo, vec![], &req, "fixture", "duplicate")
+        .prepare_land(&f.repo, vec![], &req, "fixture", "duplicate", &wal::OsFileSystem, 0)
         .err()
         .unwrap();
     assert_eq!(error.cause, "land-already-merged");
@@ -466,7 +469,7 @@ fn fresh_id_refuses_an_already_landed_source() {
 fn recovery_candidate_parent_check_ignores_signature_display() {
     let f = Fixture::new();
     enable_signing(&f.main, &f.temp);
-    let session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "unsigned").unwrap();
+    let session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "unsigned", &wal::OsFileSystem, 0).unwrap();
     let candidate = session.candidate().unwrap();
     let signed = git(&f.main, &["commit-tree", "-S", &candidate.tree,
         "-p", &candidate.target, "-p", &candidate.source, "-m", "signed candidate"]);
@@ -509,14 +512,14 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
     let target = git(&f.main, &["rev-parse", "HEAD"]);
     let mut request = f.request.clone();
     request.target.clear();
-    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current", &wal::OsFileSystem, 0).unwrap();
     let candidate = session.candidate().unwrap().clone();
     assert_eq!(candidate.target, target);
     assert_eq!(git(&candidate.worktree, &["show", "-s", "--format=%P"]), format!("{} {}", target, request.source));
     assert_eq!(fs::read_to_string(candidate.worktree.join("b")).unwrap(), "sibling\n");
     assert_eq!(fs::read_to_string(candidate.worktree.join("a")).unwrap(), "incoming\n");
     let verification = evidence(&session);
-    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification, &wal::OsFileSystem, 0).unwrap();
     drop(session);
     let retained = f.driver.list_retained_land(&f.repo, 100).unwrap();
     assert_eq!(retained["complete"], true);
@@ -534,25 +537,25 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
         ])
     );
     assert!(kept["updatedAtMs"].as_u64().unwrap() > 0);
-    assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack").unwrap().is_empty());
+    assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack", &wal::OsFileSystem).unwrap().is_empty());
     assert!(f.driver.list_retained_land(&f.repo, 100).unwrap()["candidates"].as_array().unwrap().is_empty());
     assert!(!candidate.worktree.exists());
     git(&f.main, &["update-ref", "refs/heads/trunk", &f.request.target]);
-    let replay = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    let replay = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current", &wal::OsFileSystem, 0).unwrap();
     assert_eq!(serde_json::to_value(replay.receipt().unwrap()).unwrap(), serde_json::to_value(receipt).unwrap());
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
     let mut changed = request.clone();
     changed.message = "different request".into();
-    assert_eq!(f.driver.prepare_land(&f.repo, vec![], &changed, "fixture", "current").err().unwrap().cause, "operation-id-reused");
+    assert_eq!(f.driver.prepare_land(&f.repo, vec![], &changed, "fixture", "current", &wal::OsFileSystem, 0).err().unwrap().cause, "operation-id-reused");
 }
 
 #[test]
 fn retained_listing_skips_chains_that_hold_nothing() {
     let f = Fixture::new();
-    let mut session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "gone").unwrap();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "gone", &wal::OsFileSystem, 0).unwrap();
     let candidate = session.candidate().unwrap().clone();
     let verification = evidence(&session);
-    f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    f.driver.publish_land(&f.repo, &mut session, &verification, &wal::OsFileSystem, 0).unwrap();
     drop(session);
     let listed = || f.driver.list_retained_land(&f.repo, 100).unwrap();
     assert_eq!(listed()["candidates"].as_array().unwrap().len(), 1);
@@ -578,7 +581,7 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     let mut request = f.request.clone();
     request.target = git(&f.main, &["rev-parse", "HEAD"]);
     request.files = vec![LandFile { path: "a".into(), bytes: Some(b"consumer resolution\n".to_vec()) }];
-    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "resolved").unwrap();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "resolved", &wal::OsFileSystem, 0).unwrap();
     let candidate = session.candidate().unwrap();
     assert_eq!(fs::read_to_string(candidate.worktree.join("a")).unwrap(), "consumer resolution\n");
     assert_eq!(git(&candidate.worktree, &["diff", "--name-only", "--diff-filter=U"]), "");
@@ -587,7 +590,7 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     assert_eq!(git(&f.main, &["rev-parse", "source"]), request.source);
     let published = candidate.candidate.clone();
     let verification = evidence(&session);
-    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification, &wal::OsFileSystem, 0).unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), published, "{receipt:?}");
     assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "consumer resolution\n");
 }
@@ -597,7 +600,7 @@ fn land_doors_refuse_an_unfenced_workspace_without_writing_records() {
     let f = Fixture::new();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "fenced")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "fenced", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
     let journal = || wal::Wal::with_filesystem(f.repo.common_dir(), wal::OsFileSystem).unwrap();
@@ -614,17 +617,17 @@ fn land_doors_refuse_an_unfenced_workspace_without_writing_records() {
             Err(e) => format!("{e:?}"),
         }
     }
-    assert!(refusal(f.driver.publish_land(&f.repo, &mut s, &e)).contains("git-fence-missing"));
+    assert!(refusal(f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)).contains("git-fence-missing"));
     assert!(refusal(f.driver.acknowledge_land(
         &f.repo,
         "fixture",
         "fenced",
-        "durable-consumer-ack"
+        "durable-consumer-ack", &wal::OsFileSystem
     ))
     .contains("git-fence-missing"));
     assert!(refusal(
         f.driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "fresh")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "fresh", &wal::OsFileSystem, 0)
     )
     .contains("git-fence-missing"));
     assert_eq!(journal().inspect("fenced").unwrap().records().len(), before);

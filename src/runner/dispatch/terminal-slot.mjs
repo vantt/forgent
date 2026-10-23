@@ -2,7 +2,7 @@
 //
 // Every herdr call of the controller goes through terminal-control, which
 // addresses a pane by a key: this module makes the client (one per route
-// configuration), names keys and display data, and turns a refusal from the
+// configuration), names keys and display facts, and turns a refusal from the
 // port into a thrown `TerminalSlotError` whose `code` is the driver's own
 // error code when the driver named one. What happens in the pane after the
 // handover belongs to the run supervisor.
@@ -75,15 +75,27 @@ export function createRoundTerminalControl({ herdrBin, herdrEnv, config, hostBin
   return client;
 }
 
-/** Tab label for a group: short and readable, never read back. */
-export function groupLabel(groupKey) {
-  return String(groupKey).slice(0, 40);
+/**
+ * What names the work in a label: its work item, else its run (`run-` and the first four characters of the
+ * unit run's random part, the rest of a unit run id being only a clock) with the start of its objective as
+ * the title. A work item carries its own title when the item had one at dispatch; without it the label
+ * shows the id alone.
+ */
+export function workLabelOf(assignment) {
+  if (assignment?.workId) return { id: assignment.workId, ...(assignment.title ? { title: assignment.title } : {}) };
+  const unitRunId = assignment?.unitRunId ?? assignment?.provenance?.unitRunId;
+  const random = /-([0-9a-f]{8})$/.exec(unitRunId ?? '')?.[1];
+  return { ...(random ? { id: `run-${random.slice(0, 4)}` } : {}), ...(assignment?.objective ? { title: assignment.objective } : {}) };
 }
 
-/** Display data for a slot: structured, written to the terminal only. */
-export function slotDisplay({ groupKey, agent, model, role }) {
+/**
+ * Display data for a slot: structured and written to the terminal only. The port builds the visible
+ * label from these fields (short id, title cut, role and model), so nothing here formats text.
+ */
+export function slotDisplay({ id, title, agent, model, role }) {
   return {
-    label: groupLabel(groupKey),
+    ...(id ? { id: String(id) } : {}),
+    ...(title ? { title: String(title) } : {}),
     ...(role ? { role } : {}),
     ...(agent ? { agent: path.basename(String(agent)) } : {}),
     ...(model ? { model: String(model) } : {}),

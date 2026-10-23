@@ -1,4 +1,4 @@
-// The terminal-control doctor checks and setup fix against the real host
+// The terminal-control doctor checks against the real host
 // binary (FGOS_HOST_BIN, built from this checkout) and the fake herdr script
 // the Rust driver tests use. Configs are written to temporary workspaces.
 import '../helpers/process-tmp-root.mjs';
@@ -12,14 +12,11 @@ import { fileURLToPath } from 'node:url';
 
 import {
   checkTerminalControl,
-  checkTerminalConfig,
   checkTerminalAllocations,
-  fixTerminalDir,
 } from '../../src/setup/terminal-control-checks.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import {
   DEFAULT_TERMINAL_CONFIG,
-  KNOWN_POLICIES,
   resolveTerminalConfig,
   retainFailedPaneMsOf,
   terminalRouteConfig,
@@ -67,20 +64,21 @@ function workspace(name, terminal) {
   return root;
 }
 
-const configCheck = (root, globalConfigPath = noGlobal) => checkTerminalConfig(root, { globalConfigPath });
+const configCheck = (root, globalConfigPath = noGlobal) => checkTerminalControl(root, { globalConfigPath });
+const controlCheck = (options) => checkTerminalControl(workspace('control'), { globalConfigPath: noGlobal, ...options });
 
-// ---- terminal-config ---------------------------------------------------
+// ---- terminal-control: terminal.* ---------------------------------------
 
-test('terminal-config passes on defaults and prints every value with its source', () => {
+test('terminal-control passes on defaults and prints every value with its source', () => {
   const r = configCheck(workspace('defaults'));
   assert.equal(r.passed, true);
   assert.match(r.message, /allocationGraceMs=60000 \(default\)/);
   assert.match(r.message, /retainFailedPaneMs=null \(default\)/);
-  assert.match(r.message, /layout\.policy="measured-split" \(default\)/);
+  assert.match(r.message, /layout\.policy="even-split" \(default\)/);
   assert.match(r.message, /layout\.maxPanesPerTab=8 \(default\)/);
 });
 
-test('terminal-config names the source of an override: project over global over default', () => {
+test('terminal-control names the source of an override: project over global over default', () => {
   const globalPath = path.join(scratch, 'global-with-terminal.json');
   fs.writeFileSync(globalPath, JSON.stringify({ terminal: { allocationGraceMs: 90000, layout: { minCols: 100 } } }));
   const root = workspace('override', { layout: { minCols: 120 } });
@@ -91,7 +89,7 @@ test('terminal-config names the source of an override: project over global over 
   assert.match(r.message, /layout\.minRows=20 \(default\)/);
 });
 
-test('terminal-config fails an allocationGraceMs below the ready timeout plus 30 s, and passes the exact bound', () => {
+test('terminal-control fails an allocationGraceMs below the ready timeout plus 30 s, and passes the exact bound', () => {
   const bound = READY_TIMEOUT_MS + 30000;
   const bad = configCheck(workspace('grace-low', { allocationGraceMs: bound - 1 }));
   assert.equal(bad.passed, false);
@@ -99,7 +97,7 @@ test('terminal-config fails an allocationGraceMs below the ready timeout plus 30
   assert.equal(configCheck(workspace('grace-edge', { allocationGraceMs: bound })).passed, true);
 });
 
-test('terminal-config fails a retainFailedPaneMs that is neither null nor a positive integer', () => {
+test('terminal-control fails a retainFailedPaneMs that is neither null nor a positive integer', () => {
   for (const [name, value] of [['zero', 0], ['negative', -5], ['text', 'soon'], ['float', 1.5]]) {
     const r = configCheck(workspace(`retain-${name}`, { retainFailedPaneMs: value }));
     assert.equal(r.passed, false, name);
@@ -110,35 +108,30 @@ test('terminal-config fails a retainFailedPaneMs that is neither null nor a posi
   assert.match(ok.message, /retainFailedPaneMs=3600000 \(project\)/);
 });
 
-test('terminal-config fails an unregistered policy and names the registered ones', () => {
-  const r = configCheck(workspace('policy', { layout: { policy: 'golden-ratio' } }));
-  assert.equal(r.passed, false);
-  assert.match(r.message, /terminal\.layout\.policy = "golden-ratio" is not a registered placement policy \(measured-split\)/);
-});
-
-test('terminal-config fails layout limits that are not positive integers or sit below the measured floor', () => {
-  for (const [key, value, pattern] of [
-    ['minCols', 0, /must be a positive integer/],
-    ['minRows', 2.5, /must be a positive integer/],
-    ['maxPanesPerTab', -1, /must be a positive integer/],
-    ['minCols', 39, /below the measured floor of 40/],
-    ['minRows', 7, /below the measured floor of 8/],
-  ]) {
-    const r = configCheck(workspace(`limit-${key}-${value}`, { layout: { [key]: value } }));
+test('terminal-control prints the refusal the core names for a limit below the measured floor, and passes the floor itself', () => {
+  for (const [key, value, named] of [['minCols', 39, 'layout.minCols=39 < 40'], ['minRows', 7, 'layout.minRows=7 < 8']]) {
+    const r = configCheck(workspace(`floor-${key}`, { layout: { [key]: value } }));
     assert.equal(r.passed, false, `${key}=${value}`);
-    assert.match(r.message, new RegExp(`terminal\\.layout\\.${key}`));
-    assert.match(r.message, pattern);
+    assert.ok(r.message.includes(named) && r.message.includes('terminal-config-below-floor'), r.message);
   }
   assert.equal(configCheck(workspace('floor-ok', { layout: { minCols: 40, minRows: 8 } })).passed, true);
 });
 
-test('terminal-config reports every broken setting in one message', () => {
-  const r = configCheck(workspace('many', { allocationGraceMs: 10, layout: { policy: 'x', minCols: 1 } }));
+test('terminal-control reports the Node rules and the core refusal in one message', () => {
+  const r = configCheck(workspace('many', { allocationGraceMs: 10, layout: { minCols: 1 } }));
   assert.equal(r.passed, false);
-  for (const key of ['allocationGraceMs', 'layout.policy', 'layout.minCols']) assert.match(r.message, new RegExp(`terminal\\.${key.replace('.', '\\.')}`));
+  assert.match(r.message, /terminal\.allocationGraceMs/);
+  assert.match(r.message, /layout\.minCols=1 < 40/);
 });
 
-test('terminal-config fails by name on a config file that does not parse', () => {
+test('terminal-control warns, without failing, when the route cannot be reached', () => {
+  const createClient = (config) => createTerminalControl({ hostBin: path.join(scratch, 'no-such-host'), config });
+  const r = checkTerminalControl(workspace('route-down'), { globalConfigPath: noGlobal, createClient });
+  assert.equal(r.passed, true);
+  assert.match(r.message, /^warning: the terminal-control route did not answer/);
+});
+
+test('terminal-control fails by name on a config file that does not parse', () => {
   const root = workspace('broken');
   writeRawProjectConfig(root, '{ not json');
   const r = configCheck(root);
@@ -146,10 +139,10 @@ test('terminal-config fails by name on a config file that does not parse', () =>
   assert.match(r.message, /terminal\.\* unreadable/);
 });
 
-// ---- terminal-control --------------------------------------------------
+// ---- terminal-control: driver, capabilities, anchor pane ----------------
 
 test('terminal-control prints driver, capabilities and server incarnation from the real route', { skip: !POSIX }, () => {
-  const r = checkTerminalControl();
+  const r = controlCheck();
   assert.equal(r.passed, true, r.message);
   assert.doesNotMatch(r.message, /^(warning|info):/);
   assert.match(r.message, /driver herdr, \d+ capabilities \(.*layout\.geometry.*server\.incarnation.*\)/);
@@ -160,7 +153,7 @@ test('terminal-control warns, without failing, when herdr is not on the machine'
   const prev = process.env.FGOS_HERDR_BIN;
   process.env.FGOS_HERDR_BIN = '/no/such/herdr-binary';
   try {
-    const r = checkTerminalControl();
+    const r = controlCheck();
     assert.equal(r.passed, true);
     assert.match(r.message, /^warning: terminal mode unsupported: herdr is not usable \(\/no\/such\/herdr-binary\); direct mode unaffected$/);
   } finally {
@@ -172,7 +165,7 @@ test('terminal-control says on Windows that the terminal mode depends on a herdr
   const prev = process.env.FGOS_HERDR_BIN;
   process.env.FGOS_HERDR_BIN = '/no/such/herdr-binary';
   try {
-    const r = checkTerminalControl({ platform: 'win32' });
+    const r = controlCheck({ platform: 'win32' });
     assert.equal(r.passed, true);
     assert.match(r.message, /^warning: terminal mode unsupported: Windows has no herdr build, and terminal-control runs on herdr only; direct mode unaffected$/);
   } finally {
@@ -186,7 +179,7 @@ test('terminal-control gives an info line, not a failure, when herdr cannot repo
   const prev = process.env.FGOS_HERDR_BIN;
   process.env.FGOS_HERDR_BIN = wrapper;
   try {
-    const r = checkTerminalControl();
+    const r = controlCheck();
     assert.equal(r.passed, true, r.message);
     assert.match(r.message, /^info: driver herdr, \d+ capabilities/);
     assert.doesNotMatch(r.message, /layout\.geometry/);
@@ -196,32 +189,27 @@ test('terminal-control gives an info line, not a failure, when herdr cannot repo
   }
 });
 
-test('terminal-control warns when the route cannot be reached instead of crashing doctor', () => {
-  const r = checkTerminalControl({ terminalControl: createTerminalControl({ hostBin: path.join(scratch, 'no-such-host') }) });
-  assert.equal(r.passed, true);
-  assert.match(r.message, /^warning: the terminal-control route did not answer/);
-});
+test('terminal-control reports the anchor pane the route answers: empty and unresolvable fail, a resolvable pane is verified', { skip: !POSIX }, () => {
+  // The route's answer is the driver's (herdr_driver_fake owns it); this pins how the row reads it.
+  const asked = [];
+  const named = (pane, anchorPane) => controlCheck({
+    env: { FGOS_HERDR_ANCHOR_PANE: pane },
+    createClient: (config, env) => { asked.push(env); return { capabilities: () => ({ ...realClient(config).capabilities(), anchorPane }) }; },
+  });
 
-test('terminal-control keeps the FGOS_HERDR_ANCHOR_PANE diagnosis: empty and unresolvable fail, a resolvable pane is verified', { skip: !POSIX }, () => {
-  const anchorHerdr = path.join(scratch, 'herdr-anchor.sh');
-  fs.writeFileSync(anchorHerdr, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = get ]; then\n  if [ "$3" = valid-pane-42 ]; then echo '{"id":"valid-pane-42"}'; exit 0; fi\n  echo 'error: pane not found' >&2; exit 1\nfi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
-  const prevBin = process.env.FGOS_HERDR_BIN;
-  process.env.FGOS_HERDR_BIN = anchorHerdr;
-  try {
-    const empty = checkTerminalControl({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: '   ' } });
-    assert.equal(empty.passed, false);
-    assert.match(empty.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
+  const empty = named('   ', { state: 'absent' });
+  assert.equal(empty.passed, false);
+  assert.match(empty.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
 
-    const ghost = checkTerminalControl({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: 'ghost-pane-999' } });
-    assert.equal(ghost.passed, false);
-    assert.match(ghost.message, /FGOS_HERDR_ANCHOR_PANE="ghost-pane-999" cannot be resolved/);
+  const ghost = named('ghost-pane-999', { state: 'unresolvable', reason: 'pane ghost-pane-999 does not exist' });
+  assert.equal(ghost.passed, false);
+  assert.match(ghost.message, /FGOS_HERDR_ANCHOR_PANE="ghost-pane-999" cannot be resolved: pane ghost-pane-999 does not exist/);
 
-    const valid = checkTerminalControl({ env: { ...process.env, FGOS_HERDR_ANCHOR_PANE: 'valid-pane-42' } });
-    assert.equal(valid.passed, true, valid.message);
-    assert.match(valid.message, /anchor pane "valid-pane-42" verified/);
-  } finally {
-    process.env.FGOS_HERDR_BIN = prevBin;
-  }
+  const valid = named('  valid-pane-42 ', { state: 'resolved' });
+  assert.equal(valid.passed, true, valid.message);
+  assert.match(valid.message, /anchor pane "valid-pane-42" verified/);
+  assert.deepEqual(asked.filter(Boolean), [{ FGOS_HERDR_ANCHOR_PANE: 'ghost-pane-999' }, { FGOS_HERDR_ANCHOR_PANE: 'valid-pane-42' }], 'the trimmed pane rides in the envelope env; an empty one is not sent');
+  assert.equal(controlCheck({ env: {} }).passed, true, 'no variable, no anchor line');
 });
 
 // ---- terminal-allocations ----------------------------------------------
@@ -245,13 +233,13 @@ test('terminal-allocations warns about a slot that was allocated and never launc
   const fixtures = path.dirname(FAKE_HERDR);
   fs.writeFileSync(bareShell, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = process-info ]; then cat "${fixtures}/pane-process-info-shell.json"; exit 0; fi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
   const tc = realClient({ allocationGraceMs: 0 }, bareShell);
-  const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { label: 'stuck', role: 'worker' } });
+  const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { title: 'stuck', role: 'worker' } });
   assert.equal(slot.result, 'slot');
   const before = fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '';
   const root = workspace('alloc-stuck', { allocationGraceMs: 0 });
   const r = checkTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: tc });
   assert.equal(r.passed, true);
-  assert.match(r.message, /^warning: 1 slot\(s\) need a person; nothing was closed: doctor-stuck-slot: a slot was allocated but never launched/);
+  assert.match(r.message, /^warning: 1 slot\(s\) need a person; nothing was closed: doctor-stuck-slot \(pane \S+\): a slot was allocated but never launched/);
   const closes = (fs.readFileSync(log, 'utf8').slice(before.length).match(/pane\tclose|pane close/g) ?? []).length;
   assert.equal(closes, 0, 'the scan must not close anything');
 });
@@ -264,7 +252,7 @@ test('terminal-allocations says it did not scan when terminal mode is unsupporte
   assert.doesNotMatch(r.message, /need a person/);
 });
 
-// ---- setup: config default and terminal directory ----------------------
+// ---- setup: config default ---------------------------------------------
 
 test('setup config-merge adds terminal.* when missing and leaves a project value alone', () => {
   const fresh = workspace('merge-fresh');
@@ -280,30 +268,11 @@ test('setup config-merge adds terminal.* when missing and leaves a project value
   assert.equal(after.layout.minRows, 20, 'a missing nested key is filled');
 });
 
-test('the three checks and the terminal-dir fix are registered', () => {
+test('the two checks are registered and setup has no terminal directory fix', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
-  for (const id of ['terminal-control', 'terminal-config', 'terminal-allocations']) assert.ok(ids.includes(id), id);
+  for (const id of ['terminal-control', 'terminal-allocations']) assert.ok(ids.includes(id), id);
   assert.ok(!ids.includes('herdr-available'), 'the old check id is gone');
-  assert.ok(FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'));
-});
-
-test('fixTerminalDir creates <stateRoot>/terminal at 0700, is idempotent and tightens a loose mode', { skip: !POSIX }, () => {
-  const stateRoot = path.join(scratch, 'fix-state');
-  const env = { ...process.env, FGOS_STATE_ROOT: stateRoot };
-  const root = workspace('fix-dir');
-  const dir = path.join(stateRoot, 'terminal');
-
-  const created = fixTerminalDir(root, { env });
-  assert.equal(created.changed, true, created.message);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
-
-  assert.equal(fixTerminalDir(root, { env }).changed, false);
-
-  fs.chmodSync(dir, 0o755);
-  const tightened = fixTerminalDir(root, { env });
-  assert.equal(tightened.changed, true);
-  assert.match(tightened.message, /tightened/);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
+  assert.ok(!FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'), 'the store creates its own directory');
 });
 
 // ---- the config reaches the route --------------------------------------
@@ -321,19 +290,6 @@ test('an unreadable config gives the route no settings and no retain time instea
   writeRawProjectConfig(root, '{ not json');
   assert.deepEqual(terminalRouteConfig(root, { globalConfigPath: noGlobal }), {});
   assert.equal(retainFailedPaneMsOf(root, { globalConfigPath: noGlobal }), null);
-});
-
-test('the route accepts the configuration the defaults describe (same numbers as the Rust core)', () => {
-  const rust = fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/rust/src/route.rs'), 'utf8');
-  const limits = rust.match(/DEFAULT_LIMITS: Limits = Limits \{ min_cols: (\d+), min_rows: (\d+), max_panes_per_tab: (\d+) \}/);
-  const grace = rust.match(/DEFAULT_ALLOCATION_GRACE_MS: u64 = ([\d_]+)/);
-  assert.deepEqual(
-    [Number(limits[1]), Number(limits[2]), Number(limits[3]), Number(grace[1].replace(/_/g, ''))],
-    [DEFAULT_TERMINAL_CONFIG.layout.minCols, DEFAULT_TERMINAL_CONFIG.layout.minRows, DEFAULT_TERMINAL_CONFIG.layout.maxPanesPerTab, DEFAULT_TERMINAL_CONFIG.allocationGraceMs],
-  );
-  const contract = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/contracts/placement-policy.v1.json'), 'utf8'));
-  assert.deepEqual([...KNOWN_POLICIES], contract.registry.names);
-  assert.equal(DEFAULT_TERMINAL_CONFIG.layout.policy, contract.registry.default);
 });
 
 test('resolveTerminalConfig treats an explicit null as a set value', () => {

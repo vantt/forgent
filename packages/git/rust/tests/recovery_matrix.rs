@@ -92,7 +92,7 @@ fn recovery_matrix_child() {
     let target = Oid::parse(v["target"].as_str().unwrap(), repo.object_format()).unwrap();
     let source = Oid::parse(v["source"].as_str().unwrap(), repo.object_format()).unwrap();
     let baseline = if kind == "ScopedCommit" {
-        let b = driver.preflight_commit(&repo, held(&lease)).unwrap();
+        let b = driver.preflight_commit(&repo, held(&lease), None).unwrap();
         fs::write(tree.join("b"), "producer\n").unwrap();
         Some(b)
     } else {
@@ -127,6 +127,8 @@ fn recovery_matrix_child() {
                     &serde_json::from_value(v["request"].clone()).unwrap(),
                     WRITER,
                     ID,
+                    &wal::OsFileSystem,
+                    0,
                 )
                 .unwrap();
         }
@@ -144,6 +146,7 @@ fn recovery_matrix_child() {
                     },
                     WRITER,
                     ID,
+                    &wal::OsFileSystem,
                 )
                 .unwrap();
         }
@@ -220,6 +223,7 @@ fn recovery_matrix_child() {
                     },
                     WRITER,
                     ID,
+                    &wal::OsFileSystem,
                 )
                 .unwrap();
         }
@@ -444,7 +448,7 @@ fn own_recovery(
         }
         "ScopedCommit" => serde_json::to_value(
             driver
-                .recover_scoped_commit(repo, held(lease), WRITER, ID)
+                .recover_scoped_commit(repo, held(lease), WRITER, ID, &wal::OsFileSystem)
                 .unwrap(),
         )
         .unwrap(),
@@ -633,7 +637,7 @@ fn recovery_matrix_all_payload_kinds() {
                 // Checkout recovery may compact its abandoned operation itself.
             } else if kind == "Restore" {
                 f.driver
-                    .acknowledge_restore(&repo, vec![], WRITER, ID)
+                    .acknowledge_restore(&repo, vec![], WRITER, ID, &wal::OsFileSystem)
                     .unwrap();
             } else if kind == "PublicationCas" {
                 publication(&f.driver, &repo, &mut seal)
@@ -641,7 +645,7 @@ fn recovery_matrix_all_payload_kinds() {
                     .unwrap();
             } else if kind == "Land" {
                 f.driver
-                    .acknowledge_land(&repo, WRITER, ID, "durable matrix consumer")
+                    .acknowledge_land(&repo, WRITER, ID, "durable matrix consumer", &wal::OsFileSystem)
                     .unwrap();
             } else {
                 // The owning resource remains held while exercising WAL's existing

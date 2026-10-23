@@ -13,12 +13,17 @@ use std::path::PathBuf;
 #[derive(Deserialize)]
 struct Fixture {
     name: String,
+    policy: String,
     input: PlaceInput,
     expected: Placement,
 }
 
 fn measured_split() -> Box<dyn PlacementPolicy> {
-    policy_by_name(None).expect("default policy resolves")
+    policy_by_name(Some("measured-split")).expect("measured-split resolves")
+}
+
+fn even_split() -> Box<dyn PlacementPolicy> {
+    policy_by_name(Some("even-split")).expect("even-split resolves")
 }
 
 fn fixtures() -> Vec<(PathBuf, Fixture)> {
@@ -44,12 +49,12 @@ fn fixtures() -> Vec<(PathBuf, Fixture)> {
 fn every_fixture_matches_its_expected_placement() {
     let all = fixtures();
     assert!(
-        all.len() >= 12,
+        all.len() >= 30,
         "expected the fixture set, found {}",
         all.len()
     );
-    let policy = measured_split();
     for (path, fixture) in &all {
+        let policy = policy_by_name(Some(&fixture.policy)).expect("fixture names a known policy");
         let stem = path.file_stem().and_then(|s| s.to_str()).unwrap();
         assert_eq!(stem, fixture.name, "fixture name matches its file name");
         assert_eq!(
@@ -80,7 +85,12 @@ fn fixtures_are_the_contract_serialization_of_a_placement() {
 
 #[test]
 fn registry_resolves_the_default_and_rejects_unknown_names() {
+    assert_eq!(DEFAULT_POLICY, "even-split");
     assert_eq!(policy_by_name(None).unwrap().name(), DEFAULT_POLICY);
+    assert_eq!(
+        policy_by_name(Some("even-split")).unwrap().name(),
+        "even-split"
+    );
     assert_eq!(
         policy_by_name(Some("measured-split")).unwrap().name(),
         "measured-split"
@@ -128,7 +138,7 @@ impl Sim {
         }
     }
 
-    fn input(&self, limits: Limits) -> PlaceInput {
+    fn input(&self, limits: Limits, group_size: Option<u32>) -> PlaceInput {
         PlaceInput {
             group_key: "g".into(),
             tabs: vec![TabGeometry {
@@ -140,7 +150,6 @@ impl Sim {
                     .map(|(key, r)| PaneGeometry {
                         pane_id: format!("p-{key}"),
                         rect: *r,
-                        pty: None,
                     })
                     .collect(),
             }],
@@ -152,19 +161,19 @@ impl Sim {
                     tab_id: "t".into(),
                     pane_id: format!("p-{key}"),
                     rect: *r,
-                    role_hint: None,
                 })
                 .collect(),
             request: PlaceRequest {
                 label: "w".into(),
-                role_hint: None,
+                group_size,
             },
             limits,
         }
     }
 
-    /// Split like herdr: `first` keeps `ratio`, rounded up, the new pane gets
-    /// the rest (352 -> 176+176, 69 -> 35+34).
+    /// Split like herdr: `first` keeps `ratio` of the size, rounded to the
+    /// nearest cell with halves up, the new pane gets the rest (352 -> 176+176,
+    /// 69 -> 35+34).
     fn apply(&mut self, anchor_key: &str, direction: Direction, ratio: f64) {
         let at = self
             .panes
@@ -174,14 +183,14 @@ impl Sim {
         let old = self.panes[at].1;
         let (first, second) = match direction {
             Direction::Right => {
-                let w = (f64::from(old.width) * ratio).ceil() as u32;
+                let w = (f64::from(old.width) * ratio).round() as u32;
                 (
                     rect(old.x, old.y, w, old.height),
                     rect(old.x + w, old.y, old.width - w, old.height),
                 )
             }
             Direction::Down => {
-                let h = (f64::from(old.height) * ratio).ceil() as u32;
+                let h = (f64::from(old.height) * ratio).round() as u32;
                 (
                     rect(old.x, old.y, old.width, h),
                     rect(old.x, old.y + h, old.width, old.height - h),
@@ -250,7 +259,6 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
                 panes.push(PaneGeometry {
                     pane_id: pane_id.clone(),
                     rect: r,
-                    pty: None,
                 });
                 if !rng.next_u64().is_multiple_of(3) {
                     group_panes.push(GroupPane {
@@ -258,7 +266,6 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
                         tab_id: format!("t{t}"),
                         pane_id,
                         rect: r,
-                        role_hint: None,
                     });
                 }
             }
@@ -274,7 +281,7 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
             group_panes,
             request: PlaceRequest {
                 label: "w".into(),
-                role_hint: None,
+                group_size: None,
             },
             limits,
         };
@@ -334,7 +341,7 @@ fn property_filling_a_tab_never_leaves_a_pane_below_the_minimum() {
             rng.range(limits.min_rows, 100),
         );
         loop {
-            match policy.place(&sim.input(limits)) {
+            match policy.place(&sim.input(limits, None)) {
                 Placement::Split {
                     anchor_key,
                     direction,
@@ -375,7 +382,7 @@ fn measured_split_fills_352x69_where_the_fixed_down_split_breaks_the_minimum() {
         anchor_key,
         direction,
         ratio,
-    } = policy.place(&sim.input(LIMITS))
+    } = policy.place(&sim.input(LIMITS, None))
     {
         sim.apply(&anchor_key, direction, ratio);
         placed += 1;
@@ -385,4 +392,72 @@ fn measured_split_fills_352x69_where_the_fixed_down_split_breaks_the_minimum() {
         placed >= 6,
         "measured split holds at least six workers, got {placed}"
     );
+}
+
+/// Fill one tab with a batch the way the dispatcher does: every allocate
+/// carries the same `group_size`, until the policy asks for a new tab.
+fn fill(
+    policy: &dyn PlacementPolicy,
+    mut sim: Sim,
+    limits: Limits,
+    group_size: Option<u32>,
+) -> Sim {
+    while let Placement::Split {
+        anchor_key,
+        direction,
+        ratio,
+    } = policy.place(&sim.input(limits, group_size))
+    {
+        sim.apply(&anchor_key, direction, ratio);
+        assert_covers_minimum(&sim, limits);
+        assert!(sim.panes.len() <= limits.max_panes_per_tab as usize);
+        if group_size.is_some_and(|size| sim.panes.len() as u32 >= size) {
+            break;
+        }
+    }
+    sim
+}
+
+#[test]
+fn property_even_split_never_leaves_a_pane_below_the_minimum() {
+    let policy = even_split();
+    let mut rng = Lcg(0xe7e7);
+    for _ in 0..400 {
+        let limits = Limits {
+            min_cols: rng.range(10, 100),
+            min_rows: rng.range(4, 30),
+            max_panes_per_tab: rng.range(2, 12),
+        };
+        let area = (
+            rng.range(limits.min_cols, 400),
+            rng.range(limits.min_rows, 100),
+        );
+        let group_size = [None, Some(rng.range(2, 14))][rng.range(0, 1) as usize];
+        fill(&*policy, Sim::new(area.0, area.1), limits, group_size);
+    }
+}
+
+#[test]
+fn even_split_with_a_batch_size_gives_every_pane_the_same_size() {
+    let policy = even_split();
+    let sizes = |width: u32, height: u32, group_size: u32| {
+        let sim = fill(&*policy, Sim::new(width, height), LIMITS, Some(group_size));
+        let mut sizes: Vec<(u32, u32)> =
+            sim.panes.iter().map(|(_, r)| (r.width, r.height)).collect();
+        sizes.sort_unstable();
+        sizes
+    };
+    assert_eq!(sizes(240, 60, 3), [(80, 60); 3]);
+    assert_eq!(sizes(352, 69, 4), [(88, 69); 4]);
+    assert_eq!(sizes(240, 60, 4), [(120, 30); 4]);
+    assert_eq!(sizes(110, 80, 3), [(110, 26), (110, 27), (110, 27)]);
+}
+
+#[test]
+fn even_split_without_a_batch_size_halves_and_never_rebalances() {
+    let policy = even_split();
+    let sim = fill(&*policy, Sim::new(240, 60), LIMITS, None);
+    let mut sizes: Vec<(u32, u32)> = sim.panes.iter().map(|(_, r)| (r.width, r.height)).collect();
+    sizes.sort_unstable();
+    assert_eq!(sizes, [(120, 30); 4]);
 }

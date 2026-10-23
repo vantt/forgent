@@ -47,14 +47,14 @@ fn crash_child() {
     if cleanup {
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "crash")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "crash", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&s);
-        f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
+        f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
         drop(s);
         let warnings = f
             .driver
-            .acknowledge_land_with_filesystem(
+            .acknowledge_land(
                 &f.repo,
                 "fixture",
                 "crash",
@@ -66,11 +66,11 @@ fn crash_child() {
     } else {
         let mut s = f
             .driver
-            .prepare_land_with_filesystem(&f.repo, vec![], &f.request, "fixture", "crash", &barrier)
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "crash", &barrier, 0)
             .unwrap();
         let e = evidence(&s);
         f.driver
-            .publish_land_with_filesystem(&f.repo, &mut s, &e, &barrier)
+            .publish_land(&f.repo, &mut s, &e, &barrier, 0)
             .unwrap();
     }
 }
@@ -145,7 +145,7 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
         let before = git(&main, &["rev-parse", "HEAD"]);
         if !attempted && chain.is_ok() {
             let refused = driver
-                .prepare_land(&repo, vec![], &req, "successor", "successor-blocked")
+                .prepare_land(&repo, vec![], &req, "successor", "successor-blocked", &wal::OsFileSystem, 0)
                 .err()
                 .unwrap();
             assert_eq!(refused.cause, "land-abandoned-writer-mismatch");
@@ -199,10 +199,10 @@ fn sigkill_at_every_acknowledged_wal_pin_cas_checkout_and_receipt_boundary() {
         req.source = git(&main, &["rev-parse", "HEAD"]);
         git(&main, &["checkout", "-q", "trunk"]);
         let mut s = driver
-            .prepare_land(&repo, vec![], &req, "successor", "fresh")
+            .prepare_land(&repo, vec![], &req, "successor", "fresh", &wal::OsFileSystem, 0)
             .unwrap_or_else(|e| panic!("{} fresh: {e:?}", boundaries[stop - 1]));
         let e = evidence(&s);
-        driver.publish_land(&repo, &mut s, &e).unwrap();
+        driver.publish_land(&repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
         drop(s);
         fs::remove_dir_all(temp).unwrap();
     }
@@ -222,12 +222,12 @@ fn interrupted_read_tree_preserves_index_lock_and_current_files_without_owned_in
     }
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "interrupted")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "interrupted", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
     assert!(f
         .driver
-        .publish_land_with_filesystem(&f.repo, &mut s, &e, &Stop)
+        .publish_land(&f.repo, &mut s, &e, &Stop, 0)
         .is_err());
     drop(s);
     fs::write(f.main.join("a"), "incoming\n").unwrap();
@@ -257,13 +257,13 @@ impl wal::FileSystem for StopAt {
 fn attempted(f: &Fixture, id: &str) -> LandCandidate {
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", id)
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", id, &wal::OsFileSystem, 0)
         .unwrap();
     let c = s.candidate().unwrap().clone();
     let e = evidence(&s);
     assert!(f
         .driver
-        .publish_land_with_filesystem(&f.repo, &mut s, &e, &StopAt("land-before-cas"))
+        .publish_land(&f.repo, &mut s, &e, &StopAt("land-before-cas"), 0)
         .is_err());
     c
 }
@@ -470,7 +470,7 @@ fn sigkill_at_every_cleanup_pin_and_compaction_boundary_preserves_replay() {
             .unwrap();
         assert_eq!(receipt.local_effect.published_oid.unwrap().as_str(), before);
         let warnings = driver
-            .acknowledge_land(&repo, "fixture", "crash", "durable-consumer-entry")
+            .acknowledge_land(&repo, "fixture", "crash", "durable-consumer-entry", &wal::OsFileSystem)
             .unwrap();
         let wal = wal::Wal::open(&repo).unwrap();
         if warnings.is_empty() {
@@ -496,11 +496,11 @@ fn sigkill_at_every_cleanup_pin_and_compaction_boundary_preserves_replay() {
         request.source = git(&main, &["rev-parse", "HEAD"]);
         git(&main, &["checkout", "-q", "trunk"]);
         let mut session = driver
-            .prepare_land(&repo, vec![], &request, "fixture", "fresh-cleanup")
+            .prepare_land(&repo, vec![], &request, "fixture", "fresh-cleanup", &wal::OsFileSystem, 0)
             .unwrap();
         let verification = evidence(&session);
         driver
-            .publish_land(&repo, &mut session, &verification)
+            .publish_land(&repo, &mut session, &verification, &wal::OsFileSystem, 0)
             .unwrap();
         drop(session);
         fs::remove_dir_all(temp).unwrap();
@@ -725,11 +725,11 @@ fn native_trace_controller() {
         request.source = git(&main, &["rev-parse", "HEAD"]);
         git(&main, &["checkout", "-q", "trunk"]);
         let mut session = driver
-            .prepare_land(&repo, vec![], &request, "fixture", "fresh-native")
+            .prepare_land(&repo, vec![], &request, "fixture", "fresh-native", &wal::OsFileSystem, 0)
             .unwrap();
         let verification = evidence(&session);
         driver
-            .publish_land(&repo, &mut session, &verification)
+            .publish_land(&repo, &mut session, &verification, &wal::OsFileSystem, 0)
             .unwrap();
         drop(session);
     } else {
@@ -808,12 +808,12 @@ fn fresh_land_waits_for_observed_predecessor_and_stat_refresh_is_safe() {
     git(&f.main, &["checkout", "-q", "trunk"]);
     let mut x = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "x")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "x", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&x);
     assert!(f
         .driver
-        .publish_land_with_filesystem(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"))
+        .publish_land(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"), 0)
         .is_err());
     drop(x);
     let mut y = f.request.clone();
@@ -821,7 +821,7 @@ fn fresh_land_waits_for_observed_predecessor_and_stat_refresh_is_safe() {
     y.source = source;
     let err = f
         .driver
-        .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+        .prepare_land(&f.repo, vec![], &y, "fixture", "y", &wal::OsFileSystem, 0)
         .err()
         .unwrap();
     assert_eq!(err.cause, "resource-recovery-required");
@@ -842,10 +842,10 @@ fn fresh_land_waits_for_observed_predecessor_and_stat_refresh_is_safe() {
         .unwrap();
     let mut session = f
         .driver
-        .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+        .prepare_land(&f.repo, vec![], &y, "fixture", "y", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&session);
-    f.driver.publish_land(&f.repo, &mut session, &e).unwrap();
+    f.driver.publish_land(&f.repo, &mut session, &e, &wal::OsFileSystem, 0).unwrap();
     assert_eq!(fs::read(f.main.join("a")).unwrap(), b"incoming\n");
     assert_eq!(fs::read(f.main.join("b")).unwrap(), b"second\n");
 }
@@ -855,25 +855,25 @@ fn another_writer_abandons_pre_attempt_but_only_owner_cleans_candidate() {
     let f = Fixture::new();
     let session = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "a", "abandoned")
+        .prepare_land(&f.repo, vec![], &f.request, "a", "abandoned", &wal::OsFileSystem, 0)
         .unwrap();
     let candidate = session.candidate().unwrap().worktree.clone();
     drop(session);
     assert!(f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "b", "new")
+        .prepare_land(&f.repo, vec![], &f.request, "b", "new", &wal::OsFileSystem, 0)
         .is_err());
     f.driver
         .recover_land(&f.repo, vec![], "b", "abandoned")
         .unwrap();
     assert!(f
         .driver
-        .acknowledge_land(&f.repo, "b", "abandoned", "ack")
+        .acknowledge_land(&f.repo, "b", "abandoned", "ack", &wal::OsFileSystem)
         .is_err());
     fs::write(candidate.join("a"), "retained user edit\n").unwrap();
     let warnings = f
         .driver
-        .acknowledge_land(&f.repo, "a", "abandoned", "ack")
+        .acknowledge_land(&f.repo, "a", "abandoned", "ack", &wal::OsFileSystem)
         .unwrap();
     assert!(!warnings.is_empty());
     assert_eq!(
@@ -883,7 +883,7 @@ fn another_writer_abandons_pre_attempt_but_only_owner_cleans_candidate() {
     fs::write(candidate.join("a"), "incoming\n").unwrap();
     let warnings = f
         .driver
-        .acknowledge_land(&f.repo, "a", "abandoned", "ack")
+        .acknowledge_land(&f.repo, "a", "abandoned", "ack", &wal::OsFileSystem)
         .unwrap();
     assert!(warnings.is_empty(), "{warnings:?}");
     assert!(!candidate.exists());
@@ -910,10 +910,10 @@ fn another_writer_abandons_pre_attempt_but_only_owner_cleans_candidate() {
     }
     let mut session = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "b", "new")
+        .prepare_land(&f.repo, vec![], &f.request, "b", "new", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&session);
-    f.driver.publish_land(&f.repo, &mut session, &e).unwrap();
+    f.driver.publish_land(&f.repo, &mut session, &e, &wal::OsFileSystem, 0).unwrap();
 }
 
 #[test]
@@ -931,12 +931,12 @@ fn ignored_store_collision_is_terminal_after_post_cas_crash() {
     fs::write(f.main.join(".fgos/store/x"), "local store\n").unwrap();
     let mut s = f
         .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "collision")
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "collision", &wal::OsFileSystem, 0)
         .unwrap();
     let e = evidence(&s);
     assert!(f
         .driver
-        .publish_land_with_filesystem(&f.repo, &mut s, &e, &StopAt("land-after-cas"))
+        .publish_land(&f.repo, &mut s, &e, &StopAt("land-after-cas"), 0)
         .is_err());
     drop(s);
     let index = fs::read(f.main.join(".git/index")).unwrap();
@@ -962,7 +962,7 @@ fn recovery_checks_native_state_even_before_attempt_and_off_destination() {
         let f = Fixture::new();
         let s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "native")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "native", &wal::OsFileSystem, 0)
             .unwrap();
         drop(s);
         git(&f.main, &["checkout", "-q", "source"]);
@@ -988,12 +988,12 @@ fn descendant_recovery_preserves_checkout_and_allows_next_land() {
         let f = Fixture::new();
         let mut x = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "x")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "x", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&x);
         assert!(f
             .driver
-            .publish_land_with_filesystem(&f.repo, &mut x, &e, &StopAt(boundary))
+            .publish_land(&f.repo, &mut x, &e, &StopAt(boundary), 0)
             .is_err());
         drop(x);
         // Ordinary user commit, including a staged revert when X was not reconciled.
@@ -1009,7 +1009,7 @@ fn descendant_recovery_preserves_checkout_and_allows_next_land() {
         y.source = source;
         let err = f
             .driver
-            .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+            .prepare_land(&f.repo, vec![], &y, "fixture", "y", &wal::OsFileSystem, 0)
             .err()
             .unwrap();
         assert_eq!(err.cause, "resource-recovery-required");
@@ -1039,10 +1039,10 @@ fn descendant_recovery_preserves_checkout_and_allows_next_land() {
         );
         let mut session = f
             .driver
-            .prepare_land(&f.repo, vec![], &y, "fixture", "y")
+            .prepare_land(&f.repo, vec![], &y, "fixture", "y", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&session);
-        f.driver.publish_land(&f.repo, &mut session, &e).unwrap();
+        f.driver.publish_land(&f.repo, &mut session, &e, &wal::OsFileSystem, 0).unwrap();
         assert_eq!(fs::read(f.main.join("a")).unwrap(), a);
         assert_eq!(fs::read(f.main.join("b")).unwrap(), b"second\n");
     }
@@ -1057,16 +1057,16 @@ fn unrelated_native_state_allows_prepare_publish_and_terminal_replay() {
         fs::write(&path, "foreign evidence").unwrap();
         let mut s = f
             .driver
-            .prepare_land(&f.repo, vec![], &f.request, "fixture", "native-replay")
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "native-replay", &wal::OsFileSystem, 0)
             .unwrap();
         let e = evidence(&s);
-        f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
+        f.driver.publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0).unwrap();
         f.driver
             .recover_land(&f.repo, vec![], "fixture", "native-replay")
             .unwrap();
         let warnings = f
             .driver
-            .acknowledge_land(&f.repo, "fixture", "native-replay", "ack")
+            .acknowledge_land(&f.repo, "fixture", "native-replay", "ack", &wal::OsFileSystem)
             .unwrap();
         assert!(warnings.is_empty(), "{warnings:?}");
         assert!(wal::Wal::open(&f.repo)

@@ -13,15 +13,12 @@
     { "name": "activity.state", "meaning": "agent lifecycle state of the pane (idle, working, blocked, done)" },
     { "name": "label", "meaning": "set display labels of a tab or pane" },
     { "name": "layout.geometry", "meaning": "real rect of the tab area and of every pane in it" },
-    { "name": "pane.resize", "meaning": "resize a split" },
-    { "name": "pane.swap", "meaning": "swap two panes" },
-    { "name": "pane.move", "meaning": "move a pane" },
     { "name": "server.incarnation", "meaning": "identity of the multiplexer server process: peer credentials of its socket, then start time and boot id of that pid" }
   ],
   "drivers": {
     "herdr": {
-      "linux": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "pane.resize", "pane.swap", "pane.move", "server.incarnation"],
-      "macos": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "pane.resize", "pane.swap", "pane.move", "server.incarnation"],
+      "linux": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "server.incarnation"],
+      "macos": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "server.incarnation"],
       "windows": [],
       "absent": [],
       "notes": [

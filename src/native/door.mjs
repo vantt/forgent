@@ -15,6 +15,10 @@ const unavailable = (cause) => Object.assign(new Error(`git-addon-unavailable: $
 const safeRelative = (p) => typeof p === 'string' && p && !path.isAbsolute(p) && !p.split(/[\\/]/).some(s => s === '..' || s === '');
 /** The verified `fgos` host executable of the release `addon` was loaded from, or null. */
 export const nativeHelperExe = (addon) => helperExes.get(addon) ?? null;
+/** The typed fields a native port error carries (`cause`, `stderr` bytes, ...), or undefined for an error that is not one. */
+const nativeFields = (error) => { try { return JSON.parse(error.message); } catch { return undefined; } };
+/** A native port error as its typed fields; an error that is not one keeps its message as the cause. */
+export const nativeError = (error) => nativeFields(error) ?? { cause: error.message ?? error.code, stderr: [] };
 // A release manifest counts only when its payload is this running payload: a cwd's activation may be another release.
 function ownRelease(bin) {
   const found = releasePayloadManifest(bin);
@@ -92,8 +96,7 @@ function durable(call, dir, name, bytes, mode) {
     throw Object.assign(new Error(`durable-file-mode-invalid: mode must be an integer from 0 to 0o7777, got ${JSON.stringify(mode)}`), { code: 'durable-file-mode-invalid', installed: 'none' });
   }
   try { return nativeDoor().durableFile[call](dir, name, Buffer.from(bytes), mode); } catch (err) {
-    let fields = {};
-    try { fields = JSON.parse(err.message); } catch {}
+    const fields = nativeFields(err) ?? {};
     if (fields.temporary) fs.rmSync(fields.temporary, { force: true });
     if (fields.cause) err.message = `durable-file-${call}: ${fields.cause}`;
     throw Object.assign(err, { installed: fields.installed ?? 'none' });

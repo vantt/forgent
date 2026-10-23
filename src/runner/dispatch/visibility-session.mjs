@@ -149,28 +149,6 @@ export function markDetached(runDir, opts = {}) {
 // requirement instead of guessed at now.
 
 /**
- * Find this run's agent among the ones herdr currently reports.
- *
- * Pane id first, then the agent session value. herdr does not reuse a pane id
- * after the pane closes, so a handle that finds nothing means the pane is
- * gone -- it can never quietly resolve to somebody else's pane.
- */
-export function findAgentBinding(agents, visibility) {
-  if (!Array.isArray(agents) || !visibility) return null;
-  const { paneId, agentSession } = visibility;
-  if (paneId) {
-    const byPane = agents.find((a) => a && (a.pane_id ?? a.paneId) === paneId);
-    if (byPane) return byPane;
-  }
-  const wanted = agentSession?.value;
-  if (wanted) {
-    const bySession = agents.find((a) => (a?.agent_session?.value ?? a?.agentSession?.value) === wanted);
-    if (bySession) return bySession;
-  }
-  return null;
-}
-
-/**
  * Did the worker leave a result behind?
  *
  * The worker's own claim first, under either name it may have been written

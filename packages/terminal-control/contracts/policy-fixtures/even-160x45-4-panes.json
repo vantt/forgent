@@ -1,0 +1,113 @@
+{
+  "name": "even-160x45-4-panes",
+  "policy": "even-split",
+  "input": {
+    "groupKey": "g",
+    "tabs": [
+      {
+        "tabId": "t1",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 160,
+          "height": 45
+        },
+        "panes": [
+          {
+            "paneId": "p1",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 80,
+              "height": 23
+            }
+          },
+          {
+            "paneId": "p2",
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 80,
+              "height": 23
+            }
+          },
+          {
+            "paneId": "p3",
+            "rect": {
+              "x": 0,
+              "y": 23,
+              "width": 80,
+              "height": 22
+            }
+          },
+          {
+            "paneId": "p4",
+            "rect": {
+              "x": 80,
+              "y": 23,
+              "width": 80,
+              "height": 22
+            }
+          }
+        ]
+      }
+    ],
+    "groupPanes": [
+      {
+        "key": "k1",
+        "tabId": "t1",
+        "paneId": "p1",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 80,
+          "height": 23
+        }
+      },
+      {
+        "key": "k2",
+        "tabId": "t1",
+        "paneId": "p2",
+        "rect": {
+          "x": 80,
+          "y": 0,
+          "width": 80,
+          "height": 23
+        }
+      },
+      {
+        "key": "k3",
+        "tabId": "t1",
+        "paneId": "p3",
+        "rect": {
+          "x": 0,
+          "y": 23,
+          "width": 80,
+          "height": 22
+        }
+      },
+      {
+        "key": "k4",
+        "tabId": "t1",
+        "paneId": "p4",
+        "rect": {
+          "x": 80,
+          "y": 23,
+          "width": 80,
+          "height": 22
+        }
+      }
+    ],
+    "request": {
+      "label": "w"
+    },
+    "limits": {
+      "minCols": 80,
+      "minRows": 20,
+      "maxPanesPerTab": 8
+    }
+  },
+  "expected": {
+    "newTab": {}
+  }
+}

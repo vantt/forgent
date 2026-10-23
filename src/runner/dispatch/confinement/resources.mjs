@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
+import { createRoundTerminalControl, resolveHerdrBin } from '../terminal-slot.mjs';
 
 /**
  * `hostRead: blind` leaves the host readable except what other dispatches and live agent
@@ -179,15 +180,33 @@ function realPathOrNull(p) {
   }
 }
 
+// The answers are per process: the socket of a session does not move while it runs.
+const socketDirs = new Map();
+
 /**
- * The directory holding the herdr API sockets: the one the caller's own socket sits in, else
- * herdr's default. A confined reader that can connect to a socket there can list and read a
- * sibling's pane.
+ * The directory holding the herdr API sockets: the one the caller's own socket sits in, else the
+ * one the terminal-control route names for the caller's session (herdr's default session when it
+ * names none). A confined reader that can connect to a socket there can list and read a sibling's
+ * pane. A route that does not answer refuses the grant: hiding nothing would be the silent failure.
  */
 function herdrSocketDir(env = process.env) {
-  const socket = env.HERDR_SOCKET_PATH;
-  if (typeof socket === 'string' && path.isAbsolute(socket)) return path.dirname(socket);
-  return path.join(os.homedir(), '.config', 'herdr');
+  const own = env.HERDR_SOCKET_PATH;
+  if (typeof own === 'string' && path.isAbsolute(own)) return path.dirname(own);
+  const key = `${env.HERDR_SESSION ?? ''}\0${env.FGOS_HERDR_BIN ?? ''}`;
+  if (!socketDirs.has(key)) {
+    let socketPath;
+    let cause = 'it named no socket';
+    try {
+      socketPath = createRoundTerminalControl({ herdrBin: resolveHerdrBin(undefined, env), herdrEnv: env }).capabilities()?.endpoint?.socketPath;
+    } catch (error) {
+      cause = error?.message ?? String(error);
+    }
+    if (typeof socketPath !== 'string' || !path.isAbsolute(socketPath)) {
+      throw new ConfinementResourceError('confinement-grant-invalid', `hostRead: blind needs the herdr socket directory, and the terminal-control route did not name it (${cause}).`);
+    }
+    socketDirs.set(key, path.dirname(socketPath));
+  }
+  return socketDirs.get(key);
 }
 
 /**

@@ -11,6 +11,31 @@ use std::{
 };
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
+static LOGGING_GIT: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+
+/// Puts a `git` that records `<cwd> <argv>` ahead of the real one on PATH, once, before any
+/// driver exists: the driver picks its git from PATH the first time one is created.
+fn logging_git_log() -> &'static Path {
+    LOGGING_GIT.get_or_init(|| {
+        let dir = std::env::temp_dir().join(format!("fgos-sequence-git-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir(&dir).unwrap();
+        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout;
+        let real = String::from_utf8(real).unwrap().trim().to_owned();
+        let script = dir.join("git");
+        let log = dir.join("argv.log");
+        fs::write(
+            &script,
+            format!("#!/bin/sh\nprintf '%s %s\\n' \"$PWD\" \"$*\" >> '{}'\nexec '{real}' \"$@\"\n", log.display()),
+        )
+        .unwrap();
+        fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
+        let mut paths = vec![dir.clone()];
+        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
+        log
+    })
+}
 
 fn git(path: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -35,6 +60,7 @@ struct Fixture {
 
 impl Fixture {
     fn new() -> Self {
+        logging_git_log();
         let root = std::env::temp_dir().join(format!(
             "fgos-sequence-{}-{}",
             std::process::id(),
@@ -81,7 +107,7 @@ fn claimed(push: SequencePush) -> Oid {
 fn a_repository_without_a_remote_keeps_its_counter_in_its_own_ref() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     assert!(matches!(home, SequenceHome::Local));
     assert_eq!(f.driver.sequence_tip(&repo, &home, "d-adr").unwrap(), None);
 
@@ -125,11 +151,42 @@ fn a_repository_without_a_remote_keeps_its_counter_in_its_own_ref() {
 }
 
 #[test]
+fn a_local_claim_asks_git_to_flush_even_when_the_repository_configures_writeout_only() {
+    // Git's `writeout-only` method hands bytes to the kernel without a flush. The claim must
+    // override it on the very commands that write the counter, and still be claimed and ordered.
+    let f = Fixture::new();
+    let repo = f.clone_named("alone", false);
+    git(&f.root.join("alone"), &["config", "core.fsyncMethod", "writeout-only"]);
+    let home = f.driver.sequence_home(&repo).unwrap();
+    let first = claimed(f.driver.sequence_push(&repo, &home, "d-adr", None, 1, "claim-a").unwrap());
+    assert_eq!(git(&f.root.join("alone"), &["rev-parse", "refs/fgos/seq/d-adr"]), first.as_str());
+
+    let calls = fs::read_to_string(logging_git_log()).unwrap();
+    let root = f.root.canonicalize().unwrap();
+    // The driver's floor probe may run first in a scratch `git-floor-*` directory under the same
+    // root; only the calls that write the counter are judged.
+    let ours: Vec<&str> = calls
+        .lines()
+        .filter(|l| l.starts_with(root.to_str().unwrap()) && !l.contains("/git-floor-"))
+        .collect();
+    for (verb, mark) in [("commit-tree", ""), ("update-ref", "refs/fgos/seq/d-adr")] {
+        let call = ours
+            .iter()
+            .find(|l| l.split(' ').any(|word| word == verb) && l.contains(mark))
+            .unwrap_or_else(|| panic!("no {verb} call in {ours:?}"));
+        assert!(
+            call.contains("core.fsync=all") && call.contains("core.fsyncMethod=fsync"),
+            "{verb} did not force a flushing method: {call}"
+        );
+    }
+}
+
+#[test]
 fn a_remote_counter_accepts_one_of_two_claims_made_from_the_same_tip() {
     let f = Fixture::new();
     let a = f.clone_named("a", true);
     let b = f.clone_named("b", true);
-    let (home_a, home_b) = (f.driver.sequence_home(&a), f.driver.sequence_home(&b));
+    let (home_a, home_b) = (f.driver.sequence_home(&a).unwrap(), f.driver.sequence_home(&b).unwrap());
     assert!(matches!(home_a, SequenceHome::Remote(_)));
 
     let first = claimed(
@@ -188,7 +245,7 @@ fn a_remote_counter_accepts_one_of_two_claims_made_from_the_same_tip() {
 fn an_unreachable_remote_is_a_failure_never_a_stale_answer() {
     let f = Fixture::new();
     let repo = f.clone_named("a", true);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     fs::remove_dir_all(f.root.join("origin.git")).unwrap();
     assert!(f.driver.sequence_tip(&repo, &home, "d-adr").is_err());
     assert!(f
@@ -198,10 +255,23 @@ fn an_unreachable_remote_is_a_failure_never_a_stale_answer() {
 }
 
 #[test]
+fn an_origin_that_cannot_be_used_is_a_refusal_not_a_local_counter() {
+    // No other case proves it: an unreadable or unsupported origin used to read as "no origin",
+    // and the claim went to a counter on this machine alone.
+    let f = Fixture::new();
+    let repo = f.clone_named("a", true);
+    git(&f.root.join("a"), &["config", "remote.origin.url", "git://example.invalid/r"]);
+    let refused = f.driver.sequence_home(&repo).expect_err("an unsupported origin");
+    assert!(refused.cause.contains("remote-protocol-not-supported"), "{}", refused.cause);
+    git(&f.root.join("a"), &["config", "--unset", "remote.origin.url"]);
+    assert!(matches!(f.driver.sequence_home(&repo).unwrap(), SequenceHome::Local));
+}
+
+#[test]
 fn a_claimant_that_is_not_a_plain_name_is_refused() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     for bad in ["", "two words", "a=b", &"x".repeat(65)] {
         assert!(
             f.driver
@@ -216,7 +286,7 @@ fn a_claimant_that_is_not_a_plain_name_is_refused() {
 fn a_kind_that_is_not_a_slug_is_refused_before_any_ref_is_touched() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     assert!(f
         .driver
         .sequence_push(&repo, &home, "../heads/trunk", None, 1, "claim-a")

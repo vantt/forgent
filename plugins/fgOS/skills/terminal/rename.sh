@@ -6,8 +6,9 @@
 # pane-labeling capability not being registered at all -- is a silent no-op,
 # exit 0.
 #
-# Usage: rename.sh <task-id> <project-root>
-#   <task-id>      the claimed fgOS item id (first label segment)
+# Usage: rename.sh <task-id> <project-root> [<title>]
+#   <task-id>      the claimed fgOS item id (shown by its first 8 characters)
+#   <title>        optional: what the task is called, when the caller knows it
 #   <project-root> absolute path to this repo's checkout, so the fgOS
 #                  session-id fallback (fg.ssid) can be resolved even when
 #                  this script itself runs from an installed plugin cache
@@ -16,6 +17,7 @@ set -u
 
 task_id="${1:-}"
 project_root="${2:-}"
+title="${3:-}"
 
 [ -n "$task_id" ] || exit 0
 
@@ -67,40 +69,30 @@ command -v herdr >/dev/null 2>&1 || exit 0
 command -v fgos >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
 # HERDR_PANE_ID can be inherited from a shared agent daemon and name a dead
-# pane or another session's pane: act only on this caller's own live pane.
-. "$(dirname "$0")/pane-owned.sh"
+# pane or another session's pane. The port's attach takes only a pane whose
+# shell is an ancestor of this process, so a foreign pane stops at the attach
+# below.
 . "$(dirname "$0")/terminal-port.sh"
-fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
-# fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else the
+# fgOS's own session id. FGOS_SESSION_ID first, else the
 # activated host's writer identity (`fgos identity`: its env/registry/pid
 # chain) -- dropped entirely if neither resolves.
 fg_ssid="${FGOS_SESSION_ID:-}"
 [ -n "$fg_ssid" ] || fg_ssid=$(fgos_writer_id "$project_root")
 
-# a.ssid (D1): the coding agent tool's own native session id. Claude Code
-# exposes CLAUDE_CODE_SESSION_ID; other agent tools are not detected today
-# (docs/history/fgos-terminal-pane-rename/CONTEXT.md, outstanding questions)
-# and simply drop this segment (D4).
-a_ssid="${CLAUDE_CODE_SESSION_ID:-}"
+# The label is `<short id> · <title> | fg.ssid:<first 8>`: the port builds it from
+# these fields, so shell and Node share one format and one truncation rule. The
+# coding agent's own session id is not shown; full ids stay in the record.
+display="{\"id\":$(fgos_json_str "$task_id")"
+[ -n "$title" ] && display="$display,\"title\":$(fgos_json_str "$title")"
+[ -n "$fg_ssid" ] && display="$display,\"session\":$(fgos_json_str "$fg_ssid")"
+display="$display}"
 
-# resolveWriterIdentity()'s own fallback chain reads CLAUDE_CODE_SESSION_ID
-# too when FGOS_SESSION_ID is unset, so fg_ssid can come back equal to
-# a_ssid -- collapsing the two genuinely-distinct identities D1 requires.
-# Drop the duplicate rather than show the same value twice.
-if [ -n "$fg_ssid" ] && [ "$fg_ssid" = "$a_ssid" ]; then
-  fg_ssid=""
-fi
-
-# D4: taskid | fg.ssid:<v> | a.ssid:<v>, unresolved segments dropped.
-label="$task_id"
-[ -n "$fg_ssid" ] && label="$label | fg.ssid:$fg_ssid"
-[ -n "$a_ssid" ] && label="$label | a.ssid:$a_ssid"
-
-# The terminal-control port takes the pane (attach, keyed by this session's
-# writer id; idempotent) and then writes the label. Either step failing is
-# the same silent no-op as every guard above.
+# The terminal-control port takes the pane (attach with the display facts, keyed by
+# this session's writer id; idempotent; refused unless the pane is this caller's own) and then
+# writes the label. Either step failing is the same silent no-op as every
+# guard above.
 key=$(fgos_terminal_key "$project_root")
-fgos_terminal_attach "$key" "$HERDR_PANE_ID" || exit 0
-fgos_terminal_call label "{\"key\":$(fgos_json_str "$key"),\"display\":{\"label\":$(fgos_json_str "$label")}}" >/dev/null || true
+fgos_terminal_attach "$key" "$HERDR_PANE_ID" "$display" || exit 0
+fgos_terminal_call label "{\"key\":$(fgos_json_str "$key"),\"display\":$display}" >/dev/null || true
 exit 0

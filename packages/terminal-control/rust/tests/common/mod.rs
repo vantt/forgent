@@ -188,6 +188,12 @@ impl MemDriver {
     }
 }
 
+/// Make the test process the shell of `pane`: the caller of a core built in a test runs in it.
+pub fn run_caller_in(driver: &MemDriver, pane: &str) {
+    let me = std::process::id();
+    driver.set_foreground(pane, me, vec![ForegroundProcess { pid: me, argv: vec!["bash".into()] }], me);
+}
+
 pub fn bare(shell: u32) -> ProcessInfo {
     ProcessInfo {
         shell_pid: shell,
@@ -296,14 +302,6 @@ impl TerminalDriver for MemDriver {
     fn activity(&self, _pane: &str) -> DriverResult<Activity> {
         Ok(Activity { state: "idle".into(), ..Default::default() })
     }
-    fn activity_start(&self, pane: &str, name: &str, kind: &str, _args: &[String], _timeout_ms: u64) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("activity.start {pane} {name} {kind}"));
-        Ok(())
-    }
-    fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("label.tab {tab} {label}"));
-        Ok(())
-    }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {
         self.log.borrow_mut().push(format!("label.pane {pane} {label}"));
         Ok(())
@@ -318,7 +316,7 @@ impl TerminalDriver for MemDriver {
         let members = panes
             .iter()
             .filter(|(_, p)| p.tab == tab)
-            .map(|(id, p)| PaneGeometry { pane_id: id.clone(), rect: p.rect, pty: None })
+            .map(|(id, p)| PaneGeometry { pane_id: id.clone(), rect: p.rect })
             .collect();
         Ok(TabGeometry { tab_id: tab, area: self.area, panes: members })
     }
@@ -349,8 +347,8 @@ pub fn request(key: &str, group: &str) -> AllocateRequest {
     AllocateRequest {
         key: key.into(),
         group_key: group.into(),
-        display: Display { label: format!("label-{group}"), ..Display::default() },
-        role_hint: None,
+        display: Display { title: Some(format!("label-{group}")), ..Display::default() },
+        group_size: None,
         cwd: None,
         env: Default::default(),
     }

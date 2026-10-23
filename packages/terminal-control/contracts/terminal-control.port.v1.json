@@ -11,16 +11,19 @@
   },
   "display": {
     "fields": {
-      "label": "string; tab label for the group and pane label for the slot",
-      "role": "optional string",
-      "agent": "optional string",
-      "model": "optional string"
+      "id": "optional string; the work item or run, kept whole in the record; labels show its first 8 characters",
+      "title": "optional string; labels show its first 24 characters",
+      "role": "optional string; a pane with a role is labelled `<role> · <model>`",
+      "agent": "optional string; stands in for a missing model",
+      "model": "optional string",
+      "session": "optional string; marks a person's own pane, labelled `<short id> · <title> | fg.ssid:<first 8>`"
     },
+    "labels": "the core builds them from these fields: tab `<short id> · <title>` (the group key when both are missing; an overflow tab adds ` (n)`), worker pane `<role> · <model>`, own pane as above",
     "rule": "display is written to the terminal and the record only; no code reads it back to decide anything"
   },
   "operations": {
     "allocate": {
-      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "groupSize": "optional integer: how many panes the caller's batch opens in all; the placement policy sizes them equally when it is given", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": [
         "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",
@@ -32,7 +35,8 @@
     "attach": {
       "input": { "key": "key", "pane": "driver pane id", "groupKey": "optional groupKey: the pane joins that group so its next pane opens beside it; defaults to the key", "display": "optional display" },
       "results": ["slot", "unsupported", "unknown"],
-      "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"]
+      "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"],
+      "rule": "the caller must run in the pane: the pane's shell (the driver's process.info shell pid) is the caller or one of the caller's ancestors, judged by the process tuples the OS reports now. The caller is named by the OS (the process the route was started by; in process, the process itself), never by the request. Anything unreadable, an unnamed caller or a shell that is not an ancestor is refused as unknown with a reason that starts pane-not-owned:. The check runs before the store is read, so a key already bound to the pane is no way around it. On Windows the OS gives no parent, so only a pane whose shell is the caller itself is taken."
     },
     "launch": {
       "input": {
@@ -42,14 +46,13 @@
           "args": "string[]",
           "cwd": "absolute path",
           "env": "object of string",
-          "activity": "optional {kind, args, timeoutMs}: start through the driver's agent support (activity.state) instead of a plain pane.run; timeoutMs bounds how long the driver may take to bring the agent to ready",
           "expect": "optional {argv0, command, args}: the foreground process the launch becomes when it is not the command itself (a launcher script that execs the real one); identity is taken from the process matching it"
         }
       },
       "results": ["launched", "not-started", "unsupported", "unknown"],
       "effects": [
-        "requires pane.run, read.screen and process.info for plain launch; activity.state and process.info for activity launch",
-        "plain launch types probe commands to prove shell execution before the marker is written",
+        "requires pane.run, read.screen and process.info",
+        "types probe commands to prove shell execution before the marker is written",
         "writes marker launch-requested after the ready-shell handshake succeeds, before typing the launch line",
         "writes marker launched{identity} after the root process of the pane command is identified (argv checked like verifyForegroundProcessArgv)",
         "returns not-started if launch was already requested, if pane foreground is not the shell, if pane shell did not become ready in time, or if the launched root process was not identified in time",
@@ -76,26 +79,26 @@
         "until": "retain only: epoch ms, or null for kept until a person closes it",
         "callerPane": "optional driver pane id: the pane the caller itself runs in; only a close of an attached slot whose pane equals it closes the pane"
       },
-      "results": ["released", "kept-unknown", "unsupported"],
+      "results": ["released", "kept-unknown", "unsupported", "unknown"],
       "effects": [
         "close: closes only the pane this key allocated, only when the server incarnation matches right before and right after the close; never closes a tab",
-        "retain: records released{retain, until}; a later reconcile closes only past until, same incarnation, foreground not foreign",
+        "retain: records released{retain, until}; the pane stays open, a later close by key is refused, and a person closes it (reconcile-scan reports it as retain-expired past until)",
         "attached slots: release removes label and link only, except a close whose callerPane is the slot's own pane (a person closing their own pane through /fgOS:terminal-close), which closes it like an allocated pane (same incarnation checks); the only exception"
       ]
     },
     "label": {
-      "input": { "key": "key", "display": "display", "reportState": "optional string: also tell the driver which agent (display.agent) runs in the pane, for a process it does not recognise on its own; the reported state becomes the pane's status authority" },
+      "input": { "key": "key", "display": "display" },
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {
-      "input": {},
+      "input": { "agents": "optional boolean: also answer agentKinds and integrations (two more herdr reads; omitted otherwise)" },
       "results": ["capabilities"],
-      "meaning": "driver name, declared capability list (driver-capabilities.v1.json) and current server incarnation or unknown; doctor reads this"
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, the socket the driver talks to, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the agent kinds and integration hooks when asked, the core's default for every config key and the registered placement policy names; doctor reads this"
     },
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
-      "results": ["scan"],
-      "rule": "reports only; never closes anything because time passed (except retain past until under the release rule)"
+      "results": ["scan", "unsupported", "unknown"],
+      "rule": "reports only; never closes anything, however much time passed; a retained pane past until is reported as retain-expired with its pane id"
     }
   },
   "results": {
@@ -113,19 +116,34 @@
     },
     "released": { "result": "released", "disposition": { "enum": ["close", "retain"] } },
     "kept-unknown": { "result": "kept-unknown", "reason": "string; the pane is kept because the core could not prove it may close it" },
-    "capabilities": { "result": "capabilities", "driver": "string", "capabilities": "string[]", "serverIncarnation": "serverIncarnation | null" },
+    "capabilities": {
+      "result": "capabilities",
+      "driver": "string",
+      "capabilities": "string[]",
+      "serverIncarnation": "serverIncarnation | null",
+      "endpoint": "{socketPath: string | null}: the socket the driver talks to, named without asking the server: the caller's own HERDR_SOCKET_PATH, else the one herdr keeps for the HERDR_SESSION the caller named (the default session's when it named none); null when no home directory is known or the session name is not one herdr accepts",
+      "anchorPane": "{state: absent} when the caller named none, {state: resolved} when the driver finds the pane, {state: unresolvable, reason} otherwise (one driver read, only when a pane was named)",
+      "agentKinds": "string[] | \"unknown\"; only when asked (agents: true): the kinds herdr's agent start accepts, \"unknown\" when its text cannot be read",
+      "integrations": "object | \"unknown\"; only when asked: agent name -> current | outdated | not installed, \"unknown\" when herdr's text cannot be read",
+      "defaults": "object: the core's value for every key the route's config accepts (minCols, minRows, maxPanesPerTab, policy, allocationGraceMs, launchIdentifyTimeoutMs, shellReadyTimeoutMs)",
+      "policies": "string[]: the placement policy names the core registers (placement-policy.v1.json registry.names)"
+    },
     "scan": {
       "result": "scan",
       "findings": [
         {
           "key": "key",
+          "paneId": "string | null; the pane the finding is about, null when no record names one",
           "kind": { "enum": ["allocated-not-launched-bare-shell", "retain-expired", "stale-incarnation", "unknown"] },
           "detail": "string"
         }
       ]
     },
-    "unsupported": { "result": "unsupported", "capability": "the missing capability name, or driver-absent", "detail": "string" },
-    "unknown": { "result": "unknown", "reason": "string; driver timeout, unreadable output, incarnation mismatch, or missing record" }
+    "unsupported": { "result": "unsupported", "capability": "the missing capability name, or the driver name (herdr) when its binary is not found", "detail": "string" },
+    "unknown": { "result": "unknown", "reason": "string, the refusal's own text; driver timeout, unreadable output, incarnation mismatch, or missing record" }
+  },
+  "configRefusals": {
+    "terminal-config-below-floor": "a route config limit under the measured floor (minCols 40, minRows 8) is refused before any operation runs; the message names the key, the value and the floor"
   },
   "types": {
     "identity": { "pid": "integer", "startTime": "string (clock ticks since boot on Linux)", "bootId": "string", "pgid": "integer" },

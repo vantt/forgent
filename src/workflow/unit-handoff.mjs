@@ -338,8 +338,9 @@ export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {
 export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {
   if (!repoRoot || !branch) throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');
   const worktreePath = path.resolve(worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-')));
-  const existing = workflowInspect(repoRoot).resolveRef({ name: `refs/heads/${branch}` });
-  createWorktreeCheckoutSync(scope, repoRoot, { path: worktreePath, branch, base: existing.kind === 'direct' ? existing.oid : baseRef });
+  const inspect = workflowInspect(repoRoot);
+  const existing = inspect.resolveRef({ name: `refs/heads/${branch}` });
+  createWorktreeCheckoutSync(scope, repoRoot, { path: worktreePath, branch, base: existing.kind === 'direct' ? existing.oid : baseRef }, { inspect });
   return { worktreePath: fs.realpathSync(worktreePath), branch };
 }
 

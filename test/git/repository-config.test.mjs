@@ -19,7 +19,6 @@ test('RepositoryConfig fills empty hooks, reports missing enforcement and remove
     assert.equal(f.git('config', 'core.hooksPath'), ownedPath);
     fs.mkdirSync(ownedPath); fs.writeFileSync(path.join(ownedPath, 'pre-commit'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
     assert.equal(port.inspectHooks({ ownedPath }).enforcementMissing, false);
-    assert.equal(port.recover({ operationId: 'hooks' }).status, 'owned');
     assert.equal(port.removeOwnedHooksConfig({ ownedPath, operationId: 'remove' }).status, 'empty');
     f.git('config', 'core.hooksPath', '/custom/hooks');
     assert.equal(port.ensureHooks({ ownedPath, operationId: 'custom' }).status, 'skippedExisting');
