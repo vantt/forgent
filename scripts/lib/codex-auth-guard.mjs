@@ -11,8 +11,12 @@
  * so the guard is safe for both: when the link was replaced by a plain file,
  * that file may hold the only valid, just-rotated refresh token, and it is
  * set aside, never deleted, and the run directory is never cleaned while it
- * exists.
+ * exists. The same rule covers a login copied into a confined run (the V6
+ * behaviour suite, scripts/lib/mailbox-live-confined.mjs): a copy whose bytes
+ * differ from its snapshot after the run may hold the only valid token, and
+ * is set aside under the same name.
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -37,6 +41,29 @@ export function setAsideReplacedAuth(link) {
   const aside = path.join(path.dirname(link), ROTATED_AUTH);
   if (fs.existsSync(aside)) throw new Error(`${aside} exists already; ${link} is left in place`);
   fs.renameSync(link, aside);
+  fs.chmodSync(aside, 0o600);
+  return aside;
+}
+
+/** The sha256 of a login file's bytes, the snapshot a copy is compared with. */
+export function loginDigest(file) {
+  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+}
+
+/**
+ * After a run that held a copied login at `copy`: null when the copy still has the bytes of
+ * `snapshot` (its sha256 at copy time). Otherwise, the copy (changed, or replaced by another
+ * entry) is moved to `asideDir`/auth.json.rotated, mode 0600, and that path is returned; a
+ * missing copy returns `missing`, which the caller treats as changed. Never deletes anything:
+ * it throws rather than replace a file already set aside there.
+ */
+export function setAsideChangedCopy(copy, snapshot, asideDir) {
+  const stat = fs.lstatSync(copy, { throwIfNoEntry: false });
+  if (!stat) return 'missing';
+  if (stat.isFile() && loginDigest(copy) === snapshot) return null;
+  const aside = path.join(asideDir, ROTATED_AUTH);
+  if (fs.existsSync(aside)) throw new Error(`${aside} exists already; ${copy} is left in place`);
+  fs.renameSync(copy, aside);
   fs.chmodSync(aside, 0o600);
   return aside;
 }

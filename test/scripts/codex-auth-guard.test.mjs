@@ -7,7 +7,9 @@ import {
   ROTATED_AUTH,
   authRefusalAfterRun,
   isAuthLink,
+  loginDigest,
   removeRunDir,
+  setAsideChangedCopy,
   setAsideAuthFiles,
   setAsideReplacedAuth,
 } from '../../scripts/lib/codex-auth-guard.mjs';
@@ -102,4 +104,30 @@ test('the guard never walks into a linked directory, such as a case HOME linking
   assert.equal(removeRunDir(run), null);
   assert.equal(fs.existsSync(run), false);
   assert.deepEqual(fs.readdirSync(real).sort(), ['auth.json', ROTATED_AUTH].sort(), 'the linked directory is untouched');
+});
+
+test('a copied login whose bytes changed is set aside out of its home under the one set-aside name, never deleted, and blocks cleaning; an unchanged copy is left alone', () => {
+  const dir = scratch();
+  const run = path.join(dir, 'run-1');
+  const copy = path.join(run, 'home', '.claude', '.credentials.json');
+  fs.mkdirSync(path.dirname(copy), { recursive: true });
+  fs.writeFileSync(copy, '{"tokens":"copied"}', { mode: 0o600 });
+  const snapshot = loginDigest(copy);
+
+  assert.equal(setAsideChangedCopy(copy, snapshot, run), null);
+  assert.equal(fs.readFileSync(copy, 'utf8'), '{"tokens":"copied"}');
+
+  fs.writeFileSync(copy, '{"tokens":"rotated"}');
+  const aside = setAsideChangedCopy(copy, snapshot, run);
+  assert.equal(aside, path.join(run, ROTATED_AUTH));
+  assert.equal(fs.readFileSync(aside, 'utf8'), '{"tokens":"rotated"}');
+  assert.equal(fs.statSync(aside).mode & 0o777, 0o600);
+  assert.equal(fs.existsSync(copy), false);
+  assert.deepEqual(setAsideAuthFiles(run), [aside]);
+  assert.match(removeRunDir(run), /refusing to remove/);
+  assert.throws(() => { fs.writeFileSync(copy, 'again'); setAsideChangedCopy(copy, snapshot, run); }, /exists already/);
+  assert.equal(fs.readFileSync(aside, 'utf8'), '{"tokens":"rotated"}', 'the first set-aside file is never replaced');
+
+  fs.rmSync(copy);
+  assert.equal(setAsideChangedCopy(copy, snapshot, run), 'missing');
 });

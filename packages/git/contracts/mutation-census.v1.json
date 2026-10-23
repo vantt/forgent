@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7cf5d12953a77474aa2b6625c04df383544765a8cb1693d623bffb89af6239ba",
+  "payloadDigest": "daad278de442d80ae4b2abeb496441159a1de0417cc402bd53db96d372222ce0",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -737,7 +737,7 @@
     "scripts/knowledge-canary.mjs": "3a3cb3dafc17a9128a19ec49e33ebf46f0f157bd3a254e783a693aebe4f5845a",
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
-    "scripts/lib/codex-auth-guard.mjs": "c7b8720a80033095554d4eed08a0637accc308c03b6371e199b7aa57ff5d1065",
+    "scripts/lib/codex-auth-guard.mjs": "81ef7ac3aa029b6a50257fceefb4334b2ad265af7794c9f419ee49c8798b92da",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "1ec1179ce9ed73ad9e8ccba357d9ee141cd5bb57aff9d86f39b45eacc8da1ad7",
@@ -747,6 +747,7 @@
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
+    "scripts/lib/mailbox-live-confined.mjs": "cb0d60b8d2a2582d6db1644ab238d4a358debce606a6d6c2220d56e08bf37e66",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
@@ -901,7 +902,7 @@
     "src/runner/dispatch/provider-auth-failure.mjs": "d87918a5cabbad7eed60876bd02c976ef1f680c45e28d379338f59effb892dda",
     "src/runner/dispatch/provider-capacity.mjs": "3ab39cb15779c9f3cdd02382b09ee82a764441e868cab551ee4156f201760100",
     "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
-    "src/runner/dispatch/provider-credential-renewal.mjs": "1cb5087f80db94afe6073864d920228aadffd0937dba97a7f96a08b05b862fd5",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "688164f5c9162b7e1324eb803e5e103798d825b9582f4f392f478b3abaecd657",
     "src/runner/dispatch/reconciliation-planner.mjs": "4b9656622397128a0d861abbf8512830bfecd670ac9b7fe2489ad3e0eeb1af2f",
     "src/runner/dispatch/recovery-planner.mjs": "d30b45e5ec808c2f451b70c5ac6d1aaccc3b4f1c480143559502afc2da89942b",
     "src/runner/dispatch/recovery.mjs": "4f2b86847289118fbfe50ca261310de18864a2718f6962214bc362569310e5ca",
@@ -2759,6 +2760,14 @@
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/mailbox-live-confined.mjs",
+      "line": 328,
+      "spawn": "spawn",
+      "binary": "param prepared",
+      "class": "uncalled-wrapper",
+      "function": "startConfinedRun"
     },
     {
       "path": "scripts/lib/sandbox-git.mjs",

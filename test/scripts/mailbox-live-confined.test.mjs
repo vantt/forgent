@@ -1,0 +1,362 @@
+// mailbox-live-confined.test.mjs — the confined launch of the mailbox behaviour suite's live
+// CLIs (scripts/lib/mailbox-live-confined.mjs): fgOS's bwrap driver with the run directory as
+// the only writable host path, login stores and secrets masked, a copied login, and an end
+// that leaves no process. Real bwrap, real host and shim, a stub head; skipped only where no
+// working bwrap exists (a platform capability).
+
+import '../helpers/process-tmp-root.mjs';
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import cp from 'node:child_process';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import {
+  endConfinedRun,
+  layOutRunProject,
+  maskPlan,
+  prepareConfinedRun,
+  processesOfRun,
+  settleLoginCopy,
+  startConfinedRun,
+  sweepOrphans,
+} from '../../scripts/lib/mailbox-live-confined.mjs';
+import { ROTATED_AUTH, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
+
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const MODULE = path.join(REPO, 'scripts', 'lib', 'mailbox-live-confined.mjs');
+const STUB = path.join(REPO, 'test', 'live', 'mailbox-behaviour-stub.mjs');
+const HOME = os.homedir();
+
+function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
+  if (os.platform() !== 'linux') return false;
+  return cp.spawnSync(binary, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
+}
+const HAS_WORKING_BWRAP = hasWorkingBwrap();
+
+const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let shimBytes = null;
+/** The workspace shim exactly as this branch's `fgctl` writes it (its generator's output). */
+function shim() {
+  shimBytes ??= cp.execFileSync('cargo', ['run', '-q', '--locked', '-p', 'fgos-distribution', '--example', 'print-workspace-shim'], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 20 });
+  assert.ok(shimBytes.startsWith('#!/bin/sh'));
+  return shimBytes;
+}
+
+/** The pinned Codex release directory, when Codex is installed here. */
+function codexRelease() {
+  try {
+    return path.dirname(path.dirname(fs.realpathSync(path.join(HOME, '.local', 'bin', 'codex'))));
+  } catch {
+    return null;
+  }
+}
+
+const codexAccountHomes = () => fs.readdirSync(HOME).filter((n) => n.startsWith('.codex-')).map((n) => path.join(HOME, n)).filter((d) => fs.statSync(d).isDirectory());
+
+/**
+ * One base (under /tmp) with a private release of the host under test, a planted login home (scratch
+ * bytes, never a real login), a planted secret, a planted host file and a sibling run.
+ */
+function world() {
+  // Under /tmp, as the live base is: the driver's private /tmp hides it unless bound back.
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-confined-'));
+  const host = process.env.FGOS_HOST_BIN;
+  assert.ok(host && fs.existsSync(host), 'the test runner names the host binary under test (FGOS_HOST_BIN)');
+  const release = path.join(base, 'release');
+  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
+  fs.copyFileSync(host, path.join(release, 'bin', 'fgos'));
+  fs.chmodSync(path.join(release, 'bin', 'fgos'), 0o755);
+  const loginHome = makeFixtureDir('mbx-login-');
+  const login = path.join(loginHome, '.claude', '.credentials.json');
+  fs.mkdirSync(path.dirname(login), { recursive: true });
+  fs.writeFileSync(login, '{"claudeAiOauth":{"accessToken":"SCRATCH-NOT-A-TOKEN","expiresAt":1}}\n', { mode: 0o600 });
+  const secretRoot = makeFixtureDir('mbx-secrets-');
+  const secret = path.join(secretRoot, 'project', '.fgos', 'secrets.local.env');
+  fs.mkdirSync(path.dirname(secret), { recursive: true });
+  fs.writeFileSync(secret, 'PLANTED_SECRET=1\n');
+  const planted = path.join(makeFixtureDir('mbx-planted-'), 'host-file.txt');
+  fs.writeFileSync(planted, 'PLANTED\n');
+  const sibling = path.join(base, 'run-sibling');
+  fs.mkdirSync(sibling, { recursive: true });
+  const masks = maskPlan({ codexAccountHomes: codexAccountHomes(), secretRoots: [secretRoot], codexRelease: codexRelease() });
+  return { base, release, loginHome, login, secret, planted, sibling, masks };
+}
+
+const baseEnv = (extra = {}) => ({ PATH: process.env.PATH, LANG: 'C.UTF-8', ...extra });
+
+/** Runs `command args` confined as run `runId`, to its exit; returns stdout, the exit and the end. */
+async function runConfined(w, runId, command, args, { login = null, env = {}, layOut = null } = {}) {
+  const prepared = prepareConfinedRun({ base: w.base, runId, command, args, env: baseEnv(env), login, masks: w.masks, readOnly: layOut ? [path.join(w.base, runId, 'ws', '.fgos', 'installation')] : [] });
+  layOut?.(prepared);
+  const run = startConfinedRun(prepared);
+  let stdout = '';
+  run.child.stdout.on('data', (d) => { stdout += d; });
+  run.child.stderr.resume();
+  const exit = await run.exited;
+  const end = await endConfinedRun(run);
+  return { prepared, run, stdout, exit, end };
+}
+
+const nodeProbe = (body) => ['-e', `const fs = require('fs'); const P = JSON.parse(process.env.PROBE); const code = (fn) => { try { const v = fn(); return v === undefined ? 'ok' : v; } catch (e) { return e.code; } }; ${body}`];
+
+const WRITE_PROBE = `process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(P).map(([k, f]) => [k, code(() => { fs.mkdirSync(require('path').dirname(f), { recursive: true }); fs.writeFileSync(f, 'W'); })]))));`;
+const READ_PROBE = `process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(P).map(([k, f]) => [k, code(() => fs.readFileSync(f).length)]))));`;
+
+function writeTargets(w, runId) {
+  const dir = path.join(w.base, runId);
+  return {
+    ws: path.join(dir, 'ws', 'probe.txt'),
+    mailbox: path.join(dir, 'ws', '.fgos', 'runtime', 'mailbox', 'probe.txt'),
+    log: path.join(dir, 'log', 'probe.txt'),
+    home: path.join(dir, 'home', 'probe.txt'),
+    sibling: path.join(w.sibling, 'probe.txt'),
+    base: path.join(w.base, 'probe.txt'),
+    repo: path.join(REPO, '.fgos', 'runtime', `mbx-confined-probe-${process.pid}.txt`),
+    planted: w.planted,
+    realClaude: path.join(HOME, '.claude', `mbx-confined-probe-${process.pid}.txt`),
+  };
+}
+
+function readTargets(w, runId) {
+  const targets = {
+    claudeJson: path.join(HOME, '.claude.json'),
+    secret: w.secret,
+    ownCopy: path.join(w.base, runId, 'home', '.claude', '.credentials.json'),
+  };
+  if (fs.existsSync(path.join(HOME, '.claude'))) targets.claudeLogin = path.join(HOME, '.claude', '.credentials.json');
+  const tetnu = path.join(HOME, '.codex-tetnu', 'auth.json');
+  if (fs.existsSync(path.dirname(tetnu))) targets.codexLogin = tetnu;
+  return targets;
+}
+
+test('a confined run writes its own run directory and nothing else', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const before = sha256(w.planted);
+  const targets = writeTargets(w, 'run-write');
+  const { stdout } = await runConfined(w, 'run-write', process.execPath, nodeProbe(WRITE_PROBE), { env: { PROBE: JSON.stringify(targets) } });
+  const seen = JSON.parse(stdout);
+  for (const own of ['ws', 'mailbox', 'log', 'home']) assert.equal(seen[own], 'ok', `${own}: ${stdout}`);
+  for (const other of ['sibling', 'base', 'repo', 'planted', 'realClaude']) assert.equal(seen[other], 'EROFS', `${other}: ${stdout}`);
+  assert.equal(sha256(w.planted), before, 'the planted host file is unchanged');
+  for (const other of ['sibling', 'base', 'repo', 'realClaude']) assert.equal(fs.existsSync(targets[other]), false, other);
+});
+
+test('a confined run cannot read a real login store or a listed secret, and reads its own login copy', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const targets = readTargets(w, 'run-read');
+  const { stdout } = await runConfined(w, 'run-read', process.execPath, nodeProbe(READ_PROBE), { env: { PROBE: JSON.stringify(targets) }, login: { cli: 'claude', home: w.loginHome } });
+  const seen = JSON.parse(stdout);
+  if (targets.claudeLogin) assert.equal(seen.claudeLogin, 'ENOENT');
+  if (targets.codexLogin) assert.equal(seen.codexLogin, 'ENOENT');
+  assert.equal(seen.claudeJson, fs.existsSync(targets.claudeJson) ? 0 : 'ENOENT', 'the masked ~/.claude.json reads as empty');
+  assert.equal(seen.secret, 0, 'the planted secrets.local.env reads as empty');
+  assert.equal(seen.ownCopy, fs.statSync(w.login).size, 'the run reads its own copy');
+
+  const release = codexRelease();
+  if (release) {
+    const codex = await runConfined(w, 'run-codex-version', path.join(release, 'bin', 'codex'), ['--version']);
+    assert.equal(codex.exit.code, 0, 'the masked ~/.codex still lets the pinned Codex binary start');
+    assert.match(codex.stdout, /^codex-cli \d+\.\d+\.\d+/);
+  }
+});
+
+test('the falsifier: the same probes without the confined launch write the planted host file and read the planted secret', () => {
+  const w = world();
+  const before = sha256(w.planted);
+  const write = cp.spawnSync(process.execPath, nodeProbe(WRITE_PROBE), { env: baseEnv({ PROBE: JSON.stringify({ planted: w.planted }) }), encoding: 'utf8' });
+  assert.equal(JSON.parse(write.stdout).planted, 'ok');
+  assert.notEqual(sha256(w.planted), before);
+  const read = cp.spawnSync(process.execPath, nodeProbe(READ_PROBE), { env: baseEnv({ PROBE: JSON.stringify({ secret: w.secret }) }), encoding: 'utf8' });
+  assert.equal(JSON.parse(read.stdout).secret, fs.statSync(w.secret).size);
+});
+
+test('a confined run holds a copy of its login, never a link', (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const prepared = prepareConfinedRun({ base: w.base, runId: 'run-copy', command: 'true', env: baseEnv(), login: { cli: 'claude', home: w.loginHome }, masks: w.masks });
+  const stat = fs.lstatSync(prepared.copy);
+  assert.equal(stat.isFile(), true);
+  assert.equal(stat.isSymbolicLink(), false);
+  assert.equal(stat.mode & 0o777, 0o600);
+  assert.deepEqual(fs.readFileSync(prepared.copy), fs.readFileSync(w.login));
+  assert.notEqual(stat.ino, fs.statSync(w.login).ino);
+  assert.equal(prepared.snapshot, sha256(w.login));
+  assert.equal(prepared.env.HOME, path.join(w.base, 'run-copy', 'home'));
+});
+
+/** The project's mailbox snapshot, or null. */
+const snapshotOf = (ws) => {
+  const file = path.join(ws, '.fgos', 'runtime', 'mailbox', 'record', 'snapshot.json');
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+};
+
+async function waitFor(fn, ms = 20_000) {
+  const deadline = Date.now() + ms;
+  for (;;) {
+    const value = fn();
+    if (value) return value;
+    if (Date.now() > deadline) return null;
+    await sleep(100);
+  }
+}
+
+/** The harness's own send, from outside every sandbox, through the run's shim. */
+function harnessSend(ws, to, body) {
+  const out = cp.spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, '--', body], { cwd: ws, env: { PATH: process.env.PATH, HOME, FGOS_SESSION_ID: 'mailbox-behaviour-harness' }, encoding: 'utf8' });
+  return { status: out.status, text: `${out.stdout}${out.stderr}` };
+}
+
+const claudeTexts = (home) => {
+  const dir = path.join(home, '.claude', 'projects', 'stub');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') : '';
+};
+
+test('a send from outside reaches a head registered inside the sandbox; a send before registration is refused as an unknown name', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const runId = 'run-send';
+  const settings = path.join(w.base, 'settings', `${runId}.json`);
+  const prompt = '1. Run: ls\n2. Run: until [ -f go1.txt ]; do sleep 0.2; done\n';
+  const prepared = prepareConfinedRun({ base: w.base, runId, command: process.execPath, args: [STUB, 'claude', '-p', '--settings', settings, prompt], env: baseEnv(), masks: w.masks, readOnly: [path.join(w.base, runId, 'ws', '.fgos', 'installation')] });
+  layOutRunProject(prepared.paths, { cli: 'claude', release: w.release, shim: shim() });
+  const early = harnessSend(prepared.paths.ws, 'ws-claude', 'too early');
+  assert.notEqual(early.status, 0);
+  assert.match(early.text, /unknown-name/);
+
+  const run = startConfinedRun(prepared);
+  run.child.stdout.resume();
+  run.child.stderr.resume();
+  const binding = await waitFor(() => Object.values(snapshotOf(prepared.paths.ws)?.bindings ?? {})[0]);
+  assert.ok(binding, 'the head registered at its first hook');
+  assert.equal(JSON.parse(binding.head).pid, 1, 'the head is the sandbox pid 1, seen from its own namespace');
+  assert.equal(snapshotOf(prepared.paths.ws).messages?.length ?? 0, 0, 'the registering hook claimed nothing');
+  const sent = harnessSend(prepared.paths.ws, binding.name, 'MBX-CONFINED-HELLO');
+  assert.equal(sent.status, 0, sent.text);
+  fs.writeFileSync(path.join(prepared.paths.ws, 'go1.txt'), '');
+  assert.equal((await run.exited).code, 0);
+  assert.deepEqual((await endConfinedRun(run)).left, []);
+
+  const [message] = snapshotOf(prepared.paths.ws).messages;
+  assert.equal(message.from, 'mailbox-behaviour-harness');
+  assert.ok(message.state.offered, JSON.stringify(message.state));
+  assert.match(claudeTexts(prepared.paths.home), /MBX-CONFINED-HELLO/, 'the frame reached the head as hook context');
+});
+
+test('ending a confined run leaves no process, whether it ignores SIGTERM or forked a setsid child', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  for (const [runId, script] of [['run-trap', "trap '' TERM; while :; do sleep 1; done"], ['run-setsid', 'setsid sleep 600 & sleep 600']]) {
+    const prepared = prepareConfinedRun({ base: w.base, runId, command: 'sh', args: ['-c', script], env: baseEnv(), masks: w.masks });
+    const run = startConfinedRun(prepared);
+    await sleep(300);
+    assert.ok(processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, `${runId} runs before the end`);
+    const { left } = await endConfinedRun(run);
+    assert.deepEqual(left, [], runId);
+    assert.deepEqual(processesOfRun(prepared.paths.dir, run.entry.pidNs), [], runId);
+    assert.ok(JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8')).endedAt);
+  }
+});
+
+test('the orphan sweep kills a run the harness did not finish, even one whose launch facts were never written, and records it as an error before a new run starts', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const harness = `
+    const C = await import(${JSON.stringify(MODULE)});
+    const entries = [];
+    for (const runId of ['run-orphan-a', 'run-orphan-b']) {
+      const prepared = C.prepareConfinedRun({ base: ${JSON.stringify(w.base)}, runId, command: 'sleep', args: ['600'], env: { PATH: process.env.PATH }, masks: ${JSON.stringify(w.masks)} });
+      entries.push(C.startConfinedRun(prepared, { stdio: 'ignore' }).entry);
+    }
+    process.stdout.write(JSON.stringify(entries) + '\\n');
+    setInterval(() => {}, 1000);`;
+  const child = cp.spawn(process.execPath, ['--input-type=module', '-e', harness], { stdio: ['ignore', 'pipe', 'inherit'] });
+  const line = await new Promise((resolve) => { let buf = ''; child.stdout.on('data', (d) => { buf += d; if (buf.includes('\n')) resolve(buf.split('\n')[0]); }); });
+  const entries = JSON.parse(line);
+  child.kill('SIGKILL');
+  await new Promise((resolve) => child.once('exit', resolve));
+  for (const entry of entries) assert.ok(processesOfRun(entry.dir, entry.pidNs).length > 0, `${entry.runId} outlives its killed harness`);
+  // A harness killed between the spawn and the second ledger write leaves an entry without launch facts.
+  const bareFile = path.join(w.base, 'ledger', 'run-orphan-b.json');
+  fs.writeFileSync(bareFile, JSON.stringify({ runId: 'run-orphan-b', dir: entries[1].dir, startedAt: entries[1].startedAt }));
+
+  const { swept, left } = sweepOrphans(w.base);
+  assert.deepEqual(swept, ['run-orphan-a', 'run-orphan-b']);
+  assert.deepEqual(left, []);
+  for (const entry of entries) {
+    assert.deepEqual(processesOfRun(entry.dir, entry.pidNs), [], entry.runId);
+    const recorded = JSON.parse(fs.readFileSync(path.join(w.base, 'ledger', `${entry.runId}.json`), 'utf8'));
+    assert.equal(recorded.outcome, 'error');
+    assert.equal(recorded.reason, 'orphan');
+  }
+  assert.deepEqual(sweepOrphans(w.base).swept, [], 'a swept run is not swept again');
+
+  const next = await runConfined(w, 'run-after-sweep', 'true', []);
+  assert.equal(next.exit.code, 0);
+});
+
+test('two heads in two sandboxes share one record, and each receives the other\'s frame', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const workspace = path.join(w.base, 'pair');
+  fs.mkdirSync(workspace);
+  const ws = path.join(workspace, 'ws');
+  const installation = path.join(ws, '.fgos', 'installation');
+  const prompt = (me, peer) => `1. Run: ls\n2. Run: until [ -f go.txt ]; do sleep 0.2; done; fgos mailbox send --to "$(cat peer-${me}.txt)" -- "MBX-FROM-${me}"; touch sent-${me}.txt\n3. Run: until [ -f sent-${peer}.txt ]; do sleep 0.2; done\n`;
+  const runs = {};
+  for (const [me, peer] of [['A', 'B'], ['B', 'A']]) {
+    const runId = `run-pair-${me}`;
+    const settings = path.join(w.base, 'settings', `${runId}.json`);
+    const prepared = prepareConfinedRun({ base: w.base, runId, workspace, command: process.execPath, args: [STUB, 'claude', '-p', '--settings', settings, prompt(me, peer)], env: baseEnv({ PATH: `${path.join(installation, 'bin')}:${process.env.PATH}` }), masks: w.masks, readOnly: [installation] });
+    if (me === 'A') layOutRunProject(prepared.paths, { cli: 'claude', release: w.release, shim: shim() });
+    else fs.copyFileSync(path.join(w.base, 'settings', 'run-pair-A.json'), settings);
+    runs[me] = startConfinedRun(prepared);
+    runs[me].prepared = prepared;
+    runs[me].child.stdout.resume();
+    runs[me].child.stderr.resume();
+  }
+  const bindings = await waitFor(() => { const b = Object.values(snapshotOf(ws)?.bindings ?? {}); return b.length === 2 ? b : null; });
+  assert.ok(bindings, 'both heads registered');
+  const nameOf = (me) => bindings.find((b) => JSON.parse(b.head).pidNs === runs[me].entry.pidNs)?.name;
+  assert.ok(nameOf('A') && nameOf('B') && nameOf('A') !== nameOf('B'), JSON.stringify(bindings));
+  fs.writeFileSync(path.join(ws, 'peer-A.txt'), nameOf('B'));
+  fs.writeFileSync(path.join(ws, 'peer-B.txt'), nameOf('A'));
+  fs.writeFileSync(path.join(ws, 'go.txt'), '');
+  for (const me of ['A', 'B']) {
+    assert.equal((await runs[me].exited).code, 0, me);
+    assert.deepEqual((await endConfinedRun(runs[me])).left, [], me);
+  }
+  const messages = snapshotOf(ws).messages;
+  assert.equal(messages.length, 2);
+  for (const m of messages) assert.ok(m.state.offered, JSON.stringify(m));
+  assert.match(claudeTexts(runs.A.prepared.paths.home), /MBX-FROM-B/);
+  assert.match(claudeTexts(runs.B.prepared.paths.home), /MBX-FROM-A/);
+});
+
+test('a changed login copy is set aside, never deleted, keeps its run directory and stops the batch', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const source = fs.readFileSync(w.login);
+  const { prepared, exit } = await runConfined(w, 'run-rotate', 'sh', ['-c', 'printf CHANGED >> "$HOME/.claude/.credentials.json"'], { login: { cli: 'claude', home: w.loginHome } });
+  assert.equal(exit.code, 0);
+  const settled = settleLoginCopy(prepared);
+  assert.match(settled.stop, /login refreshed inside a run/);
+  assert.equal(settled.aside, path.join(prepared.paths.dir, ROTATED_AUTH));
+  assert.equal(fs.readFileSync(settled.aside, 'utf8'), `${source}CHANGED`);
+  assert.equal(fs.existsSync(prepared.copy), false);
+  assert.match(removeRunDir(prepared.paths.dir), /refusing to remove/);
+  assert.deepEqual(fs.readFileSync(w.login), source, 'the source login is untouched');
+
+  const { prepared: same } = await runConfined(w, 'run-same', 'true', [], { login: { cli: 'claude', home: w.loginHome } });
+  assert.equal(settleLoginCopy(same), null);
+  assert.equal(fs.existsSync(same.copy), false, 'an unchanged copy is removed, by its name only');
+  assert.ok(fs.existsSync(same.paths.home), 'the home with its transcripts stays');
+});
