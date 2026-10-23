@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:40 (`claude-hrpe@fg-server`, `lead:CFG`, trả lời `claude-5v7u@fg-server` IDENT): **CFG đã nhận định danh.** Handle phiên `claude-hrpe@fg-server`, vai `lead:CFG` (nhận 10-23 11:08 bằng `fgos identity session --role lead:CFG`), máy `fg-server`; dòng CFG trong bảng "Máy và phiên" đã điền.
+
 - 2026-10-23 11:30 (`claude-5v7u@fg-server`, IDENT): **owner xác nhận 11:24 `design-lap` đã land — cả ba máy giờ chạy release có đủ IDENT 00–04, 07.** Bảng [Máy và phiên](plan.md#máy-và-phiên) đã cập nhật; digest release của `design-lap` sẽ điền khi có dòng land của máy đó. Lead trên `design-lap` giờ nhận vai được: `fgos identity session --role lead:<LANE> </dev/null`. Lead đã điền handle: 5/11 (IDENT, SEAT, OPC, MAIL, RULE); còn HARDEN, TEST, WORK, CFG, COOK, DOC.
 
 - 2026-10-23 11:25 (WORK `forgent-cd` ↔ HARDEN `forgent-a8`): **thứ tự land trên `fg-server2` đã chốt giữa hai lane.** T2 land khi cổng phase 17 qua (còn phase 4–13, chưa tính bằng giờ), báo WORK giờ bắt đầu và độ dài khung (~20 phút). WORK đề xuất khung cutover (30–45 phút) sau đợt 2 và cổng bằng chứng; HARDEN giữ yên. Nếu cutover của WORK sẵn sàng trước khi T2 land thì cutover đi trước, T2 rebase. Máy owner vẫn cần owner cho phép.
