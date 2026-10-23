@@ -2,7 +2,7 @@
 use crate::{
     refs::Authority,
     scoped_commit::{
-        authority_gate, binding, checkout_resources, compact_matches, handle, is_store_path, paths,
+        authority_gate, binding, checkout_resources, handle, is_store_path, paths,
         require_no_index_lock, root, scope,
     },
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
@@ -642,7 +642,7 @@ impl GitDriver {
                     Tip::Oid(compact.next.clone()),
                 ),
             );
-            if !compact_matches(&compact, &intent, repo)? {
+            if !compact.matches(&intent)? {
                 return Err(failure("sync-authority-mismatch"));
             }
             let outcome = compact.outcome()?;

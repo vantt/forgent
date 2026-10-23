@@ -511,31 +511,29 @@ fn commit_of_a_thousand_paths_in_a_dirty_worktree_stays_within_the_record_bound(
 
 /// Construct real durable interruption states under the fixture's held custody.
 fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
-    interrupted_resources(f, id, phase, sync, false, None)
+    interrupted_with_request(f, id, phase, sync, None)
 }
 /// The same interruption, recorded in the bounded form new intents use: the
 /// selected paths as a digest and a baseline without its dirty list.
 fn interrupted_digest(f: &Fixture, id: &str, phase: u8) -> wal::Chain {
-    interrupted_as(f, id, phase, false, false, None, Some(&["a"]))
+    interrupted_as(f, id, phase, false, None, Some(&["a"]))
 }
 /// `stored_request` replaces the serialized request the intent persists, to
 /// reproduce what an earlier release wrote.
-fn interrupted_resources(
+fn interrupted_with_request(
     f: &Fixture,
     id: &str,
     phase: u8,
     sync: bool,
-    legacy: bool,
     stored_request: Option<String>,
 ) -> wal::Chain {
-    interrupted_as(f, id, phase, sync, legacy, stored_request, None)
+    interrupted_as(f, id, phase, sync, stored_request, None)
 }
 fn interrupted_as(
     f: &Fixture,
     id: &str,
     phase: u8,
     sync: bool,
-    legacy: bool,
     stored_request: Option<String>,
     // The path set a bounded record carries as its digest; None writes the listed form.
     bounded: Option<&[&str]>,
@@ -601,15 +599,11 @@ fn interrupted_as(
         },
         kind,
         repo_identity: wal.repository_identity().into(),
-        resource_set: vec![if legacy {
-            format!("worktree:{}", baseline.worktree)
-        } else {
-            format!(
-                "worktree:{}:custody:{}",
-                baseline.worktree,
-                f.lease.as_ref().unwrap().path().display()
-            )
-        }],
+        resource_set: vec![format!(
+            "worktree:{}:custody:{}",
+            baseline.worktree,
+            f.lease.as_ref().unwrap().path().display()
+        )],
         authority_binding: baseline.authority,
         writer_identity: "fixture".into(),
         object_format: f.repo.object_format(),
@@ -811,7 +805,7 @@ fn recovery_reconciles_an_attempt_stored_with_the_retired_legacy_events_field() 
         })
         .to_string();
         assert!(serde_json::from_str::<CommitRequest>(&stored).is_err());
-        interrupted_resources(&f, "interrupted", 2, false, false, Some(stored));
+        interrupted_with_request(&f, "interrupted", 2, false, Some(stored));
         if committed {
             git(&f.tree, &["commit", "-qm", "interrupted"]);
         }
@@ -1015,15 +1009,7 @@ fn recovery_of_a_bounded_record_unstages_only_its_own_paths() {
     assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "human");
     // When the tree no longer shows exactly the recorded set, nothing is unstaged.
     let f = Fixture::new();
-    interrupted_as(
-        &f,
-        "unknown-digest",
-        2,
-        false,
-        false,
-        None,
-        Some(&["a", "b"]),
-    );
+    interrupted_as(&f, "unknown-digest", 2, false, None, Some(&["a", "b"]));
     let outcome = f
         .driver
         .recover_scoped_commit(
@@ -1090,11 +1076,11 @@ fn pre_attempt_recovery_does_not_unstage_a_changed_index() {
 }
 
 #[test]
-fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
+fn chains_from_a_dead_checkout_are_abandoned_without_replay() {
     use std::os::unix::fs::MetadataExt;
     for (phase, residue) in [(0, false), (2, false), (0, true), (2, true)] {
         let mut f = Fixture::new();
-        interrupted_resources(&f, "dead", phase, false, true, None);
+        interrupted(&f, "dead", phase, false);
         drop(f.lease.take());
         git(
             &f.main,
