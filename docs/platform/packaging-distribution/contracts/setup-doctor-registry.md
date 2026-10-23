@@ -33,7 +33,7 @@ Current Node `fgos setup` remains implemented as deprecated legacy compatibility
 | Fix | `registerFix` | A named repair run by `fgos doctor --fix`; current legacy `fgos setup` also runs fixes while it remains implemented. |
 | Config default | `registerConfigDefault` | A default config shape merged into shared config without overwriting user values. |
 
-`event-store` registers the `eventStore` config shape `{ seal: { intervalSec }, sync: { intervalSec }, rebuild: { maxAttempts }, remote }` with the defaults of `EVENT_STORE_DEFAULTS` in `src/event-store/config.mjs`. Config merge fills missing keys while preserving explicit user values, the remote choice included; `git-publication-refspecs` diagnoses and repairs obsolete exact legacy mappings on the configured remote and on historical `origin`.
+`event-store` registers the `eventStore` config shape `{ seal: { intervalSec, coalesceSec }, sync: { intervalSec }, rebuild: { maxAttempts }, remote }` with the defaults of `EVENT_STORE_DEFAULTS` in `src/event-store/config.mjs`. Config merge fills missing keys while preserving explicit user values, the remote choice included; `seal.coalesceSec` (default 30, an integer of at least 1) is the runner's seal batching window, and a malformed value fails every Event Store doctor row with `event-store-config: invalid seal.coalesceSec`; `git-publication-refspecs` diagnoses and repairs obsolete exact legacy mappings on the configured remote and on historical `origin`.
 
 The registries are independent. A module may register only a check, only a fix, only a config default, or any combination.
 

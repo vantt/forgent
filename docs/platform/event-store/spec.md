@@ -72,7 +72,7 @@ Agent defaults that the owner accepted on 2026-10-17 15:13. An agent chose them 
 
 | Default |
 |---|
-| Seal cadence: on lifecycle events, else after 300 s (`eventStore.seal.intervalSec`), else at clean writer exit (section 16) |
+| Seal cadence: on lifecycle events (the runner batches them within `eventStore.seal.coalesceSec`, owner decision 2026-10-23 17:57), else after 300 s (`eventStore.seal.intervalSec`), else at clean writer exit (section 16) |
 | Doctor thresholds for unsealed events: warn above twice the interval, fail above 3600 s (sections 16, 21) |
 
 The spec also takes the following decisions inside that frame. They are agent decisions, reported here, and are not owner decisions:
@@ -499,12 +499,15 @@ Agent default, accepted by the owner on 2026-10-17 15:13 (M3), configurable by `
 
 | Trigger | Action | Who |
 |---|---|---|
-| A `sealOnWrite` type was appended (Work: status move, answer, decision, approval, land result) | `seal(project)` right after the gate is released | the appending process |
+| A `sealOnWrite` type was appended (Work: status move, answer, decision, approval, land result) | `seal(project)` right after the gate is released | the appending process: every CLI command |
+| A `sealOnWrite` type was appended by the runner (`runOnce`, hence `--once` and `--watch`) | mark the seal pending; seal once when a dispatched wave settles, when `runOnce` returns, and at the latest `eventStore.seal.coalesceSec` (default 30) after the first pending event | the runner process, which declares itself long-lived through `processSealCoalescer.scope` (`src/event-store/seal-coalescing.mjs`) |
 | The oldest unsealed event is older than the interval | seal every stream | the opportunistic check at the start and end of every fgOS command that opens the store, and in the poll loop of the long-lived runner process (the only long-lived seal-on-poll loop) |
 | Clean writer exit | seal every stream | session end (session deregistration) and shutdown of gateway and runner |
 | A crashed process left an uncommitted batch or closed segments | repair and seal | the next fgOS command on the clone, through the same triggers |
 
 Clarification, 2026-10-22: the long-lived gateway has no seal loop and seals on stop. Its Work writes go through `fgos` CLI invocations, and each of those seals in its own end-of-command trigger. No daemon and no timer exist only for sealing. When no fgOS process runs, unsealed events wait until the next command; that window is not bounded by wall clock and the contract says so. Sealing runs only git plumbing on refs, so the council's objection to sealing on every lifecycle event (one work-tree commit and `index.lock` each) does not apply.
+
+Update, 2026-10-23 17:57 (owner decision, supersedes M3 for long-running processes only): the runner coalesces the seals of its own `sealOnWrite` appends as the table says. The CLI keeps sealing at once, and nothing else changes: append durability, `fsync`, crash repair and the clean-exit row stand. Appends are durable and readable before the seal, so a runner killed with a pending seal loses nothing beyond the rule that already covered a crash between an append and its seal: the events sit in the open batch and the next trigger certifies them: any later `sealOnWrite`, a clean writer exit, or a command's opportunistic seal once they are older than `eventStore.seal.intervalSec`. The gateway has nothing to coalesce: its Work writes are `fgos` CLI invocations, each sealing in its own process. Children the runner spawns (settle, finalize) are CLI processes and seal once per command.
 
 Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twice the interval; warns above that; fails when the oldest unsealed event is older than 3600 s. There is no event-count cap, because lifecycle events already seal at once. These thresholds are agent defaults that the owner accepted as spec v2 on 2026-10-17 15:13.
 
@@ -598,6 +601,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 | Key | Default |
 |---|---|
 | `eventStore.seal.intervalSec` | 300 |
+| `eventStore.seal.coalesceSec` | 30 (runner only: longest a `sealOnWrite` seal may stay pending; at least 1) |
 | `eventStore.sync.intervalSec` | 300 (0 = explicit sync only) |
 | `eventStore.rebuild.maxAttempts` | 5 (rebuild-install attempts before `event-store-rebuild-busy`) |
 | `eventStore.remote` | `origin` |
