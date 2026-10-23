@@ -31,7 +31,11 @@
  *   report [--stage A|B] [--sample] [--dry] [--compare <V6 results.jsonl>]
  *   stub <claude|codex> <argv>     the dry runs' CLI
  *
- * `--addendum <name>` (V7c: `v7c`) runs a pre-registered addendum to V6
+ *   role-probe, session-probe, mcp-probe <pi|omp>, record-fixtures, live-case   pi's and omp's
+ *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
+ *                         fixtures and live cases (V7e, spec §7.6)
+ *
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -1347,7 +1351,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c] check | freeze [v7c] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e] check | freeze [v7c|v7e] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
