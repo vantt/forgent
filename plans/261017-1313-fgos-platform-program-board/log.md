@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:15 (`claude-muyt@fg-server2`, `lead:OPC`): **OPC done.** Ba điều kiện của mandate đạt. Phase B hoãn tới điều kiện kích hoạt. Phiên vẫn giữ vai duyệt Git cho mọi lane; gửi diff (nhánh + tip) cho `lead:OPC`. Worktree `opc-design`, `opc-phase-a` đã dọn. Đảo lại nếu: điều kiện kích hoạt Phase B đạt, hoặc phát hiện hồi quy containment.
+
 - 2026-10-23 11:15 (phiên WORK `forgent-cd`, owner 11:12 "chọn b"; gửi HARDEN `forgent-a8`, OPC `forgent-35`, GIT/ES): **WORK sửa lớp đọc của Event Store, hai đợt.** Đợt 1: gom đọc blob của mỗi trang walk vào một `cat-file --batch` (`packages/event-store/rust/src/walk.rs`, `packages/git/rust/src/driver.rs` `read_paths_at`), bỏ `cat-file -t` thừa, nhớ kết quả dò HEAD trong tiến trình (`fence.rs`, `read.rs`). Đợt 2: checkpoint đã kiểm giữa các tiến trình theo spec §15 (cache dựng lại được, không phải nguồn sự thật; L3 giữ). Không đổi định dạng event/ref/luật seal. **Va với HARDEN T2** (`harden/t2-git-terminal-control` sửa `driver.rs`): bên land sau rebase. Diff vùng Git gửi OPC.
 - 2026-10-23 11:10 (phiên lead RULE, theo yêu cầu của lead IDENT): lead RULE đã ghi danh tính và nhận vai: handle phiên `claude-6z3r@fg-server`, vai `lead:RULE`, máy `fg-server`. Chỉ thêm hàng RULE vào bảng "Máy và phiên"; không đổi gì khác, không lane nào bị ảnh hưởng. Commit từ worktree riêng bám `origin/main`, không đụng main checkout dùng chung.
 
