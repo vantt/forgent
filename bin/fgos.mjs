@@ -2844,7 +2844,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
 
-      const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const { runUnit, resolveGitRoots, admitDocumentationExecution } = await import('../src/runner/execution/run.mjs');
       const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
       const resumeUnitRunId = flags.resume;
@@ -2949,8 +2949,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // run goes on only into a worktree no case owns.
       const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
       const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+      // Port construction marks the bindings directory. Admit before even that
+      // write, and pass this operation-local result so runUnit does not re-read
+      // the lease or reinterpret the declared caller checkout.
+      const documentationAdmission = admitDocumentationExecution({
+        repoRoot: portRoot ?? process.cwd(), callerCheckout: worktree ?? process.cwd(),
+      });
 
       return attachDirWarning(await runUnit({
+        documentationAdmission,
         unitPath,
         unitData,
         ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
@@ -3860,26 +3867,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'acquire') {
         const res = acquireDocumentationCutoverLease({ repoRoot: cwd, worktree: flags.worktree ? path.resolve(flags.worktree) : undefined });
         if (flags.json) return { result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar };
-        console.log(`acquired documentation-cutover lease (token hash: ${res.tokenHash})`);
-        return;
+        return `acquired documentation-cutover lease (token hash: ${res.tokenHash})\n`;
       }
       if (sub === 'status') {
         const res = inspectDocumentationCutoverLease({ repoRoot });
         if (flags.json) return res;
-        if (!res.held) {
-          console.log(`documentation-cutover lease is ${res.state}`);
-        } else {
-          console.log(`documentation-cutover lease is held (age: ${Math.round(res.ageMs / 1000)}s, kernel lock: ${res.kernelLock})`);
-          console.log(`holder token hash: ${res.holderTokenHash}`);
-          console.log(`worktree: ${res.worktree}`);
-        }
-        return;
+        if (!res.held) return `documentation-cutover lease is ${res.state}\n`;
+        return `documentation-cutover lease is held (age: ${Math.round(res.ageMs / 1000)}s, kernel lock: ${res.kernelLock})\nholder token hash: ${res.holderTokenHash}\nworktree: ${res.worktree}\n`;
       }
       if (sub === 'release') {
         const res = releaseDocumentationCutoverLease({ repoRoot: cwd });
         if (flags.json) return res;
-        console.log(`released documentation-cutover lease at ${res.releasedAt}; drift: ${res.drift.length ? res.drift.join(', ') : 'none'}`);
-        return;
+        return `released documentation-cutover lease at ${res.releasedAt}; drift: ${res.drift.length ? res.drift.join(', ') : 'none'}\n`;
       }
       if (sub === 'abandon') {
         const res = abandonDocumentationCutoverLease({
@@ -3888,8 +3887,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           reason: flags.reason,
         });
         if (flags.json) return res;
-        console.log(`abandoned documentation-cutover lease: ${res.reason}`);
-        return;
+        return `abandoned documentation-cutover lease: ${res.reason}\n`;
       }
       throw new Error(`unknown docs-lease sub-verb: ${sub}`);
     }
@@ -5248,6 +5246,8 @@ async function main() {
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
+    } else if (verb === 'docs-lease' && !flags.json) {
+      process.stdout.write(data);
     } else if (verb === 'plan-lint' && !flags.json) {
       process.stdout.write(renderPlanLintReport(data));
     } else {

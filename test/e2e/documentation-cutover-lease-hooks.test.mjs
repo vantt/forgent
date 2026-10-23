@@ -93,7 +93,7 @@ function fixture(t) {
 
   // boundary: real docs-lease CLI transitions and both Git hooks must share
   // the staged host/addon; module-only tests cannot prove their wiring.
-  const rawCli = (args, cwd = repo, extraEnv = {}) => spawnSync(process.execPath, ['--import', cliBootstrap, path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, '--json'], {
+  const rawCli = (args, cwd = repo, extraEnv = {}, json = true) => spawnSync(process.execPath, ['--import', cliBootstrap, path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, ...(json ? ['--json'] : [])], {
     cwd, env: { ...env, ...extraEnv }, encoding: 'utf8', timeout: 60_000,
   });
   const cli = (args, cwd = repo) => {
@@ -433,6 +433,37 @@ exec '${realGit}' "$@"
   assert.equal(f.git(['rev-list', '--count', `${ownerBefore}..main`]), '1');
   assert.equal(JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'abandoned');
 });
+
+// The transition proof above uses JSON; it cannot catch failures in the human output step
+// after a successful mutation. These cases own the four human-mode CLI render paths.
+for (const sub of ['acquire', 'status', 'release', 'abandon']) {
+  test(`CLI human-mode ${sub} exits successfully and renders stable text`, t => {
+    const f = fixture(t);
+    const holder = f.addWorktree('human-holder');
+    if (sub !== 'acquire') f.setupLease(holder);
+    const args = sub === 'acquire' ? [sub, '--worktree', holder]
+      : sub === 'abandon' ? [sub, '--owner-confirmed', '--reason', 'human-mode proof'] : [sub];
+    const result = f.rawCli(args, sub === 'release' ? holder : f.repo, {}, false);
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+    const lines = result.stdout.trimEnd().split('\n');
+    const expected = {
+      acquire: /^acquired documentation-cutover lease \(token hash: [a-f0-9]{64}\)$/,
+      status: /^documentation-cutover lease is held \(age: \d+s, kernel lock: .+\)$/,
+      release: /^released documentation-cutover lease at .+; drift: none$/,
+      abandon: /^abandoned documentation-cutover lease: human-mode proof$/,
+    };
+    assert.match(lines[0], expected[sub]);
+    assert.equal(lines.length, sub === 'status' ? 3 : 1, 'only human text, not a second envelope');
+    if (sub === 'status') {
+      assert.match(lines[1], /^holder token hash: [a-f0-9]{64}$/);
+      assert.equal(lines[2], `worktree: ${holder}`);
+      f.cli(['release'], holder);
+      const released = f.rawCli(['status'], f.repo, {}, false);
+      assert.equal(released.status, 0, released.stderr + released.stdout);
+      assert.equal(released.stdout, 'documentation-cutover lease is released\n');
+    }
+  });
+}
 
 test('reference hook preserves NUL boundaries for multi-path commits and renames with --no-verify', t => {
   const f = fixture(t); f.setupLease(); const before = f.git(['rev-parse', 'main']);

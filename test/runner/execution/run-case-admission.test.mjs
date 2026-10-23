@@ -7,7 +7,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
 import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../../src/runner/documentation-cutover-lease.mjs';
@@ -129,6 +130,21 @@ test('documentation lease admission refuses non-holder runs before writes and le
   acquireDocumentationCutoverLease({ repoRoot: worktreeDir });
   const port = recordingPort();
   const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
+  const sentinel = path.join(repoRoot, '.fgos', 'workflow-runs', '.bindings', '.root');
+  assert.equal(fs.existsSync(sentinel), false, 'fixture has no bindings sentinel');
+  // One CLI wiring proof: the recording port cannot expose the real port's
+  // host-side constructor write. This child models the host, not a nested
+  // dispatch, and must refuse before any worker or unit-control lock starts.
+  const bootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;
+  const cli = spawnSync(process.execPath, [
+    '--import', bootstrap, fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url)),
+    'run', '--resume', 'not-created', '--dir', repoRoot, '--worktree', repoRoot, '--json',
+  ], {
+    cwd: repoRoot, env: { ...process.env, FGOS_DISPATCH_DEPTH: '0' }, encoding: 'utf8', timeout: 60_000,
+  });
+  assert.notEqual(cli.status, 0, cli.stderr + cli.stdout);
+  assert.match(cli.stderr + cli.stdout, /documentation cutover lease is held/);
+  assert.equal(fs.existsSync(sentinel), false, 'CLI lease refusal precedes even the bindings sentinel');
   for (const extra of [
     { unitData: WRITE_UNIT },
     { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },
@@ -138,6 +154,7 @@ test('documentation lease admission refuses non-holder runs before writes and le
       ...extra, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'scout' },
       repoRoot, cwd: repoRoot, worktree: repoRoot,
     }), { code: 'documentation-cutover-lease' });
+    assert.equal(fs.existsSync(sentinel), false, 'lease refusal leaves no bindings sentinel');
   }
   const foreign = setup().repoRoot;
   const outside = makeFixtureDir('fgos-outside-');
