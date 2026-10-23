@@ -1164,3 +1164,54 @@ fn the_hook_and_a_sender_resolve_the_same_identity_state_root_under_an_explicit_
     let unpinned = send_to(&scene, &own.handle, false);
     assert_eq!(unpinned.status.code(), Some(1), "{unpinned:?}");
 }
+
+#[test]
+fn mailbox_list_and_status_run_natively_read_the_record_and_create_nothing() {
+    let scene = Scene::new("list-status");
+    let (path, log) = node_spy(&scene.root.join("spy"));
+    let native = |args: &[&str]| {
+        scene
+            .command(&scene.main(), Some("sender-a"))
+            .env("PATH", &path)
+            .args(args)
+            .stdin(Stdio::null())
+            .output()
+            .unwrap()
+    };
+
+    let empty = native(&["mailbox", "status", "--json"]);
+    assert_eq!(empty.status.code(), Some(0), "{empty:?}");
+    let envelope: serde_json::Value = serde_json::from_slice(&empty.stdout).unwrap();
+    assert_eq!(envelope["data"]["record"], "none");
+    assert!(
+        !scene.main().join(".fgos/runtime").exists(),
+        "status created nothing"
+    );
+    let none = native(&["mailbox", "list"]);
+    assert_eq!(
+        String::from_utf8_lossy(&none.stdout),
+        "No heads in this project's mailbox yet.\n"
+    );
+    assert!(
+        !scene.main().join(".fgos/runtime").exists(),
+        "list created nothing"
+    );
+
+    let root = identity_root(&scene);
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let handle = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER).handle;
+    let listed = native(&["mailbox", "list"]);
+    assert_eq!(listed.status.code(), Some(0), "{listed:?}");
+    assert_eq!(
+        String::from_utf8_lossy(&listed.stdout),
+        format!(
+            "{} {handle} agent=claude tier=turn alive\n",
+            scene.head_name()
+        )
+    );
+    let status = native(&["mailbox", "status", "--json"]);
+    let envelope: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    assert_eq!(envelope["data"]["record"], "ok");
+    assert_eq!(envelope["data"]["heads"], 1);
+    assert!(!log.exists(), "no node child ran");
+}

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
@@ -1242,4 +1242,43 @@ test('the mailbox check passes as not enabled until the project opts in, and nam
     assert.equal(on.passed, true);
     assert.match(on.message, /^enabled/);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('the mailbox-hook doctor row reports the record verdict from fgos mailbox status, passes with no record yet, and writes nothing', async () => {
+  const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
+  const host = ensureHostBin(process.env, REPO_ROOT);
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
+  const temp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-doctor-')));
+  const project = path.join(temp, 'project');
+  const record = path.join(project, '.fgos', 'runtime', 'mailbox', 'record');
+  const before = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = host;
+  try {
+    execFileSync('git', ['init', '-q', project]);
+    fs.mkdirSync(path.join(project, '.fgos'));
+    writeProjectConfig(project, { mailbox: { enabled: true } });
+
+    const none = check.check(project);
+    assert.equal(none.passed, true, none.message);
+    assert.match(none.message, /record: none yet/);
+    assert.equal(fs.existsSync(path.join(project, '.fgos', 'runtime')), false, 'the check created nothing');
+
+    // A refused send opens the record and counts the refusal.
+    const sent = spawnSync(host, ['mailbox', 'send', '--to', 'nobody', 'hi'], { cwd: project, env: { ...process.env, FGOS_SESSION_ID: 'doctor-test' }, encoding: 'utf8' });
+    assert.equal(sent.status, 1, sent.stdout + sent.stderr);
+    const snapshot = fs.readFileSync(path.join(record, 'snapshot.json'));
+    const ok = check.check(project);
+    assert.equal(ok.passed, true, ok.message);
+    assert.match(ok.message, /record: ok \(0 head\(s\), 0 pending\)/);
+    assert.deepEqual(fs.readFileSync(path.join(record, 'snapshot.json')), snapshot, 'the check wrote nothing');
+
+    fs.chmodSync(record, 0o777);
+    const broken = check.check(project);
+    assert.equal(broken.passed, false);
+    assert.match(broken.message, /record cannot be read: record-dir-untrusted/);
+  } finally {
+    if (before === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = before;
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
 });

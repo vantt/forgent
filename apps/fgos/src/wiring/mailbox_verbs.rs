@@ -1,5 +1,7 @@
-//! `fgos mailbox send|inbox [--claim]`: the mailbox's verbs as native
-//! operations (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim`),
+//! `fgos mailbox send|inbox [--claim]|list [--long]|status`: the mailbox's
+//! verbs as native operations (`mailbox.send`, `mailbox.inbox`,
+//! `mailbox.inbox.claim`, `mailbox.list`, `mailbox.status`); `list` and
+//! `status` read the record without its lock and create nothing,
 //! thin wiring over the store's verbs. The record directory is the main
 //! checkout's `.fgos` (`mailbox_root`); the caller is session identity's
 //! writer (attribution only, spec §5.1). Every answer is the frame
@@ -26,8 +28,8 @@ use fgos_mailbox::limits::{load, read_project_config, Loaded};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
-    record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, Liveness,
-    MessageId, SendRequest, Timestamp, WriterKey,
+    list_text, record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, ListRow,
+    Liveness, MessageId, SendRequest, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -38,11 +40,13 @@ use std::pin::Pin;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// The sub-verbs of `fgos mailbox`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["send", "inbox"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["send", "inbox", "list", "status"];
 
 pub const SEND_OPERATION_ID: &str = "mailbox.send";
 pub const INBOX_OPERATION_ID: &str = "mailbox.inbox";
 pub const INBOX_CLAIM_OPERATION_ID: &str = "mailbox.inbox.claim";
+pub const LIST_OPERATION_ID: &str = "mailbox.list";
+pub const STATUS_OPERATION_ID: &str = "mailbox.status";
 
 const fn descriptor(
     id: &'static str,
@@ -81,6 +85,16 @@ pub const INBOX_CLAIM_DESCRIPTOR: ProviderDescriptor = descriptor(
     "mailbox.inbox.claim.request",
     "mailbox.inbox.claim.outcome",
 );
+pub const LIST_DESCRIPTOR: ProviderDescriptor = descriptor(
+    LIST_OPERATION_ID,
+    "mailbox.list.request",
+    "mailbox.list.outcome",
+);
+pub const STATUS_DESCRIPTOR: ProviderDescriptor = descriptor(
+    STATUS_OPERATION_ID,
+    "mailbox.status.request",
+    "mailbox.status.outcome",
+);
 
 /// One `fgos mailbox` invocation, as the projector parsed it.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -96,6 +110,13 @@ pub enum MailboxRequest {
         claim: bool,
         json: bool,
     },
+    List {
+        long: bool,
+        json: bool,
+    },
+    Status {
+        json: bool,
+    },
     /// The arguments do not form a request; the cause.
     Usage(String),
 }
@@ -107,13 +128,16 @@ impl MailboxRequest {
             Self::Send { .. } | Self::Usage(_) => SEND_OPERATION_ID,
             Self::Inbox { claim: true, .. } => INBOX_CLAIM_OPERATION_ID,
             Self::Inbox { claim: false, .. } => INBOX_OPERATION_ID,
+            Self::List { .. } => LIST_OPERATION_ID,
+            Self::Status { .. } => STATUS_OPERATION_ID,
         }
     }
 }
 
 /// `fgos mailbox send --to <name> [--wake] [--reply-to <id>] [--] <body>`,
-/// `fgos mailbox inbox [--claim]`; `--json` on both, `--dir` accepted and
-/// ignored (the record is always the main checkout's).
+/// `fgos mailbox inbox [--claim]`, `fgos mailbox list [--long]`, `fgos
+/// mailbox status`; `--json` on each, `--dir` accepted and ignored (the
+/// record is always the main checkout's).
 pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
     let text: Vec<String> = args
         .iter()
@@ -124,6 +148,7 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
     let mut reply_to = None;
     let mut wake = false;
     let mut claim = false;
+    let mut long = false;
     let mut json = false;
     let mut positional = Vec::new();
     let mut flags_done = false;
@@ -156,6 +181,7 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
             (Some("send"), "--reply-to") => reply_to = value(),
             (Some("send"), "--wake") => wake = true,
             (Some("inbox"), "--claim") => claim = true,
+            (Some("list"), "--long") => long = true,
             (_, other) => return MailboxRequest::Usage(format!("unknown flag {other}")),
         }
     }
@@ -177,7 +203,12 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
         }
         Some("inbox") if positional.is_empty() => MailboxRequest::Inbox { claim, json },
         Some("inbox") => MailboxRequest::Usage("inbox takes no positional argument".to_string()),
-        _ => MailboxRequest::Usage("mailbox needs send or inbox".to_string()),
+        Some("list") if positional.is_empty() => MailboxRequest::List { long, json },
+        Some("status") if positional.is_empty() => MailboxRequest::Status { json },
+        Some(verb @ ("list" | "status")) => {
+            MailboxRequest::Usage(format!("{verb} takes no positional argument"))
+        }
+        _ => MailboxRequest::Usage("mailbox needs send, inbox, list or status".to_string()),
     }
 }
 
@@ -218,8 +249,9 @@ fn failed(text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
     }
 }
 
-/// The record directory, its record and its limits, or the failed answer.
-fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<MailboxAnswer>> {
+/// The record directory and its limits, or the failed answer; opens no
+/// record.
+fn locate(json: bool) -> Result<(PathBuf, Loaded, Option<String>), Box<MailboxAnswer>> {
     let cwd = std::env::current_dir()
         .map_err(|_| failed(record_error_text("cwd-unreadable"), json, None))?;
     let fgos_dir = super::mailbox_root::mailbox_fgos_dir(
@@ -245,9 +277,99 @@ fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<Mai
             loaded.ignored_keys.join(", ")
         )
     });
+    Ok((fgos_dir, loaded, warning))
+}
+
+/// The record directory, its record and its limits, or the failed answer.
+fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<MailboxAnswer>> {
+    let (fgos_dir, loaded, warning) = locate(json)?;
     let record = Record::open(&fgos_dir)
         .map_err(|e| failed(record_error_text(e.code()), json, warning.clone()))?;
     Ok((fgos_dir, record, loaded, warning))
+}
+
+/// `list`: every head of the record not judged dead, with its handle
+/// (derived through Identity), CLI, tier and liveness; `--long` adds the key.
+fn list(long: bool, json: bool) -> MailboxAnswer {
+    let (fgos_dir, loaded, warning) = match locate(json) {
+        Ok(located) => located,
+        Err(answer) => return *answer,
+    };
+    let heads = match verbs::heads(&fgos_dir, &loaded.limits) {
+        Ok(heads) => heads,
+        Err(text) => return failed(text, json, warning),
+    };
+    let root = state_root();
+    let rows: Vec<ListRow> = heads
+        .into_iter()
+        .map(|head| ListRow {
+            handle: root
+                .as_deref()
+                .and_then(|root| session_of(root, &head.key, &head.cli))
+                .map(|info| info.handle),
+            tier: TestedClis::embedded().tier(&head.cli),
+            name: head.name,
+            key: head.key,
+            cli: head.cli,
+            liveness: head.liveness,
+        })
+        .collect();
+    let data: Vec<Value> = rows
+        .iter()
+        .map(|row| {
+            let mut entry = json!({
+                "name": row.name.as_str(),
+                "handle": row.handle,
+                "cli": row.cli.as_str(),
+                "tier": row.tier,
+                "liveness": liveness_word(row.liveness),
+            });
+            if long {
+                entry["key"] = Value::from(row.key.as_str());
+            }
+            entry
+        })
+        .collect();
+    let text = list_text(&rows, long, &loaded.limits);
+    MailboxAnswer {
+        data: json!({ "ok": true, "heads": data, "text": text }),
+        text,
+        json,
+        exit: EXIT_DONE,
+        already_written: false,
+        warning,
+    }
+}
+
+/// `status`: the record's verdict and the spec §9 signals, report-only.
+fn status(json: bool) -> MailboxAnswer {
+    let (fgos_dir, loaded, warning) = match locate(json) {
+        Ok(located) => located,
+        Err(answer) => return *answer,
+    };
+    let answer = verbs::status(&fgos_dir, now(), &loaded.limits);
+    let mut data = answer.json;
+    data["ok"] = Value::from(answer.record_ok);
+    MailboxAnswer {
+        data,
+        text: answer.text,
+        json,
+        exit: if answer.record_ok {
+            EXIT_DONE
+        } else {
+            EXIT_REFUSED
+        },
+        already_written: false,
+        warning,
+    }
+}
+
+fn liveness_word(liveness: Liveness) -> &'static str {
+    match liveness {
+        Liveness::Alive => "alive",
+        Liveness::Dead => "dead",
+        Liveness::Unknown => "unknown",
+    }
 }
 
 /// An alias refusal's candidates as typed objects for `--json`.
@@ -260,11 +382,7 @@ fn typed_candidates(refusal: &AliasRefusal) -> Value {
             json!({
                 "id": c.id,
                 "handle": c.handle,
-                "liveness": match c.liveness {
-                    Liveness::Alive => "alive",
-                    Liveness::Dead => "dead",
-                    Liveness::Unknown => "unknown",
-                },
+                "liveness": liveness_word(c.liveness),
             })
         })
         .collect()
@@ -318,7 +436,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             };
             let wait = Wait::Ms(loaded.hook.hook.lock_wait_ms);
             let (to_key, alias_refusal, role_holder) = if is_alias(to) {
-                let heads = match verbs::heads(&record, wait, now(), &loaded.limits) {
+                let heads = match verbs::heads(&fgos_dir, &loaded.limits) {
                     Ok(heads) => heads,
                     Err(text) => return failed(text, *json, warning),
                 };
@@ -368,6 +486,8 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 warning,
             }
         }
+        MailboxRequest::List { long, json } => list(*long, *json),
+        MailboxRequest::Status { json } => status(*json),
         MailboxRequest::Inbox { claim: false, json } => {
             let (fgos_dir, record, loaded, warning) = match open(*json) {
                 Ok(opened) => opened,

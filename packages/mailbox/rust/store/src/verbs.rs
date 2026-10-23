@@ -85,33 +85,28 @@ pub struct HeadView {
 }
 
 /// Every head of the record whose process the store does not judge dead,
-/// ordered by key, read in one hold that changes nothing. A runner
-/// attempt's key is never listed (it is never registered either). `Err`
-/// carries the record-error text.
-pub fn heads(
-    record: &Record,
-    wait: Wait,
-    now: Timestamp,
-    limits: &Limits,
-) -> Result<Vec<HeadView>, String> {
-    let held = record
-        .hold(wait, now, limits, |state, _| {
-            Reported::unchanged(
-                state
-                    .bindings()
-                    .filter(|b| !fgos_identity::is_attempt_writer_id(b.key.as_str()))
-                    .map(|b| HeadView {
-                        key: b.key.clone(),
-                        name: b.name.clone(),
-                        cli: b.cli.clone(),
-                        liveness: stored_liveness(b),
-                    })
-                    .filter(|h| h.liveness != Liveness::Dead)
-                    .collect::<Vec<_>>(),
-            )
+/// ordered by key, read without the lock and creating nothing
+/// ([`Record::read_existing`]); empty when there is no record yet. A
+/// runner attempt's key is never listed (it is never registered either).
+/// `Err` carries the record-error text.
+pub fn heads(fgos_dir: &std::path::Path, limits: &Limits) -> Result<Vec<HeadView>, String> {
+    let existing =
+        Record::read_existing(fgos_dir, limits).map_err(|error| record_error_text(error.code()))?;
+    let Some(existing) = existing else {
+        return Ok(Vec::new());
+    };
+    Ok(existing
+        .state
+        .bindings()
+        .filter(|b| !fgos_identity::is_attempt_writer_id(b.key.as_str()))
+        .map(|b| HeadView {
+            key: b.key.clone(),
+            name: b.name.clone(),
+            cli: b.cli.clone(),
+            liveness: stored_liveness(b),
         })
-        .map_err(|error| record_error_text(error.code()))?;
-    Ok(held.value.value)
+        .filter(|h| h.liveness != Liveness::Dead)
+        .collect())
 }
 
 /// What the delivery report says of the recipient's CLI version.
@@ -199,4 +194,223 @@ pub fn inbox_claim(
         written: emitted.stdout_written,
         finished: emitted.finished,
     })
+}
+
+/// What `status` answers (spec §9, report-only): the record's verdict, the
+/// signals the snapshot and the hook-outcome file give, as JSON and as text.
+/// No signal has a threshold yet, so none fails the answer.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StatusAnswer {
+    pub json: serde_json::Value,
+    pub text: String,
+    /// `false` only when the record could not be read (its code is in
+    /// `json.record`); a missing record is `true`, "none".
+    pub record_ok: bool,
+}
+
+/// `status`: reads the record without the lock and creates nothing
+/// ([`Record::read_existing`]); the latest hook outcome is read only from a
+/// trusted `runtime/mailbox/`.
+pub fn status(fgos_dir: &std::path::Path, now: Timestamp, limits: &Limits) -> StatusAnswer {
+    let existing = match Record::read_existing(fgos_dir, limits) {
+        Ok(existing) => existing,
+        Err(error) => {
+            let json = serde_json::json!({ "record": error.code() });
+            return StatusAnswer {
+                text: format!("record: {}", error.code()),
+                json,
+                record_ok: false,
+            };
+        }
+    };
+    let Some(existing) = existing else {
+        return StatusAnswer {
+            json: serde_json::json!({ "record": "none" }),
+            text: "record: none (no hook has run in this project yet)".to_string(),
+            record_ok: true,
+        };
+    };
+    let outcome = hook_outcome(fgos_dir);
+    let signals = signals(&existing.state, now);
+    let json = serde_json::json!({
+        "record": "ok",
+        "recordBytes": existing.snapshot_bytes,
+        "heads": existing.state.bindings().count(),
+        "signals": signals,
+        "hookOutcome": outcome,
+    });
+    StatusAnswer {
+        text: status_text(&json),
+        json,
+        record_ok: true,
+    }
+}
+
+/// The latest hook outcome line, when one was written.
+fn hook_outcome(fgos_dir: &std::path::Path) -> serde_json::Value {
+    let paths = crate::record::Paths::new(fgos_dir);
+    crate::record::trusted_mailbox_dir(&paths)
+        .and_then(|_| crate::record::read_regular_capped(&paths.hook_outcome(), 4096).ok())
+        .and_then(|bytes| serde_json::from_slice(&bytes).ok())
+        .unwrap_or(serde_json::Value::Null)
+}
+
+/// Nearest-rank percentile of sorted `values`.
+fn rank(sorted: &[u64], percent: usize) -> u64 {
+    let index = (percent * sorted.len())
+        .div_ceil(100)
+        .clamp(1, sorted.len())
+        - 1;
+    sorted[index]
+}
+
+/// The spec §9 signals one snapshot gives: 1 recorded to offered, 2
+/// refusals per reason, 3 offers per message, 5 queue depth and oldest
+/// age, 9 heads with mail pending and no drain since it arrived, 10
+/// offered and never answered.
+fn signals(state: &fgos_mailbox_core::MailboxState, now: Timestamp) -> serde_json::Value {
+    use fgos_mailbox_core::MessageState;
+    let age = |at: Timestamp| now.as_millis().saturating_sub(at.as_millis());
+    let mut latency: Vec<u64> = state
+        .messages()
+        .filter_map(|h| match h.state {
+            MessageState::Offered { at } => {
+                Some(at.as_millis().saturating_sub(h.recorded_at.as_millis()))
+            }
+            _ => None,
+        })
+        .collect();
+    latency.sort_unstable();
+    let latency = if latency.is_empty() {
+        serde_json::json!({ "n": 0 })
+    } else {
+        serde_json::json!({
+            "n": latency.len(),
+            "p50": rank(&latency, 50),
+            "p95": rank(&latency, 95),
+            "max": latency[latency.len() - 1],
+        })
+    };
+    let refusals: serde_json::Map<String, serde_json::Value> = state
+        .counters()
+        .totals()
+        .map(|(reason, count)| (reason.code().to_string(), count.into()))
+        .collect();
+    let pending = |h: &&fgos_mailbox_core::Header| {
+        matches!(
+            h.state,
+            MessageState::Recorded | MessageState::InFlight { .. }
+        )
+    };
+    let oldest_pending = state
+        .messages()
+        .filter(pending)
+        .map(|h| h.recorded_at)
+        .min();
+    let undrained: Vec<serde_json::Value> = state
+        .bindings()
+        .filter_map(|b| {
+            let mine: Vec<&fgos_mailbox_core::Header> = state
+                .messages()
+                .filter(pending)
+                .filter(|h| h.to == b.key && h.to_generation == b.generation)
+                .collect();
+            let oldest = mine.iter().map(|h| h.recorded_at).min()?;
+            let drained_since = b.last_drain_at.is_some_and(|at| at >= oldest);
+            (!drained_since).then(|| {
+                serde_json::json!({
+                    "name": b.name.as_str(),
+                    "pending": mine.len(),
+                    "lastDrainAgeMs": b.last_drain_at.map(age),
+                })
+            })
+        })
+        .collect();
+    let offered: Vec<&fgos_mailbox_core::Header> = state
+        .messages()
+        .filter(|h| matches!(h.state, MessageState::Offered { .. }))
+        .collect();
+    serde_json::json!({
+        "offerLatencyMs": latency,
+        "refusals": refusals,
+        "offers": {
+            "max": state.messages().map(|h| h.offers).max().unwrap_or(0),
+            "repeated": state.messages().filter(|h| h.offers > 1).count(),
+        },
+        "queue": {
+            "pending": state.messages().filter(pending).count(),
+            "oldestAgeMs": oldest_pending.map(age),
+        },
+        "undrained": undrained,
+        "offeredUnanswered": {
+            "offered": offered.len(),
+            "unanswered": offered.iter().filter(|h| !h.answered).count(),
+        },
+    })
+}
+
+/// The status JSON as operator lines.
+fn status_text(json: &serde_json::Value) -> String {
+    let s = &json["signals"];
+    let refusals = s["refusals"]
+        .as_object()
+        .filter(|m| !m.is_empty())
+        .map_or_else(
+            || "none".to_string(),
+            |m| {
+                m.iter()
+                    .map(|(k, v)| format!("{k}={v}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            },
+        );
+    let latency = &s["offerLatencyMs"];
+    let undrained = s["undrained"]
+        .as_array()
+        .filter(|a| !a.is_empty())
+        .map_or_else(
+            || "none".to_string(),
+            |a| {
+                a.iter()
+                    .map(|u| {
+                        format!(
+                            "{} pending={} last_drain_age_ms={}",
+                            u["name"].as_str().unwrap_or(""),
+                            u["pending"],
+                            u["lastDrainAgeMs"]
+                        )
+                    })
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            },
+        );
+    let outcome = &json["hookOutcome"];
+    [
+        "record: ok".to_string(),
+        format!("record bytes: {}", json["recordBytes"]),
+        format!("heads: {}", json["heads"]),
+        format!(
+            "recorded to offered (ms): n={} p50={} p95={} max={}",
+            latency["n"], latency["p50"], latency["p95"], latency["max"]
+        ),
+        format!("refusals: {refusals}"),
+        format!(
+            "offers per message: max={} repeated={}",
+            s["offers"]["max"], s["offers"]["repeated"]
+        ),
+        format!(
+            "queue: pending={} oldest_age_ms={}",
+            s["queue"]["pending"], s["queue"]["oldestAgeMs"]
+        ),
+        format!("pending with no drain since: {undrained}"),
+        format!(
+            "offered and never answered: {} of {}",
+            s["offeredUnanswered"]["unanswered"], s["offeredUnanswered"]["offered"]
+        ),
+        format!(
+            "last hook outcome: {}",
+            outcome["reason"].as_str().unwrap_or("none")
+        ),
+    ]
+    .join("\n")
 }

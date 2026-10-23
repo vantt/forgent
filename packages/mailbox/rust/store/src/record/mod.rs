@@ -310,6 +310,14 @@ impl fmt::Display for RecordError {
 
 impl std::error::Error for RecordError {}
 
+/// A record [`Record::read_existing`] found: its state and the size of
+/// its snapshot file (0 when no snapshot was written yet).
+#[derive(Debug, Clone)]
+pub struct Existing {
+    pub state: MailboxState,
+    pub snapshot_bytes: u64,
+}
+
 /// The mailbox's record under one `.fgos` directory.
 #[derive(Debug, Clone)]
 pub struct Record {
@@ -343,6 +351,35 @@ impl Record {
 
     pub fn paths(&self) -> &Paths {
         &self.paths
+    }
+
+    /// The installed state read without the mailbox lock and without
+    /// creating anything, for a report: each directory of the chain that
+    /// exists passes [`Record::open`]'s checks, and `None` means no record
+    /// yet (a directory down to `record/` is missing). The snapshot is
+    /// replaced by rename, so an unlocked read sees a whole one.
+    pub fn read_existing(
+        fgos_dir: impl Into<PathBuf>,
+        limits: &Limits,
+    ) -> Result<Option<Existing>, RecordError> {
+        let paths = Paths::new(fgos_dir);
+        let record_dir = paths.record_dir();
+        for (dir, creator) in paths.chain() {
+            match std::fs::symlink_metadata(&dir) {
+                Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+                _ => {}
+            }
+            check_dir(&dir, creator)?;
+            if dir == record_dir {
+                break;
+            }
+        }
+        let state = snapshot::read(&paths, snapshot_read_cap(limits))?;
+        let snapshot_bytes = std::fs::symlink_metadata(paths.snapshot()).map_or(0, |m| m.len());
+        Ok(Some(Existing {
+            state,
+            snapshot_bytes,
+        }))
     }
 
     /// One hold: `mutate` runs on the installed state with a fresh id

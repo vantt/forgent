@@ -106,7 +106,7 @@ test('only the hook selector declares native_kinds and it lists exactly mailbox'
   );
 });
 
-test('the mailbox selector is native with send and inbox and its flags', () => {
+test('the mailbox selector is native with send, inbox, list and status and their flags', () => {
   const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
   assert.equal(routes.mailbox.route_kind, 'native');
   assert.equal(routes.mailbox.operation_id, 'mailbox.inbox');
@@ -114,7 +114,9 @@ test('the mailbox selector is native with send and inbox and its flags', () => {
   assert.equal(routes.mailbox.subcommands, true);
   assert.deepEqual(routes.mailbox.subcommand_flags, {
     inbox: ['claim', 'dir', 'help', 'json'],
+    list: ['dir', 'help', 'json', 'long'],
     send: ['body', 'dir', 'help', 'json', 'reply-to', 'to', 'wake'],
+    status: ['dir', 'help', 'json'],
   });
 });
 

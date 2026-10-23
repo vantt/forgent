@@ -1108,15 +1108,15 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'mailbox',
-    invoke: 'fgos mailbox <send|inbox>',
-    description: 'The agent mailbox (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host from the main checkout\'s .fgos (also from a linked worktree; `--dir` is accepted and ignored). `send` records a message for another agent head of this project and answers with the delivery report or why it was refused (exit 0 recorded, 1 refused or the record failed). `inbox` lists this session\'s pending mail and changes nothing; `inbox --claim` consumes it: it prints the frames and marks them offered only after the print. A body that starts with `--` goes after `--`, and a body that is exactly `--help` or `-h` is read as a help request.',
+    invoke: 'fgos mailbox <send|inbox|list|status>',
+    description: 'The agent mailbox (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host from the main checkout\'s .fgos (also from a linked worktree; `--dir` is accepted and ignored). `send` records a message for another agent head of this project and answers with the delivery report or why it was refused (exit 0 recorded, 1 refused or the record failed). `inbox` lists this session\'s pending mail and changes nothing; `inbox --claim` consumes it: it prints the frames and marks them offered only after the print. `list` names the project\'s heads and `status` reports the record\'s health signals; both change nothing. A body that starts with `--` goes after `--`, and a body that is exactly `--help` or `-h` is read as a help request.',
     subcommands: {
       send: {
-        description: 'Record a message for the head named --to (a short name or an unambiguous prefix). Consuming: it writes the record. Answers `recorded <id> for <name>` plus when the recipient will see it, or the refusal.',
+        description: 'Record a message for the head named --to: a short name or an unambiguous prefix, or an Identity handle, full session id or lead:<LANE> role that names a head of this project. Consuming: it writes the record. Answers `recorded <id> for <name>` plus when the recipient will see it, or the refusal.',
         parameters: {
           type: 'object',
           properties: {
-            to: { type: 'string', description: 'The recipient\'s short name, or an unambiguous prefix of it.' },
+            to: { type: 'string', description: 'The recipient: its short name or an unambiguous prefix, or an Identity handle (`claude-5v7u@fg-server`), full session id or `lead:<LANE>` role naming a head of this project.' },
             wake: { type: 'boolean', description: 'Ask to wake the recipient at the end of its turn; the mailbox may drop the wake (its quota), and the answer says so.' },
             'reply-to': { type: 'string', description: 'The id of the message this one answers (from the reply line under that message).' },
             body: { type: 'string', description: 'The message text (positional; quote it).' },
@@ -1136,6 +1136,26 @@ export const COMMAND_REGISTRY = [
           required: [],
         },
         examples: ['fgos mailbox inbox', 'fgos mailbox inbox --claim', 'fgos mailbox inbox --json'],
+      },
+      list: {
+        description: 'Read-only: one line per head of this project\'s mailbox that is not known dead, with its short name, Identity handle, CLI, tier and liveness; `--long` adds its key. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            long: { type: 'boolean', description: 'Also show each head\'s key.' },
+          },
+          required: [],
+        },
+        examples: ['fgos mailbox list', 'fgos mailbox list --long --json'],
+      },
+      status: {
+        description: 'Read-only report of the record: its verdict (ok, none yet, or the record error) and the health signals of spec §9 (recorded-to-offered latency, refusals per reason, offers per message, queue depth and oldest age, record size, heads with mail and no drain since, offered and never answered, the last hook outcome). No signal has a threshold yet; exit 1 only when the record cannot be read. Creates nothing.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+        examples: ['fgos mailbox status', 'fgos mailbox status --json'],
       },
     },
     examples: ['fgos mailbox send --to forgent-claude-2b "hello"', 'fgos mailbox inbox', 'fgos mailbox inbox --claim'],

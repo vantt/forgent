@@ -342,6 +342,28 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ),
         ("report.wake-no-channel", &["wake was not used"][..]),
         ("report.role-holder", &["{{role}}", "{{handle}}"][..]),
+        ("list.empty", &[][..]),
+        (
+            "list.line",
+            &[
+                "{{name}}",
+                "{{handle}}",
+                "{{agent}}",
+                "{{tier}}",
+                "{{liveness}}",
+            ][..],
+        ),
+        (
+            "list.line.long",
+            &[
+                "{{name}}",
+                "{{handle}}",
+                "{{agent}}",
+                "{{tier}}",
+                "{{liveness}}",
+                "{{key}}",
+            ][..],
+        ),
         ("refusal.alias.no-address", &["no mailbox address"][..]),
         (
             "refusal.policy",

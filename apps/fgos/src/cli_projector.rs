@@ -106,6 +106,14 @@ pub fn project_cli_invocation(
             ContractRef::from_static("mailbox.inbox.claim.request", "1.0.0"),
             Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
         ),
+        crate::wiring::mailbox_verbs::LIST_OPERATION_ID => (
+            ContractRef::from_static("mailbox.list.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::STATUS_OPERATION_ID => (
+            ContractRef::from_static("mailbox.status.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -121,8 +129,9 @@ pub fn project_cli_invocation(
 
 /// The operation a native route runs for these arguments. A route names one
 /// operation; `identity` fans out over three (`identity.writer` bare,
-/// `identity.read`, `identity.write`) and `mailbox` over three
-/// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`),
+/// `identity.read`, `identity.write`) and `mailbox` over five
+/// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
+/// `mailbox.list`, `mailbox.status`),
 /// and the arguments decide which.
 pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<String, String> {
     if route_operation == fgos_identity::IDENTITY_OPERATION_ID {
@@ -143,30 +152,44 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 /// [--project] [--prune]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
-fn project_identity_request(
-    args: &[OsString],
-) -> Result<fgos_identity::IdentityRequest, String> {
+fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::IdentityRequest, String> {
     let subcommand = args
         .get(1)
         .map(|value| value.to_string_lossy().into_owned())
         .filter(|value| !value.starts_with('-'));
     let mut index = if subcommand.is_some() { 2 } else { 1 };
     let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand.as_deref() {
-        None | Some("writer") => (fgos_identity::Verb::Writer, &["--pid", "--fgos-dir", "--dir"]),
+        None | Some("writer") => (
+            fgos_identity::Verb::Writer,
+            &["--pid", "--fgos-dir", "--dir"],
+        ),
         Some("machine") => (
             fgos_identity::Verb::Machine { alias: None },
             &["--alias", "--dir"],
         ),
         Some("session") => (
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
-            &["--pid", "--fgos-dir", "--register", "--role", "--drop-role", "--take", "--dir"],
+            &[
+                "--pid",
+                "--fgos-dir",
+                "--register",
+                "--role",
+                "--drop-role",
+                "--take",
+                "--dir",
+            ],
         ),
         Some("resolve") => (
-            fgos_identity::Verb::Resolve { query: String::new() },
+            fgos_identity::Verb::Resolve {
+                query: String::new(),
+            },
             &["--dir"],
         ),
         Some("list") => (
-            fgos_identity::Verb::List { project: false, prune: false },
+            fgos_identity::Verb::List {
+                project: false,
+                prune: false,
+            },
             &["--project", "--prune", "--dir"],
         ),
         Some("project") => (
@@ -174,7 +197,10 @@ fn project_identity_request(
             &["--init", "--new", "--handle", "--dir"],
         ),
         Some("mint") => (
-            fgos_identity::Verb::Mint { kind: String::new(), release: None },
+            fgos_identity::Verb::Mint {
+                kind: String::new(),
+                release: None,
+            },
             &["--release", "--dir"],
         ),
         Some(other) => {
@@ -196,7 +222,10 @@ fn project_identity_request(
                 .map(|value| value.to_string_lossy().into_owned())
                 .filter(|value| !value.starts_with('-'))
                 .ok_or_else(|| {
-                    format!("mint requires an id kind. Available: {}", fgos_identity::KIND_NAMES.join(", "))
+                    format!(
+                        "mint requires an id kind. Available: {}",
+                        fgos_identity::KIND_NAMES.join(", ")
+                    )
                 })?;
             index += 1;
             *kind = name;
@@ -206,7 +235,9 @@ fn project_identity_request(
                 .get(index)
                 .map(|value| value.to_string_lossy().into_owned())
                 .filter(|value| !value.starts_with('-'))
-                .ok_or_else(|| "resolve requires a handle or a role such as lead:MAIL".to_string())?;
+                .ok_or_else(|| {
+                    "resolve requires a handle or a role such as lead:MAIL".to_string()
+                })?;
             index += 1;
             *query = name;
         }
@@ -227,7 +258,16 @@ fn project_identity_request(
         if value == "--json" {
             continue;
         }
-        if ["--init", "--new", "--register", "--take", "--project", "--prune"].contains(&value.as_str()) {
+        if [
+            "--init",
+            "--new",
+            "--register",
+            "--take",
+            "--project",
+            "--prune",
+        ]
+        .contains(&value.as_str())
+        {
             if !allowed.contains(&value.as_str()) {
                 return Err(format!("unknown identity option '{value}'"));
             }
@@ -270,7 +310,9 @@ fn project_identity_request(
                     .parse::<u32>()
                     .ok()
                     .filter(|pid| *pid > 0)
-                    .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
+                    .ok_or_else(|| {
+                        format!("--pid must be a positive integer, got '{flag_value}'")
+                    })?;
                 request.pid = Some(pid);
             }
             "--release" => {
@@ -278,7 +320,9 @@ fn project_identity_request(
                     .parse::<u64>()
                     .ok()
                     .filter(|number| *number > 0)
-                    .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+                    .ok_or_else(|| {
+                        format!("--release must be a positive number, got '{flag_value}'")
+                    })?;
                 if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
                     *release = Some(number);
                 }
@@ -331,7 +375,10 @@ fn project_identity_request(
                 *action = fgos_identity::SessionAction::Register { role, take };
             }
         }
-        fgos_identity::Verb::List { project, prune: pruned } => {
+        fgos_identity::Verb::List {
+            project,
+            prune: pruned,
+        } => {
             *project = by_project;
             *pruned = prune;
         }
@@ -483,9 +530,18 @@ mod tests {
             native_operation_id("identity.writer", &args).unwrap()
         };
         assert_eq!(operation(&["identity", "--json"]), "identity.writer");
-        assert_eq!(operation(&["identity", "writer", "--pid", "7"]), "identity.writer");
-        assert_eq!(operation(&["identity", "machine", "--json"]), "identity.read");
-        assert_eq!(operation(&["identity", "session", "--pid", "7"]), "identity.read");
+        assert_eq!(
+            operation(&["identity", "writer", "--pid", "7"]),
+            "identity.writer"
+        );
+        assert_eq!(
+            operation(&["identity", "machine", "--json"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "session", "--pid", "7"]),
+            "identity.read"
+        );
         assert_eq!(
             operation(&["identity", "machine", "--alias", "lab"]),
             "identity.write"
@@ -495,17 +551,38 @@ mod tests {
             .map(OsString::from)
             .collect();
         assert!(native_operation_id("identity.writer", &args).is_err());
-        assert_eq!(operation(&["identity", "project", "--json"]), "identity.read");
-        assert_eq!(operation(&["identity", "project", "--init"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "project", "--json"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "project", "--init"]),
+            "identity.write"
+        );
         assert_eq!(
             operation(&["identity", "project", "--handle", "app", "--new"]),
             "identity.write"
         );
-        assert_eq!(operation(&["identity", "mint", "work", "--json"]), "identity.write");
-        assert_eq!(operation(&["identity", "resolve", "lead:MAIL"]), "identity.read");
-        assert_eq!(operation(&["identity", "list", "--project"]), "identity.read");
-        assert_eq!(operation(&["identity", "list", "--prune"]), "identity.write");
-        assert_eq!(operation(&["identity", "session", "--register"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "mint", "work", "--json"]),
+            "identity.write"
+        );
+        assert_eq!(
+            operation(&["identity", "resolve", "lead:MAIL"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "list", "--project"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "list", "--prune"]),
+            "identity.write"
+        );
+        assert_eq!(
+            operation(&["identity", "session", "--register"]),
+            "identity.write"
+        );
         assert_eq!(
             operation(&["identity", "session", "--role", "lead:MAIL", "--take"]),
             "identity.write"
@@ -518,7 +595,14 @@ mod tests {
             let args: Vec<OsString> = args.iter().map(OsString::from).collect();
             project_identity_request(&args)
         };
-        let registered = request(&["identity", "session", "--role=lead:MAIL", "--take", "--json"]).unwrap();
+        let registered = request(&[
+            "identity",
+            "session",
+            "--role=lead:MAIL",
+            "--take",
+            "--json",
+        ])
+        .unwrap();
         assert_eq!(
             registered.verb,
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Register {
@@ -527,14 +611,26 @@ mod tests {
             })
         );
         assert_eq!(
-            request(&["identity", "resolve", "claude-4f2a@fg", "--json"]).unwrap().verb,
-            fgos_identity::Verb::Resolve { query: "claude-4f2a@fg".into() }
+            request(&["identity", "resolve", "claude-4f2a@fg", "--json"])
+                .unwrap()
+                .verb,
+            fgos_identity::Verb::Resolve {
+                query: "claude-4f2a@fg".into()
+            }
         );
         assert_eq!(
-            request(&["identity", "list", "--project", "--prune"]).unwrap().verb,
-            fgos_identity::Verb::List { project: true, prune: true }
+            request(&["identity", "list", "--project", "--prune"])
+                .unwrap()
+                .verb,
+            fgos_identity::Verb::List {
+                project: true,
+                prune: true
+            }
         );
-        assert!(request(&["identity", "session", "--take"]).is_err(), "--take needs --role");
+        assert!(
+            request(&["identity", "session", "--take"]).is_err(),
+            "--take needs --role"
+        );
         assert!(request(&["identity", "resolve"]).is_err());
         assert!(request(&["identity", "machine", "--register"]).is_err());
         assert!(request(&["identity", "list", "--role", "lead:MAIL"]).is_err());
@@ -549,10 +645,16 @@ mod tests {
         let minted = request(&["identity", "mint", "d-adr", "--release", "73", "--json"]).unwrap();
         assert_eq!(
             minted.verb,
-            fgos_identity::Verb::Mint { kind: "d-adr".into(), release: Some(73) }
+            fgos_identity::Verb::Mint {
+                kind: "d-adr".into(),
+                release: Some(73)
+            }
         );
         let message = request(&["identity", "mint", "--json"]).unwrap_err();
-        assert!(message.contains("requires an id kind") && message.contains("d-adr"), "{message}");
+        assert!(
+            message.contains("requires an id kind") && message.contains("d-adr"),
+            "{message}"
+        );
         assert!(request(&["identity", "mint", "d-adr", "--release", "0"]).is_err());
         assert!(request(&["identity", "machine", "--release", "3"]).is_err());
     }

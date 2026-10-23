@@ -169,6 +169,11 @@ impl BoundedCounters {
         }
     }
 
+    /// Every reason counted so far with its total, in reason order.
+    pub fn totals(&self) -> impl Iterator<Item = (CounterReason, u64)> + '_ {
+        self.totals.iter().map(|(reason, count)| (*reason, *count))
+    }
+
     pub fn total(&self, reason: CounterReason) -> u64 {
         self.totals.get(&reason).copied().unwrap_or(0)
     }

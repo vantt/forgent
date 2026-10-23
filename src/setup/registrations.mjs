@@ -2370,12 +2370,52 @@ registerConfigDefault({
   shape: {},
 });
 
+// The record's verdict as the host's `fgos mailbox status --json` reports it: the record's
+// rules (its directory checks, its snapshot version and caps) stay in Rust, and status
+// reads without the lock and creates nothing. Run from the main checkout without
+// CLAUDE_PROJECT_DIR, which the verbs would otherwise read as the project. `null` with a
+// reason when no host can answer (none resolved, or a release without `mailbox status`).
+function mailboxRecordVerdict(cwd) {
+  const hostBin = resolveHostBin(cwd);
+  if (!hostBin) return { data: null, why: 'no host binary (FGOS_HOST_BIN unset and no active installation manifest)' };
+  const { CLAUDE_PROJECT_DIR: _projectDir, ...env } = process.env;
+  let stdout;
+  try {
+    stdout = execFileSync(hostBin, ['mailbox', 'status', '--json'], {
+      cwd: resolveMainCheckoutRoot(cwd) ?? cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 10000,
+    });
+  } catch (err) {
+    // Exit 1 still prints the envelope when the record failed; anything else names why.
+    stdout = err.stdout ? String(err.stdout) : '';
+    if (!stdout.trim()) return { data: null, why: (err.stderr ? String(err.stderr).trim().split('\n')[0] : '') || err.message };
+  }
+  try {
+    return { data: JSON.parse(stdout).data, why: null };
+  } catch {
+    return { data: null, why: 'the host answered `mailbox status` with no JSON envelope' };
+  }
+}
+
+function checkMailboxHook(cwd) {
+  if (!mailboxEnabled(cwd)) {
+    return { passed: true, message: 'not enabled: set mailbox.enabled: true in .fgos/config.json, then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' };
+  }
+  const enabled = 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits and overrides: packages/mailbox/contracts/limits.v1.json, under mailbox.* in .fgos/config.json';
+  const { data, why } = mailboxRecordVerdict(cwd);
+  if (!data) return { passed: true, message: `${enabled}; record not checked: ${why}` };
+  // No record field: the verb found no record directory to read here (not a repository,
+  // no .fgos), and says so in its text.
+  if (!data.record) return { passed: true, message: `${enabled}; record not checked: ${data.text ?? 'no answer'}` };
+  if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
+  if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record} (fgos mailbox status names it)` };
+  const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
+  return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})` };
+}
+
 registerCheck({
   id: 'mailbox-hook',
-  description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled)',
-  check: (cwd) => (mailboxEnabled(cwd)
-    ? { passed: true, message: 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits and overrides: packages/mailbox/contracts/limits.v1.json, under mailbox.* in .fgos/config.json' }
-    : { passed: true, message: 'not enabled: set mailbox.enabled: true in .fgos/config.json, then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' }),
+  description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status',
+  check: (cwd) => checkMailboxHook(cwd),
 });
 
 registerConfigDefault({

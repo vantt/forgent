@@ -273,6 +273,23 @@ impl TestedClis {
         self.facts.get(word)
     }
 
+    /// The tier `send` and `list` name for a head of `cli` (spec §6.2): `turn`
+    /// where a step drain delivers (no wake channel is built yet), `pull`
+    /// otherwise (mail only through `inbox --claim`).
+    pub fn tier(&self, cli: &Cli) -> &'static str {
+        let delivers = self.clis.iter().any(|c| c == cli.as_str())
+            && self.platforms.get(cli.as_str()).map(String::as_str) == Some(std::env::consts::OS)
+            && self
+                .facts
+                .get(cli.as_str())
+                .is_some_and(|f| f.post_tool_use_max_bytes.is_some());
+        if delivers {
+            "turn"
+        } else {
+            "pull"
+        }
+    }
+
     /// The CLIs whose `Stop` takes mail, by the facts usable on this
     /// platform: what `send` passes the core, so a wake toward any other
     /// CLI, or one the contract does not know, has no channel.

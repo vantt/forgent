@@ -7,7 +7,9 @@
 use crate::delivery::{AliasRefusal, MessageView, Refusal, SendOutcome};
 use crate::envelope::Kind;
 use crate::frame::{escape_handle, escape_header, fill, section};
+use crate::ids::{Cli, ShortName, WriterKey};
 use crate::limits::Limits;
+use crate::registry::Liveness;
 use crate::wake::WakeDrop;
 
 /// What the sender learns of the recipient's CLI version (spec §4.1): a
@@ -192,6 +194,55 @@ fn limit_text(refusal: &Refusal) -> String {
         .map(|(name, value)| format!("{name}={value}"))
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+/// One head as `list` shows it: plain data the store and the wiring
+/// gathered (the handle derived by the wiring, the tier from the adapters
+/// contract, the liveness from the store's judgement).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ListRow {
+    pub name: ShortName,
+    pub key: WriterKey,
+    pub cli: Cli,
+    pub handle: Option<String>,
+    pub tier: &'static str,
+    pub liveness: Liveness,
+}
+
+/// The `list` answer: one line per head in the given order, with its key
+/// when `long`, or the empty line.
+pub fn list_text(rows: &[ListRow], long: bool, limits: &Limits) -> String {
+    if rows.is_empty() {
+        return section("list.empty").to_string();
+    }
+    rows.iter()
+        .map(|row| {
+            let name = escape_header(row.name.as_str(), limits);
+            let handle = row
+                .handle
+                .as_deref()
+                .map_or_else(|| "unknown".to_string(), |h| escape_handle(h, limits));
+            let agent = escape_header(row.cli.as_str(), limits);
+            let key = escape_header(row.key.as_str(), limits);
+            let liveness = match row.liveness {
+                Liveness::Alive => "alive",
+                Liveness::Dead => "dead",
+                Liveness::Unknown => "unknown",
+            };
+            fill(
+                section(if long { "list.line.long" } else { "list.line" }),
+                &[
+                    ("name", &name),
+                    ("handle", &handle),
+                    ("agent", &agent),
+                    ("tier", row.tier),
+                    ("liveness", liveness),
+                    ("key", &key),
+                ],
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// The read-only inbox listing: one line per pending item, oldest mail

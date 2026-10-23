@@ -147,6 +147,28 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("mailbox.list"),
+        owning_component_id: Cow::Borrowed("mailbox"),
+        request_contract: ContractRef::from_static("mailbox.list.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("mailbox.list.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("mailbox.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("mailbox.status"),
+        owning_component_id: Cow::Borrowed("mailbox"),
+        request_contract: ContractRef::from_static("mailbox.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("mailbox.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("mailbox.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -155,8 +177,9 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        // Nine operations, plus the mailbox's send, inbox and inbox claim.
-        assert_eq!(CATALOG.len(), 12);
+        // Nine operations, plus the mailbox's send, inbox, inbox claim, list
+        // and status.
+        assert_eq!(CATALOG.len(), 14);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -170,6 +193,8 @@ mod tests {
         assert!(ids.contains(&"mailbox.send"));
         assert!(ids.contains(&"mailbox.inbox"));
         assert!(ids.contains(&"mailbox.inbox.claim"));
+        assert!(ids.contains(&"mailbox.list"));
+        assert!(ids.contains(&"mailbox.status"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

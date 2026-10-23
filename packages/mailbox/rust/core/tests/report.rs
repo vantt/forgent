@@ -323,3 +323,40 @@ fn candidates_and_recipients_still_render_through_the_header_escape_after_the_ha
     assert!(delivery_report(&sent, &VersionClause::Tested, &limits)
         .starts_with("recorded a1b2 for forgent-claude-2b_x\n"));
 }
+
+#[test]
+fn list_shows_one_line_per_head_with_its_name_handle_cli_tier_and_liveness_and_the_key_only_when_long(
+) {
+    use fgos_mailbox_core::{list_text, Cli, ListRow, Liveness, WriterKey};
+    let limits = spec_limits();
+    let rows = vec![
+        ListRow {
+            name: name("forgent-claude-2b"),
+            key: WriterKey::new("k-claude").unwrap(),
+            cli: Cli::new("claude").unwrap(),
+            handle: Some("claude-5v7u@fg-server".to_string()),
+            tier: "turn",
+            liveness: Liveness::Alive,
+        },
+        ListRow {
+            name: name("forgent-codex-9c"),
+            key: WriterKey::new("k-codex").unwrap(),
+            cli: Cli::new("codex").unwrap(),
+            handle: None,
+            tier: "turn",
+            liveness: Liveness::Unknown,
+        },
+    ];
+    assert_eq!(
+        list_text(&rows, false, &limits),
+        "forgent-claude-2b claude-5v7u@fg-server agent=claude tier=turn alive\n\
+         forgent-codex-9c unknown agent=codex tier=turn unknown"
+    );
+    assert!(list_text(&rows, true, &limits)
+        .lines()
+        .all(|l| l.contains(" key=k-")));
+    assert_eq!(
+        list_text(&[], false, &limits),
+        "No heads in this project's mailbox yet."
+    );
+}

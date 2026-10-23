@@ -12,14 +12,14 @@
 #
 # Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
 # {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
-# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}} {{role}} {{handle}}. Every value taken from the
+# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}} {{role}} {{handle}} {{name}} {{tier}} {{liveness}} {{key}}. Every value taken from the
 # record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
-# {{to}} {{from_label}} {{candidates}} {{version}}) goes through the header escape,
+# {{to}} {{from_label}} {{candidates}} {{version}} {{name}} {{key}}) goes through the header escape,
 # except an Identity handle or role ({{role}} {{handle}}, and the candidates of an
 # alias refusal), which goes through the handle escape: the header alphabet plus @ and :.
 # In [message], {{handle}} is the sender's Identity handle, derived when the frame is
 # rendered and never stored; "unknown" for a head whose handle cannot be derived and
-# "unregistered" for a sender with no head.
+# "unregistered" for a sender with no head. {{tier}} and {{liveness}} are words fixed by the code.
 # The others are fixed by the code and inserted as they are: the words
 # {{code}}, {{kind}} and {{state}}, the numbers {{attempt}}, {{offers}} and {{count}},
 # and {{limit}}, a refusal's own fields as name=value pairs, in field
@@ -94,3 +94,9 @@ No pending mail.
 {{id}} {{kind}} from={{from_label}} state={{state}} offers={{offers}}
 [inbox.no-address]
 This session has no mailbox address yet; it gets one at its first hook.
+[list.empty]
+No heads in this project's mailbox yet.
+[list.line]
+{{name}} {{handle}} agent={{agent}} tier={{tier}} {{liveness}}
+[list.line.long]
+{{name}} {{handle}} agent={{agent}} tier={{tier}} {{liveness}} key={{key}}

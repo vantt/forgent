@@ -433,7 +433,7 @@ fn heads_lists_every_head_not_judged_dead_with_its_name_cli_and_liveness_and_wri
     let unknown_name = with_cli_head(&fgos, "head-unknown", "claude", "not a process record");
     let before = std::fs::read(fgos.paths().snapshot()).unwrap();
 
-    let listed = heads(&fgos.record(), Wait::Try, T0, &limits()).unwrap();
+    let listed = heads(&fgos.fgos_dir(), &limits()).unwrap();
 
     let rows: Vec<(String, String, String, Liveness)> = listed
         .iter()
@@ -464,4 +464,113 @@ fn heads_lists_every_head_not_judged_dead_with_its_name_cli_and_liveness_and_wri
         ]
     );
     assert_eq!(std::fs::read(fgos.paths().snapshot()).unwrap(), before);
+}
+
+#[test]
+fn heads_never_lists_a_runner_attempt_key() {
+    use fgos_mailbox::verbs::heads;
+    let fgos = TempFgos::new("verb-heads-runner");
+    let live = Child::spawn();
+    with_cli_head(&fgos, "att-0123456789abcdef", "claude", &live.head_text());
+
+    assert!(heads(&fgos.fgos_dir(), &limits()).unwrap().is_empty());
+}
+
+#[test]
+fn status_reports_each_signal_from_a_record_seeded_through_the_stores_own_holds_and_creates_nothing(
+) {
+    use fgos_mailbox::verbs::status;
+    use fgos_mailbox_core::{Checkpoint, Timestamp};
+    let at = |secs: u64| Timestamp::from_millis(T0.as_millis() + secs * 1000);
+    let fgos = TempFgos::new("verb-status");
+
+    let none = status(&fgos.fgos_dir(), T0, &limits());
+    assert_eq!(none.json["record"], "none");
+    assert!(none.record_ok);
+    assert!(
+        !fgos.fgos_dir().join("runtime").exists(),
+        "status created nothing"
+    );
+
+    let name = with_head(&fgos, "head-a");
+    let record = fgos.record();
+    for (secs, body) in [(0, "one"), (0, "two")] {
+        record
+            .send(
+                send_req("sender-x", &name, body),
+                Wait::Try,
+                at(secs),
+                &limits(),
+            )
+            .unwrap();
+    }
+    record
+        .hold(Wait::Try, at(5), &limits(), |state, ids| {
+            let generation = state.binding(&key("head-a")).unwrap().generation;
+            let claim = state.claim(
+                &key("head-a"),
+                generation,
+                Checkpoint::Step,
+                at(5),
+                &limits(),
+                ids,
+            );
+            state.finish(&key("head-a"), generation, &claim.token.unwrap(), at(5));
+            Reported::changing(())
+        })
+        .unwrap();
+    record
+        .send(
+            send_req("sender-x", &name, "three"),
+            Wait::Try,
+            at(10),
+            &limits(),
+        )
+        .unwrap();
+    record
+        .send(
+            send_req("sender-x", "nobody", "lost"),
+            Wait::Try,
+            at(11),
+            &limits(),
+        )
+        .unwrap();
+    let before = std::fs::read(fgos.paths().snapshot()).unwrap();
+
+    let answer = status(&fgos.fgos_dir(), at(60), &limits());
+
+    let json = &answer.json;
+    assert_eq!(json["record"], "ok");
+    assert_eq!(json["recordBytes"], before.len() as u64);
+    assert_eq!(json["heads"], 1);
+    let s = &json["signals"];
+    assert_eq!(
+        s["offerLatencyMs"],
+        serde_json::json!({ "n": 2, "p50": 5000, "p95": 5000, "max": 5000 })
+    );
+    assert_eq!(s["refusals"], serde_json::json!({ "unknown-name": 1 }));
+    assert_eq!(s["offers"], serde_json::json!({ "max": 1, "repeated": 0 }));
+    assert_eq!(
+        s["queue"],
+        serde_json::json!({ "pending": 1, "oldestAgeMs": 50_000 })
+    );
+    assert_eq!(
+        s["undrained"],
+        serde_json::json!([{ "name": name, "pending": 1, "lastDrainAgeMs": 55_000 }])
+    );
+    assert_eq!(
+        s["offeredUnanswered"],
+        serde_json::json!({ "offered": 2, "unanswered": 2 })
+    );
+    assert_eq!(json["hookOutcome"], serde_json::Value::Null);
+    assert!(
+        answer.text.contains("offered and never answered: 2 of 2"),
+        "{}",
+        answer.text
+    );
+    assert_eq!(
+        std::fs::read(fgos.paths().snapshot()).unwrap(),
+        before,
+        "status wrote nothing"
+    );
 }
