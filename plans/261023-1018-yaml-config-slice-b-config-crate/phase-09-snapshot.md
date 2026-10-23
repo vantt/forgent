@@ -54,3 +54,7 @@ Spec section 5: `snapshot` returns the effective value of every described key an
 ## Rollback
 
 Revert: new files only.
+
+## Note added 2026-10-23 (coordinator, from phase 08)
+
+`ConfigRefusal` is 208 bytes and trips `clippy::result_large_err` (phase 08 allowed it locally in `grammar.rs`). Before more modules return it, box its large payload in `error.rs` once and remove the local allow, so no module carries its own allow.

@@ -74,3 +74,7 @@ Spec section 4: "The first standard is authored from this repository's tuned cat
 ## Rollback
 
 Revert: the section schema, the fixtures and the test come out together; `src/bundle.rs` loses one line. Nothing links the crate.
+
+## Note added 2026-10-23 (coordinator, from phase 08)
+
+The Seat Binding ladder text is several lines, and phase 08 renders one `@fgos:doc` line per schema `description`. Spec section 7 says the ladder is rendered as `# @fgos:doc` lines (plural): render a multi-line description as one `@fgos:doc` line per source line, in order, and pin it in the authoring test; do not collapse it.
