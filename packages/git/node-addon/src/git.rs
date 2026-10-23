@@ -164,7 +164,6 @@ impl GitPublication {
                 Ok(json!({"commits":page.commits.into_iter().map(|c| json!({"oid":c.oid,"parents":c.parents,"tree":c.tree})).collect::<Vec<_>>(),"nextCursor":page.next_cursor.map(|c| c.0),"complete":page.complete}))
             }
             "compareAndSwap" => Ok(json!(port.compare_and_swap(repo, &self.reference, &tip(&args["expected"])?, &tip(&args["next"])?, text(&args,"operationId")?).map_err(operation)?)),
-            "fetchRefs" => Ok(json!(port.fetch_refs(repo, text(&args,"remote")?, &strings(&args,"refspecs")?).map_err(operation)?)),
             "pushRefs" => {
                 let pairs: Vec<(String,String)> = serde_json::from_value(args["refs"].clone()).map_err(error)?;
                 let refs = pairs.iter().map(|(a,b)| Ok((RefName::parse(a).map_err(error)?, RefName::parse(b).map_err(error)?))).collect::<Result<Vec<_>>>()?;

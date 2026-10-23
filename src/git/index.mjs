@@ -9,7 +9,7 @@ export function createGitPublication(options, loaderOptions) {
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitPublication(options.stateRoot, options.repoPath, options.trustedMain, options.reference, options.writer, nativeHelperExe(native));
   const facade = { close() { outsideGate(); return port.close(); } };
-  for (const method of ['resolveRepo', 'writeBlob', 'writeTree', 'writeCommit', 'readRef', 'readObject', 'walkCommits', 'compareAndSwap', 'fetchRefs', 'pushRefs', 'ensureFetchMapping', 'configuredFetchRefspecs', 'pushRefspecs', 'remoteUrl', 'machineId', 'gitFloorVerdict', 'fetchMappingProvenance', 'recover', 'supersede']) {
+  for (const method of ['resolveRepo', 'writeBlob', 'writeTree', 'writeCommit', 'readRef', 'readObject', 'walkCommits', 'compareAndSwap', 'pushRefs', 'ensureFetchMapping', 'configuredFetchRefspecs', 'pushRefspecs', 'remoteUrl', 'machineId', 'gitFloorVerdict', 'fetchMappingProvenance', 'recover', 'supersede']) {
     facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };
   }
   return Object.freeze(facade);
