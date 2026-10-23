@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "77c966dc427105c6909ee73bc583a791d4e2ffc142916e90dda7726bf5218f6a",
+  "payloadDigest": "9611afc94ed291bc7799d842d8f52454de1a7e5ecf868c267559f6390d8efb38",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -446,7 +446,7 @@
     "packages/process/rust/src/lib.rs": "ad71de601877e524e4cf019681689f9359a327478acb41a75633319466fba2ef",
     "packages/process/rust/src/mapped.rs": "10a60edf2c77662c0fe53fdfa0cb42ab447421340b613f9dd6c742678c30055c",
     "packages/process/rust/src/platform/linux.rs": "be9faa2af77c0eceab0fdff9028c3cf156c476b076a4102bfa6037ae8825218e",
-    "packages/process/rust/src/platform/macos.rs": "8224a406882097afea071ce4750c7d3f02ff05109662a1366415a3b9d48af455",
+    "packages/process/rust/src/platform/macos.rs": "7c2e2d66b709aaff94e308c6e5aef05a55e170d6ffff9c48d4dffa611ba66f03",
     "packages/process/rust/src/platform/mod.rs": "37eff472f270dc5a3ba0be9f712df1f791bf4ea6200e7724f7e7d8d0c2021364",
     "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
     "packages/process/rust/src/platform/windows_job.rs": "0b4c5b1d99cf6764b23efbddcab454357eb963965b2ca2dbe8f9cd2591fca3bc",
