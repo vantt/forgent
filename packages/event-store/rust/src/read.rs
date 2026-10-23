@@ -3,6 +3,7 @@ pub use crate::order::VerifiedView;
 use crate::{
     append::Positions,
     checkpoint::{self, Checkpoint, CheckpointReport, Retained},
+    commit_memo::CommitMemo,
     cursor::{fold_answer, Cursor, Fold},
     envelope::{Envelope, Scope},
     errors::{invalid, Error, ErrorCode},
@@ -13,7 +14,10 @@ use crate::{
     walk::{self, blobs, git_error},
 };
 use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    sync::{Arc, Mutex},
+};
 #[derive(Debug)]
 pub struct ReadResult {
     pub events: Vec<Envelope>,
@@ -28,6 +32,9 @@ pub struct ReadResult {
     pub verified_view: VerifiedView,
     /// What this read did with its checkpoint; default when it had none.
     pub checkpoint: CheckpointReport,
+    /// The answer came from the process's `ReadMemo`: every observed input was
+    /// the remembered one, so nothing was walked, certified or ordered.
+    pub memoized: bool,
 }
 pub struct ReadRequest<'a> {
     pub layout: &'a Layout,
@@ -41,12 +48,136 @@ pub struct ReadRequest<'a> {
     pub folded: &'a [Envelope],
     pub project: bool,
 }
+#[derive(Clone, PartialEq)]
 struct Tip {
     name: String,
     oid: Oid,
     machine: String,
     scope: Scope,
     mirror: bool,
+}
+
+/// The legacy events one read answers with and the digest that names them.
+struct LegacyView {
+    events: Vec<LegacyEvent>,
+    digest: Option<String>,
+}
+impl LegacyView {
+    /// The same view object (one commit's memoized parse) or the same content.
+    fn same_as(self: &Arc<Self>, other: &Arc<Self>) -> bool {
+        Arc::ptr_eq(self, other) || (self.digest == other.digest && self.events == other.events)
+    }
+}
+
+/// What this process's last complete read answered, and the real inputs it
+/// answered them from. A repeat read observes every one of those inputs again
+/// (own files, every ref tip, the legacy files at HEAD) and returns the same
+/// answer only when all of them are exactly what the memo saw and the caller
+/// holds exactly the history the memo answered; any difference reads normally.
+/// The memo is a per-store value: it is never shared and never outlives its
+/// store.
+#[derive(Default)]
+pub struct ReadMemo {
+    last: Mutex<Option<Last>>,
+}
+struct Last {
+    origin: String,
+    tips: Vec<Tip>,
+    legacy_refs: BTreeMap<String, Oid>,
+    local: Vec<Envelope>,
+    legacy: Arc<LegacyView>,
+    cursor: Cursor,
+    sequence: Vec<Envelope>,
+    missing: BTreeSet<(String, u64)>,
+    concurrent: Vec<(String, String)>,
+    full_order: Vec<String>,
+}
+impl ReadMemo {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    fn lock(&self) -> std::sync::MutexGuard<'_, Option<Last>> {
+        self.last
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+    /// The answer for a caller that holds exactly the remembered history while
+    /// every observed input is the remembered one; `None` when anything differs.
+    fn answer(
+        &self,
+        req: &ReadRequest<'_>,
+        observed: &Observed<'_>,
+        legacy: &Arc<LegacyView>,
+        legacy_held: Option<&str>,
+    ) -> Option<ReadResult> {
+        let guard = self.lock();
+        let last = guard.as_ref()?;
+        if last.origin != req.origin
+            || last.cursor != *req.cursor
+            || last.tips != observed.tips
+            || last.legacy_refs != *observed.legacy_refs
+            || last.local != observed.local
+            || !last.legacy.same_as(legacy)
+            || last.sequence != req.folded
+        {
+            return None;
+        }
+        Some(ReadResult {
+            events: Vec::new(),
+            sequence: last.sequence.clone(),
+            legacy: if legacy_held.is_some() && legacy_held == last.legacy.digest.as_deref() {
+                Vec::new()
+            } else {
+                last.legacy.events.clone()
+            },
+            deferred: Vec::new(),
+            missing: last.missing.clone(),
+            concurrent: last.concurrent.clone(),
+            cursor: last.cursor.clone(),
+            fold: Fold::Incremental,
+            full_order: last.full_order.clone(),
+            verified_view: VerifiedView {
+                events: last.sequence.clone(),
+            },
+            checkpoint: CheckpointReport::default(),
+            memoized: true,
+        })
+    }
+    fn remember(
+        &self,
+        origin: &str,
+        observed: &Observed<'_>,
+        legacy: &Arc<LegacyView>,
+        answer: &ReadResult,
+    ) {
+        *self.lock() = Some(Last {
+            origin: origin.into(),
+            tips: observed.tips.to_vec(),
+            legacy_refs: observed.legacy_refs.clone(),
+            local: observed.local.to_vec(),
+            legacy: legacy.clone(),
+            cursor: answer.cursor.clone(),
+            sequence: answer.sequence.clone(),
+            missing: answer.missing.clone(),
+            concurrent: answer.concurrent.clone(),
+            full_order: answer.full_order.clone(),
+        });
+    }
+}
+/// A read's use of its process memo.
+#[derive(Clone, Copy)]
+pub struct Memoized<'a> {
+    pub memo: &'a ReadMemo,
+    /// Digest of the legacy events the caller already holds from an earlier
+    /// answer. A memo answer whose legacy history has this digest leaves
+    /// `ReadResult::legacy` empty: the caller keeps its own copy.
+    pub legacy_held: Option<&'a str>,
+}
+/// The inputs of one read that were observed from the real store.
+struct Observed<'a> {
+    tips: &'a [Tip],
+    legacy_refs: &'a BTreeMap<String, Oid>,
+    local: &'a [Envelope],
 }
 pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
     let (remote, suffix) = rest
@@ -188,12 +319,12 @@ fn legacy_files(
 fn read_legacy(
     port: &dyn Inspect,
     repo: &RepoHandle,
+    authority: &RepoHandle,
+    head: &HeadFact,
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let authority = crate::fence::authority(port, repo)?;
-    let head = port.resolve_head(&authority).map_err(git_error)?;
-    let pin = crate::fence::pinned_at_head(port, &authority, &head).map_err(|error| {
+    let pin = crate::fence::pinned_at_head(port, authority, head).map_err(|error| {
         if refs.is_empty() && error.code == ErrorCode::EventStoreIo {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,
@@ -218,11 +349,54 @@ fn read_legacy(
         }
         crate::legacy_import::read_consumer_at(
             port,
-            &authority,
+            authority,
             streams,
-            &head,
+            head,
             refs.get("refs/fgos/legacy"),
         )
+    }
+}
+/// The tracked legacy files of one commit never change, so one process parses
+/// them, orders them and digests them once per commit, legacy refs and query.
+/// HEAD is observed anew on every call: a moved HEAD names another commit.
+static LEGACY_VIEWS: CommitMemo<Arc<LegacyView>> = CommitMemo::new();
+
+fn legacy_view(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    refs: &BTreeMap<String, Oid>,
+    streams: &[StreamId],
+) -> Result<Arc<LegacyView>, Error> {
+    let authority = crate::fence::authority(port, repo)?;
+    let head = port.resolve_head(&authority).map_err(git_error)?;
+    let compute = || {
+        let (work, porting): (Vec<_>, Vec<_>) =
+            read_legacy(port, repo, &authority, &head, refs, streams)?
+                .into_iter()
+                .partition(|e| !e.provenance.file.starts_with("porting/"));
+        let mut events = legacy::order(work);
+        events.extend(porting);
+        let digest = if events.is_empty() {
+            None
+        } else {
+            Some(crate::envelope::sha256(&crate::envelope::line(
+                &events.iter().map(LegacyEvent::identity).collect::<Vec<_>>(),
+            )?))
+        };
+        Ok(Arc::new(LegacyView { events, digest }))
+    };
+    match &head {
+        HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => {
+            let mut question = Vec::new();
+            for (name, oid) in refs {
+                question.extend_from_slice(format!("{name}\0{}\0", oid.as_str()).as_bytes());
+            }
+            for stream in streams {
+                question.extend_from_slice(format!("\n{}", stream.as_str()).as_bytes());
+            }
+            LEGACY_VIEWS.get_or_compute(&authority, commit, &question, compute)
+        }
+        HeadFact::Unborn { .. } => compute(),
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.
@@ -231,7 +405,7 @@ pub fn read(
     repo: &RepoHandle,
     req: ReadRequest<'_>,
 ) -> Result<ReadResult, Error> {
-    read_with_view(port, repo, req, None)
+    read_with_view(port, repo, req, None, None)
 }
 /// Reuse only exact envelopes from a previously verified consumer view.
 /// Changed input still undergoes ordinary validation; Git facts never reuse.
@@ -240,8 +414,9 @@ pub fn read_with_view(
     repo: &RepoHandle,
     req: ReadRequest<'_>,
     view: Option<&VerifiedView>,
+    memo: Option<Memoized<'_>>,
 ) -> Result<ReadResult, Error> {
-    read_from(port, repo, &req, view, None)
+    read_from(port, repo, &req, view, None, memo)
 }
 
 /// A read that continues from the checkpoint file when the caller holds no
@@ -255,6 +430,7 @@ pub fn read_checkpointed(
     req: ReadRequest<'_>,
     view: Option<&VerifiedView>,
     checkpoint: &Checkpoint,
+    memo: Option<Memoized<'_>>,
 ) -> Result<ReadResult, Error> {
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
     let caller_has_history = holds_history(&req, &query);
@@ -268,7 +444,7 @@ pub fn read_checkpointed(
     }
     let mut result = None;
     if let Some(found) = &retained {
-        match read_from(port, repo, &req, view, Some(found)) {
+        match read_from(port, repo, &req, view, Some(found), memo) {
             Ok(read) => {
                 report.continued = true;
                 result = Some(read);
@@ -279,7 +455,7 @@ pub fn read_checkpointed(
     }
     let mut result = match result {
         Some(read) => read,
-        None => read_from(port, repo, &req, view, None)?,
+        None => read_from(port, repo, &req, view, None, memo)?,
     };
     // A checkpoint is worth writing when this read certified commits that the
     // history it started from did not; local-only changes are re-read cheaply.
@@ -354,6 +530,7 @@ fn read_from(
     req: &ReadRequest<'_>,
     view: Option<&VerifiedView>,
     retained: Option<&Retained>,
+    memo: Option<Memoized<'_>>,
 ) -> Result<ReadResult, Error> {
     let mut local = Vec::new();
     for stream in req.streams {
@@ -363,6 +540,24 @@ fn read_from(
     // A replay source is retained by the consumer, not hidden inside the cursor.
     let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
     let caller_has_history = holds_history(req, &query);
+    // A repeat read of a caller that holds the last answer: the inputs were
+    // just observed above and the legacy files of the current HEAD are read
+    // here; when all of them are the remembered ones nothing else can differ.
+    let mut early_legacy = None;
+    if let Some(Memoized { memo, legacy_held }) =
+        memo.filter(|_| retained.is_none() && caller_has_history)
+    {
+        let legacy = legacy_view(port, repo, &legacy_refs, req.streams)?;
+        let observed = Observed {
+            tips: &tips,
+            legacy_refs: &legacy_refs,
+            local: &local,
+        };
+        if let Some(answer) = memo.answer(req, &observed, &legacy, legacy_held) {
+            return Ok(answer);
+        }
+        early_legacy = Some(legacy);
+    }
     // The history this read continues from: the checkpoint's when one was
     // loaded (and then checked below), else the caller's own.
     let (retained_cursor, retained_events, have_history) = match retained {
@@ -473,7 +668,7 @@ fn read_from(
         walk::own_origin_bounded(&mirror.published, req.origin, &bounds)?;
     }
     let mut union = retained_events.to_vec();
-    union.extend(local);
+    union.extend(local.iter().cloned());
     union.extend(walked.events.iter().cloned());
     let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
     if req.project {
@@ -534,20 +729,13 @@ fn read_from(
         .iter()
         .map(|(n, o)| (n.clone(), o.as_str().into()))
         .collect();
-    let raw_legacy = read_legacy(port, repo, &legacy_refs, req.streams)?;
-    let (work, porting): (Vec<_>, Vec<_>) = raw_legacy
-        .into_iter()
-        .partition(|e| !e.provenance.file.starts_with("porting/"));
-    let mut legacy = legacy::order(work);
-    legacy.extend(porting);
-    cursor.legacy_digest = if legacy.is_empty() {
-        None
-    } else {
-        Some(crate::envelope::sha256(&crate::envelope::line(
-            &legacy.iter().map(LegacyEvent::identity).collect::<Vec<_>>(),
-        )?))
+    let legacy_view = match early_legacy {
+        Some(view) => view,
+        None => legacy_view(port, repo, &legacy_refs, req.streams)?,
     };
-    let full_order: Vec<_> = legacy
+    cursor.legacy_digest = legacy_view.digest.clone();
+    let full_order: Vec<_> = legacy_view
+        .events
         .iter()
         .map(LegacyEvent::identity)
         .chain(ordered.events.iter().map(|e| e.h.clone()))
@@ -579,13 +767,13 @@ fn read_from(
             first_difference: 0,
         }
     };
-    Ok(ReadResult {
+    let answer = ReadResult {
         events: delta,
         verified_view: VerifiedView {
             events: ordered.events.clone(),
         },
         sequence: ordered.events,
-        legacy,
+        legacy: legacy_view.events.clone(),
         deferred: ordered.deferred,
         missing: ordered.missing,
         concurrent: ordered.concurrent,
@@ -593,7 +781,17 @@ fn read_from(
         fold,
         full_order,
         checkpoint: CheckpointReport::default(),
-    })
+        memoized: false,
+    };
+    if let Some(Memoized { memo, .. }) = memo.filter(|_| answer.deferred.is_empty()) {
+        let observed = Observed {
+            tips: &tips,
+            legacy_refs: &legacy_refs,
+            local: &local,
+        };
+        memo.remember(req.origin, &observed, &legacy_view, &answer);
+    }
+    Ok(answer)
 }
 
 /// Pre-gate hook: rebuild the local durable-history receipt from the own ref.

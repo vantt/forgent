@@ -365,6 +365,8 @@ pub struct CountingPort<'a> {
     pub fence: Cell<usize>,
     /// `list_tree` calls.
     pub trees: Cell<usize>,
+    /// `list_refs` calls: every read observes the real ref tips.
+    pub refs: Cell<usize>,
 }
 impl<'a> CountingPort<'a> {
     pub fn new(inner: &'a dyn Inspect) -> Self {
@@ -375,6 +377,7 @@ impl<'a> CountingPort<'a> {
             read_commits: Cell::new(0),
             fence: Cell::new(0),
             trees: Cell::new(0),
+            refs: Cell::new(0),
         }
     }
 }
@@ -401,6 +404,7 @@ impl Inspect for CountingPort<'_> {
         cursor: Option<RefCursor>,
         max_entries: usize,
     ) -> Result<RefPage> {
+        self.refs.set(self.refs.get() + 1);
         self.inner.list_refs(repo, prefixes, cursor, max_entries)
     }
     fn read_paths_at(

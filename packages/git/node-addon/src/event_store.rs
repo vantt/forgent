@@ -42,6 +42,9 @@ pub struct EventStoreReadRequest {
     pub project: bool,
     pub view: Option<External<fgos_event_store::read::VerifiedView>>,
     pub checkpoint: Option<EventStoreCheckpoint>,
+    /// Digest of the legacy events the caller already holds from an earlier
+    /// read; the same legacy history is then not sent again.
+    pub legacy_held: Option<String>,
 }
 
 #[napi(object)]
@@ -60,6 +63,8 @@ pub struct EventStore {
     /// pre-gate `admit_writes`, never by a read.
     write_refusal: OnceLock<Option<String>>,
     publication_remote: String,
+    /// What this store's last complete read answered; see `ReadMemo`.
+    read_memo: fgos_event_store::read::ReadMemo,
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -218,6 +223,7 @@ pub fn open_store(
     registry.load_files(&registry_files).map_err(error)?;
     Ok(EventStore {
         write_refusal: OnceLock::new(),
+        read_memo: fgos_event_store::read::ReadMemo::new(),
         publication_remote: publication_remote.unwrap_or_else(|| "origin".into()),
         layout: Layout::from_common_dir(Some(resolved_root.repo.common_dir())).map_err(error)?,
         registry,
@@ -464,6 +470,7 @@ impl EventStore {
             project,
             view,
             checkpoint,
+            legacy_held,
         } = request;
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let origin = match std::fs::symlink_metadata(self.layout.store()) {
@@ -490,6 +497,10 @@ impl EventStore {
             folded: &folded,
             project,
         };
+        let memoized = Some(fgos_event_store::read::Memoized {
+            memo: &self.read_memo,
+            legacy_held: legacy_held.as_deref(),
+        });
         let result = match checkpoint {
             Some(checkpoint) => fgos_event_store::read::read_checkpointed(
                 driver,
@@ -500,8 +511,15 @@ impl EventStore {
                     path: checkpoint.path.into(),
                     reuse: checkpoint.reuse,
                 },
+                memoized,
             ),
-            None => fgos_event_store::read::read_with_view(driver, repo, request, view.as_deref()),
+            None => fgos_event_store::read::read_with_view(
+                driver,
+                repo,
+                request,
+                view.as_deref(),
+                memoized,
+            ),
         }
         .map_err(error)?;
         // The facade already owns the supplied prefix. Return only changed
@@ -519,9 +537,21 @@ impl EventStore {
             }
         };
         let view = External::new(result.verified_view);
+        // The caller holds exactly this legacy history: it is the same bytes
+        // (the digest names every event), so none of it crosses again.
+        let legacy_unchanged = legacy_held.is_some() && legacy_held == result.cursor.legacy_digest;
+        let legacy: Vec<Value> = if legacy_unchanged {
+            Vec::new()
+        } else {
+            result
+                .legacy
+                .iter()
+                .map(|e| json!({"raw":e.raw,"provenance":e.provenance}))
+                .collect()
+        };
         Ok(EventStoreRead {
             view,
-            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":result.legacy.into_iter().map(|e| json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>(),"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"fullOrder":result.full_order,"checkpoint":{"continued":result.checkpoint.continued,"ignored":result.checkpoint.ignored,"written":result.checkpoint.written,"writeError":result.checkpoint.write_error}}),
+            result: json!({"events":result.events,"sequence":&result.sequence[sequence_prefix..],"sequencePrefix":sequence_prefix,"legacy":legacy,"legacyUnchanged":legacy_unchanged,"deferred":result.deferred,"missing":result.missing,"concurrent":result.concurrent,"cursor":result.cursor,"fold":fold,"checkpoint":{"continued":result.checkpoint.continued,"ignored":result.checkpoint.ignored,"written":result.checkpoint.written,"writeError":result.checkpoint.write_error}}),
         })
     }
 }
