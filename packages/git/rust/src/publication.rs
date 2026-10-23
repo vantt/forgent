@@ -425,6 +425,15 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             &RefName::parse(reference).map_err(|_| failure("invalid-ref"))?,
         )?)
     }
+    /// The tip read that costs one Git child in the state the caller expects:
+    /// an absent ref is probed with an existence check, a present one with
+    /// the listing. A ref in the other state costs one more child.
+    fn tip_expecting(&self, repo: &RepoHandle, reference: &str, expect: &ExpectedTip) -> Result<ExpectedTip> {
+        match expect {
+            ExpectedTip::Absent => self.absent_tip(repo, reference),
+            ExpectedTip::Oid(_) => self.ref_tip(repo, reference),
+        }
+    }
     /// [`Self::ref_tip`] for a ref that is usually absent at this point (an
     /// operation pin before it is created or after it is deleted).
     fn absent_tip(&self, repo: &RepoHandle, reference: &str) -> Result<ExpectedTip> {
@@ -448,10 +457,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         next: &ExpectedTip,
     ) -> Result<Output> {
         // Best-effort symbolic preflight; a create expects nothing there.
-        match old {
-            ExpectedTip::Absent => self.absent_tip(repo, name)?,
-            ExpectedTip::Oid(_) => self.ref_tip(repo, name)?,
-        };
+        self.tip_expecting(repo, name, old)?;
         self.cas_preflighted(repo, name, old, next)
     }
     /// The exact-old no-deref update alone, for a caller whose own read of
@@ -674,8 +680,9 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                     next: i.next.clone(),
                 },
             )?;
+        let old = expected(&i.expected, repo.object_format())?;
         let before = self
-            .ref_tip(repo, &i.resource_set[0])
+            .tip_expecting(repo, &i.resource_set[0], &old)
             .map_err(|e| self.pending_error(repo, id, i, e))?;
         if tip(&before) != i.expected {
             let terminal = wal
@@ -694,7 +701,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         let effect = self.cas_preflighted(
             repo,
             &i.resource_set[0],
-            &expected(&i.expected, repo.object_format())?,
+            &old,
             &expected(&i.next, repo.object_format())?,
         );
         self.point("after-target-cas")
@@ -1179,7 +1186,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
                 self.check_oid(repo, o)?;
             }
         }
-        self.ref_tip(repo, name.as_str())?;
+        self.tip_expecting(repo, name.as_str(), old)?;
         let wal = self.wal(repo)?;
         self.admit_pending(repo, &wal, id)?;
         let request_digest =
@@ -1215,13 +1222,17 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         let i = chain.intent();
         let pin = format!("refs/fgos/git-operations/{id}/candidate");
         self.point("before-pin-cas")?;
-        let out = self.cas_raw(
+        // Creating against an absent old value refuses a ref of any kind, a
+        // symbolic one included, so no read precedes it; a refusal reads the
+        // pin once to name a symbolic pin as such.
+        let out = self.cas_preflighted(
             repo,
             &pin,
             &ExpectedTip::Absent,
             &expected(i.candidate(), repo.object_format())?,
         )?;
         if !out.success {
+            self.ref_tip(repo, &pin)?;
             return Err(out.error("publication-pin-cas-failed"));
         }
         self.point("after-pin-cas")?;
@@ -1649,7 +1660,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 .map_err(OperationError::from);
         }
         let pin = format!("refs/fgos/git-operations/{id}/candidate");
-        if matches!(chain.last_state(), Phase::Outcome(_)) {
+        let resumed = !matches!(chain.last_state(), Phase::Outcome(_));
+        if !resumed {
             chain = wal
                 .append(
                     &chain,
@@ -1670,9 +1682,16 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         // call completes once it is gone.
         if matches!(chain.last_state(), Phase::PinReleaseAttempt { .. }) {
             let candidate = expected(chain.intent().candidate(), repo.object_format())?;
-            let now = self.absent_tip(repo, &pin)?;
+            // A first release finds the pin in place; a resumed one usually
+            // finds it already gone. The read is the symbolic preflight of
+            // the delete below, so the delete does not read again.
+            let now = self.tip_expecting(
+                repo,
+                &pin,
+                if resumed { &ExpectedTip::Absent } else { &candidate },
+            )?;
             if now == candidate {
-                let out = self.cas_raw(repo, &pin, &candidate, &ExpectedTip::Absent)?;
+                let out = self.cas_preflighted(repo, &pin, &candidate, &ExpectedTip::Absent)?;
                 if !out.success && self.ref_tip(repo, &pin)? != ExpectedTip::Absent {
                     return Err(out.error("pin-release-failed"));
                 }
