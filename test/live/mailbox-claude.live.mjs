@@ -81,7 +81,9 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
-const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v5-live');
+/** The current rung's run home. Each rung that spends live runs gets its own, so an earlier
+ * rung's spent cases (V5: `mailbox-v5-live`) stay read-only evidence. */
+const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v7-live-suite');
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
 const CASES = ['L1', 'L2', 'C1', 'T1', 'T2'];
 const CLI_OF = { L1: 'claude', L2: 'claude', C1: 'codex', T1: 'claude', T2: 'codex' };
