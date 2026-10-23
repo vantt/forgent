@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2fde6fbcd62b7f48d0858e825ef131de853afc835773e0feee87b981a32a91e3",
+  "payloadDigest": "8a873529cc6ea0f7e6de8b1ea93bfbfdec80a4b4020ae396d0e476eea24108b4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -550,7 +550,7 @@
     "packages/terminal-control/rust/src/route.rs": "c93a4f48c915385c13a6c52c27605de933dbae4b89aeaaa8697ca6f228af4c98",
     "packages/terminal-control/rust/src/store.rs": "7d3d8f0d47623a70ad9b7a545d3c5069528d5e2532792d79e5ee20ebfc104d18",
     "packages/terminal-control/rust/tests/common/mod.rs": "e447178f1482507811f3ce01031cd585d1422c0c79800d731c0a51cf677ab05a",
-    "packages/terminal-control/rust/tests/core_failures.rs": "af94f14338560d99654dd9c5ce79640bd2c6452ab7be7e20fcd1d78fc812c668",
+    "packages/terminal-control/rust/tests/core_failures.rs": "21bc7ceb9c88579a0d1d9e04f803771c26ac4e913cdc1475be4ab084c66a2fbd",
     "packages/terminal-control/rust/tests/core_rules.rs": "ef78be93da91ac9d01037583e19d66f69a9655fd647f00570c55e16301278466",
     "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": "04375ca1650b15a8578b4067cb2ae04de457b0f7838dac99fe953b59e5da2c0e",
     "packages/terminal-control/rust/tests/herdr_driver_fake.rs": "79e24743ce00fddc98b2e8d03d8ddd5956d62a7c7ce4ae41806b43ccf25b512b",

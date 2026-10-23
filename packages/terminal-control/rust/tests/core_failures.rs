@@ -338,7 +338,7 @@ fn the_launcher_is_typed_only_after_the_shell_has_run_a_probe() {
 fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_line() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("eats-first-key"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::PromptReadsFirstKey);
@@ -367,7 +367,7 @@ fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_lin
 fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_probes() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("echo-only-backoff"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::EchoOnly);
@@ -409,7 +409,7 @@ fn a_line_typed_before_the_start_prompt_draws_is_not_swallowed_and_launches_once
 fn a_shell_reading_whole_lines_gets_at_most_three_probes_and_ends_not_started() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("line-mode-read"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
@@ -487,7 +487,7 @@ fn a_shell_that_never_becomes_ready_ends_not_started_with_no_marker_and_reports_
 fn every_probe_differs_contains_no_y_and_scrollback_token_does_not_satisfy() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("scrollback-check"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_screen(&slot.pane_id, "earlier session\nfgos-ok-cafebabedeadbeef0123456789abcdef\n");
