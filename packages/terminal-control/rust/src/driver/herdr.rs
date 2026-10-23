@@ -585,20 +585,6 @@ impl TerminalDriver for HerdrDriver {
         parse_activity(&result).ok_or_else(|| unknown("herdr agent get reported no agent_status"))
     }
 
-    fn activity_start(&self, pane: &str, name: &str, kind: &str, args: &[String], timeout_ms: u64) -> DriverResult<()> {
-        self.require("activity.state")?;
-        let wait = timeout_ms.to_string();
-        let mut argv = vec!["agent", "start", name, "--kind", kind, "--pane", pane, "--timeout", &wait];
-        if !args.is_empty() {
-            argv.push("--");
-            argv.extend(args.iter().map(String::as_str));
-        }
-        // The call blocks up to `timeout_ms`; a margin keeps a slow herdr from
-        // being killed mid-answer and reported as unreachable.
-        let timeout = Duration::from_millis(timeout_ms + DEFAULT_TIMEOUT_MS);
-        call(&self.config, &argv, timeout).map(|_| ()).map_err(CallError::into_refusal)
-    }
-
     fn activity_detail(&self, pane: &str) -> DriverResult<ActivityDetail> {
         self.require("activity.state")?;
         let out = exec(&self.config, &["agent", "explain", pane, "--json"], self.config.timeout())?;
@@ -607,16 +593,6 @@ impl TerminalDriver for HerdrDriver {
             return Err(CallError::Herdr(e).into_refusal());
         }
         Ok(parse_explain(&body))
-    }
-
-    fn report_agent(&self, pane: &str, agent: &str, state: &str) -> DriverResult<()> {
-        self.require("activity.state")?;
-        self.run(&["pane", "report-agent", pane, "--source", "fgos", "--agent", agent, "--state", state]).map(|_| ())
-    }
-
-    fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()> {
-        self.require("label")?;
-        self.run(&["tab", "rename", tab, label]).map(|_| ())
     }
 
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {

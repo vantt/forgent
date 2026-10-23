@@ -74,9 +74,6 @@ fn declares_what_herdr_can_do_after_one_probe() {
         assert!(caps.contains(&expected), "{expected} missing from {caps:?}");
     }
     assert_eq!(caps.contains(&"server.incarnation"), cfg!(unix));
-    for never in ["pane.resize", "pane.swap", "pane.move"] {
-        assert!(!caps.contains(&never), "{never} is not implemented");
-    }
     assert!(caps.iter().all(|c| CAPABILITIES.contains(c)));
     // The probe ran two commands; declaring again asks nothing more.
     let probed = fake.calls().len();
@@ -100,13 +97,10 @@ fn each_capability_runs_the_expected_command() {
     let seen = d.activity_detail("wS:p59Y").unwrap();
     assert_eq!((seen.state.as_deref(), seen.visible_idle, seen.visible_working), (Some("idle"), true, false));
     assert_eq!((seen.matched_rule.as_deref(), seen.prompt_text.as_str()), (Some("live_prompt_box"), "❯ half typed\n"));
-    d.report_agent("wS:p59Y", "claude", "working").unwrap();
     d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()]).unwrap();
     assert_eq!(d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(), "line one\nline two\n");
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
     assert_eq!(d.activity("wS:p59Y").unwrap().state, "working");
-    d.activity_start("wS:p59Y", "seat-1", "claude", &["--model".into(), "opus".into()], 30_000).unwrap();
-    d.label_tab("wS:tF9", "fgos lead").unwrap();
     d.label_pane("wS:p59Y", "seat 1").unwrap();
     assert_eq!(d.pane_liveness("wS:p59Y").unwrap(), PaneLiveness::Live);
     assert_eq!(d.layout_geometry("wS:p59Y").unwrap().panes.len(), 2);
@@ -119,13 +113,10 @@ fn each_capability_runs_the_expected_command() {
         "agent prompt wS:p59Y hello world",
         "pane send-text wS:p59Y draft",
         "agent explain wS:p59Y --json",
-        "pane report-agent wS:p59Y --source fgos --agent claude --state working",
         "pane send-keys wS:p59Y Escape Enter",
         "pane read wS:p59Y --lines 40 --source visible",
         "pane process-info --pane wS:p59Y",
         "agent get wS:p59Y",
-        "agent start seat-1 --kind claude --pane wS:p59Y --timeout 30000 -- --model opus",
-        "tab rename wS:tF9 fgos lead",
         "pane rename wS:p59Y seat 1",
         "pane get wS:p59Y",
         "pane layout --pane wS:p59Y",
@@ -409,7 +400,7 @@ mod incarnation {
         let driver = fake.driver();
         let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
         let core = Core::new(&driver, &MeasuredSplit, config);
-        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, role_hint: None, cwd: None, env: Default::default() }).unwrap();
+        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, cwd: None, env: Default::default() }).unwrap();
 
         let typed = fake.dir.join("typed");
         let prompted = fake.dir.join("prompted");

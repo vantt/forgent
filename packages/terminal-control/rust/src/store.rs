@@ -1,9 +1,9 @@
 //! Allocation store under `<stateRoot>/terminal/<driver>/<incarnationId>/`.
-//! Records and markers are published once (temp file, fsync, `link(2)`);
-//! only the group hint is rewritten.
+//! Records and markers are published once (temp file, fsync, `link(2)`) and
+//! never rewritten.
 
 use crate::port::ServerIncarnation;
-use crate::record::{AllocationRecord, GroupHint, MarkerKind};
+use crate::record::{AllocationRecord, MarkerKind};
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs;
 use std::io;
@@ -59,7 +59,6 @@ impl Store {
     pub fn open_id(state_root: &Path, driver: &str, incarnation_id: &str) -> io::Result<Store> {
         let dir = driver_dir(state_root, driver).join(incarnation_id);
         create_private_dir(&dir.join("allocations"))?;
-        create_private_dir(&dir.join("groups"))?;
         Ok(Store { dir })
     }
 
@@ -108,16 +107,6 @@ impl Store {
 
     pub fn has_marker(&self, key: &str, kind: MarkerKind) -> bool {
         self.allocations().join(format!("{key}.{}.json", kind.suffix())).exists()
-    }
-
-    /// Rewrite the hint of a group (temp file, rename over).
-    pub fn write_hint(&self, hint: &GroupHint) -> io::Result<()> {
-        let dir = self.dir.join("groups");
-        install_result(fgos_durable_file::replace_durably_with_mode(&dir, &format!("{}.json", hint.group_key), &serde_json::to_vec(hint)?, 0o666)).map(|_| ())
-    }
-
-    pub fn read_hint(&self, group_key: &str) -> io::Result<Option<GroupHint>> {
-        read_json(&self.dir.join("groups").join(format!("{group_key}.json")))
     }
 }
 

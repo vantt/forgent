@@ -54,17 +54,6 @@ fn markers_are_one_shot_and_are_not_keys() {
 }
 
 #[test]
-fn the_group_hint_is_rewritten() {
-    let root = state_dir("hint");
-    let store = Store::open(&root, "mem", &incarnation()).unwrap();
-    for (tab, at) in [("t1", 1), ("t2", 2)] {
-        store.write_hint(&GroupHint { v: VERSION, group_key: "g".into(), tab_id: tab.into(), updated_at: at }).unwrap();
-    }
-    assert_eq!(store.read_hint("g").unwrap().unwrap().tab_id, "t2");
-    assert!(store.read_hint("other").unwrap().is_none());
-}
-
-#[test]
 fn a_different_incarnation_is_a_different_directory() {
     let root = state_dir("incarnations");
     let a = Store::open(&root, "mem", &incarnation()).unwrap();

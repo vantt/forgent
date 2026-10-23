@@ -239,7 +239,6 @@ fn launch_spec(plan: &Plan, run_dir: &Path) -> Result<LaunchSpec, String> {
         args: Vec::new(),
         cwd: run_dir.to_string_lossy().into_owned(),
         env: Default::default(),
-        activity: None,
         expect: Some(ExpectedProcess { argv0: program.clone(), command: program, args }),
     })
 }

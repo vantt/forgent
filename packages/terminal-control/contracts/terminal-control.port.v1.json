@@ -20,7 +20,7 @@
   },
   "operations": {
     "allocate": {
-      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": [
         "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",
@@ -42,14 +42,13 @@
           "args": "string[]",
           "cwd": "absolute path",
           "env": "object of string",
-          "activity": "optional {kind, args, timeoutMs}: start through the driver's agent support (activity.state) instead of a plain pane.run; timeoutMs bounds how long the driver may take to bring the agent to ready",
           "expect": "optional {argv0, command, args}: the foreground process the launch becomes when it is not the command itself (a launcher script that execs the real one); identity is taken from the process matching it"
         }
       },
       "results": ["launched", "not-started", "unsupported", "unknown"],
       "effects": [
-        "requires pane.run, read.screen and process.info for plain launch; activity.state and process.info for activity launch",
-        "plain launch types probe commands to prove shell execution before the marker is written",
+        "requires pane.run, read.screen and process.info",
+        "types probe commands to prove shell execution before the marker is written",
         "writes marker launch-requested after the ready-shell handshake succeeds, before typing the launch line",
         "writes marker launched{identity} after the root process of the pane command is identified (argv checked like verifyForegroundProcessArgv)",
         "returns not-started if launch was already requested, if pane foreground is not the shell, if pane shell did not become ready in time, or if the launched root process was not identified in time",
@@ -84,7 +83,7 @@
       ]
     },
     "label": {
-      "input": { "key": "key", "display": "display", "reportState": "optional string: also tell the driver which agent (display.agent) runs in the pane, for a process it does not recognise on its own; the reported state becomes the pane's status authority" },
+      "input": { "key": "key", "display": "display" },
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {

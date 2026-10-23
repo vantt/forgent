@@ -296,14 +296,6 @@ impl TerminalDriver for MemDriver {
     fn activity(&self, _pane: &str) -> DriverResult<Activity> {
         Ok(Activity { state: "idle".into(), ..Default::default() })
     }
-    fn activity_start(&self, pane: &str, name: &str, kind: &str, _args: &[String], _timeout_ms: u64) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("activity.start {pane} {name} {kind}"));
-        Ok(())
-    }
-    fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("label.tab {tab} {label}"));
-        Ok(())
-    }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {
         self.log.borrow_mut().push(format!("label.pane {pane} {label}"));
         Ok(())
@@ -350,7 +342,6 @@ pub fn request(key: &str, group: &str) -> AllocateRequest {
         key: key.into(),
         group_key: group.into(),
         display: Display { label: format!("label-{group}"), ..Display::default() },
-        role_hint: None,
         cwd: None,
         env: Default::default(),
     }

@@ -14,8 +14,6 @@ pub struct GroupPane {
     pub tab_id: String,
     pub pane_id: String,
     pub rect: Rect,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub role_hint: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -30,8 +28,6 @@ pub struct Limits {
 #[serde(rename_all = "camelCase")]
 pub struct PlaceRequest {
     pub label: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub role_hint: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

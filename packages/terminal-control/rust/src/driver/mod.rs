@@ -8,7 +8,7 @@ use crate::port::{Refusal, ServerIncarnation};
 use serde::{Deserialize, Serialize};
 
 /// Capability names, exactly as `driver-capabilities.v1.json` spells them.
-pub const CAPABILITIES: [&str; 15] = [
+pub const CAPABILITIES: [&str; 12] = [
     "tab.create",
     "pane.split",
     "pane.close",
@@ -20,9 +20,6 @@ pub const CAPABILITIES: [&str; 15] = [
     "activity.state",
     "label",
     "layout.geometry",
-    "pane.resize",
-    "pane.swap",
-    "pane.move",
     "server.incarnation",
 ];
 
@@ -175,25 +172,10 @@ pub trait TerminalDriver {
     ) -> DriverResult<String>;
     fn process_info(&self, pane: &str) -> DriverResult<ProcessInfo>;
     fn activity(&self, pane: &str) -> DriverResult<Activity>;
-    /// Start an agent of `kind` in the pane through the driver's agent support.
-    fn activity_start(
-        &self,
-        pane: &str,
-        name: &str,
-        kind: &str,
-        args: &[String],
-        timeout_ms: u64,
-    ) -> DriverResult<()>;
     /// The driver's own detector verdict for the pane (`activity.state`).
     fn activity_detail(&self, _pane: &str) -> DriverResult<ActivityDetail> {
         Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} gives no detector detail", self.name()) })
     }
-    /// Tell the driver which agent runs in a pane it does not recognise, so
-    /// the pane can be addressed as one (`activity.state`).
-    fn report_agent(&self, _pane: &str, _agent: &str, _state: &str) -> DriverResult<()> {
-        Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} cannot be told an agent", self.name()) })
-    }
-    fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()>;
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
     /// Geometry of the tab holding `pane`.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;

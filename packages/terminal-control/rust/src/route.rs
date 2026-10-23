@@ -249,8 +249,7 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "label" => {
             let key: String = field(request, "key")?;
             let display: Display = field(request, "display")?;
-            let report_state: Option<String> = optional(request, "reportState")?;
-            answer(core.label(&key, &display, report_state.as_deref()), ok_answer)
+            answer(core.label(&key, &display), ok_answer)
         }
         "capabilities" => {
             let report = core.capabilities();

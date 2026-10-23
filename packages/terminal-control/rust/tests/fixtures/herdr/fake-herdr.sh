@@ -40,7 +40,7 @@ case "$1 $2" in
   "workspace create") cat "$dir/tab-create.json" ;;
   "status server") sed "s#\"socket\":\"[^\"]*\"#\"socket\":\"$FAKE_HERDR_SOCKET\"#" "$dir/status-server.json" ;;
   "tab create") cat "$dir/tab-create.json" ;;
-  "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent start"|"agent prompt"|"pane report-agent") cat "$dir/pane-close-ok.json" ;;
+  "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent prompt") cat "$dir/pane-close-ok.json" ;;
   "pane split") cat "$dir/pane-split.json" ;;
   "pane layout") cat "$dir/pane-layout-two-panes.json" ;;
   "agent explain") cat "$dir/agent-explain.json" ;;
