@@ -65,7 +65,7 @@ Per seal: before 8+5 = 13 steady, 10+5 = 15 first. After 7+3 = 10 both.
 
 ## Proof
 
-Extended `tests/publication.rs` with `a_publication_and_its_release_run_only_the_git_children_whose_answers_are_not_known`. It names the behaviour, lists the exact subcommand sequence for a first publication, a pin release and a changing publication (the pin update precedes the target update), and checks every `update-ref` carries `core.fsync=all`, `core.fsyncMethod=fsync` and `--no-deref`. No existing test counted children or pinned the order. It fails on the old code (10-child first publication) and passes on the new. The logging git is installed once per test binary before any driver exists (the driver fixes its git per process), so every case in `publication.rs` now runs through the wrapper; the file went from about 10 s to about 11 s.
+New binary `tests/publication_children.rs` (like `tests/head_switch.rs`), one case: `a_publication_and_its_release_run_only_the_git_children_whose_answers_are_not_known`. It names the behaviour, lists the exact subcommand sequence for a first publication, a pin release and a changing publication (the pin update precedes the target update), and checks every `update-ref` carries `core.fsync=all`, `core.fsyncMethod=fsync` and `--no-deref`. No existing test counted children or pinned the order. It fails on the pre-5C source (10-child first publication) and passes on the new. The logging git is installed once per test binary before any driver exists (the driver fixes its git per process), so it lives in its own binary and the other `publication.rs` cases run against real git, unchanged from the base.
 
 ## Verification
 
@@ -78,12 +78,12 @@ Extended `tests/publication.rs` with `a_publication_and_its_release_run_only_the
 ## Net size and test cost
 
 - Rust source: +30 -11 in `packages/git/rust/src/publication.rs`.
-- Rust test: +96 -0 in `packages/git/rust/tests/publication.rs`. Tests added 1, retired 0, new CLI or host spawns 0 (the wrapper is one `sh` hop per existing Git child).
+- Rust test: +96 -0 in the new `packages/git/rust/tests/publication_children.rs` (`publication.rs` test file is unchanged from the base). Tests added 1, retired 0, new CLI or host spawns 0 (the wrapper is one `sh` hop per existing Git child).
 - Node: 0.
 
 ## Git-area SHAs for OPC
 
-- `66117d9d3` perf(git): drop the publication ceremony's Git reads whose answer the operation already holds (`publication.rs` src and test).
+- `66117d9d3` perf(git): drop the publication ceremony's Git reads whose answer the operation already holds (`publication.rs` source; the test case, later moved).
 - Census regeneration commit: see the branch tip (last commit).
 
 ## Open points
