@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "V7f: wake channel probes"
-status: pending
+status: in-progress
 sub_rung: V7f
 depends_on: [phase 3, phase 5 (harness home), owner Q3; the pi/omp probes also phase 8]
 live_budget: "Q3 (option A: 10 benign interactive sessions + 80 confined print-mode runs)"
@@ -46,3 +46,8 @@ Report (`fgos convention path`): per channel the measured result, role, latency,
 
 Part B's confined runs use only the launch phase 5 hardened after `plans/261023-0049-mailbox-v6-behaviour-through-real-hook/reports/code-review-v6.md`: no MCP server or account connector (H3, phase 5 T10 green), the one credential mask list with its hash in each ledger entry (M6), the reasoning effort pinned where the CLI has one (M3; Codex `model_reasoning_effort` from the addendum), and killed runs settling their login copy through the existing guard (H4). A run whose ledger entry lacks the argv or the mask hash is not counted.
 Part A's interactive probes run benign text only, but each probe session is also started with no MCP server or account connector, by the same per-CLI arguments.
+
+## Progress (2026-10-24)
+
+- Part B: addendum `v7f` frozen (second freeze `2a16ce1b7`, superseding `3cb542d98`), stage A done (41 of 80 runs), sample drawn; stage B waits for the controller's mark (`sample-v7f-A.controller.json` beside `sample-v7f-A.md` in the run home). Report: `plans/reports/research-261024-0415-mailbox-v7f-wake-channel-probes.md`.
+- Part A: prepared and dry-run (`node test/live/mailbox-wake-probe.live.mjs plan`); eight sessions; W5 targets a REPL on its own private daemon (the plan's `--no-daemon` form is refused by codex 0.161.0) and W7 measures a prompting-mode Claude Code session's default gate. Waits for the owner to watch.
