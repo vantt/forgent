@@ -1,6 +1,13 @@
 {
  "version": 1,
  "about": "Owning cases of the scope judge: which file may hold which key. A case lists the refusals per source as [code, path, belongs_in, line, column]; a source not listed is not run. The schemas inline the shape the real sections will ship (gateway, secrets, bin, runner).",
+ "first-slice-global-only": [
+  "gateway",
+  "secrets.globalFile",
+  "secrets.sources",
+  "secrets.declarations.name.consumers",
+  "bin.globalFgosPath"
+ ],
  "cases": [
   {
    "id": "scope-gateway-port-global-only",

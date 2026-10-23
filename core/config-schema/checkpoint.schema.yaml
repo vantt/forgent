@@ -1,0 +1,10 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:checkpoint:v1
+$comment: "owner: event-store"
+description: "The fallback timer of the event-log checkpoint."
+type: object
+properties:
+  fallbackIntervalSec:
+    description: Seconds between checkpoints of the event log when no other trigger fired.
+    type: integer
+    minimum: 1

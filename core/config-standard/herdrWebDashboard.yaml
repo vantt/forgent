@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc The herdr web dashboard on the selected machine.
+herdrWebDashboard:
+  # @fgos:doc When true the dashboard serves the web bundle it carries; unlike the orchestrator toggles it is on out of the box. Default: true.
+  staticServing: true

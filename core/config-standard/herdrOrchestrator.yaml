@@ -1,0 +1,12 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Which orchestration steps the herdr launcher starts by itself.
+herdrOrchestrator:
+  # @fgos:doc When true the launcher starts the discover step on its own. Default: false.
+  autoDiscover: false
+  # @fgos:doc When true the launcher starts the merge step on its own. Default: false.
+  autoMerge: false
+  # @fgos:doc When true the launcher starts the retrospective step on its own. Default: false.
+  autoRetro: false
+  # @fgos:doc When true the launcher starts the cleanup step on its own. Default: false.
+  autoCleanup: false
