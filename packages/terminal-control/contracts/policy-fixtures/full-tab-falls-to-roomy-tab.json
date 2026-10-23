@@ -1,5 +1,6 @@
 {
   "name": "full-tab-falls-to-roomy-tab",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

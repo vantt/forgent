@@ -8,25 +8,12 @@ use sha2::{Digest, Sha256};
 use std::time::Duration;
 
 const LIMIT: usize = 32 * 1024 * 1024;
-fn refused(cause: &str) -> OperationError {
-    OperationError {
-        code: ResultCode::Refused,
-        cause: cause.into(),
-        retryable: false,
-        operation_id: None,
-        receipt: None,
-        exit_code: None,
-        signal: None,
-        stderr: vec![],
-        detail: None,
-    }
-}
 fn oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
     Oid::parse(
-        std::str::from_utf8(bytes).map_err(|_| refused("invalid-object-id"))?,
+        std::str::from_utf8(bytes).map_err(|_| failure("invalid-object-id"))?,
         repo.object_format(),
     )
-    .map_err(|_| refused("invalid-object-id"))
+    .map_err(|_| failure("invalid-object-id"))
 }
 fn records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
     if bytes.is_empty() {
@@ -34,7 +21,7 @@ fn records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
     }
     let bytes = bytes
         .strip_suffix(&[0])
-        .ok_or_else(|| refused("invalid-nul-protocol"))?;
+        .ok_or_else(|| failure("invalid-nul-protocol"))?;
     Ok(bytes.split(|b| *b == 0).collect())
 }
 
@@ -119,7 +106,7 @@ fn literal_prefix(raw: &str) -> Result<&str> {
         || prefix.chars().any(char::is_control)
         || fgos_write_scope::canonicalize(prefix).as_deref() != Ok(prefix)
     {
-        return Err(refused("invalid-literal-path"));
+        return Err(failure("invalid-literal-path"));
     }
     Ok(prefix)
 }
@@ -127,10 +114,9 @@ fn literal_prefix(raw: &str) -> Result<&str> {
 fn literal_paths(files: &[String]) -> Result<()> {
     if files.len() > 4096
         || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
-        || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
-            || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
+        || files.iter().any(|p| crate::fgos_scope_literal(p).is_err())
     {
-        return Err(refused("invalid-literal-path"));
+        return Err(failure("invalid-literal-path"));
     }
     Ok(())
 }
@@ -138,7 +124,7 @@ fn count(bytes: &[u8]) -> Result<u64> {
     std::str::from_utf8(bytes)
         .ok()
         .and_then(|text| text.trim_end_matches('\n').parse().ok())
-        .ok_or_else(|| refused("invalid-count"))
+        .ok_or_else(|| failure("invalid-count"))
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -171,12 +157,12 @@ fn page<T>(
     max: usize,
 ) -> Result<InspectPage<T>> {
     if max == 0 || max > 4096 {
-        return Err(refused("invalid-inspect-page-bound"));
+        return Err(failure("invalid-inspect-page-bound"));
     }
     let digest = Sha256::digest(bytes).to_vec();
     let offset = match cursor {
         Some(c) if c.digest == digest && c.offset <= entries.len() => c.offset,
-        Some(_) => return Err(refused("inspect-cursor-stale")),
+        Some(_) => return Err(failure("inspect-cursor-stale")),
         None => 0,
     };
     let end = offset.saturating_add(max).min(entries.len());
@@ -223,30 +209,19 @@ impl GitDriver {
     /// Work's existing fallback timing read, with bounded literal paths.
     pub fn last_path_commit_time(&self, repo: &RepoHandle, files: &[String]) -> Result<Option<i64>> {
         if files.is_empty() {
-            return Err(refused("invalid-literal-path"));
+            return Err(failure("invalid-literal-path"));
         }
         literal_paths(files)?;
         let mut args = vec!["--literal-pathspecs", "log", "-1", "--format=%ct", "--"];
         args.extend(files.iter().map(String::as_str));
         let raw = self.checked(repo, &args, Policy::Inspect)?;
-        let text = std::str::from_utf8(&raw).map_err(|_| refused("invalid-commit-time"))?.trim();
+        let text = std::str::from_utf8(&raw).map_err(|_| failure("invalid-commit-time"))?.trim();
         if text.is_empty() { return Ok(None); }
-        text.parse().map(Some).map_err(|_| refused("invalid-commit-time"))
+        text.parse().map(Some).map_err(|_| failure("invalid-commit-time"))
     }
     /// Literal full refs only; missing remains distinct from errors and symbolic.
     pub fn resolve_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
-        let prefix = RefPrefix::parse(name.as_str()).map_err(|_| refused("invalid-ref"))?;
-        let mut cursor = None;
-        loop {
-            let found = self.list_refs(repo, std::slice::from_ref(&prefix), cursor, 4096)?;
-            if let Some(entry) = found.entries.into_iter().find(|e| &e.name == name) {
-                return Ok(entry.value);
-            }
-            if found.complete {
-                return Ok(RefValue::Absent);
-            }
-            cursor = found.next_cursor;
-        }
+        crate::driver::read_ref_value(repo, name, &|args| self.inspect_command(repo, args))
     }
     /// Explicit target, unique configured remote HEAD, then attached main HEAD.
     pub fn resolve_trunk(
@@ -261,7 +236,7 @@ impl GitDriver {
             });
         }
         let mut defaults = std::collections::BTreeSet::new();
-        let prefix = RefPrefix::parse("refs/remotes/").map_err(|_| refused("invalid-ref"))?;
+        let prefix = RefPrefix::parse("refs/remotes/").map_err(|_| failure("invalid-ref"))?;
         let mut cursor = None;
         loop {
             let found = self.list_refs(repo, std::slice::from_ref(&prefix), cursor, 4096)?;
@@ -284,12 +259,12 @@ impl GitDriver {
         }
         if let Some(target) = defaults.into_iter().next() {
             return Ok(TrunkFact::Known(
-                RefName::parse(&target).map_err(|_| refused("invalid-ref"))?,
+                RefName::parse(&target).map_err(|_| failure("invalid-ref"))?,
             ));
         }
         let main = match self.resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
-            _ => return Err(refused("trusted-main-disappeared")),
+            _ => return Err(failure("trusted-main-disappeared")),
         };
         Ok(match self.resolve_head(&main)? {
             HeadFact::Attached { target, .. } if target.as_str().starts_with("refs/heads/") => {
@@ -344,7 +319,7 @@ impl GitDriver {
                         .splitn(if unmerged { 11 } else { 9 }, |b| *b == b' ')
                         .collect();
                     if fields.len() != if unmerged { 11 } else { 9 } || fields[1].len() != 2 {
-                        return Err(refused("invalid-status-protocol"));
+                        return Err(failure("invalid-status-protocol"));
                     }
                     StatusEntry {
                         path: fields.last().unwrap().to_vec(),
@@ -355,10 +330,10 @@ impl GitDriver {
                         unmerged,
                     }
                 }
-                _ => return Err(refused("invalid-status-protocol")),
+                _ => return Err(failure("invalid-status-protocol")),
             };
             if entry.path.is_empty() {
-                return Err(refused("invalid-status-path"));
+                return Err(failure("invalid-status-path"));
             }
             entries.push(entry);
         }
@@ -432,7 +407,7 @@ impl GitDriver {
                 || tail[..arity].iter().any(|p| p.is_empty())
                 || (!renamed && (status.len() != 1 || !b"ACDMTUXB".contains(&status[0])))
             {
-                return Err(refused("invalid-diff-protocol"));
+                return Err(failure("invalid-diff-protocol"));
             }
             entries.push(DiffEntry {
                 path: tail[arity - 1].to_vec(),
@@ -455,7 +430,7 @@ impl GitDriver {
         max_bytes: usize,
     ) -> Result<Vec<u8>> {
         if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 || context.is_some_and(|n| n > 1_000_000) {
-            return Err(refused("invalid-diff-bound"));
+            return Err(failure("invalid-diff-bound"));
         }
         literal_paths(paths)?;
         let unified = context.map(|n| format!("--unified={n}"));
@@ -474,19 +449,19 @@ impl GitDriver {
     }
     fn require_tree_ish(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
         Oid::parse(value.as_str(), repo.object_format())
-            .map_err(|_| refused("object-format-mismatch"))?;
+            .map_err(|_| failure("object-format-mismatch"))?;
         let kind = self.checked(repo, &["cat-file", "-t", value.as_str()], Policy::Inspect)?;
         if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(refused("expected-commit-or-tree"));
+            return Err(failure("expected-commit-or-tree"));
         }
         Ok(())
     }
     fn require_commit(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
         Oid::parse(value.as_str(), repo.object_format())
-            .map_err(|_| refused("object-format-mismatch"))?;
+            .map_err(|_| failure("object-format-mismatch"))?;
         let kind = self.checked(repo, &["cat-file", "-t", value.as_str()], Policy::Inspect)?;
         if kind != b"commit\n" {
-            return Err(refused("expected-commit"));
+            return Err(failure("expected-commit"));
         }
         Ok(())
     }
@@ -521,20 +496,20 @@ impl GitDriver {
             // reachable commit ids and match the trusted shallow-file boundary.
             use std::io::Read;
             let file = std::fs::File::open(repo.common_dir().join("shallow"))
-                .map_err(|_| refused("shallow-boundary-unreadable"))?;
+                .map_err(|_| failure("shallow-boundary-unreadable"))?;
             let mut boundary = Vec::new();
             file.take(LIMIT as u64 + 1)
                 .read_to_end(&mut boundary)
-                .map_err(|_| refused("shallow-boundary-unreadable"))?;
+                .map_err(|_| failure("shallow-boundary-unreadable"))?;
             if boundary.len() > LIMIT {
-                return Err(refused("shallow-boundary-limit"));
+                return Err(failure("shallow-boundary-limit"));
             }
             let boundaries: std::collections::BTreeSet<_> = boundary
                 .split(|b| *b == b'\n')
                 .filter(|l| !l.is_empty())
                 .collect();
             if boundaries.is_empty() || boundaries.iter().any(|b| oid(repo, b).is_err()) {
-                return Err(refused("shallow-boundary-invalid"));
+                return Err(failure("shallow-boundary-invalid"));
             }
             let reachable = self.checked(
                 repo,
@@ -545,10 +520,10 @@ impl GitDriver {
                 .split(|b| *b == b'\n')
                 .any(|id| boundaries.contains(id))
             {
-                return Err(refused("shallow-history-incomplete"));
+                return Err(failure("shallow-history-incomplete"));
             }
         } else if shallow != b"false\n" {
-            return Err(refused("invalid-shallow-protocol"));
+            return Err(failure("invalid-shallow-protocol"));
         }
         Ok(false)
     }
@@ -569,16 +544,16 @@ impl GitDriver {
             if field.is_empty() {
                 let item = current
                     .take()
-                    .ok_or_else(|| refused("invalid-worktree-protocol"))?;
+                    .ok_or_else(|| failure("invalid-worktree-protocol"))?;
                 if !item.bare && item.head.is_none() {
-                    return Err(refused("invalid-worktree-protocol"));
+                    return Err(failure("invalid-worktree-protocol"));
                 }
                 entries.push(item);
                 continue;
             }
             if let Some(path) = field.strip_prefix(b"worktree ") {
                 if current.is_some() || path.is_empty() {
-                    return Err(refused("invalid-worktree-protocol"));
+                    return Err(failure("invalid-worktree-protocol"));
                 }
                 current = Some(WorktreeFact {
                     path: path.to_vec(),
@@ -593,16 +568,16 @@ impl GitDriver {
             }
             let item = current
                 .as_mut()
-                .ok_or_else(|| refused("invalid-worktree-protocol"))?;
+                .ok_or_else(|| failure("invalid-worktree-protocol"))?;
             if let Some(head) = field.strip_prefix(b"HEAD ") {
                 item.head = Some(oid(repo, head)?);
             } else if let Some(branch) = field.strip_prefix(b"branch ") {
                 item.branch = Some(
                     RefName::parse(
                         std::str::from_utf8(branch)
-                            .map_err(|_| refused("invalid-worktree-branch"))?,
+                            .map_err(|_| failure("invalid-worktree-branch"))?,
                     )
-                    .map_err(|_| refused("invalid-worktree-branch"))?,
+                    .map_err(|_| failure("invalid-worktree-branch"))?,
                 );
             } else if field == b"bare" {
                 item.bare = true;
@@ -617,11 +592,11 @@ impl GitDriver {
             } else if let Some(reason) = field.strip_prefix(b"prunable ") {
                 item.prunable = Some(reason.to_vec());
             } else {
-                return Err(refused("invalid-worktree-protocol"));
+                return Err(failure("invalid-worktree-protocol"));
             }
         }
         if current.is_some() {
-            return Err(refused("invalid-worktree-protocol"));
+            return Err(failure("invalid-worktree-protocol"));
         }
         page(entries, &bytes, cursor, max)
     }
@@ -659,53 +634,53 @@ impl GitDriver {
         max_bytes: usize,
     ) -> Result<Vec<ReadObject>> {
         if ids.len() > 4096 || max_bytes == 0 || max_bytes > LIMIT {
-            return Err(refused("invalid-object-read-bounds"));
+            return Err(failure("invalid-object-read-bounds"));
         }
         let mut input = Vec::new();
         for id in ids {
             Oid::parse(id.as_str(), repo.object_format())
-                .map_err(|_| refused("object-format-mismatch"))?;
+                .map_err(|_| failure("object-format-mismatch"))?;
             input.extend_from_slice(id.as_str().as_bytes());
             input.push(0);
         }
         let headers = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
         let headers = records(&headers)?;
         if headers.len() != ids.len() {
-            return Err(refused("invalid-object-batch"));
+            return Err(failure("invalid-object-batch"));
         }
         let mut sizes = Vec::new();
         let mut total = 0usize;
         for (header, id) in headers.iter().zip(ids) {
             if header == &format!("{} missing", id.as_str()).as_bytes() {
                 if repo.layout().promisor {
-                    return Err(refused("promisor-object-unavailable"));
+                    return Err(failure("promisor-object-unavailable"));
                 }
                 if repo.layout().alternates {
-                    return Err(refused("alternate-object-unavailable"));
+                    return Err(failure("alternate-object-unavailable"));
                 }
                 sizes.push(None);
                 continue;
             }
             let fields: Vec<_> = header.split(|b| *b == b' ').collect();
             if fields.len() != 3 || fields[0] != id.as_str().as_bytes() {
-                return Err(refused("invalid-object-batch"));
+                return Err(failure("invalid-object-batch"));
             }
             let kind = match fields[1] {
                 b"blob" => ObjectType::Blob,
                 b"tree" => ObjectType::Tree,
                 b"commit" => ObjectType::Commit,
                 b"tag" => ObjectType::Tag,
-                _ => return Err(refused("invalid-object-type")),
+                _ => return Err(failure("invalid-object-type")),
             };
             let size: usize = std::str::from_utf8(fields[2])
                 .ok()
                 .and_then(|n| n.parse().ok())
-                .ok_or_else(|| refused("invalid-object-size"))?;
+                .ok_or_else(|| failure("invalid-object-size"))?;
             total = total
                 .checked_add(size)
-                .ok_or_else(|| refused("object-read-limit"))?;
+                .ok_or_else(|| failure("object-read-limit"))?;
             if total > max_bytes {
-                return Err(refused("object-read-limit"));
+                return Err(failure("object-read-limit"));
             }
             sizes.push(Some((kind, size)));
         }
@@ -716,16 +691,16 @@ impl GitDriver {
             let end = rest
                 .iter()
                 .position(|b| *b == 0)
-                .ok_or_else(|| refused("invalid-object-batch"))?;
+                .ok_or_else(|| failure("invalid-object-batch"))?;
             if &rest[..end] != *header {
-                return Err(refused("object-changed-during-read"));
+                return Err(failure("object-changed-during-read"));
             }
             rest = &rest[end + 1..];
             match info {
                 None => results.push(ReadObject::Missing),
                 Some((kind, size)) => {
                     if rest.get(size) != Some(&0) {
-                        return Err(refused("invalid-object-size"));
+                        return Err(failure("invalid-object-size"));
                     }
                     let content = rest[..size].to_vec();
                     rest = &rest[size + 1..];
@@ -737,18 +712,9 @@ impl GitDriver {
             }
         }
         if !rest.is_empty() {
-            return Err(refused("invalid-object-batch"));
+            return Err(failure("invalid-object-batch"));
         }
         Ok(results)
-    }
-    pub fn paths_at_revision(
-        &self,
-        repo: &RepoHandle,
-        revision: &Oid,
-        paths: &[Vec<u8>],
-        max_blob_bytes: usize,
-    ) -> Result<Vec<PathRead>> {
-        self.read_paths_at(repo, revision, paths, max_blob_bytes)
     }
 }
 
@@ -782,7 +748,7 @@ impl GitDriver {
         max_bytes: u64,
     ) -> Result<WritesSnapshot> {
         if max_bytes == 0 || previous_paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
-            return Err(refused("invalid-snapshot-bounds"));
+            return Err(failure("invalid-snapshot-bounds"));
         }
         let head = match self.resolve_head(repo)? {
             HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => Some(commit),
@@ -795,7 +761,7 @@ impl GitDriver {
             let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
             if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
-                return Err(refused("snapshot-path-limit"));
+                return Err(failure("snapshot-path-limit"));
             }
             if page.complete {
                 break;
@@ -805,7 +771,7 @@ impl GitDriver {
         let root = repo
             .work_tree
             .as_ref()
-            .ok_or_else(|| refused("snapshot-requires-worktree"))?;
+            .ok_or_else(|| failure("snapshot-requires-worktree"))?;
         let mut remaining = max_bytes;
         let mut files = vec![];
         for path in paths {
@@ -816,7 +782,7 @@ impl GitDriver {
                     .split(|b| *b == b'/')
                     .any(|p| p.is_empty() || p == b"." || p == b"..")
             {
-                return Err(refused("invalid-literal-path"));
+                return Err(failure("invalid-literal-path"));
             }
             let fingerprint = fingerprint(root, &path, &mut remaining)?;
             files.push(SnapshotEntry { path, fingerprint });
@@ -826,7 +792,7 @@ impl GitDriver {
             HeadFact::Unborn { .. } => None,
         };
         if head != after {
-            return Err(refused("snapshot-head-changed"));
+            return Err(failure("snapshot-head-changed"));
         }
         Ok(WritesSnapshot { head, files })
     }
@@ -851,10 +817,10 @@ pub(crate) fn fingerprint(
         .read(true)
         .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW)
         .open(root)
-        .map_err(|_| refused("snapshot-root-unreadable"))?;
+        .map_err(|_| failure("snapshot-root-unreadable"))?;
     let mut parts = path.split(|b| *b == b'/').peekable();
     while let Some(part) = parts.next() {
-        let name = CString::new(part).map_err(|_| refused("invalid-literal-path"))?;
+        let name = CString::new(part).map_err(|_| failure("invalid-literal-path"))?;
         if parts.peek().is_some() {
             let fd = unsafe {
                 libc::openat(
@@ -867,7 +833,7 @@ pub(crate) fn fingerprint(
                 if std::io::Error::last_os_error().kind() == std::io::ErrorKind::NotFound {
                     return Ok(PathFingerprint::Missing);
                 }
-                return Err(refused("snapshot-parent-unreadable"));
+                return Err(failure("snapshot-parent-unreadable"));
             }
             dir = unsafe { std::fs::File::from_raw_fd(fd) };
             continue;
@@ -885,7 +851,7 @@ pub(crate) fn fingerprint(
             if std::io::Error::last_os_error().kind() == std::io::ErrorKind::NotFound {
                 return Ok(PathFingerprint::Missing);
             }
-            return Err(refused("snapshot-path-unreadable"));
+            return Err(failure("snapshot-path-unreadable"));
         }
         let stat = unsafe { stat.assume_init() };
         let mode = stat.st_mode as u32;
@@ -900,7 +866,7 @@ pub(crate) fn fingerprint(
                 )
             };
             if n < 0 || n as usize == target.len() {
-                return Err(refused("snapshot-link-unreadable"));
+                return Err(failure("snapshot-link-unreadable"));
             }
             target.truncate(n as usize);
             return Ok(PathFingerprint::Link { target });
@@ -927,12 +893,12 @@ pub(crate) fn fingerprint(
         let mut file = unsafe { std::fs::File::from_raw_fd(fd) };
         let metadata = file
             .metadata()
-            .map_err(|_| refused("snapshot-path-unreadable"))?;
+            .map_err(|_| failure("snapshot-path-unreadable"))?;
         if !metadata.is_file()
             || metadata.dev() != stat.st_dev as u64
             || metadata.ino() != stat.st_ino as u64
         {
-            return Err(refused("snapshot-path-changed"));
+            return Err(failure("snapshot-path-changed"));
         }
         let mut hash = Sha256::new();
         let mut buffer = [0u8; 65536];
@@ -946,26 +912,26 @@ pub(crate) fn fingerprint(
             }
             *remaining = remaining
                 .checked_sub(n as u64)
-                .ok_or_else(|| refused("snapshot-byte-limit"))?;
+                .ok_or_else(|| failure("snapshot-byte-limit"))?;
             hash.update(&buffer[..n]);
         }
         let after = file
             .metadata()
-            .map_err(|_| refused("snapshot-path-unreadable"))?;
+            .map_err(|_| failure("snapshot-path-unreadable"))?;
         if metadata.len() != after.len()
             || metadata.mtime() != after.mtime()
             || metadata.mtime_nsec() != after.mtime_nsec()
             || metadata.ctime() != after.ctime()
             || metadata.ctime_nsec() != after.ctime_nsec()
         {
-            return Err(refused("snapshot-path-changed"));
+            return Err(failure("snapshot-path-changed"));
         }
         return Ok(PathFingerprint::File {
             sha256: format!("{:x}", hash.finalize()),
             mode: metadata.mode(),
         });
     }
-    Err(refused("invalid-literal-path"))
+    Err(failure("invalid-literal-path"))
 }
 #[cfg(not(unix))]
 pub(crate) fn fingerprint(
@@ -973,18 +939,18 @@ pub(crate) fn fingerprint(
     _path: &[u8],
     _remaining: &mut u64,
 ) -> Result<PathFingerprint> {
-    Err(refused("snapshot-platform-unsupported"))
+    Err(failure("snapshot-platform-unsupported"))
 }
 
 impl GitDriver {
     pub fn resolve_commit_ref(&self, repo: &RepoHandle, name: &str) -> Result<Option<Oid>> {
-        if name.is_empty() || name.contains('\0') { return Err(refused("invalid-ref-name")); }
+        if name.is_empty() || name.contains('\0') { return Err(failure("invalid-ref-name")); }
         let revision = format!("{name}^{{commit}}");
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke(Some(repo), repo.trusted_main_root(), &["rev-parse", "-q", "--verify", "--end-of-options", &revision], Policy::Inspect, None, true, 4096, std::time::Duration::from_secs(30))?;
         if out.success {
-            Ok(Some(Oid::parse(std::str::from_utf8(&out.stdout).map_err(|_|refused("invalid-oid"))?.trim_end_matches('\n'), repo.object_format()).map_err(|_|refused("invalid-oid"))?))
+            Ok(Some(Oid::parse(std::str::from_utf8(&out.stdout).map_err(|_|failure("invalid-oid"))?.trim_end_matches('\n'), repo.object_format()).map_err(|_|failure("invalid-oid"))?))
         } else if out.code == Some(1) { Ok(None) } else { Err(out.error("ref-resolution-failed")) }
     }
 }
@@ -1013,11 +979,11 @@ impl GitDriver {
             Policy::Inspect,
         )?;
         let counts = std::str::from_utf8(&counts)
-            .map_err(|_| refused("invalid-count"))?
+            .map_err(|_| failure("invalid-count"))?
             .split_whitespace()
             .map(str::parse::<u64>)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .map_err(|_| refused("invalid-count"))?;
+            .map_err(|_| failure("invalid-count"))?;
         let commits = self.checked(
             repo,
             &[
@@ -1027,20 +993,20 @@ impl GitDriver {
             Policy::Inspect,
         )?;
         if counts.len() != 2 {
-            return Err(refused("invalid-count"));
+            return Err(failure("invalid-count"));
         }
         let commits = std::str::from_utf8(&commits)
-            .map_err(|_| refused("invalid-object-id"))?
+            .map_err(|_| failure("invalid-object-id"))?
             .lines()
             .collect::<Vec<_>>();
         Ok(
-            serde_json::json!({"mergeBase":std::str::from_utf8(&base).map_err(|_| refused("invalid-object-id"))?.trim(),"left":counts[0],"right":counts[1],"commits":commits}),
+            serde_json::json!({"mergeBase":std::str::from_utf8(&base).map_err(|_| failure("invalid-object-id"))?.trim(),"left":counts[0],"right":counts[1],"commits":commits}),
         )
     }
     pub fn list_branches(&self, repo: &RepoHandle, prefix: &str) -> Result<Vec<String>> {
-        RefName::parse(prefix.trim_end_matches('/')).map_err(|_| refused("invalid-ref-prefix"))?;
+        RefName::parse(prefix.trim_end_matches('/')).map_err(|_| failure("invalid-ref-prefix"))?;
         if !prefix.starts_with("refs/heads/") {
-            return Err(refused("invalid-ref-prefix"));
+            return Err(failure("invalid-ref-prefix"));
         }
         let out = self.checked(
             repo,
@@ -1048,7 +1014,7 @@ impl GitDriver {
             Policy::Inspect,
         )?;
         Ok(std::str::from_utf8(&out)
-            .map_err(|_| refused("invalid-ref-name"))?
+            .map_err(|_| failure("invalid-ref-name"))?
             .lines()
             .map(str::to_owned)
             .collect())
@@ -1101,7 +1067,7 @@ impl GitDriver {
             Policy::Inspect,
         )?;
         Ok(
-            serde_json::json!({"lastSynced":std::str::from_utf8(&reflog).map_err(|_| refused("invalid-object-id"))?.trim(),"delta":delta,"stagedPatch":staged,"status":status,"orphanedPatches":self.restore_patch_paths(repo)?}),
+            serde_json::json!({"lastSynced":std::str::from_utf8(&reflog).map_err(|_| failure("invalid-object-id"))?.trim(),"delta":delta,"stagedPatch":staged,"status":status,"orphanedPatches":self.restore_patch_paths(repo)?}),
         )
     }
     pub fn remote_tracking(
@@ -1113,7 +1079,7 @@ impl GitDriver {
         let name = branch
             .as_str()
             .strip_prefix("refs/heads/")
-            .ok_or_else(|| refused("invalid-branch"))?;
+            .ok_or_else(|| failure("invalid-branch"))?;
         let out = self.checked(
             repo,
             &[
@@ -1123,7 +1089,7 @@ impl GitDriver {
             ],
             Policy::Inspect,
         )?;
-        let listing = std::str::from_utf8(&out).map_err(|_| refused("invalid-ref-name"))?;
+        let listing = std::str::from_utf8(&out).map_err(|_| failure("invalid-ref-name"))?;
         let upstream = listing
             .lines()
             .filter_map(|line| line.split_once('\0'))
@@ -1166,7 +1132,7 @@ impl GitDriver {
         let fields = records(&out.stdout)?;
         let (tree, paths) = fields
             .split_first()
-            .ok_or_else(|| refused("invalid-merge-tree-protocol"))?;
+            .ok_or_else(|| failure("invalid-merge-tree-protocol"))?;
         let tree = oid(repo, tree)?;
         let mut conflicted_paths: Vec<Vec<u8>> = vec![];
         for path in paths.iter().filter(|p| !p.is_empty()) {
@@ -1175,7 +1141,7 @@ impl GitDriver {
             }
         }
         if conflicted != !conflicted_paths.is_empty() {
-            return Err(refused("invalid-merge-tree-protocol"));
+            return Err(failure("invalid-merge-tree-protocol"));
         }
         Ok(MergeTreeFact { tree, conflicted_paths })
     }
@@ -1193,14 +1159,14 @@ impl GitDriver {
             || attribute.starts_with('-')
             || !attribute.bytes().all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
         {
-            return Err(refused("invalid-attribute-name"));
+            return Err(failure("invalid-attribute-name"));
         }
         if paths.is_empty()
             || paths.len() > 4096
             || paths.iter().any(|p| p.is_empty() || p.contains(&0))
             || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
         {
-            return Err(refused("invalid-literal-path"));
+            return Err(failure("invalid-literal-path"));
         }
         let mut input = Vec::new();
         for path in paths {
@@ -1211,19 +1177,19 @@ impl GitDriver {
         let bytes = self.inspect_input(repo, &["check-attr", "-z", "--stdin", &source, attribute], &input)?;
         let fields = records(&bytes)?;
         if fields.len() != paths.len() * 3 {
-            return Err(refused("invalid-check-attr-protocol"));
+            return Err(failure("invalid-check-attr-protocol"));
         }
         fields
             .chunks(3)
             .zip(paths)
             .map(|(record, path)| {
                 if record[0] != path.as_slice() || record[1] != attribute.as_bytes() {
-                    return Err(refused("invalid-check-attr-protocol"));
+                    return Err(failure("invalid-check-attr-protocol"));
                 }
                 Ok(AttributeFact {
                     path: path.clone(),
                     value: String::from_utf8(record[2].to_vec())
-                        .map_err(|_| refused("invalid-check-attr-protocol"))?,
+                        .map_err(|_| failure("invalid-check-attr-protocol"))?,
                 })
             })
             .collect()
@@ -1256,7 +1222,7 @@ impl GitDriver {
         std::str::from_utf8(&raw)
             .ok()
             .and_then(|text| text.trim_end_matches('\n').parse().ok())
-            .ok_or_else(|| refused("invalid-commit-time"))
+            .ok_or_else(|| failure("invalid-commit-time"))
     }
     /// How many commits `include` reaches that `exclude`, when given, does not.
     pub fn count_commits(&self, repo: &RepoHandle, include: &Oid, exclude: Option<&Oid>) -> Result<u64> {
@@ -1292,7 +1258,7 @@ impl GitDriver {
         let bytes = self.checked(repo, &["ls-files", "-z", "--cached", "--full-name"], Policy::Inspect)?;
         let entries = records(&bytes)?
             .into_iter()
-            .map(|path| if path.is_empty() { Err(refused("invalid-ls-files-protocol")) } else { Ok(path.to_vec()) })
+            .map(|path| if path.is_empty() { Err(failure("invalid-ls-files-protocol")) } else { Ok(path.to_vec()) })
             .collect::<Result<Vec<_>>>()?;
         page(entries, &bytes, cursor, max)
     }

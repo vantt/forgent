@@ -8,11 +8,13 @@
 
 use crate::core::{Core, CoreConfig, Want};
 use crate::driver::herdr::{HerdrConfig, HerdrDriver};
-use crate::policy::{policy_by_name, Limits};
+use crate::identity;
+use crate::policy::{policy_by_name, Limits, PlacementPolicy, DEFAULT_POLICY, POLICY_NAMES};
 use crate::port::*;
 use serde::de::DeserializeOwned;
 use serde_json::{json, Map, Value};
 use std::io::Read;
+use std::time::{Duration, Instant};
 
 /// The protocol this route speaks.
 pub const PROTOCOL: u64 = 1;
@@ -20,6 +22,7 @@ pub const PROTOCOL: u64 = 1;
 const EXIT_OK: i32 = 0;
 const EXIT_USAGE: i32 = 2;
 const EXIT_MISMATCH: i32 = 3;
+const CODE_BELOW_FLOOR: &str = "terminal-config-below-floor";
 const MAX_STDIN: u64 = 1024 * 1024;
 
 pub const OPS: [&str; 10] = [
@@ -38,6 +41,8 @@ pub const OPS: [&str; 10] = [
 /// Layout defaults from the herdr measurements: the size the five supported
 /// agent CLIs are designed for, and the panes a 352x69 tab holds at it.
 pub const DEFAULT_LIMITS: Limits = Limits { min_cols: 80, min_rows: 20, max_panes_per_tab: 8 };
+/// The smallest pane the five supported agent CLIs were measured to start in.
+pub const LIMITS_FLOOR: Limits = Limits { min_cols: 40, min_rows: 8, max_panes_per_tab: 1 };
 /// Ready timeout of a round plus 30 s.
 pub const DEFAULT_ALLOCATION_GRACE_MS: u64 = 60_000;
 pub const DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS: u64 = 5_000;
@@ -114,29 +119,62 @@ fn whole<T: DeserializeOwned>(request: &Value) -> Result<T, String> {
     serde_json::from_value(request.clone()).map_err(|e| format!("request: {e}"))
 }
 
+/// A config the core will not run with: the route's error code and what to tell the caller.
+#[derive(Debug)]
+struct ConfigRefusal {
+    code: &'static str,
+    message: String,
+}
+
+impl From<String> for ConfigRefusal {
+    fn from(message: String) -> Self {
+        ConfigRefusal { code: "usage", message }
+    }
+}
+
+/// The core's value for every `config` key the envelope accepts.
+fn defaults() -> Value {
+    json!({
+        "minCols": DEFAULT_LIMITS.min_cols,
+        "minRows": DEFAULT_LIMITS.min_rows,
+        "maxPanesPerTab": DEFAULT_LIMITS.max_panes_per_tab,
+        "policy": DEFAULT_POLICY,
+        "allocationGraceMs": DEFAULT_ALLOCATION_GRACE_MS,
+        "launchIdentifyTimeoutMs": DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS,
+        "shellReadyTimeoutMs": DEFAULT_SHELL_READY_TIMEOUT_MS,
+    })
+}
+
 /// The optional `config` object of the stdin envelope: layout limits, the
-/// placement policy and the two core timeouts. Absent keys keep the defaults.
-fn core_config(envelope: &Value) -> Result<(CoreConfig, Option<String>), String> {
+/// placement policy and the three core timeouts. Absent keys keep the defaults;
+/// a limit below the measured floor or an unregistered policy is refused by name.
+fn core_config(envelope: &Value) -> Result<(CoreConfig, Box<dyn PlacementPolicy>), ConfigRefusal> {
     let config = envelope.get("config").cloned().unwrap_or_else(|| json!({}));
     let number = |name: &str, default: u64| -> Result<u64, String> {
         match config.get(name) {
             None | Some(Value::Null) => Ok(default),
-            Some(v) => v.as_u64().ok_or_else(|| format!("config.{name} needs a non-negative integer")),
+            Some(v) => v.as_u64().ok_or_else(|| format!("config.{name} needs a non-negative integer, got {v}")),
         }
     };
-    let limit = |name: &str, default: u32| -> Result<u32, String> {
+    let limit = |name: &str, default: u32, floor: u32| -> Result<u32, ConfigRefusal> {
         let n = number(name, default as u64)?;
-        u32::try_from(n).ok().filter(|n| *n >= 1).ok_or_else(|| format!("config.{name} needs an integer >= 1"))
+        let n = u32::try_from(n).ok().filter(|n| *n >= 1).ok_or_else(|| format!("config.{name} needs an integer >= 1, got {n}"))?;
+        if n < floor {
+            let message = format!("layout.{name}={n} < {floor}, the measured floor: the agent CLIs were not shown to start in a pane that small");
+            return Err(ConfigRefusal { code: CODE_BELOW_FLOOR, message });
+        }
+        Ok(n)
     };
     let limits = Limits {
-        min_cols: limit("minCols", DEFAULT_LIMITS.min_cols)?,
-        min_rows: limit("minRows", DEFAULT_LIMITS.min_rows)?,
-        max_panes_per_tab: limit("maxPanesPerTab", DEFAULT_LIMITS.max_panes_per_tab)?,
+        min_cols: limit("minCols", DEFAULT_LIMITS.min_cols, LIMITS_FLOOR.min_cols)?,
+        min_rows: limit("minRows", DEFAULT_LIMITS.min_rows, LIMITS_FLOOR.min_rows)?,
+        max_panes_per_tab: limit("maxPanesPerTab", DEFAULT_LIMITS.max_panes_per_tab, LIMITS_FLOOR.max_panes_per_tab)?,
     };
-    let policy = match config.get("policy") {
+    let policy_name = match config.get("policy") {
         None | Some(Value::Null) => None,
-        Some(v) => Some(v.as_str().ok_or("config.policy needs a string")?.to_string()),
+        Some(v) => Some(v.as_str().ok_or_else(|| "config.policy needs a string".to_string())?),
     };
+    let policy = policy_by_name(policy_name).map_err(|e| e.to_string())?;
     let core = CoreConfig {
         state_root: crate::store::default_state_root(),
         limits,
@@ -147,7 +185,9 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Option<String>), String>
     Ok((core, policy))
 }
 
-fn herdr_config(envelope: &Value) -> Result<HerdrConfig, String> {
+/// The caller's whole budget for this operation rides in `timeoutMs`; herdr commands may use
+/// nine tenths of it, so a stuck command is answered `unknown` before the caller gives up.
+fn herdr_config(envelope: &Value, started: Instant, inherited_socket: Option<String>) -> Result<HerdrConfig, String> {
     let mut config = HerdrConfig::new(match envelope.get("herdrBin") {
         None | Some(Value::Null) => String::new(),
         Some(v) => v.as_str().ok_or("herdrBin needs a string")?.to_string(),
@@ -164,16 +204,29 @@ fn herdr_config(envelope: &Value) -> Result<HerdrConfig, String> {
             config.env.push((key.clone(), value.to_string()));
         }
     }
+    match envelope.get("timeoutMs") {
+        None | Some(Value::Null) => {}
+        Some(v) => {
+            let ms = v.as_u64().filter(|ms| *ms >= 1).ok_or("timeoutMs needs an integer >= 1")?;
+            config.deadline = Some(started + Duration::from_millis(ms - ms / 10));
+        }
+    }
     // herdr sets `HERDR_SOCKET_PATH` in every pane it creates, so a caller
     // running inside one reaches the same server the CLI would; the caller's own
-    // `env` still wins.
-    if config.socket_path.is_none() {
-        config.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|p| !p.is_empty());
+    // `env` still wins, and a named session is never redirected to the inherited
+    // socket of another one.
+    if config.socket_path.is_none() && config.session.is_none() {
+        config.socket_path = inherited_socket.filter(|p| !p.is_empty());
     }
     Ok(config)
 }
 
-fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
+/// The pane the caller named as its anchor in the envelope's `env`, when it named one.
+fn anchor_pane(envelope: &Value) -> Option<&str> {
+    envelope.pointer("/env/FGOS_HERDR_ANCHOR_PANE").and_then(Value::as_str).map(str::trim).filter(|p| !p.is_empty())
+}
+
+fn dispatch(op: &str, core: &Core, request: &Value, anchor: Option<&str>) -> Result<Answer, String> {
     Ok(match op {
         "allocate" => answer(core.allocate(&whole::<AllocateRequest>(request)?), slot_answer),
         "attach" => {
@@ -249,12 +302,25 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "label" => {
             let key: String = field(request, "key")?;
             let display: Display = field(request, "display")?;
-            let report_state: Option<String> = optional(request, "reportState")?;
-            answer(core.label(&key, &display, report_state.as_deref()), ok_answer)
+            answer(core.label(&key, &display), ok_answer)
         }
         "capabilities" => {
-            let report = core.capabilities();
-            ("capabilities".into(), json!({ "driver": report.driver, "capabilities": report.capabilities, "serverIncarnation": report.server_incarnation }))
+            let agents: Option<bool> = optional(request, "agents")?;
+            let report = core.capabilities(CapabilitiesAsk { anchor_pane: anchor, agents: agents.unwrap_or(false) });
+            let mut fields = json!({
+                "driver": report.driver,
+                "capabilities": report.capabilities,
+                "serverIncarnation": report.server_incarnation,
+                "anchorPane": report.anchor_pane,
+                "endpoint": { "socketPath": report.socket_path },
+                "defaults": defaults(),
+                "policies": POLICY_NAMES,
+            });
+            if let Some(facts) = report.agents {
+                fields["agentKinds"] = facts.kinds.map_or(json!("unknown"), |kinds| json!(kinds));
+                fields["integrations"] = facts.integrations.map_or(json!("unknown"), |states| json!(states));
+            }
+            ("capabilities".into(), fields)
         }
         "reconcile-scan" => {
             let older: u64 = field(request, "olderThanMs")?;
@@ -279,6 +345,7 @@ fn read_stdin() -> Result<Value, String> {
 /// `fgos internal terminal-control ...`; `args` are the arguments after the
 /// route name. Returns the process exit code and prints one JSON line.
 pub fn main(args: &[String]) -> i32 {
+    let started = Instant::now();
     let mut protocol: Option<&str> = None;
     let mut json_flag = false;
     let mut op: Option<&str> = None;
@@ -326,22 +393,19 @@ pub fn main(args: &[String]) -> i32 {
         None | Some("herdr") => {}
         Some(other) => return usage(&format!("unknown driver {other}")),
     }
-    let (config, policy_name) = match core_config(&envelope) {
+    let (config, policy) = match core_config(&envelope) {
+        Ok(c) => c,
+        Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
+    };
+    let herdr = match herdr_config(&envelope, started, std::env::var("HERDR_SOCKET_PATH").ok()) {
         Ok(c) => c,
         Err(message) => return usage(&message),
-    };
-    let herdr = match herdr_config(&envelope) {
-        Ok(c) => c,
-        Err(message) => return usage(&message),
-    };
-    let policy = match policy_by_name(policy_name.as_deref()) {
-        Ok(p) => p,
-        Err(e) => return usage(&e.to_string()),
     };
     let request = envelope.get("request").cloned().unwrap_or_else(|| json!({}));
     let driver = HerdrDriver::new(herdr);
-    let core = Core::new(&driver, policy.as_ref(), config);
-    match dispatch(op, &core, &request) {
+    // The route is a child of its caller: the OS names the caller, the request never does.
+    let core = Core::new(&driver, policy.as_ref(), config).with_caller(identity::parent_of_this_process());
+    match dispatch(op, &core, &request, anchor_pane(&envelope)) {
         Ok((result, fields)) => {
             let mut fields = fields;
             // `op` rides next to the result, as the contract's stdout shape says.
@@ -382,10 +446,54 @@ mod tests {
         let (config, policy) = core_config(&json!({})).unwrap();
         assert_eq!((config.limits.min_cols, config.limits.min_rows, config.limits.max_panes_per_tab), (80, 20, 8));
         assert_eq!(config.allocation_grace_ms, 60_000);
-        assert!(policy.is_none());
+        assert_eq!(policy.name(), DEFAULT_POLICY);
         let (config, policy) = core_config(&json!({ "config": { "minCols": 40, "policy": "measured-split" } })).unwrap();
         assert_eq!(config.limits.min_cols, 40);
-        assert_eq!(policy.as_deref(), Some("measured-split"));
-        assert!(core_config(&json!({ "config": { "minRows": 0 } })).is_err());
+        assert_eq!(policy.name(), "measured-split");
+        for bad in [json!({ "minRows": 0 }), json!({ "minCols": 2.5 }), json!({ "maxPanesPerTab": -1 }), json!({ "policy": "nope" })] {
+            let Err(refusal) = core_config(&json!({ "config": bad })) else { panic!("{bad} was accepted") };
+            assert_eq!(refusal.code, "usage", "{bad}");
+        }
+    }
+
+    #[test]
+    fn an_envelope_below_the_measured_floor_is_refused_by_name() {
+        for (config, named) in [
+            (json!({ "minCols": 30 }), "layout.minCols=30 < 40"),
+            (json!({ "minRows": 7 }), "layout.minRows=7 < 8"),
+        ] {
+            let Err(refusal) = core_config(&json!({ "config": config })) else { panic!("{named} was accepted") };
+            assert_eq!(refusal.code, CODE_BELOW_FLOOR);
+            assert!(refusal.message.starts_with(named), "{}", refusal.message);
+        }
+        assert!(core_config(&json!({ "config": { "minCols": 40, "minRows": 8 } })).is_ok(), "the floor itself is allowed");
+    }
+
+    #[test]
+    fn a_named_session_is_never_pointed_at_the_inherited_socket() {
+        let started = Instant::now();
+        let inherited = || Some("/cockpit/herdr.sock".to_string());
+        assert_eq!(herdr_config(&json!({}), started, inherited()).unwrap().socket_path.as_deref(), Some("/cockpit/herdr.sock"));
+        let named = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker" } }), started, inherited()).unwrap();
+        assert_eq!((named.session.as_deref(), named.socket_path), (Some("fgos-worker"), None));
+        let both = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker", "HERDR_SOCKET_PATH": "/own.sock" } }), started, inherited()).unwrap();
+        assert_eq!(both.socket_path.as_deref(), Some("/own.sock"), "the caller's own socket still wins");
+    }
+
+    #[test]
+    fn the_anchor_pane_comes_from_the_envelope_env_only() {
+        assert_eq!(anchor_pane(&json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": " w1:p2 " } })), Some("w1:p2"));
+        for none in [json!({}), json!({ "env": {} }), json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": "  " } }), json!({ "request": { "anchorPane": "w1:p2" } })] {
+            assert_eq!(anchor_pane(&none), None, "{none}");
+        }
+    }
+
+    #[test]
+    fn the_operation_budget_bounds_every_herdr_command() {
+        let started = Instant::now();
+        assert!(herdr_config(&json!({ "timeoutMs": 0 }), started, None).is_err());
+        assert!(herdr_config(&json!({}), started, None).unwrap().deadline.is_none());
+        let deadline = herdr_config(&json!({ "timeoutMs": 10_000 }), started, None).unwrap().deadline.unwrap();
+        assert_eq!(deadline.duration_since(started), Duration::from_millis(9_000));
     }
 }

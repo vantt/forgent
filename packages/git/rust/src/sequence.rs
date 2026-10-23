@@ -53,26 +53,27 @@ pub fn sequence_ref(kind: &str) -> Result<RefName> {
             .bytes()
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-');
     if !valid {
-        return Err(failure_text("invalid-sequence-kind"));
+        return Err(failure("invalid-sequence-kind"));
     }
-    RefName::parse(&format!("{NAMESPACE}{kind}")).map_err(|e| failure_text(e.to_string()))
-}
-
-fn failure_text(cause: impl Into<String>) -> OperationError {
-    crate::refs::failure(cause.into())
+    RefName::parse(&format!("{NAMESPACE}{kind}")).map_err(|e| failure(e.to_string()))
 }
 
 impl GitDriver {
     /// Where this repository's counters live: its `origin` when it has one,
-    /// else the repository itself.
-    pub fn sequence_home(&self, repo: &RepoHandle) -> SequenceHome {
-        match Inspect::remote_url(self, repo, REMOTE) {
-            Ok(url) => SequenceHome::Remote(RemoteGrant {
-                name: REMOTE.into(),
-                pinned_url: url,
-            }),
-            Err(_) => SequenceHome::Local,
+    /// else the repository itself. An origin that cannot be read, or whose
+    /// transport is not supported, is a refusal here, before any claim:
+    /// it is never mistaken for "no origin".
+    pub fn sequence_home(&self, repo: &RepoHandle) -> Result<SequenceHome> {
+        let key = format!("remote.{REMOTE}.url");
+        if crate::driver::config_facts(self, repo, &key)?.is_empty() {
+            return Ok(SequenceHome::Local);
         }
+        let grant = RemoteGrant {
+            name: REMOTE.into(),
+            pinned_url: Inspect::remote_url(self, repo, REMOTE)?,
+        };
+        self.remote_target(repo, &grant)?;
+        Ok(SequenceHome::Remote(grant))
     }
 
     /// The counter of `kind`: `None` while nobody claimed a number.
@@ -86,7 +87,7 @@ impl GitDriver {
         let oid = match home {
             SequenceHome::Local => self.local_tip(repo, &name)?,
             SequenceHome::Remote(grant) => {
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 self.remote_tip(repo, &url, scheme, &name)?
             }
         };
@@ -100,13 +101,13 @@ impl GitDriver {
                 )
                 .is_err()
             {
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 self.fetch_commit(repo, &url, scheme, &oid)?;
             }
         }
         let commit = self.checked(repo, &["cat-file", "commit", oid.as_str()], Policy::Inspect)?;
         let number =
-            commit_number(&commit).ok_or_else(|| failure_text("sequence-ref-malformed"))?;
+            commit_number(&commit).ok_or_else(|| failure("sequence-ref-malformed"))?;
         Ok(Some(SequenceTip { oid, number }))
     }
 
@@ -129,21 +130,32 @@ impl GitDriver {
         let commit = self.new_counter_commit(repo, number, claimant)?;
         match home {
             SequenceHome::Local => {
+                // The commit is durable before the ref can name it, and the ref
+                // before a number is reported: a power cut must not roll the
+                // counter back to a number already handed out.
+                crate::objects::sync_loose_objects(
+                    repo.common_dir(),
+                    std::slice::from_ref(&commit),
+                    true,
+                )
+                .map_err(|e| failure(e.to_string()))?;
                 let old = expected.map_or_else(
                     || "0".repeat(commit.as_str().len()),
                     |o| o.as_str().to_owned(),
                 );
                 let out = self.run_local(
                     repo,
-                    &[
+                    &durable_args(&[
                         "update-ref",
                         "--no-deref",
                         name.as_str(),
                         commit.as_str(),
                         &old,
-                    ],
+                    ]),
                 )?;
                 if out.success {
+                    sync_ref_file(repo, &name)?;
+                    crate::refs::sync_refs(repo, &name)?;
                     return Ok(SequencePush::Claimed(commit));
                 }
                 // A refused swap is a counter that moved; anything else is a fault.
@@ -154,7 +166,7 @@ impl GitDriver {
             }
             SequenceHome::Remote(grant) => {
                 self.require_floor()?;
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 let lease = format!(
                     "--force-with-lease={}:{}",
                     name.as_str(),
@@ -177,12 +189,9 @@ impl GitDriver {
                 if out.success {
                     return Ok(SequencePush::Claimed(commit));
                 }
-                // Porcelain marks a ref the remote refused with a leading `!`.
-                if out
-                    .stdout
-                    .split(|b| *b == b'\n')
-                    .any(|line| line.first() == Some(&b'!'))
-                {
+                // Only git's own lease verdict means the counter moved. Any other
+                // refused ref (a receive hook, a protection rule) keeps its stderr.
+                if out.stdout.split(|b| *b == b'\n').any(is_stale_lease_row) {
                     return Ok(SequencePush::Stale);
                 }
                 Err(out.error("sequence-push-failed"))
@@ -260,13 +269,13 @@ impl GitDriver {
             return Err(out.error("sequence-read-failed"));
         }
         let text = std::str::from_utf8(&out.stdout)
-            .map_err(|_| failure_text("git-protocol-invalid-utf8"))?;
+            .map_err(|_| failure("git-protocol-invalid-utf8"))?;
         for line in text.lines() {
             if let Some((oid, advertised)) = line.split_once('\t') {
                 if advertised == name.as_str() {
                     return Ok(Some(
                         Oid::parse(oid, repo.object_format())
-                            .map_err(|e| failure_text(e.to_string()))?,
+                            .map_err(|e| failure(e.to_string()))?,
                     ));
                 }
             }
@@ -303,7 +312,7 @@ impl GitDriver {
                 .bytes()
                 .all(|b| b.is_ascii_alphanumeric() || b"-_.@".contains(&b));
         if !valid {
-            return Err(failure_text("invalid-sequence-claimant"));
+            return Err(failure("invalid-sequence-claimant"));
         }
         let tree = match repo.object_format() {
             ObjectFormat::Sha1 => EMPTY_TREE_SHA1,
@@ -312,7 +321,7 @@ impl GitDriver {
         let message = number.to_string();
         let out = self.run_local(
             repo,
-            &[
+            &durable_args(&[
                 "-c",
                 &format!("user.name={claimant}"),
                 "-c",
@@ -323,7 +332,7 @@ impl GitDriver {
                 tree,
                 "-m",
                 &message,
-            ],
+            ]),
         )?;
         if !out.success {
             return Err(out.error("sequence-commit-failed"));
@@ -332,9 +341,19 @@ impl GitDriver {
     }
 }
 
+/// The loose ref file's bytes, before its directories: a packed or reftable
+/// ref has no such file and is flushed by git itself.
+fn sync_ref_file(repo: &RepoHandle, name: &RefName) -> Result<()> {
+    match std::fs::File::open(repo.common_dir().join(name.as_str())) {
+        Ok(file) => file.sync_all().map_err(|e| failure(e.to_string())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(failure(e.to_string())),
+    }
+}
+
 fn parse_oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
-    let text = std::str::from_utf8(bytes).map_err(|_| failure_text("git-protocol-invalid-utf8"))?;
-    Oid::parse(text.trim(), repo.object_format()).map_err(|e| failure_text(e.to_string()))
+    let text = std::str::from_utf8(bytes).map_err(|_| failure("git-protocol-invalid-utf8"))?;
+    Oid::parse(text.trim(), repo.object_format()).map_err(|e| failure(e.to_string()))
 }
 
 /// The number in the message of a raw commit: the text after the header's blank line.
@@ -345,6 +364,25 @@ fn commit_number(raw: &[u8]) -> Option<u64> {
     (!message.is_empty() && message.bytes().all(|b| b.is_ascii_digit()))
         .then(|| message.parse().ok())
         .flatten()
+}
+
+/// The reasons git reports on a `push --porcelain` row when the counter no
+/// longer is where the push expected it: the client's own lease check, and the
+/// remote's compare-and-swap of the same expected value, which is the one a
+/// concurrent claim loses.
+const LOST_LEASE_REASONS: [&[u8]; 4] = [
+    b"[rejected] (stale info)",
+    b"[remote rejected] (incorrect old value provided)",
+    b"[remote rejected] (reference already exists)",
+    b"[remote rejected] (reference does not exist)",
+];
+
+/// A refused row (`!\t<from>:<to>\t<reason>`) whose reason is a lost lease.
+fn is_stale_lease_row(line: &[u8]) -> bool {
+    line.first() == Some(&b'!')
+        && LOST_LEASE_REASONS
+            .iter()
+            .any(|reason| line.trim_ascii_end().ends_with(reason))
 }
 
 #[cfg(test)]
@@ -368,5 +406,22 @@ mod tests {
         assert_eq!(commit_number(raw), Some(63));
         assert_eq!(commit_number(b"tree x\n\nnot a number\n"), None);
         assert_eq!(commit_number(b"tree x\n\n\n"), None);
+    }
+
+    #[test]
+    fn only_a_row_reporting_the_expected_value_not_held_is_a_lost_lease() {
+        let row = |reason: &str| format!("!\tabc:refs/fgos/seq/d-adr\t{reason}\n").into_bytes();
+        for lost in LOST_LEASE_REASONS {
+            assert!(is_stale_lease_row(&row(std::str::from_utf8(lost).unwrap())));
+        }
+        for other in [
+            "[remote rejected] (pre-receive hook declined)",
+            "[remote rejected] (protected branch hook declined)",
+            "[remote rejected] (failed to update ref)",
+            "[rejected] (fetch first)",
+        ] {
+            assert!(!is_stale_lease_row(&row(other)), "{other}");
+        }
+        assert!(!is_stale_lease_row(b"*\tabc:ref\t[new reference]"));
     }
 }

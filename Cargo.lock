@@ -411,6 +411,7 @@ dependencies = [
  "fgos-identity",
  "fgos-process",
  "fgos-write-scope",
+ "fgos-yaml-doc",
  "libc",
  "napi",
  "napi-build",

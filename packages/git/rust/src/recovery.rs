@@ -1,6 +1,5 @@
 //! One recovery dispatch door. Resource authority remains with each owning port.
 use crate::{
-    refs::failure,
     wal::{self, OperationKind, Wal},
     *,
 };
@@ -54,10 +53,10 @@ impl GitDriver {
         let wal = match Wal::open_existing(repo.common_dir(), wal::OsFileSystem) {
             Ok(wal) => wal,
             Err(e) if unknown(&e) => return Err(failure("git-operation-unknown")),
-            Err(e) => return Err(failure(e)),
+            Err(e) => return Err(e.into()),
         };
-        if let Some(c) = wal.compacted(id).map_err(failure)? {
-            let outcome = c.outcome().map_err(failure)?;
+        if let Some(c) = wal.compacted(id)? {
+            let outcome = c.outcome()?;
             let compact_kind = match &outcome {
                 wal::Outcome::Restore { .. } => Some("Restore"),
                 wal::Outcome::Land { .. } => Some("Land"),
@@ -72,15 +71,15 @@ impl GitDriver {
         let c = match wal.inspect(id) {
             Ok(c) => c,
             Err(e) if unknown(&e) => return Err(failure("git-operation-unknown")),
-            Err(e) => return Err(failure(e)),
+            Err(e) => return Err(e.into()),
         };
         Ok(
             json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":kind(&c.intent().kind),"requestDigest":c.intent().request_digest,"intent":c.intent(),"terminal":c.outcome().is_some(),"compacted":false,"outcome":c.outcome(),"phase":c.last_state()}),
         )
     }
     pub fn list_pending(&self, repo: &RepoHandle, bound: usize) -> Result<Value> {
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let scan = wal.scan(bound).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let scan = wal.scan(bound)?;
         let mut operations = vec![];
         for e in &scan.entries {
             if let Some(error) = &e.error {
@@ -106,9 +105,9 @@ impl GitDriver {
             Err(wal::WalError::Io(io)) if io.kind() == std::io::ErrorKind::NotFound => {
                 return Ok(json!({"candidates":[],"complete":true}));
             }
-            Err(e) => return Err(failure(e)),
+            Err(e) => return Err(e.into()),
         };
-        let scan = wal.scan(bound).map_err(failure)?;
+        let scan = wal.scan(bound)?;
         let mut candidates = vec![];
         for e in &scan.entries {
             if let Some(error) = &e.error {
@@ -117,14 +116,14 @@ impl GitDriver {
                     e.operation_id
                 )));
             }
-            if !e.terminal || wal.compacted(&e.operation_id).map_err(failure)?.is_some() {
+            if !e.terminal || wal.compacted(&e.operation_id)?.is_some() {
                 continue;
             }
             // A chain with no intent record never created a candidate.
-            if !wal.known_id(&e.operation_id).map_err(failure)? {
+            if !wal.known_id(&e.operation_id)? {
                 continue;
             }
-            let chain = wal.inspect(&e.operation_id).map_err(failure)?;
+            let chain = wal.inspect(&e.operation_id)?;
             let OperationKind::Land(land) = &chain.intent().kind else {
                 continue;
             };
@@ -169,15 +168,15 @@ impl GitDriver {
         id: &str,
         publication: Option<&PublicationPort<'_>>,
     ) -> Result<Value> {
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        if let Some(c) = wal.compacted(id).map_err(failure)? {
-            return value(c.outcome().map_err(failure)?);
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        if let Some(c) = wal.compacted(id)? {
+            return value(c.outcome()?);
         }
-        let c = wal.inspect(id).map_err(failure)?;
+        let c = wal.inspect(id)?;
         match &c.intent().kind {
             OperationKind::Land(_) => value(self.recover_land(repo, held, writer, id)?),
             OperationKind::ScopedCommit(_) => {
-                value(self.recover_scoped_commit(repo, held, writer, id)?)
+                value(self.recover_scoped_commit(repo, held, writer, id, &wal::OsFileSystem)?)
             }
             OperationKind::Sync(_) => value(self.inspect_sync(repo, held, writer, id)?),
             OperationKind::Restore(_) => value(self.recover_restore(repo, held, writer, id)?),

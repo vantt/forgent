@@ -164,7 +164,7 @@ mod sequence {
         floor: u64,
     ) -> Result<u64, Refusal> {
         let (driver, repo) = open_repository(driver_dir, dir)?;
-        let home = driver.sequence_home(&repo);
+        let home = driver.sequence_home(&repo).map_err(git_refusal)?;
         for _ in 0..MAX_CLAIM_ATTEMPTS {
             let tip = driver
                 .sequence_tip(&repo, &home, counter)
@@ -205,7 +205,16 @@ mod sequence {
         number: u64,
     ) -> Result<bool, Refusal> {
         let (driver, repo) = open_repository(driver_dir, dir)?;
-        let home = driver.sequence_home(&repo);
+        // Never fall back to a local counter: the number belongs to the origin's.
+        let home = driver.sequence_home(&repo).map_err(|e| Refusal {
+            reason: "sequence-unreachable",
+            detail: format!(
+                "number {number} of the {} counter was not given back: its home could not be determined ({})",
+                kind.counter(),
+                e.cause
+            ),
+            candidates: Vec::new(),
+        })?;
         let tip = driver
             .sequence_tip(&repo, &home, kind.counter())
             .map_err(git_refusal)?;

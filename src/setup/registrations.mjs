@@ -1,6 +1,6 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
-import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery, checkLandRetainedCandidates } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
@@ -113,6 +113,7 @@ import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAcc
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
+import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
@@ -147,7 +148,7 @@ import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
-import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
+import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -4423,37 +4424,16 @@ export function checkInvocationGitWriteGrants(runnerCfg = {}) {
   };
 }
 
-/** herdr's own list of agent kinds it can start, read from the command that
- * enforces it rather than copied into this repo where it would go stale in
- * silence. Returns null when herdr cannot be asked -- absence is already
- * `terminal-control`'s business, and reporting it twice helps nobody. */
-export function readHerdrAgentKinds(run = defaultHerdrRun) {
-  const help = run(['agent', 'start', '--help']);
-  if (help === null) return null;
-  const match = help.match(/\[possible values:\s*([^\]]+)\]/);
-  if (!match) return null;
-  return match[1].split(',').map((s) => s.trim()).filter(Boolean);
-}
-
-/** herdr's per-agent integration hook status, as `name -> 'current' |
- * 'outdated' | 'not installed'`. */
-export function readHerdrIntegrationStatus(run = defaultHerdrRun) {
-  const out = run(['integration', 'status']);
-  if (out === null) return null;
-  const status = {};
-  for (const line of out.split('\n')) {
-    const m = line.match(/^\s*([a-z0-9-]+):\s*(current|outdated|not installed)\b/i);
-    if (m) status[m[1]] = m[2].toLowerCase();
-  }
-  return status;
-}
-
-function defaultHerdrRun(args) {
+/** What herdr says it can start and which integration hooks it has, asked through the
+ * terminal-control port. `null` for either when herdr cannot be asked or its text cannot be
+ * read: absence is already `terminal-control`'s business, and reporting it twice helps nobody. */
+function askHerdrFacts() {
   try {
-    const bin = resolveHerdrBin();
-    return execFileSync(bin, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 });
+    const report = createTerminalControl({ herdrBin: resolveHerdrBin() }).capabilities({ agents: true });
+    const known = (value) => (value !== null && typeof value === 'object' ? value : null);
+    return { kinds: known(report.agentKinds), integrations: known(report.integrations) };
   } catch {
-    return null;
+    return { kinds: null, integrations: null };
   }
 }
 
@@ -4481,12 +4461,7 @@ function resolveCliInvocation(executor) {
   return (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor;
 }
 
-export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
-  // Presence, not truthiness: a caller passing `kinds: null` is saying "herdr
-  // could not be asked", which is a different statement from not passing it
-  // at all, and `??` cannot tell those two apart.
-  const hasKinds = Object.prototype.hasOwnProperty.call(injected, 'kinds');
-  const hasIntegrations = Object.prototype.hasOwnProperty.call(injected, 'integrations');
+export function checkHerdrExecutorKinds(runnerCfg = {}, ask = askHerdrFacts) {
   const executors = Object.entries(runnerCfg.executors ?? {});
   const herdrExecutors = [];
   for (const [id, executor] of executors) {
@@ -4500,7 +4475,7 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
     return { passed: true, message: 'no executor dispatches through a herdr pane' };
   }
 
-  const supported = hasKinds ? injected.kinds : readHerdrAgentKinds();
+  const { kinds: supported, integrations: status } = ask();
   if (!supported) {
     return { passed: true, message: 'herdr could not be asked which agent kinds it supports; kinds not evaluated' };
   }
@@ -4513,7 +4488,6 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
     };
   }
 
-  const status = hasIntegrations ? injected.integrations : readHerdrIntegrationStatus();
   const notes = [];
   const stale = [];
   for (const e of herdrExecutors) {
@@ -4536,13 +4510,8 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
 
 registerCheck({
   id: 'terminal-control',
-  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to; a bad FGOS_HERDR_ANCHOR_PANE fails, a missing herdr only warns',
-  check: () => checkTerminalControl(),
-});
-registerCheck({
-  id: 'terminal-config',
-  description: 'terminal.* after the config merge, each value with its source; allocationGraceMs, retainFailedPaneMs, the layout policy and limits must satisfy their rules',
-  check: (cwd) => checkTerminalConfig(cwd),
+  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns',
+  check: (cwd) => checkTerminalControl(cwd),
 });
 registerCheck({
   id: 'terminal-allocations',
@@ -4550,7 +4519,6 @@ registerCheck({
   check: (cwd) => checkTerminalAllocations(cwd),
 });
 registerConfigDefault({ id: 'terminal', key: TERMINAL_CONFIG_KEY, shape: DEFAULT_TERMINAL_CONFIG });
-registerFix({ id: 'terminal-dir', fix: (cwd) => fixTerminalDir(cwd) });
 
 registerCheck({
   id: 'herdr-executor-kinds',
@@ -6426,23 +6394,15 @@ registerCheck({
 registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
 
 // Git and Event Store share one addon ABI admission row.
-for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks']) {
   registerCheck({ id, description: {
     'git-worktree-recovery': 'Orphan, dirty/stale checkout and pending worktree operations (read-only)',
-    'git-component-compatible': 'Combined addon contracts and Git feature floor',
-    'git-transport-config': 'Repository transport settings refused by Publication/Remote',
-    'git-trust-topology': 'Trusted repository layout and common directory',
-    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone)',
+    'git-component-compatible': 'Combined addon contracts and Git feature floor, with the repository layout and measured durability',
+    'git-repository-config': 'Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings',
+    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone); warns about retained Land candidates awaiting Work acknowledgement',
     'git-native-locks': 'Native Git lock residue (read-only detection)',
-    'git-publication-refspecs': 'Additive Event Store mirror fetch mappings',
-    'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
-registerCheck({
-  id: 'git-land-recovery',
-  description: 'Finished Land operations whose candidate worktree and pins are still retained awaiting Work acknowledgement (read-only; warns, never fails)',
-  check: (cwd) => checkLandRetainedCandidates(cwd),
-});
 registerCheck({
   id: 'git-mutation-one-door',
   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',

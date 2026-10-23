@@ -43,7 +43,7 @@ fn preview_is_read_only_and_apply_preserves_staged_unstaged_binary_links_and_mod
     assert!(!f.main.join(".git/fgos/git/operations").exists());
     let out = f
         .driver
-        .apply_restore(&f.repo, vec![], &r, "fixture", "restore-one")
+        .apply_restore(&f.repo, vec![], &r, "fixture", "restore-one", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), r.target);
     assert_eq!(fs::read(f.main.join("a")).unwrap(), b"incoming\n");
@@ -86,7 +86,7 @@ fn preview_is_read_only_and_apply_preserves_staged_unstaged_binary_links_and_mod
     assert_eq!(staged.stdout, b"stage\0binary\xff\n");
     assert_eq!(
         f.driver
-            .apply_restore(&f.repo, vec![], &r, "fixture", "restore-one")
+            .apply_restore(&f.repo, vec![], &r, "fixture", "restore-one", &wal::OsFileSystem)
             .unwrap()
             .snapshot,
         out.snapshot
@@ -133,7 +133,7 @@ fn restore_crash_child() {
     );
     std::io::stdout().flush().unwrap();
     f.driver
-        .apply_restore_with_filesystem(
+        .apply_restore(
             &f.repo,
             vec![],
             &request(&f, true),
@@ -246,7 +246,7 @@ fn every_durable_snapshot_wal_and_effect_boundary_preserves_bytes_and_allows_fre
             ..request(&f, false)
         };
         f.driver
-            .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh")
+            .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh", &wal::OsFileSystem)
             .unwrap_or_else(|e| panic!("{n}: {step}: {e:?}"));
     }
     println!("SIGKILL boundaries verified: {}", steps.len());
@@ -285,7 +285,7 @@ fn refuses_bad_target_ancestry_head_native_state_and_conflicting_reapply_retains
     fs::write(f.main.join("a"), "conflicting producer\n").unwrap();
     assert!(f
         .driver
-        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "conflict")
+        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "conflict", &wal::OsFileSystem)
         .unwrap_err()
         .cause
         .contains("reapply-required"));
@@ -347,7 +347,7 @@ fn interrupted_restore_preserves_native_residue_user_edits_and_corrupt_evidence(
     };
     assert_eq!(fs::read(f.main.join("b")).unwrap(), b"later user edits");
     f.driver
-        .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh-corrupt")
+        .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh-corrupt", &wal::OsFileSystem)
         .unwrap();
 }
 
@@ -373,7 +373,7 @@ fn ancestor_and_directory_collisions_require_exact_permission_and_retain_bytes()
             let mut r = request(&f, reapply);
             assert!(f
                 .driver
-                .apply_restore(&f.repo, vec![], &r, "fixture", "denied")
+                .apply_restore(&f.repo, vec![], &r, "fixture", "denied", &wal::OsFileSystem)
                 .unwrap_err()
                 .cause
                 .contains("untracked-target-collision"));
@@ -381,7 +381,7 @@ fn ancestor_and_directory_collisions_require_exact_permission_and_retain_bytes()
             r.allowed_replacements = vec!["cfg".into(), "leaf/local".into()];
             let result = f
                 .driver
-                .apply_restore(&f.repo, vec![], &r, "fixture", "allowed")
+                .apply_restore(&f.repo, vec![], &r, "fixture", "allowed", &wal::OsFileSystem)
                 .unwrap();
             assert_eq!(fs::read(f.main.join("cfg/x")).unwrap(), b"incoming");
             assert_eq!(fs::read(f.main.join("leaf")).unwrap(), b"incoming leaf");
@@ -401,7 +401,7 @@ fn ancestor_and_directory_collisions_require_exact_permission_and_retain_bytes()
                 .extract_restore_path(&f.repo, vec![], "fixture", "allowed", "cfg", &output)
                 .is_err());
             f.driver
-                .acknowledge_restore(&f.repo, vec![], "fixture", "allowed")
+                .acknowledge_restore(&f.repo, vec![], "fixture", "allowed", &wal::OsFileSystem)
                 .unwrap();
             assert!(Wal::open(&f.repo)
                 .unwrap()
@@ -430,7 +430,7 @@ fn clean_large_tracked_bytes_do_not_use_snapshot_capacity() {
     git(&f.main, &["reset", "--hard", &f.request.target]);
     let out = f
         .driver
-        .apply_restore(&f.repo, vec![], &request(&f, false), "fixture", "large")
+        .apply_restore(&f.repo, vec![], &request(&f, false), "fixture", "large", &wal::OsFileSystem)
         .unwrap();
     assert!(f
         .driver
@@ -466,7 +466,7 @@ fn incoming_executable_mode_and_local_content_survive_and_local_mode_conflict_re
         .unwrap();
         let out = f
             .driver
-            .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "mode");
+            .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "mode", &wal::OsFileSystem);
         if conflict {
             assert!(out.unwrap_err().cause.contains("local-mode-conflict"));
         } else {
@@ -485,7 +485,7 @@ fn intent_to_add_survives_reapply() {
     fs::write(f.main.join("new"), b"intent bytes\n").unwrap();
     git(&f.main, &["add", "-N", "new"]);
     f.driver
-        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "ita")
+        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "ita", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(git(&f.main, &["diff", "--cached", "--name-only"]), "");
     assert_eq!(git(&f.main, &["diff", "--name-only"]), "new");
@@ -506,7 +506,7 @@ fn overlapping_offset_hunks_refuse_before_effect() {
     fs::write(f.main.join("b"), local).unwrap();
     assert!(f
         .driver
-        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "offset")
+        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "offset", &wal::OsFileSystem)
         .unwrap_err()
         .cause
         .contains("overlapping-content"));
@@ -532,7 +532,7 @@ fn completed_restore_reports_post_check_failure_as_warning() {
     let f = Fixture::new();
     let out = f
         .driver
-        .apply_restore_with_filesystem(
+        .apply_restore(
             &f.repo,
             vec![],
             &request(&f, false),
@@ -599,7 +599,7 @@ fn missing_or_corrupt_active_snapshot_closes_with_evidence_and_allows_fresh_oper
             ..request(&f, false)
         };
         f.driver
-            .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh-after-damage")
+            .apply_restore(&f.repo, vec![], &fresh, "fixture", "fresh-after-damage", &wal::OsFileSystem)
             .unwrap();
     }
 }
@@ -610,7 +610,7 @@ fn retention_ages_only_valid_unreferenced_snapshots_and_known_temps() {
     let f = Fixture::new();
     let out = f
         .driver
-        .apply_restore(&f.repo, vec![], &request(&f, false), "fixture", "retained")
+        .apply_restore(&f.repo, vec![], &request(&f, false), "fixture", "retained", &wal::OsFileSystem)
         .unwrap();
     let directory = f.main.join(".git/fgos/git/restore-snapshots");
     let mut value: serde_json::Value =
@@ -641,13 +641,19 @@ fn retention_ages_only_valid_unreferenced_snapshots_and_known_temps() {
         ..request(&f, false)
     };
     f.driver
-        .apply_restore(&f.repo, vec![], &fresh, "fixture", "prune")
+        .apply_restore(&f.repo, vec![], &fresh, "fixture", "prune", &wal::OsFileSystem)
         .unwrap();
     assert!(!directory.join(orphan).exists());
     assert!(!directory.join(temporary).exists());
     for name in [&out.snapshot, &corrupt, &young, "unknown"] {
         assert!(directory.join(name).exists(), "{name}");
     }
+}
+/// A write-ahead-log filesystem failure is named by one cause; its text travels in `detail`.
+fn names_the_injected_io_failure(e: &fgos_git::OperationError, text: &str) {
+    assert_eq!(e.cause, "git-wal-io");
+    let diagnostic = e.detail.as_ref().and_then(|d| d["diagnostic"].as_str());
+    assert!(diagnostic.is_some_and(|d| d.contains(text)), "{e:?}");
 }
 struct AckInterruption;
 impl FileSystem for AckInterruption {
@@ -663,27 +669,20 @@ fn acknowledged_cleanup_can_resume_after_snapshot_release_failure() {
     let f = Fixture::new();
     dirty(&f);
     f.driver
-        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "ack-retry")
+        .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "ack-retry", &wal::OsFileSystem)
         .unwrap();
-    assert!(f
+    let failed = f
         .driver
-        .acknowledge_restore_with_filesystem(
-            &f.repo,
-            vec![],
-            "fixture",
-            "ack-retry",
-            &AckInterruption
-        )
-        .unwrap_err()
-        .cause
-        .contains("interrupted acknowledged cleanup"));
+        .acknowledge_restore(&f.repo, vec![], "fixture", "ack-retry", &AckInterruption)
+        .unwrap_err();
+    names_the_injected_io_failure(&failed, "interrupted acknowledged cleanup");
     let wal = Wal::open(&f.repo).unwrap();
     assert!(matches!(
         wal.inspect("ack-retry").unwrap().last().phase,
         fgos_git::wal::Phase::RestoreAcknowledged
     ));
     f.driver
-        .acknowledge_restore(&f.repo, vec![], "fixture", "ack-retry")
+        .acknowledge_restore(&f.repo, vec![], "fixture", "ack-retry", &wal::OsFileSystem)
         .unwrap();
     assert!(wal.compacted("ack-retry").unwrap().is_some());
 }
@@ -708,20 +707,14 @@ fn acknowledged_compaction_suffix_does_not_block_fresh_checkout_work() {
             &request(&f, false),
             "fixture",
             "compact-interrupt",
+            &wal::OsFileSystem,
         )
         .unwrap();
-    assert!(f
+    let failed = f
         .driver
-        .acknowledge_restore_with_filesystem(
-            &f.repo,
-            vec![],
-            "fixture",
-            "compact-interrupt",
-            &CompactionInterruption
-        )
-        .unwrap_err()
-        .cause
-        .contains("interrupted restore compaction"));
+        .acknowledge_restore(&f.repo, vec![], "fixture", "compact-interrupt", &CompactionInterruption)
+        .unwrap_err();
+    names_the_injected_io_failure(&failed, "interrupted restore compaction");
     let scan = Wal::open(&f.repo).unwrap().scan(100).unwrap();
     assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
     assert!(!f
@@ -734,7 +727,7 @@ fn acknowledged_compaction_suffix_does_not_block_fresh_checkout_work() {
         ..request(&f, false)
     };
     f.driver
-        .apply_restore(&f.repo, vec![], &fresh, "fixture", "after-ack-interrupt")
+        .apply_restore(&f.repo, vec![], &fresh, "fixture", "after-ack-interrupt", &wal::OsFileSystem)
         .unwrap();
 }
 
@@ -742,7 +735,7 @@ fn acknowledged_compaction_suffix_does_not_block_fresh_checkout_work() {
 fn extraction_refuses_sibling_worktree_and_state_root() {
     let f = Fixture::new();
     dirty(&f);
-    f.driver.apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "extract-roots").unwrap();
+    f.driver.apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "extract-roots", &wal::OsFileSystem).unwrap();
     let sibling = f.temp.join("sibling");
     git(&f.main, &["worktree", "add", "--detach", sibling.to_str().unwrap()]);
     for destination in [&sibling, &f.temp.join("state")] {
@@ -761,6 +754,21 @@ fn extraction_refuses_sibling_worktree_and_state_root() {
     assert!(f.driver.extract_restore_path(&f.repo, vec![], "fixture", "extract-roots", "b", &sibling)
         .unwrap_err().cause.contains("outside-repository"));
     assert!(!sibling.join("b").exists());
+}
+#[test]
+fn a_restore_during_a_bisect_succeeds_and_leaves_the_bisect_marker() {
+    let f = Fixture::new();
+    let marker = f.main.join(".git/BISECT_START");
+    fs::write(&marker, "trunk\n").unwrap();
+    let r = request(&f, false);
+    f.driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "bisect-restore", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), r.target);
+    f.driver
+        .acknowledge_restore(&f.repo, vec![], "fixture", "bisect-restore", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(fs::read(marker).unwrap(), b"trunk\n");
 }
 #[test]
 fn case_only_target_rename_preserves_index_identity() {
@@ -784,7 +792,7 @@ fn case_only_target_rename_preserves_index_identity() {
         confirmed_by: None,
     };
     f.driver
-        .apply_restore(&f.repo, vec![], &r, "fixture", "case-rename")
+        .apply_restore(&f.repo, vec![], &r, "fixture", "case-rename", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(fs::read(f.main.join("README")).unwrap(), b"tracked");
 }
@@ -934,7 +942,7 @@ fn confirmed_main_discard_resets_backward_pins_old_head_and_snapshots_the_dirty_
     let r = confirmed_discard(&old_head, &f.request.target, Some("fixture operator"));
     let out = f
         .driver
-        .apply_restore(&f.repo, vec![], &r, "fixture", "main-discard")
+        .apply_restore(&f.repo, vec![], &r, "fixture", "main-discard", &wal::OsFileSystem)
         .unwrap();
     assert!(out.warnings.is_empty(), "{:?}", out.warnings);
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
@@ -1028,7 +1036,7 @@ fn confirmed_main_discard_clears_a_stopped_merge_and_retains_its_bytes() {
     let r = confirmed_discard(&head, &f.request.target, Some("fixture operator"));
     let out = f
         .driver
-        .apply_restore(&f.repo, vec![], &r, "fixture", "stopped-merge")
+        .apply_restore(&f.repo, vec![], &r, "fixture", "stopped-merge", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
     for name in [
@@ -1105,7 +1113,7 @@ fn forward_restore_updates_clean_tracked_fgos_paths_and_leaves_runtime_state() {
     let preview = f.driver.preview_restore(&f.repo, vec![], &r).unwrap();
     assert!(preview.paths.contains(&".fgos/store.jsonl".to_owned()));
     f.driver
-        .apply_restore(&f.repo, vec![], &r, "fixture", "forward-fgos")
+        .apply_restore(&f.repo, vec![], &r, "fixture", "forward-fgos", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), next);
     assert_eq!(
@@ -1153,7 +1161,7 @@ fn forward_restore_refuses_dirty_tracked_fgos_and_untracked_collision_and_change
         for err in [
             f.driver.preview_restore(&f.repo, vec![], &r).unwrap_err(),
             f.driver
-                .apply_restore(&f.repo, vec![], &r, "fixture", &format!("dirty-{name}"))
+                .apply_restore(&f.repo, vec![], &r, "fixture", &format!("dirty-{name}"), &wal::OsFileSystem)
                 .unwrap_err(),
         ] {
             assert!(

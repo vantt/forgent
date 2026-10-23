@@ -226,13 +226,14 @@ test('the walker never takes another operation of the same item for the validate
   // would only reach the walker if the operation filter were missing.
   const scoutRun = await runUnit({
     unitData: { id: 'scout', objective: 'scout', capability: 'review', writes: [], pattern: 'solo' },
-    declared: { workId: work.id, domain: 'coding', workflow: 'feature', stage: 'planning', operation: scout.id, operations: ops },
+    declared: { workId: work.id, title: 'Scout the blast radius', domain: 'coding', workflow: 'feature', stage: 'planning', operation: scout.id, operations: ops },
     repoRoot: repo, cwd: repo, worktree: repo,
     session: { headless: true, herdrPresent: false },
   });
   const scoutAsgnFile = path.join(repo, '.fgos', 'assignments', scoutRun.unitRunId, 'producer', '1', 'assignment.json');
   const scoutAsgn = JSON.parse(fs.readFileSync(scoutAsgnFile, 'utf8'));
   assert.equal(scoutAsgn.operation, 'scout-blast-radius');
+  assert.equal(scoutAsgn.title, 'Scout the blast radius', 'the assignment the round receives carries the declared title');
   assert.equal(scoutAsgn.resultKind, 'advisory');
   fs.writeFileSync(scoutAsgnFile, JSON.stringify({ ...scoutAsgn, resultKind: 'gate-verdict' }, null, 2));
   const next = chooseStageOperation({ work, stage: 'planning', repoRoot: repo });

@@ -1177,11 +1177,10 @@ test('A4 guarded folders hold only plain .mjs sources, so every guard reads ever
   }
 });
 
-// One door for YAML: src/util/yaml.mjs is the only module that may load a YAML parser, and it loads
-// the vendored bundle. Anything else -- the npm packages, the bundle itself -- going around it is a
-// second authority on how fgOS reads YAML.
+// One door for YAML: src/util/yaml.mjs reads YAML through the native addon (the Rust fgos-yaml-doc crate), and no
+// file in the tree, the door included, loads a YAML library. A JavaScript parser anywhere would be a second
+// authority on what YAML means.
 const YAML_DOOR = 'src/util/yaml.mjs';
-const YAML_THIRD_PARTY = 'src/util/third-party/js-yaml.mjs';
 const YAML_SPECIFIER = /^(?:(?:js-)?yaml(?:\/.*)?|(?:.*\/)?third-party\/js-yaml\.mjs)$/;
 
 /** Specifiers in `rawSource` that load a YAML parser, by import, `import()`, `require()` or `createRequire(...)()`. */
@@ -1226,15 +1225,15 @@ function scriptFilesUnder(dir) {
     .filter((f) => !f.split('/').includes('node_modules'));
 }
 
-test('YAML has one door: only src/util/yaml.mjs loads a YAML parser', () => {
+test('YAML has one door: src/util/yaml.mjs reads through the native door and no file loads a YAML library', () => {
   // core/ is scanned too; .agents/skills is generated from it and plugins carry copies, so they are not.
-  const files = ['src', 'bin', 'scripts', 'test', 'core'].flatMap(scriptFilesUnder).filter((file) => file !== YAML_DOOR && file !== YAML_THIRD_PARTY);
+  const files = ['src', 'bin', 'scripts', 'test', 'core'].flatMap(scriptFilesUnder);
   const violations = files.flatMap((file) => findYamlParserLoads(fs.readFileSync(path.join(root, file), 'utf8')).map((spec) => `${file}: ${spec}`));
   assert.deepEqual(violations, [], `Expected every YAML parse to go through ${YAML_DOOR}, found:\n${violations.join('\n')}`);
   const copies = files.filter((file) => hasYamlBundleSignature(fs.readFileSync(path.join(root, file), 'utf8')));
-  assert.deepEqual(copies, [], `Expected no copy of the YAML parser outside ${YAML_THIRD_PARTY}, found:\n${copies.join('\n')}`);
-  assert.ok(hasYamlBundleSignature(fs.readFileSync(path.join(root, YAML_THIRD_PARTY), 'utf8')), 'the signature check recognises the vendored bundle');
-  assert.deepEqual(findYamlParserLoads(fs.readFileSync(path.join(root, YAML_DOOR), 'utf8')), ['./third-party/js-yaml.mjs']);
+  assert.deepEqual(copies, [], `Expected no copy of a YAML parser, found:\n${copies.join('\n')}`);
+  assert.match(fs.readFileSync(path.join(root, YAML_DOOR), 'utf8'), /^import \{[^}]*\} from '\.\.\/native\/door\.mjs';$/m);
+  assert.equal(fs.existsSync(path.join(root, 'src/util/third-party/js-yaml.mjs')), false, 'the vendored parser is gone');
 });
 
 test('YAML door guard catches each way to load a parser and ignores comments, strings and other packages', () => {

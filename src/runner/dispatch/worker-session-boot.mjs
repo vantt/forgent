@@ -8,7 +8,7 @@
 // only be given a different one, by living in a different session.
 //
 // A private HOME is still worth having: it closes the second route, the
-// `$HOME/.config/herdr/herdr.sock` fallback, which a worker would otherwise
+// default socket under `$HOME`, the fallback a worker would otherwise
 // find with no environment variable at all. Neither measure closes the hole
 // alone, which is why the config door refuses `bypass` unless both are declared.
 //
@@ -19,18 +19,19 @@
 // a group asks for one (`herdr tab create` needs a workspace to hold the tab).
 
 import fs from 'node:fs';
+import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { createRoundTerminalControl, resolveHerdrBin } from './terminal-slot.mjs';
-import { isolatedSessionEnv, socketPathForSession, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
+import { isolatedSessionEnv, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
 
 /** The session every confined worker shares unless an executor names another. */
 export const DEFAULT_WORKER_SESSION = 'fgos-worker';
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
-/** Is a server actually answering on the session `env` addresses? Asked with the
- * cheapest call terminal-control answers, and a failure is read as "no" -- the
- * point is to tell a live server from the socket file a dead one left behind. */
+/** Is a server answering on the session `env` addresses? Asked with the
+ * cheapest call terminal-control answers; only an answer that names a server
+ * incarnation counts, and any failure is "not proven", never "dead". */
 function serverAnswers(terminalControl) {
   try {
     const answer = terminalControl.capabilities();
@@ -38,6 +39,70 @@ function serverAnswers(terminalControl) {
   } catch {
     return false;
   }
+}
+
+/** The socket file of the session `terminalControl` addresses, as the terminal-control route names it.
+ * A route that does not answer proves nothing about the server, so nothing is started on its word. */
+function sessionSocket(terminalControl, sessionName) {
+  let socketPath;
+  let cause = 'it named no socket';
+  try {
+    socketPath = terminalControl.capabilities()?.endpoint?.socketPath;
+  } catch (error) {
+    cause = error?.message ?? String(error);
+  }
+  if (typeof socketPath === 'string' && socketPath !== '') return socketPath;
+  throw new WorkerSessionError(
+    'worker-session-server-unknown',
+    `worker-session-server-unknown: worker session "${sessionName}": the terminal-control route did not name its socket (${cause}); nothing was started.`,
+    { sessionName, cause },
+  );
+}
+
+/** One connect to the socket: resolves when a server accepts, rejects with the
+ * OS error (`ECONNREFUSED` means nothing listens). */
+function connectProbe(socketPath, timeoutMs = 2000) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection(socketPath);
+    const finish = (settle, value) => { socket.destroy(); settle(value); };
+    socket.setTimeout(timeoutMs, () => finish(reject, Object.assign(new Error('connect timed out'), { code: 'ETIMEDOUT' })));
+    socket.once('connect', () => finish(resolve));
+    socket.once('error', (error) => finish(reject, error));
+  });
+}
+
+/**
+ * Judge the server behind an existing socket file: `alive`, `dead` or `unknown`.
+ *
+ * Only the OS can say dead: the socket refuses a connect on two looks, a
+ * poll apart, with the same file (inode and mtime) both times. A socket file
+ * exists between `bind()` and `listen()`, so one refusal can be a server
+ * still starting; and a route that fails to answer says nothing about the
+ * server (a missing host binary, a timeout, a version mismatch).
+ */
+async function judgeServer(terminalControl, socketPath, { connectFn, statFn, sleepFn, pollMs }) {
+  let before = null;
+  for (let look = 0; look < 2; look += 1) {
+    if (serverAnswers(terminalControl)) return { state: 'alive' };
+    let file;
+    try {
+      const st = statFn(socketPath);
+      file = `${st.ino}:${st.mtimeMs}`;
+      await connectFn(socketPath);
+      return { state: 'unknown', cause: 'a connect succeeded but the server did not answer' };
+    } catch (error) {
+      if (file === undefined || error?.code !== 'ECONNREFUSED') {
+        return { state: 'unknown', cause: error?.code ?? error?.message ?? 'socket probe failed' };
+      }
+    }
+    if (look === 0) {
+      before = file;
+      await sleepFn(pollMs);
+    } else if (file !== before) {
+      return { state: 'unknown', cause: 'the socket file changed between two looks' };
+    }
+  }
+  return { state: 'dead' };
 }
 
 /**
@@ -59,27 +124,39 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   terminalControlFor = (env) => createRoundTerminalControl({ herdrBin, herdrEnv: env }),
   sleepFn = sleep,
   unlinkFn = fs.unlinkSync,
+  statFn = fs.statSync,
+  connectFn = connectProbe,
   timeoutMs = 30000,
   pollMs = 500,
 } = {}) {
   // Before any process is started: never the operator's session.
   assertNotOperatorSession(sessionName, callerEnv);
 
-  const operatorHome = callerEnv?.HOME ?? process.env.HOME;
-  const socketPath = socketPathForSession(sessionName, { home: operatorHome });
-  const env = isolatedSessionEnv(callerEnv, sessionName, { home: operatorHome });
+  const env = isolatedSessionEnv(callerEnv, sessionName);
   const terminalControl = terminalControlFor(env);
+  const socketPath = sessionSocket(terminalControl, sessionName);
 
   // A server that died without unlinking leaves its socket file behind. Read
   // as "already up", that file wedges every confined dispatch from then on:
   // nothing listens, the first pane call fails, and each round refuses with
   // `confinement-unavailable` until a person deletes the file by hand. The
   // file is evidence a server once ran, never that one is running -- so a
-  // socket nobody answers is removed and started again.
+  // socket the OS refuses twice is removed and started again. A server whose
+  // state is unknown (the route failed, or a connect worked) keeps its socket.
   let socketPresent = existsSync(socketPath);
-  if (socketPresent && !serverAnswers(terminalControl)) {
-    try { unlinkFn(socketPath); } catch { /* a socket we cannot remove is reported by the wait below */ }
-    socketPresent = existsSync(socketPath);
+  if (socketPresent) {
+    const { state, cause } = await judgeServer(terminalControl, socketPath, { connectFn, statFn, sleepFn, pollMs });
+    if (state === 'unknown') {
+      throw new WorkerSessionError(
+        'worker-session-server-unknown',
+        `worker-session-server-unknown: worker session "${sessionName}" has a socket at ${socketPath} but its server's state could not be judged (${cause}); the socket was kept.`,
+        { sessionName, socketPath, cause },
+      );
+    }
+    if (state === 'dead') {
+      try { unlinkFn(socketPath); } catch { /* a socket we cannot remove is reported by the wait below */ }
+      socketPresent = existsSync(socketPath);
+    }
   }
 
   let startedServer = false;

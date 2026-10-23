@@ -98,6 +98,7 @@ test('a read-only operation Unit writes nothing, declares its operation and pins
   assert.equal(unitData.id, 'work-tsk-abc-validate-plan');
   assert.deepEqual(unitData.inputs, [docsRef, `${docsRef}/plan.md`, `${docsRef}/CONTEXT.md`, 'src/x.mjs']);
   assert.equal(declared.workId, 'tsk-abc');
+  assert.equal(declared.title, 'Add pagination', 'the item title travels with the declaration, read from the item in hand');
   assert.equal(declared.domain, 'coding');
   assert.equal(declared.workflow, 'feature');
   assert.equal(declared.stage, 'planning');

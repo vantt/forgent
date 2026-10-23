@@ -282,6 +282,22 @@ test('creating the mailbox root is a no-op without a .fgos or under one that can
   assert.equal(refIsHiddenFromBlind(ref, project.proj), true, 'a runtime file still answers the ref check');
 });
 
+test('a caller with no socket of its own hides the herdr directory the terminal-control route names for its session', () => {
+  const project = makeProject();
+  const home = path.join(project.root, 'operator-home');
+  const sessionDir = path.join(home, '.config', 'herdr', 'sessions', 'blind-probe');
+  fs.mkdirSync(sessionDir, { recursive: true });
+  const previousHome = process.env.HOME;
+  process.env.HOME = home;
+  try {
+    const resolved = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot }, env: { HERDR_SESSION: 'blind-probe' } });
+    assert.ok(resolved.includes(fs.realpathSync(sessionDir)), `${sessionDir} not in ${resolved}`);
+  } finally {
+    if (previousHome === undefined) delete process.env.HOME;
+    else process.env.HOME = previousHome;
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Argv shape
 // ---------------------------------------------------------------------------

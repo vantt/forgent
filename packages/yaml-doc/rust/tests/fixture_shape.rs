@@ -33,7 +33,6 @@ fn contract_files_are_json_with_version_one() {
         "limits.v1.json",
         "profiles.v1.json",
         "refusal-rules.v1.json",
-        "fixtures/yaml-test-mapping.v1.json",
     ] {
         assert_eq!(read_json(file)["version"], 1, "{file}");
     }
@@ -381,67 +380,4 @@ fn generated_inputs_meet_the_size_claims_they_make() {
             }
         }
     }
-}
-
-fn node_test_titles() -> Vec<String> {
-    let file =
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../test/util/yaml.test.mjs");
-    let text = std::fs::read_to_string(&file).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
-    text.lines()
-        .filter_map(|line| line.strip_prefix("test('"))
-        .map(|rest| rest.split("', ").next().expect("title").to_string())
-        .collect()
-}
-
-#[test]
-fn every_case_of_the_node_yaml_test_is_mapped_to_fixtures() {
-    let mapping = read_json("fixtures/yaml-test-mapping.v1.json");
-    let tests = mapping["tests"].as_array().expect("tests");
-    let mapped: Vec<&str> = tests
-        .iter()
-        .map(|t| t["title"].as_str().expect("title"))
-        .collect();
-    let titles = node_test_titles();
-    assert_eq!(
-        titles.len(),
-        15,
-        "the Node test file holds 14 behaviour tests and the vendored-bundle hash test"
-    );
-    for title in &titles {
-        assert!(
-            mapped.contains(&title.as_str()),
-            "Node test not mapped to fixtures: {title}"
-        );
-    }
-    for title in &mapped {
-        assert!(
-            titles.iter().any(|t| t == title),
-            "mapping names a Node test that does not exist: {title}"
-        );
-    }
-    let parse_ids: HashSet<String> = fixture_cases("parse")
-        .iter()
-        .map(|c| id(c).to_string())
-        .collect();
-    let mut retired = 0;
-    for test in tests {
-        let ids = test["ids"].as_array().expect("ids");
-        if test["retired"].is_string() {
-            assert!(ids.is_empty(), "a retired test owns no fixture");
-            retired += 1;
-            continue;
-        }
-        assert!(!ids.is_empty(), "{}: mapped to no fixture", test["title"]);
-        for fixture in ids {
-            assert!(
-                parse_ids.contains(fixture.as_str().expect("id")),
-                "{}: unknown fixture {fixture}",
-                test["title"]
-            );
-        }
-    }
-    assert_eq!(
-        retired, 1,
-        "only the vendored-bundle hash test is retired, with the bundle"
-    );
 }

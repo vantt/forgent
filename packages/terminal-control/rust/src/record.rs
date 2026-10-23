@@ -1,6 +1,5 @@
-//! The allocation record, its one-shot markers and the group hint
-//! (`allocation-record.v1.json`). A record is never edited; state changes are
-//! new markers.
+//! The allocation record and its one-shot markers (`allocation-record.v1.json`).
+//! A record is never edited; state changes are new markers.
 
 use crate::port::{Disposition, Display, Origin, ProcessIdentity, ServerIncarnation};
 use serde::{Deserialize, Serialize};
@@ -62,7 +61,6 @@ pub struct LaunchedMarker {
 pub enum ReleaseMarkerOutcome {
     Closed,
     Retained,
-    KeptUnknown,
     Unlinked,
 }
 
@@ -75,13 +73,4 @@ pub struct ReleasedMarker {
     /// Retain only: epoch ms, or `null` for kept until a person closes it.
     pub until: Option<u64>,
     pub outcome: ReleaseMarkerOutcome,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupHint {
-    pub v: u32,
-    pub group_key: String,
-    pub tab_id: String,
-    pub updated_at: u64,
 }

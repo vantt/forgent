@@ -25,8 +25,8 @@ fn layout_gives_area_and_pane_rects() {
     assert_eq!(
         geometry.panes,
         vec![
-            PaneGeometry { pane_id: "wS:p59X".into(), rect: r(0, 0, 176, 69), pty: None },
-            PaneGeometry { pane_id: "wS:p59Y".into(), rect: r(176, 0, 176, 69), pty: None },
+            PaneGeometry { pane_id: "wS:p59X".into(), rect: r(0, 0, 176, 69) },
+            PaneGeometry { pane_id: "wS:p59Y".into(), rect: r(176, 0, 176, 69) },
         ]
     );
 }
@@ -79,16 +79,8 @@ fn error_envelopes_keep_their_code() {
     for (name, code) in [
         ("pane-close-not-found", "pane_not_found"),
         ("pane-split-dead-anchor", "pane_not_found"),
-        ("tab-get-not-found", "tab_not_found"),
     ] {
         assert_eq!(envelope(&fixture(name)).unwrap_err().code, code, "{name}");
-    }
-}
-
-#[test]
-fn list_and_session_answers_unwrap() {
-    for name in ["pane-list", "tab-list", "tab-get", "session-list", "pane-close-ok"] {
-        envelope(&fixture(name)).unwrap_or_else(|e| panic!("{name}: {e:?}"));
     }
 }
 
@@ -136,4 +128,26 @@ fn agent_get_gives_the_agent_state_and_session() {
     let body = serde_json::json!({ "agent": { "agent": "claude", "agent_status": "working", "agent_session": { "value": "sess-1" } } });
     let activity = parse_activity(&body).unwrap();
     assert_eq!((activity.state.as_str(), activity.agent.as_deref(), activity.session.as_deref()), ("working", Some("claude"), Some("sess-1")));
+}
+
+fn text_fixture(name: &str) -> String {
+    let path = format!("{}/tests/fixtures/herdr/{name}.txt", env!("CARGO_MANIFEST_DIR"));
+    std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{path}: {e}"))
+}
+
+#[test]
+fn agent_start_help_lists_the_kinds_herdr_starts() {
+    assert_eq!(parse_agent_kinds(&text_fixture("agent-start-help")).unwrap(), ["pi", "claude", "codex", "agy", "gemini"]);
+    assert_eq!(parse_agent_kinds("no list in this text"), None);
+    assert_eq!(parse_agent_kinds("[possible values: "), None);
+    assert_eq!(parse_agent_kinds("[possible values:  ]"), None);
+}
+
+#[test]
+fn integration_status_reads_each_hook_state_and_ignores_the_paths_after_it() {
+    let states = parse_integrations(&text_fixture("integration-status")).unwrap();
+    let states: Vec<(&str, &str)> = states.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+    assert_eq!(states, [("antigravity-cli", "not installed"), ("claude", "current"), ("codex", "outdated")]);
+    assert_eq!(parse_integrations("Integrations\n  nothing recognisable: here\n"), None);
+    assert_eq!(parse_integrations("claude: currently broken"), None, "a state is a whole word");
 }

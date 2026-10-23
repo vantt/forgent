@@ -85,15 +85,7 @@ impl GitWorktree {
                     path: text(&args, "path")?.into(),
                     branch,
                     base,
-                    session_id: args
-                        .get("sessionId")
-                        .filter(|v| !v.is_null())
-                        .map(|v| {
-                            v.as_str()
-                                .map(str::to_owned)
-                                .ok_or_else(|| error("invalid-session-id"))
-                        })
-                        .transpose()?,
+                    session_id: None,
                 };
                 Ok(json!(self
                     .driver
