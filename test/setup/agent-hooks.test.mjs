@@ -300,6 +300,121 @@ for (const [cli, install, check] of [['omp', installOmpHook, checkOmpHook], ['pi
   });
 }
 
+/** The handlers the generated extension of an opted-in `cli` project registers, by event, loaded from what the installer wrote. */
+async function loadedHandlers(repoRoot, cli) {
+  const extFile = path.join(repoRoot, `.${cli}`, 'extensions', 'fgos-hooks.ts');
+  const mod = await import(`${extFile}?load=${Date.now()}-${Math.random()}`);
+  const handlers = {};
+  mod.default({ on: (event, fn) => { handlers[event] = fn; } });
+  return handlers;
+}
+
+/** A shim that records each call's argv and stdin under `log` and answers `answer` on stdout. */
+function recordingShim(shimPath, log, answer) {
+  fs.mkdirSync(path.dirname(shimPath), { recursive: true });
+  fs.writeFileSync(shimPath, `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\nprintf '%s' '${answer}'\n`, { mode: 0o755 });
+}
+
+/** A stub of the CLI's handler context: its directory and its session manager. */
+const stubCtx = (cwd, { id = 'sess-0001', parentSession } = {}) => ({ cwd, sessionManager: { getSessionId: () => id, getHeader: () => ({ type: 'session', id, ...(parentSession ? { parentSession } : {}) }) } });
+
+for (const cli of ['omp', 'pi']) {
+  test(`the generated ${cli} extension carries the mailbox handlers only for an opted-in project and doctor accepts exactly that file`, async () => {
+    const repoRoot = mkTempDir(`agent-hooks-${cli}-mailbox-`);
+    mockRunnableShim(repoRoot);
+    const install = cli === 'omp' ? installOmpHook : installPiHook;
+    const check = cli === 'omp' ? checkOmpHook : checkPiHook;
+    const extFile = path.join(repoRoot, `.${cli}`, 'extensions', 'fgos-hooks.ts');
+    install(repoRoot);
+    assert.ok(!fs.readFileSync(extFile, 'utf8').includes("'mailbox'"), 'not opted in: no mailbox handler');
+    assert.equal(check(repoRoot).passed, true);
+
+    mailboxOptIn(repoRoot, true);
+    assert.equal(check(repoRoot).passed, false, 'opting in without reinstalling leaves a file that differs from the generated one');
+    install(repoRoot);
+    const content = fs.readFileSync(extFile, 'utf8');
+    assert.match(content, new RegExp(`MAILBOX_CLI = '${cli}'`));
+    assert.match(content, /'hook', 'mailbox', '--cli', MAILBOX_CLI, '--event', event/);
+    for (const [, spec] of content.matchAll(/^import .* from '([^']+)';$/gm)) assert.match(spec, /^node:/, `only node builtins: ${spec}`);
+    const handlers = await loadedHandlers(repoRoot, cli);
+    assert.deepEqual(Object.keys(handlers).sort(), ['agent_end', 'tool_call', 'tool_result'], 'the opted-in extension loads in Node and registers its handlers');
+    assert.equal(check(repoRoot).passed, true, 'doctor accepts exactly the generated opted-in file');
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  });
+}
+
+test('the extension stays inert for a runner worker and never writes the process environment, and otherwise appends the host\'s frame after the tool\'s real output', async () => {
+  const repoRoot = mkTempDir('agent-hooks-pi-runner-');
+  mailboxOptIn(repoRoot, true);
+  installPiHook(repoRoot);
+  const log = path.join(repoRoot, 'shim-log');
+  recordingShim(getProjectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
+  const handlers = await loadedHandlers(repoRoot, 'pi');
+  const real = [{ type: 'text', text: 'readme.txt' }];
+  const before = { ...process.env };
+  const saved = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'att-0001';
+    assert.equal(await handlers.tool_result({ content: real }, stubCtx(repoRoot)), undefined, 'a runner worker gets nothing');
+    await handlers.agent_end({}, stubCtx(repoRoot));
+    assert.equal(fs.existsSync(`${log}.stdin`), false, 'the shim never ran for a runner worker');
+
+    delete process.env.FGOS_SESSION_ID;
+    const out = await handlers.tool_result({ content: real }, stubCtx(repoRoot, { id: 'sess-7' }));
+    assert.deepEqual(out, { content: [...real, { type: 'text', text: 'MBX-FRAME' }] }, 'the frame follows the real output');
+    await handlers.agent_end({}, stubCtx(repoRoot, { id: 'sess-7' }));
+    await handlers.tool_result({ content: real }, stubCtx(repoRoot, { id: 'sess-8', parentSession: '/sessions/head.jsonl' }));
+    assert.deepEqual(fs.readFileSync(`${log}.argv`, 'utf8').trim().split('\n'), ['hook mailbox --cli pi --event post-tool-use', 'hook mailbox --cli pi --event stop', 'hook mailbox --cli pi --event post-tool-use']);
+    const payloads = fs.readFileSync(`${log}.stdin`, 'utf8').replace(/\}\{/g, '}\n{').split('\n').map((l) => JSON.parse(l));
+    assert.deepEqual(payloads, [
+      { session_id: 'sess-7', hook_event_name: 'PostToolUse', cwd: repoRoot, subagent: false },
+      { session_id: 'sess-7', hook_event_name: 'Stop', cwd: repoRoot, subagent: false },
+      { session_id: 'sess-8', hook_event_name: 'PostToolUse', cwd: repoRoot, subagent: true },
+    ], 'the session goes in the payload only; a session with a parent is marked a subagent\'s');
+  } finally {
+    if (saved === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = saved;
+  }
+  assert.deepEqual({ ...process.env }, before, 'the process environment is unchanged');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the extension finds the shim from a subdirectory and refuses a group-writable shim or one that is not a regular file', async () => {
+  const repoRoot = mkTempDir('agent-hooks-omp-walk-');
+  mailboxOptIn(repoRoot, true);
+  installOmpHook(repoRoot);
+  const shim = getProjectShimPath(repoRoot);
+  const log = path.join(repoRoot, 'shim-log');
+  recordingShim(shim, log, '{"inject":"MBX-FRAME","method":"tool-result"}');
+  const handlers = await loadedHandlers(repoRoot, 'omp');
+  const deep = path.join(repoRoot, 'src', 'deep');
+  fs.mkdirSync(deep, { recursive: true });
+  const real = [{ type: 'text', text: 'x' }];
+  assert.deepEqual(await handlers.tool_result({ content: real }, stubCtx(deep)), { content: [...real, { type: 'text', text: 'MBX-FRAME' }] }, 'found by walking up');
+
+  fs.chmodSync(shim, 0o775);
+  assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined, 'a group-writable shim is refused');
+  fs.chmodSync(shim, 0o757);
+  assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined, 'a world-writable shim is refused');
+  fs.renameSync(shim, `${shim}.real`);
+  fs.chmodSync(`${shim}.real`, 0o755);
+  fs.symlinkSync(`${shim}.real`, shim);
+  assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined, 'a link in the shim\'s place is refused');
+  // The nearest candidate decides: an unusable shim below never falls through to one above.
+  fs.rmSync(shim);
+  fs.renameSync(`${shim}.real`, shim);
+  const inner = getProjectShimPath(deep);
+  recordingShim(inner, path.join(repoRoot, 'inner-log'), '{"inject":"INNER","method":"tool-result"}');
+  fs.chmodSync(inner, 0o777);
+  assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined);
+  assert.equal(fs.readFileSync(`${log}.argv`, 'utf8').trim().split('\n').length, 1, 'only the first call reached the project shim');
+  // A host answer in any other shape, or naming another method, is ignored.
+  fs.rmSync(path.join(deep, '.fgos'), { recursive: true });
+  recordingShim(shim, log, '{"inject":"MBX-FRAME","method":"send-user-message"}');
+  assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 // ---------------------------------------------------------------------------
 // 6. Aggregate installer and checker
 // ---------------------------------------------------------------------------
@@ -389,7 +504,7 @@ test('the hook table is the only source of each CLI\'s rows', () => {
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and none for agy, omp or pi', () => {
+test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and none for agy; omp and pi get theirs in the extension', () => {
   const repoRoot = mkTempDir('agent-hooks-mailbox-rows-');
   mailboxOptIn(repoRoot, true);
   installAllAgentHooks(repoRoot);
@@ -404,7 +519,7 @@ test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and no
   assert.deepEqual(codex.hooks.PostToolUse, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event post-tool-use`, timeout: 10 }] }]);
   assert.ok(!JSON.stringify(readFile(repoRoot, 'agy')).includes('hook mailbox'));
   for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {
-    assert.ok(!fs.readFileSync(path.join(repoRoot, ext), 'utf8').includes("'mailbox'"), ext);
+    assert.ok(fs.readFileSync(path.join(repoRoot, ext), 'utf8').includes("'mailbox'"), ext);
   }
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });

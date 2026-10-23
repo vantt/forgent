@@ -189,6 +189,7 @@ const PAYLOAD_LITERALS: &[(&str, &[&str])] = &[
     ("permission_mode", &["bypassPermissions"]),
     ("level", &["low", "medium", "high"]),
     ("decision", &["block"]),
+    ("method", &["tool-result"]),
     ("stdout", &["mailbox-fixture", "mailbox-subagent"]),
     ("last_assistant_message", &["done"]),
     (
@@ -426,12 +427,23 @@ fn every_tested_cli_has_its_fixtures() {
         for name in [
             files::STOP,
             files::POST_TOOL_USE,
-            files::ACCEPTED_STOP,
             files::ACCEPTED_POST_TOOL_USE,
             files::VECTORS,
         ] {
             assert!(dir.join(name).is_file(), "{cli} has no {name}");
         }
+        // An accepted Stop output exists exactly for a CLI with a Stop shape
+        // (`adapters.rs` owns that rule; pi's and omp's Stop has none).
+        let adapter = common::ADAPTERS
+            .into_iter()
+            .find(|a| a.word() == cli)
+            .expect("a tested CLI has an adapter");
+        assert_eq!(
+            dir.join(files::ACCEPTED_STOP).is_file(),
+            adapter.shape(fgos_mailbox::hook::HookEvent::Stop).is_some(),
+            "{cli} {}",
+            files::ACCEPTED_STOP
+        );
         let vectors: Value =
             serde_json::from_str(&fs::read_to_string(dir.join(files::VECTORS)).unwrap()).unwrap();
         assert_eq!(vectors["cli"], cli.as_str());
@@ -494,6 +506,15 @@ fn every_drained_cli_names_its_hook_topology_shell_head_executables_and_output_b
     assert_eq!(codex.topology, Topology::Direct);
     assert_eq!(codex.hook_shell, None);
     assert_eq!(codex.head_executables, vec!["codex".to_string()]);
+    // pi's head runs node (its launcher execs the release through
+    // `#!/usr/bin/env node`); omp's runs its own binary.
+    for (adapter, exe) in [(Adapter::Pi, "node"), (Adapter::Omp, "omp")] {
+        let facts = tested.facts(adapter).unwrap();
+        assert_eq!(facts.topology, Topology::Direct);
+        assert_eq!(facts.hook_shell, None);
+        assert_eq!(facts.head_executables, vec![exe.to_string()]);
+        assert!(!facts.stop_delivers);
+    }
     assert!(!tested.contains(Adapter::Agy) && tested.facts(Adapter::Agy).is_none());
 }
 

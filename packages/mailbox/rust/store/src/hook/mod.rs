@@ -49,6 +49,8 @@ pub enum Adapter {
     Claude,
     Codex,
     Agy,
+    Pi,
+    Omp,
 }
 
 impl Adapter {
@@ -59,6 +61,8 @@ impl Adapter {
             Self::Claude => "claude",
             Self::Codex => "codex",
             Self::Agy => "agy",
+            Self::Pi => "pi",
+            Self::Omp => "omp",
         }
     }
 

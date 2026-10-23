@@ -332,12 +332,86 @@ export function checkAgyHook(cwd) {
 // 4. OMP (.omp/extensions/fgos-hooks.ts)
 // ---------------------------------------------------------------------------
 
-function generateInProcessExtensionSource() {
+/**
+ * The mailbox part of the generated extension (spec §6.1, §7): at every tool result the
+ * handler hands the CLI's session to the native `fgos hook mailbox` and appends the frame the
+ * host answers after the tool's real output, the one injection method recorded reaching the
+ * provider as tool output on both pi and omp (`plans/reports/research-261024-0024-mailbox-pi-omp-recordings-and-roles.md`);
+ * at the end of a run it only lets the host register the head. It never writes the process
+ * environment and does nothing for a runner worker (`FGOS_SESSION_ID` `att-…`). The shim is the
+ * first `.fgos/installation/bin/fgos` walking up from the session's directory, used only when it
+ * is a regular file this user owns and no one else may write. Any failure is swallowed.
+ */
+function mailboxExtensionPart(cli) {
+  const timeoutMs = mailboxHookTimeoutSec() * 1000;
+  return `
+const MAILBOX_CLI = '${cli}';
+const MAILBOX_TIMEOUT_MS = ${timeoutMs};
+
+function mailboxShim(dir: string): string | null {
+  for (let at = path.resolve(dir); ; at = path.dirname(at)) {
+    const shim = path.join(at, '.fgos', 'installation', 'bin', 'fgos');
+    const st = lstatSync(shim, { throwIfNoEntry: false });
+    if (st) return st.isFile() && st.uid === process.getuid?.() && (st.mode & 0o022) === 0 ? shim : null;
+    if (path.dirname(at) === at) return null;
+  }
+}
+
+function mailboxHook(event: string, ctx: any): string | null {
+  if ((process.env.FGOS_SESSION_ID || '').startsWith('att-')) return null;
+  const session = ctx?.sessionManager?.getSessionId?.();
+  if (typeof session !== 'string' || !session) return null;
+  const cwd = ctx?.cwd || process.cwd();
+  const shim = mailboxShim(cwd);
+  if (!shim) return null;
+  let subagent = false;
+  try {
+    subagent = typeof ctx.sessionManager.getHeader?.()?.parentSession === 'string';
+  } catch {
+    // no header: the head's own session
+  }
+  const res = spawnSync(shim, ['hook', 'mailbox', '--cli', MAILBOX_CLI, '--event', event], {
+    input: JSON.stringify({ session_id: session, hook_event_name: event === 'stop' ? 'Stop' : 'PostToolUse', cwd, subagent }),
+    cwd,
+    encoding: 'utf8',
+    timeout: MAILBOX_TIMEOUT_MS,
+    stdio: ['pipe', 'pipe', 'ignore'],
+  });
+  if (res.status !== 0 || !res.stdout) return null;
+  const answer = JSON.parse(res.stdout);
+  return answer?.method === 'tool-result' && typeof answer.inject === 'string' && answer.inject ? answer.inject : null;
+}
+`;
+}
+
+const MAILBOX_HANDLERS = `
+  api.on('tool_result', async (event: any, ctx: any) => {
+    try {
+      const text = mailboxHook('post-tool-use', ctx);
+      if (text) return { content: [...(event?.content || []), { type: 'text', text }] };
+    } catch {
+      // fail-open per fgOS hook policy
+    }
+  });
+  api.on('agent_end', async (_event: any, ctx: any) => {
+    try {
+      mailboxHook('stop', ctx);
+    } catch {
+      // fail-open per fgOS hook policy
+    }
+  });
+`;
+
+/**
+ * The generated extension of `cli` (omp or pi): the dispatch and decision guards, and the
+ * mailbox handlers only when `mailbox` (the project opted in).
+ */
+function generateInProcessExtensionSource({ cli, mailbox = false }) {
   return `// @ts-nocheck
 // fgos-hooks.ts — managed fgOS guard extension
 import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-
+${mailbox ? "import { lstatSync } from 'node:fs';\n" : ''}import path from 'node:path';
+${mailbox ? mailboxExtensionPart(cli) : ''}
 export default function (api: any) {
   api.on('tool_call', async (event: any, ctx: any) => {
     try {
@@ -377,16 +451,20 @@ export default function (api: any) {
     } catch {
       // fail-open per fgOS hook policy
     }
-  });
-}
+  });${mailbox ? MAILBOX_HANDLERS : '\n'}}
 `;
+}
+
+/** The extension source of a project for `cli` (`omp` or `pi`), as the installer writes it and the check expects it. */
+export function extensionSourceFor(repoRoot, cli) {
+  return generateInProcessExtensionSource({ cli, mailbox: mailboxEnabled(repoRoot) });
 }
 
 /** The in-process extension of OMP or Pi (`dir` is `.omp` or `.pi`): one generated file. */
 function installExtension(repoRoot, dir) {
   const extPath = path.join(repoRoot, dir, 'extensions', 'fgos-hooks.ts');
   mkdirSync(path.dirname(extPath), { recursive: true });
-  writeFileSync(extPath, generateInProcessExtensionSource(), 'utf8');
+  writeFileSync(extPath, extensionSourceFor(repoRoot, dir.slice(1)), 'utf8');
   return { wired: true, skippedExisting: null };
 }
 
@@ -404,10 +482,10 @@ function checkExtension(cwd, dir, label) {
   if (!existsSync(extPath)) {
     return { passed: false, message: `${shown} not found — run fgos doctor --fix` };
   }
-  if (readFileSync(extPath, 'utf8') !== generateInProcessExtensionSource()) {
+  if (readFileSync(extPath, 'utf8') !== extensionSourceFor(cwd, dir.slice(1))) {
     return { passed: false, message: `${shown} differs from the generated extension — run fgos doctor --fix` };
   }
-  const probe = isShimRunnable(cwd);
+  const probe = isShimRunnable(cwd, { mailboxCli: mailboxEnabled(cwd) ? dir.slice(1) : null });
   if (!probe.runnable) {
     return { passed: false, message: `${label} extension present but local shim not runnable (${probe.reason})` };
   }

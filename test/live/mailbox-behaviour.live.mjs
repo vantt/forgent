@@ -51,8 +51,10 @@ import * as confined from '../../scripts/lib/mailbox-live-confined.mjs';
 import * as score from '../../scripts/lib/mailbox-behaviour-score.mjs';
 import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
+import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
+import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
@@ -76,6 +78,58 @@ const DATA = path.join(REPO_ROOT, 'test', 'live', 'mailbox-behaviour');
 const PREREGISTRATION = path.join(DATA, 'preregistration.json');
 /** The loop test's addendum, outside the frozen data directory: its own file, its own hash. */
 const LOOP_ADDENDUM = path.join(REPO_ROOT, 'test', 'live', 'mailbox-behaviour.loop-addendum.json');
+/**
+ * What each addendum measures: the CLIs it pins and runs, its addendum builder, its cells, its
+ * scoring, stop rules and report, its stage sizes and the group a stop rule takes out, and
+ * the file its stage A sample is drawn into. V6 itself runs none of these.
+ */
+const MEASURES = {
+  v7c: {
+    clis: ['codex'],
+    build: v7.addendumV7c,
+    cells: v7.cells,
+    baselines: v7.baselines,
+    measured: (addendum, needle) => ({
+      models: { ...score.MODELS, codex: addendum.model },
+      effort: addendum.modelReasoningEffort,
+      stageARuns: addendum.stageARuns,
+      projectConfig: (cell) => v7.ARMS[cell.arm].config,
+      scoreRun: (evidence) => v7.scoreRun({ ...evidence, needle }),
+      rules: v7.stopRules,
+      phases: v7.stagePhases,
+      order: v7.stageOrder,
+    }),
+    report: ({ results, compare, addendum, stage }) => v7.report({ results, v6: compare ? runs.readResults(compare).filter((r) => r.cli === 'codex' && r.channel === 'PT' && r.stage === 'A') : [], addendum, stage }),
+    sample: 'sample-codex',
+  },
+  v7e: {
+    clis: ['pi', 'omp'],
+    build: v7e.addendumV7e,
+    cells: v7e.cells,
+    baselines: v7e.baselines,
+    measured: (addendum) => ({
+      models: Object.fromEntries(addendum.pairs.map((p) => [p.cli, p.model])),
+      effort: addendum.thinking,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: v7e.pairOf,
+      projectConfig: () => ({ mailbox: { enabled: true } }),
+      scoreRun: (evidence) => v7e.scoreRun(evidence),
+      rules: v7e.stopRules,
+      phases: v7e.stagePhases,
+      order: v7e.stageOrder,
+    }),
+    report: ({ results, compare, addendum, stage }) => v7e.report({ results, v7c: compare ? runs.readResults(compare).filter((r) => r.cli === 'codex' && r.arm === 'F' && r.stage === 'A') : [], addendum, stage }),
+    sample: 'sample-v7e',
+  },
+};
+const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
+/** Every CLI a pin records: V6's two, and the CLIs of the addendum it runs. */
+const PINNED_CLIS = ['claude', 'codex', ...(MEASURE?.clis ?? []).filter((c) => !['claude', 'codex'].includes(c))];
+/** The omp profile store of the account pi and omp runs carry the login of (owner Q2: openai-tetnu). */
+const ACCOUNT_PROFILE = (account) => path.join(os.homedir(), '.omp', 'profiles', account);
+
 const MIN_FREE_GB = 8;
 const MEMORY_WAIT_MS = 30 * 60_000;
 const PROVIDER_PAUSE_MS = 20 * 60_000;
@@ -89,7 +143,7 @@ function readAddendum() {
   if (!fs.existsSync(ADDENDUM)) die(`no addendum ${ADDENDUM_NAME}; run freeze ${ADDENDUM_NAME} first`);
   const frozen = readJson(ADDENDUM);
   if (frozen.addendumTo.sha256 !== sha256(PREREGISTRATION)) die('the addendum does not bind the current pre-registration');
-  const problems = v7.addendumProblems(frozen, v7.addendumV7c({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions: frozen.versions, seed: frozen.seed }));
+  const problems = v7.addendumProblems(frozen, MEASURE.build({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions: frozen.versions, seed: frozen.seed }));
   if (problems.length) die(`the addendum does not match the runner (${problems.join(', ')}); a change is a new measurement`);
   return frozen;
 }
@@ -175,6 +229,31 @@ function piOmpInstall() {
   return { allow, pi: path.join(home, '.pi', 'agent', 'bin', 'pi'), omp: path.join(home, '.local', 'bin', 'omp'), natives: path.join(home, '.omp', 'natives') };
 }
 
+/** The scripted task of a dry pi or omp run: the frozen task's four commands, then the final answer. */
+const DRY_TASK_CALLS = ['ls', 'until [ -f go1.txt ]; do sleep 2; done', 'ls | wc -l > summary.txt', 'until [ -f go2.txt ]; do sleep 2; done'];
+
+/**
+ * A dry pi or omp run's provider: the recording endpoint, scripted to walk the task's commands
+ * and answer, as `behaviour` says: `ignore` answers the count only; `act` also reads readme.txt
+ * and answers its first line (LR acts); `fail` points the CLI at a closed port (a provider error).
+ * Writes the provider override into the run's home. Returns `{close}`.
+ */
+async function dryProvider(cell, paths, behaviour) {
+  const calls = [...DRY_TASK_CALLS, ...(behaviour === 'act' ? ['head -1 readme.txt'] : [])];
+  const recorder = await startRecorder({
+    dir: path.join(paths.capture, 'recorder'),
+    callFor: (body) => {
+      const done = (body?.input ?? []).filter((i) => i.type === 'function_call').length;
+      return done < calls.length ? { name: 'bash', arguments: JSON.stringify({ command: calls[done] }) } : null;
+    },
+    textFor: () => (behaviour === 'act' ? `There are 3 files. The first line of readme.txt is ${score.README_TOKEN}.` : 'There are 3 files.'),
+  });
+  const url = behaviour === 'fail' ? 'http://127.0.0.1:9' : recorder.url;
+  if (cell.cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [confined.ACCOUNT_PROVIDER]: { baseUrl: url } } });
+  else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', runs.RUN_PROFILE, 'agent', 'models.yml'), `providers:\n  ${confined.ACCOUNT_PROVIDER}:\n    baseUrl: ${url}\n`);
+  return recorder;
+}
+
 /** A dry run's login: scratch bytes in a scratch home, never a real login. */
 function stubLogin(base, cli) {
   const home = path.join(base, 'stub-login', cli);
@@ -207,7 +286,7 @@ function pinState(base) {
   const problems = [];
   if (REPO_ROOT !== pin.worktree) problems.push(`real runs start from the pinned worktree ${pin.worktree}, not ${REPO_ROOT}`);
   if (headCommit(REPO_ROOT) !== pin.commit) problems.push(`the worktree is at ${headCommit(REPO_ROOT)}, pinned ${pin.commit}`);
-  const clis = { claude: cliBinary('claude'), codex: cliBinary('codex') };
+  const clis = Object.fromEntries(PINNED_CLIS.map((c) => [c, cliBinary(c)]));
   problems.push(...runs.pinProblems(pin, {
     hostSha256: fs.existsSync(pin.host.path) ? sha256(pin.host.path) : null,
     shimSha256: fs.existsSync(pin.shim.path) ? sha256(pin.shim.path) : null,
@@ -235,27 +314,25 @@ function context({ dry, stage = null }) {
   const masks = confinedMasks(dry);
   const windowSec = readJson(path.join(CONTRACTS, 'limits.v1.json')).keys.find((k) => k.key === 'mailbox.human.fallbackWindowSec').default;
   const needle = v7.pointerNeedle(REPO_ROOT);
-  const measured = addendum ? {
-    addendum: addendum.name,
-    models: { ...score.MODELS, codex: addendum.model },
-    effort: addendum.modelReasoningEffort,
-    stageARuns: addendum.stageARuns,
-    projectConfig: (cell) => v7.ARMS[cell.arm].config,
-    scoreRun: (evidence) => v7.scoreRun({ ...evidence, needle }),
-    rules: v7.stopRules,
-    phases: v7.stagePhases,
-    order: v7.stageOrder,
-  } : { effort: V6_CODEX_EFFORT };
-  const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, ...measured };
+  const measured = addendum ? { addendum: addendum.name, ...MEASURE.measured(addendum, needle) } : { effort: V6_CODEX_EFFORT };
+  const install = piOmpInstall();
+  const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
+  // pi's and omp's login: the account's Codex login, read fresh from its omp profile at every
+  // start (a scratch one, and the recording endpoint as the provider, for a dry run).
+  const pairAccount = (cli) => addendum?.pairs?.find((p) => p.cli === cli)?.account;
+  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cli))), profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
   if (dry) {
     const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
     return {
       ...common,
       release: path.dirname(path.dirname(host)),
       shim: fs.readFileSync(shimFile, 'utf8'),
-      cliBin: { claude: [process.execPath, STUB, 'claude'], codex: [codexStubBin(base), STUB, 'codex'] },
+      cliBin: { claude: [process.execPath, STUB, 'claude'], codex: [codexStubBin(base), STUB, 'codex'], pi: [install.pi], omp: [install.omp] },
       versions: { claude: 'stub', codex: 'stub' },
       login: { claude: stubLogin(base, 'claude'), codex: stubLogin(base, 'codex') },
+      accountLogin,
+      // A dry pi or omp run is the real CLI against the recording endpoint, scripted with the stub behaviour.
+      providerFor: async (cell, paths, behaviour) => (runs.EXTENSION_CLIS.includes(cell.cli) ? dryProvider(cell, paths, behaviour) : null),
       hostSha256: sha256(host),
       beforeRun: async () => live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true }),
       providerPause: async () => {},
@@ -270,9 +347,10 @@ function context({ dry, stage = null }) {
     hostSha256: pin.host.sha256,
     release: path.dirname(path.dirname(pin.host.path)),
     shim: fs.readFileSync(pin.shim.path, 'utf8'),
-    cliBin: { claude: [pin.clis.claude.bin], codex: [pin.clis.codex.bin] },
-    versions: { claude: pin.clis.claude.version, codex: pin.clis.codex.version },
+    cliBin: Object.fromEntries(Object.entries(pin.clis).map(([c, v]) => [c, [v.bin]])),
+    versions: Object.fromEntries(Object.entries(pin.clis).map(([c, v]) => [c, v.version])),
     login,
+    accountLogin,
     providerPause: async () => {
       say(`${new Date().toISOString()} waiting: provider limit, pausing ${PROVIDER_PAUSE_MS / 60_000} minutes`);
       await sleep(PROVIDER_PAUSE_MS);
@@ -292,6 +370,21 @@ function context({ dry, stage = null }) {
       if (Date.now() - waited > MEMORY_WAIT_MS) return `memory: ${problem}`;
       say(`${new Date().toISOString()} waiting: memory (${problem})`);
       await sleep(60_000);
+    }
+    if (runs.EXTENSION_CLIS.includes(cell?.cli)) {
+      // The account's login is read where its owner's omp sessions refresh it; a stale one waits, never refreshes in a run.
+      for (const waited = Date.now(); ;) {
+        let fresh;
+        try {
+          fresh = confined.accountLoginFreshness(confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cell.cli))));
+        } catch (error) {
+          return `login: ${error.message}`;
+        }
+        if (fresh === 'fresh') return null;
+        if (Date.now() - waited > 2 * 3_600_000) return 'login: the account login stayed near expiry for 2 hours';
+        say(`${new Date().toISOString()} waiting: the ${cell.cli} account login is near expiry; its owner's omp sessions refresh it`);
+        await sleep(5 * 60_000);
+      }
     }
     const cliLogin = login[cell?.cli ?? 'claude'];
     if (confined.loginFreshness(cliLogin) !== 'fresh') say(`${new Date().toISOString()} waiting: the ${cliLogin.cli} login is near expiry; its owner's sessions refresh it`);
@@ -320,11 +413,13 @@ function recover(ctx) {
 function cmdFreeze(name) {
   if (name) {
     if (name !== ADDENDUM_NAME) die(`freeze ${name} takes --addendum ${name}`, 2);
-    const versions = { codex: cliBinary('codex').version };
-    const notTested = live.versionProblem('codex', versions.codex, CONTRACTS);
-    if (notTested) die(notTested);
+    const versions = Object.fromEntries(MEASURE.clis.map((c) => [c, cliBinary(c).version]));
+    for (const [cli, version] of Object.entries(versions)) {
+      const notTested = live.versionProblem(cli, version, CONTRACTS);
+      if (notTested) die(notTested);
+    }
     try {
-      v7.writeOnce(ADDENDUM, v7.addendumV7c({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions, seed: crypto.randomBytes(8).toString('hex') }));
+      v7.writeOnce(ADDENDUM, MEASURE.build({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions, seed: crypto.randomBytes(8).toString('hex') }));
     } catch (error) {
       die(error.message);
     }
@@ -364,7 +459,7 @@ function cmdPin() {
     fs.mkdirSync(path.dirname(kept), { recursive: true });
     fs.copyFileSync(host, kept);
   }
-  const clis = { claude: cliBinary('claude'), codex: cliBinary('codex') };
+  const clis = Object.fromEntries(PINNED_CLIS.map((c) => [c, cliBinary(c)]));
   const pin = runs.pinOf({
     commit,
     worktree: PINNED_WORKTREE,
@@ -402,7 +497,7 @@ async function cmdRunStage(stage, { dry, cli }) {
   const ctx = context({ dry, stage });
   recover(ctx);
   if (ADDENDUM && stage === 'B' && !dry) {
-    const gate = v7.oracleProblem(path.join(ctx.base, 'sample-codex-A.md'));
+    const gate = v7.oracleProblem(path.join(ctx.base, `${MEASURE.sample}-A.md`));
     if (gate) die(`stage B waits: ${gate}`);
   }
   const { stop, closedSt, stoppedArms } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
@@ -454,17 +549,16 @@ function cmdReportAddendum({ stage, sample, dry, compare }) {
   const base = dry ? `${BASE}-dry` : BASE;
   const addendum = readJson(ADDENDUM);
   const results = runs.readResults(path.join(base, 'results.jsonl'));
-  const v6 = compare ? runs.readResults(compare).filter((r) => r.cli === 'codex' && r.channel === 'PT' && r.stage === 'A') : [];
-  say(v7.report({ results, v6, addendum, stage }));
+  say(MEASURE.report({ results, compare, addendum, stage }));
   if (!sample) return;
   const bodies = readData().bodies;
-  const lines = [`# Sample, codex${stage ? `, stage ${stage}` : ''}`, '', 'Mark each run agree or disagree with the oracle.', ''];
-  for (const cell of v7.cells()) {
+  const lines = [`# Sample, ${ADDENDUM_NAME}${stage ? `, stage ${stage}` : ''}`, '', 'Mark each run agree or disagree with the oracle.', ''];
+  for (const cell of MEASURE.cells()) {
     for (const r of score.sampleOf(cell, results.filter((x) => x.cell === cell.id && (!stage || x.stage === stage)), addendum.seed)) {
       lines.push(`## ${r.runId} (${cell.id}): ${r.outcome}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[cell.variant].body])}`, '', `Claimed: ${r.claimRan}; carried by: ${(r.roleRecord ?? []).join(', ') || '-'}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '', 'Mark: agree / disagree', '');
     }
   }
-  const file = path.join(base, `sample-codex${stage ? `-${stage}` : ''}.md`);
+  const file = path.join(base, `${MEASURE.sample}${stage ? `-${stage}` : ''}.md`);
   if (fs.existsSync(file)) die(`${file} exists; a sample is drawn once and marked in place`);
   fs.writeFileSync(own(file), `${lines.join('\n')}\n`);
   say(`sample: ${file}`);
@@ -543,23 +637,39 @@ const WIRING_V7 = [
   ['P', score.BASELINE, 'ignore', 'not-acted'],
 ];
 
+/**
+ * V7e's wiring runs: per pair, a cell, the dry provider's behaviour and the outcome it must give
+ * (the real pi or omp, its real extension and host, the recording endpoint as the model).
+ */
+const WIRING_V7E = v7e.PAIRS.flatMap((p) => [
+  [p, 'LR', 'act', 'acted'],
+  [p, 'B', 'ignore', 'not-acted'],
+  [p, 'M', 'fail', 'error'],
+  [p, score.BASELINE, 'ignore', 'not-acted'],
+]);
+
 async function cmdCheckAddendum() {
   const failures = [];
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
   if (problem) failures.push(problem);
   const addendum = readAddendum();
-  const { version } = cliBinary('codex');
-  const notTested = live.versionProblem('codex', version, CONTRACTS);
-  if (notTested) failures.push(notTested);
-  if (version !== addendum.versions.codex) failures.push(`codex is ${version}; the addendum names ${addendum.versions.codex}`);
+  for (const cli of MEASURE.clis) {
+    const { version } = cliBinary(cli);
+    const notTested = live.versionProblem(cli, version, CONTRACTS);
+    if (notTested) failures.push(notTested);
+    if (version !== addendum.versions[cli]) failures.push(`${cli} is ${version}; the addendum names ${addendum.versions[cli]}`);
+  }
   if (fs.existsSync(pinFile(BASE))) {
     const { problems } = pinState(BASE);
     say(`pin: ${problems.length ? problems.join('; ') : 'holds'}`);
   } else say('pin: none yet');
   const ctx = context({ dry: true, stage: 'check' });
   recover(ctx);
-  for (const [arm, variant, behaviour, want] of WIRING_V7) {
-    const cell = [...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant);
+  const wiring = ADDENDUM_NAME === 'v7e'
+    ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
+    : WIRING_V7.map(([arm, variant, behaviour, want]) => [[...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant), behaviour, want]);
+  for (const [cell, behaviour, want] of wiring) {
+    const arm = cell.arm;
     const progress = runs.cellProgress(runs.readResults(ctx.resultsFile), cell.id);
     const { line } = await runs.runOne({ ...ctx, stubBehaviour: behaviour }, cell, runs.runIdOf(cell, progress.next));
     const ok = line.outcome === want;
@@ -866,35 +976,38 @@ function scratchCodexLogin() {
  * runner worker's `FGOS_SESSION_ID` into the CLI's environment, `subagent` (omp) answers the
  * head's first request with a `task` call and a `wait`. Its own home `mailbox-v7e-probe-live`.
  */
-async function zeroModelProbe(cli, { method = 'none', plant = false, off = true, runnerId = null, subagent = false }) {
+async function zeroModelProbe(cli, { method = 'none', plant = false, off = true, runnerId = null, subagent = false, extension = ROLE_PROBE_EXT, toolCommand = null, layOut = null, extraEnv = {}, tag = '' }) {
   const base = path.join(TMP, 'fgos-work', 'mailbox-v7e-probe-live');
   fs.mkdirSync(base, { recursive: true });
   live.assertOutsideCheckout(base);
   const orphans = confined.sweepOrphans(base);
   if (orphans.left.length || orphans.unsettled.length || orphans.asides.length) die('orphans or login copies left in the probe home');
   const install = piOmpInstall();
-  const runId = `${cli}-${method.replace(':', '-')}${plant ? '-planted' : ''}${off ? '' : '-without-off'}${runnerId ? '-runner' : ''}${subagent ? '-subagent' : ''}-${Date.now()}`;
+  const runId = `${cli}-${tag || method.replace(':', '-')}${plant ? '-planted' : ''}${off ? '' : '-without-off'}${runnerId ? '-runner' : ''}${subagent ? '-subagent' : ''}-${Date.now()}`;
   const paths = confined.runPaths(base, runId);
   const recorderDir = path.join(base, 'recorder', runId);
   const spawnCall = { name: 'task', arguments: JSON.stringify({ context: '# Goal\nprobe', tasks: [{ name: 'Sub', task: 'Run ls, then reply done.', solutionSpace: 'one step' }] }) };
   const called = (body) => (body?.input ?? []).filter((i) => i.type === 'function_call').map((i) => i.name);
+  const tool = toolCommand ? { name: 'bash', arguments: JSON.stringify({ command: toolCommand }) } : null;
   const recorder = await startRecorder({ dir: recorderDir, callFor: (body) => {
-    if (!subagent || !JSON.stringify(body?.input ?? []).includes('SPAWN-SUBAGENT')) return null;
+    if (!subagent || !JSON.stringify(body?.input ?? []).includes('SPAWN-SUBAGENT')) return called(body).length ? null : tool;
     if (!called(body).includes('task')) return spawnCall;
     return called(body).includes('wait') ? null : { name: 'wait', arguments: JSON.stringify({ ids: ['Sub'] }) };
   } });
+  // A subagent's requests carry no SPAWN marker: its first call is the tool command too.
   const offConfig = path.join(base, 'settings', `${runId}-omp-off.yml`);
   fs.mkdirSync(path.dirname(offConfig), { recursive: true });
   fs.writeFileSync(offConfig, runs.OMP_OFF_CONFIG);
   const probeLog = path.join(paths.home, 'probe.log');
-  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), extra: { MBX_LOG: probeLog, MBX_METHOD: method, ...(cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: install.natives }) } });
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), extra: { MBX_LOG: probeLog, MBX_METHOD: method, ...(typeof extraEnv === 'function' ? extraEnv(paths) : extraEnv), ...(cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: install.natives }) } });
   if (runnerId) env.FGOS_SESSION_ID = runnerId;
   const prompt = subagent ? 'SPAWN-SUBAGENT: delegate one task.' : 'Run ls, then reply done.';
-  const args = runs.piOmpArgs(cli, { extension: ROLE_PROBE_EXT, model: PI_OMP_MODEL, effort: 'low', prompt, profile: 'acct', offConfig, off });
+  const args = runs.piOmpArgs(cli, { extension: typeof extension === 'function' ? extension(paths) : extension, model: PI_OMP_MODEL, effort: 'low', prompt, profile: 'acct', offConfig, off });
   const prepared = confined.prepareConfinedRun({ base, runId, command: install[cli], args, env, masks: confinedMasks(false), readOnly: [ROLE_PROBE_EXT, MCP_PROBE_SERVER, offConfig], accountLogin: { cli, credential: scratchCodexLogin(), profile: 'acct', ompBin: install.omp, nativesDir: install.natives } });
   if (cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [confined.ACCOUNT_PROVIDER]: { baseUrl: recorder.url } } });
   else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', 'acct', 'agent', 'models.yml'), `providers:\n  ${confined.ACCOUNT_PROVIDER}:\n    baseUrl: ${recorder.url}\n`);
   fs.writeFileSync(path.join(paths.ws, 'readme.txt'), 'probe\n');
+  layOut?.(paths);
   if (plant) {
     const config = JSON.stringify({ mcpServers: { planted: { command: process.execPath, args: [MCP_PROBE_SERVER] } } });
     for (const rel of [...PLANTED_MCP.map((r) => path.join(paths.ws, r)), ...(cli === 'pi' ? [path.join(paths.home, 'mcp.json')] : [])]) {
@@ -924,17 +1037,21 @@ async function zeroModelProbe(cli, { method = 'none', plant = false, off = true,
     toolResults: events.filter((e) => e.at === 'tool_result').map(({ tool, id, subagent: sub, proc }) => ({ tool, id, subagent: sub, proc })),
     extensionTools: events.filter((e) => e.at === 'tools').map((e) => e.all),
     errors: events.filter((e) => e.at === 'error'),
+    paths,
+    requestBodies: requests,
   };
   writeJson(path.join(base, 'results', `${runId}.json`), result);
   if (settled) die(`${settled.stop}: ${settled.aside}`);
   return result;
 }
 
-async function cmdRoleProbe(cli, only) {
+async function cmdRoleProbe(cli, only, pad) {
   if (!['pi', 'omp'].includes(cli)) die('role-probe takes pi or omp', 2);
   for (const method of only ? only.split(',') : ROLE_METHODS[cli]) {
-    const r = await zeroModelProbe(cli, { method });
-    say(`role-probe ${cli} ${method}: exit ${r.exit.code}; ${r.requests.length} requests; carriers ${JSON.stringify(r.carriers)}${r.errors.length ? `; errors ${JSON.stringify(r.errors.map((e) => e.error))}` : ''}`);
+    const r = await zeroModelProbe(cli, { method, extraEnv: pad ? { MBX_PAD: String(pad) } : {}, tag: `${method.replace(':', '-')}${pad ? `-pad${pad}` : ''}` });
+    // With a pad, the bound ladder: the whole marker must arrive in one carrier.
+    const whole = pad ? r.requestBodies.filter((q) => JSON.stringify(q.body ?? '').includes(`MARK-${method}`.padEnd(Number(pad), '.'))).length : null;
+    say(`role-probe ${cli} ${method}${pad ? ` (${pad} bytes)` : ''}: exit ${r.exit.code}; ${r.requests.length} requests; carriers ${JSON.stringify(r.carriers)}${pad ? `; the whole marker in ${whole} requests` : ''}${r.errors.length ? `; errors ${JSON.stringify(r.errors.map((e) => e.error))}` : ''}`);
   }
 }
 
@@ -954,6 +1071,225 @@ async function cmdMcpProbePiOmp(cli, { off }) {
   const mcpTools = r.extensionTools.flat().filter((t) => /mcp|codemode|tool_search/i.test(t));
   say(`mcp-probe ${cli} ${off ? 'confined' : 'without the off switches'}: exit ${r.exit.code}; extension tools ${JSON.stringify(r.extensionTools.at(-1) ?? null)}; MCP tools ${JSON.stringify(mcpTools)}; planted tool named in ${r.plantedInRequests} provider requests; ${path.join(TMP, 'fgos-work', 'mailbox-v7e-probe-live', 'results', `${r.runId}.json`)}`);
   return r;
+}
+
+// ---------------------------------------------------------------- pi and omp live cases (benign)
+
+/** The live case's task: one tool call, the step at which the frame arrives, a send to the head's own name, the answer. */
+const CASE_PROMPT = 'Do these steps in order, one command per step. 1. List the files here with ls. 2. Wait for the signal file by running: until [ -f go1.txt ]; do sleep 2; done 3. Run: fgos mailbox send --to "$(cat own-name.txt)" -- pong 4. Tell me what the last command printed, and the text of any message from another agent you received.';
+const CASE_BODY = 'MBX-CASE-HELLO: a benign hello from the live case; nothing to do.';
+const CASE_CALLS = ['ls', 'until [ -f go1.txt ]; do sleep 2; done', 'fgos mailbox send --to "$(cat own-name.txt)" -- pong'];
+
+/**
+ * pi's or omp's live case (spec §14 V7 row: each adapter with its own live suite), one benign
+ * confined print-mode run through the shipped door: the generated extension of an opted-in
+ * project and the branch-built host behind the project shim. Checked: the head registered as
+ * the sandbox's pid 1; a message sent between registration and the step 2 wait was offered
+ * and reached the model inside that step's tool result; a send from the head's own tool is
+ * attributed to the head (refused `self`, since it names the head's own address); the run
+ * ended cleanly and its login copy is unchanged. `--dry` puts the recording endpoint, scripted
+ * with the same calls, in the model's place. Its own home `mailbox-v7e-live-cases`.
+ */
+async function cmdLiveCase(cli, dry) {
+  if (!['pi', 'omp'].includes(cli)) die('live-case takes pi or omp', 2);
+  const base = path.join(TMP, 'fgos-work', `mailbox-v7e-live-cases${dry ? '-dry' : ''}`);
+  const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry });
+  if (problem) die(problem);
+  fs.mkdirSync(base, { recursive: true });
+  live.assertOutsideCheckout(base);
+  const orphans = confined.sweepOrphans(base);
+  if (orphans.left.length || orphans.unsettled.length || orphans.asides.length) die('orphans or login copies left in the live-case home');
+  const binary = cliBinary(cli);
+  const versionProblem = live.versionProblem(cli, binary.version, CONTRACTS);
+  if (versionProblem) die(versionProblem);
+  const pair = v7e.PAIRS.find((p) => p.cli === cli);
+  const credential = dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pair.account));
+  if (!dry && confined.accountLoginFreshness(credential) !== 'fresh') die('login near expiry: stale; wait for the owner\'s omp sessions to refresh it');
+  const install = piOmpInstall();
+  const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
+  const runId = `case-${cli}-${Date.now()}`;
+  const paths = confined.runPaths(base, runId);
+  const args = runs.piOmpArgs(cli, { extension: paths.extension, model: pair.model, effort: 'low', prompt: CASE_PROMPT, profile: runs.RUN_PROFILE, offConfig: paths.ompOff });
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: install.natives } });
+  const prepared = confined.prepareConfinedRun({ base, runId, command: install[cli], args, env, masks: confinedMasks(false), readOnly: [paths.installation, paths.extension, ...(cli === 'omp' ? [paths.ompOff] : [])], accountLogin: { cli, credential, profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives } });
+  confined.layOutRunProject(paths, { cli, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
+  runs.seedWorkspace(paths.ws);
+  if (cli === 'omp') fs.writeFileSync(paths.ompOff, runs.OMP_OFF_CONFIG, { mode: 0o444 });
+  let recorder = null;
+  if (dry) {
+    recorder = await startRecorder({ dir: path.join(base, 'recorder', runId), callFor: (body) => {
+      const done = (body?.input ?? []).filter((i) => i.type === 'function_call').length;
+      return done < CASE_CALLS.length ? { name: 'bash', arguments: JSON.stringify({ command: CASE_CALLS[done] }) } : null;
+    } });
+    if (cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [confined.ACCOUNT_PROVIDER]: { baseUrl: recorder.url } } });
+    else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', runs.RUN_PROFILE, 'agent', 'models.yml'), `providers:\n  ${confined.ACCOUNT_PROVIDER}:\n    baseUrl: ${recorder.url}\n`);
+  }
+  fs.mkdirSync(paths.capture, { recursive: true });
+  const stdoutFile = path.join(paths.capture, 'stdout.txt');
+  const startedAt = Date.now();
+  const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(stdoutFile, 'w'), fs.openSync(path.join(paths.capture, 'stderr.txt'), 'w')] });
+  run.exited.then(() => { run.done = true; });
+  const timeout = setTimeout(() => confined.endConfinedRun(run), runs.CLI_TIMEOUT_MS);
+  say(`live-case ${cli}${dry ? ' (dry)' : ''}: started ${runId}`);
+  const binding = await waitWhile(() => Object.values(snapshotOf(paths.ws)?.bindings ?? {})[0], run);
+  if (binding) fs.writeFileSync(path.join(paths.ws, 'own-name.txt'), `${binding.name}\n`);
+  const sent = binding ? runs.harnessSend(paths.ws, binding.name, CASE_BODY, { sender: score.SENDERS.trusted.sessionId }) : null;
+  fs.writeFileSync(path.join(paths.ws, 'go1.txt'), '');
+  const exit = await run.exited;
+  clearTimeout(timeout);
+  const end = await confined.endConfinedRun(run);
+  await recorder?.close();
+  const settled = confined.settleLoginCopy(prepared);
+  const records = runs.modelRecords(cli, paths.home);
+  const message = sent?.id ? snapshotOf(paths.ws)?.messages?.find((m) => m.id === sent.id) : null;
+  const head = binding ? JSON.parse(binding.head) : null;
+  const toolResults = records.filter((r) => r.type === 'message' && r.message?.role === 'toolResult');
+  const frameRecord = sent?.id ? toolResults.findIndex((r) => JSON.stringify(r).includes(sent.id)) : -1;
+  const providerError = runs.providerErrorOf(stdoutFile);
+  const checks = {
+    exitZero: exit.code === 0,
+    noProviderError: providerError === null,
+    registered: Boolean(binding),
+    headIsSandboxPid1: head ? head.pid === 1 && head.startTime === run.entry.pid1Start : false,
+    sent: sent?.status === 0,
+    offered: Boolean(message?.state?.offered),
+    frameInToolResult: frameRecord >= 0 && v7e.sessionChannel(records, sent.id) === 'PT',
+    frameAfterRealOutput: frameRecord >= 0 && JSON.stringify(toolResults[frameRecord].message.content.at(-1)).includes(sent.id),
+    sendFromToolIsTheHeads: toolResults.some((r) => /Refused: self\b/.test(JSON.stringify(r))),
+    noProcessLeft: end.left.length === 0,
+    loginCopyUnchanged: settled === null,
+    versionUnchanged: cliBinary(cli).version === binary.version,
+  };
+  const result = {
+    runId, cli, model: pair.model, thinking: 'low', version: binary.version, invocations: dry ? 0 : 1, dry,
+    host: { commit: headCommit(REPO_ROOT), sha256: sha256(host), shimSha256: sha256(shimFile) },
+    argv: prepared.launch.argv.map((a) => (a === CASE_PROMPT ? '<case prompt>' : a)), masks: prepared.launch.masks, maskSha256: prepared.launch.maskSha256,
+    binding: binding ? { name: binding.name, cli: binding.cli } : null,
+    message: message ? { state: Object.keys(message.state ?? {})[0] ?? message.state, latencyMs: message.state?.offered?.at && message.recorded_at ? message.state.offered.at - message.recorded_at : null } : null,
+    carriers: sent?.id ? v7e.carriers(records, sent.id) : [],
+    providerError, exit, wallMs: Date.now() - startedAt, settled, checks,
+  };
+  writeJson(path.join(base, 'results', `${runId}.json`), result);
+  const failed = Object.entries(checks).filter(([, v]) => !v).map(([k]) => k);
+  say(`live-case ${cli}${dry ? ' (dry)' : ''}: exit ${exit.code}; ${failed.length ? `not passed: ${failed.join(', ')}` : 'every check passed'}; carried by ${result.carriers.join(', ') || '-'}; ${path.join(base, 'results', `${runId}.json`)}`);
+  if (settled) die(`${settled.stop}: ${settled.aside}`);
+  return failed.length === 0;
+}
+
+// ---------------------------------------------------------------- pi and omp hook fixtures (no model)
+
+/** The fixture capture shim: records each hook call's argv, stdin and identity variables, and answers a canary frame at a tool result. */
+const CAPTURE_SHIM = `#!/bin/sh
+n=$(ls "$MBX_CAPTURE" | wc -l)
+f="$MBX_CAPTURE/call-$(printf '%03d' "$n")"
+printf '%s\\n' "$*" > "$f.argv"
+cat > "$f.stdin"
+env | grep -E '^(FGOS_SESSION_ID|CODEX_THREAD_ID|PI_SESSION_ID|CLAUDE_CODE_SESSION_ID)=' > "$f.env"
+case "$*" in *post-tool-use*) printf '%s' '{"inject":"MBX-FIXTURE-CANARY","method":"tool-result"}' ;; esac
+`;
+const FIXTURE_TOOL = "env | grep -E '^(FGOS_SESSION_ID|CODEX_THREAD_ID|PI_SESSION_ID|CLAUDE_CODE_SESSION_ID)=' > tool-env.txt; echo mailbox-fixture";
+const ID_VARS = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'PI_SESSION_ID', 'CLAUDE_CODE_SESSION_ID'];
+
+/**
+ * One zero-model run of `cli` with the product's generated extension of an opted-in project,
+ * the capture shim in the shim's place, and the scripted tool command: returns each hook call
+ * (argv, payload, identity variables), the tool's identity variables and whether the canary
+ * frame reached the provider as tool output.
+ */
+async function fixtureRun(cli, { subagent = false, tag }) {
+  const capture = '.mbx-capture';
+  const r = await zeroModelProbe(cli, {
+    tag,
+    subagent,
+    toolCommand: FIXTURE_TOOL,
+    extension: (paths) => path.join(paths.ws, `.${cli}`, 'extensions', 'fgos-hooks.ts'),
+    extraEnv: (paths) => ({ MBX_CAPTURE: path.join(paths.ws, capture) }),
+    layOut: (paths) => {
+      writeJson(path.join(paths.ws, '.fgos', 'config.json'), { mailbox: { enabled: true } });
+      (cli === 'pi' ? installPiHook : installOmpHook)(paths.ws);
+      const shim = path.join(paths.ws, '.fgos', 'installation', 'bin', 'fgos');
+      fs.mkdirSync(path.dirname(shim), { recursive: true });
+      fs.writeFileSync(shim, CAPTURE_SHIM, { mode: 0o755 });
+      fs.mkdirSync(path.join(paths.ws, capture));
+    },
+  });
+  const dir = path.join(r.paths.ws, capture);
+  const calls = fs.readdirSync(dir).filter((f) => f.endsWith('.argv')).sort().map((f) => {
+    const stem = path.join(dir, f.slice(0, -'.argv'.length));
+    return { argv: fs.readFileSync(`${stem}.argv`, 'utf8').trim(), payload: JSON.parse(fs.readFileSync(`${stem}.stdin`, 'utf8')), env: parseEnv(fs.readFileSync(`${stem}.env`, 'utf8')) };
+  });
+  const toolEnvFiles = fs.readdirSync(r.paths.ws, { recursive: true }).map(String).filter((f) => f.endsWith('tool-env.txt'));
+  const toolEnv = toolEnvFiles.map((f) => parseEnv(fs.readFileSync(path.join(r.paths.ws, f), 'utf8')));
+  const canary = rolesCarrying(r.requestBodies, 'MBX-FIXTURE-CANARY');
+  return { ...r, calls, toolEnv, canary };
+}
+
+const parseEnv = (text) => Object.fromEntries(ID_VARS.map((k) => [k, new RegExp(`^${k}=(.*)$`, 'm').exec(text)?.[1] ?? null]));
+
+/**
+ * Records pi's or omp's hook fixtures from the generated extension, with no model: the head's
+ * PostToolUse and Stop payloads of two runs (the second run's Stop is `stop-continued.json`),
+ * omp's subagent PostToolUse, the identity variables of the hook and the tool processes, the
+ * answer the extension applied (the canary reached the provider as tool output), and the parse
+ * vectors. Ids become placeholders that keep equality; paths go under `/run-dir/`.
+ */
+async function cmdRecordFixtures(cli) {
+  if (!['pi', 'omp'].includes(cli)) die('record-fixtures takes pi or omp', 2);
+  const version = cliBinary(cli).version;
+  const first = await fixtureRun(cli, { tag: 'fixture-dump' });
+  const second = await fixtureRun(cli, { tag: 'fixture-again' });
+  const sub = cli === 'omp' ? await fixtureRun(cli, { subagent: true, tag: 'fixture-subagent' }) : null;
+  const pick = (run, event, subagentOnly = false) => run.calls.find((c) => c.argv.endsWith(`--event ${event}`) && c.payload.subagent === subagentOnly);
+  const needed = { first: [pick(first, 'post-tool-use'), pick(first, 'stop')], second: [pick(second, 'stop')], ...(sub ? { sub: [pick(sub, 'post-tool-use', true)] } : {}) };
+  for (const [run, calls] of Object.entries(needed)) if (calls.some((c) => !c)) die(`the ${run} run lacks a hook call: ${JSON.stringify({ first: first.calls.map((c) => c.argv), second: second.calls.map((c) => c.argv), sub: sub?.calls.map((c) => c.argv) })}`);
+  if (!first.canary.some((c) => c.carriers.includes('function_call_output:'))) die(`the canary frame did not reach the provider as tool output: ${JSON.stringify(first.canary)}`);
+  // Placeholders keep equality across every recorded value.
+  const ids = new Map();
+  const placeholder = (id) => {
+    if (id === null || id === undefined) return null;
+    if (!ids.has(id)) ids.set(id, `00000000-0000-4000-8000-${String(ids.size + 1).padStart(12, '0')}`);
+    return ids.get(id);
+  };
+  const redact = (payload, run) => ({ ...payload, session_id: placeholder(payload.session_id), cwd: `/run-dir/${cli}/${run}/ws` });
+  const redactEnv = (env) => Object.fromEntries(Object.entries(env).map(([k, v]) => [k, placeholder(v)]));
+  const out = path.join(CONTRACTS, 'fixtures', 'hooks', cli);
+  fs.mkdirSync(out, { recursive: true });
+  const files = {
+    'post-tool-use.json': redact(needed.first[0].payload, 'dump'),
+    'stop.json': redact(needed.first[1].payload, 'dump'),
+    'stop-continued.json': redact(needed.second[0].payload, 'again'),
+    ...(sub ? { 'post-tool-use-subagent.json': redact(needed.sub[0].payload, 'subagent') } : {}),
+    'accepted-post-tool-use.json': { inject: '{{TEXT}}', method: 'tool-result' },
+  };
+  const env = {
+    note: 'Session-identity variables seen by the hook process the generated extension starts and by the head\'s tool process, as id placeholders that keep equality with the payload placeholders; null means unset.',
+    hookIdVars: { 'post-tool-use.json': redactEnv(needed.first[0].env), 'stop.json': redactEnv(needed.first[1].env), ...(sub ? { 'post-tool-use-subagent.json': redactEnv(needed.sub[0].env) } : {}) },
+    toolIdVars: redactEnv(first.toolEnv[0] ?? {}),
+  };
+  const session = files['post-tool-use.json'].session_id;
+  const head = { subordinate: false, firstStop: null };
+  const vectors = [
+    { name: 'head-stop', kind: 'parse', source: 'recorded', event: 'stop', file: 'stop.json', expect: { ...head, session } },
+    { name: 'head-stop-of-a-later-run', kind: 'parse', source: 'recorded', event: 'stop', file: 'stop-continued.json', expect: { ...head, session: files['stop-continued.json'].session_id } },
+    { name: 'head-post-tool-use', kind: 'parse', source: 'recorded', event: 'post-tool-use', file: 'post-tool-use.json', expect: { ...head, session } },
+    ...(sub ? [{ name: 'subagent-post-tool-use', kind: 'parse', source: 'recorded', event: 'post-tool-use', file: 'post-tool-use-subagent.json', expect: { subordinate: true, firstStop: null, session: files['post-tool-use-subagent.json'].session_id } }] : []),
+    { name: 'empty-input', kind: 'parse', source: 'synthesized', event: 'stop', text: '', expect: { unparsed: 'malformed' } },
+    { name: 'not-json', kind: 'parse', source: 'synthesized', event: 'post-tool-use', text: 'not json', expect: { unparsed: 'malformed' } },
+    { name: 'a-json-array', kind: 'parse', source: 'synthesized', event: 'stop', json: [], expect: { unparsed: 'malformed' } },
+    { name: 'a-stop-sent-as-post-tool-use', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'stop.json', expect: { unparsed: 'event-mismatch' } },
+    { name: 'a-post-tool-use-cut-in-half', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'post-tool-use.json', truncate: true, expect: { unparsed: 'malformed' } },
+    { name: 'an-empty-session-id-is-no-session', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'post-tool-use.json', set: { session_id: '' }, expect: { ...head, session: null } },
+    { name: 'agent-subagent-true', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'post-tool-use.json', set: { subagent: true }, expect: { subordinate: true, firstStop: null, session } },
+    { name: 'agent-subagent-missing', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'post-tool-use.json', set: { subagent: null }, expect: { subordinate: true, firstStop: null, session } },
+    { name: 'agent-subagent-a-number', kind: 'parse', source: 'synthesized', event: 'post-tool-use', file: 'post-tool-use.json', set: { subagent: 0 }, expect: { subordinate: true, firstStop: null, session } },
+  ];
+  // Every path, standalone or after `--flag=`, is replaced: none may name the machine's user.
+  const runLine = (r) => `\`${cli} ${r.argv.slice(1).map((a) => a.replace(/(^|=)\/.*$/, '$1<path>')).join(' ')}\` (exit ${r.exit.code})`;
+  const source = `recorded ${new Date().toISOString().slice(0, 10)} from ${cli} ${version} on this machine by test/live/mailbox-behaviour.live.mjs record-fixtures, with no model: the Codex provider pointed at the recording endpoint (scripts/lib/mailbox-role-recorder.mjs) under the confined launch, the product's generated extension of an opted-in project loaded by path, and a capture shim in the shim's place answering a canary frame at each tool result; dump run ${runLine(first)}; second run ${runLine(second)}${sub ? `; subagent run ${runLine(sub)} (the recorder answered with a task call and a wait)` : ''}; the canary frame reached the provider as ${first.canary.map((c) => c.carriers.join(' ')).join(', ')}; the hook processes saw ${Object.entries(needed.first[0].env).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none of the identity variables'}; the tool process saw ${Object.entries(first.toolEnv[0] ?? {}).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none'}${sub ? `; the subagent's PostToolUse carried subagent true and its own session id` : `; ${cli} has no subagent tool, so the subagent vectors are synthesized`}`;
+  for (const [name, value] of Object.entries(files)) writeJson(path.join(out, name), value);
+  writeJson(path.join(out, 'env.json'), env);
+  writeJson(path.join(out, 'vectors.json'), { cli, source, vectors });
+  say(`record-fixtures ${cli} ${version}: ${Object.keys(files).length + 2} files in ${out}; canary carried by ${JSON.stringify(first.canary)}; hook calls ${first.calls.map((c) => c.argv.split(' ').at(-1)).join(', ')}`);
 }
 
 // ---------------------------------------------------------------- main
@@ -996,7 +1332,13 @@ if (process.argv[1] === SCRIPT) {
         else await cmdMcpProbe(rest[0], { off: !flag('--without-off'), dry: flag('--dry') });
         break;
       case 'role-probe':
-        await cmdRoleProbe(rest[0], option('--methods'));
+        await cmdRoleProbe(rest[0], option('--methods'), option('--pad'));
+        break;
+      case 'live-case':
+        process.exitCode = (await cmdLiveCase(rest[0], flag('--dry'))) ? 0 : 1;
+        break;
+      case 'record-fixtures':
+        await cmdRecordFixtures(rest[0]);
         break;
       case 'session-probe':
         await cmdSessionProbe(rest[0]);

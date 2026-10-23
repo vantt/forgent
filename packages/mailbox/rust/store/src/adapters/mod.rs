@@ -8,8 +8,9 @@ mod claude;
 #[cfg(unix)]
 pub mod claude_head;
 mod codex;
+mod extension;
 #[cfg(unix)]
-pub mod codex_head;
+pub mod payload_head;
 #[cfg(unix)]
 pub mod version;
 
@@ -35,6 +36,10 @@ pub enum Shape {
     /// The text itself and a line end: a verb's stdout (`inbox --claim`),
     /// not a hook's.
     Plain,
+    /// `{"inject":text,"method":"tool-result"}`: the answer to the generated
+    /// pi/omp extension, which appends `text` after the tool's real output
+    /// (both ends are ours, spec §7).
+    ExtensionToolResult,
 }
 
 impl Shape {
@@ -49,6 +54,7 @@ impl Shape {
                 }
             }),
             Self::StopBlock => json!({ "decision": "block", "reason": text }),
+            Self::ExtensionToolResult => json!({ "inject": text, "method": "tool-result" }),
         };
         value.to_string()
     }
@@ -65,6 +71,7 @@ impl Adapter {
             Self::Claude => claude::parse(event, &object),
             Self::Codex => codex::parse(event, &object),
             Self::Agy => agy::parse(event, &object),
+            Self::Pi | Self::Omp => extension::parse(event, &object),
         }
     }
 
@@ -75,6 +82,7 @@ impl Adapter {
             Self::Claude => claude::shape(event),
             Self::Codex => codex::shape(event),
             Self::Agy => agy::shape(event),
+            Self::Pi | Self::Omp => extension::shape(event),
         }
     }
 }

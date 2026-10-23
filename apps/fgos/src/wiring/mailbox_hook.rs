@@ -1,4 +1,4 @@
-//! `fgos hook mailbox --cli <claude|codex> --event <stop|post-tool-use>`:
+//! `fgos hook mailbox --cli <claude|codex|pi|omp> --event <stop|post-tool-use>`:
 //! the mailbox's checkpoint, served natively before the composition root
 //! (the route table's `native_kinds` of `hook`). A thin, straight-line
 //! wiring of the store's hook shell to the real process: no logic, and
@@ -36,7 +36,7 @@ pub fn main(args: &[OsString]) -> ! {
     std::process::exit(0)
 }
 
-/// The flags: `--cli <claude|codex>` and `--event <stop|post-tool-use>`,
+/// The flags: `--cli <claude|codex|pi|omp>` and `--event <stop|post-tool-use>`,
 /// each once, nothing else.
 fn parse(args: &[OsString]) -> Option<(Adapter, HookEvent)> {
     let mut cli = None;
@@ -49,6 +49,8 @@ fn parse(args: &[OsString]) -> Option<(Adapter, HookEvent)> {
                 cli = Some(match value? {
                     "claude" => Adapter::Claude,
                     "codex" => Adapter::Codex,
+                    "pi" => Adapter::Pi,
+                    "omp" => Adapter::Omp,
                     _ => return None,
                 });
             }
@@ -76,11 +78,11 @@ fn run(args: &[OsString]) {
     let Ok(cwd) = std::env::current_dir() else {
         return;
     };
-    // Only Claude Code sets the variable; a Codex session that inherited
-    // one from its shell must not reach another project's record.
+    // Only Claude Code sets the variable; a Codex, pi or omp session that
+    // inherited one from its shell must not reach another project's record.
     let project_dir = match adapter {
         Adapter::Claude => std::env::var_os("CLAUDE_PROJECT_DIR"),
-        Adapter::Codex | Adapter::Agy => None,
+        Adapter::Codex | Adapter::Agy | Adapter::Pi | Adapter::Omp => None,
     };
     let Ok(fgos_dir) = super::mailbox_root::mailbox_fgos_dir(project_dir.as_deref(), &cwd) else {
         return;

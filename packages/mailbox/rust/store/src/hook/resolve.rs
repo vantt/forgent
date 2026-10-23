@@ -6,13 +6,13 @@
 //! - Claude Code: the writer is session identity's (from the environment
 //!   or the registry only, never a pid fallback), and the head comes from
 //!   the session file under the shared config-directory resolver.
-//! - Codex: the writer is the payload's `session_id` (its hook sees no
-//!   session variable), and the head is the direct head position whose
-//!   executable the adapter names.
+//! - Codex, pi and omp: the writer is the payload's `session_id` (their
+//!   hooks see no session variable), and the head is the direct head
+//!   position whose executable the adapter names.
 //! - agy: deferred, so no head.
 use super::shell::Resolved;
 use super::{Adapter, HookCallLimits};
-use crate::adapters::{claude_head, codex_head, AdapterFacts};
+use crate::adapters::{claude_head, payload_head, AdapterFacts};
 use crate::head::{Ancestry, NoHead};
 use fgos_identity::cli_dirs::claude_config_dir;
 use fgos_identity::resolve::{env_identity, resolve_current, Source, WriterId};
@@ -68,9 +68,9 @@ pub fn resolver_for<'a>(
             let head = claude_head::find_head(&sessions, ancestry, facts, &writer, hook)?;
             Ok(Resolved { writer, head })
         }
-        Adapter::Codex => {
-            let writer = codex_head::codex_writer(payload, env.session_env.as_deref())?;
-            let head = codex_head::find_head(ancestry, facts)?;
+        Adapter::Codex | Adapter::Pi | Adapter::Omp => {
+            let writer = payload_head::payload_writer(payload, env.session_env.as_deref())?;
+            let head = payload_head::find_head(ancestry, facts)?;
             Ok(Resolved { writer, head })
         }
         Adapter::Agy => Err(NoHead::WrongTopology),

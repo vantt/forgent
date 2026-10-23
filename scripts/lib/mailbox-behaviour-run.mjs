@@ -109,8 +109,8 @@ export function cellProgress(results, cellId) {
   return { attempts, valid, next: mine.length + 1 };
 }
 
-/** Whether a cell needs another run in a stage whose target is `target` valid runs: below it and under the attempt cap. */
-export const cellOpen = (progress, target) => progress.valid < target && progress.attempts < score.RULES.CAP;
+/** Whether a cell needs another run in a stage whose target is `target` valid runs: below it and under the attempt `cap` (V6's by default). */
+export const cellOpen = (progress, target, cap = score.RULES.CAP) => progress.valid < target && progress.attempts < cap;
 
 /**
  * At a harness start: the orphan sweep (confined) ends every run a dead harness left, and each
@@ -200,11 +200,28 @@ export function stepFinished(cli, records, needle) {
   return false;
 }
 
-/** Every Claude transcript or Codex rollout record under a private home, parsed, in file order. */
+/** The omp profile a confined run names; its login store lives in the private home under it. */
+export const RUN_PROFILE = 'acct';
+
+/** Where a CLI keeps its session records under a private home. */
+const recordsRoot = (cli, home) => ({
+  claude: path.join(home, '.claude', 'projects'),
+  codex: path.join(home, 'sessions'),
+  pi: path.join(home, 'sessions'),
+  omp: path.join(home, '.omp', 'profiles', RUN_PROFILE, 'agent', 'sessions'),
+}[cli]);
+
+/**
+ * Every Claude transcript, Codex rollout or pi/omp session record of the head under a private
+ * home, parsed, in file order. A subagent's records are left out: Claude Code's under
+ * `subagents`, omp's in a directory named after its parent session (deeper than the head's
+ * `<cwd>/<session>.jsonl`).
+ */
 export function modelRecords(cli, home) {
-  const root = cli === 'claude' ? path.join(home, '.claude', 'projects') : path.join(home, 'sessions');
+  const root = recordsRoot(cli, home);
   if (!fs.existsSync(root)) return [];
-  return fs.readdirSync(root, { recursive: true }).map(String).filter((f) => f.endsWith('.jsonl') && !f.includes('subagents')).sort()
+  const head = (f) => (cli === 'pi' || cli === 'omp' ? f.split(path.sep).length === 2 : !f.includes('subagents'));
+  return fs.readdirSync(root, { recursive: true }).map(String).filter((f) => f.endsWith('.jsonl') && head(f)).sort()
     .flatMap((f) => fs.readFileSync(path.join(root, f), 'utf8').split('\n').filter(Boolean).flatMap((l) => {
       try {
         return [JSON.parse(l)];
@@ -265,6 +282,9 @@ export const CLAUDE_NO_CONNECTORS_ENV = Object.freeze({ ENABLE_CLAUDEAI_MCP_SERV
 /** The environment a confined run of `cli` adds to its base: Claude Code's connector switch. */
 export const cliRunEnv = (cli) => (cli === 'claude' ? { ...CLAUDE_NO_CONNECTORS_ENV } : {});
 
+/** The CLIs whose head runs the generated pi/omp extension. */
+export const EXTENSION_CLIS = Object.freeze(['pi', 'omp']);
+
 /**
  * pi's and omp's switches that keep a confined run to the one extension under test: no
  * discovered or built-in extension (pi's MCP support is one), no MCP server, no skills, no
@@ -318,9 +338,32 @@ export function writeCodexConfig(home, ws, hooks, { effort }) {
   writeJson(path.join(home, 'hooks.json'), { hooks });
 }
 
-/** The final answer: Claude Code's last result record on stdout, Codex's `-o` file. */
+/** The JSON lines of a CLI's stdout, parsed; a line that is not JSON is skipped. */
+const jsonLines = (file) => fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).flatMap((l) => {
+  try {
+    return [JSON.parse(l)];
+  } catch {
+    return [];
+  }
+});
+
+/** pi's and omp's finished assistant messages, from their `--mode json` event stream. */
+const assistantMessages = (stdoutFile) => jsonLines(stdoutFile).filter((e) => e.type === 'message_end' && e.message?.role === 'assistant').map((e) => e.message);
+const textOf = (message) => (Array.isArray(message?.content) ? message.content.filter((c) => c.type === 'text').map((c) => c.text).join('\n') : String(message?.content ?? ''));
+
+/**
+ * The provider error a pi or omp run ended its last turn with (`stopReason` `error`), or null:
+ * both exit 0 when the provider refuses, so the run is an error only by this.
+ */
+export function providerErrorOf(stdoutFile) {
+  const last = assistantMessages(stdoutFile).at(-1);
+  return last?.stopReason === 'error' ? String(last.errorMessage ?? 'provider error') : null;
+}
+
+/** The final answer: Claude Code's last result record on stdout, Codex's `-o` file, pi's and omp's last assistant text. */
 function finalAnswerOf(cli, stdoutFile, lastMessage) {
   if (cli === 'codex') return fs.existsSync(lastMessage) ? fs.readFileSync(lastMessage, 'utf8') : '';
+  if (cli === 'pi' || cli === 'omp') return textOf(assistantMessages(stdoutFile).filter((m) => textOf(m).trim()).at(-1));
   const results = fs.readFileSync(stdoutFile, 'utf8').split('\n').filter((l) => l.includes('"type":"result"'));
   try {
     return String(JSON.parse(results.at(-1) ?? '{}').result ?? '');
@@ -329,8 +372,14 @@ function finalAnswerOf(cli, stdoutFile, lastMessage) {
   }
 }
 
-/** Token counts only (never a session id): Claude Code's result usage and cost, Codex's summed turn usage. */
+/** Token counts only (never a session id): Claude Code's result usage and cost, Codex's summed turn usage, pi's and omp's summed assistant usage. */
 function usageOf(cli, stdoutFile) {
+  if (cli === 'pi' || cli === 'omp') {
+    const usages = assistantMessages(stdoutFile).map((m) => m.usage ?? {});
+    if (!usages.length) return null;
+    const sum = (k) => usages.reduce((s, u) => s + (u[k] ?? 0), 0);
+    return { input: sum('input'), output: sum('output'), cacheRead: sum('cacheRead'), cacheWrite: sum('cacheWrite'), costUsd: usages.reduce((s, u) => s + (u.cost?.total ?? 0), 0) };
+  }
   const lines = fs.readFileSync(stdoutFile, 'utf8').split('\n').filter(Boolean).flatMap((l) => {
     try {
       return [JSON.parse(l)];
@@ -366,13 +415,21 @@ export async function runOne(ctx, cell, runId) {
   const sender = variant ? score.SENDERS[variant.sender].sessionId : null;
   const instruction = renderInstruction(data.instruction, [score.SENDERS.trusted.label]);
   const { lastMessage } = paths;
-  const args = cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
-  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: { ...cliRunEnv(cell.cli), ...(ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {}) } });
-  const prepared = confined.prepareConfinedRun({ base, runId, command: ctx.cliBin[cell.cli][0], args: [...ctx.cliBin[cell.cli].slice(1), ...args], env, login: ctx.login[cell.cli], masks: ctx.masks, readOnly: [paths.installation] });
+  const ext = EXTENSION_CLIS.includes(cell.cli);
+  const args = ext
+    ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, instruction, prompt: data.task, profile: RUN_PROFILE, offConfig: paths.ompOff })
+    : cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
+  const extEnv = ext ? (cell.cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: ctx.natives }) : {};
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: { ...cliRunEnv(cell.cli), ...extEnv, ...(ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {}) } });
+  const readOnly = [paths.installation, ...(ext ? [paths.extension, ...(cell.cli === 'omp' ? [paths.ompOff] : [])] : [])];
+  const prepared = confined.prepareConfinedRun({ base, runId, command: ctx.cliBin[cell.cli][0], args: [...ctx.cliBin[cell.cli].slice(1), ...args], env, login: ext ? null : ctx.login[cell.cli], accountLogin: ext ? ctx.accountLogin(cell.cli) : null, masks: ctx.masks, readOnly });
   const hooks = confined.layOutRunProject(paths, { cli: cell.cli, release: ctx.release, shim: ctx.shim, ...(ctx.projectConfig ? { config: ctx.projectConfig(cell) } : {}) });
   seedWorkspace(paths.ws);
   if (cell.cli === 'claude') live.seedClaudeState({ home: paths.home, version: ctx.versions.claude, trusted: [paths.ws] });
-  else writeCodexConfig(paths.home, paths.ws, hooks, { effort: ctx.effort });
+  else if (cell.cli === 'codex') writeCodexConfig(paths.home, paths.ws, hooks, { effort: ctx.effort });
+  else if (cell.cli === 'omp') fs.writeFileSync(paths.ompOff, OMP_OFF_CONFIG, { mode: 0o444 });
+  // A dry pi or omp run's provider: the recording endpoint scripted with the stub behaviour.
+  const provider = ctx.providerFor ? await ctx.providerFor(cell, paths, ctx.stubBehaviour) : null;
   fs.mkdirSync(paths.capture, { recursive: true });
   const stdoutFile = path.join(paths.capture, 'stdout.txt');
   const stderrFile = path.join(paths.capture, 'stderr.txt');
@@ -427,11 +484,14 @@ export async function runOne(ctx, cell, runId) {
     await sleep(200);
   }
   const end = await confined.endConfinedRun(run, { outcome: timedOut ? 'timeout' : null });
+  await provider?.close();
   exit ??= { code: null, signal: 'SIGKILL' };
   const settled = confined.settleLoginCopy(prepared);
   const output = `${fs.readFileSync(stdoutFile, 'utf8')}\n${fs.readFileSync(stderrFile, 'utf8')}`;
-  const providerLimit = exit.code !== 0 && PROVIDER_LIMIT.test(output);
-  const error = settled ? 'login-guard' : timedOut ? 'timeout' : exit.code !== 0 ? `exit ${exit.code ?? exit.signal}` : end.left.length ? 'processes left' : sent && sent.status !== 0 ? `send refused: ${sent.text.split('\n')[0]}` : null;
+  // pi and omp exit 0 when the provider refuses; their last turn says so.
+  const providerError = ext ? providerErrorOf(stdoutFile) : null;
+  const providerLimit = (exit.code !== 0 && PROVIDER_LIMIT.test(output)) || Boolean(providerError && PROVIDER_LIMIT.test(providerError));
+  const error = settled ? 'login-guard' : timedOut ? 'timeout' : exit.code !== 0 ? `exit ${exit.code ?? exit.signal}` : providerError ? `provider error: ${providerError.split('\n')[0].slice(0, 200)}` : end.left.length ? 'processes left' : sent && sent.status !== 0 ? `send refused: ${sent.text.split('\n')[0]}` : null;
   const finalAnswer = finalAnswerOf(cell.cli, stdoutFile, lastMessage);
   const message = sent?.id ? (snapshotOf(paths.ws)?.messages ?? []).find((m) => m.id === sent.id) : null;
   const records = modelRecords(cell.cli, paths.home);
@@ -701,14 +761,18 @@ export const stagePhases = (stage, clis = null) => (stage === 'A' ? [score.basel
  * Runs stage `stage` (A: the baselines to 5 runs per CLI, then every cell to 5 valid runs;
  * B: every cell to 20) round by round in the interleaved order, never repeating a finished
  * run; `ctx.clis`, when given, limits it to those CLIs' cells. An addendum gives its own
- * `ctx.phases(stage)`, `ctx.order(cells, round)`, `ctx.stageARuns` and `ctx.rules(results,
- * {stageComplete, stage})`, whose `stoppedArms` take an arm's cells out of the stage. Before
+ * `ctx.phases(stage)`, `ctx.order(cells, round)`, `ctx.stageARuns`, `ctx.stageBRuns`, `ctx.cap`,
+ * `ctx.groupOf(cell)` and `ctx.rules(results, {stageComplete, stage})`, whose `stoppedArms`
+ * take a group's cells (an arm, or a pair) out of the stage. Before
  * each start `ctx.beforeRun(cell)` returns a stop reason or null (memory, pins, ceiling,
  * sentinels, login freshness); after each run the result stop rules run. Returns `{stop}`
  * with the reason, or `{stop: null}` when every open cell is done.
  */
 export async function runStage(ctx, stage) {
-  const target = stage === 'A' ? (ctx.stageARuns ?? score.STAGE_A_RUNS) : score.RULES.N;
+  const target = stage === 'A' ? (ctx.stageARuns ?? score.STAGE_A_RUNS) : (ctx.stageBRuns ?? score.RULES.N);
+  const cap = ctx.cap ?? score.RULES.CAP;
+  // The group a stop rule takes out: V7c's arm, or V7e's pair (`ctx.groupOf`).
+  const groupOf = ctx.groupOf ?? ((c) => c.arm);
   const closedSt = new Set(ctx.closedSt ?? []);
   const rules = ctx.rules ?? resultStopRules;
   const order = ctx.order ?? stageOrder;
@@ -719,14 +783,14 @@ export async function runStage(ctx, stage) {
     for (let round = 0; ; round += 1) {
       const results = readResults(ctx.resultsFile);
       const arms = stopped(rules(results, { stageComplete: false, stage }));
-      const open = order(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && !(c.arm && arms[c.arm]) && cellOpen(cellProgress(results, c.id), goal));
+      const open = order(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && !(c.arm && arms[groupOf(c)]) && cellOpen(cellProgress(results, c.id), goal, cap));
       if (!open.length) break;
       for (const cell of open) {
         const now = readResults(ctx.resultsFile);
         const progress = cellProgress(now, cell.id);
         const ruled = rules(now, { stageComplete: false, stage });
         if (ruled.stops.length) return { stop: ruled.stops.join('; ') };
-        if (!cellOpen(progress, goal) || (cell.arm && stopped(ruled)[cell.arm])) continue;
+        if (!cellOpen(progress, goal, cap) || (cell.arm && stopped(ruled)[groupOf(cell)])) continue;
         const problem = await ctx.beforeRun(cell);
         if (problem) return { stop: problem };
         const { line, stop } = await runOne(ctx, cell, runIdOf(cell, progress.next));

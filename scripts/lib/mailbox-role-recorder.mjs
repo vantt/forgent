@@ -25,12 +25,12 @@ const usage = { input_tokens: 10, input_tokens_details: { cached_tokens: 0 }, ou
  * The events of one scripted response: `forced`, a function call the caller names, when given;
  * else the bash tool running `ls` when `input` holds no function call yet; else the final text.
  */
-export function scriptedEvents(input, n, forced = null) {
+export function scriptedEvents(input, n, forced = null, text = FINAL_TEXT) {
   const id = `resp_${n}`;
   const called = !forced && (input ?? []).some((item) => item?.type === 'function_call');
   const call = forced ?? SCRIPTED_CALL;
   const item = called
-    ? { type: 'message', id: `msg_${n}`, role: 'assistant', status: 'completed', content: [{ type: 'output_text', text: FINAL_TEXT, annotations: [] }] }
+    ? { type: 'message', id: `msg_${n}`, role: 'assistant', status: 'completed', content: [{ type: 'output_text', text, annotations: [] }] }
     : { type: 'function_call', id: `fc_${n}`, call_id: `call_${n}`, status: 'completed', ...call };
   const added = called ? { ...item, status: 'in_progress', content: [] } : { ...item, status: 'in_progress', arguments: '' };
   const response = { id, object: 'response', status: 'in_progress', model: 'recorder', output: [] };
@@ -42,8 +42,8 @@ export function scriptedEvents(input, n, forced = null) {
   if (called) {
     events.push(
       { type: 'response.content_part.added', output_index: 0, item_id: item.id, content_index: 0, part: { type: 'output_text', text: '', annotations: [] } },
-      { type: 'response.output_text.delta', output_index: 0, item_id: item.id, content_index: 0, delta: FINAL_TEXT },
-      { type: 'response.output_text.done', output_index: 0, item_id: item.id, content_index: 0, text: FINAL_TEXT },
+      { type: 'response.output_text.delta', output_index: 0, item_id: item.id, content_index: 0, delta: text },
+      { type: 'response.output_text.done', output_index: 0, item_id: item.id, content_index: 0, text },
       { type: 'response.content_part.done', output_index: 0, item_id: item.id, content_index: 0, part: item.content[0] },
     );
   } else {
@@ -78,10 +78,11 @@ export const parseSse = (text) => text.split('\n').filter((l) => l.startsWith('d
 /**
  * Starts the endpoint on 127.0.0.1 (a free port) writing into `dir`. `callFor(body)` may name
  * the function call that answers a request (a subagent probe's `task` and `wait` calls); null
- * keeps the script. Returns
+ * keeps the script. `textFor(body)` may name the final text (a dry run's scripted answer).
+ * Returns
  * its `url`, `requests()` (the kept files, in arrival order) and `close()`.
  */
-export async function startRecorder({ dir, callFor = () => null }) {
+export async function startRecorder({ dir, callFor = () => null, textFor = () => FINAL_TEXT }) {
   fs.mkdirSync(dir, { recursive: true });
   const kept = [];
   const server = http.createServer((req, res) => {
@@ -105,7 +106,7 @@ export async function startRecorder({ dir, callFor = () => null }) {
         return;
       }
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
-      for (const event of scriptedEvents(body?.input, n, callFor(body))) res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+      for (const event of scriptedEvents(body?.input, n, callFor(body), textFor(body))) res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
       res.end();
     });
   });

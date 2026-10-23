@@ -26,7 +26,7 @@ const LIMITS = path.join('packages', 'mailbox', 'contracts', 'limits.v1.json');
 const SELF = path.join('scripts', 'lib', 'mailbox-behaviour-v7.mjs');
 
 /** The addenda this harness knows, each with its own home. */
-export const ADDENDA = Object.freeze(['v7c']);
+export const ADDENDA = Object.freeze(['v7c', 'v7e']);
 
 // ---------------------------------------------------------------- the harness home
 

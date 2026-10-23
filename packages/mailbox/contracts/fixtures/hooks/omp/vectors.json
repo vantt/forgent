@@ -1,0 +1,165 @@
+{
+  "cli": "omp",
+  "source": "recorded 2026-10-23 from omp 18.12.6 on this machine by test/live/mailbox-behaviour.live.mjs record-fixtures, with no model: the Codex provider pointed at the recording endpoint (scripts/lib/mailbox-role-recorder.mjs) under the confined launch, the product's generated extension of an opted-in project loaded by path, and a capture shim in the shim's place answering a canary frame at each tool result; dump run `omp --profile=acct -p --mode json --no-extensions --no-skills --no-rules --no-lsp --no-title --config=<path> -e <path> --model openai-codex/gpt-6.1-sol --thinking low Run ls, then reply done.` (exit 0); second run `omp --profile=acct -p --mode json --no-extensions --no-skills --no-rules --no-lsp --no-title --config=<path> -e <path> --model openai-codex/gpt-6.1-sol --thinking low Run ls, then reply done.` (exit 0); subagent run `omp --profile=acct -p --mode json --no-extensions --no-skills --no-rules --no-lsp --no-title --config=<path> -e <path> --model openai-codex/gpt-6.1-sol --thinking low SPAWN-SUBAGENT: delegate one task.` (exit 0) (the recorder answered with a task call and a wait); the canary frame reached the provider as function_call_output:; the hook processes saw none of the identity variables; the tool process saw PI_SESSION_ID; the subagent's PostToolUse carried subagent true and its own session id",
+  "vectors": [
+    {
+      "name": "head-stop",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "head-stop-of-a-later-run",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-continued.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000002"
+      }
+    },
+    {
+      "name": "head-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "subagent-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use-subagent.json",
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000003"
+      }
+    },
+    {
+      "name": "empty-input",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "text": "",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "not-json",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "text": "not json",
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-json-array",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "stop",
+      "json": [],
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "a-stop-sent-as-post-tool-use",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "stop.json",
+      "expect": {
+        "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-cut-in-half",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "truncate": true,
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "an-empty-session-id-is-no-session",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "session_id": ""
+      },
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "session": null
+      }
+    },
+    {
+      "name": "agent-subagent-true",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "subagent": true
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-subagent-missing",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "subagent": null
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "agent-subagent-a-number",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "subagent": 0
+      },
+      "expect": {
+        "subordinate": true,
+        "firstStop": null,
+        "session": "00000000-0000-4000-8000-000000000001"
+      }
+    }
+  ]
+}

@@ -36,7 +36,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS, readCredentialExpiry } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
-import { installClaudeHook, installCodexHook } from '../../src/setup/agent-hooks.mjs';
+import { installClaudeHook, installCodexHook, installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { loginDigest, setAsideChangedCopy } from './codex-auth-guard.mjs';
 import { sandboxGit } from './sandbox-git.mjs';
@@ -105,6 +105,9 @@ export function runPaths(base, runId, workspace = null) {
     installation: path.join(wsRoot, 'ws', '.fgos', 'installation'),
     ledger: path.join(base, 'ledger', `${runId}.json`),
     settings: path.join(base, 'settings', `${runId}.json`),
+    // pi's or omp's generated extension and omp's off overlay, read-only to the run.
+    extension: path.join(base, 'settings', `${runId}-fgos-hooks.ts`),
+    ompOff: path.join(base, 'settings', `${runId}-omp-off.yml`),
     capture: path.join(base, 'capture', runId),
   };
 }
@@ -132,9 +135,19 @@ export function layOutRunProject(paths, { cli, release, shim, config = { mailbox
  * The product installer's hook rows for `cli` in the run's project, without its PreToolUse
  * guards (they need the legacy-node payload the private release does not stage). Claude
  * Code's rows go to `paths.settings`, outside the project and read-only to the run; Codex's
- * rows are returned, for the run's CODEX_HOME. The project keeps no hook file of its own.
+ * rows are returned, for the run's CODEX_HOME; pi's and omp's generated extension (the
+ * project's opt-in decides its mailbox handlers) goes to `paths.extension`, read-only, and
+ * its path is returned. The project keeps no hook file of its own.
  */
 export function installRunRows(paths, cli) {
+  if (cli === 'pi' || cli === 'omp') {
+    (cli === 'pi' ? installPiHook : installOmpHook)(paths.ws);
+    fs.mkdirSync(path.dirname(paths.extension), { recursive: true });
+    fs.copyFileSync(path.join(paths.ws, `.${cli}`, 'extensions', 'fgos-hooks.ts'), paths.extension);
+    fs.chmodSync(paths.extension, 0o444);
+    fs.rmSync(path.join(paths.ws, `.${cli}`), { recursive: true });
+    return paths.extension;
+  }
   if (cli === 'claude') {
     installClaudeHook(paths.ws);
     const file = path.join(paths.ws, '.claude', 'settings.json');

@@ -31,7 +31,8 @@ const parentSession = (ctx) => {
 
 export default function (api) {
   const method = process.env.MBX_METHOD || 'none';
-  const mark = `MARK-${method}`;
+  // MBX_PAD lengthens the marker to that many bytes (the output-bound ladder).
+  const mark = `MARK-${method}`.padEnd(Number(process.env.MBX_PAD || 0), '.');
   const [kind, as] = method.split(':');
   let fired = false;
   log({ at: 'load', proc: self(), api: names(api) });

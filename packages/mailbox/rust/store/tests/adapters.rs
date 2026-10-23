@@ -41,7 +41,7 @@ fn every_payload_vector_parses_as_it_says() {
 
 #[test]
 fn a_subagent_event_is_subordinate_however_the_marker_is_written() {
-    for adapter in [Adapter::Claude, Adapter::Codex] {
+    for adapter in [Adapter::Claude, Adapter::Codex, Adapter::Pi, Adapter::Omp] {
         let marked: Vec<Value> = vectors(adapter, "parse")
             .into_iter()
             .filter(|v| {
@@ -108,6 +108,7 @@ fn rendered_output_survives_hostile_text() {
             let text = rendered["reason"]
                 .as_str()
                 .or_else(|| rendered["hookSpecificOutput"]["additionalContext"].as_str())
+                .or_else(|| rendered["inject"].as_str())
                 .unwrap();
             assert_eq!(text, hostile);
         }

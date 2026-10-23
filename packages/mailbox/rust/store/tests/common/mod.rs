@@ -11,7 +11,13 @@ use fgos_mailbox::hook::{Adapter, HookEvent};
 use serde_json::Value;
 use std::path::PathBuf;
 
-pub const ADAPTERS: [Adapter; 3] = [Adapter::Claude, Adapter::Codex, Adapter::Agy];
+pub const ADAPTERS: [Adapter; 5] = [
+    Adapter::Claude,
+    Adapter::Codex,
+    Adapter::Agy,
+    Adapter::Pi,
+    Adapter::Omp,
+];
 
 /// The mailbox contracts directory; the one place the tests name it.
 pub fn contracts_dir() -> PathBuf {

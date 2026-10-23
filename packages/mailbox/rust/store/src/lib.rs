@@ -3,7 +3,7 @@
 //! §4.1): the hook kind and its per-CLI adapters (§6.1), the record
 //! adapter (§6.4, module `record`), the hook shell (`hook::shell`), the
 //! ancestry reader, head finders and caller check (`ancestry`, `head`,
-//! `adapters::{claude_head, codex_head}`, `hook::resolve`), the limits
+//! `adapters::{claude_head, payload_head}`, `hook::resolve`), the limits
 //! loader (`limits`), and the verbs (`verbs`). The store reads the process
 //! table only through process facts: its own ancestry, and the liveness of
 //! a stored head.

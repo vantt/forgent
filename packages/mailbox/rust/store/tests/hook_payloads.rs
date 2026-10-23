@@ -421,8 +421,14 @@ fn a_subagent_event_takes_nothing_and_the_head_gets_the_mail_next() {
         let id = drain.send("peer", "for the head only", false);
         let before = drain.state.clone();
 
-        let mut subordinate =
-            vec![serde_json::to_vec(&fixture(adapter, files::POST_TOOL_USE_SUBAGENT)).unwrap()];
+        // pi has no subagent tool, so it has no recorded subagent payload;
+        // its synthesized `agent-` vectors carry the marker.
+        let recorded = common::fixture_dir(adapter).join(files::POST_TOOL_USE_SUBAGENT);
+        let mut subordinate: Vec<Vec<u8>> = if recorded.is_file() {
+            vec![serde_json::to_vec(&fixture(adapter, files::POST_TOOL_USE_SUBAGENT)).unwrap()]
+        } else {
+            Vec::new()
+        };
         for vector in vectors(adapter, "parse") {
             if vector["name"].as_str().unwrap().starts_with("agent-") {
                 subordinate.push(vector_input(adapter, &vector));
@@ -597,10 +603,14 @@ fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
         assert_eq!(payload["session_id"].as_str(), Some(from_tool.as_str()));
         match key_from(&env["hookIdVars"][files::POST_TOOL_USE]) {
             Some(from_hook) => assert_eq!(from_hook, from_tool, "{}", adapter.word()),
-            // Recorded: Codex's hook process sees no identity
-            // variable, so the hook cannot derive the key from its
-            // environment.
-            None => assert_eq!(adapter, Adapter::Codex),
+            // Recorded: the hook processes of Codex, and of pi's and omp's
+            // extension, see no identity variable, so the hook cannot
+            // derive the key from its environment.
+            None => assert!(
+                matches!(adapter, Adapter::Codex | Adapter::Pi | Adapter::Omp),
+                "{}",
+                adapter.word()
+            ),
         }
     }
 }
@@ -694,12 +704,14 @@ fn a_cli_missing_from_the_tested_list_is_quiet_and_changes_nothing() {
     }
 }
 
-/// The `additionalContext` text of a `PostToolUse` reply, in the shape the
-/// CLI injects.
+/// The text of a `PostToolUse` reply, in the shape the CLI injects: the
+/// `additionalContext` of Claude Code and Codex, the `inject` of the pi/omp
+/// extension.
 fn context_of(stdout: &str) -> String {
     let out: Value = serde_json::from_str(stdout).unwrap();
     out["hookSpecificOutput"]["additionalContext"]
         .as_str()
+        .or_else(|| out["inject"].as_str())
         .unwrap()
         .to_string()
 }

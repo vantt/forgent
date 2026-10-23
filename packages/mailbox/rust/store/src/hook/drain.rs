@@ -259,13 +259,19 @@ pub fn begin(
     if payload.subordinate {
         return quiet(QuietReason::Subordinate);
     }
-    let (Some(shape), Some(cli), true) = (
-        call.adapter.shape(call.event),
-        call.adapter.cli(),
-        tested.contains(call.adapter),
-    ) else {
+    let (Some(cli), Some(facts)) = (call.adapter.cli(), tested.facts(call.adapter)) else {
         return quiet(QuietReason::Untested);
     };
+    // A channel that delivers needs the shape its CLI was recorded injecting;
+    // one that does not (a pi or omp Stop) only registers, and needs none.
+    let delivers = match call.event {
+        HookEvent::Stop => facts.stop_delivers,
+        HookEvent::PostToolUse => facts.post_tool_use_max_bytes.is_some(),
+    };
+    let shape = call.adapter.shape(call.event);
+    if delivers && shape.is_none() {
+        return quiet(QuietReason::Untested);
+    }
     if payload
         .session
         .as_deref()
@@ -307,16 +313,22 @@ pub fn begin(
         registered,
     };
     let key = &call.writer;
+    // A channel that takes no mail ends here, after the registration and
+    // before the first-Stop reset and the cap, so a CLI whose Stop takes no
+    // mail never reads or writes its Stop-block count. Every path past this
+    // point delivers, so its shape was required above.
+    let Some(shape) = shape.filter(|_| delivers) else {
+        return after(
+            if call.event == HookEvent::Stop {
+                QuietReason::StopChannelOff
+            } else {
+                QuietReason::NoStepBound
+            },
+            changed,
+        );
+    };
     let checkpoint = match call.event {
         HookEvent::Stop => {
-            // Before the first-Stop reset and the cap: a CLI whose Stop
-            // takes no mail never reads or writes its Stop-block count.
-            if !tested
-                .facts(call.adapter)
-                .is_some_and(|facts| facts.stop_delivers)
-            {
-                return after(QuietReason::StopChannelOff, changed);
-            }
             if payload.first_stop == Some(true) {
                 changed |= state.note_stop(key, generation, false);
             }
@@ -327,10 +339,7 @@ pub fn begin(
             }
             Checkpoint::Stop
         }
-        HookEvent::PostToolUse => match tested
-            .facts(call.adapter)
-            .and_then(|facts| facts.post_tool_use_max_bytes)
-        {
+        HookEvent::PostToolUse => match facts.post_tool_use_max_bytes {
             Some(_) if hook.post_tool_use.pointer_clis.contains(&call.adapter) => {
                 let pointed = state.point(key, generation, now, limits, ids);
                 if pointed.count == 0 {

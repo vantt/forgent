@@ -7,7 +7,7 @@ mod common;
 use common::hook_limits;
 use common::record::{mkfifo, TempFgos};
 use fgos_mailbox::adapters::claude_head::find_head;
-use fgos_mailbox::adapters::{codex_head, AdapterFacts, TestedClis};
+use fgos_mailbox::adapters::{payload_head, AdapterFacts, TestedClis};
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::head::{Ancestry, NoHead};
 use fgos_mailbox::hook::Adapter;
@@ -296,33 +296,51 @@ fn a_name_that_is_not_derived_gives_no_own_suffix() {
 
 #[test]
 fn a_direct_head_must_run_one_of_the_adapters_head_executables() {
-    let codex = facts(Adapter::Codex);
+    // Each direct CLI's own head executable, as installed here: Codex's
+    // release binary, pi's Node (its launcher execs the release through
+    // `#!/usr/bin/env node`), omp's single binary.
+    let heads = [
+        (Adapter::Codex, "/home/u/.codex/releases/0.161.0/bin/codex"),
+        (Adapter::Pi, "/home/u/.nvm/versions/node/v24.21.0/bin/node"),
+        (Adapter::Omp, "/home/u/.local/bin/omp"),
+    ];
     let child = spawn("sleep", &["30"]);
     let record = record_of(child.0.id());
     let at = |exe: &str| ancestry(record.clone(), exe, exe, None);
-
-    let head =
-        codex_head::find_head(&at("/home/u/.codex/releases/0.161.0/bin/codex"), &codex).unwrap();
-    assert_eq!(head.record, record);
-    assert_eq!(head.own_suffix, None);
-    for subreaper in [
-        "/usr/lib/systemd/systemd",
-        "/home/u/.local/bin/herdr",
-        "/usr/bin/zsh",
-    ] {
+    for (adapter, own) in heads {
+        let facts = facts(adapter);
+        let head = payload_head::find_head(&at(own), &facts).unwrap();
+        assert_eq!(head.record, record);
+        assert_eq!(head.own_suffix, None);
+        let others = heads
+            .iter()
+            .filter(|(a, _)| *a != adapter)
+            .map(|(_, exe)| *exe);
+        for wrong in [
+            "/usr/lib/systemd/systemd",
+            "/home/u/.local/bin/herdr",
+            "/usr/bin/zsh",
+        ]
+        .into_iter()
+        .chain(others)
+        {
+            assert_eq!(
+                payload_head::find_head(&at(wrong), &facts),
+                Err(NoHead::WrongExecutable),
+                "{} {wrong}",
+                adapter.word()
+            );
+        }
+        // A real ancestry: the entry's parent is a shell, not the CLI.
+        let shell = spawn("/bin/sh", &["-c", "sleep 30; :"]);
+        let entry = child_of(shell.0.id());
         assert_eq!(
-            codex_head::find_head(&at(subreaper), &codex),
+            payload_head::find_head(&ancestry_of(entry).unwrap(), &facts),
             Err(NoHead::WrongExecutable),
-            "{subreaper}"
+            "{}",
+            adapter.word()
         );
     }
-    // A real ancestry: the entry's parent is a shell, not Codex.
-    let shell = spawn("/bin/sh", &["-c", "sleep 30; :"]);
-    let entry = child_of(shell.0.id());
-    assert_eq!(
-        codex_head::find_head(&ancestry_of(entry).unwrap(), &codex),
-        Err(NoHead::WrongExecutable)
-    );
 }
 
 #[test]
@@ -366,13 +384,16 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
 fn a_codex_entry_takes_its_writer_from_the_payload_and_refuses_an_environment_naming_another_session(
 ) {
     let payload = br#"{"session_id":"00000000-0000-4000-8000-000000000001"}"#;
-    assert_eq!(codex_head::codex_writer(payload, None).unwrap(), writer());
     assert_eq!(
-        codex_head::codex_writer(payload, Some(WRITER)).unwrap(),
+        payload_head::payload_writer(payload, None).unwrap(),
         writer()
     );
     assert_eq!(
-        codex_head::codex_writer(payload, Some("00000000-0000-4000-8000-000000000002")),
+        payload_head::payload_writer(payload, Some(WRITER)).unwrap(),
+        writer()
+    );
+    assert_eq!(
+        payload_head::payload_writer(payload, Some("00000000-0000-4000-8000-000000000002")),
         Err(NoHead::WriterMismatch)
     );
     for bad in [
@@ -381,6 +402,9 @@ fn a_codex_entry_takes_its_writer_from_the_payload_and_refuses_an_environment_na
         br#"{"session_id":"a b"}"#,
         b"not json",
     ] {
-        assert_eq!(codex_head::codex_writer(bad, None), Err(NoHead::NoWriter));
+        assert_eq!(
+            payload_head::payload_writer(bad, None),
+            Err(NoHead::NoWriter)
+        );
     }
 }

@@ -116,7 +116,7 @@ fn the_pointer_key_takes_a_list_of_cli_names_and_refuses_an_unknown_name() {
     assert_eq!(loaded, expected, "only the listed key changes");
 
     assert_eq!(
-        load(Some(&with(json!(["codex", "pi"])))),
+        load(Some(&with(json!(["codex", "gemini"])))),
         Err(LimitsError::Rejected(
             "mailbox.postToolUse.pointerClis".to_string()
         ))
