@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice C: native-door cutover (yaml and config namespaces, one Node facade, every reader and writer moved, js-yaml and src/config deleted)"
 description: "Three landings: A (yaml namespace, js-yaml deleted, RUL101 superseded), B (config namespace entries snapshot/explain/applyPatch/init, crate additions, Node facade), C (the cutover: ~100 Node reader sites, 5 writers, Rust readers, fixture helper flip, guards, then the live migration of this repository as its first committed step)."
-status: pending
+status: in-progress
 priority: P1
 effort: 131h
 branch: cfg/slice-c-yaml (A), cfg/slice-c-door (B), cfg/slice-c (C): linked worktrees; never the shared main checkout
@@ -14,6 +14,8 @@ created: 2026-10-23
 # YAML Document + Config, Slice C
 
 Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/config/spec.md) sections 5, 12, 13, 15 (source of truth), [YAML Document](../../docs/platform/yaml-document/spec.md) sections 10, 12, [Distribution](../../docs/specs/distribution.md) (RUL101, RUL107). Board row: CFG in [the program board](../261017-1313-fgos-platform-program-board/plan.md). Built on: [Slice D plan](../261023-1627-yaml-config-slice-d-migrate-and-machine-files/plan.md) (**written, not yet landed when this plan was made; every fact about D below is tagged [D-ASSUMED] and re-read by phase 00 against D as landed**), [Slice B plan](../261023-1018-yaml-config-slice-b-config-crate/plan.md) (landed, crate `fgos-config`, 2,372 source lines), Slice A (landed, `fgos-yaml-doc`). Owner-approved order: **D before C** for the config cutover; landing A touches nothing D owns except two addon files (see order).
+
+> Frame approved by the owner 2026-10-23 20:19 (D first; C landing A in parallel).
 
 ## Outcome
 
