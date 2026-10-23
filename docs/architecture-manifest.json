@@ -226,6 +226,7 @@
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",
+    "src/setup/git-retention-note.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/identity-checks.mjs": "use-case",
     "src/setup/terminal-control-checks.mjs": "infra",
