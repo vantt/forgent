@@ -16,8 +16,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { routeEnv } from '../holder-lock/driver.mjs';
 
-export const PROTOCOL = 1;
-const OPS = ['allocate', 'attach', 'launch', 'send', 'read', 'inspect', 'release', 'label', 'capabilities', 'reconcile-scan'];
+const PROTOCOL = 1;
 const DEFAULT_TIMEOUT_MS = 60_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
@@ -87,8 +86,8 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
 
 /**
  * createTerminalControl({ hostBin, herdrBin, env, config, timeoutMs }) ->
- *   { allocate, attach, launch, send, read, inspect, release, label,
- *     capabilities, reconcileScan, allocateAsync, releaseAsync }
+ *   { allocate, attach, read, inspect, release, capabilities, reconcileScan,
+ *     allocateAsync, releaseAsync }
  *
  * `hostBin` defaults to the active release's host (resolved on first call).
  * `herdrBin` is the caller's resolved herdr binary; `env` the driver's
@@ -199,8 +198,6 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
       return callSync('allocate', request);
     },
     attach: (request) => callSync('attach', request),
-    launch: (request) => callSync('launch', request),
-    send: (request) => callSync('send', request),
     read: (request) => callSync('read', request),
     inspect: (request) => callSync('inspect', request),
     release(request) {
@@ -208,7 +205,6 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
       if (result.result === 'released') groupOfKey.delete(request.key);
       return result;
     },
-    label: (request) => callSync('label', request),
     capabilities: () => callSync('capabilities', {}),
     reconcileScan: (request) => callSync('reconcile-scan', request),
 
@@ -237,5 +233,3 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
   };
   return client;
 }
-
-export { OPS as TERMINAL_CONTROL_OPS };
