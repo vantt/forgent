@@ -356,32 +356,45 @@ impl GitDriver {
     fn read_repository_facts(&self, repo: &mut RepoHandle) -> Result<Vec<ConfigRecord>> {
         let config = self.config(repo)?;
         self.check_config(repo, &config)?;
-        // A long-lived handle reuses the formats its unchanged config stamp
-        // already answered; a checkout handle reads them afresh every call.
-        let cached = if repo.checkout_config.is_some() { None } else { self.cached_formats(repo)? };
-        (repo.object_format, repo.layout.refs) = match cached {
+        // Formats are config facts: reused exactly while the stamp that proved
+        // them still matches, read afresh when the stamp moved.
+        let formats = match self.cached_formats(repo)? {
             Some(formats) => formats,
             None => {
                 let formats = self.repository_formats(repo)?;
-                if repo.checkout_config.is_none() {
-                    if let Some(entry) = REPOSITORY_CONFIG.lock()
-                        .map_err(|_| failure("config-cache-poisoned"))?.get_mut(&repo.git_dir)
-                    {
-                        entry.formats = Some(formats);
-                    }
-                }
+                self.keep_formats(repo, formats)?;
                 formats
             }
         };
+        (repo.object_format, repo.layout.refs) = formats;
         repo.layout.promisor = config.iter().any(|(_, k, v)| {
             (k.ends_with(".promisor") && v != b"false") || k == "extensions.partialclone"
         });
         Ok(config)
     }
 
+    // A checkout handle answers from its own operation-local cache, any other
+    // handle from the process-wide one; both only ever hold a validated stamp.
     fn cached_formats(&self, repo: &RepoHandle) -> Result<Option<(ObjectFormat, RefStorage)>> {
+        if let Some(local) = &repo.checkout_config {
+            let local = local.lock().map_err(|_| failure("config-cache-poisoned"))?;
+            return Ok(local.as_ref().and_then(|entry| entry.formats));
+        }
         Ok(REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
             .get(&repo.git_dir).and_then(|entry| entry.formats))
+    }
+
+    fn keep_formats(&self, repo: &RepoHandle, formats: (ObjectFormat, RefStorage)) -> Result<()> {
+        if let Some(local) = &repo.checkout_config {
+            if let Some(entry) = local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut() {
+                entry.formats = Some(formats);
+            }
+        } else if let Some(entry) = REPOSITORY_CONFIG.lock()
+            .map_err(|_| failure("config-cache-poisoned"))?.get_mut(&repo.git_dir)
+        {
+            entry.formats = Some(formats);
+        }
+        Ok(())
     }
 
     fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
@@ -797,7 +810,8 @@ impl GitDriver {
         Ok(())
     }
     /// An owned handle local to one port call. It never escapes into the
-    /// long-lived port handle; the next call reads all facts afresh.
+    /// long-lived port handle; every call re-proves its facts against the
+    /// config stamp and reads afresh only what the stamp no longer covers.
     pub(crate) fn checkout_repository(&self, repo: &RepoHandle) -> Result<RepoHandle> {
         self.require_floor()?;
         let mut current = match self.resolve_topology(
@@ -810,7 +824,11 @@ impl GitDriver {
         if !current.same_checkout(repo) {
             return Err(failure("untrusted-worktree"));
         }
-        let config = self.validated_config(&current, None, Policy::Inspect, None)?;
+        // Seeded from the process-wide entry for this git dir; the stamp check
+        // inside decides whether it still stands or the config is read afresh.
+        let seed = REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
+            .get(&current.git_dir).cloned();
+        let config = self.validated_config(&current, seed.as_ref(), Policy::Inspect, None)?;
         current.checkout_config = Some(Mutex::new(Some(config)));
         self.read_repository_facts(&mut current)?;
         if current.object_format != repo.object_format || current.layout.refs != repo.layout.refs {
@@ -818,6 +836,13 @@ impl GitDriver {
         }
         if current.layout.promisor != repo.layout.promisor {
             return Err(failure("repository-promisor-changed"));
+        }
+        // What this operation proved stands for the next handle of the same git dir.
+        let proven = current.checkout_config.as_ref()
+            .and_then(|local| local.lock().ok().and_then(|entry| entry.clone()));
+        if let Some(proven) = proven {
+            REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
+                .insert(current.git_dir.clone(), proven);
         }
         Ok(current)
     }
@@ -2669,14 +2694,42 @@ mod tests {
             _ => panic!("not repo"),
         }
     }
+    /// Points the driver at a Git that logs each argument list, so a test can count the
+    /// config listings and format reads a call really spawned.
+    fn log_git_children(driver: &mut GitDriver, dir: &Path) -> PathBuf {
+        let log = dir.join("children.log");
+        let script = dir.join("logging-git");
+        fs::write(&script, format!("#!/bin/sh\necho \"$*\" >> '{}'\nexec '{}' \"$@\"\n", log.display(), driver.git.display())).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        driver.git = script;
+        log
+    }
+    /// (config listings, format reads) spawned so far.
+    fn fact_reads(log: &Path) -> (usize, usize) {
+        let text = fs::read_to_string(log).unwrap_or_default();
+        (text.lines().filter(|l| l.contains("--show-origin")).count(),
+         text.lines().filter(|l| l.contains("--show-object-format")).count())
+    }
+
     #[test]
     fn checkout_stamp_rechecks_external_config_writes_between_children() {
         let state = Temp::new();
         let dir = Temp::new();
+        let logs = Temp::new();
         git(&dir.0, &["init", "-q"]);
-        let driver = GitDriver::new(&state.0).unwrap();
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        // The floor probe lists config itself; settle it before counting.
+        driver.require_floor().unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
         let repo = resolve(&driver, &dir.0);
+        let proven = fact_reads(&log);
+        assert_eq!(proven, (1, 1), "the first handle reads its config and formats once");
         let operation = driver.checkout_repository(&repo).unwrap();
+        assert_eq!(fact_reads(&log), proven, "a checkout handle answers from the facts the stamp still proves");
         driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
         // An independent writer, outside cooperative checkout exclusion.
         let root = dir.0.clone();
@@ -2684,10 +2737,18 @@ mod tests {
             .join().unwrap();
         let error = driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap_err();
         assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"));
+        // A new checkout handle sees the write too: the held stamp no longer matches.
+        let error = driver.checkout_repository(&repo).unwrap_err();
+        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"), "{}", error.cause);
         git(&dir.0, &["config", "--unset", "filter.external.clean"]);
         assert_eq!(driver.preflight(&operation).unwrap_err().cause, "checkout-facts-invalidated");
         let next = driver.checkout_repository(&repo).unwrap();
         driver.checked(&next, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        let reread = fact_reads(&log);
+        assert!(reread.0 > proven.0 && reread.1 > proven.1, "a moved stamp re-reads config and formats");
+        let again = driver.checkout_repository(&repo).unwrap();
+        driver.checked(&again, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        assert_eq!(fact_reads(&log), reread, "the re-read facts stand for the next handle");
     }
 
     // The config cache is shared by every driver in a process; a new driver must still see a
