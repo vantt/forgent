@@ -5,11 +5,11 @@ import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
 import { fixLandRecovery, checkLandRetainedCandidates } from '../../src/setup/git-checks.mjs';
 
-test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', () => {
+test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
   const f = fixture();
   try {
     const land = f.port();
-    land.prepare({operationId:'interrupted-land',request:f.request});
+    await land.prepare({operationId:'interrupted-land',request:f.request});
     land.close();
     const recovery = createGitRecovery(f.options,f.loader);
     const listed = recovery.listPending();
@@ -27,11 +27,11 @@ test('Recovery lists and inspects an interrupted Land and delegates to its exist
     assert.throws(() => recovery.inspectOperation({operationId:'never-journalled'}), err => JSON.parse(err.message).cause === 'git-operation-unknown');
   } finally { f.close(); }
 });
-test('doctor --fix recovers an interrupted Land through the Recovery door and then has nothing left to recover', () => {
+test('doctor --fix recovers an interrupted Land through the Recovery door and then has nothing left to recover', async () => {
   const f = fixture();
   try {
     const land = f.port();
-    land.prepare({operationId:'interrupted-fix',request:f.request});
+    await land.prepare({operationId:'interrupted-fix',request:f.request});
     land.close();
     const fixed = fixLandRecovery(f.repo,f.loader,f.options);
     assert.equal(fixed.changed,true,fixed.message);
@@ -40,12 +40,12 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
     assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land operation'});
   } finally { f.close(); }
 });
-test('doctor warns, never fails, about a finished Land whose candidate is still retained', () => {
+test('doctor warns, never fails, about a finished Land whose candidate is still retained', async () => {
   const f = fixture();
   try {
     assert.deepEqual(checkLandRetainedCandidates(f.repo,f.loader),{passed:true,message:'no retained Land candidate'});
     const land = f.port();
-    land.prepare({operationId:'retained-land',request:f.request});
+    await land.prepare({operationId:'retained-land',request:f.request});
     land.close();
     fixLandRecovery(f.repo,f.loader,f.options);
     const row = checkLandRetainedCandidates(f.repo,f.loader,f.options);

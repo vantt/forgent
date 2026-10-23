@@ -239,8 +239,7 @@ test('a Land waiting for admission keeps its process running, so a session close
     const first = f.port(); const { candidate: held } = await first.prepare({ operationId: 'in-process-holder', request: f.request });
     let ticks = 0; const ticker = setInterval(() => { ticks += 1; }, 20);
     // The holder is closed only from a timer, so the waiter being admitted after it proves the loop
-    // ran while the Land waited. Each lock retry still blocks the loop for a helper spawn, so the
-    // tick count shrinks with machine load; it goes back to at least 5 once the lock runs in process.
+    // ran while the Land waited, and the tick count shows it kept running throughout.
     let closedAt = null;
     setTimeout(() => { first.close(); closedAt = process.hrtime.bigint(); }, 300);
     try {
@@ -248,8 +247,33 @@ test('a Land waiting for admission keeps its process running, so a session close
       const admittedAt = process.hrtime.bigint();
       assert.equal(c.target, held.target);
       assert.ok(closedAt !== null && closedAt <= admittedAt, 'the timer closed the holder while the Land waited, before it was admitted');
-      assert.ok(ticks >= 1, `the event loop ran while the Land waited (${ticks} ticks)`);
+      assert.ok(ticks >= 5, `the event loop ran while the Land waited (${ticks} ticks)`);
       second.close();
     } finally { clearInterval(ticker); }
+  } finally { f.close(); }
+});
+test('a second call or a close while a Land waits is answered by name and leaves no slot held', async () => {
+  const f = fixture(); try {
+    const first = f.port(); const { candidate: held } = await first.prepare({ operationId: 'pending-holder', request: f.request });
+    const waiter = f.port();
+    const waiting = waiter.prepare({ operationId: 'pending-waiter', request: f.request, waitMs: 10000 });
+    const outcome = waiting.then(() => null, error => error);
+    await assert.rejects(async () => waiter.prepare({ operationId: 'pending-again', request: f.request }), /land-call-pending/);
+    await assert.rejects(async () => waiter.publish(evidence(held)), /land-call-pending/);
+    // Closing the waiter cancels what it will produce; the holder's release then admits it.
+    waiter.close();
+    first.close();
+    assert.match((await outcome).message, /land-session-closed/);
+    // Nothing is left holding the destination slot: a Land with no wait is admitted at once.
+    const next = f.port(); await next.prepare({ operationId: 'pending-next', request: f.request }); next.close();
+    await assert.rejects(async () => waiter.publish(evidence(held)), /land-session-required/);
+  } finally { f.close(); }
+});
+test('a Land that waits refuses to do so while the caller lends held locks', async () => {
+  const f = fixture(); try {
+    const scope = createLockScope();
+    const held = acquireSync(scope, 'dispatch-cwd', { fgosDir: path.join(f.repo, '.fgos'), cwd: f.repo }); assert.equal(held.result, 'acquired');
+    try { await assert.rejects(async () => f.port().prepare({ operationId: 'wait-with-held', request: f.request, waitMs: 100 }, [held.handle]), /land-wait-with-held-locks/); }
+    finally { held.handle.release(); }
   } finally { f.close(); }
 });
