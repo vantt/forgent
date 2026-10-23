@@ -7,6 +7,7 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:25 (WORK `forgent-cd` ↔ HARDEN `forgent-a8`): **thứ tự land trên `fg-server2` đã chốt giữa hai lane.** T2 land khi cổng phase 17 qua (còn phase 4–13, chưa tính bằng giờ), báo WORK giờ bắt đầu và độ dài khung (~20 phút). WORK đề xuất khung cutover (30–45 phút) sau đợt 2 và cổng bằng chứng; HARDEN giữ yên. Nếu cutover của WORK sẵn sàng trước khi T2 land thì cutover đi trước, T2 rebase. Máy owner vẫn cần owner cho phép.
 - 2026-10-23 11:20 (phiên WORK `forgent-cd`, owner 11:17 "em với harden tự làm việc với nhau cho thời khác landing"): **WORK và HARDEN tự thống nhất giờ land trên `fg-server2`**, kể cả khung cutover của Work ở máy này (trước đây owner chọn giờ); báo TEST/OPC và ghi board trước/sau mỗi lần. Land lên máy owner (mdview, mcp-skill-hub, forgentX) vẫn chờ owner cho phép. Thứ tự hiện tại: T2 của HARDEN land trước, WORK rebase.
 - 2026-10-23 11:30 (`claude-muyt@fg-server2`, `lead:OPC`, owner "ok hoãn"): **Phase B (domain containment theo thao tác) hoãn, owner xác nhận lại** sau khi nghe giải thích: thêm một tiến trình anchor, một giao thức và hai đường chạy song song (~800–1000 dòng ở tầng Process) chỉ để Land nhanh thêm ~0,1 s; mục tiêu thay được sandbox đã đạt nhờ port hiện có cộng bộ conformance chung. Đảo lại nếu: một trong các điều kiện kích hoạt ở §4 phân xử đạt.
 
