@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "035d2aac077623ee250cf47d72f50bd8b3e0f2e42e947a39bd8149c98a673863",
+  "payloadDigest": "63cdb0559872aed96aa83b4c88b032d8bd134dcc1fb94f070dc50f2981c64f0e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -825,7 +825,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "5e98c306dc89ccffcb94f2fe6b330dac564d16947e07032e3da69a419a0f63ca",
+    "scripts/run-tests.mjs": "897742329a5750ce7bc7568611dff6cc7410020848e6326c7a473d504f98f431",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
@@ -1018,7 +1018,7 @@
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
-    "src/runner/lock-fence.mjs": "e128397527edce60462e4337ed2253383808747ef5f12dd19a8a4e35a12eaa5f",
+    "src/runner/lock-fence.mjs": "8fbfbf4cfc12f6e0f1437f45ad2b0afca94badf76190db7e32e5ef55c97cba1f",
     "src/runner/lock-status.mjs": "fc33d73f4e3fe2b65e6a1bdefaed2b59870a54edac15936c20f9681773910bcc",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
     "src/runner/loop.mjs": "7a8b9f85476aef152293a78ee0ffdc7a05ae6d4efb86b3bda824c805af84fa55",

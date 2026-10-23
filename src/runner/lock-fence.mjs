@@ -139,7 +139,10 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
   };
   const { terminated, killed, left } = await terminateHolders(holders, stillHolding);
 
-  if (left.length > 0 || probe(name, filled).result !== 'free') {
+  // The kernel drops a killed holder's lock description a moment after the listing stops showing the holder,
+  // so freedom is awaited within the same bounded kill wait rather than read once.
+  const free = () => (probe(name, filled).result === 'free' ? [] : [null]);
+  if (left.length > 0 || (await waitUntilGone(free, [null], KILL_WAIT_MS)).length > 0) {
     throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL${left.length ? ` (pid ${left.map((holder) => holder.pid).join(', ')})` : ''}`, { lock: name, pids: left.map((holder) => holder.pid) });
   }
   return { lock: name, path: lock.v3Path, status: 'fenced', holders, terminated, killed };
