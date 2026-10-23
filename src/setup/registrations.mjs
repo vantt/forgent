@@ -140,7 +140,7 @@ import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
-import { checkSeatBindingConfig, checkSeatBindingDrain, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
+import { checkSeatBindingConfig, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
@@ -635,7 +635,7 @@ export function checkTierVocabularyDeadKeys(cwd) {
     }
     // The global file of a machine that has not re-run setup still carries it; it is dropped at load.
     if (level === 'project' && 'rigorToTier' in runner) {
-      problems.push('project config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, run `fgos setup` to convert the config');
+      problems.push('project config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, delete the key and declare "tier" per capability, role, persona or seat');
     }
     for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
       if (exec && typeof exec === 'object') {
@@ -6338,14 +6338,8 @@ registerCheck({
 
 registerCheck({
   id: 'seat-binding-config',
-  description: 'the project runner config is in the seat-binding schema (no rigorToTier, schema marker present, ladder comment current)',
+  description: 'the project runner config\'s tier ladder comment, when it has one, matches the tier ladder',
   check: (cwd) => checkSeatBindingConfig(cwd),
-});
-
-registerCheck({
-  id: 'seat-binding-drain',
-  description: 'no unit run written before seats existed still has a live controller (the stop predicate for landing the seat-binding release)',
-  check: (cwd) => checkSeatBindingDrain(cwd),
 });
 
 registerCheck({
