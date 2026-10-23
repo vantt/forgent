@@ -13,6 +13,8 @@ created: 2026-10-23
 
 # Mailbox V7: after V6
 
+> **Owner answered 2026-10-23 14:53:** Q1 **D** with model M2 (`gpt-6.1-sol`), approved up to the 510-run ceiling; Q2 **A** (N = 10 per cell, three CLI × model pairs, about 417 runs); Q3 **A** (10 benign interactive probes plus 80 sandboxed print-mode runs). Q4 is still open: the owner asked for its options, and the controller laid out A (claim time in the snapshot, schema 2), B (defer) and C (a bounded hook log of claim and finish times, no schema change).
+
 Planned 2026-10-23 14:15 Asia/Saigon (`fg-server`) on main `89f7cbd58`, branch `mailbox/v1-v3` at `709bf399c` (196 commits ahead of main). The V6 lead is measuring in `/home/vantt/projects/forgent-mailbox` (stage B, Claude only), so every fact below was read with `git show origin/<ref>:<path>`, never in that worktree. Owner decisions of 2026-10-23 that set the scope are in the board log at 11:40 ("B rồi A"), 12:40 (IDENT library doors) and 14:10 (Codex stops after stage A; Stop off; PostToolUse only; pi and omp).
 
 Spec on the branch: `docs/platform/agent-mailbox/spec.md` (§4.1, §5.1-§5.5, §6.1-§6.4, §7, §8, §9, §11, §12, §14 V6/V7 rows and the stop rule, §15.3, §15.8, §16 items 16 and 22-24, §17). IDENT: `docs/platform/identity/spec.md` §5 and crate `packages/identity/rust` on main (`3cee85c9a`). V6: main `plans/261023-0049-mailbox-v6-behaviour-through-real-hook/`, branch `plans/reports/research-261023-1135-mailbox-v6-preparation.md`.
