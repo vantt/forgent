@@ -75,7 +75,7 @@ export function checkTerminalControl({ env = process.env, terminalControl, platf
  * default), each value with its source. The core refuses a layout value it
  * cannot run with and names it; the two rules only Node can judge are checked here.
  */
-export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient = (config) => createTerminalControl({ herdrBin: resolveHerdrBin(), config }) } = {}) {
+export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient } = {}) {
   const root = path.resolve(repoRoot);
   let explicit;
   try {
@@ -84,16 +84,15 @@ export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient =
   } catch (err) {
     return { passed: false, message: `terminal.* unreadable: ${err.message}` };
   }
-  const ask = (config) => createClient(config).capabilities();
   let report;
   let refused = null;
   try {
     try {
-      report = ask(explicit);
+      report = (createClient?.(explicit) ?? createTerminalControl({ herdrBin: resolveHerdrBin(), config: explicit })).capabilities();
     } catch (err) {
       if (!isConfigRefusal(err)) throw err;
       refused = `${err.routeMessage} (${err.code})`;
-      report = ask({});
+      report = (createClient?.({}) ?? createTerminalControl({ herdrBin: resolveHerdrBin(), config: {} })).capabilities();
     }
   } catch (err) {
     return { passed: true, message: `warning: the terminal-control route did not answer, so terminal.* cannot be judged here (${err.message})` };
