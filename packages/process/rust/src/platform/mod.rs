@@ -48,6 +48,11 @@ pub trait ProcessPlatform: Send + Sync {
     fn relation_of(&self, _pid: ProcId) -> Option<Relation> {
         None
     }
+    /// The kernel's short command name of `pid` (Linux `comm`); `None` where
+    /// the OS has no such read or the process is gone.
+    fn command_name_of(&self, _pid: ProcId) -> Option<String> {
+        None
+    }
     /// The last pid allocated in this process's pid namespace.
     fn last_pid(&self) -> Option<u32> {
         None

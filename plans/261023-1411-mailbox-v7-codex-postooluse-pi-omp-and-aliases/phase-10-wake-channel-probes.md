@@ -41,3 +41,8 @@ The probe driver's logic (timing, socket write, queue call) lives in `scripts/li
 ## Deliverable
 
 Report (`fgos convention path`): per channel the measured result, role, latency, side effects (focus, dialog, typed input), presence source; part B's rates with Wilson intervals; a go or no-go per channel for phase 11 against the bar: starts a turn with no dialog, no focus change, no typed input, and part B at 0 acted for that CLI.
+
+## Plan-owner decision after the V6 review (agent, 2026-10-23)
+
+Part B's confined runs use only the launch phase 5 hardened after `plans/261023-0049-mailbox-v6-behaviour-through-real-hook/reports/code-review-v6.md`: no MCP server or account connector (H3, phase 5 T10 green), the one credential mask list with its hash in each ledger entry (M6), the reasoning effort pinned where the CLI has one (M3; Codex `model_reasoning_effort` from the addendum), and killed runs settling their login copy through the existing guard (H4). A run whose ledger entry lacks the argv or the mask hash is not counted.
+Part A's interactive probes run benign text only, but each probe session is also started with no MCP server or account connector, by the same per-CLI arguments.

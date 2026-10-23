@@ -11,7 +11,7 @@ export class WriterIdentityError extends Error {
   }
 }
 
-const ENV_ORDER = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID']; // what the rule reads: the cache key
+const ENV_ORDER = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'PI_SESSION_ID', 'CLAUDE_CODE_SESSION_ID']; // what the rule reads: the cache key
 const kept = new Map(); // answers only; a failure is never kept
 
 function door() {

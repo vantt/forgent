@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { removeWorktree } from '../../src/runner/worktree.mjs';
 import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs, headCheckouts } from '../../scripts/test-select-mutate.mjs';
 
 test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
@@ -280,6 +281,7 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   assert.ok(rule, 'rule for m-edit-1 must exist in the manifest');
 
   const repoRoot = process.cwd();
+  let preserved = false;
   const worktreePath = headCheckouts.create();
   try {
     fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
@@ -303,8 +305,12 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
     assert.equal(fs.readFileSync(path.join(worktreePath, mutant.file), 'utf8'), fs.readFileSync(path.join(repoRoot, mutant.file), 'utf8'), 'the mutated file is restored after classification');
   } finally {
     headCheckouts.remove(worktreePath);
+    // This checkout is registered in the real repository and lives in the run's temp dir: one the guarded
+    // removal kept would outlive that dir as a registration that blocks every later worktree add.
+    preserved = fs.existsSync(worktreePath);
+    if (preserved) removeWorktree(process.cwd(), worktreePath, { force: true });
   }
-  assert.equal(fs.existsSync(worktreePath), false, 'the guarded removal took the restored checkout away');
+  assert.equal(preserved, false, 'the guarded removal took the restored checkout away');
 });
 
 
