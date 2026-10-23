@@ -1,14 +1,14 @@
 # Phase 8 scorecard — rebuilt handoff, pending acceptance
 
-Status: **handoff rebuilt under L12-124, bounded code repairs through L12-132 and records corrections under L12-133; no Phase 8 closure or Phase 9 authorization**. Closure reviews [A](review-a38-step-08-closure-A.md) and [C](review-a38-step-08-closure-C.md) supersede the earlier claim that integration r3 established complete Step 3/4 carriage. Historical acceptances and L12-118..121 dispositions remain intact; they do not accept this new composition.
+Status: **handoff rebuilt under L12-124, bounded code repairs through L12-132 and records corrections under L12-133/L12-134; no Phase 8 closure or Phase 9 authorization**. Closure reviews [A](review-a38-step-08-closure-A.md) and [C](review-a38-step-08-closure-C.md) supersede the earlier claim that integration r3 established complete Step 3/4 carriage. Historical acceptances and L12-118..121 dispositions remain intact; they do not accept this new composition.
 
 ## Authority and proof boundary
 
 - Source/author pin: **`5e03159334df726e43ffe9505ad4ed43f72ba94d`**. Authority: [rebuild brief](step-08-handoff-rebuild-brief.md), Lead under A42, recorded as **L12-124** in [owner answers](owner-answers.md).
 - L12-124 explicitly reassigns unfinished composition and independent-review duties to **Phase 9 PRE-FLIP gates**. It does **not** mark those duties met, waive the Lead suite/clean committed-byte checks, or authorize cutover. The 44 missing doctrine claims are not the separate 44 Work freshness references.
 - No consumer changes were applied: **0 applied-safe**. Existing verifier/lease implementations, including L12-123's Land recheck fix, are on the plan branch only. No main landing, real lease, alias adoption, legacy deletion or live-state completeness is claimed.
-- Runtime parity commands in new records are **obligations, not executed tests**. Actual proof this turn is record conservation, pinned source binding, exact scratch patch roundtrip and determinism. Impact analysis: degraded/unqueried under the no-fgOS-CLI boundary; no product symbol changed. Markdown preview remains Lead custody.
-- Historical proofs remain at their recorded pins. `step-07-integration-verification.json`, `step-07-final-verification.json`, export and post-move proofs are not current whole-handoff acceptance receipts. Current verification is [rebuild verification](step-08-handoff-rebuild-verification.json), [determinism](step-07-final-determinism.json) and [source recomposition](step-08-source-recomposition.json).
+- Runtime parity commands in new records are **obligations, not executed tests**. L12-133's last assembly proof covers record conservation, pinned source binding, exact scratch patch roundtrip and determinism. L12-134 checks reader metadata, projection-only preservation and current ownership/audit; it does not claim a new assembler run. Impact analysis: degraded/unqueried under the no-fgOS-CLI boundary; no product symbol changed. Markdown preview remains Lead custody.
+- Historical proofs remain at their recorded pins. `step-07-integration-verification.json`, `step-07-final-verification.json`, export and post-move proofs are not current whole-handoff acceptance receipts. Assembly verification remains [rebuild verification](step-08-handoff-rebuild-verification.json), [historical determinism](step-07-final-determinism.json) and [source recomposition](step-08-source-recomposition.json). [L12-134 verification](step-08-l12-134-verification.json) owns the current reader-metadata projection hashes; historical digests are not relabelled as a new run.
 
 ## Steps and independent reviews
 
@@ -22,7 +22,7 @@ Status: **handoff rebuilt under L12-124, bounded code repairs through L12-132 an
 | 5 Behavioral ownership | Original **46,404 items** retained with stable rNNNNN ids and L12-118..121 overlays. Effective: **146 prepared / 9,555 preserved / 512 parked / 36,191 rejected**. Added [post-census records](step-08-post-census-records.jsonl): **72 files / 427 items = 85 preserve + 28 park + 314 reject** | L12-90 author acceptance retained; new traces and current file composition are **pending independent/parity review**. Identity mint and setup duplicate-id scans have explicit owners/blockers; they are no longer untraced. Do not substitute a flat `docs/platform` scan for split live holders |
 | 6 Evidence verifier | Existing 867 identical mirrors; historical before 867/0 and expected pre-deletion after red 907; owning tests historically 41/41 | L12-95/97 acceptance retained. No verifier/runtime test rerun this turn. Standing-suite, retirement integration and actual after-deletion proof remain owed |
 | 6b Lease | L12-115 branch delivery retained; L12-123 publication recheck preserved, L12-126 repairs sequential Land by admitting the actual prepared target | Independent final lease review predates follow-ups. Real landing, Git-owner §7 consent, Holder-lock notice, current-scope proof and integrated suite remain owed |
-| 7 Atomic handoff | **55,658 rows / 524 per-file specs / 423 composed roundtrips / 101 named composition parks**; all final Step 3/4/5 hunks composed together where unambiguous | **Not accepted/readiness not met.** Two byte-identical `--final --pin` runs; five generated handoff outputs **7,477,269 bytes**, below 8 MB. Pilot directories fail loudly. Roundtrip proves bytes, not semantic parity |
+| 7 Atomic handoff | **55,658 rows / 524 per-file specs / 423 composed roundtrips / 101 named composition parks**; all final Step 3/4/5 hunks composed together where unambiguous | **Not accepted/readiness not met.** L12-133's two byte-identical `--final --pin` runs: five outputs **7,477,269 bytes**. L12-134 adds only reader metadata to readiness: current five-file total **7,479,967 bytes**, below 8 MB, not a new assembler run. Pilot directories fail loudly. Historical roundtrip proves bytes, not semantic parity |
 | 8 Closure | This rebuilt scorecard, L12-124, progress and current receipts | **Not met:** Lead full suite/attribution, actual runner-pair clean acceptance and fresh independent closure review remain pending |
 
 ### Closure round 2 independent verdicts (at `1eae797d8`, not acceptance of this repair)
@@ -32,6 +32,14 @@ Status: **handoff rebuilt under L12-124, bounded code repairs through L12-132 an
 | [A r2](review-a38-step-08-closure-A-r2.md), Verdict / New defects M-A, M-B | **REWORK** (narrow; two Medium wiring gaps in the machine handoff, no false green in the closure-A findings themselves) | L12-133 wires archive/source-context gates, current binding hashes and Pilot B labels; fresh independent acceptance still owed |
 | [B r2](review-a38-step-08-closure-B-r2.md), Verdict / M1, M2 / R1, R2 | **REWORK (small)** | L12-132 / `890715ead` repairs spec, admission-before-config and corrupt status. Final-code holder Land and staged-release proof remain owned PRE-FLIP gates |
 | [C r2](review-a38-step-08-closure-C-r2.md), Verdict / D1–D4 | **REWORK** (bounded, records-only) | L12-133 corrects attribution, restores six inputs, refreshes gate index and accounts actual pairs. No review verdict is promoted to acceptance |
+
+### Closure round 3 independent verdicts (at `27c2b2cde`; follow-up at L12-134, not new acceptance)
+
+| Review | Verbatim verdict | Bounded follow-up |
+|---|---|---|
+| [A r3](review-a38-step-08-closure-A-r3.md), Verdict | **APPROVE** | Preserve the future-pin re-enumeration gate: the post-pin lists omit `test/scripts/doc-runner-liveness.test.mjs` at `44ca64559` and are not exhaustive future worklists |
+| [B r3](review-a38-step-08-closure-B-r3.md), Verdict | **APPROVE** | Existing final holder-Land and installed-release PRE-FLIP gates remain unmet |
+| [C r3](review-a38-step-08-closure-C-r3.md), Verdict / N1, Low | **REWORK** | L12-134 scans all committed plan blobs, adds 121 exact reader joins for 34 removed inputs, names 43 historical readers in L12-129 and qualifies 3/4 versus 0/1 suite attribution; fresh acceptance still owed |
 
 Step 3's historical 9,424 authored-edge count and Step 5 membership totals are not additional unique handoff rows. The final matrix intentionally represents cross-stage memberships separately, never pretends Step 5 inherited Step 3/4 ownership.
 
@@ -109,7 +117,7 @@ The authority is **L12-124**, with the existing owner L12-129 prerequisite wired
 | Class / input | Corrected proof and limit |
 |---|---|
 | Spawn status-null timeouts ×3 | dev-door, host help and holder hook titles; timeouts are observed, root cause is not established by total suite wall time. Main also ran **1,136 s** versus branch **1,138 s** |
-| Worktree-admin eight-process title ×1 | **Load-sensitive under the full suite, not branch-caused**, based on Lead's quiet-machine A/B replay **2026-10-23 13:45**: addon via `scripts/lib/git-addon-stage.mjs` `ensureGitAddon`; `env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree-admin-multiprocess.test.mjs`, three runs each. Branch clone `e1966d417`: **7/7 ×3**, 11.2/26.4/25.5 s; main clone `9c7edde30`: **7/7 ×3**, 24.9/12.2/12.4 s. It failed in **3 of 4 branch full-suite runs and 0 recorded main runs**. The load explanation rests on this alone-pass replay, **not wall time**; branch does not alter `src/runner/repo-locks.mjs` or the worktree-admin path, only adds a lock-registry row. L12-125's infrastructure-blocked run was not flake proof |
+| Worktree-admin eight-process title ×1 | **Inferred load-sensitive under the full suite, not established as branch-caused**, based on Lead's quiet-machine A/B replay **2026-10-23 13:45**: addon via `scripts/lib/git-addon-stage.mjs` `ensureGitAddon`; `env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree-admin-multiprocess.test.mjs`, three runs each. Branch clone `e1966d417`: **7/7 ×3**, 11.2/26.4/25.5 s; main clone `9c7edde30`: **7/7 ×3**, 24.9/12.2/12.4 s. It failed in **3 of 4 branch full-suite runs versus 0 of 1 main full-suite run**. “Load-sensitive” is an **inference from alone-pass replays, not a reproduced load failure** (L12-134 / C r3 Low); one main run does not establish equal rates. The load explanation rests on this alone-pass replay, **not wall time**; branch does not alter `src/runner/repo-locks.mjs` or the worktree-admin path, only adds a lock-registry row. L12-125's infrastructure-blocked run was not flake proof |
 | `/tmp` clone artifacts ×3 | Two worker/admission outcomes plus the symlink-output title. The latter is a **location-dependent safety check**: when the repo itself is under `/tmp/fgos-work`, a symlink resolving back inside it can pass the guard and then crash on import. Not merely a missing clone module; retain as a documented limitation, no code repair authorized here |
 | Reproduction titles ×2 | In `p8-suite3.log`, **`audit-ownership.mjs:8:56` asserts `current.noNewDoubleOwnership`** before checks.mjs runs: target-digest drift after merge `e1966d417`, **not pair bookkeeping** (review C r2 D1). Current replay at `890715ead` proves the five `1eae797d8` rebindings removed that drift: both ownership/audit commands exit **0/0**, `noNewDoubleOwnership: true`, zero failingRows. Any current checks-A red is separately attributed to real pairs/working paths in the L12-133 receipt |
 | Ratchet self-check ×1 | L12-130 fixes two existing target-digest exceptions; historical owning file **28/28**, exact title **1/1**, exit 0 |
@@ -360,7 +368,7 @@ One line per existing decision, grouped by work. These are pointers/summaries, n
 - **L12-121** — Remove role exemption, all-preserve premise proof, ten named patches/nine parks plus 37 further overturns; final 214 parks/226 specs.
 
 
-### Closing record updates (122–133)
+### Closing record updates (122–134)
 
 - **L12-122** — Initial scorecard delivery; closure A/C subsequently return rework. Its counts are historical, not current carriage.
 - **L12-123** — Both Land doors recheck lease admission through publication; code/race proof on plan branch only.
@@ -376,6 +384,7 @@ One line per existing decision, grouped by work. These are pointers/summaries, n
 - **L12-131** — Lead eleven-title suite attribution; retain original text with the dated L12-133 correction: two reproduction titles failed ownership target-digest drift, not bookkeeping; quiet-machine worktree A/B replay supplies the load-sensitive evidence.
 - **L12-132** — Code repair at `890715ead`: admit prompt/provider runs before config bootstrap, align Git spec §9 with optional target, and render corrupt status fail-closed without garbage. Owning scoped proofs supplied; no final holder-Land/release acceptance.
 - **L12-133** — Round-2 records repair: twelve owned machine gates, no `readyRows` claim, five current rebind hashes, Pilot B 18+3 split, six exact restored directory inputs, corrected suite signals and last actual-pair accounting; fresh acceptance still pending.
+- **L12-134** — Whole-plan prune scan at `83f572ac3`: 6,516 committed files / 531,487 extracted bodies; 34 removed input rows / 121 joins / 43 historical readers, no current owning dependency and no further restore. L12-129/readiness name every historical reader to repoint or retire. [Audit recipe and locators](step-08-closure-r3-reader-audit.json), [verification](step-08-l12-134-verification.json) and [last actual-pair accounting](step-08-l12-134-pair-accounting.json). Main suite denominator is one; load sensitivity is inference, not reproduced load failure. A/B r3 APPROVE, C r3 REWORK → bounded fix, no self-acceptance.
 
 ## Next concrete action
 
