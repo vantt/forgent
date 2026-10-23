@@ -1,0 +1,29 @@
+{
+  "status": "pass",
+  "sourcePin": "623ee7f221d777e60204fb5f0b320da035069990",
+  "evaluation": "current working-tree targets, source pin for preimages only",
+  "s14RationaleCorrections": 4,
+  "linkReplacements": 8,
+  "changedUnitsBound": 6,
+  "additiveRebindings": 6,
+  "candidateUnitsWithoutPredecessorBound": 3,
+  "ledgerRowsRecomputed": 13569,
+  "storedBindingHashesVerified": 5010,
+  "effectiveCurrentStoredBindingsVerified": 4452,
+  "historicalBindingsResolvedByOverlay": 558,
+  "independentNodePythonHashes": true,
+  "dualExtractorAgreement": true,
+  "retiredHistoryFilesUnchanged": 99,
+  "foundationsStaysVerbatim": true,
+  "foundationsReason": "The operational projection declares verbatim source/provenance carriage and retained historical self-paths. The row matches the legacy spec and the retained original L7 source; this is not a fresh reader route. No law or literal history is rewritten.",
+  "relativeComponentLinksChecked": 123,
+  "metadataFindings": [
+    {
+      "type": "switchboard-route-conflict",
+      "path": "docs/reading-map.md",
+      "message": "the switchboard routes this document more than once (2 entries); the status is ambiguous"
+    }
+  ],
+  "newMetadataFindings": 0,
+  "independentReview": "pending; no authority flip or gate acceptance"
+}

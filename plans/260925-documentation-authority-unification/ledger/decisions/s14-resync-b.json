@@ -3062,8 +3062,8 @@
       "targetUnitDigest": "45a8354146d6ae363487b1c89234d6b24b9cacf8cf18938067e2a67073b8ad40",
       "bindingSha256": "6864d1f3dd4e5db33a587c8c1dd528742419b1104fda6cf8acc8a16f847a462f",
       "disposition": {
-        "kind": "post-retirement-edit-not-carried",
-        "reason": "Post-retirement edit, not carried: this source only routes to the retired engine. Current-source metadata, renamed historical recipes and engine-only state/schema changes do not update the literal snapshot or create a live contract. The linked retirement statement is a disposition witness, not a carriage claim."
+        "kind": "candidate-metadata-adaptation",
+        "reason": "The migration banner was introduced by 9818f25a8 (2026-09-19), before retirement 2180b4e72 (2026-10-02), not by a post-retirement edit. As with rows 36/66/89/319, legacy status/authority metadata is adapted to the candidate/history envelope. The banner is not carried: it only routes to the retired contract family and grants no live authority. The retirement statement remains a disposition witness, not a literal carriage claim."
       },
       "reviewStatus": "pending"
     },
@@ -3225,8 +3225,8 @@
       "targetUnitDigest": "45a8354146d6ae363487b1c89234d6b24b9cacf8cf18938067e2a67073b8ad40",
       "bindingSha256": "6c827f0d342264345b4edadefc2acea03b3ef362143a6a9673a4c54461c607b1",
       "disposition": {
-        "kind": "post-retirement-edit-not-carried",
-        "reason": "Post-retirement edit, not carried: this source only routes to the retired engine. Current-source metadata, renamed historical recipes and engine-only state/schema changes do not update the literal snapshot or create a live contract. The linked retirement statement is a disposition witness, not a carriage claim."
+        "kind": "candidate-metadata-adaptation",
+        "reason": "The migration banner was introduced by 9818f25a8 (2026-09-19), before retirement 2180b4e72 (2026-10-02), not by a post-retirement edit. As with rows 36/66/89/319, legacy status/authority metadata is adapted to the candidate/history envelope. The banner is not carried: it only routes to the retired contract family and grants no live authority. The retirement statement remains a disposition witness, not a literal carriage claim."
       },
       "reviewStatus": "pending"
     },
@@ -6004,8 +6004,8 @@
       "targetUnitDigest": "45a8354146d6ae363487b1c89234d6b24b9cacf8cf18938067e2a67073b8ad40",
       "bindingSha256": "a31ff2a41cb99f5b5ca1988f6ff7f8d3615ec25bb998bcda7b82e20cc245efbf",
       "disposition": {
-        "kind": "post-retirement-edit-not-carried",
-        "reason": "Post-retirement edit, not carried: this source only routes to the retired engine. Current-source metadata, renamed historical recipes and engine-only state/schema changes do not update the literal snapshot or create a live contract. The linked retirement statement is a disposition witness, not a carriage claim."
+        "kind": "candidate-metadata-adaptation",
+        "reason": "The migration banner was introduced by 9818f25a8 (2026-09-19), before retirement 2180b4e72 (2026-10-02), not by a post-retirement edit. As with rows 36/66/89/319, legacy status/authority metadata is adapted to the candidate/history envelope. The banner is not carried: it only routes to the retired contract family and grants no live authority. The retirement statement remains a disposition witness, not a literal carriage claim."
       },
       "reviewStatus": "pending"
     },
@@ -25092,7 +25092,7 @@
       "bindingSha256": "e34235949270ebf23c4702804a54eb71677df32a8ec22f7d12d4847d01fd44ac",
       "preimageContentSha256": "badfb72ac5910f6d76d4553bde821ec5d772f3a4ee71b655d15935c2c14c0c98",
       "matchScore": 2,
-      "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
+      "reason": "Changed links: ../specs/workflow.md destinations are rebound to workflow/spec.md; prose and link labels are preserved, not byte-identical full unit content. Refresh current digest, self-inclusive ancestry and placement.",
       "reviewStatus": "pending"
     },
     {

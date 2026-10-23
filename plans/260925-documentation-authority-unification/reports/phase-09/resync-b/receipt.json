@@ -1,6 +1,11 @@
 {
   "version": 1,
   "status": "authoring-complete-independent-review-pending",
+  "followUp": {
+    "receipt": "review-fixes/receipt.json",
+    "verification": "review-fixes/verification.json",
+    "qualification": "D7b corrects four rationale fields and adds s15 overlays for changed candidate units; original document hashes, scanner output and test commands below remain historical authoring evidence. Disposition counts below reflect the corrected s14 labels."
+  },
   "head": "6d275ad81897089d5cac63f4ffc0311447a1c0a7",
   "baselineHead": "7be0cbc52b872b2eae12f3bbba4a1a346754838f",
   "baselineSourceBytesUnchanged": true,
@@ -81,10 +86,9 @@
   "dispositions": {
     "existing-literal-history": 367,
     "equivalent-current-content": 169,
-    "candidate-metadata-adaptation": 7,
+    "candidate-metadata-adaptation": 10,
     "retained-truth-correction": 13,
     "dated-audit-framing": 1,
-    "post-retirement-edit-not-carried": 3,
     "historical-link-adaptation": 1,
     "live-direction-update": 1,
     "post-retirement-edit-live-successor": 1,

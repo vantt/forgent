@@ -2,6 +2,8 @@
 
 Status: authoring complete; independent review pending. **No authority cutover, gate acceptance, source retirement, pair accounting or approval carry.**
 
+D7b follow-up: [current delta receipt](review-fixes/receipt.md), [current proof](review-fixes/verification.json) and `ledger/decisions/s15-navigation-review-fixes.json` supersede this receipt's old target-byte claims for component-boundary/reading-map. Existing scan, verification and one-shot authoring artifacts remain dated evidence, not current acceptance; use `review-fixes/verify-d7b.py` for the corrected bytes.
+
 Read first: `docs/specs/reading-map.md`, the affected legacy area specs, then `w2-d7-brief.md`, `preflip-execution-plan.md`, owner/review notes and the D1b/D6 receipts. This is documentation conservation and disposition, not a new product mechanism.
 
 ## Result and evidence
@@ -39,8 +41,8 @@ Dashboard, Observe, proposal, domainization, system-architecture and other coord
 The new shard retains every source passage and source ancestry, current target anchor/digest/self-inclusive ancestry, placement and four-key binding hash. Prior shards are unchanged. New rows are `reviewStatus: pending`.
 
 - **367** units are already fully contained in literal retired-engine snapshots; verifier checks complete normalized content containment and unchanged file bytes.
-- **169** are equivalent current content; **4** are complete source content inside candidate envelopes; **7** have candidate/source metadata adaptations.
-- **3 post-retirement edits, not carried:** the migration banners in the contracts README, coordination-session and flow-definition sources. These point at the retired contract family and establish no still-live normative claim. Each row records its reason and uses the retirement statement as a **disposition witness**, not a claimed copy.
+- **169** are equivalent current content; **4** are complete source content inside candidate envelopes; **10** have candidate/source metadata adaptations (including the following three corrected by D7b).
+- **3 pre-retirement migration banners, not carried:** the contracts README, coordination-session and flow-definition banners were introduced by `9818f25a8` (2026-09-19), before retirement `2180b4e72` (2026-10-02). Like rows 36/66/89/319, these are `candidate-metadata-adaptation`, not post-retirement edits. They point at the retired contract family and establish no still-live normative claim. Their retirement statements remain **disposition witnesses**, not claimed literal copies.
 - **1 historical link adaptation:** coordination-session's schema paragraph predates retirement (`f9c98501c`, 2026-09-04, versus retirement `2180b4e72`, 2026-10-02). The snapshot already preserves the entire paragraph with the missing historical module displayed as a path and explicitly qualified. Do not classify it as new engine functionality, recreate the module, or edit the literal fence.
 - **1 live-successor post-retirement edit:** raw `dispatch execute` removal (`15c7e720c`, 2026-10-14) is already recorded in the live advisory companion's *Upstream Execution Door Transition*. Preserve its `fgos run` replacement there; do not reactivate or rewrite the historical manual prompt.
 - Remaining **25** units have explicit, individually authored decisions in `adjudications.json`: dated audit framing, existing code-backed truth/relocation corrections, V-013, complete successor contract links and reading-map/system-overview unions. They are **not** accepted merely because a similarity score found a target.

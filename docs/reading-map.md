@@ -121,8 +121,7 @@ does not authorize migration or cutover.
 
 ## 5. Detailed Product And Source Map
 
-Merged from `docs/specs/reading-map.md` (current-source delta rechecked at the
-pin recorded in `plans/260925-documentation-authority-unification/reports/phase-09/resync-b/receipt.json`).
+Merged from the retained legacy product/source map, `docs/specs/reading-map.md`.
 The retained transition banner in section 3 is not replaced by the dated source
 banner, whose authorization counts are historical. The how-to directory and README
 routes above retain their routing role; their complete source entries below

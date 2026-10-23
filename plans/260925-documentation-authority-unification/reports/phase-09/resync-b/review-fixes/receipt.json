@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "status": "authored-independent-review-pending",
+  "sourcePin": "623ee7f221d777e60204fb5f0b320da035069990",
+  "authorityCutover": false,
+  "gateAcceptance": false,
+  "approvalCarry": false,
+  "needsWrites": [],
+  "changedDocuments": [
+    {
+      "path": "docs/platform/component-boundary.md",
+      "beforeSha256": "ea350dd5b2f6e0fa05bb6f208eb623a5f05f6469e129edb48c517c8e63954272",
+      "afterSha256": "36b9d7cb925279f936665d993921dd13aeb582eda0d8d6539c7025c381e922c0"
+    },
+    {
+      "path": "docs/reading-map.md",
+      "beforeSha256": "059422bb8d487c6404cc992ee76c604ba3cde9bed02b49bc24d898fdfeeac740",
+      "afterSha256": "1e7296664eb04d3858a2b3a092cf949b31dc43bc39979797dfdea6d7bb673332"
+    }
+  ],
+  "correctedRows": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/125"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/132"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/unitCarries/247"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "pointer": "/bindingRefresh/475"
+    }
+  ],
+  "newShard": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
+  "newShardBindings": {
+    "unitCarries": 3,
+    "bindingRefresh": 6,
+    "changedNativeUnitsCovered": 6
+  },
+  "verification": {
+    "status": "pass",
+    "sourcePin": "623ee7f221d777e60204fb5f0b320da035069990",
+    "evaluation": "current working-tree targets, source pin for preimages only",
+    "s14RationaleCorrections": 4,
+    "linkReplacements": 8,
+    "changedUnitsBound": 6,
+    "additiveRebindings": 6,
+    "candidateUnitsWithoutPredecessorBound": 3,
+    "ledgerRowsRecomputed": 13569,
+    "storedBindingHashesVerified": 5010,
+    "effectiveCurrentStoredBindingsVerified": 4452,
+    "historicalBindingsResolvedByOverlay": 558,
+    "independentNodePythonHashes": true,
+    "dualExtractorAgreement": true,
+    "retiredHistoryFilesUnchanged": 99,
+    "foundationsStaysVerbatim": true,
+    "foundationsReason": "The operational projection declares verbatim source/provenance carriage and retained historical self-paths. The row matches the legacy spec and the retained original L7 source; this is not a fresh reader route. No law or literal history is rewritten.",
+    "relativeComponentLinksChecked": 123,
+    "metadataFindings": [
+      {
+        "type": "switchboard-route-conflict",
+        "path": "docs/reading-map.md",
+        "message": "the switchboard routes this document more than once (2 entries); the status is ambiguous"
+      }
+    ],
+    "newMetadataFindings": 0,
+    "independentReview": "pending; no authority flip or gate acceptance"
+  },
+  "tests": [
+    {
+      "test": "test/scripts/check-doc-candidate-status.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/check-doc-candidate-status.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w3-d7b-brief/focused/checkout",
+      "exit": 0,
+      "stdoutSha256": "2e7ab4dea7d728aef737eebdbf7296873b4fb2126fd290b48a110c8083869e28",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w3-d7b-brief/focused/01.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+    },
+    {
+      "test": "test/scripts/list-doc-anchors.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/list-doc-anchors.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w3-d7b-brief/focused/checkout",
+      "exit": 0,
+      "stdoutSha256": "d85dce39b44b6426a945f5f2364f2fdb83b7c0edea3fdf6390a0d42fd3415392",
+      "summary": [
+        "ℹ tests 3",
+        "ℹ pass 3",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w3-d7b-brief/focused/02.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness."
+    }
+  ],
+  "commands": [
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/resync-b/review-fixes/verify-d7b.py",
+      "exit": 0,
+      "repeatedByteIdentically": true
+    },
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/late-areas/replay-checks.py --release-path <activation.releasePath> --scratch /tmp/fgos-work/w3-d7b-brief/focused",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "historicalArtifactsNotRebaselined": [
+    "resync-b/legacy-drift.json",
+    "resync-b/verification.json",
+    "ledgerfix/recipe-migration.json",
+    "phase-08 gate register"
+  ],
+  "limitations": [
+    "Independent semantic review pending.",
+    "Existing duplicate reading-map switchboard route remains.",
+    "Lead owns final-pin gate/migration/scanner integration of new overlays.",
+    "Broad Node and Cargo suites prohibited; not run.",
+    "No production symbol edited; impact-analysis degraded/unqueried under no-CLI boundary."
+  ]
+}
