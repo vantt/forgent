@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2fb3d07e5437a11ea2933cfb9fe9fcdbc2eabfdefde709dee62172ebb05422f4",
+  "payloadDigest": "292be83ffb4ea87c7157fa35722875accd7e80fb0962901c534ae044f248e13c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -278,7 +278,7 @@
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "486dc0c163a142ed5574b332b01313945abde6ec37311e047df1b3225167ed85",
-    "packages/git/node-addon/src/git.rs": "6f6974fb4d3e93f2c1a39a8178d8fe1016cbcbbbd7108c0f4e4b59ccf19482dc",
+    "packages/git/node-addon/src/git.rs": "1a4dc23284035ab7eb7932eee27bdb099ef2926f3e5e955e6c53509b5e2651be",
     "packages/git/node-addon/src/git/config.rs": "063357ef31bcf3abe4f73040f2ccb326ffc09ed60eaa57ac9ecb4c413e4b0b7f",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
     "packages/git/node-addon/src/git/inspect.rs": "f16a32a38ea4cdbd0699eaca9d534ab837950f12b654202e3a6ec69f420849b5",
@@ -312,7 +312,7 @@
     "packages/git/rust/src/scoped_commit.rs": "47582ad7f03b509d30259328ca77575e9959014b31352fcc291959358498d315",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
     "packages/git/rust/src/sync.rs": "0fd36afdf42dc99246386d3ed9b87c2086c88edab260f99bbd9f2327c9a85cca",
-    "packages/git/rust/src/wal.rs": "6a361d9d3ea4bc1d8349a153f98e915d53a8ce6368aae62139a32b6c821f4666",
+    "packages/git/rust/src/wal.rs": "33586aaf9d687ef5b9e846d688f40d80895f4798988b54ef5dddf6acce514f9d",
     "packages/git/rust/src/worktree.rs": "a1094850624cfe314efc2aed5666c50596557c028ac6614e8f34182b667aee84",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "91acedb270a60ee727e10dd823c817d4a914062dead0a8fd6f319f381d4fb2b1",
@@ -912,8 +912,9 @@
     "src/setup/event-store-fixes.mjs": "c02842cf801adb41fb3e338c025bc519159833ee256dca558202f19e97d453b2",
     "src/setup/executor-posture-coverage.mjs": "b9bb0adc2d173321342aaede10d6e767f221d9194f197bee5f8dcb23901843c4",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "14b34c0e3a9d9b44f257bb7e6b29153d6d6f75dded78842bbd3e39097ae56d81",
+    "src/setup/git-checks.mjs": "2f84c6baab84e772487158c9364ecdd436509c6626a4221c1faa57f85605f44d",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
+    "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "7a4676d00e63d3f47508d1d081d2941a794f30de18931dfce871ed9e396f923d",
     "src/setup/identity-checks.mjs": "492ce7b6fc122b042dcaad5b696336bf8b01935ac2b6334c339a1bd37b892b26",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
@@ -1880,7 +1881,7 @@
     },
     {
       "path": "packages/git/rust/src/wal.rs",
-      "line": 3044,
+      "line": 3085,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
