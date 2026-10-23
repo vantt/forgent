@@ -235,7 +235,7 @@ pub fn open_store(
     })
 }
 fn sealed(result: fgos_event_store::seal::Sealed) -> Value {
-    json!({"segments":result.segments,"busy":result.busy,"lastSeq":result.last_seq})
+    json!({"segments":result.segments,"busy":result.busy,"lastSeq":result.last_seq,"checkpointError":result.checkpoint_error})
 }
 fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
     streams
@@ -281,11 +281,12 @@ impl EventStore {
         held_ranks: Vec<u32>,
         hot_lock_depth: u32,
         opportunistic: Option<bool>,
+        checkpoint_path: Option<String>,
     ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let stream = StreamId::parse(&stream).map_err(error)?;
         Ok(sealed(
-            fgos_event_store::seal::seal(
+            fgos_event_store::seal::seal_checkpointed(
                 driver,
                 repo,
                 fgos_event_store::seal::SealRequest {
@@ -296,6 +297,8 @@ impl EventStore {
                     hot_lock_depth,
                     opportunistic: opportunistic.unwrap_or(false),
                 },
+                &fgos_event_store::fsio::OsFileSystem,
+                checkpoint_path.as_deref().map(std::path::Path::new),
             )
             .map_err(error)?,
         ))
