@@ -146,7 +146,7 @@ import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
-import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
+import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -4488,7 +4488,6 @@ registerCheck({
   check: (cwd) => checkTerminalAllocations(cwd),
 });
 registerConfigDefault({ id: 'terminal', key: TERMINAL_CONFIG_KEY, shape: DEFAULT_TERMINAL_CONFIG });
-registerFix({ id: 'terminal-dir', fix: (cwd) => fixTerminalDir(cwd) });
 
 registerCheck({
   id: 'herdr-executor-kinds',

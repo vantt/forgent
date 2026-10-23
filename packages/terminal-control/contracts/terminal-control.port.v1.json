@@ -20,7 +20,7 @@
   },
   "operations": {
     "allocate": {
-      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": [
         "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",
@@ -42,14 +42,13 @@
           "args": "string[]",
           "cwd": "absolute path",
           "env": "object of string",
-          "activity": "optional {kind, args, timeoutMs}: start through the driver's agent support (activity.state) instead of a plain pane.run; timeoutMs bounds how long the driver may take to bring the agent to ready",
           "expect": "optional {argv0, command, args}: the foreground process the launch becomes when it is not the command itself (a launcher script that execs the real one); identity is taken from the process matching it"
         }
       },
       "results": ["launched", "not-started", "unsupported", "unknown"],
       "effects": [
-        "requires pane.run, read.screen and process.info for plain launch; activity.state and process.info for activity launch",
-        "plain launch types probe commands to prove shell execution before the marker is written",
+        "requires pane.run, read.screen and process.info",
+        "types probe commands to prove shell execution before the marker is written",
         "writes marker launch-requested after the ready-shell handshake succeeds, before typing the launch line",
         "writes marker launched{identity} after the root process of the pane command is identified (argv checked like verifyForegroundProcessArgv)",
         "returns not-started if launch was already requested, if pane foreground is not the shell, if pane shell did not become ready in time, or if the launched root process was not identified in time",
@@ -76,7 +75,7 @@
         "until": "retain only: epoch ms, or null for kept until a person closes it",
         "callerPane": "optional driver pane id: the pane the caller itself runs in; only a close of an attached slot whose pane equals it closes the pane"
       },
-      "results": ["released", "kept-unknown", "unsupported"],
+      "results": ["released", "kept-unknown", "unsupported", "unknown"],
       "effects": [
         "close: closes only the pane this key allocated, only when the server incarnation matches right before and right after the close; never closes a tab",
         "retain: records released{retain, until}; a later reconcile closes only past until, same incarnation, foreground not foreign",
@@ -84,17 +83,17 @@
       ]
     },
     "label": {
-      "input": { "key": "key", "display": "display", "reportState": "optional string: also tell the driver which agent (display.agent) runs in the pane, for a process it does not recognise on its own; the reported state becomes the pane's status authority" },
+      "input": { "key": "key", "display": "display" },
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {
       "input": {},
       "results": ["capabilities"],
-      "meaning": "driver name, declared capability list (driver-capabilities.v1.json) and current server incarnation or unknown; doctor reads this"
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, the core's default for every config key and the registered placement policy names; doctor reads this"
     },
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
-      "results": ["scan"],
+      "results": ["scan", "unsupported", "unknown"],
       "rule": "reports only; never closes anything because time passed (except retain past until under the release rule)"
     }
   },
@@ -113,7 +112,14 @@
     },
     "released": { "result": "released", "disposition": { "enum": ["close", "retain"] } },
     "kept-unknown": { "result": "kept-unknown", "reason": "string; the pane is kept because the core could not prove it may close it" },
-    "capabilities": { "result": "capabilities", "driver": "string", "capabilities": "string[]", "serverIncarnation": "serverIncarnation | null" },
+    "capabilities": {
+      "result": "capabilities",
+      "driver": "string",
+      "capabilities": "string[]",
+      "serverIncarnation": "serverIncarnation | null",
+      "defaults": "object: the core's value for every key the route's config accepts (minCols, minRows, maxPanesPerTab, policy, allocationGraceMs, launchIdentifyTimeoutMs, shellReadyTimeoutMs)",
+      "policies": "string[]: the placement policy names the core registers (placement-policy.v1.json registry.names)"
+    },
     "scan": {
       "result": "scan",
       "findings": [
@@ -125,8 +131,11 @@
         }
       ]
     },
-    "unsupported": { "result": "unsupported", "capability": "the missing capability name, or driver-absent", "detail": "string" },
-    "unknown": { "result": "unknown", "reason": "string; driver timeout, unreadable output, incarnation mismatch, or missing record" }
+    "unsupported": { "result": "unsupported", "capability": "the missing capability name, or the driver name (herdr) when its binary is not found", "detail": "string" },
+    "unknown": { "result": "unknown", "reason": "string, the refusal's own text; driver timeout, unreadable output, incarnation mismatch, or missing record" }
+  },
+  "configRefusals": {
+    "terminal-config-below-floor": "a route config limit under the measured floor (minCols 40, minRows 8) is refused before any operation runs; the message names the key, the value and the floor"
   },
   "types": {
     "identity": { "pid": "integer", "startTime": "string (clock ticks since boot on Linux)", "bootId": "string", "pgid": "integer" },

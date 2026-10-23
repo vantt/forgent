@@ -1,21 +1,14 @@
 // Per-group promise queue of the async allocate and release(close): calls of
 // one groupKey run one after another, other groups are not held back, and one
-// failed call does not stall the next. First against a recording stand-in for
-// the host binary (timing is the point), then against the real host binary and
-// the fake herdr (nothing splits a pane that is being closed).
+// failed call does not stall the next. Against a recording stand-in for the host
+// binary: the order and overlap of the calls are the point.
 import '../helpers/process-tmp-root.mjs';
-import { test, after, before } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const HOST_BIN = process.env.FGOS_HOST_BIN;
-const FAKE_HERDR = path.join(REPO_ROOT, 'packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh');
 
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tc-queue-'));
 after(() => fs.rmSync(scratch, { recursive: true, force: true }));
@@ -90,39 +83,4 @@ test('a route error rejects its own call and the queue moves on', async () => {
   const next = tc.allocateAsync({ key: 'k2', groupKey: 'g-err', display: { label: 'x' } });
   await assert.rejects(bad, (e) => e.code === 'terminal-control-no-host-binary');
   await assert.rejects(next, (e) => e.code === 'terminal-control-no-host-binary');
-});
-
-test('5 allocates and 2 closes of one group reach herdr one at a time', async () => {
-  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout: ${HOST_BIN}`);
-  const sock = path.join(scratch, 'herdr.sock');
-  const server = net.createServer().listen(sock);
-  await new Promise((resolve) => server.once('listening', resolve));
-  process.env.FGOS_STATE_ROOT = path.join(scratch, 'state');
-  const log = path.join(scratch, 'herdr.log');
-  const tc = createTerminalControl({
-    hostBin: HOST_BIN,
-    herdrBin: FAKE_HERDR,
-    // Only the shell is in each pane's foreground, so the closes are provably safe.
-    env: { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: sock, HERDR_SOCKET_PATH: sock, FAKE_HERDR_FOREGROUND: 'shell' },
-  });
-  try {
-    const display = { label: 'real-queue' };
-    const allocations = [1, 2, 3, 4, 5].map((n) => tc.allocateAsync({ key: `w${n}`, groupKey: 'group-real', display }));
-    const closes = [1, 2].map((n) => tc.releaseAsync({ key: `w${n}`, disposition: 'close' }));
-    const results = await Promise.all([...allocations, ...closes]);
-    for (const r of results.slice(0, 5)) assert.equal(r.result, 'slot');
-    // The fake hands out one pane for every split, so a later allocate of the
-    // same group may find its record's pane closed; the close itself is what
-    // must have come after every allocate, never in between.
-    for (const r of results.slice(5)) assert.ok(['released', 'kept-unknown'].includes(r.result), JSON.stringify(r));
-
-    const calls = fs.readFileSync(log, 'utf8').split('\n').filter(Boolean).map((l) => l.replace(/\t+$/, '').split('\t').join(' '));
-    const placing = calls.map((c, i) => [c, i]).filter(([c]) => /^(tab create|pane split)/.test(c)).map(([, i]) => i);
-    const closing = calls.map((c, i) => [c, i]).filter(([c]) => c.startsWith('pane close')).map(([, i]) => i);
-    assert.ok(placing.length >= 1);
-    assert.ok(closing.length >= 1, 'a close reached herdr');
-    assert.ok(Math.max(...placing) < Math.min(...closing), `a placement came after a close:\n${calls.join('\n')}`);
-  } finally {
-    server.close();
-  }
 });

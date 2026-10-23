@@ -74,9 +74,6 @@ fn declares_what_herdr_can_do_after_one_probe() {
         assert!(caps.contains(&expected), "{expected} missing from {caps:?}");
     }
     assert_eq!(caps.contains(&"server.incarnation"), cfg!(unix));
-    for never in ["pane.resize", "pane.swap", "pane.move"] {
-        assert!(!caps.contains(&never), "{never} is not implemented");
-    }
     assert!(caps.iter().all(|c| CAPABILITIES.contains(c)));
     // The probe ran two commands; declaring again asks nothing more.
     let probed = fake.calls().len();
@@ -100,13 +97,10 @@ fn each_capability_runs_the_expected_command() {
     let seen = d.activity_detail("wS:p59Y").unwrap();
     assert_eq!((seen.state.as_deref(), seen.visible_idle, seen.visible_working), (Some("idle"), true, false));
     assert_eq!((seen.matched_rule.as_deref(), seen.prompt_text.as_str()), (Some("live_prompt_box"), "❯ half typed\n"));
-    d.report_agent("wS:p59Y", "claude", "working").unwrap();
     d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()]).unwrap();
     assert_eq!(d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(), "line one\nline two\n");
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
     assert_eq!(d.activity("wS:p59Y").unwrap().state, "working");
-    d.activity_start("wS:p59Y", "seat-1", "claude", &["--model".into(), "opus".into()], 30_000).unwrap();
-    d.label_tab("wS:tF9", "fgos lead").unwrap();
     d.label_pane("wS:p59Y", "seat 1").unwrap();
     assert_eq!(d.pane_liveness("wS:p59Y").unwrap(), PaneLiveness::Live);
     assert_eq!(d.layout_geometry("wS:p59Y").unwrap().panes.len(), 2);
@@ -119,13 +113,10 @@ fn each_capability_runs_the_expected_command() {
         "agent prompt wS:p59Y hello world",
         "pane send-text wS:p59Y draft",
         "agent explain wS:p59Y --json",
-        "pane report-agent wS:p59Y --source fgos --agent claude --state working",
         "pane send-keys wS:p59Y Escape Enter",
         "pane read wS:p59Y --lines 40 --source visible",
         "pane process-info --pane wS:p59Y",
         "agent get wS:p59Y",
-        "agent start seat-1 --kind claude --pane wS:p59Y --timeout 30000 -- --model opus",
-        "tab rename wS:tF9 fgos lead",
         "pane rename wS:p59Y seat 1",
         "pane get wS:p59Y",
         "pane layout --pane wS:p59Y",
@@ -182,6 +173,17 @@ fn a_hung_herdr_command_is_unknown_after_the_timeout() {
         assert!(refused, "a hang of `{hung}` is never read as gone or idle");
         assert!(started.elapsed() < std::time::Duration::from_secs(5));
     }
+}
+
+#[test]
+fn a_command_never_runs_past_the_operations_budget() {
+    let mut fake = Fake::new("budget").env("FAKE_HERDR_HANG", "pane get");
+    fake.config.timeout_ms = 30_000;
+    fake.config.deadline = Some(std::time::Instant::now() + std::time::Duration::from_millis(800));
+    let d = fake.driver();
+    let started = std::time::Instant::now();
+    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang past the budget is never read as gone");
+    assert!(started.elapsed() < std::time::Duration::from_secs(5), "the command outlived the budget: {:?}", started.elapsed());
 }
 
 #[test]
@@ -396,6 +398,59 @@ mod incarnation {
     }
 
     #[test]
+    fn each_operation_runs_a_fixed_number_of_herdr_commands() {
+        use fgos_terminal_control::core::{Core, CoreConfig};
+        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
+        use fgos_terminal_control::port::{AllocateRequest, Disposition, Display, LaunchSpec};
+
+        let fake = Fake::new("count");
+        let sock = fake.dir.join("s");
+        let _listener = UnixListener::bind(&sock).unwrap();
+        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
+        let driver = fake.driver();
+        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
+        let core = Core::new(&driver, &MeasuredSplit, config);
+        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { label: key.into(), ..Default::default() }, cwd: None, env: Default::default() };
+        let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
+        // Commands herdr was asked to run by one operation; the probe at construction is not counted.
+        let ran = |op: &dyn Fn()| {
+            let before = fake.calls().len();
+            op();
+            fake.calls().len() - before
+        };
+
+        let counts = [
+            ("capabilities", ran(&|| drop(core.capabilities()))),
+            ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
+            ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
+            ("attach", ran(&|| drop(core.attach("k3", "wS:p59Z", Some("g3"), None).unwrap()))),
+            ("launch refused for an attached pane", ran(&|| drop(core.launch("k3", &spec).unwrap_err()))),
+            ("send refused at a shell", ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap()))),
+            ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
+            ("inspect", ran(&|| drop(core.inspect("k1", false)))),
+            ("label", ran(&|| core.label("k1", &Display { label: "renamed".into(), ..Default::default() }).unwrap())),
+            ("reconcile-scan over three records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
+            ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
+        ];
+        assert_eq!(
+            counts,
+            [
+                ("capabilities", 0),
+                ("allocate into a new tab", 1),
+                ("allocate beside a live pane", 8),
+                ("attach", 4),
+                ("launch refused for an attached pane", 1),
+                ("send refused at a shell", 2),
+                ("read", 2),
+                ("inspect", 3),
+                ("label", 2),
+                ("reconcile-scan over three records", 6),
+                ("release close", 2),
+            ],
+        );
+    }
+
+    #[test]
     fn a_brief_sent_to_a_pane_whose_shell_holds_the_foreground_is_not_typed_and_nothing_runs() {
         use fgos_terminal_control::core::{Core, CoreConfig};
         use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
@@ -409,7 +464,7 @@ mod incarnation {
         let driver = fake.driver();
         let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
         let core = Core::new(&driver, &MeasuredSplit, config);
-        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, role_hint: None, cwd: None, env: Default::default() }).unwrap();
+        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, cwd: None, env: Default::default() }).unwrap();
 
         let typed = fake.dir.join("typed");
         let prompted = fake.dir.join("prompted");

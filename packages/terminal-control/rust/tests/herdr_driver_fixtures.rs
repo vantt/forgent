@@ -79,16 +79,8 @@ fn error_envelopes_keep_their_code() {
     for (name, code) in [
         ("pane-close-not-found", "pane_not_found"),
         ("pane-split-dead-anchor", "pane_not_found"),
-        ("tab-get-not-found", "tab_not_found"),
     ] {
         assert_eq!(envelope(&fixture(name)).unwrap_err().code, code, "{name}");
-    }
-}
-
-#[test]
-fn list_and_session_answers_unwrap() {
-    for name in ["pane-list", "tab-list", "tab-get", "session-list", "pane-close-ok"] {
-        envelope(&fixture(name)).unwrap_or_else(|e| panic!("{name}: {e:?}"));
     }
 }
 

@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { DispatchError } from './dispatch-error.mjs';
 import { terminalRouteConfig } from '../../terminal-control/config.mjs';
-import { normalizeAgentName } from './herdr-agent.mjs';
+import { normalizeAgentName } from './proof-helpers.mjs';
 import { createRoundTerminalControl, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';

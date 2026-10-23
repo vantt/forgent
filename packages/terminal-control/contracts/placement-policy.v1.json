@@ -15,8 +15,8 @@
         "panes": [{ "paneId": "string", "rect": { "x": "integer", "y": "integer", "width": "integer", "height": "integer" } }]
       }
     ],
-    "groupPanes": [{ "key": "key", "tabId": "string", "paneId": "string", "rect": "rect", "roleHint": "optional string" }],
-    "request": { "display": "display", "roleHint": "optional string" },
+    "groupPanes": [{ "key": "key", "tabId": "string", "paneId": "string", "rect": "rect" }],
+    "request": { "label": "string" },
     "limits": { "minCols": "integer >= 1", "minRows": "integer >= 1", "maxPanesPerTab": "integer >= 1" }
   },
   "output": {

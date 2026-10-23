@@ -16,8 +16,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { routeEnv } from '../holder-lock/driver.mjs';
 
-export const PROTOCOL = 1;
-const OPS = ['allocate', 'attach', 'launch', 'send', 'read', 'inspect', 'release', 'label', 'capabilities', 'reconcile-scan'];
+const PROTOCOL = 1;
 const DEFAULT_TIMEOUT_MS = 60_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
@@ -74,8 +73,9 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
     throw new TerminalControlError('terminal-control-route-bad-output', `${bin} terminal-control ${op} answered non-JSON: ${text.slice(0, 200)}`);
   }
   if (line.result === 'error') {
-    if (line.code === 'host-version-mismatch') throw new TerminalControlError('host-version-mismatch', `${bin} terminal-control ${op}: ${line.message}`);
-    throw new TerminalControlError('terminal-control-route-usage', `${bin} terminal-control ${op}: ${line.message}`);
+    // The route's own refusal codes keep their name; everything else it refuses is a usage error.
+    const code = line.code === 'host-version-mismatch' || String(line.code).startsWith('terminal-config-') ? line.code : 'terminal-control-route-usage';
+    throw new TerminalControlError(code, `${bin} terminal-control ${op}: ${line.message}`, { routeMessage: line.message });
   }
   const { v, protocol, op: _op, ...result } = line;
   if (typeof result.result !== 'string') {
@@ -86,8 +86,8 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
 
 /**
  * createTerminalControl({ hostBin, herdrBin, env, config, timeoutMs }) ->
- *   { allocate, attach, launch, send, read, inspect, release, label,
- *     capabilities, reconcileScan, allocateAsync, releaseAsync }
+ *   { allocate, attach, read, inspect, release, capabilities, reconcileScan,
+ *     allocateAsync, releaseAsync }
  *
  * `hostBin` defaults to the active release's host (resolved on first call).
  * `herdrBin` is the caller's resolved herdr binary; `env` the driver's
@@ -100,7 +100,7 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
   const bin = () => hostBin ?? activeHostBin();
 
   const prepare = (op, request) => {
-    const envelope = { v: PROTOCOL, driver: 'herdr', request };
+    const envelope = { v: PROTOCOL, driver: 'herdr', timeoutMs, request };
     if (herdrBin) envelope.herdrBin = herdrBin;
     if (env) envelope.env = env;
     if (config) envelope.config = config;
@@ -198,8 +198,6 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
       return callSync('allocate', request);
     },
     attach: (request) => callSync('attach', request),
-    launch: (request) => callSync('launch', request),
-    send: (request) => callSync('send', request),
     read: (request) => callSync('read', request),
     inspect: (request) => callSync('inspect', request),
     release(request) {
@@ -207,7 +205,6 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
       if (result.result === 'released') groupOfKey.delete(request.key);
       return result;
     },
-    label: (request) => callSync('label', request),
     capabilities: () => callSync('capabilities', {}),
     reconcileScan: (request) => callSync('reconcile-scan', request),
 
@@ -236,5 +233,3 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
   };
   return client;
 }
-
-export { OPS as TERMINAL_CONTROL_OPS };

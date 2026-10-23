@@ -1,4 +1,4 @@
-// The terminal-control doctor checks and setup fix against the real host
+// The terminal-control doctor checks against the real host
 // binary (FGOS_HOST_BIN, built from this checkout) and the fake herdr script
 // the Rust driver tests use. Configs are written to temporary workspaces.
 import '../helpers/process-tmp-root.mjs';
@@ -14,12 +14,10 @@ import {
   checkTerminalControl,
   checkTerminalConfig,
   checkTerminalAllocations,
-  fixTerminalDir,
 } from '../../src/setup/terminal-control-checks.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import {
   DEFAULT_TERMINAL_CONFIG,
-  KNOWN_POLICIES,
   resolveTerminalConfig,
   retainFailedPaneMsOf,
   terminalRouteConfig,
@@ -110,32 +108,27 @@ test('terminal-config fails a retainFailedPaneMs that is neither null nor a posi
   assert.match(ok.message, /retainFailedPaneMs=3600000 \(project\)/);
 });
 
-test('terminal-config fails an unregistered policy and names the registered ones', () => {
-  const r = configCheck(workspace('policy', { layout: { policy: 'golden-ratio' } }));
-  assert.equal(r.passed, false);
-  assert.match(r.message, /terminal\.layout\.policy = "golden-ratio" is not a registered placement policy \(measured-split\)/);
-});
-
-test('terminal-config fails layout limits that are not positive integers or sit below the measured floor', () => {
-  for (const [key, value, pattern] of [
-    ['minCols', 0, /must be a positive integer/],
-    ['minRows', 2.5, /must be a positive integer/],
-    ['maxPanesPerTab', -1, /must be a positive integer/],
-    ['minCols', 39, /below the measured floor of 40/],
-    ['minRows', 7, /below the measured floor of 8/],
-  ]) {
-    const r = configCheck(workspace(`limit-${key}-${value}`, { layout: { [key]: value } }));
+test('terminal-config prints the refusal the core names for a limit below the measured floor, and passes the floor itself', () => {
+  for (const [key, value, named] of [['minCols', 39, 'layout.minCols=39 < 40'], ['minRows', 7, 'layout.minRows=7 < 8']]) {
+    const r = configCheck(workspace(`floor-${key}`, { layout: { [key]: value } }));
     assert.equal(r.passed, false, `${key}=${value}`);
-    assert.match(r.message, new RegExp(`terminal\\.layout\\.${key}`));
-    assert.match(r.message, pattern);
+    assert.ok(r.message.includes(named) && r.message.includes('terminal-config-below-floor'), r.message);
   }
   assert.equal(configCheck(workspace('floor-ok', { layout: { minCols: 40, minRows: 8 } })).passed, true);
 });
 
-test('terminal-config reports every broken setting in one message', () => {
-  const r = configCheck(workspace('many', { allocationGraceMs: 10, layout: { policy: 'x', minCols: 1 } }));
+test('terminal-config reports the Node rules and the core refusal in one message', () => {
+  const r = configCheck(workspace('many', { allocationGraceMs: 10, layout: { minCols: 1 } }));
   assert.equal(r.passed, false);
-  for (const key of ['allocationGraceMs', 'layout.policy', 'layout.minCols']) assert.match(r.message, new RegExp(`terminal\\.${key.replace('.', '\\.')}`));
+  assert.match(r.message, /terminal\.allocationGraceMs/);
+  assert.match(r.message, /layout\.minCols=1 < 40/);
+});
+
+test('terminal-config warns, without failing, when the route cannot be reached', () => {
+  const createClient = (config) => createTerminalControl({ hostBin: path.join(scratch, 'no-such-host'), config });
+  const r = checkTerminalConfig(workspace('route-down'), { globalConfigPath: noGlobal, createClient });
+  assert.equal(r.passed, true);
+  assert.match(r.message, /^warning: the terminal-control route did not answer/);
 });
 
 test('terminal-config fails by name on a config file that does not parse', () => {
@@ -264,7 +257,7 @@ test('terminal-allocations says it did not scan when terminal mode is unsupporte
   assert.doesNotMatch(r.message, /need a person/);
 });
 
-// ---- setup: config default and terminal directory ----------------------
+// ---- setup: config default ---------------------------------------------
 
 test('setup config-merge adds terminal.* when missing and leaves a project value alone', () => {
   const fresh = workspace('merge-fresh');
@@ -280,30 +273,11 @@ test('setup config-merge adds terminal.* when missing and leaves a project value
   assert.equal(after.layout.minRows, 20, 'a missing nested key is filled');
 });
 
-test('the three checks and the terminal-dir fix are registered', () => {
+test('the three checks are registered and setup has no terminal directory fix', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
   for (const id of ['terminal-control', 'terminal-config', 'terminal-allocations']) assert.ok(ids.includes(id), id);
   assert.ok(!ids.includes('herdr-available'), 'the old check id is gone');
-  assert.ok(FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'));
-});
-
-test('fixTerminalDir creates <stateRoot>/terminal at 0700, is idempotent and tightens a loose mode', { skip: !POSIX }, () => {
-  const stateRoot = path.join(scratch, 'fix-state');
-  const env = { ...process.env, FGOS_STATE_ROOT: stateRoot };
-  const root = workspace('fix-dir');
-  const dir = path.join(stateRoot, 'terminal');
-
-  const created = fixTerminalDir(root, { env });
-  assert.equal(created.changed, true, created.message);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
-
-  assert.equal(fixTerminalDir(root, { env }).changed, false);
-
-  fs.chmodSync(dir, 0o755);
-  const tightened = fixTerminalDir(root, { env });
-  assert.equal(tightened.changed, true);
-  assert.match(tightened.message, /tightened/);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
+  assert.ok(!FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'), 'the store creates its own directory');
 });
 
 // ---- the config reaches the route --------------------------------------
@@ -321,19 +295,6 @@ test('an unreadable config gives the route no settings and no retain time instea
   writeRawProjectConfig(root, '{ not json');
   assert.deepEqual(terminalRouteConfig(root, { globalConfigPath: noGlobal }), {});
   assert.equal(retainFailedPaneMsOf(root, { globalConfigPath: noGlobal }), null);
-});
-
-test('the route accepts the configuration the defaults describe (same numbers as the Rust core)', () => {
-  const rust = fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/rust/src/route.rs'), 'utf8');
-  const limits = rust.match(/DEFAULT_LIMITS: Limits = Limits \{ min_cols: (\d+), min_rows: (\d+), max_panes_per_tab: (\d+) \}/);
-  const grace = rust.match(/DEFAULT_ALLOCATION_GRACE_MS: u64 = ([\d_]+)/);
-  assert.deepEqual(
-    [Number(limits[1]), Number(limits[2]), Number(limits[3]), Number(grace[1].replace(/_/g, ''))],
-    [DEFAULT_TERMINAL_CONFIG.layout.minCols, DEFAULT_TERMINAL_CONFIG.layout.minRows, DEFAULT_TERMINAL_CONFIG.layout.maxPanesPerTab, DEFAULT_TERMINAL_CONFIG.allocationGraceMs],
-  );
-  const contract = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/contracts/placement-policy.v1.json'), 'utf8'));
-  assert.deepEqual([...KNOWN_POLICIES], contract.registry.names);
-  assert.equal(DEFAULT_TERMINAL_CONFIG.layout.policy, contract.registry.default);
 });
 
 test('resolveTerminalConfig treats an explicit null as a set value', () => {

@@ -230,13 +230,6 @@ impl<'a> Core<'a> {
             let _ = self.close_unrecorded(&created.pane_id, &incarnation);
             return self.allocate(request);
         }
-        let hint = GroupHint {
-            v: VERSION,
-            group_key: request.group_key.clone(),
-            tab_id: created.tab_id.clone(),
-            updated_at: self.now(),
-        };
-        store.write_hint(&hint).map_err(store_err)?;
         Ok(Allocation {
             slot: Slot { tab_id: created.tab_id, pane_id: created.pane_id },
             origin: Origin::Allocated,
@@ -354,7 +347,6 @@ impl<'a> Core<'a> {
                     tab_id: geometry.tab_id.clone(),
                     pane_id: p.pane_id.clone(),
                     rect: p.rect,
-                    role_hint: None,
                 });
             }
         }
@@ -366,7 +358,7 @@ impl<'a> Core<'a> {
             group_key: request.group_key.clone(),
             tabs,
             group_panes,
-            request: PlaceRequest { label: request.display.label.clone(), role_hint: request.role_hint.clone() },
+            request: PlaceRequest { label: request.display.label.clone() },
             limits: self.config.limits,
         };
         match self.policy.place(&input) {
@@ -433,13 +425,8 @@ impl<'a> Core<'a> {
         if record.origin == Origin::Attached {
             return Err(unknown(format!("`{key}` is an attached pane; the core never launches into it")));
         }
-        match &spec.activity {
-            Some(_) => self.need("activity.state")?,
-            None => {
-                self.need("pane.run")?;
-                self.need("read.screen")?;
-            }
-        }
+        self.need("pane.run")?;
+        self.need("read.screen")?;
         self.need("process.info")?;
         let line = launch_line(spec)?;
 
@@ -447,14 +434,12 @@ impl<'a> Core<'a> {
             return Ok(LaunchOutcome::NotStarted { reason: "launch was already requested for this slot".into() });
         }
 
-        if spec.activity.is_none() {
-            if let Some(not_started) = self.wait_for_shell(&record.pane_id)? {
-                return Ok(not_started);
-            }
-            let info = self.driver.process_info(&record.pane_id)?;
-            if !identity::is_bare_shell(&info) {
-                return Ok(LaunchOutcome::NotStarted { reason: "pane foreground is not the shell".into() });
-            }
+        if let Some(not_started) = self.wait_for_shell(&record.pane_id)? {
+            return Ok(not_started);
+        }
+        let info = self.driver.process_info(&record.pane_id)?;
+        if !identity::is_bare_shell(&info) {
+            return Ok(LaunchOutcome::NotStarted { reason: "pane foreground is not the shell".into() });
         }
 
         let requested = LaunchRequestedMarker { v: VERSION, key: key.to_string(), at: self.now() };
@@ -462,16 +447,7 @@ impl<'a> Core<'a> {
             return Ok(LaunchOutcome::NotStarted { reason: "launch was already requested for this slot".into() });
         }
         // The marker is on disk: from here on the slot is kept, whatever happens.
-        match &spec.activity {
-            Some(activity) => self.driver.activity_start(
-                &record.pane_id,
-                key,
-                &activity.kind,
-                &activity.args,
-                activity.timeout_ms.unwrap_or(self.config.launch_identify_timeout_ms),
-            )?,
-            None => self.driver.pane_run(&record.pane_id, &line)?,
-        }
+        self.driver.pane_run(&record.pane_id, &line)?;
 
         let Some(identity) = self.identify_root(&record.pane_id, spec) else {
             return Ok(LaunchOutcome::NotStarted { reason: "launched root process was not identified in time".into() });
@@ -550,9 +526,7 @@ impl<'a> Core<'a> {
         let deadline = Instant::now() + Duration::from_millis(self.config.launch_identify_timeout_ms);
         loop {
             if let Ok(info) = self.driver.process_info(pane) {
-                let root = if spec.activity.is_some() {
-                    identity::first_non_shell(&info)
-                } else if let Some(expect) = &spec.expect {
+                let root = if let Some(expect) = &spec.expect {
                     identity::match_expected(&info, expect)
                 } else {
                     identity::match_launched(&info, &spec.command, &spec.args)
@@ -585,7 +559,7 @@ impl<'a> Core<'a> {
         let record = self.live_record(&store, key)?;
         let info = match self.driver.process_info(&record.pane_id) {
             Ok(info) => info,
-            Err(refusal) => return Ok(SendOutcome::ForegroundNotAgent { reason: format!("the pane's foreground could not be read: {refusal:?}") }),
+            Err(refusal) => return Ok(SendOutcome::ForegroundNotAgent { reason: format!("the pane's foreground could not be read: {refusal}") }),
         };
         if self.foreground_of(&store, key, &info).is_none() {
             let reason = if identity::is_bare_shell(&info) {
@@ -662,19 +636,11 @@ impl<'a> Core<'a> {
     }
 
     /// Write display data to the terminal. The record is never edited.
-    pub fn label(&self, key: &str, display: &Display, report_state: Option<&str>) -> Result<(), Refusal> {
+    pub fn label(&self, key: &str, display: &Display) -> Result<(), Refusal> {
         self.need("label")?;
         let (store, _) = self.open()?;
         let record = self.live_record(&store, key)?;
-        self.driver.label_pane(&record.pane_id, &display.label)?;
-        if let Some(state) = report_state {
-            // Only for an agent the driver does not recognise on its own: a
-            // reported state becomes the pane's status authority.
-            self.need("activity.state")?;
-            let agent = display.agent.as_deref().ok_or_else(|| unknown("report needs display.agent"))?;
-            self.driver.report_agent(&record.pane_id, agent, state)?;
-        }
-        Ok(())
+        self.driver.label_pane(&record.pane_id, &display.label)
     }
 
     pub fn capabilities(&self) -> CapabilitiesReport {

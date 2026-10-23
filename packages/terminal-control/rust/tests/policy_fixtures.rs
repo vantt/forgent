@@ -152,12 +152,10 @@ impl Sim {
                     tab_id: "t".into(),
                     pane_id: format!("p-{key}"),
                     rect: *r,
-                    role_hint: None,
                 })
                 .collect(),
             request: PlaceRequest {
                 label: "w".into(),
-                role_hint: None,
             },
             limits,
         }
@@ -258,7 +256,6 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
                         tab_id: format!("t{t}"),
                         pane_id,
                         rect: r,
-                        role_hint: None,
                     });
                 }
             }
@@ -274,7 +271,6 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
             group_panes,
             request: PlaceRequest {
                 label: "w".into(),
-                role_hint: None,
             },
             limits,
         };

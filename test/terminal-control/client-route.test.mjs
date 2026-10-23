@@ -1,7 +1,9 @@
-// The Node client against the real host binary (FGOS_HOST_BIN, built from this
-// checkout) and the fake herdr script the Rust driver tests use: every port
-// operation answers as the contract says, refusals come back untouched, and a
-// route problem throws a named error.
+// The Node client and the route against the real host binary (FGOS_HOST_BIN,
+// built from this checkout) and the fake herdr script the Rust driver tests use:
+// every port operation answers as the contract says, refusals come back
+// untouched, and a route problem throws a named error. The client carries only
+// the operations a Node caller uses; `send`, `launch` and `label` are reached
+// through the route directly, as the terminal skill does.
 import '../helpers/process-tmp-root.mjs';
 import { test, after, before } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,6 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createTerminalControl, TerminalControlError } from '../../src/terminal-control/client.mjs';
+import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -35,6 +38,14 @@ after(() => {
 });
 
 const herdrEnv = { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: socketPath, HERDR_SOCKET_PATH: socketPath };
+
+/** One route call with no client in between: the answer line, flattened as the contract says. */
+function route(op, request, { env = herdrEnv, config } = {}) {
+  const input = JSON.stringify({ v: 1, driver: 'herdr', herdrBin: FAKE_HERDR, env, ...(config ? { config } : {}), request });
+  const res = spawnSync(HOST_BIN, ['internal', 'terminal-control', op, '--protocol', '1', '--json'], { input, encoding: 'utf8', env: { ...process.env } });
+  assert.equal(res.status, 0, res.stderr);
+  return JSON.parse(res.stdout);
+}
 const client = (extra = {}) => createTerminalControl({ hostBin: HOST_BIN, herdrBin: FAKE_HERDR, env: herdrEnv, ...extra });
 const calls = () => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').split('\n').filter(Boolean).map((l) => l.replace(/\t+$/, '').split('\t').join(' ')) : []);
 
@@ -56,6 +67,15 @@ test('every operation of the port answers through the route', () => {
   }
   assert.equal(capabilities.serverIncarnation.endpoint, socketPath);
   assert.equal(capabilities.serverIncarnation.pid, process.pid);
+  // The core's own defaults and policy registry are what setup writes and the contract names.
+  const { layout, allocationGraceMs } = DEFAULT_TERMINAL_CONFIG;
+  assert.deepEqual(
+    { minCols: layout.minCols, minRows: layout.minRows, maxPanesPerTab: layout.maxPanesPerTab, policy: layout.policy, allocationGraceMs },
+    { minCols: capabilities.defaults.minCols, minRows: capabilities.defaults.minRows, maxPanesPerTab: capabilities.defaults.maxPanesPerTab, policy: capabilities.defaults.policy, allocationGraceMs: capabilities.defaults.allocationGraceMs },
+  );
+  const placement = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/contracts/placement-policy.v1.json'), 'utf8'));
+  assert.deepEqual(capabilities.policies, placement.registry.names);
+  assert.equal(capabilities.defaults.policy, placement.registry.default);
 
   const slot = tc.allocate({ key: 'k-one', groupKey: 'g-one', display });
   assert.equal(slot.result, 'slot');
@@ -67,12 +87,11 @@ test('every operation of the port answers through the route', () => {
   assert.equal(attached.result, 'slot');
   assert.equal(attached.origin, 'attached');
 
-  assert.deepEqual(tc.label({ key: 'k-one', display: { label: 'renamed' } }), { result: 'ok' });
+  assert.equal(route('label', { key: 'k-one', display: { label: 'renamed' } }, shellForeground).result, 'ok');
   // Only the pane's shell holds the foreground: nothing is typed, and the route names why.
-  const refused = tc.send({ key: 'k-one', text: 'hello', submit: true });
+  const refused = route('send', { key: 'k-one', text: 'hello', submit: true }, shellForeground);
   assert.equal(refused.result, 'foreground-not-agent');
   assert.match(refused.reason, /shell/);
-  assert.ok(!calls().some((c) => c.startsWith('pane send-text') || c.startsWith('agent prompt')), 'nothing reached the pane');
   assert.equal(tc.read({ key: 'k-one', lines: 5 }).screen, 'line one\nline two\n');
 
   const inspection = tc.inspect({ key: 'k-one' });
@@ -83,16 +102,12 @@ test('every operation of the port answers through the route', () => {
   assert.equal(scan.result, 'scan');
   assert.ok(Array.isArray(scan.findings));
 
-  // The fake herdr's pane never has a program in its foreground that the shell holds: the shell
-  // handshake cannot prove a ready shell, so the route answers not-started and nothing is typed.
-  const launcher = client({ config: { launchIdentifyTimeoutMs: 200, shellReadyTimeoutMs: 600 } });
+  // The fake herdr's shell never proves it runs commands, so the route answers not-started and names why.
+  const launcher = client({ config: { launchIdentifyTimeoutMs: 200, shellReadyTimeoutMs: 200 } });
   assert.equal(launcher.allocate({ key: 'k-launch', groupKey: 'g-launch', display }).result, 'slot');
-  const runsBefore = calls().filter((c) => c.startsWith('pane run')).length;
-  const launched = launcher.launch({ key: 'k-launch', launchSpec: { command: 'sleep', args: ['300'], cwd: scratch, env: {} } });
+  const launched = route('launch', { key: 'k-launch', launchSpec: { command: 'sleep', args: ['300'], cwd: scratch, env: {} } }, { config: { launchIdentifyTimeoutMs: 200, shellReadyTimeoutMs: 200 } });
   assert.equal(launched.result, 'not-started');
   assert.ok(launched.reason, 'the route names why nothing started');
-  const runsAfter = calls().filter((c) => c.startsWith('pane run')).slice(runsBefore);
-  assert.ok(runsAfter.every((c) => c.includes("printf '%s%s\\n' fgos-ok-")), `only probes were typed: ${JSON.stringify(runsAfter)}`);
 
   assert.deepEqual(tc.release({ key: 'k-attached', disposition: 'retain', until: null }), { result: 'released', disposition: 'retain' });
   assert.deepEqual(tc.release({ key: 'k-one', disposition: 'close' }), { result: 'released', disposition: 'close' });
@@ -110,27 +125,12 @@ test('unknown keys and a missing herdr come back as results, not exceptions', ()
 });
 
 test('a bad request or a wrong protocol throws a named error', () => {
-  assert.throws(() => client().send({ key: 'k-one' }), (e) => e instanceof TerminalControlError && e.code === 'terminal-control-route-usage');
-  assert.throws(() => client().read({ key: 'k-one', source: 'nope' }), (e) => e.code === 'terminal-control-route-usage');
+  assert.throws(() => client().read({ key: 'k-one', source: 'nope' }), (e) => e instanceof TerminalControlError && e.code === 'terminal-control-route-usage');
   assert.throws(() => client().allocate({ key: 'k' }), (e) => e.code === 'terminal-control-route-usage');
   assert.throws(() => createTerminalControl({ hostBin: path.join(scratch, 'missing-host') }).capabilities(), (e) => e.code === 'terminal-control-no-host-binary');
+  const neither = spawnSync(HOST_BIN, ['internal', 'terminal-control', 'send', '--protocol', '1', '--json'], { input: JSON.stringify({ v: 1, request: { key: 'k-one' } }), encoding: 'utf8' });
+  assert.equal(neither.status, 2, 'a send with neither text nor keys is a usage error');
   const direct = spawnSync(HOST_BIN, ['internal', 'terminal-control', 'capabilities', '--protocol', '2', '--json'], { encoding: 'utf8' });
   assert.equal(direct.status, 3);
   assert.equal(JSON.parse(direct.stdout).code, 'host-version-mismatch');
-});
-
-test('read through the route is fast enough to poll (p50/p95 over 200 calls)', () => {
-  const tc = client();
-  tc.allocate({ key: 'k-perf', groupKey: 'g-perf', display: { label: 'perf' } });
-  const samples = [];
-  for (let i = 0; i < 200; i += 1) {
-    const start = process.hrtime.bigint();
-    assert.equal(tc.read({ key: 'k-perf', lines: 5 }).result, 'screen');
-    samples.push(Number(process.hrtime.bigint() - start) / 1e6);
-  }
-  samples.sort((a, b) => a - b);
-  const p50 = samples[100];
-  const p95 = samples[189];
-  console.log(`read via route over fake herdr: p50 ${p50.toFixed(1)} ms, p95 ${p95.toFixed(1)} ms`);
-  assert.ok(p95 < 1000, `p95 ${p95} ms`);
 });

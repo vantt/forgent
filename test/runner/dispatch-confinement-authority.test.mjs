@@ -7,7 +7,7 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { executeThroughConfinement, buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
-import { normalizeAgentName } from "../../src/runner/dispatch/herdr-agent.mjs";
+import { normalizeAgentName } from "../../src/runner/dispatch/proof-helpers.mjs";
 import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
