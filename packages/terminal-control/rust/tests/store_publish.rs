@@ -70,8 +70,11 @@ fn directories_are_private() {
     use std::os::unix::fs::PermissionsExt;
     let root = state_dir("perms");
     let _ = Store::open(&root, "mem", &incarnation()).unwrap();
-    let dir = root.join("terminal").join("mem").join(incarnation().id()).join("allocations");
-    assert_eq!(std::fs::metadata(dir).unwrap().permissions().mode() & 0o777, 0o700);
+    // Every directory the store creates under a state root that had none, the terminal directory itself included.
+    let driver = root.join("terminal").join("mem");
+    for dir in [root.join("terminal"), driver.clone(), driver.join(incarnation().id()), driver.join(incarnation().id()).join("allocations")] {
+        assert_eq!(std::fs::metadata(&dir).unwrap().permissions().mode() & 0o777, 0o700, "{dir:?}");
+    }
 }
 
 #[test]

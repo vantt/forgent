@@ -1,4 +1,4 @@
-// The terminal-control doctor checks and setup fix against the real host
+// The terminal-control doctor checks against the real host
 // binary (FGOS_HOST_BIN, built from this checkout) and the fake herdr script
 // the Rust driver tests use. Configs are written to temporary workspaces.
 import '../helpers/process-tmp-root.mjs';
@@ -14,7 +14,6 @@ import {
   checkTerminalControl,
   checkTerminalConfig,
   checkTerminalAllocations,
-  fixTerminalDir,
 } from '../../src/setup/terminal-control-checks.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import {
@@ -258,7 +257,7 @@ test('terminal-allocations says it did not scan when terminal mode is unsupporte
   assert.doesNotMatch(r.message, /need a person/);
 });
 
-// ---- setup: config default and terminal directory ----------------------
+// ---- setup: config default ---------------------------------------------
 
 test('setup config-merge adds terminal.* when missing and leaves a project value alone', () => {
   const fresh = workspace('merge-fresh');
@@ -274,30 +273,11 @@ test('setup config-merge adds terminal.* when missing and leaves a project value
   assert.equal(after.layout.minRows, 20, 'a missing nested key is filled');
 });
 
-test('the three checks and the terminal-dir fix are registered', () => {
+test('the three checks are registered and setup has no terminal directory fix', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
   for (const id of ['terminal-control', 'terminal-config', 'terminal-allocations']) assert.ok(ids.includes(id), id);
   assert.ok(!ids.includes('herdr-available'), 'the old check id is gone');
-  assert.ok(FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'));
-});
-
-test('fixTerminalDir creates <stateRoot>/terminal at 0700, is idempotent and tightens a loose mode', { skip: !POSIX }, () => {
-  const stateRoot = path.join(scratch, 'fix-state');
-  const env = { ...process.env, FGOS_STATE_ROOT: stateRoot };
-  const root = workspace('fix-dir');
-  const dir = path.join(stateRoot, 'terminal');
-
-  const created = fixTerminalDir(root, { env });
-  assert.equal(created.changed, true, created.message);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
-
-  assert.equal(fixTerminalDir(root, { env }).changed, false);
-
-  fs.chmodSync(dir, 0o755);
-  const tightened = fixTerminalDir(root, { env });
-  assert.equal(tightened.changed, true);
-  assert.match(tightened.message, /tightened/);
-  assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
+  assert.ok(!FIX_REGISTRATIONS.some((f) => f.id === 'terminal-dir'), 'the store creates its own directory');
 });
 
 // ---- the config reaches the route --------------------------------------

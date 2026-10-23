@@ -1,23 +1,18 @@
-// terminal-control-checks.mjs -- the doctor checks and the setup fix of the
-// terminal-control component (docs/platform/terminal-control/spec.md,
-// "Configuration" and "Failure cases"). `registrations.mjs` registers them;
-// the bodies live here.
+// terminal-control-checks.mjs -- the doctor checks of the terminal-control
+// component (docs/platform/terminal-control/spec.md, "Configuration" and
+// "Failure cases"). `registrations.mjs` registers them; the bodies live here.
 //
-// Every check reads; only `fixTerminalDir` writes. Levels follow the doctor
-// convention: `passed: false` fails, a message that starts with `warning:`
-// warns, `info:` is informational, anything else passes.
+// Every check reads. Levels follow the doctor convention: `passed: false` fails,
+// a message that starts with `warning:` warns, `info:` is informational,
+// anything else passes.
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { createTerminalControl, TerminalControlError } from '../terminal-control/client.mjs';
 import { resolveTerminalConfig, terminalConfigProblems, terminalRouteConfig } from '../terminal-control/config.mjs';
-import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { READY_TIMEOUT_MS } from '../runner/dispatch/herdr-deadlines.mjs';
-
-const TERMINAL_DIR = 'terminal';
 
 /** `FGOS_HERDR_ANCHOR_PANE`, when set, must name a pane herdr can resolve: it is
  * the input of `attach`. Returns a failure message, a note to append, or `''`. */
@@ -152,33 +147,4 @@ export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalC
   if (scan.findings.length === 0) return { passed: true, message: `no slot older than ${grace} ms is stuck and no retained pane is past its time` };
   const lines = scan.findings.map((f) => `${f.key}: ${FINDING_TEXT[f.kind] ?? f.kind}${f.detail ? ` (${f.detail})` : ''}`);
   return { passed: true, message: `warning: ${scan.findings.length} slot(s) need a person; nothing was closed: ${lines.join('; ')}` };
-}
-
-/**
- * terminal-dir (setup): create `<stateRoot>/terminal` with mode 0700, or
- * tighten an existing one to 0700.
- */
-export function fixTerminalDir(repoRoot, { env = process.env } = {}) {
-  let dir;
-  try {
-    dir = path.join(resolveStateRoot({ env }).stateRoot, TERMINAL_DIR);
-  } catch (err) {
-    return { changed: false, message: `terminal directory not created: state root unresolved: ${err.message}` };
-  }
-  try {
-    if (fs.statSync(dir).isDirectory()) {
-      if ((fs.statSync(dir).mode & 0o077) === 0) return { changed: false, message: `terminal directory present at ${dir}` };
-      fs.chmodSync(dir, 0o700);
-      return { changed: true, message: `tightened ${dir} to 0700` };
-    }
-  } catch {
-    // missing: created below
-  }
-  try {
-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-    fs.chmodSync(dir, 0o700);
-    return { changed: true, message: `created ${dir}` };
-  } catch (err) {
-    return { changed: false, message: `terminal directory not created at ${dir}: ${err.code ?? err.message}` };
-  }
 }
