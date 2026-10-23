@@ -713,7 +713,13 @@ fn json_flag_wraps_the_same_answer_in_the_envelope() {
 /// one the adapters contract lists for Codex's head, standing at the direct
 /// head position (the entry is its child; `; :` keeps it from exec'ing).
 fn codex_like(dir: &Path) -> PathBuf {
-    let bin = dir.join("bin/codex");
+    cli_like(dir, "codex")
+}
+
+/// A shell under the file name `name`, so the direct head check reads that
+/// CLI's head executable (`codex`; pi runs `node`; `omp`).
+fn cli_like(dir: &Path, name: &str) -> PathBuf {
+    let bin = dir.join("bin").join(name);
     if !bin.exists() {
         fs::create_dir_all(bin.parent().unwrap()).unwrap();
         // Copied by a child process, so no descriptor open for writing is
@@ -804,6 +810,49 @@ fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
         "{}",
         scene.head_name()
     );
+}
+
+#[test]
+fn a_pi_or_omp_extension_call_registers_its_head_from_the_payload() {
+    for (cli, exe) in [("pi", "node"), ("omp", "omp")] {
+        let scene = Scene::new(&format!("{cli}-head"));
+        let mut payload: serde_json::Value = serde_json::from_slice(
+            &fs::read(repo_root().join(format!(
+                "packages/mailbox/contracts/fixtures/hooks/{cli}/post-tool-use.json"
+            )))
+            .unwrap(),
+        )
+        .unwrap();
+        payload["session_id"] = serde_json::Value::from(WRITER);
+        // The extension starts the hook from inside the CLI's own process.
+        let mut child = Command::new(cli_like(&scene.root, exe))
+            .args(["-c", "\"$0\" \"$@\"; :"])
+            .arg(fgos_bin())
+            .args(["hook", "mailbox", "--cli", cli, "--event", "post-tool-use"])
+            .current_dir(scene.main())
+            .env_clear()
+            .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+            .env("HOME", scene.home())
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&serde_json::to_vec(&payload).unwrap())
+            .unwrap();
+        let out = child.wait_with_output().unwrap();
+        assert_eq!(out.status.code(), Some(0), "{cli}: {out:?}");
+        assert!(out.stdout.is_empty(), "{cli}: a registering call is quiet");
+        assert!(
+            scene.head_name().starts_with(&format!("main-{cli}")),
+            "{cli}: {}",
+            scene.head_name()
+        );
+    }
 }
 
 #[test]

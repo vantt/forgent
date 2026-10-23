@@ -381,6 +381,43 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
 }
 
 #[test]
+fn a_codex_pi_or_omp_entry_resolves_its_writer_from_the_payload_and_its_head_at_the_direct_position(
+) {
+    use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+    let hook = hook_limits().hook;
+    let env = HookEnv {
+        home: None,
+        claude_config_dir: None,
+        session_writer: None,
+        session_env: None,
+    };
+    let child = spawn("sleep", &["30"]);
+    let record = record_of(child.0.id());
+    let payload = format!(r#"{{"session_id":"{WRITER}"}}"#);
+    for (adapter, exe) in [
+        (Adapter::Codex, "/home/u/.codex/releases/0.161.0/bin/codex"),
+        (Adapter::Pi, "/home/u/.nvm/versions/node/v24.21.0/bin/node"),
+        (Adapter::Omp, "/home/u/.local/bin/omp"),
+    ] {
+        let facts = facts(adapter);
+        let resolve = resolver_for(adapter, &facts, &env, &hook);
+        let resolved = resolve(
+            payload.as_bytes(),
+            &ancestry(record.clone(), exe, exe, None),
+        )
+        .unwrap_or_else(|e| panic!("{}: {e:?}", adapter.word()));
+        assert_eq!(resolved.writer, writer(), "{}", adapter.word());
+        assert_eq!(resolved.head.record, record, "{}", adapter.word());
+        assert_eq!(
+            resolve(b"{}", &ancestry(record.clone(), exe, exe, None)).unwrap_err(),
+            NoHead::NoWriter,
+            "{}: a payload without a session names no writer",
+            adapter.word()
+        );
+    }
+}
+
+#[test]
 fn a_codex_entry_takes_its_writer_from_the_payload_and_refuses_an_environment_naming_another_session(
 ) {
     let payload = br#"{"session_id":"00000000-0000-4000-8000-000000000001"}"#;

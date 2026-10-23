@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c7f6a194e11e4332d613ebb3c507d9730296c2472dba36d4c7171290d59a4495",
+  "payloadDigest": "661601abaa6cbd639c8d9c7b2f91ffaec0bbab1f6bc16526b201a2025cafc8de",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/src/wiring/mod.rs": "0a2cb09aabf9989ecdf72e34941776029bb14300974fbbc335781ed28120fa8c",
     "apps/fgos/tests/cli_tests.rs": "382ceeea451040e641e7788edd59f92e1e47d6c0bafd69d08a561bd99197ba5e",
     "apps/fgos/tests/internal_lock_routes.rs": "f0ed99bdebe74d6c54bfe8f2c4025e15bf4886a0ad3a50882251e861f92924d4",
-    "apps/fgos/tests/mailbox_routes.rs": "7bbed824b0b0ad01eee7b976902d98a5015f8b853329cbe5805245617bf69b88",
+    "apps/fgos/tests/mailbox_routes.rs": "30c655b6806f6cfa8528396aba6096a912b7f621d02c7b8d1a5dd457350080b2",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
     "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
@@ -530,7 +530,7 @@
     "packages/mailbox/rust/store/tests/common/record.rs": "f794216cbce6debb7e6a9d46c223de3791611f87f0e32bf96c0b5e0615463f32",
     "packages/mailbox/rust/store/tests/fixtures_contract.rs": "6a41bf7795559a2a870fa5d87817ba571959286485461e90bfcd412dcc1a7cb9",
     "packages/mailbox/rust/store/tests/head.rs": "e2ad06cdd080a11823d1840a647159f7f5b4876e76683ba9fa87489b50715d91",
-    "packages/mailbox/rust/store/tests/head_finder.rs": "e85f61e14ea6e4f77cfe8d6e428ec7cf8fa1e5df1453a4625356bee9fa9da719",
+    "packages/mailbox/rust/store/tests/head_finder.rs": "eed6f688daeeb0f55e170cebf3979e1471033db7c0e5d77abaca0d8148f9b6bf",
     "packages/mailbox/rust/store/tests/hook_payloads.rs": "edeb612b387620fd5f4c5b629e428a4a748698930dac7ccdda71f97640b0cc3c",
     "packages/mailbox/rust/store/tests/hook_shell.rs": "3ff16e5bcde3cd60180b52171d3fa025d859939758e15577e193acdccd6c828e",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "55fa23711315c0c12af07d7ec3cbf2ee6c760d7aa273e65d3063333be68cf0cd",
@@ -1797,6 +1797,27 @@
       "line": 144,
       "spawn": "Command::new",
       "binary": "/bin/sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/mailbox_routes.rs",
+      "line": 750,
+      "spawn": "Command::new",
+      "binary": "? name of cli_like",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/mailbox_routes.rs",
+      "line": 828,
+      "spawn": "Command::new",
+      "binary": "? name of cli_like",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/mailbox_routes.rs",
+      "line": 936,
+      "spawn": "Command::new",
+      "binary": "? name of cli_like",
       "class": "rust-test"
     },
     {
