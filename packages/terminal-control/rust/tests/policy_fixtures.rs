@@ -140,7 +140,6 @@ impl Sim {
                     .map(|(key, r)| PaneGeometry {
                         pane_id: format!("p-{key}"),
                         rect: *r,
-                        pty: None,
                     })
                     .collect(),
             }],
@@ -248,7 +247,6 @@ fn property_every_split_keeps_both_children_at_or_above_the_minimum() {
                 panes.push(PaneGeometry {
                     pane_id: pane_id.clone(),
                     rect: r,
-                    pty: None,
                 });
                 if !rng.next_u64().is_multiple_of(3) {
                     group_panes.push(GroupPane {

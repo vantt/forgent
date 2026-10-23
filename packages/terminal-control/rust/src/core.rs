@@ -296,51 +296,59 @@ impl<'a> Core<'a> {
 
     fn place(&self, store: &Store, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         let group = self.live_group(store, &request.group_key)?;
+        let tab_label = request.display.label.clone();
         if group.is_empty() {
-            return self.new_tab(request);
+            return self.new_tab(request, &tab_label);
         }
         if self.has("layout.geometry") {
-            self.place_measured(incarnation, request, &group)
+            self.place_measured(incarnation, request, &group, &tab_label)
         } else {
-            self.place_by_count(request, &group)
+            self.place_by_count(request, &group, &tab_label)
         }
     }
 
     /// First pane of a group's tab: the slot is the tab's own first pane.
-    fn new_tab(&self, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
+    fn new_tab(&self, request: &AllocateRequest, tab_label: &str) -> Result<CreatedPane, Refusal> {
         self.need("tab.create")?;
-        self.driver.tab_create(&request.display.label, request.cwd.as_deref(), &env_pairs(request))
+        self.driver.tab_create(tab_label, request.cwd.as_deref(), &env_pairs(request))
     }
 
-    fn split(&self, anchor: &str, direction: Direction, ratio: f64, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
+    fn split(&self, anchor: &str, direction: Direction, ratio: f64, request: &AllocateRequest, tab_label: &str) -> Result<CreatedPane, Refusal> {
         self.need("pane.split")?;
         match self.driver.pane_split(anchor, direction, ratio, request.cwd.as_deref(), &env_pairs(request)) {
             Ok(pane) => Ok(pane),
             // An anchor that died between the liveness check and the split:
-            // the group continues in a new tab with the same label.
+            // the group continues in a new tab.
             Err(refusal) => match self.driver.pane_liveness(anchor) {
-                Ok(PaneLiveness::Gone) => self.new_tab(request),
+                Ok(PaneLiveness::Gone) => self.new_tab(request, tab_label),
                 _ => Err(refusal),
             },
         }
     }
 
-    fn place_measured(&self, incarnation: &ServerIncarnation, request: &AllocateRequest, group: &[LivePane]) -> Result<CreatedPane, Refusal> {
+    fn place_measured(&self, incarnation: &ServerIncarnation, request: &AllocateRequest, group: &[LivePane], tab_label: &str) -> Result<CreatedPane, Refusal> {
         let mut tabs: Vec<TabGeometry> = Vec::new();
         let mut group_panes = Vec::new();
         for live in group {
-            let geometry = match self.driver.layout_geometry(&live.record.pane_id) {
-                Ok(geometry) => geometry,
-                // A pane another process released between the liveness check and this look is no longer
-                // part of the group; anything else that stops the look is the caller's to hear.
-                Err(refusal) => match self.driver.pane_liveness(&live.record.pane_id) {
-                    Ok(PaneLiveness::Gone) => continue,
-                    _ => return Err(refusal),
-                },
+            // One measurement per tab: a pane already inside a measured tab is read from it.
+            let measured = tabs.iter().position(|t| t.panes.iter().any(|p| p.pane_id == live.record.pane_id));
+            let index = match measured {
+                Some(index) => index,
+                None => {
+                    let geometry = match self.driver.layout_geometry(&live.record.pane_id) {
+                        Ok(geometry) => geometry,
+                        // A pane another process released between the liveness check and this look is no longer
+                        // part of the group; anything else that stops the look is the caller's to hear.
+                        Err(refusal) => match self.driver.pane_liveness(&live.record.pane_id) {
+                            Ok(PaneLiveness::Gone) => continue,
+                            _ => return Err(refusal),
+                        },
+                    };
+                    tabs.push(geometry);
+                    tabs.len() - 1
+                }
             };
-            if !tabs.iter().any(|t| t.tab_id == geometry.tab_id) {
-                tabs.push(geometry.clone());
-            }
+            let geometry = &tabs[index];
             if let Some(p) = geometry.panes.iter().find(|p| p.pane_id == live.record.pane_id) {
                 group_panes.push(GroupPane {
                     key: live.record.key.clone(),
@@ -352,7 +360,7 @@ impl<'a> Core<'a> {
         }
         // Every pane of the group went away while it was being measured: it continues in a new tab.
         if group_panes.is_empty() {
-            return self.new_tab(request);
+            return self.new_tab(request, tab_label);
         }
         let input = PlaceInput {
             group_key: request.group_key.clone(),
@@ -362,7 +370,7 @@ impl<'a> Core<'a> {
             limits: self.config.limits,
         };
         match self.policy.place(&input) {
-            Placement::NewTab {} => self.new_tab(request),
+            Placement::NewTab {} => self.new_tab(request, tab_label),
             Placement::Unsupported { reason } => Err(Refusal::Unsupported {
                 capability: format!("placement.{}", self.policy.name()),
                 detail: reason,
@@ -372,22 +380,22 @@ impl<'a> Core<'a> {
                     .iter()
                     .find(|l| l.record.key == anchor_key)
                     .ok_or_else(|| unknown(format!("policy chose unknown anchor `{anchor_key}`")))?;
-                let created = self.split(&anchor.record.pane_id, direction, ratio, request)?;
-                self.keep_if_roomy(created, incarnation, request)
+                let created = self.split(&anchor.record.pane_id, direction, ratio, request, tab_label)?;
+                self.keep_if_roomy(created, incarnation, request, tab_label)
             }
         }
     }
 
     /// Measure the pane a split just made; below the minimum, close that
     /// empty pane (nothing launched in it) and open a new tab instead.
-    fn keep_if_roomy(&self, created: CreatedPane, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
+    fn keep_if_roomy(&self, created: CreatedPane, incarnation: &ServerIncarnation, request: &AllocateRequest, tab_label: &str) -> Result<CreatedPane, Refusal> {
         let Ok(geometry) = self.driver.layout_geometry(&created.pane_id) else {
             return Ok(created);
         };
         let Some(pane) = geometry.panes.iter().find(|p| p.pane_id == created.pane_id) else {
             return Ok(created);
         };
-        let (cols, rows) = pane.pty.map(|s| (s.cols, s.rows)).unwrap_or((pane.rect.width, pane.rect.height));
+        let (cols, rows) = self.driver.pane_pty(&created.pane_id).map(|s| (s.cols, s.rows)).unwrap_or((pane.rect.width, pane.rect.height));
         let limits = &self.config.limits;
         if cols >= limits.min_cols && rows >= limits.min_rows {
             return Ok(created);
@@ -397,18 +405,18 @@ impl<'a> Core<'a> {
         if self.close_unrecorded(&created.pane_id, incarnation).is_err() {
             return Ok(created);
         }
-        self.new_tab(request)
+        self.new_tab(request, tab_label)
     }
 
     /// Without geometry: split the newest live group pane down at 0.3, and
     /// open a new tab once its tab holds `maxPanesPerTab` panes.
-    fn place_by_count(&self, request: &AllocateRequest, group: &[LivePane]) -> Result<CreatedPane, Refusal> {
+    fn place_by_count(&self, request: &AllocateRequest, group: &[LivePane], tab_label: &str) -> Result<CreatedPane, Refusal> {
         let newest = group.last().expect("group is not empty");
         let in_tab = group.iter().filter(|l| l.record.tab_id == newest.record.tab_id).count();
         if in_tab >= self.config.limits.max_panes_per_tab as usize {
-            return self.new_tab(request);
+            return self.new_tab(request, tab_label);
         }
-        self.split(&newest.record.pane_id, Direction::Down, FALLBACK_SPLIT_RATIO, request)
+        self.split(&newest.record.pane_id, Direction::Down, FALLBACK_SPLIT_RATIO, request, tab_label)
     }
 
     /// Close a pane the core itself just created and never recorded.

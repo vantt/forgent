@@ -34,7 +34,7 @@ pub struct Rect {
 
 /// Real size of a pane's pty when the driver can read it. The layout rect a
 /// multiplexer reports can differ from the pty (measured on herdr with two
-/// clients attached), so re-measuring prefers this when present.
+/// clients attached), so re-measuring a new pane prefers this when present.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PtySize {
     pub cols: u32,
@@ -46,8 +46,6 @@ pub struct PtySize {
 pub struct PaneGeometry {
     pub pane_id: String,
     pub rect: Rect,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pty: Option<PtySize>,
 }
 
 /// Measured geometry of one tab.
@@ -177,6 +175,10 @@ pub trait TerminalDriver {
         Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} gives no detector detail", self.name()) })
     }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
-    /// Geometry of the tab holding `pane`.
+    /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;
+    /// The pty size behind `pane` when the driver and the OS allow the read.
+    fn pane_pty(&self, _pane: &str) -> Option<PtySize> {
+        None
+    }
 }

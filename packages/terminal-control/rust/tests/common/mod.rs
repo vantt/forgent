@@ -310,7 +310,7 @@ impl TerminalDriver for MemDriver {
         let members = panes
             .iter()
             .filter(|(_, p)| p.tab == tab)
-            .map(|(id, p)| PaneGeometry { pane_id: id.clone(), rect: p.rect, pty: None })
+            .map(|(id, p)| PaneGeometry { pane_id: id.clone(), rect: p.rect })
             .collect();
         Ok(TabGeometry { tab_id: tab, area: self.area, panes: members })
     }

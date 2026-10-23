@@ -25,8 +25,8 @@ fn layout_gives_area_and_pane_rects() {
     assert_eq!(
         geometry.panes,
         vec![
-            PaneGeometry { pane_id: "wS:p59X".into(), rect: r(0, 0, 176, 69), pty: None },
-            PaneGeometry { pane_id: "wS:p59Y".into(), rect: r(176, 0, 176, 69), pty: None },
+            PaneGeometry { pane_id: "wS:p59X".into(), rect: r(0, 0, 176, 69) },
+            PaneGeometry { pane_id: "wS:p59Y".into(), rect: r(176, 0, 176, 69) },
         ]
     );
 }

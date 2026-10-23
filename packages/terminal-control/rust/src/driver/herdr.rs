@@ -105,7 +105,7 @@ pub fn parse_layout(result: &Value) -> Option<TabGeometry> {
         .get("panes")?
         .as_array()?
         .iter()
-        .map(|p| Some(PaneGeometry { pane_id: text(p, "pane_id")?.to_string(), rect: rect(p.get("rect")?)?, pty: None }))
+        .map(|p| Some(PaneGeometry { pane_id: text(p, "pane_id")?.to_string(), rect: rect(p.get("rect")?)? }))
         .collect::<Option<Vec<_>>>()?;
     Some(TabGeometry { tab_id: text(layout, "tab_id")?.to_string(), area: rect(layout.get("area")?)?, panes })
 }
@@ -368,12 +368,6 @@ impl HerdrDriver {
         *self.endpoint.borrow_mut() = Some(endpoint.clone());
         Ok(endpoint)
     }
-
-    /// Real pty size of a pane, when the OS lets this process ask.
-    fn pane_pty(&self, pane: &str) -> Option<PtySize> {
-        let info = self.process_info(pane).ok()?;
-        pty_size(info.shell_pid)
-    }
 }
 
 fn env_pairs(env: &[(String, String)]) -> Vec<String> {
@@ -609,13 +603,14 @@ impl TerminalDriver for HerdrDriver {
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
         self.require("layout.geometry")?;
         let result = self.run(&["pane", "layout", "--pane", pane])?;
-        let mut geometry = parse_layout(&result).ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))?;
-        // The rect herdr reports can differ from the pty when several clients
-        // are attached, so the pty size is read when the OS allows it.
-        for p in &mut geometry.panes {
-            p.pty = self.pane_pty(&p.pane_id);
-        }
-        Ok(geometry)
+        parse_layout(&result).ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))
+    }
+
+    /// The rect herdr reports can differ from the pty when several clients are
+    /// attached, so the pty size is read when the OS allows it.
+    fn pane_pty(&self, pane: &str) -> Option<PtySize> {
+        let info = self.process_info(pane).ok()?;
+        pty_size(info.shell_pid)
     }
 }
 
