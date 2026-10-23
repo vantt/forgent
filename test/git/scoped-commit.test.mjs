@@ -250,7 +250,7 @@ test('a clean-path restore failure still restores producer bytes on independent 
  }finally{if(fs.existsSync(dir))fs.chmodSync(dir,0o700);f.close();}
 });
 
-test('ScopedCommit probes config and formats once per loan and once after hooks', {skip:process.platform!=='linux'}, () => {
+test('ScopedCommit answers config and formats from the stamp-proven facts instead of probing per loan and after hooks', {skip:process.platform!=='linux'}, () => {
   const temp=fs.mkdtempSync(path.join(os.tmpdir(),'fgos-scoped-census-'));
   try {
     const descriptor=path.join(temp,'descriptor.json');
@@ -260,10 +260,10 @@ test('ScopedCommit probes config and formats once per loan and once after hooks'
     const before=census.phases['scoped-preflight'], after=census.phases['scoped-commit'];
     const probes=(calls,probe)=>calls.filter(call=>JSON.parse(call).join('\0').includes(probe.join('\0'))).length;
     for(const probe of [['config','--null','--show-origin','--list'],['rev-parse','--show-object-format','--show-ref-format']]) {
-      assert.equal(probes(before.gitExecs,probe),1,`preflight ${probe}`);
-      assert.equal(probes(after.gitExecs,probe),2,`commit entry + post-hook ${probe}`);
+      assert.equal(probes(before.gitExecs,probe),0,`preflight ${probe}`);
+      assert.equal(probes(after.gitExecs,probe),0,`commit entry + post-hook ${probe}`);
     }
-    assert.equal(before.gitExecCount + after.gitExecCount,29);
+    assert.equal(before.gitExecCount + after.gitExecCount,23);
     for (const phase of ['land-prepare','land-publish','land-legacy']) {
       assert.ok(census.phases[phase].gitExecCount > 0,phase);
     }
