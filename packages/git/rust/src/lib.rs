@@ -470,6 +470,15 @@ pub trait Inspect {
         paths: &[Vec<u8>],
         max_blob_bytes: usize,
     ) -> Result<Vec<PathRead>>;
+    /// `read_paths_at` for several revisions through one object-database
+    /// process: element `i` of the result answers `reads[i]`. A missing or
+    /// non-commit-or-tree root is refused exactly as the single read refuses it.
+    fn read_paths_at_many(
+        &self,
+        repo: &RepoHandle,
+        reads: &[(Oid, Vec<Vec<u8>>)],
+        max_blob_bytes: usize,
+    ) -> Result<Vec<Vec<PathRead>>>;
 
     fn walk_commits(
         &self,

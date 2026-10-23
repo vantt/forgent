@@ -1757,9 +1757,40 @@ fn literal_ref_pages_and_batched_tree_paths() {
                 assert!(
                     matches!(&Inspect::read_paths_at(&driver, &repo, revision, &paths[..1], 1).unwrap()[0].value, PathValue::Error(e) if e.cause == "blob-too-large")
                 );
+                // Several revisions through one read answer each as its own read does.
+                let reads = [
+                    (revision.clone(), paths.to_vec()),
+                    (commit.clone(), paths[..1].to_vec()),
+                    (revision.clone(), Vec::new()),
+                ];
+                let many = port.read_paths_at_many(&repo, &reads, 1024).unwrap();
+                assert_eq!(many.len(), 3);
+                for ((revision, paths), got) in reads.iter().zip(&many) {
+                    let single = port.read_paths_at(&repo, revision, paths, 1024).unwrap();
+                    assert_eq!(format!("{got:?}"), format!("{single:?}"));
+                }
+                assert!(matches!(
+                    &Inspect::read_paths_at_many(&driver, &repo, &reads[..1], 1).unwrap()[0][0].value,
+                    PathValue::Error(e) if e.cause == "blob-too-large"
+                ));
             }
             assert!(port
                 .read_paths_at(&repo, &blob, &[b"x".to_vec()], 10)
+                .is_err());
+            // A root that is missing or neither commit nor tree is refused, never read as absent paths.
+            let missing =
+                Oid::parse(&"1".repeat(blob.as_str().len()), repo.object_format()).unwrap();
+            for root in [&blob, &missing] {
+                let reads = [
+                    (commit.clone(), vec![b"seal.json".to_vec()]),
+                    (root.clone(), vec![b"x".to_vec()]),
+                ];
+                let single = port.read_paths_at(&repo, root, &[b"x".to_vec()], 10).unwrap_err();
+                let many = port.read_paths_at_many(&repo, &reads, 10).unwrap_err();
+                assert_eq!(format!("{many:?}"), format!("{single:?}"));
+            }
+            assert!(port
+                .read_paths_at_many(&repo, &[(commit.clone(), vec![b"../x".to_vec()])], 10)
                 .is_err());
         }
     }
