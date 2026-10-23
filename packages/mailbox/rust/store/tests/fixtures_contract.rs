@@ -498,6 +498,52 @@ fn every_drained_cli_names_its_hook_topology_shell_head_executables_and_output_b
 }
 
 #[test]
+fn every_drained_cli_lists_both_channel_facts_and_only_a_channel_not_reaching_the_model_as_user_delivers(
+) {
+    use fgos_mailbox::adapters::TestedClis;
+    use fgos_mailbox::hook::Adapter;
+    let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+    let contract: Value = serde_json::from_str(&text).unwrap();
+    for (cli, facts) in contract["hookFacts"].as_object().unwrap() {
+        for channel in ["stop", "postToolUse"] {
+            let fact = &facts["channels"][channel];
+            assert!(fact["deliver"].is_boolean(), "{cli}.{channel}.deliver");
+            assert!(
+                fact["role"].as_str().is_some_and(|r| !r.is_empty()),
+                "{cli}.{channel}.role"
+            );
+            assert!(
+                fact["source"].as_str().is_some_and(|s| !s.is_empty()),
+                "{cli}.{channel}.source"
+            );
+            assert!(
+                !(fact["deliver"] == true && fact["role"] == "user"),
+                "{cli}.{channel} delivers under the user role"
+            );
+        }
+    }
+    let tested = TestedClis::embedded();
+    // Codex hands a Stop block reason to the model as a user message, so its
+    // Stop takes no mail; Claude Code's Stop still does.
+    assert!(!tested.facts(Adapter::Codex).unwrap().stop_delivers);
+    assert_eq!(
+        contract["hookFacts"]["codex"]["channels"]["stop"]["role"],
+        "user"
+    );
+    assert_eq!(
+        contract["hookFacts"]["codex"]["channels"]["postToolUse"]["role"],
+        "developer"
+    );
+    assert!(tested.facts(Adapter::Claude).unwrap().stop_delivers);
+    let drains: Vec<String> = tested
+        .stop_drains()
+        .iter()
+        .map(|cli| cli.as_str().to_string())
+        .collect();
+    assert_eq!(drains, vec!["claude".to_string()]);
+}
+
+#[test]
 fn the_adapters_contract_refuses_missing_or_inconsistent_hook_facts() {
     use fgos_mailbox::adapters::TestedClis;
     let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
@@ -537,6 +583,27 @@ fn the_adapters_contract_refuses_missing_or_inconsistent_hook_facts() {
     });
     refused("an unknown field", &|c| {
         c["hookFacts"]["claude"]["hookShells"] = serde_json::json!(["/bin/sh"]);
+    });
+    refused("a delivering Stop channel whose role is user", &|c| {
+        c["hookFacts"]["codex"]["channels"]["stop"]["deliver"] = Value::from(true);
+    });
+    refused(
+        "a delivering PostToolUse channel whose role is user",
+        &|c| {
+            c["hookFacts"]["claude"]["channels"]["postToolUse"]["role"] = Value::from("user");
+        },
+    );
+    refused(
+        "a PostToolUse channel that delivers without an output bound",
+        &|c| {
+            c["hookFacts"]["codex"]["postToolUseContextMaxBytes"] = Value::Null;
+        },
+    );
+    refused("a drained CLI without channel facts", &|c| {
+        c["hookFacts"]["claude"]
+            .as_object_mut()
+            .unwrap()
+            .remove("channels");
     });
 }
 

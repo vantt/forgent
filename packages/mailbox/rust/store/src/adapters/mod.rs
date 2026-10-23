@@ -15,10 +15,11 @@ pub mod version;
 
 use crate::head::Topology;
 use crate::hook::{Adapter, HookEvent, Payload, Unparsed};
+use fgos_mailbox_core::Cli;
 use serde::de::IgnoredAny;
 use serde::Deserialize;
 use serde_json::{json, Map, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
@@ -95,6 +96,10 @@ pub struct AdapterFacts {
     /// The bound of a `PostToolUse` drain's output; `None`: no drain at
     /// that event, only at Stop and `inbox --claim`.
     pub post_tool_use_max_bytes: Option<u64>,
+    /// Whether a `Stop` hook takes mail (`channels.stop.deliver`). When not,
+    /// a `Stop` only registers the head, and a wake toward this CLI has no
+    /// channel.
+    pub stop_delivers: bool,
 }
 
 /// Why an adapters contract was refused; names the offending entry.
@@ -139,7 +144,30 @@ struct RawFacts {
     hook_shell: Option<String>,
     head_executables: Vec<String>,
     post_tool_use_context_max_bytes: Option<u64>,
+    channels: RawChannels,
 }
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RawChannels {
+    stop: RawChannel,
+    post_tool_use: RawChannel,
+}
+
+/// One hook channel: whether it delivers mail, and the role its text was
+/// recorded reaching the model under.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawChannel {
+    deliver: bool,
+    role: String,
+    #[serde(rename = "source")]
+    _source: String,
+}
+
+/// The role under which a model takes text as its user's own request; no
+/// delivering channel may have it.
+const USER_ROLE: &str = "user";
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -164,8 +192,10 @@ impl TestedClis {
     /// Parses an adapters contract. Refused: an unknown field, a tested
     /// CLI without `hookFacts`, facts for a CLI that is not tested, a
     /// `measuredOn` version not under `testedAgainst`, an unknown topology,
-    /// a direct entry with a hook shell or without head executables, and a
-    /// one-shell-hop entry without an absolute hook shell.
+    /// a direct entry with a hook shell or without head executables, a
+    /// one-shell-hop entry without an absolute hook shell, a delivering
+    /// channel whose role is `user`, and a `PostToolUse` channel whose
+    /// `deliver` disagrees with its output bound.
     pub fn from_contract(text: &str) -> Result<Self, ContractError> {
         let raw: RawContract =
             serde_json::from_str(text).map_err(|e| ContractError(e.to_string()))?;
@@ -242,6 +272,20 @@ impl TestedClis {
         }
         self.facts.get(word)
     }
+
+    /// The CLIs whose `Stop` takes mail, by the facts usable on this
+    /// platform: what `send` passes the core, so a wake toward any other
+    /// CLI, or one the contract does not know, has no channel.
+    pub fn stop_drains(&self) -> BTreeSet<Cli> {
+        self.clis
+            .iter()
+            .filter(|cli| {
+                self.platforms.get(*cli).map(String::as_str) == Some(std::env::consts::OS)
+                    && self.facts.get(*cli).is_some_and(|f| f.stop_delivers)
+            })
+            .filter_map(|cli| Cli::new(cli).ok())
+            .collect()
+    }
 }
 
 fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
@@ -264,11 +308,25 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         }
         _ => {}
     }
+    for (name, channel) in [
+        ("stop", &raw.channels.stop),
+        ("postToolUse", &raw.channels.post_tool_use),
+    ] {
+        if channel.deliver && channel.role == USER_ROLE {
+            return refuse(&format!(
+                "channels.{name} delivers under the {USER_ROLE} role"
+            ));
+        }
+    }
+    if raw.channels.post_tool_use.deliver != raw.post_tool_use_context_max_bytes.is_some() {
+        return refuse("channels.postToolUse.deliver disagrees with postToolUseContextMaxBytes");
+    }
     Ok(AdapterFacts {
         topology,
         hook_shell,
         head_executables: raw.head_executables,
         post_tool_use_max_bytes: raw.post_tool_use_context_max_bytes,
+        stop_delivers: raw.channels.stop.deliver,
     })
 }
 

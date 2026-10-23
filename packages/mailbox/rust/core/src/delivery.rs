@@ -45,6 +45,10 @@ pub struct SendRequest<'a> {
     /// Keys whose head the store judged `Dead`: name resolution skips them
     /// (owner decision Q2, option B). Empty when the store judged none.
     pub dead_keys: BTreeSet<WriterKey>,
+    /// The CLIs whose `Stop` hook takes mail (the adapters contract's
+    /// `channels.stop.deliver`). A recipient of any other CLI has no channel
+    /// a wake could use: its wake takes no effect and spends no allowance.
+    pub stop_drains: BTreeSet<Cli>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -61,6 +65,9 @@ pub struct SendOutcome {
     pub effective_wake: bool,
     /// Why the sender's wake did not take effect, when it asked for one.
     pub wake_dropped: Option<WakeDrop>,
+    /// Whether the recipient's CLI takes mail when its turn ends; when not,
+    /// it sees mail only at its next tool call.
+    pub to_stop_drains: bool,
 }
 
 /// A refused send: answered to the sender, never recorded (spec §5.3).
@@ -386,6 +393,7 @@ impl MailboxState {
                 parent.id.clone()
             });
         let to_account = self.account(&admitted.to);
+        let to_stop_drains = req.stop_drains.contains(&admitted.to_cli);
         let (effective_wake, wake_dropped) = self.effective_wake(
             &WakeParties {
                 account: &account,
@@ -393,6 +401,7 @@ impl MailboxState {
                 from: &req.from,
                 from_generation,
                 to: &admitted.to,
+                to_stop_drains,
             },
             req.wake,
             now,
@@ -427,6 +436,7 @@ impl MailboxState {
             reply_to: header.reply_to.clone(),
             effective_wake,
             wake_dropped,
+            to_stop_drains,
         };
         self.messages.push(header);
         Ok(outcome)

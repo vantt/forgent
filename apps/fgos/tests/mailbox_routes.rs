@@ -814,3 +814,66 @@ fn a_hook_payload_over_the_read_cap_leaves_its_reason_in_the_hook_outcome_file()
     assert_eq!(line["reason"], "over-read-cap");
     assert_eq!(line["cli"], "claude");
 }
+
+#[test]
+fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_end_and_the_wake_was_not_used(
+) {
+    let scene = Scene::new("codex-no-stop");
+    // The Codex head stays alive after its hook, so the send can reach it.
+    let mut payload: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            repo_root().join("packages/mailbox/contracts/fixtures/hooks/codex/post-tool-use.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    payload["session_id"] = serde_json::Value::from(WRITER);
+    let payload_file = scene.root.join("codex-payload.json");
+    fs::write(&payload_file, serde_json::to_vec(&payload).unwrap()).unwrap();
+    let mut head = Command::new(codex_like(&scene.root))
+        .args([
+            "-c",
+            "\"$0\" hook mailbox --cli codex --event post-tool-use < \"$1\"; exec sleep 30",
+        ])
+        .arg(fgos_bin())
+        .arg(&payload_file)
+        .current_dir(scene.main())
+        .env_clear()
+        .env("HOME", scene.home())
+        .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    let snapshot = scene.mailbox_dir().join("record/snapshot.json");
+    for _ in 0..200 {
+        if snapshot.exists() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+    let name = scene.head_name();
+
+    let sent = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--wake", "--to", &name, "wake up"],
+        b"",
+    );
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    let text = String::from_utf8_lossy(&sent.stdout);
+    assert!(
+        text.contains(
+            "queued: it sees it at its next tool call. This CLI takes no mail when its turn ends"
+        ),
+        "{text}"
+    );
+    assert!(
+        text.contains("Its CLI has no channel that can wake it; the wake was not used."),
+        "{text}"
+    );
+    assert!(!text.contains("or when its turn ends."), "{text}");
+    let _ = head.kill();
+    let _ = head.wait();
+}

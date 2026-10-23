@@ -146,7 +146,8 @@ impl Pair {
     }
 }
 
-/// A plain send without wake or reply hint.
+/// A plain send without wake or reply hint, where both CLIs of the pair
+/// take mail at their Stop.
 pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
     SendRequest {
         from: key(from),
@@ -155,6 +156,7 @@ pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
         wake: false,
         reply_to: None,
         dead_keys: Default::default(),
+        stop_drains: [cli("claude"), cli("codex")].into_iter().collect(),
     }
 }
 

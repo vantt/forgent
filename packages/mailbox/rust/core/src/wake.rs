@@ -17,6 +17,9 @@ pub enum WakeDrop {
     ExchangeQuota,
     /// The sender generation reached its wake lifetime cap to this recipient.
     LifetimeCap,
+    /// The recipient's CLI takes no mail when its turn ends, so no channel
+    /// can wake it; no allowance was spent.
+    NoChannel,
 }
 
 /// `<a>|<b>`: the two accounting identities of an exchange, sorted.
@@ -83,6 +86,8 @@ pub(crate) struct WakeParties<'a> {
     pub from: &'a WriterKey,
     pub from_generation: Option<Generation>,
     pub to: &'a WriterKey,
+    /// Whether the recipient's CLI takes mail at its `Stop`.
+    pub to_stop_drains: bool,
 }
 
 impl MailboxState {
@@ -109,6 +114,12 @@ impl MailboxState {
         exchange.last_at = now;
         if !wake {
             return (false, None);
+        }
+        // Checked before any allowance: the exchange quota is per pair, so
+        // spending it toward a recipient with no wake channel would drop the
+        // other side's real wakes.
+        if !parties.to_stop_drains {
+            return (false, Some(WakeDrop::NoChannel));
         }
         if exchange.wakes_spent >= limits.wake.max_per_exchange {
             return (false, Some(WakeDrop::ExchangeQuota));

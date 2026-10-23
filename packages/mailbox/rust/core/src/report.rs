@@ -26,7 +26,8 @@ pub enum VersionClause {
 /// dropped, if it was. Every drained CLI is tier `turn` until a wake
 /// channel exists (no push or pull tier yet, spec §6.2), so the sentence
 /// says the next tool call, or also the end of its turn when the wake took
-/// effect.
+/// effect; for a CLI whose Stop takes no mail it says that an idle session
+/// sees it only at its next tool call.
 pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &Limits) -> String {
     let id = escape_header(outcome.id.as_str(), limits);
     let to = escape_header(outcome.to.as_str(), limits);
@@ -35,7 +36,9 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
         &[("id", &id), ("to", &to)],
     )];
     lines.push(
-        section(if outcome.effective_wake {
+        section(if !outcome.to_stop_drains {
+            "report.turn.no-stop"
+        } else if outcome.effective_wake {
             "report.turn.wake"
         } else {
             "report.turn"
@@ -55,6 +58,7 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
             section(match dropped {
                 WakeDrop::ExchangeQuota => "report.wake-dropped.exchange-quota",
                 WakeDrop::LifetimeCap => "report.wake-dropped.lifetime-cap",
+                WakeDrop::NoChannel => "report.wake-no-channel",
             })
             .to_string(),
         );

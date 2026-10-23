@@ -18,6 +18,7 @@ use fgos_host_runtime::{
 };
 use fgos_identity::cli_dirs::claude_config_dir;
 use fgos_mailbox::adapters::version::VersionSources;
+use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::limits::{load, read_project_config, Loaded};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
@@ -298,6 +299,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 wake: *wake,
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
                 dead_keys: Default::default(),
+                stop_drains: TestedClis::embedded().stop_drains(),
             };
             let sent = verbs::send(
                 &record,

@@ -631,8 +631,13 @@ async function runC1(ctx) {
         injected: input.contexts.some((c) => c.includes(mid)), state: messageState(snap, m1.id),
       }) : notObserved('M1 was never sent'),
       modelSendRecorded: modelSend ? check(modelSend.from === binding?.key, { from: modelSend.from === binding?.key ? 'the codex head' : modelSend.from, state: messageState(snap, modelSend.id) }) : notObserved('the model sent nothing'),
-      stopGate: m2 ? check(messageState(snap, m2.id) === 'offered' && (finals.some((l) => l.includes(stop)) || input.blocks.some((b) => b.includes(stop))), {
-        state: messageState(snap, m2.id), finalHasToken: finals.some((l) => l.includes(stop)), stopReasonCarriesM2: input.blocks.some((b) => b.includes(stop)),
+      // Codex's Stop takes no mail (adapters contract channels.stop): the wake message
+      // sent after the last tool call stays recorded, no user-role record carries a frame,
+      // and the sender is told so. The Stop rule itself is proven by the hook payload suite.
+      stopOff: m2 ? check(messageState(snap, m2.id) === 'recorded' && !input.blocks.some((b) => b.includes('<mailbox-message') || b.includes(stop))
+        && m2.text.includes('This CLI takes no mail when its turn ends') && m2.text.includes('the wake was not used'), {
+        state: messageState(snap, m2.id), userRecordCarriesFrame: input.blocks.some((b) => b.includes('<mailbox-message') || b.includes(stop)),
+        sendAnswer: m2.text,
       }) : notObserved('M2 was never sent'),
     },
     finals,

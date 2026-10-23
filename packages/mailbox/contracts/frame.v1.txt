@@ -53,6 +53,8 @@ recorded {{id}} for {{to}}
 queued: it sees it at its next tool call.
 [report.turn.wake]
 queued: it sees it at its next tool call or when its turn ends.
+[report.turn.no-stop]
+queued: it sees it at its next tool call. This CLI takes no mail when its turn ends, so an idle session sees it only when it next runs a tool.
 [report.untested-version]
 Its CLI version {{version}} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified.
 [report.version-unknown]
@@ -61,6 +63,8 @@ Its CLI version could not be read; the hook still delivers, but nothing beyond t
 The wake quota of this exchange is used up; it will see this at its next checkpoint.
 [report.wake-dropped.lifetime-cap]
 The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.
+[report.wake-no-channel]
+Its CLI has no channel that can wake it; the wake was not used.
 [refusal.policy]
 Refused: {{code}} ({{limit}}). Do not retry; ask your user.
 [refusal.loop]

@@ -334,6 +334,11 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ),
         ("report.wake-dropped.lifetime-cap", &["next checkpoint"][..]),
         (
+            "report.turn.no-stop",
+            &["next tool call", "no mail when its turn ends"][..],
+        ),
+        ("report.wake-no-channel", &["wake was not used"][..]),
+        (
             "refusal.policy",
             &["{{code}}", "{{limit}}", "Do not retry; ask your user."][..],
         ),

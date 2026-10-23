@@ -24,6 +24,7 @@ fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome 
         reply_to: None,
         effective_wake,
         wake_dropped,
+        to_stop_drains: true,
     }
 }
 
@@ -45,6 +46,26 @@ fn a_send_with_an_effective_wake_reports_its_next_tool_call_or_the_end_of_its_tu
         delivery_report(&outcome(true, None), &VersionClause::Tested, &spec_limits()),
         "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call or when its turn ends."
     );
+}
+
+#[test]
+fn the_report_for_a_recipient_with_no_stop_drain_never_says_when_its_turn_ends_and_names_the_unused_wake(
+) {
+    let limits = spec_limits();
+    let mut asked = outcome(false, Some(WakeDrop::NoChannel));
+    asked.to_stop_drains = false;
+    assert_eq!(
+        delivery_report(&asked, &VersionClause::Tested, &limits),
+        "recorded a1b2 for forgent-claude-7f\n\
+         queued: it sees it at its next tool call. This CLI takes no mail when its turn ends, so an idle session sees it only when it next runs a tool.\n\
+         Its CLI has no channel that can wake it; the wake was not used."
+    );
+    let mut plain = outcome(false, None);
+    plain.to_stop_drains = false;
+    let text = delivery_report(&plain, &VersionClause::Tested, &limits);
+    assert_eq!(text.lines().count(), 2, "{text}");
+    assert!(!text.contains("when its turn ends."), "{text}");
+    assert!(!text.contains("wake"), "{text}");
 }
 
 #[test]

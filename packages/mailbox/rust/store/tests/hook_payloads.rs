@@ -16,6 +16,7 @@ use fgos_mailbox::hook::{
     begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
     QuietReason,
 };
+use fgos_mailbox_core::Cli;
 use fgos_mailbox_core::{
     Generation, MailboxState, MessageId, MessageState, RegisterRefusal, RegisterRequest,
     SendRequest, Timestamp, WriterKey,
@@ -23,7 +24,7 @@ use fgos_mailbox_core::{
 use fgos_process::facts::{identity_of, self_identity, Record};
 use fgos_process::ProcId;
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::process::{Child, Command};
 
 const PROJECT: &str = "forgent";
@@ -37,6 +38,26 @@ fn tested() -> Vec<Adapter> {
         .into_iter()
         .filter(|a| TestedClis::embedded().contains(*a))
         .collect()
+}
+
+/// The tested CLIs whose Stop takes mail.
+fn stop_draining() -> Vec<Adapter> {
+    tested().into_iter().filter(|a| stop_delivers(*a)).collect()
+}
+
+fn stop_delivers(adapter: Adapter) -> bool {
+    TestedClis::embedded()
+        .facts(adapter)
+        .is_some_and(|facts| facts.stop_delivers)
+}
+
+/// The quiet reason of a head's Stop with nothing to take.
+fn quiet_stop(adapter: Adapter) -> QuietReason {
+    if stop_delivers(adapter) {
+        QuietReason::NothingEligible
+    } else {
+        QuietReason::StopChannelOff
+    }
 }
 
 /// The writer key session identity derives from recorded id variables, if
@@ -69,6 +90,8 @@ struct Drain {
     writer: WriterKey,
     head: HeadFacts,
     tested: TestedClis,
+    /// The CLIs whose Stop drains, as `send` passes them to the core.
+    stop_drains: BTreeSet<Cli>,
     now: u64,
 }
 
@@ -86,6 +109,7 @@ impl Drain {
                 handle: None,
             },
             tested: TestedClis::embedded().clone(),
+            stop_drains: TestedClis::embedded().stop_drains(),
             now: 100,
         }
     }
@@ -163,7 +187,8 @@ impl Drain {
             .unwrap();
     }
 
-    /// A peer sends to the head; wake mail must take effect.
+    /// A peer sends to the head; wake mail must take effect when the head's
+    /// CLI takes mail at its Stop.
     fn send(&mut self, from: &str, body: &str, wake: bool) -> MessageId {
         let now = self.tick();
         let to = self.name();
@@ -177,13 +202,18 @@ impl Drain {
                     wake,
                     reply_to: None,
                     dead_keys: Default::default(),
+                    stop_drains: self.stop_drains.clone(),
                 },
                 now,
                 &limits(),
                 &mut self.ids,
             )
             .unwrap();
-        assert_eq!(outcome.effective_wake, wake, "the wake must take effect");
+        assert_eq!(
+            outcome.effective_wake,
+            wake && outcome.to_stop_drains,
+            "the wake must take effect"
+        );
         self.bodies.insert(outcome.id.clone(), body.to_string());
         outcome.id
     }
@@ -315,7 +345,8 @@ fn a_recorded_post_tool_use_offers_pending_mail_in_the_shape_the_cli_injected() 
 
 #[test]
 fn a_recorded_stop_blocks_with_wake_mail_and_passes_without_it() {
-    for adapter in tested() {
+    assert!(!stop_draining().is_empty(), "no CLI drains at Stop");
+    for adapter in stop_draining() {
         let mut drain = Drain::registered(adapter);
         drain.add_peer("peer");
         drain.send("peer", "wake up", true);
@@ -469,7 +500,11 @@ fn a_same_head_hook_with_no_mail_changes_nothing() {
             (HookEvent::Stop, files::STOP),
             (HookEvent::Stop, files::STOP_CONTINUED),
         ] {
-            assert_eq!(drain.hook(event, file), quiet(QuietReason::NothingEligible));
+            let expected = match event {
+                HookEvent::Stop => quiet_stop(adapter),
+                HookEvent::PostToolUse => QuietReason::NothingEligible,
+            };
+            assert_eq!(drain.hook(event, file), quiet(expected));
             assert_eq!(drain.state, before, "{file} wrote on the no-mail path");
         }
     }
@@ -478,7 +513,7 @@ fn a_same_head_hook_with_no_mail_changes_nothing() {
 #[test]
 fn stop_blocks_at_most_the_configured_times_in_a_row_counting_only_finished_blocks() {
     let max = hook_limits().stop_block.max;
-    for adapter in tested() {
+    for adapter in stop_draining() {
         let mut drain = Drain::registered(adapter);
         let mut senders = 0;
         let mut wake_from_a_new_sender = |drain: &mut Drain| {
@@ -739,7 +774,7 @@ fn a_step_drain_with_only_too_large_mail_prints_the_pointer_alone_and_finishes_n
 
 #[test]
 fn a_too_large_wake_message_is_still_taken_by_a_stop_drain() {
-    for adapter in tested() {
+    for adapter in stop_draining() {
         let bound = step_bound(adapter);
         let mut drain = Drain::registered(adapter);
         drain.add_peer("peer");
@@ -764,6 +799,8 @@ fn a_cli_without_a_measured_step_bound_drains_nothing_at_post_tool_use_and_keeps
         let text = std::fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
         let mut contract: Value = serde_json::from_str(&text).unwrap();
         contract["hookFacts"][adapter.word()]["postToolUseContextMaxBytes"] = Value::Null;
+        contract["hookFacts"][adapter.word()]["channels"]["postToolUse"]["deliver"] =
+            Value::from(false);
         let mut drain = Drain::new(adapter);
         drain.tested = TestedClis::from_contract(&contract.to_string()).unwrap();
         let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
@@ -781,4 +818,57 @@ fn a_cli_without_a_measured_step_bound_drains_nothing_at_post_tool_use_and_keeps
         );
         assert_eq!(drain.state_of(&id), MessageState::Recorded);
     }
+}
+
+#[test]
+fn a_codex_stop_with_eligible_wake_mail_claims_nothing_and_is_quiet_stop_channel_off() {
+    let mut drain = Drain::registered(Adapter::Codex);
+    drain.add_peer("peer");
+    // Recorded while Codex's Stop still drained, so it carries an
+    // effective wake and would be eligible at a Stop.
+    drain.stop_drains.insert(Cli::new("codex").unwrap());
+    let id = drain.send("peer", "wake up", true);
+    let before = drain.state.clone();
+
+    for file in [files::STOP, files::STOP_CONTINUED] {
+        let begun = drain.hook(HookEvent::Stop, file);
+        assert_eq!(begun, quiet(QuietReason::StopChannelOff), "{file}");
+        assert!(!begun.state_changed(), "{file}");
+        assert_eq!(drain.state, before, "{file} touched the record");
+    }
+    assert_eq!(drain.state_of(&id), MessageState::Recorded);
+    let next = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+    assert_eq!(next.items[0].id, id, "the next tool call takes it");
+}
+
+#[test]
+fn a_first_codex_stop_registers_the_head_and_claims_nothing() {
+    let mut drain = Drain::new(Adapter::Codex);
+    let begun = drain.hook(HookEvent::Stop, files::STOP);
+    assert_eq!(begun, quiet(QuietReason::StopChannelOff));
+    assert!(begun.state_changed(), "the Stop registered the head");
+    let binding = drain.state.binding(&drain.writer).unwrap();
+    assert_eq!(binding.generation, Generation::FIRST);
+    assert_eq!(binding.stop_blocks, 0);
+}
+
+#[test]
+fn a_codex_binding_that_already_holds_stop_blocks_answers_stop_channel_off_and_keeps_its_count() {
+    let max = hook_limits().stop_block.max;
+    let mut drain = Drain::registered(Adapter::Codex);
+    // Counted while Codex's Stop still drained.
+    let generation = drain.state.binding(&drain.writer).unwrap().generation;
+    for _ in 0..max {
+        drain.state.note_stop(&drain.writer, generation, true);
+    }
+    let before = drain.state.clone();
+    for file in [files::STOP, files::STOP_CONTINUED] {
+        assert_eq!(
+            drain.hook(HookEvent::Stop, file),
+            quiet(QuietReason::StopChannelOff),
+            "{file}"
+        );
+    }
+    assert_eq!(drain.stop_blocks(), max, "neither reset nor capped");
+    assert_eq!(drain.state, before);
 }

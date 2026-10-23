@@ -545,3 +545,74 @@ fn the_blank_line_between_two_frames_counts_against_the_bound() {
         vec![first]
     );
 }
+
+/// The snapshot's wake allowances as plain JSON: the exchanges and the wake
+/// lifetime counts.
+fn wake_allowances(pair: &Pair) -> (serde_json::Value, serde_json::Value) {
+    let snapshot = serde_json::to_value(&pair.state).unwrap();
+    (
+        snapshot["exchanges"].clone(),
+        snapshot["wake_lifetime"].clone(),
+    )
+}
+
+#[test]
+fn a_send_with_wake_to_a_recipient_whose_cli_has_no_stop_drain_records_no_effective_wake_and_spends_no_allowance(
+) {
+    let mut pair = Pair::new(t(100));
+    let quota = pair.limits.wake.max_per_exchange;
+    for i in 0..=quota {
+        let mut req = plain("a", B_NAME, "wake up");
+        req.wake = true;
+        req.stop_drains.remove(&common::cli("codex"));
+        let sent = pair.try_send(req, t(100 + u64::from(i))).unwrap();
+        assert!(!sent.effective_wake, "send {i}");
+        assert!(!sent.to_stop_drains);
+        assert_eq!(
+            sent.wake_dropped,
+            Some(fgos_mailbox_core::WakeDrop::NoChannel)
+        );
+        let header = pair.state.message(&sent.id).unwrap();
+        assert!(header.wake, "the sender's permission is kept");
+        assert!(!header.effective_wake);
+    }
+    let (exchanges, lifetime) = wake_allowances(&pair);
+    assert!(
+        exchanges
+            .as_object()
+            .unwrap()
+            .values()
+            .all(|e| e["wakes_spent"] == 0),
+        "{exchanges}"
+    );
+    assert_eq!(lifetime, serde_json::json!({}));
+
+    // The other direction, toward a CLI whose Stop drains, still has its
+    // whole allowance.
+    let back = pair.send_wake("b", A_NAME, t(200));
+    assert!(back.effective_wake);
+    assert!(back.to_stop_drains);
+}
+
+#[test]
+fn mail_recorded_with_an_effective_wake_before_the_stop_channel_was_turned_off_is_claimed_at_the_next_bounded_step(
+) {
+    let mut pair = Pair::new(t(100));
+    // Recorded while the recipient's Stop still drained.
+    let old = pair.send_wake("a", B_NAME, t(100));
+    assert!(old.effective_wake);
+
+    let step = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(8192),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert_eq!(
+        step.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![old.id]
+    );
+}

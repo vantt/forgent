@@ -81,6 +81,10 @@ pub enum QuietReason {
     Registration(RegisterRefusal),
     NothingEligible,
     StopBlockCap,
+    /// A `Stop` of a CLI whose Stop channel takes no mail (the adapters
+    /// contract's `channels.stop.deliver`): the head is registered, nothing
+    /// is claimed and its Stop-block count is never read or written.
+    StopChannelOff,
     /// A `PostToolUse` call of a CLI whose adapter has no measured output
     /// bound: nothing is claimed at a step; its mail waits for Stop or
     /// `inbox --claim`.
@@ -243,6 +247,17 @@ pub fn begin(
     let key = &call.writer;
     let checkpoint = match call.event {
         HookEvent::Stop => {
+            // Before the first-Stop reset and the cap: a CLI whose Stop
+            // takes no mail never reads or writes its Stop-block count.
+            if !tested
+                .facts(call.adapter)
+                .is_some_and(|facts| facts.stop_delivers)
+            {
+                return Begun::Quiet {
+                    reason: QuietReason::StopChannelOff,
+                    state_changed: changed,
+                };
+            }
             if payload.first_stop == Some(true) {
                 changed |= state.note_stop(key, generation, false);
             }
