@@ -190,7 +190,7 @@ export function maskArgs({ dirs, files, bindBack }, empty) {
  * base read-only, and `readOnly` paths bound read-only last. Returns the argv and env to
  * spawn, the paths, and the copied login's path and snapshot digest. Starts nothing.
  */
-export function prepareConfinedRun({ base, runId, command, args = [], env = {}, login = null, masks, readOnly = [], workspace = null, bwrap = BWRAP }) {
+export function prepareConfinedRun({ base, runId, command, args = [], env = {}, login = null, masks, readOnly = [], workspace = null }) {
   const paths = runPaths(base, runId, workspace);
   if (exists(paths.dir)) throw new ConfinedLaunchError(`${paths.dir} exists; every run gets a fresh directory`);
   if (exists(paths.ledger)) throw new ConfinedLaunchError(`${paths.ledger} exists; ${runId} was launched before`);
@@ -216,7 +216,7 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
     ...(spec ? { providerCapacity: { provider: login.cli, accountId: login.account ?? login.cli, credentialSource: spec.source(login.home) } } : {}),
     context,
   };
-  const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrap } });
+  const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: BWRAP } });
   const argv = [...prepared.invocation.args];
   const afterBase = argv.indexOf('--as-pid-1') + 1;
   const separator = argv.indexOf('--');
@@ -334,7 +334,8 @@ export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'] 
   const { paths } = prepared;
   const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString() };
   writeJson(paths.ledger, entry);
-  const child = spawn(prepared.command, prepared.args, { cwd: paths.ws, env: prepared.env, stdio });
+  // `prepared.command` is always BWRAP (the driver's configured executable); the program is named here.
+  const child = spawn(BWRAP, prepared.args, { cwd: paths.ws, env: prepared.env, stdio });
   const pid1 = sandboxInit(child.pid);
   Object.assign(entry, {
     bwrapPid: child.pid,
