@@ -1,6 +1,6 @@
 # Phase lead report: 05B, transaction skeleton, native_lock, ResultCode, addon/Node, ports contract
 
-Branch `harden/t2-p05b-git-skeleton-surface` (from `026dd8ff0`), pushed after each slice. Slice 12 did not run (work/es-cutover is not on main). Status: DONE_WITH_CONCERNS (the Node re-run and census wait for the big lead's "resume"; see Open).
+Branch `harden/t2-p05b-git-skeleton-surface` (from `026dd8ff0`), pushed after each slice. Slice 12 did not run (work/es-cutover is not on main). Status: DONE_WITH_CONCERNS (history rewrites, see Concerns).
 
 Δ lines: Rust src (inline tests included) / Rust tests / other.
 
@@ -49,7 +49,17 @@ Node one-file (git/*, setup/git-checks, worktree-admin-multiprocess, land-vs-man
 - Runs up to slice 10 used the worktree-local build directory (a variable-name slip), not t2-p05b-target; it was deleted; the final runs above use the private target.
 - Test-cost: added 4 (Sync hook id, native list, ports pin, two Rust assertions extended), retired 1 file; one `git init` spawn in the ports pin.
 
-## Open (waiting for "resume")
-Final Node one-file re-run on the final tree, and the census regeneration (last commit; must list exactly CFG's 5 `unresolved-binary` sites: a trial run before the last commits did).
+## After OPC (new commits, no amend)
+- `dc756d2af` fixes the one undeclared change of slice 7: the shared list made SafeRestore refuse on `BISECT_START` (it blocked a restore and closing a pending restore during a bisect). SafeRestore tolerates it again, in the same shape as the confirmed-discard tolerance. New case `a_restore_during_a_bisect_succeeds_and_leaves_the_bisect_marker` in `safe_restore.rs`: red on the slice-7 code (`restore-native-state: BISECT_START`), green with the fix.
+- `535295f3a` docs: spec §2 lists only the codes that exist; dated line retiring `createGitNativeLockRepair` (inspection Rust-only, runbook unchanged).
+- Note: `worktree_clean` also serves relocate and orphan inspection, so those now get the broader native-state list too (OPC accepted).
 
-Status: DONE_WITH_CONCERNS
+## Final verification (after the fixes, private target)
+```
+cargo test --no-fail-fast -p fgos-git                      51 binaries, passed 294 failed 0 ignored 9
+cargo test --no-fail-fast -p fgos-event-store -p fgos-identity -p fgos-node-addon   37 binaries, passed 207 failed 0 ignored 2
+cargo clippy --workspace --all-targets -- -D warnings      Finished; only a third-party arraydeque lifetime warning (dependency)
+Node one-file (git/*, setup/git-checks, worktree-admin-multiprocess, land-vs-manual-commit, runner/merge, architecture): tests 309 pass 308 fail 0 skipped 1; run-tests: ERROR lines 0
+census: 5 unresolved-binary sites (bin/fgos.mjs:3472,3616; merge.mjs:938,968; worktree.mjs:146); no createGitNativeLockRepair or native-lock.mjs entry
+```
+The census is the final commit on the branch.
