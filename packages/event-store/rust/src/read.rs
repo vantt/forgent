@@ -60,8 +60,8 @@ pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
 }
 /// Event ref tips, the legacy mirrors, and the HEAD the same listing observed (when attached).
 type ListedTips = (Vec<Tip>, BTreeMap<String, Oid>, Option<HeadFact>);
-/// The tip listing also covers `refs/heads/`, so the one listing that reads the event refs reads
-/// HEAD too: the branch HEAD names, with its own listed value, is an exact HEAD observation.
+/// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
+/// its own listed value, comes with it (see `refs::list_with_head`).
 fn tips(
     port: &dyn Inspect,
     repo: &RepoHandle,
@@ -73,19 +73,15 @@ fn tips(
         "refs/fgos/local-events/",
         "refs/fgos/remotes/",
         "refs/fgos/legacy",
-        "refs/heads/",
     ]
     .iter()
     .map(|p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string())))
     .collect::<Result<Vec<_>, _>>()?;
     let mut tips = Vec::new();
     let mut legacy = BTreeMap::new();
-    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes, 4096)?;
+    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
     for e in listed {
         let name = e.name.as_str();
-        if name.starts_with("refs/heads/") {
-            continue;
-        }
         let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
             (
                 match mirror_suffix(r)? {
