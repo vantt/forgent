@@ -8,17 +8,21 @@
 
 pub mod attempt;
 pub mod cli_dirs;
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
+pub mod current;
+#[cfg(feature = "directory")]
 pub mod directory;
 pub mod errors;
 pub mod launcher;
 pub mod machine;
 pub mod mint;
 pub mod proc_tree;
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 pub mod project;
 #[cfg(feature = "provider")]
 pub mod provider;
+#[cfg(feature = "directory")]
+pub mod refusal;
 pub mod resolve;
 pub mod session;
 pub mod text;
@@ -28,14 +32,18 @@ pub use launcher::{scrub_and_set, EmptyWriterId};
 pub use errors::Error;
 pub use mint::{random, Kind, RandomKind, SequenceKind, KIND_NAMES, RANDOM_CHARS};
 pub use proc_tree::{os_process_tree, ProcStat, ProcessTree};
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
+pub use current::{current_session, machine_info, session_info, set_alias, CurrentSession, MachineInfo, SessionInfo};
+#[cfg(feature = "directory")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 #[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
+pub use refusal::{Candidate, Liveness, Refusal};
+#[cfg(feature = "provider")]
 pub use provider::{
-    machine_info, session_info, set_alias, IdentityProvider, IdentityRequest, MachineInfo, ProjectAction, Refusal,
-    SessionAction, SessionInfo, Verb, writer_answer,
+    IdentityProvider, IdentityRequest, ProjectAction, SessionAction, Verb, writer_answer,
     AVAILABLE_SUBCOMMANDS, IDENTITY_DESCRIPTOR, IDENTITY_OPERATION_ID, IDENTITY_READ_DESCRIPTOR,
     IDENTITY_READ_OPERATION_ID, IDENTITY_WRITE_DESCRIPTOR, IDENTITY_WRITE_OPERATION_ID,
 };

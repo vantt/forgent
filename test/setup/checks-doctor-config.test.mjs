@@ -1062,7 +1062,7 @@ test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leav
       writeProjectConfig(dir, { runner: { rigorToTier } });
       const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(passed, false);
-      assert.match(message, /project config contains retired key "runner\.rigorToTier".*fgos setup/);
+      assert.match(message, /project config contains retired key "runner\.rigorToTier".*delete the key/);
       assert.doesNotMatch(message, /global/);
     });
   } finally {

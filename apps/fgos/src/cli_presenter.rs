@@ -99,8 +99,25 @@ fn present_mailbox(answer: &crate::wiring::mailbox_verbs::MailboxAnswer) -> i32 
     answer.exit
 }
 
+/// A typed refusal as one stdout line of JSON, the failure channel for a
+/// caller that asked for `--json`: `error` is the human message (the same
+/// string stderr carries), `reason` the stable code, `candidates` the sessions
+/// it concerns (`{id, handle, liveness}`; empty when none). It carries no
+/// `contract`, so
+/// it never passes for a success envelope (docs/io-contract.md: the error
+/// path is not wrapped; success and failure differ by exit code).
+pub fn refusal_json(refusal: &fgos_identity::Refusal) -> String {
+    serde_json::json!({
+        "error": refusal.detail,
+        "reason": refusal.reason,
+        "candidates": refusal.candidates,
+    })
+    .to_string()
+}
+
 /// Presents a successful provider outcome and returns the process exit code.
-pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
+/// `json` is whether the caller passed `--json`.
+pub fn present_outcome(outcome: &ProviderOutcome, json: bool) -> i32 {
     match outcome {
         ProviderOutcome::Completed { output, .. } => {
             if let Some(answer) =
@@ -110,6 +127,9 @@ pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
             }
             if let Some(refusal) = output.downcast_ref::<fgos_identity::Refusal>() {
                 eprintln!("fgos: error: {} [{}]", refusal.detail, refusal.reason);
+                if json {
+                    println!("{}", refusal_json(refusal));
+                }
                 return fgos_identity::Refusal::EXIT;
             }
             let formatted =

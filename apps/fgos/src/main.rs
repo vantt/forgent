@@ -424,7 +424,10 @@ fn main() {
 
             match res {
                 Ok(outcome) => {
-                    let code = cli_presenter::present_outcome(&outcome);
+                    let code = cli_presenter::present_outcome(
+                        &outcome,
+                        cli_args.iter().any(|arg| arg == "--json"),
+                    );
                     std::process::exit(code);
                 }
                 Err(err) => {

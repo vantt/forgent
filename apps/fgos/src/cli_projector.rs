@@ -159,7 +159,7 @@ fn project_identity_request(
         ),
         Some("session") => (
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
-            &["--pid", "--fgos-dir", "--register", "--role", "--take", "--dir"],
+            &["--pid", "--fgos-dir", "--register", "--role", "--drop-role", "--take", "--dir"],
         ),
         Some("resolve") => (
             fgos_identity::Verb::Resolve { query: String::new() },
@@ -215,6 +215,7 @@ fn project_identity_request(
     let mut register = false;
     let mut take = false;
     let mut role: Option<String> = None;
+    let mut drop_role: Option<String> = None;
     let mut by_project = false;
     let mut prune = false;
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
@@ -288,6 +289,12 @@ fn project_identity_request(
                 }
                 role = Some(flag_value);
             }
+            "--drop-role" => {
+                if flag_value.is_empty() {
+                    return Err("--drop-role requires a value".into());
+                }
+                drop_role = Some(flag_value);
+            }
             "--handle" => {
                 if flag_value.is_empty() {
                     return Err("--handle requires a value".into());
@@ -315,7 +322,12 @@ fn project_identity_request(
             if take && role.is_none() {
                 return Err("--take needs --role".into());
             }
-            if register || role.is_some() {
+            if let Some(dropped) = drop_role {
+                if register || role.is_some() {
+                    return Err("--drop-role cannot be combined with --register or --role".into());
+                }
+                *action = fgos_identity::SessionAction::DropRole { role: dropped };
+            } else if register || role.is_some() {
                 *action = fgos_identity::SessionAction::Register { role, take };
             }
         }
