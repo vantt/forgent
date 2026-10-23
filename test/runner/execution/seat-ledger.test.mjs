@@ -55,6 +55,7 @@ test('two seats whose providers fail at once never both rebind from the same vie
 
 test('a bind barrier releases once every seat of the group has arrived', async () => {
   const barrier = createBindBarrier(3);
+  assert.equal(barrier.size, 3, "a seat reads how many seats launch with it from the barrier");
   let released = false;
   barrier.bound.then(() => { released = true; });
   barrier.arrive();

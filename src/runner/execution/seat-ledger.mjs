@@ -59,7 +59,8 @@ export function createSeatLedger() {
 /**
  * A barrier for `size` seats started together: each seat calls `arrive()` once it is bound (or has
  * ended without binding) and `await barrier.bound` resolves when all have. A pattern creates one per
- * group it launches in parallel and hands it to every seat of the group.
+ * group it launches in parallel and hands it to every seat of the group. `size` is how many seats
+ * the group has; the seats' panes are laid out as that many equal parts.
  *
  * @param {number} size
  */
@@ -68,6 +69,7 @@ export function createBindBarrier(size) {
   let release;
   const bound = size <= 0 ? Promise.resolve() : new Promise((resolve) => { release = resolve; });
   return {
+    size,
     bound,
     arrive() {
       pending -= 1;

@@ -878,7 +878,7 @@ async function runUnitBody(options, scope) {
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
-  const dispatchBound = async ({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission }) => {
+  const dispatchBound = async ({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission, batchSize }) => {
     // A pinned account leases from an inventory holding only that account (account-pin.mjs).
     const runnerConfig = runnerConfigForBinding(withAccounts(unitRecord.configSnapshot.runner), bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
@@ -999,6 +999,8 @@ async function runUnitBody(options, scope) {
       ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),
       // Every role of a blind unit is dispatched blind or refused, never run unblind.
       ...(unit.blind ? { blind: true } : {}),
+      // Seats launched together as one group: their panes share the tab in equal parts. A seat alone sends none.
+      ...(batchSize > 1 ? { dispatchBatchSize: batchSize } : {}),
     });
 
     return {
@@ -1249,7 +1251,7 @@ async function runUnitBody(options, scope) {
       delete attempts[attemptNo].outcome;
       persistUnitRecord();
       assertNotCancelled();
-      const result = await dispatchBound({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
+      const result = await dispatchBound({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission, batchSize: batch?.size });
       lastResult = result;
 
       // The receipt is read from a directory the worker can reach. A pass is only a pass when the provider
