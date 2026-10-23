@@ -14,6 +14,7 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
@@ -89,7 +90,7 @@ function fixture() {
     },
   };
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(root, { runner });
   return { base, root, worktree, runner };
 }
 

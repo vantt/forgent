@@ -14,6 +14,7 @@ import { test } from 'node:test';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
 import { EXECUTOR_KINDS, compileDispatchPlan, loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 const SHARED_DIR = path.join(repoRoot, 'core', 'skills', '_shared');
@@ -138,7 +139,7 @@ test('loadRunnerConfig rejects a "serves" string attribute given an empty string
 test('advise-execute-capabilities-configured covers every curated slot, including the new P2-runtime ones', () => {
   const cwd = mkTemp('capability-doctrine-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /declares "advise", "execute", and "code:implement"/);
@@ -152,7 +153,7 @@ test('advise-execute-capabilities-configured fails when a P2-runtime slot is mis
   const cwd = mkTemp('capability-doctrine-missing-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const { 'code:review': _omit, ...withoutCodeReview } = DEFAULT_CAPABILITY_SLOTS;
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: withoutCodeReview } }));
+  writeProjectConfig(cwd, { runner: { capabilities: withoutCodeReview } });
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /missing or has a malformed slot for/);

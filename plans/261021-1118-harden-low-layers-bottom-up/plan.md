@@ -202,6 +202,13 @@ Per layer:
 16. **Owner-machine landing of T1:** an agent on the owner machine follows [the T1 guide](../reports/guide-261022-2003-harden-t1-owner-machine-landing.md).
 17. **Replacing the Windows `hold-transport.mjs` helper** is an input for T4's council (RT-M3: the supervisor needs another way to receive a domain on Windows), not a commitment.
 
+2026-10-23 11:10, owner (T2 ask 2): "Q0a Q1a Q2a Q3: A1 A2", plus a request to review terminal-control layout and tab/pane naming for looks and ease of use (example, a personal preference: on a widescreen, three panes as three columns).
+18. **T2 shapes and size ceilings approved** as written in the [T2 arbitration](../reports/council-261023-0402-harden-t2-arbitration.md) §2 and §2.5.
+19. **Fewer fsyncs on a worktree add, option (a):** the pin stays, its ref write runs without `core.fsync=all`, and the ref-directory chain is synced once per operation before the effect. Spec §10 gets the sentence.
+20. **Option (a): the last pane access moves behind the terminal-control port:** the anchor pane, agent kinds and integrations, caller ownership on `attach`, and the socket path.
+21. **Additions A1 and A2 are taken:** the retained-chain count and oldest age in the journal row, and one repository handle per process. A3 is left for a separate item; A4 and A5 are not taken.
+22. **Terminal-control layout and naming review:** HARDEN reviews whether layout and tab/pane names can be prettier and easier to use (owner example: three columns for three panes on a widescreen). The review comes back as a proposal; the owner picks before anything that adds a layout rule is built (RUL104).
+
 ## Hand-off ledger (items HARDEN gave to other lanes)
 
 A row closes only when the receiving lane has written the item into its own plan and said where. HARDEN re-checks open rows at every layer close.

@@ -16,6 +16,7 @@ import { snapshotRunnerConfig } from '../../src/runner/execution/run.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { executeExecutorCli, decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { ensureRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const FGOS = path.resolve('bin/fgos.mjs');
 const RUNNER = path.resolve('bin/fgos-runner.mjs');
@@ -37,7 +38,7 @@ function project(runner) {
   execFileSync('git', ['-c', 'user.email=t@example.com', '-c', 'user.name=T', 'commit', '-q', '--allow-empty', '-m', 'init'], { cwd: root });
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   const file = path.join(root, '.fgos', 'config.json');
-  fs.writeFileSync(file, `${JSON.stringify({ runner }, null, 2)}\n`);
+  writeProjectConfig(root, { runner });
   return { home, root, file, before: fs.readFileSync(file, 'utf8') };
 }
 

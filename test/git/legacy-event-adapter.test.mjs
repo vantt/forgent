@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { createGitScopedCommit, createGitRepositoryConfig } from '../../src/git/index.mjs';
 import { checkpointLegacyEventFiles, commitLegacyEventFiles } from '../../src/state/legacy-event-git-adapter.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/index.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('temporary Work declaration admits exact legacy events on main only',()=>{
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'legacy-git-adapter-'));try {
@@ -15,11 +16,11 @@ test('temporary Work declaration admits exact legacy events on main only',()=>{
   git('init','-qb','main');git('config','user.name','Fixture');git('config','user.email','fixture@test');
   const files=['.fgos/events.jsonl','.fgos/events/writer.jsonl','.fgos/events/archive/old.jsonl','.fgos/porting/events.jsonl'];
   for(const p of files){fs.mkdirSync(path.dirname(path.join(temp,p)),{recursive:true});fs.writeFileSync(path.join(temp,p),'base\n');}
-  fs.writeFileSync(path.join(temp,'.fgos/config.json'),'config');git('add','.');git('commit','-qm','base');
+  writeRawProjectConfig(temp, 'config');git('add','.');git('commit','-qm','base');
   const fence=path.join(temp,'.fgos/locks/activation.lock');fs.mkdirSync(fence,{recursive:true});fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
   const options={stateRoot:resolveStateRoot().stateRoot,repoPath:temp,trustedMain:temp,writer:'fixture'};
   for(const p of files)fs.appendFileSync(path.join(temp,p),'event\n');
-  fs.appendFileSync(path.join(temp,'.fgos/config.json'),'keep');
+  writeRawProjectConfig(temp,'configkeep');
   const result=checkpointLegacyEventFiles(options,{files,message:'chore(work): checkpoint',operationId:'checkpoint'});
   assert.equal(result.status,'committed');assert.deepEqual(result.files,[...files].sort());
   assert.equal(git('show','HEAD:.fgos/config.json'),'config');

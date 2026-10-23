@@ -1,0 +1,10 @@
+[package]
+name = "fgos-yaml-doc"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+sha2.workspace = true
+# Exact pin; the bytes come from packages/yaml-doc/third-party through the root [patch.crates-io].
+saphyr-parser = "=0.2.2"

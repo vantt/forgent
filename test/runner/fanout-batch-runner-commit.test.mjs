@@ -11,6 +11,7 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { confinedRunnerConfig } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The fan-out batch picks an item, runs its worker as one Unit run (runUnit) in
 // the item's worktree and then `fgos return`s it. The worker runs confined and
@@ -45,17 +46,14 @@ function setup(workerBody, itemExtra = {}) {
   const { repoRoot, fgosDir } = mkRepo();
   const scriptPath = path.join(mkTempDir(), 'worker.mjs');
   fs.writeFileSync(scriptPath, workerBody);
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         executor: { command: '/global/executor', args: ['{prompt}'] },
         executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
         modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
         timeoutMs: 20000,
       }),
-    }),
-  );
+    });
   addWork(fgosDir, {
     id: 'cand1',
     title: 'Produce the file',
@@ -193,17 +191,14 @@ test('the fanout command the fgos-fanout skill teaches runs as written: node src
 /** A repo with `executors` (completed with confined invocations) serving the implement step. */
 function setupExecutors(executors, items) {
   const { repoRoot, fgosDir } = mkRepo();
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         executors,
         capabilities: { 'code:implement': { prefer: Object.keys(executors).map((executor) => ({ executor })) } },
         modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
         timeoutMs: 60000,
       }),
-    }),
-  );
+    });
   for (const item of items) {
     addWork(fgosDir, {
       title: item.id, kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing',

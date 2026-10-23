@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { writeRawProjectConfig } from './config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -22,7 +23,6 @@ export function committedRunnerConfig() {
 /** A project directory holding only the committed config, for tests that read it through the config loader. */
 export function committedConfigDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-committed-config-'));
-  fs.mkdirSync(path.join(dir, '.fgos'));
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), committedConfigText());
+  writeRawProjectConfig(dir, committedConfigText());
   return dir;
 }

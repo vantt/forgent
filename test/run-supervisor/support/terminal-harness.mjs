@@ -10,6 +10,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
@@ -163,7 +164,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       const configDir = path.join(repoDir, '.fgos');
       fs.mkdirSync(configDir, { recursive: true });
       const executor = project.executor({ commandName: 'claude', confinement: herdrConfinement });
-      fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
+      writeProjectConfig(repoDir, {
         runner: {
           defaultExecutor: executorIds[0],
           defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -181,7 +182,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
           // A bare executor id leaves the transport to bind(): a named invocation is a hard pin and herdr never replaces it.
           capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id })) } },
         },
-      }, null, 2));
+      });
       const unitFile = path.join(repoDir, 'unit.json');
       fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-1', objective: 'Inspect the docs', capability: 'docs:write', writes: [], ...unit }));
       const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : [])], {

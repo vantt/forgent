@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigFromDir, ensureRunnerConfigForDir, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { snapshotRunnerConfig } from '../../src/runner/execution/run.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function load(tierFallback, globalRunner) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tier-fallback-'));
@@ -22,8 +23,8 @@ function load(tierFallback, globalRunner) {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
   if (tierFallback !== undefined) runner.tierFallback = tierFallback;
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }));
-  if (globalRunner) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: globalRunner }));
+  writeProjectConfig(dir, { runner });
+  if (globalRunner) writeGlobalConfig(home, { runner: globalRunner });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = home;
@@ -89,8 +90,8 @@ function loadRunner(runner, globalRunner) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tier-decl-home-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }));
-  if (globalRunner) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: globalRunner }));
+  writeProjectConfig(dir, { runner });
+  if (globalRunner) writeGlobalConfig(home, { runner: globalRunner });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = home;

@@ -19,6 +19,7 @@ import {
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
 import { recordMainCheckoutGuardWarning } from "../../src/state/main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "../../src/state/fgos-file-registry.mjs";
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
@@ -398,10 +399,9 @@ test("runOpportunisticMainCheckoutChecks D2: reads fallbackIntervalSec from .fgo
   const fgosDir = path.join(repoRoot, ".fgos");
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
-  const configPath = path.join(fgosDir, "config.json");
 
   // Write .fgos/config.json with checkpoint fallbackIntervalSec: 500
-  fs.writeFileSync(configPath, JSON.stringify({ checkpoint: { fallbackIntervalSec: 500 } }), "utf8");
+  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 500 } });
 
   const commitTime = 1000000;
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");

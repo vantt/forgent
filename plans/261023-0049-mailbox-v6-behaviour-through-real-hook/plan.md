@@ -13,6 +13,8 @@ created: 2026-10-23
 
 # Mailbox V6: behaviour through the real hook
 
+> **Owner answered 2026-10-23 11:07:** Q1 **A** (full N on both delivery channels, two stages with the pre-set stop rules; ceiling 1,082 CLI runs), Q2 **A** (`haiku` and `gpt-6-luna`), Q3 **A** (the new receiver instruction, frozen by hash before the first measured run), Q4 **A** (the owner's own Claude login, copied into each sandbox, with the expiry, byte-compare and stop-the-batch guards). Also approved: recording Claude Code 2.1.309 payloads (about 4 benign `claude -p` haiku runs) at the start of V6, outside the 1,082 budget.
+
 Planned 2026-10-23 01:00 Asia/Saigon on main `dfe2fd2d1`; branch `mailbox/v1-v3` at `188de22fc` (origin/main `88ed45b36`), with uncommitted V4-review edits by another session in its working tree. Spec on the branch: `docs/platform/agent-mailbox/spec.md` (read it with `git -C /home/vantt/projects/forgent-mailbox show HEAD:docs/platform/agent-mailbox/spec.md`): §5.1, §5.3, §5.5, §8, §11 ("Safety of the live suites"), §12, §14 (V6 row, stop rule, Codex preconditions), §16 Q14 and Q16. V5's plan `plans/261023-0013-mailbox-v5-native-hook-door/` did not exist on disk when this plan was written (checked in both checkouts, again during the red team); `blockedBy` names the directory V5's brief gives, and every V5 dependency below is a checkable output (section 6), checked by command in phase 1.
 
 ## 1. Budget (owner approval required before any live run of phases 4-6)

@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
 
@@ -160,8 +161,8 @@ import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/c
 
 function mkTempConfig(runnerObj) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dead-vocab-test-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify(runnerObj));
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, runnerObj);
   return file;
 }
 

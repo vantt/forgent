@@ -22,6 +22,7 @@ import { confinedRunnerConfig, persistRunnerConfig, unitRuns, countWorkerRuns } 
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -436,7 +437,7 @@ test('spawnWorker refuses with no-executor when no executor may run the Unit, no
   const fx = fixture(baseConfig([echo, '{prompt}']));
   const cfg = JSON.parse(fs.readFileSync(path.join(fx.repoRoot, '.fgos', 'config.json'), 'utf8'));
   for (const entry of Object.values(cfg.runner.executors)) delete entry.invocations;
-  fs.writeFileSync(path.join(fx.repoRoot, '.fgos', 'config.json'), JSON.stringify(cfg));
+  writeProjectConfig(fx.repoRoot, cfg);
 
   await assert.rejects(() => fx.run(), (err) => {
     assert.ok(err instanceof DispatchError);

@@ -15,7 +15,7 @@ verify, review of a document, docs, integration check):
 |---|---|---|
 | capability | you pick from `../_shared/capability-catalog.md` by the nature of the artifact | the default capability per kind |
 | rigor | you judge from what the slice touches, never below the frame's floor | the rigor per kind and when to raise it |
-| pattern or preset | the guide's activity declares one (`implement-item` is `reviewed`); otherwise omit and let the config rule apply | when `solo`, `reviewed`, an `rfc` preset or a panel |
+| pattern or preset | pass the pattern the guide's activity declares as `--pattern` (`implement-item` declares `reviewed`); a writing activity that declares none (`fix-verify-red`) also gets `--pattern reviewed`; a read-only activity that declares none omits it and lets the config rule apply | when `solo`, `reviewed`, an `rfc` preset or a panel |
 | persona | a name from `fgos agents list`, only when it plainly fits | which persona per kind |
 | tier / provider | never set; `bind()` decides | nothing: stays out of the loop |
 | ask-first kinds | irreversible, data or security work goes to the owner before any dispatch | the list of kinds |
@@ -24,7 +24,10 @@ verify, review of a document, docs, integration check):
 
 - Choose capability and rigor per slice by judgment, write the choice and the reason
   in the notebook, and keep rigor at or above the frame floor.
-- Use the pattern the guide's activity names; do not invent a pairing of rigor with
-  tier or with provider family.
+- Pass the pattern the guide's activity names as `--pattern` on every dispatch of
+  that activity: the door does not read it from the guide. A writing slice run
+  `solo` leaves no verify receipt, so the milestone it should produce stays
+  `unreached` (`docs/specs/workflow.md`, milestone acceptance). Do not invent a
+  pairing of rigor with tier or with provider family.
 - When the loop would need a rule only the table can give, record the question as a
   parked item; do not fill the gap with a private convention.

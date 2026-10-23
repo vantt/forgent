@@ -465,6 +465,44 @@ The big lead re-checked the evidence for every deviation before answering.
 5. **Conditional phases answered after phase 17 starts** become separate follow-up landings and do not block T3. The exception is Q2, as the planner recommends.
 6. **The census on the owner machine (D-T2-8)** goes into the T2 owner-machine guide. Phase 8's census-gated commits merge only after it reads zero.
 
+7. **After phase 1 (2026-10-23 05:20).** The big lead re-ran the phase verification with `--no-fail-fast`. Exactly the 16 new cases are red and every existing case passes.
+   - **CF07 closes as "not reproduced".** `redact` reads through `from_utf8_lossy`, so `remote_url` cannot fail on non-UTF-8, and nothing can inject a read timeout without a new seam.
+     - Phase 2 keeps the `sequence_home` restructure anyway, because RT01 needs it: the home is decided from the config listing, and a refusal is returned before any claim.
+     - It adds no CF07 test.
+     - The "absent versus error" half is a property of that shape, not a separate fix.
+   - **CF09 has no unit witness** (`sync_refs` and `sync_loose_objects` have no checkpoint seam). Phase 3's proof is OPC's reading review plus a `scripts/git/e1-power-cut.*` run where root is available. It adds no new seam.
+   - **The account-change red case** spawns one real `ssh` to `example.invalid` while it is red. Phase 2's fix makes the port refuse before ssh runs, and phase 2's report confirms that the spawn is gone.
+
+8. **F-C1 changes shape (2026-10-23 06:05).** Worktree/Refs compaction leaves T2. Commits 8e1ecbf63, 7bac1c05f and 004807272 are reverted.
+   - **Evidence:**
+     - OPC's second and third rounds on the compaction found new defects: a compacted Remove replay answered `Ok(())` for a different worktree; starvation was moved, not removed; auto-resume never reached `resume_compaction`. Each fix needed new mechanism: a registration-independent request digest (a v4 receipt that old releases refuse), a durable skip marker, a ledger-based resume.
+     - At steady state, compaction costs about 4 fsyncs (≈ 30–47 ms, the lead's measured ≈ 47 ms per chain) on every add, to save about 0.09 ms per retained chain. That works against priority 1.
+     - Counsel by kongming (Fable) and OPC agreed on this direction.
+   - **Instead:** Refs admission (`refs.rs` `admission_with_land`) and `repository_config.rs` admission drop `wal.scan` and keep only `wal.active`, the same shape as Publication's `admit_pending`.
+     - Every retained chain is still fully inspected, once instead of twice. The ledger term is gone, and so is a latent refusal at 100 000 ledger entries.
+     - Proofs extend `historical_ledger_over_admission_bound_does_not_block_new_publication` and `remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admission`.
+     - A tail-peek step is not done in T2. If it is ever done, OPC's five conditions apply: a gap-free listing; a fully valid last record plus its link to the previous record; the pin check; one rule for unknown artifacts shared with doctor; no cache that turns unknown into terminal.
+   - **Backlog item `p-djrgdijd2c`** (minted 2026-10-23 09:05, `docs/backlog.md`): "Compact finished Worktree/Refs WAL chains off the hot path."
+     - It runs through a doctor `--fix` or the guarded prune door, never on every add.
+     - A create chain is kept while its registration or checkout exists.
+     - A compacted Worktree replay answers recovery-required. Refs replay is as in the reverted 8e1ecbf63.
+     - The spec sentence comes before the code.
+     - Reason: retained chains grow about 80 a day on a busy repository, and admission stays O(chains). Its visibility is owner pick A1.
+     - Trigger (OPC, 10-23): admission's own cost stays O(retained chains) × one `inspect` each. `retained_bytes` and the chain count (doctor's `git-operation-journal`) are the signal to schedule the item.
+   - **Result:** the phase 2 delta (`3a655a8b3`, `3f1a7ef3c`) got OPC's merge verdict. Admission read p50 at 322 chains went from 32.3 to 15.8 ms, and the tail peek was not done. Phases 1 and 2 were merged into the track branch, and the census was regenerated (`9d935588c`). Only CFG's 5 known `unresolved-binary` sites remain.
+
+9. **Phases 3 and 6A merged into the track branch (2026-10-23 06:55, `e6d1471f7`).** OPC approved every Git commit.
+   - **Phase 6A (terminal-control):** only CF02, CF03, CF04 and CF10. The rest of phase 6 waits for Q0.
+   - **Phase 3:**
+     - CF05, CF06 and CF08. CF08's two commits merge as a pair: the remote's own lost-lease spellings count as stale, and hook or policy refusals keep their stderr.
+     - CF09 widened under OPC's review. Every `core.fsync=all` site in the crate (17 of them) now goes through `lib.rs::durable_args`, which also forces `core.fsyncMethod=fsync`. A repository or global `writeout-only` can no longer turn a reported durable effect into one a power cut rolls back. Before this, E1's power-cut proof held only on the default method.
+   - **Limits recorded by OPC:**
+     - `compaction_suffix` and `compact_inner` still count temporaries.
+     - The CF05 negative case injects at the checkpoint, not as an fsync EIO.
+     - The test wrapper directories are not removed: the fake ssh bin dir and `fgos-sequence-git-<pid>`.
+
+10. **Owner answers, 2026-10-23 11:10: Q0a Q1a Q2a, Q3 A1 and A2** (parent plan decisions 18–22). Phases 10, 11, 12 and 13 run; phases 14, 15 and 16 do not. Q0 being yes lifts the assumption behind phases 1–9 and 17. The rest of phase 6 runs as one lead, Rust first, then Node: E-26, F-8, the core half of E-14, the D6 test swap, then E-13, E-15, E-16, the Node half of E-14 and the test retirements. It runs in parallel with phase 4.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.

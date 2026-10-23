@@ -11,6 +11,7 @@ import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -104,9 +105,7 @@ function envelopeData(stdout) {
 
 function writeRunnerConfig(repoRoot, executorScript) {
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         // The fixture domains' execute step resolves to `<domain>:execute`; a Unit binds only from a pool the
         // config names, on the capability's own entry or its `<domain>:*` entry (the bare verb is no key).
@@ -117,8 +116,7 @@ function writeRunnerConfig(repoRoot, executorScript) {
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       }),
-    }),
-  );
+    });
 }
 
 function branchExists(repoRoot, branch) {

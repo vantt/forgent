@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Board and consumers switch to handles"
-status: pending
+status: in-progress
 priority: P2
 effort: "2h"
 dependencies: [2]
@@ -20,3 +20,6 @@ The board names agents and machines by handle, and MAIL and HARDEN know exactly 
 
 ## Verification
 - `grep -cE '[a-z]+-[a-z2-7]{4}@[a-z][a-z0-9-]*' plans/261017-1313-fgos-platform-program-board/plan.md` counts at least one handle per live row (zero today); the roster table lists all three machines with a release that carries phases 01-02 and three different machine handles.
+
+## Done condition (2026-10-23 11:25)
+Every live lane on the board has a lead handle and machine in the "Máy và phiên" table. Whether the mailbox takes IDENT handles as its address is MAIL's decision with the owner (mailbox G0, spec sections 5.1.1 and 17), tracked in the MAIL lane, not here.
