@@ -520,7 +520,7 @@ export function workUnitFor(item, opts = {}) {
     ?? domainObj?.defaultWorkflow;
   return {
     unitData,
-    ...(matchedOp ? { declared: { workId: item.id, domain, workflow, stage, operation, operations }, pinInputs } : {}),
+    ...(matchedOp ? { declared: { workId: item.id, ...(typeof item.title === 'string' && item.title.trim() ? { title: item.title } : {}), domain, workflow, stage, operation, operations }, pinInputs } : {}),
     worktree,
     warnings,
   };

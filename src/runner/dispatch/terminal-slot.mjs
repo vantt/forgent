@@ -78,10 +78,11 @@ export function createRoundTerminalControl({ herdrBin, herdrEnv, config, hostBin
 /**
  * What names the work in a label: its work item, else its run (`run-` and the first four characters of the
  * unit run's random part, the rest of a unit run id being only a clock) with the start of its objective as
- * the title. A work item's own title is not known to the round, so such a label shows the id alone.
+ * the title. A work item carries its own title when the item had one at dispatch; without it the label
+ * shows the id alone.
  */
 export function workLabelOf(assignment) {
-  if (assignment?.workId) return { id: assignment.workId };
+  if (assignment?.workId) return { id: assignment.workId, ...(assignment.title ? { title: assignment.title } : {}) };
   const unitRunId = assignment?.unitRunId ?? assignment?.provenance?.unitRunId;
   const random = /-([0-9a-f]{8})$/.exec(unitRunId ?? '')?.[1];
   return { ...(random ? { id: `run-${random.slice(0, 4)}` } : {}), ...(assignment?.objective ? { title: assignment.objective } : {}) };

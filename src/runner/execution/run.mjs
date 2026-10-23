@@ -788,6 +788,7 @@ async function runUnitBody(options, scope) {
       ...(options.declared !== undefined ? {
         declared: {
           workId: options.declared.workId,
+          ...(options.declared.title ? { title: options.declared.title } : {}),
           domain: options.declared.domain,
           ...(options.declared.workflow ? { workflow: options.declared.workflow } : {}),
           stage: options.declared.stage,
@@ -909,6 +910,7 @@ async function runUnitBody(options, scope) {
     const carriesOperation = declaredOp && seat.posture.writer;
     const operationFields = carriesOperation ? {
       workId: unitRecord.declared.workId,
+      ...(unitRecord.declared.title ? { title: unitRecord.declared.title } : {}),
       domain: declaredOp.domain,
       ...(declaredOp.workflow ? { workflow: declaredOp.workflow } : {}),
       stage: declaredOp.stage,

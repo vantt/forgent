@@ -19,7 +19,7 @@ Why this shape: the shell already talks to the core through the `attach`/`label`
 
 - Short id for a work item: `assignment.workId` (a real work item id on a work-step unit).
 - Run without work item: `run-` plus the first 4 chars of the unit run id's random part (`unit-run-<clock>-<hex8>`: the first 8 chars of the whole id would be the useless `unit-run`), title = start of `assignment.objective` (which is the prompt for `fgos run`).
-- **The work item title is NOT available at the round.** The assignment carries `workId`, `objective`, `taskSpec`, no title; `workId` in the round ctx is the executor id. I added no lookup. A work item's tab therefore shows the short id alone (`tsk-1lvx`) until a caller passes a title (the skill takes it as an optional argument now). Decision for the owner: add the item title to the unit's `declared` facts at admission (one field), or accept id-only tabs.
+- Work item title: first report said it was missing; the big lead asked to deliver it if no new lookup is needed. It needs none: `workUnitFor` (src/runner/work-dispatch.mjs, the one builder of `declared`) holds the item in hand. It now adds an optional `declared.title`; `runUnit` persists it in unit.json `declared` and puts it on the producer assignment (`operationFields`); `workLabelOf` passes it to the label. `operation-choice.mjs` only passes `built.declared` through, so no other builder needed a move. Proof: `work-unit-for.test.mjs` (declared.title), `driver-rununit.test.mjs` (assignment.json carries the title), `dispatch-terminal-slot.test.mjs` (workLabelOf), `terminal-groups.test.mjs` (round to port wiring, unchanged). A work item with no title, and any seat other than the operation-carrying producer (a reviewer seat's assignment has no `workId`), still labels by what it has.
 - A reviewer seat's `objective` is the role's own task text; if a reviewer ever opens the tab first, a run's title is that text. Producers go first in every pattern read.
 
 ## Proof
@@ -57,6 +57,5 @@ no title       tsk-1lvx
 
 ## Concerns
 
-- Work item title missing at the round (above).
 - Records written before this change keep a `label` key that is now ignored.
 - Merge with the even-split branch: my `herdr-round.mjs` hunks are the `ctx` destructure line (adds `workLabel` at its end) and the `slotDisplay(` line; a `groupSize` addition to the same destructure line would be a one-line textual conflict.
