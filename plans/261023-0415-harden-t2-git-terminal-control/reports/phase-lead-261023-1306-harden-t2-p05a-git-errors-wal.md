@@ -13,7 +13,7 @@ Branch `harden/t2-p05a-git-errors-wal` (from `fee2fd6de`), pushed after each sli
 | 5 | `eef312c22` | one `byte_path`, one `zero_oid` (4 copies), `registered_topology` (Refs inventory and worktree add), name grammar through `wal::valid_id` | −30 / +9 |
 | 6 | `a939981c9` | `config_listing` (4 readers), `paths_at_revision` alias removed (4 callers moved), `literal_paths` uses `fgos_scope_literal` | −19 / 0 |
 | 6b | `38cd9ea16` | Publication's missing-object read uses `object_gap_cause` (`promisor-object-unavailable` now written once) | −4 / 0 |
-| 7 | `aae0aa00d` | `resolve_head` on one child when HEAD is born (big lead's addition) | −31 / 0 |
+| 7 | `aae0aa00d`, then the fix commit | `resolve_head` with fewer children (big lead's addition); the first version was rejected by OPC and replaced by a bracketed two-step read | −24 vs original / +50 (new test file) |
 | 8 | final | census | — |
 
 Total (slices 1–6b, 7): Rust src about −404, Rust tests +37, contract JSON +6. Every slice paid; none was dropped whole. Sub-folds dropped are listed below.
@@ -24,7 +24,7 @@ Total (slices 1–6b, 7): Rust src about −404, Rust tests +37, contract JSON +
 ## Behaviour-preservation proof
 Verified on the final tree, paste:
 ```
-cargo test --no-fail-fast -p fgos-git                       passed 290 failed 0 ignored 9 (49 binaries, incl. land_crash_matrix, recovery_matrix, publication, refs_remote, worktree, sequence, repository_config, ssh_transport, inspect, land)
+cargo test --no-fail-fast -p fgos-git                       passed 291 failed 0 ignored 9 (50 binaries, incl. land_crash_matrix, recovery_matrix, publication, refs_remote, worktree, sequence, repository_config, ssh_transport, inspect, land)
 cargo test --no-fail-fast -p fgos-event-store -p fgos-identity -p fgos-node-addon -p fgos-durable-file -p fgos-terminal-control -p fgos-run-supervisor
                                                             passed 451 failed 0 ignored 3 (71 binaries)
 cargo clippy --workspace --all-targets -- -D warnings       Finished, no warnings
@@ -33,7 +33,7 @@ Node one-file: test/git/*.test.mjs test/setup/git-checks.test.mjs test/runner/wo
 ```
 Windows check (`cargo check --target x86_64-pc-windows-msvc`) fails on the same two symbols as before the slices (`custody_lock_path`, `libc`) and on no others.
 
-Named answer changes, each with a test: (1) WAL failures (`busy`, `operation-id-conflict`, `repository-identity-changed`, `publication-borrow-unavailable` are refusals; corrupt/io/fence/recovery are recovery-required with free text in `detail.diagnostic`): `tests/contracts.rs::every_wal_failure_is_named_by_one_kebab_cause_and_code_in_every_port` plus the two red cases; two `safe_restore` assertions moved to `git-wal-io` + diagnostic. (2) Borrowed timeout reads `git-timeout`/`detail.path=borrowed`: `tests/publication.rs` transport-timeout case; contained side in the driver case. (3) `resolve_ref` on a dangling symbolic ref is symbolic, was absent: `tests/inspect.rs::inspect_real_repositories...` (red before, green after). (4) driver `candidate_intact` refuses a tree or blob: the real-git WAL case (its candidate was a blob; now a commit, with the non-commit assertion). (5) remote and mapping names longer than 80 bytes refused: `tests/repository_config.rs::a_remote_name_is_the_crate_name_grammar_everywhere_it_is_checked`. (6) Publication read of a shallow repository names `shallow-history-incomplete` (it fell to `git-command-failed`). (7) `head-changed-during-read` removed (see resolve_head).
+Named answer changes, each with a test: (1) WAL failures (`busy`, `operation-id-conflict`, `repository-identity-changed`, `publication-borrow-unavailable` are refusals; corrupt/io/fence/recovery are recovery-required with free text in `detail.diagnostic`): `tests/contracts.rs::every_wal_failure_is_named_by_one_kebab_cause_and_code_in_every_port` plus the two red cases; two `safe_restore` assertions moved to `git-wal-io` + diagnostic. (2) Borrowed timeout reads `git-timeout`/`detail.path=borrowed`: `tests/publication.rs` transport-timeout case; contained side in the driver case. (3) `resolve_ref` on a dangling symbolic ref is symbolic, was absent: `tests/inspect.rs::inspect_real_repositories...` (red before, green after). (4) driver `candidate_intact` refuses a tree or blob: the real-git WAL case (its candidate was a blob; now a commit, with the non-commit assertion). (5) remote and mapping names longer than 80 bytes refused: `tests/repository_config.rs::a_remote_name_is_the_crate_name_grammar_everywhere_it_is_checked`. (6) Publication read of a shallow repository names `shallow-history-incomplete` (it fell to `git-command-failed`). (7) `head-changed-during-read` kept, now with one leading observation.
 
 ## F-5 caller list
 Searched `recovery-required|RecoveryRequired|publication-wal|Busy|OperationIdConflict|borrow-deadline|borrow-output-limit|hooks-config-read-failed` over `src`, `bin`, `scripts`, `test`, `packages/{git,event-store,identity,run-supervisor}`. No caller switches on a changed answer, so none moved:
@@ -43,7 +43,8 @@ Searched `recovery-required|RecoveryRequired|publication-wal|Busy|OperationIdCon
 - Receipt schema gained an optional `warnings` array; `src/` consumers read none of it.
 
 ## resolve_head children per call
-Born attached or detached: 3 → 1 (`rev-parse HEAD^{commit} --symbolic-full-name HEAD`). Unborn: 4 (symbolic-ref, rev-parse, symbolic-ref, ref listing) → 3 (rev-parse fails, symbolic-ref, ref listing). Detached with a missing commit: 3 → 2. Owning tests green (`driver::tests::` layout case, `tests/inspect.rs`, `tests/publication.rs`, WAL real-git case). Cause `head-changed-during-read` is removed: it compared two symbolic-ref reads around the rev-parse and one process cannot produce it; no test or caller referenced it. If the owner wants it kept, the born path would need a second child.
+Original: born 3 (symbolic-ref, rev-parse, symbolic-ref), unborn 4 (those three plus the ref listing), detached with a missing commit 3. Now: born 2 (symbolic-ref, then `rev-parse HEAD^{commit} --symbolic-full-name HEAD`), unborn 3 (symbolic-ref, failed rev-parse, listing), detached with a missing commit 2.
+`aae0aa00d` used one child for a born HEAD and was wrong: that rev-parse reads HEAD several times, so a switch in the middle paired one branch's commit with another's name (OPC reproduced it). The fix commit restores `head-changed-during-read` with the leading `symbolic-ref` as the observation and refuses when the two names differ; a trailing check alone would not bracket it. Proof: `tests/head_switch.rs` puts a wrapper git first on PATH that switches HEAD to another branch once, just before the `rev-parse`, and asserts the refusal, then a consistent read afterwards. It is its own test binary because the driver resolves its git once per process. `resolve_head` net versus the original is −24 lines. Owning tests green: `tests/head_tree.rs`, `tests/inspect.rs`, driver layout case, Node git files.
 
 ## Collisions
 - `read_paths_at`: only its two error ladders changed (`layout_cause`, `object_gap_cause`); no restructure.
