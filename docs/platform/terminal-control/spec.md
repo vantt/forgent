@@ -67,8 +67,8 @@ These are the test contract of the core.
 
 1. Tabs are grouped by `groupKey`. By default `groupKey` is the unit run id, or the workflow run id when one exists. No code invents a tab label from a key and a timestamp.
 2. A new pane is split from a **live** pane of the group. A new tab opens with the first worker's own pane; there is no empty root pane.
-3. A dead anchor pane, or a tab that vanished, makes the core open a new tab with the same label. When the last pane closes the multiplexer removes the tab itself; there is no "close the tab if empty" step.
-4. A label is display only. No code reads a label to decide anything.
+3. A dead anchor pane, or a tab that vanished, makes the core open a new tab. A group's second and later tabs that are open at the same time carry their ordinal (`label (2)`, `label (3)`), so no two tabs of a group share a name. When the last pane closes the multiplexer removes the tab itself; there is no "close the tab if empty" step.
+4. A label is display only. No code reads a label to decide anything. Every allocated pane, the first pane of a tab included, is named with the request's display label after its record is published; a pane that cannot be named stays a usable slot.
 5. The core closes only panes it allocated, by key. It never closes a tab.
 
 Hệ quả người dùng thấy được: các bước chạy nối tiếp (reviewer sau producer) mở tab mới cùng nhãn khi tab cũ đã tự biến mất; không có pane giữ chỗ để giữ một tab xuyên suốt.
@@ -107,7 +107,7 @@ The default policy is `measured-split`: for each live pane of the group and each
 Measured on a real herdr (details in the [measurement report](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md)):
 
 - The tab area follows the attached client and changes during the day (352×69, 244×71 and 51×36 were seen).
-- **The rect herdr reports can differ from the real pty size.** With two clients attached, `pane layout` reported 40×8 while the pty was 18×51. The re-measure therefore prefers the pty size when the driver can read it, and only falls back to the reported rect.
+- **The rect herdr reports can differ from the real pty size.** With two clients attached, `pane layout` reported 40×8 while the pty was 18×51. The re-measure of a new pane therefore prefers the pty size when the driver can read it, and only falls back to the reported rect. Placement measures each tab once per allocate from the reported rects; only the new pane's pty is read.
 - `ratio` of a split is the share of the **old** pane.
 - When the whole tab is smaller than the minimum, the first pane of a new tab is still accepted; otherwise the core would open new tabs forever.
 

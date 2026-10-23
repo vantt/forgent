@@ -394,7 +394,7 @@ export async function prepareTerminalAttempt(ctx) {
     herdrEnv: sessionEnv,
     config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
   });
-  const display = slotDisplay({ groupKey, agent: agentKind, model });
+  const display = slotDisplay({ groupKey, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
     try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ }

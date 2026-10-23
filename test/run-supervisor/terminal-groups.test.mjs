@@ -71,6 +71,9 @@ test('the seats of one batch share a tab and each gets the key of its attempt', 
     assert.equal(splits.length, 2, 'the other two seats split from panes of the group');
     for (const split of splits) assert.ok(new Set(['mock-pane-1', 'mock-pane-2', 'mock-pane-3']).has(split[split.indexOf('--pane') + 1]));
     assert.deepEqual(fake.closedPaneIds(), [], 'preparing a seat closes nothing');
+    const renames = verbs(fake, 'pane', 'rename');
+    assert.equal(renames.length, 3, 'every seat\'s pane is named, the first of the tab included');
+    assert.ok(renames.every((call) => call[call.length - 1] === 'batch-one'));
   } finally { fake.cleanup(); }
 });
 
@@ -257,6 +260,14 @@ test('the brief a reviewer reads says its claim needs assessment.verdict; the pr
     await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
     assert.match(fs.readFileSync(path.join(dir, 'run-reviewer', 'brief-1.md'), 'utf8'), /"assessment\.verdict" is required for this assessment role/);
     assert.doesNotMatch(fs.readFileSync(path.join(dir, 'run-producer', 'brief-1.md'), 'utf8'), /assessment\.verdict/);
+    // The role reaches the port with the display data, not only the brief.
+    const herdrState = path.join(harness.stateRoot, 'terminal', 'herdr');
+    const recordOf = (key) => {
+      const incarnation = fs.readdirSync(herdrState).find((id) => fs.existsSync(path.join(herdrState, id, 'allocations', `${key}.json`)));
+      return JSON.parse(fs.readFileSync(path.join(herdrState, incarnation, 'allocations', `${key}.json`), 'utf8'));
+    };
+    assert.equal(recordOf('cmd_reviewer').display.role, 'reviewer');
+    assert.equal(recordOf('cmd_producer').display.role, 'producer');
   } finally { fake.cleanup(); }
 });
 

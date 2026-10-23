@@ -114,6 +114,16 @@ fn the_policy_opens_a_new_tab_when_no_split_keeps_the_minimum() {
     assert_eq!(labels, vec!["label-g", "label-g (2)", "label-g (3)"]);
 }
 
+#[test]
+fn an_allocated_pane_carries_its_display_label_in_a_new_tab_and_after_a_split() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("pane-label"));
+    let first = core.allocate(&request("a", "g")).unwrap().slot;
+    let second = core.allocate(&request("b", "g")).unwrap().slot;
+    assert_eq!(driver.calls("pane.split").len(), 1);
+    assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", first.pane_id), format!("label.pane {} label-g", second.pane_id)]);
+}
+
 /// A policy that always splits, so the core's own re-measure is what protects
 /// the minimum.
 struct AlwaysSplit;

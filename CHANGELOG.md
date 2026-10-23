@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Worker panes opened by terminal-control now carry their label (the same text their tab has) instead of herdr's default name, a group's second and later tabs are numbered (`batch (2)`), and an allocate into a tab of N panes reads the layout once instead of once per pane (each read also spawned a process-info call per pane).
 - `fgos doctor --fix` no longer has a `terminal-dir` repair: the terminal allocation store creates `<state root>/terminal` and everything under it with mode 0700 on first use.
 - A terminal layout limit below the measured floor (`terminal.layout.minCols` under 40 or `minRows` under 8) is now refused by the terminal-control core itself, with the code `terminal-config-below-floor` naming key, value and floor, instead of running; `fgos doctor` prints that refusal in `terminal-config`. The core also answers its defaults and registered placement policies in `capabilities`, and the caller's `timeoutMs` bounds every herdr command of one operation.
 - `fgos doctor` no longer closes expired retained terminal panes: the `terminal-allocations` check reports them with the pane id so a person closes them, and the allocation scan answers every finding with its `paneId`.

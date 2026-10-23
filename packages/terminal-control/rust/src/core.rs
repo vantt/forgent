@@ -230,6 +230,10 @@ impl<'a> Core<'a> {
             let _ = self.close_unrecorded(&created.pane_id, &incarnation);
             return self.allocate(request);
         }
+        // Display only: a pane that cannot be named is still a usable, recorded slot.
+        if self.has("label") {
+            let _ = self.driver.label_pane(&created.pane_id, &request.display.label);
+        }
         Ok(Allocation {
             slot: Slot { tab_id: created.tab_id, pane_id: created.pane_id },
             origin: Origin::Allocated,
