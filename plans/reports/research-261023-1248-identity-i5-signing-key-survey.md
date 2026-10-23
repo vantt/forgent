@@ -21,7 +21,7 @@ for p in ~/.ssh/*.pub; do [ -f "$p" ] || continue; k="${p%.pub}"; enc=no-private
 echo "ssh-agent keys: $(ssh-add -l 2>/dev/null | grep -c .)"
 echo "git gpg.format=$(git config --global gpg.format) signingkey-set=$([ -n "$(git config --global user.signingkey)" ] && echo yes || echo no) commit.gpgsign=$(git config --global commit.gpgsign)"
 echo "gpg secret keys: $(gpg --list-secret-keys --with-colons 2>/dev/null | grep -c '^sec')"
-echo "push transport: $(git -C ~/projects/forgent remote get-url origin 2>/dev/null | sed -E 's#^(https?|ssh|git)(://|@).*#\1#')"
+echo "push transport: $(git remote get-url origin 2>/dev/null | sed -E 's#^(https?|ssh|git)(://|@).*#\1#')"
 ```
 
 ## Results
@@ -30,8 +30,8 @@ echo "push transport: $(git -C ~/projects/forgent remote get-url origin 2>/dev/n
 |---|---|---|---|---|---|---|
 | `fg-server` | 10.2p1 (`ssh-keygen -Y sign` available) | none (`~/.ssh` holds only `authorized_keys` and `known_hosts`) | 0 keys | no | 0 | https, credential helper `gh auth git-credential` |
 | `fg-server2` | pending | | | | | |
-| `design-lap` | pending | | | | | |
+| `design-lap` | 8.9p1 (`-Y sign` available) | two ED25519 pairs without passphrase, both deploy keys named for other jobs (`fgos-prod-sync`, `vnflow_deploy`); not machine identity keys and not to be reused | 0 keys | no | 0 | https |
 
 ## Reading so far
 
-`fg-server` has no key it could sign with, so "use the keys already on the machine" would mean creating one there anyway. The choice is then between creating a key by hand per machine (SSH format, signed with `ssh-keygen -Y sign`, which OpenSSH 10.2 has) and Identity minting it in `fgos doctor --fix`, like the machine id. The decision question goes to the owner when the other two rows are filled.
+`fg-server` and `design-lap` have no key fit to sign as the machine (`design-lap`'s two keys belong to deploy jobs), so "use the keys already on the machine" would mean creating one there anyway. The choice is then between creating a key by hand per machine (SSH format, signed with `ssh-keygen -Y sign`, which OpenSSH 10.2 has) and Identity minting it in `fgos doctor --fix`, like the machine id. The decision question goes to the owner when the other two rows are filled.
