@@ -1,12 +1,12 @@
 //! Scope and file placement (spec section 3): which file may hold which key. One total function
 //! judges a parsed file against the section schemas; `Schemas::locate` is the only way to a node.
+//! A `command` value comes from the trusted root's project file, never a linked worktree's copy.
 //! A refusal names the role of the file the key belongs in, never a path guessed from the home
 //! directory, and never a value.
-use fgos_yaml_doc::path::format_path;
-use fgos_yaml_doc::Document;
+use fgos_yaml_doc::{Document, Segment};
 use serde_json::Value;
 
-use crate::schema::{descend, At, Inherited, Resolved, Schemas};
+use crate::schema::{descend, json_at, json_put, key_span, At, Inherited, Resolved, Schemas};
 use crate::ConfigRefusal;
 
 /// The file a value was read from. The gateway token file is not YAML and is never judged here.
@@ -32,18 +32,8 @@ const DEPTH: usize = 12;
 
 /// Whether a `global-only` node sits below `at`.
 fn global_only_below<'a>(s: &'a Schemas, at: &At<'a>, inh: &Inherited<'a>, depth: usize) -> bool {
-    let node = at.node;
-    let named = node["properties"]
-        .as_object()
-        .into_iter()
-        .flat_map(|m| m.keys());
-    let mut kids: Vec<At> = named
-        .filter_map(|k| s.sub(at, "properties", Some(k)))
-        .collect();
-    kids.extend(s.sub(at, "additionalProperties", None));
-    kids.extend(s.sub(at, "items", None));
     depth > 0
-        && kids.into_iter().any(|kid| {
+        && s.children(at).into_iter().any(|(_, kid)| {
             let mut inh = inh.clone();
             s.enter(kid, &mut inh).is_some_and(|kid| {
                 inh.get("x-fgos-scope") == Some("global-only")
@@ -86,17 +76,53 @@ pub fn judge(
         } else {
             return true;
         };
-        let mut refusal = ConfigRefusal::new(code);
-        refusal.path = Some(format_path(path));
+        let mut refusal = ConfigRefusal::new(code).at_path(path);
         refusal.detail_mut().belongs_in = Some(belongs.to_string());
         if let Some(document) = document {
-            refusal.file = Some(document.file().to_string());
-            let at = document.span_of(path).map(|s| s.key.unwrap_or(s.value));
-            (refusal.line, refusal.column) = (at.map(|s| s.line), at.map(|s| s.column));
+            refusal = refusal
+                .in_file(document.file())
+                .at_span(key_span(document, path));
         }
         out.push(refusal);
         false
     });
     out.sort_by(|a, b| a.path.cmp(&b.path));
     out
+}
+
+/// The topmost `command` paths of `value`, cut at the first list index (a list comes whole from one file).
+fn command_tops(schemas: &Schemas, value: &Value) -> Vec<Vec<Segment>> {
+    let mut tops: Vec<Vec<Segment>> = Vec::new();
+    descend(value, &mut Vec::new(), &mut |path, _| {
+        let command = schemas
+            .resolve(path)
+            .is_some_and(|r| r.sensitivity == "command");
+        if command {
+            let cut = path.iter().position(|s| matches!(s, Segment::Index(_)));
+            let top = path[..cut.unwrap_or(path.len())].to_vec();
+            if !tops.contains(&top) {
+                tops.push(top);
+            }
+        }
+        !command
+    });
+    tops
+}
+
+/// The project file with every `command` subtree taken from the trusted file, or removed when that
+/// file lacks it; also the paths replaced.
+pub(crate) fn trusted_project(
+    schemas: &Schemas,
+    project: &Value,
+    trusted: &Value,
+) -> (Value, Vec<Vec<Segment>>) {
+    let tops: Vec<_> = command_tops(schemas, project)
+        .into_iter()
+        .chain(command_tops(schemas, trusted))
+        .collect();
+    let mut out = project.clone();
+    for top in &tops {
+        json_put(&mut out, top, json_at(trusted, top).cloned());
+    }
+    (out, tops)
 }

@@ -56,9 +56,7 @@ pub fn check_mode(file: &str, actual: u32, expected: u32) -> Option<ModeFinding>
 }
 
 fn refusal(code: &'static str, file: &str) -> FileError {
-    let mut refusal = ConfigRefusal::new(code);
-    refusal.file = Some(file.to_string());
-    FileError::Refused(Box::new(refusal))
+    FileError::Refused(Box::new(ConfigRefusal::new(code).in_file(file)))
 }
 
 /// Read `relative` beneath `root`. `Ok(None)` when the file or a directory above it is missing;
@@ -74,12 +72,11 @@ pub fn read_beneath(
     let name = relative.to_string_lossy();
     let map = |error: BeneathError| match error {
         BeneathError::Refused(BeneathRefusal::TooLarge) => {
-            let mut parse = ConfigRefusal::new("config-parse");
-            parse.file = Some(name.to_string());
-            parse.yaml = Some(Box::new(
-                fgos_yaml_doc::Refusal::new("input-too-large").with_file(&name),
-            ));
-            FileError::Refused(Box::new(parse))
+            let yaml = fgos_yaml_doc::Refusal::new("input-too-large").with_file(&name);
+            FileError::Refused(Box::new(ConfigRefusal {
+                yaml: Some(Box::new(yaml)),
+                ..ConfigRefusal::new("config-parse").in_file(&name)
+            }))
         }
         BeneathError::Refused(_) => refusal("config-path-symlink", &name),
         BeneathError::Io(error) => FileError::Io(error),

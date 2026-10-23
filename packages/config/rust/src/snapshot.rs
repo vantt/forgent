@@ -5,16 +5,15 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use fgos_yaml_doc::merge::{merge, MergeRule};
-use fgos_yaml_doc::path::format_path;
-use fgos_yaml_doc::{parse, Document, Profile, Segment, Value as Doc};
+use fgos_yaml_doc::{Document, Profile, Segment, Value as Doc};
 use serde_json::Value;
 
 use crate::detect::{self, Detectors};
 use crate::files::{
     read_beneath, select_source, FileError, LoadedFile, Source, JSON_NAME, YAML_NAME,
 };
-use crate::schema::{descend, json_at, Schemas};
-use crate::scope::{judge, SourceKind};
+use crate::schema::{json_at, json_put, key_span, load, Schemas};
+use crate::scope::{judge, trusted_project, SourceKind};
 use crate::standard::Standard;
 use crate::ConfigRefusal;
 
@@ -99,21 +98,29 @@ pub(crate) struct Src {
     pub(crate) file: Option<LoadedFile>,
 }
 
-fn keep<T>(
-    read: Result<T, FileError>,
-    refused: &mut Vec<ConfigRefusal>,
-) -> Result<Option<T>, SnapshotError> {
-    match read {
-        Ok(found) => Ok(Some(found)),
-        Err(FileError::Refused(refusal)) => {
-            refused.push(*refusal);
-            Ok(None)
-        }
-        Err(FileError::Io(error)) => Err(SnapshotError::Io(error)),
+fn fail_if_any(refusals: Vec<ConfigRefusal>) -> Result<(), SnapshotError> {
+    if refusals.is_empty() {
+        Ok(())
+    } else {
+        Err(SnapshotError::Refused(refusals))
     }
 }
 
-/// Opens each source once, beneath its root without following a symlink.
+/// One source: the file of a scope chosen beneath its root, without following a symlink.
+fn open_source(role: &'static str, root: &Path, dir: &Path, max: usize) -> Result<Src, FileError> {
+    let (name, file) = match select_source(root, dir, max)? {
+        Source::Yaml(file) => (YAML_NAME, Some(file)),
+        Source::LegacyJson(file) => (JSON_NAME, Some(file)),
+        Source::Absent => (YAML_NAME, None),
+    };
+    Ok(Src {
+        role,
+        name: format!("{role}:{name}"),
+        file,
+    })
+}
+
+/// Opens each source once.
 pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotError> {
     let max = Profile::StrictConfig.limits().input_bytes;
     let (Some(parent), Some(dir)) = (
@@ -124,98 +131,31 @@ pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotEr
             "config-path-symlink",
         )]));
     };
-    let mut scopes = vec![("project", req.project_root.as_path(), Path::new(".fgos"))];
+    let project = |role, root| open_source(role, root, Path::new(".fgos"), max);
+    let mut reads = vec![project("project", &req.project_root)];
     if req.trusted_root != req.project_root {
-        scopes.push((
-            "project@trusted",
-            req.trusted_root.as_path(),
-            Path::new(".fgos"),
-        ));
+        reads.push(project("project@trusted", &req.trusted_root));
     }
-    scopes.push(("global", parent, dir));
-    let (mut out, mut refused) = (Vec::new(), Vec::new());
-    for (role, root, dir) in scopes {
-        let (name, file) = match keep(select_source(root, dir, max), &mut refused)? {
-            Some(Source::Yaml(f)) => (YAML_NAME, Some(f)),
-            Some(Source::LegacyJson(f)) => (JSON_NAME, Some(f)),
-            _ => (YAML_NAME, None),
-        };
-        out.push(Src {
-            role,
-            name: format!("{role}:{name}"),
-            file,
-        });
-    }
+    reads.push(open_source("global", parent, dir, max));
     if req.class == SessionClass::Unconfined {
-        let file = keep(
-            read_beneath(parent, &dir.join("private/accounts.yaml"), max),
-            &mut refused,
-        )?
-        .flatten();
-        out.push(Src {
-            role: "accounts",
-            name: "accounts:accounts.yaml".into(),
-            file,
-        });
+        reads.push(
+            read_beneath(parent, &dir.join("private/accounts.yaml"), max).map(|file| Src {
+                role: "accounts",
+                name: "accounts:accounts.yaml".into(),
+                file,
+            }),
+        );
     }
-    if refused.is_empty() {
-        Ok(out)
-    } else {
-        Err(SnapshotError::Refused(refused))
-    }
-}
-
-/// The topmost `command` paths of `value`, cut at the first list index (a list comes whole from one file).
-fn command_tops(schemas: &Schemas, value: &Value) -> Vec<Vec<Segment>> {
-    let mut tops: Vec<Vec<Segment>> = Vec::new();
-    descend(value, &mut Vec::new(), &mut |path, _| {
-        let command = schemas
-            .resolve(path)
-            .is_some_and(|r| r.sensitivity == "command");
-        if command {
-            let cut = path
-                .iter()
-                .position(|s| matches!(s, Segment::Index(_)))
-                .unwrap_or(path.len());
-            if !tops.iter().any(|t| t[..] == path[..cut]) {
-                tops.push(path[..cut].to_vec());
-            }
-        }
-        !command
-    });
-    tops
-}
-
-/// Sets (or removes) the value at a key path, creating the mappings above it.
-fn put(node: &mut Value, path: &[Segment], new: Option<Value>) {
-    let Some((Segment::Key(key), rest)) = path.split_first() else {
-        return;
-    };
-    if new.is_some() && !node.is_object() {
-        *node = Value::Object(Default::default());
-    }
-    let Some(map) = node.as_object_mut() else {
-        return;
-    };
-    match (rest.is_empty(), new) {
-        (true, Some(value)) => drop(map.insert(key.clone(), value)),
-        (true, None) => drop(map.remove(key)),
-        (false, new) => {
-            let child = if new.is_some() {
-                Some(map.entry(key.clone()).or_insert(Value::Null))
-            } else {
-                map.get_mut(key)
-            };
-            if let Some(child) = child {
-                put(child, rest, new);
-            }
+    let (mut out, mut refused) = (Vec::new(), Vec::new());
+    for read in reads {
+        match read {
+            Ok(src) => out.push(src),
+            Err(FileError::Refused(refusal)) => refused.push(*refusal),
+            Err(FileError::Io(error)) => return Err(SnapshotError::Io(error)),
         }
     }
-}
-
-struct Parsed {
-    doc: Document,
-    json: Value,
+    fail_if_any(refused)?;
+    Ok(out)
 }
 
 struct Layer {
@@ -224,96 +164,49 @@ struct Layer {
     json: Value,
 }
 
-fn layer(layer: &'static str, json: Value) -> Layer {
-    Layer {
+/// A layer holding `json`; none for a null, which holds nothing.
+fn layer(layer: &'static str, json: Value) -> Option<Layer> {
+    (!json.is_null()).then(|| Layer {
         layer,
         doc: Doc::from_json(&json),
         json,
-    }
-}
-
-/// Where a merged value came from: the layer's file, or none for a detected value.
-fn provenance(
-    layer: &Layer,
-    path: &[Segment],
-    docs: &BTreeMap<&str, Parsed>,
-    std: &Standard,
-    trusted: bool,
-) -> Provenance {
-    let role = if trusted {
-        "project@trusted"
-    } else {
-        layer.layer
-    };
-    let found = match layer.layer {
-        "standard" => std
-            .span_of(path)
-            .map(|(file, span)| (file.to_string(), span)),
-        "detected" => None,
-        _ => docs.get(role).and_then(|p| {
-            let spans = p.doc.span_of(path)?;
-            Some((p.doc.file().to_string(), spans.key.unwrap_or(spans.value)))
-        }),
-    };
-    Provenance {
-        layer: layer.layer,
-        role,
-        line: found.as_ref().map(|f| f.1.line),
-        column: found.as_ref().map(|f| f.1.column),
-        file: found.map(|f| f.0),
-    }
+    })
 }
 
 /// Parses every source and judges it against its scope; each refusal is listed.
-fn load(ctx: &Context, srcs: &[Src]) -> (BTreeMap<&'static str, Parsed>, Vec<ConfigRefusal>) {
+fn load_sources(
+    ctx: &Context,
+    srcs: &[Src],
+) -> (
+    BTreeMap<&'static str, (Document, Value)>,
+    Vec<ConfigRefusal>,
+) {
     let (mut docs, mut errors) = (BTreeMap::new(), Vec::new());
-    for src in srcs.iter().filter_map(|s| Some((s, s.file.as_ref()?))) {
-        let (src, file) = src;
-        let parsed = parse(&file.bytes, Profile::StrictConfig, &src.name)
-            .and_then(|doc| Ok((doc.to_json()?, doc)))
-            .map_err(ConfigRefusal::parse);
-        match (parsed, src.role) {
-            (Ok((json, doc)), role) => {
-                let kind = [
-                    ("project", SourceKind::Project),
-                    ("global", SourceKind::Global),
-                    ("accounts", SourceKind::Accounts),
-                ];
-                if let Some((_, kind)) = kind.iter().find(|(name, _)| *name == role) {
-                    errors.extend(judge(ctx.schemas, *kind, &json, Some(&doc)));
-                }
-                docs.insert(role, Parsed { doc, json });
+    for (src, file) in srcs.iter().filter_map(|s| Some((s, s.file.as_ref()?))) {
+        let (doc, json) = match load(&src.name, &file.bytes) {
+            Ok(parsed) => parsed,
+            Err(refusal) => {
+                errors.push(refusal);
+                continue;
             }
-            (Err(refusal), _) => errors.push(refusal),
+        };
+        let kind = match src.role {
+            "project" => Some(SourceKind::Project),
+            "global" => Some(SourceKind::Global),
+            "accounts" => Some(SourceKind::Accounts),
+            _ => None,
+        };
+        if let Some(kind) = kind {
+            errors.extend(judge(ctx.schemas, kind, &json, Some(&doc)));
         }
+        docs.insert(src.role, (doc, json));
     }
     (docs, errors)
 }
 
-/// The project file with every `command` subtree taken from the trusted file, or removed when that
-/// file lacks it; also the paths replaced.
-fn trusted_project(
-    schemas: &Schemas,
-    project: &Value,
-    trusted: &Value,
-) -> (Value, Vec<Vec<Segment>>) {
-    let mut tops = command_tops(schemas, project);
-    for top in command_tops(schemas, trusted) {
-        if !tops.contains(&top) {
-            tops.push(top);
-        }
-    }
-    let mut out = project.clone();
-    for top in &tops {
-        put(&mut out, top, json_at(trusted, top).cloned());
-    }
-    (out, tops)
-}
-
 /// A merge that cannot combine two layers: `config-schema` naming the layers that hold the path.
 fn mismatch(layers: &[Layer], refusal: fgos_yaml_doc::Refusal) -> ConfigRefusal {
-    let mut out = ConfigRefusal::new("config-schema");
-    out.path = Some(format_path(&refusal.path));
+    let mut out = ConfigRefusal::new("config-schema").at_path(&refusal.path);
     let detail = out.detail_mut();
     detail.keyword = Some(refusal.rule.to_string());
     detail.layers = layers
@@ -329,23 +222,21 @@ pub(crate) fn build(
     req: &SnapshotRequest,
     srcs: &[Src],
 ) -> Result<Snapshot, SnapshotError> {
-    let (docs, errors) = load(ctx, srcs);
-    if !errors.is_empty() {
-        return Err(SnapshotError::Refused(errors));
-    }
-    let json = |role: &str| docs.get(role).map(|p| p.json.clone());
+    let (docs, errors) = load_sources(ctx, srcs);
+    fail_if_any(errors)?;
+    let json = |role: &str| docs.get(role).map(|(_, json)| json.clone());
     let project = json("project").unwrap_or(Value::Null);
     let (project, tops) = match json("project@trusted") {
         Some(trusted) => trusted_project(ctx.schemas, &project, &trusted),
         None => (project, Vec::new()),
     };
     let mut layers: Vec<Layer> = [
-        ("project", Some(project)),
-        ("global", json("global")),
-        ("accounts", json("accounts")),
+        ("project", project),
+        ("global", json("global").unwrap_or_default()),
+        ("accounts", json("accounts").unwrap_or_default()),
     ]
     .into_iter()
-    .filter_map(|(name, json)| json.filter(|j| !j.is_null()).map(|j| layer(name, j)))
+    .filter_map(|(name, json)| layer(name, json))
     .collect();
     let held = |path: &[Segment]| {
         layers.iter().any(|l| json_at(&l.json, path).is_some())
@@ -354,19 +245,11 @@ pub(crate) fn build(
     let mut detected = Value::Null;
     for path in detect::paths(ctx.schemas).iter().filter(|p| !held(p)) {
         if let Some(value) = ctx.detectors.detect(path) {
-            put(&mut detected, path, Some(value.to_json()));
+            json_put(&mut detected, path, Some(value.to_json()));
         }
     }
-    layers.extend(
-        Some(detected)
-            .filter(|d| !d.is_null())
-            .map(|d| layer("detected", d)),
-    );
-    layers.extend(
-        Some(ctx.standard.value().clone())
-            .filter(|d| !d.is_null())
-            .map(|d| layer("standard", d)),
-    );
+    layers.extend(layer("detected", detected));
+    layers.extend(layer("standard", ctx.standard.value().clone()));
     let rules = |path: &[Segment]| match ctx.schemas.resolve(path)?.merge? {
         "deep" => Some(MergeRule::Deep),
         "replace" => Some(MergeRule::Replace),
@@ -375,66 +258,78 @@ pub(crate) fn build(
     };
     let merged = merge(&layers.iter().map(|l| &l.doc).collect::<Vec<_>>(), &rules)
         .map_err(|refusal| SnapshotError::Refused(vec![mismatch(&layers, refusal)]))?;
-    let prov = |at: usize, path: &[Segment]| {
+    // Where the value at `path` came from: the file of the layer that won it (a command value
+    // taken from the main checkout reads `project@trusted`), none for a detected value.
+    let provenance = |at: usize, path: &[Segment]| {
         let layer = &layers[at];
-        let trusted = layer.layer == "project" && tops.iter().any(|t| path.starts_with(t));
-        provenance(layer, path, &docs, ctx.standard, trusted)
-    };
-    let origins = merged.origins.iter().map(|(path, at)| Origin {
-        described: ctx.schemas.resolve(path).is_some(),
-        provenance: prov(*at, path),
-        path: path.clone(),
-    });
-    let mut errors = Vec::new();
-    match ctx.schemas.validate(&merged.value) {
-        Ok(violations) => {
-            for v in violations
-                .into_iter()
-                .filter(|v| ctx.schemas.resolve(&v.path).is_some())
-            {
-                // The deepest path of the violation that some layer wrote, for its file and position.
-                let from = (1..=v.path.len()).rev().find_map(|n| {
-                    let (_, at) = merged
-                        .origins
-                        .iter()
-                        .find(|(p, _)| p.starts_with(&v.path[..n]))?;
-                    Some(prov(*at, &v.path[..n]))
-                });
-                let mut refusal = ConfigRefusal::new("config-schema");
-                refusal.path = Some(format_path(&v.path));
-                if let Some(from) = from {
-                    (refusal.file, refusal.line, refusal.column) =
-                        (from.file, from.line, from.column);
-                }
-                let detail = refusal.detail_mut();
-                (detail.keyword, detail.schema_path) = (Some(v.keyword), Some(v.schema_path));
-                errors.push(refusal);
-            }
+        let role = if layer.layer == "project" && tops.iter().any(|t| path.starts_with(t)) {
+            "project@trusted"
+        } else {
+            layer.layer
+        };
+        let found = match layer.layer {
+            "standard" => ctx.standard.span_of(path),
+            "detected" => None,
+            _ => docs
+                .get(role)
+                .and_then(|(doc, _)| Some((doc.file(), key_span(doc, path)?))),
+        };
+        Provenance {
+            layer: layer.layer,
+            role,
+            file: found.map(|(file, _)| file.to_string()),
+            line: found.map(|(_, span)| span.line),
+            column: found.map(|(_, span)| span.column),
         }
-        Err(refusal) => errors.push(refusal),
-    }
-    if !errors.is_empty() {
-        errors.sort_by(|a, b| {
-            (&a.file, a.line, a.column, &a.path).cmp(&(&b.file, b.line, b.column, &b.path))
-        });
-        return Err(SnapshotError::Refused(errors));
-    }
-    let revisions = srcs.iter().map(|s| {
-        (
-            s.role,
-            s.file
-                .as_ref()
-                .map_or("absent".into(), |f| f.revision.clone()),
-        )
+    };
+    let violations = ctx
+        .schemas
+        .validate(&merged.value)
+        .map_err(|refusal| SnapshotError::Refused(vec![refusal]))?;
+    let mut errors: Vec<ConfigRefusal> = violations
+        .into_iter()
+        .filter(|v| ctx.schemas.resolve(&v.path).is_some())
+        .map(|v| {
+            // The deepest path of the violation that some layer wrote, for its file and position.
+            let from = (1..=v.path.len()).rev().find_map(|n| {
+                let (_, at) = merged
+                    .origins
+                    .iter()
+                    .find(|(p, _)| p.starts_with(&v.path[..n]))?;
+                Some(provenance(*at, &v.path[..n]))
+            });
+            let mut refusal = v.into_refusal();
+            if let Some(from) = from {
+                (refusal.file, refusal.line, refusal.column) = (from.file, from.line, from.column);
+            }
+            refusal
+        })
+        .collect();
+    errors.sort_by(|a, b| {
+        (&a.file, a.line, a.column, &a.path).cmp(&(&b.file, b.line, b.column, &b.path))
     });
+    fail_if_any(errors)?;
     Ok(Snapshot {
         value: merged.value.to_json(),
-        origins: origins.collect(),
-        revisions: revisions.collect(),
-        accounts: if req.class == SessionClass::Confined {
-            AccountsState::UnavailableConfined
-        } else {
-            AccountsState::Present
+        origins: merged
+            .origins
+            .iter()
+            .map(|(path, at)| Origin {
+                described: ctx.schemas.resolve(path).is_some(),
+                provenance: provenance(*at, path),
+                path: path.clone(),
+            })
+            .collect(),
+        revisions: srcs
+            .iter()
+            .map(|s| {
+                let revision = s.file.as_ref().map(|f| f.revision.clone());
+                (s.role, revision.unwrap_or_else(|| "absent".into()))
+            })
+            .collect(),
+        accounts: match req.class {
+            SessionClass::Confined => AccountsState::UnavailableConfined,
+            SessionClass::Unconfined => AccountsState::Present,
         },
     })
 }

@@ -15,7 +15,7 @@ use jsonschema::error::ValidationErrorKind as Kind;
 use jsonschema::{Draft, Registry, Validator};
 use serde_json::{json, Value};
 
-use crate::schema::Schemas;
+use crate::schema::{unescape_pointer, Schemas};
 use crate::ConfigRefusal;
 
 /// One failed keyword: where in the checked value, which keyword, and the schema location of that
@@ -25,6 +25,16 @@ pub struct Violation {
     pub path: Vec<Segment>,
     pub keyword: String,
     pub schema_path: String,
+}
+
+impl Violation {
+    /// The `config-schema` refusal of this violation, without a file position.
+    pub(crate) fn into_refusal(self) -> ConfigRefusal {
+        let mut refusal = ConfigRefusal::new("config-schema").at_path(&self.path);
+        let detail = refusal.detail_mut();
+        (detail.keyword, detail.schema_path) = (Some(self.keyword), Some(self.schema_path));
+        refusal
+    }
 }
 
 /// A refusal of the crate itself (a panic caught, a schema it cannot build) carries no value.
@@ -37,7 +47,7 @@ fn segments(instance: &Value, pointer: &str) -> Vec<Segment> {
     let mut node = instance;
     let mut out = Vec::new();
     for token in pointer.split('/').skip(1) {
-        let token = token.replace("~1", "/").replace("~0", "~");
+        let token = unescape_pointer(token);
         let (segment, next) = match (node, token.parse::<usize>()) {
             (Value::Array(items), Ok(i)) => (Segment::Index(i), items.get(i)),
             _ => (Segment::Key(token.clone()), node.get(&token)),
@@ -116,11 +126,7 @@ const META_ID: &str = "urn:fgos:config-schema-meta:v1";
 /// The rules every section schema must satisfy, as data: a `$defs` entry per rule id, named after it
 /// (`contracts/config-schema.meta.v1.json`).
 fn contract() -> &'static Value {
-    static CONTRACT: OnceLock<Value> = OnceLock::new();
-    CONTRACT.get_or_init(|| {
-        serde_json::from_str(include_str!("../../contracts/config-schema.meta.v1.json"))
-            .unwrap_or(Value::Null)
-    })
+    contract!("config-schema.meta.v1.json")
 }
 
 /// The rule ids a section schema `doc` breaks, each with the path in `doc` of the failing keyword.

@@ -9,6 +9,17 @@
 //! file, path and position, never a value of the input (spec section 9).
 #![forbid(unsafe_code)]
 
+/// The contract document `contracts/<name>`, parsed once; null when it does not parse.
+macro_rules! contract {
+    ($name:literal) => {{
+        static CONTRACT: std::sync::OnceLock<serde_json::Value> = std::sync::OnceLock::new();
+        CONTRACT.get_or_init(|| {
+            serde_json::from_str(include_str!(concat!("../../contracts/", $name)))
+                .unwrap_or(serde_json::Value::Null)
+        })
+    }};
+}
+
 pub mod error;
 pub mod locks;
 // Modules below are stubs; each names the phase that fills it.

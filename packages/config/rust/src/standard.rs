@@ -5,7 +5,7 @@ use fgos_yaml_doc::merge::{merge, NoRules};
 use fgos_yaml_doc::{Document, Segment, Span};
 use serde_json::Value;
 
-use crate::schema::{json_at, load, Schemas};
+use crate::schema::{json_at, key_span, load, Schemas};
 use crate::{bundle, ConfigRefusal};
 
 /// One standard file: its section (the file stem), the parsed file and its JSON form.
@@ -74,7 +74,6 @@ impl Standard {
             return None;
         };
         let file = self.files.iter().find(|f| f.name == *section)?;
-        let spans = file.doc.span_of(path)?;
-        Some((file.doc.file(), spans.key.unwrap_or(spans.value)))
+        Some((file.doc.file(), key_span(&file.doc, path)?))
     }
 }

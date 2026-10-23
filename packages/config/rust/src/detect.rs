@@ -18,31 +18,27 @@ impl Detectors for NoDetectors {
     }
 }
 
+/// Collects the detectable paths at and below `at` (the section root itself is never one).
 fn walk<'a>(
     s: &'a Schemas,
-    at: &At<'a>,
-    inh: &Inherited<'a>,
+    at: At<'a>,
+    mut inh: Inherited<'a>,
     path: &mut Vec<Segment>,
     out: &mut Vec<Vec<Segment>>,
 ) {
+    let Some(at) = s.enter(at, &mut inh) else {
+        return;
+    };
+    if path.len() > 1 && inh.get("x-fgos-absent") == Some("detected") {
+        out.push(path.clone());
+    }
     if path.len() >= 12 {
         return;
     }
-    let names = at.node["properties"]
-        .as_object()
-        .into_iter()
-        .flat_map(|m| m.keys());
-    for name in names {
-        let mut inh = inh.clone();
-        let kid = s
-            .sub(at, "properties", Some(name))
-            .and_then(|k| s.enter(k, &mut inh));
-        let Some(kid) = kid else { continue };
-        path.push(Segment::Key(name.clone()));
-        if inh.get("x-fgos-absent") == Some("detected") {
-            out.push(path.clone());
-        }
-        walk(s, &kid, &inh, path, out);
+    for (name, kid) in s.children(&at) {
+        let Some(name) = name else { continue };
+        path.push(Segment::Key(name.to_string()));
+        walk(s, kid, inh.clone(), path, out);
         path.pop();
     }
 }
@@ -51,16 +47,8 @@ fn walk<'a>(
 pub(crate) fn paths(s: &Schemas) -> Vec<Vec<Segment>> {
     let mut out = Vec::new();
     for (i, section) in s.sections.iter().enumerate() {
-        let mut inh = Inherited::default();
-        if let Some(root) = s.enter(s.root(i), &mut inh) {
-            walk(
-                s,
-                &root,
-                &inh,
-                &mut vec![Segment::Key(section.name.clone())],
-                &mut out,
-            );
-        }
+        let path = &mut section.path();
+        walk(s, s.root(i), Inherited::default(), path, &mut out);
     }
     out
 }

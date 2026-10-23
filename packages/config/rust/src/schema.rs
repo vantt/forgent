@@ -6,18 +6,14 @@
 use std::sync::OnceLock;
 
 use fgos_yaml_doc::path::format_path;
-use fgos_yaml_doc::{parse, Document, Profile, Segment};
+use fgos_yaml_doc::{parse, Document, Profile, Segment, Span};
 use serde_json::Value;
 
 use crate::validate::Checker;
 use crate::{bundle, ConfigRefusal};
 
 fn contract() -> &'static Value {
-    static CONTRACT: OnceLock<Value> = OnceLock::new();
-    CONTRACT.get_or_init(|| {
-        serde_json::from_str(include_str!("../../contracts/annotations.v1.json"))
-            .unwrap_or(Value::Null)
-    })
+    contract!("annotations.v1.json")
 }
 
 /// The closed annotation list: name, allowed values and default (when it has one).
@@ -43,6 +39,13 @@ pub struct Section {
     pub name: String,
     pub doc: Document,
     pub root: Value,
+}
+
+impl Section {
+    /// The config path of the section itself: its name.
+    pub(crate) fn path(&self) -> Vec<Segment> {
+        vec![Segment::Key(self.name.clone())]
+    }
 }
 
 /// Visits every node below `value` with its path; `visit` returns whether to look deeper.
@@ -78,6 +81,44 @@ pub(crate) fn json_at<'a>(value: &'a Value, path: &[Segment]) -> Option<&'a Valu
         Segment::Key(key) => node.get(key.as_str()),
         Segment::Index(index) => node.get(*index),
     })
+}
+
+/// Sets (or, with `None`, removes) the value at a key path, creating the mappings above it.
+pub(crate) fn json_put(node: &mut Value, path: &[Segment], new: Option<Value>) {
+    let Some((Segment::Key(key), rest)) = path.split_first() else {
+        return;
+    };
+    if new.is_some() && !node.is_object() {
+        *node = Value::Object(Default::default());
+    }
+    let Some(map) = node.as_object_mut() else {
+        return;
+    };
+    if rest.is_empty() {
+        match new {
+            Some(value) => map.insert(key.clone(), value),
+            None => map.remove(key),
+        };
+        return;
+    }
+    let child = match new {
+        Some(_) => Some(map.entry(key.clone()).or_insert(Value::Null)),
+        None => map.get_mut(key),
+    };
+    if let Some(child) = child {
+        json_put(child, rest, new);
+    }
+}
+
+/// Where a path starts in a parsed file: its key when it has one, else its value.
+pub(crate) fn key_span(doc: &Document, path: &[Segment]) -> Option<Span> {
+    let spans = doc.span_of(path)?;
+    Some(spans.key.unwrap_or(spans.value))
+}
+
+/// A JSON Pointer token with its `~1` and `~0` escapes undone.
+pub(crate) fn unescape_pointer(token: &str) -> String {
+    token.replace("~1", "/").replace("~0", "~")
 }
 
 pub struct Schemas {
@@ -141,12 +182,6 @@ impl<'a> Resolved<'a> {
     }
 }
 
-fn refused(file: &str) -> ConfigRefusal {
-    let mut refusal = ConfigRefusal::new("config-parse");
-    refusal.file = Some(file.to_string());
-    refusal
-}
-
 /// A bundled or fixture file: strict-config parse, JSON form, the document kept for positions.
 pub(crate) fn load(file: &str, bytes: &[u8]) -> Result<(Document, Value), ConfigRefusal> {
     let doc = parse(bytes, Profile::StrictConfig, file).map_err(ConfigRefusal::parse)?;
@@ -162,7 +197,7 @@ impl Schemas {
             let file = format!("{name}.schema.yaml");
             let (doc, root) = load(&file, bytes)?;
             if !root.is_object() {
-                return Err(refused(&file));
+                return Err(ConfigRefusal::new("config-parse").in_file(&file));
             }
             sections.push(Section {
                 name: name.to_string(),
@@ -203,11 +238,10 @@ impl Schemas {
             _ => self.sections.iter().position(|s| s.root["$id"] == base)?,
         };
         let node = self.sections[sec].root.pointer(pointer)?;
-        let unescape = |t: &str| t.replace("~1", "/").replace("~0", "~");
         let loc = pointer
             .split('/')
             .skip(1)
-            .map(|t| Segment::Key(unescape(t)))
+            .map(|t| Segment::Key(unescape_pointer(t)))
             .collect();
         Some(At { sec, node, loc })
     }
@@ -239,6 +273,26 @@ impl Schemas {
             node,
             loc,
         })
+    }
+
+    /// The schema nodes one level below `at`, before `$ref`: each named property with its name,
+    /// then `additionalProperties` and `items` with none.
+    pub(crate) fn children<'a>(&self, at: &At<'a>) -> Vec<(Option<&'a str>, At<'a>)> {
+        let node: &'a Value = at.node;
+        let named = node["properties"]
+            .as_object()
+            .into_iter()
+            .flat_map(|m| m.keys());
+        let named = named.filter_map(|name| {
+            Some((Some(name.as_str()), self.sub(at, "properties", Some(name))?))
+        });
+        let others = [
+            self.sub(at, "additionalProperties", None),
+            self.sub(at, "items", None),
+        ];
+        named
+            .chain(others.into_iter().flatten().map(|kid| (None, kid)))
+            .collect()
     }
 
     /// The schema node (before `$ref`) of a child: `properties` wins over `additionalProperties`;

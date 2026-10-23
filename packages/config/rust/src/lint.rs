@@ -5,7 +5,7 @@
 use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{Document, Segment};
 
-use crate::schema::{descend, own, At, Schemas};
+use crate::schema::{descend, key_span, own, At, Schemas};
 use crate::standard::Standard;
 use crate::validate::meta_check;
 
@@ -20,7 +20,7 @@ pub struct Finding {
 }
 
 fn finding(id: &'static str, doc: &Document, at: &[Segment], path: &[Segment]) -> Finding {
-    let span = doc.span_of(at).map(|s| s.key.unwrap_or(s.value));
+    let span = key_span(doc, at);
     Finding {
         id,
         file: doc.file().to_string(),
@@ -66,12 +66,11 @@ pub fn cross_node(schemas: &Schemas, standard: &Standard) -> Vec<Finding> {
         {
             out.push(finding("schema-id", &section.doc, &[], &[]));
         }
-        let path = vec![Segment::Key(section.name.clone())];
         walk(
             schemas,
             standard,
             schemas.root(sec),
-            Some(path),
+            Some(section.path()),
             "both",
             &mut Vec::new(),
             &mut out,
@@ -117,23 +116,9 @@ fn walk(
     }
     let scope = own_scope.unwrap_or(parent_scope);
     stack.push(key);
-    let named = last.node["properties"].as_object().into_iter().flatten();
-    let children = named
-        .filter_map(|(name, _)| {
-            let child = schemas.sub(&last, "properties", Some(name))?;
-            Some((
-                child,
-                path.clone()
-                    .map(|p| [p, vec![Segment::Key(name.clone())]].concat()),
-            ))
-        })
-        .chain(
-            schemas
-                .sub(&last, "additionalProperties", None)
-                .map(|c| (c, None)),
-        )
-        .chain(schemas.sub(&last, "items", None).map(|c| (c, None)));
-    for (child, path) in children.collect::<Vec<_>>() {
+    for (name, child) in schemas.children(&last) {
+        let path = name
+            .and_then(|name| Some([path.clone()?, vec![Segment::Key(name.to_string())]].concat()));
         walk(schemas, standard, child, path, scope, stack, out);
     }
     stack.pop();
@@ -178,9 +163,7 @@ fn standard_valid(schemas: &Schemas, standard: &Standard, out: &mut Vec<Finding>
         return;
     };
     for v in violations.iter().filter(|v| v.keyword != "required") {
-        let (file, span) = standard
-            .span_of(&v.path)
-            .map_or((None, None), |(f, s)| (Some(f), Some(s)));
+        let (file, span) = standard.span_of(&v.path).unzip();
         out.push(Finding {
             id: "standard-invalid",
             file: file.unwrap_or_default().to_string(),

@@ -2,6 +2,9 @@
 //! never a value (spec section 9).
 use std::fmt;
 
+use fgos_yaml_doc::path::format_path;
+use fgos_yaml_doc::{Segment, Span};
+
 /// The rarely set parts of a refusal. Never a value of the input.
 #[derive(Clone, Default, PartialEq, Eq)]
 pub struct Detail {
@@ -40,6 +43,22 @@ impl ConfigRefusal {
             column: None,
             detail: None,
         }
+    }
+
+    pub(crate) fn in_file(mut self, file: &str) -> Self {
+        self.file = Some(file.to_string());
+        self
+    }
+
+    pub(crate) fn at_path(mut self, path: &[Segment]) -> Self {
+        self.path = Some(format_path(path));
+        self
+    }
+
+    pub(crate) fn at_span(mut self, span: Option<Span>) -> Self {
+        self.line = span.map(|s| s.line);
+        self.column = span.map(|s| s.column);
+        self
     }
 
     pub fn detail_mut(&mut self) -> &mut Detail {

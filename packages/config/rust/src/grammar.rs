@@ -2,7 +2,6 @@
 //! `@fgos:why` and `@fgos:doc` lines, the new-file header and the block of lines above a key. Pure
 //! over text; applying the lines to a document belongs to the write transaction. Lists live in
 //! `contracts/comment-grammar.v1.json`.
-use std::sync::OnceLock;
 
 use fgos_identity::WriterIdentity;
 use fgos_yaml_doc::comment::sanitize;
@@ -14,11 +13,7 @@ use crate::ConfigRefusal;
 const REASON_REQUIRED: &str = "config-comment-reason-required";
 
 fn contract() -> &'static Value {
-    static CONTRACT: OnceLock<Value> = OnceLock::new();
-    CONTRACT.get_or_init(|| {
-        serde_json::from_str(include_str!("../../contracts/comment-grammar.v1.json"))
-            .unwrap_or(Value::Null)
-    })
+    contract!("comment-grammar.v1.json")
 }
 
 fn text(key: &str) -> &'static str {
