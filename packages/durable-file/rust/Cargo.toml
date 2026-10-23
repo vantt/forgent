@@ -3,8 +3,19 @@ name = "fgos-durable-file"
 version.workspace = true
 edition.workspace = true
 
+[dependencies]
+# The revision of a file is the sha256 of the bytes read from the descriptor that was opened.
+sha2.workspace = true
+
 [target.'cfg(unix)'.dependencies]
 libc.workspace = true
+# Safe wrappers for openat2 / openat / mkdirat, so the no-follow open needs no `unsafe` here or in
+# fgos-config. Already in Cargo.lock (via xattr); `fs` is the only feature needed, `std` for io::Error.
+rustix = { version = "=1.1.4", default-features = false, features = ["std", "fs"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys.workspace = true
+
+[target.'cfg(unix)'.dev-dependencies]
+# Tests set the process umask through the safe wrapper.
+rustix = { version = "=1.1.4", default-features = false, features = ["std", "fs", "process"] }
