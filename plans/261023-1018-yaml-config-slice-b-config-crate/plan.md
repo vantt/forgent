@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice B: crate fgos-config, JSON Schema section schemas, standard files, two locks"
 description: "The Rust crate fgos-config (loading JSON Schema section schemas, x-fgos annotation lint, validation through an existing validator crate, snapshot with provenance and cache, one-file write transaction, comment grammar, redaction), the bundled section schemas (shape) and standard files (values), and the project-config and global-config locks. Rust-only; no Node door, no migration."
-status: in-progress
+status: completed
 priority: P1
 effort: 52h
 branch: cfg/slice-b (linked worktree; never the shared main checkout)
@@ -87,7 +87,7 @@ Measured after 04b: `packages/config/rust/src` is 1,230 lines (comments and blan
 | `write.rs` | 10 | 200 |
 | `redact.rs` | 11 | 80 |
 
-Second revision (owner, 2026-10-23 14:01, option A): after the simplification pass the crate was 1,896 lines (about 1,540 of code), so the crate ceiling is **2,200 lines**; the `write.rs` (200) and `redact.rs` (80) caps stand.
+Final ceiling (owner, 2026-10-23 15:00): 2,400 lines, landed at 2,372. Second revision (owner, 2026-10-23 14:01, option A): after the simplification pass the crate was 1,896 lines (about 1,540 of code), so the crate ceiling is **2,200 lines**; the `write.rs` (200) and `redact.rs` (80) caps stand.
 
 Durable File's `beneath.rs` (281) is a shared primitive and is counted with Durable File, not here. Schema and standard YAML are data and counted apart.
 
