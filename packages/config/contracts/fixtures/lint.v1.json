@@ -1,0 +1,441 @@
+{
+ "version": 1,
+ "about": "Owning cases of the cross-node and cross-file lint rules (src/lint.rs). The per-node rules are the meta-schema's (meta.v1.json). Findings are compared by id; 'at' also by file, line and column.",
+ "cases": [
+  {
+   "id": "lint-scope-conflict",
+   "why": "spec 3: a project-only key under a global-only ancestor",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    x-fgos-scope: global-only",
+      "    properties:",
+      "      b:",
+      "        x-fgos-scope: project-only"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": [
+     "schema-scope-conflict"
+    ],
+    "at": [
+     {
+      "id": "schema-scope-conflict",
+      "file": "s.schema.yaml",
+      "line": 6,
+      "column": 7
+     }
+    ]
+   }
+  },
+  {
+   "id": "lint-scope-conflict-reverse",
+   "why": "the reverse direction conflicts too",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    x-fgos-scope: project-only",
+      "    properties:",
+      "      b:",
+      "        x-fgos-scope: global-only"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": [
+     "schema-scope-conflict"
+    ]
+   }
+  },
+  {
+   "id": "lint-scope-narrowing-is-fine",
+   "why": "both under global-only, and the same scope again, are not a conflict",
+   "input": {
+    "schemas": {
+     "s": [
+      "x-fgos-scope: global-only",
+      "properties:",
+      "  a:",
+      "    x-fgos-scope: global-only",
+      "  b:",
+      "    x-fgos-scope: both"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "lint-absent-conflict",
+   "why": "x-fgos-absent is used only where the standard holds no value",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    x-fgos-absent: required"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "schema-absent-conflict"
+    ]
+   }
+  },
+  {
+   "id": "lint-absent-without-standard-value",
+   "why": "absent where the standard holds nothing is the legal use",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    x-fgos-absent: required"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  b: 1"
+     ]
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "lint-id-section-mismatch",
+   "why": "the $id names the file's own section",
+   "input": {
+    "schemas": {
+     "s": [
+      "$id: urn:fgos:config-schema:other:v1",
+      "type: object"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": [
+     "schema-id"
+    ]
+   }
+  },
+  {
+   "id": "lint-ref-dangling",
+   "why": "a $ref that points nowhere in the bundled set",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    $ref: '#/$defs/missing'"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": [
+     "schema-dialect"
+    ]
+   }
+  },
+  {
+   "id": "lint-ref-cycle",
+   "why": "a $ref cycle would make a path walk endless",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    $ref: '#/$defs/n'",
+      "$defs:",
+      "  n:",
+      "    properties:",
+      "      again:",
+      "        $ref: '#/$defs/n'"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "findings": [
+     "schema-dialect"
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-orphan-without-schema",
+   "why": "a standard file whose section has no schema",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "z": [
+      "z:",
+      "  a: 1"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-orphan"
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-orphan-extra-key",
+   "why": "a standard file holds exactly the one key named by its stem",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "other: 2"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-orphan"
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-forbidden-secret",
+   "why": "the standard holds no secret value",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  tok:",
+      "    x-fgos-sensitivity: secret-value",
+      "    x-fgos-scope: global-only",
+      "  pool:",
+      "    x-fgos-file: accounts",
+      "    x-fgos-scope: global-only",
+      "    additionalProperties:",
+      "      type: integer",
+      "  host:",
+      "    x-fgos-absent: detected",
+      "  ok:",
+      "    type: string"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  tok: x"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-forbidden-key"
+    ],
+    "at": [
+     {
+      "id": "standard-forbidden-key",
+      "file": "s.yaml",
+      "line": 2,
+      "column": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-forbidden-file-placed",
+   "why": "the standard holds no accounts or token entry",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  tok:",
+      "    x-fgos-sensitivity: secret-value",
+      "    x-fgos-scope: global-only",
+      "  pool:",
+      "    x-fgos-file: accounts",
+      "    x-fgos-scope: global-only",
+      "    additionalProperties:",
+      "      type: integer",
+      "  host:",
+      "    x-fgos-absent: detected",
+      "  ok:",
+      "    type: string"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  pool:",
+      "    a: 1"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-forbidden-key"
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-forbidden-detected",
+   "why": "the standard holds no machine-detected value (the absent annotation on a path the standard answers is also a conflict)",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  tok:",
+      "    x-fgos-sensitivity: secret-value",
+      "    x-fgos-scope: global-only",
+      "  pool:",
+      "    x-fgos-file: accounts",
+      "    x-fgos-scope: global-only",
+      "    additionalProperties:",
+      "      type: integer",
+      "  host:",
+      "    x-fgos-absent: detected",
+      "  ok:",
+      "    type: string"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  host: box"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-forbidden-key",
+     "schema-absent-conflict"
+    ]
+   }
+  },
+  {
+   "id": "lint-clean-combined",
+   "why": "a legitimate global-only account entry and an ordinary standard value raise nothing",
+   "input": {
+    "schemas": {
+     "s": [
+      "properties:",
+      "  tok:",
+      "    x-fgos-sensitivity: secret-value",
+      "    x-fgos-scope: global-only",
+      "  pool:",
+      "    x-fgos-file: accounts",
+      "    x-fgos-scope: global-only",
+      "    additionalProperties:",
+      "      type: integer",
+      "  host:",
+      "    x-fgos-absent: detected",
+      "  ok:",
+      "    type: string"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  ok: fine"
+     ]
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "lint-standard-invalid",
+   "why": "the standard layer is judged by its own schema: a value of the wrong type is refused at its place",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a:",
+      "    type: integer",
+      "    description: A.",
+      "  b:",
+      "    type: string",
+      "    description: B."
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: 2"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-invalid"
+    ],
+    "at": [
+     {
+      "id": "standard-invalid",
+      "file": "s.yaml",
+      "line": 3,
+      "column": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-required-is-for-the-merge",
+   "why": "a standard file holds differences only, so a missing required key is not an error there",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a:",
+      "    type: integer",
+      "    description: A.",
+      "  b:",
+      "    type: string",
+      "    description: B."
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  b: x"
+     ]
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  }
+ ]
+}

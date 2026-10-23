@@ -94,14 +94,14 @@ pub fn random(kind: RandomKind) -> io::Result<String> {
     ))
 }
 
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 pub use sequence::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 
-#[cfg(feature = "provider")]
+#[cfg(feature = "directory")]
 mod sequence {
     use super::SequenceKind;
     use crate::project::open_repository;
-    use crate::provider::Refusal;
+    use crate::refusal::Refusal;
     use crate::text::random_bytes;
     use fgos_git::{OperationError, RepoHandle, SequencePush};
     use std::fs;
@@ -125,6 +125,7 @@ mod sequence {
         let stderr = String::from_utf8_lossy(&e.stderr);
         let stderr = stderr.trim();
         Refusal {
+            candidates: Vec::new(),
             reason: "sequence-unreachable",
             detail: format!(
                 "the counter could not be read or written ({}{}{}); no number was claimed. Retry when the remote is reachable: the id format never changes to work around a missing network",
@@ -186,6 +187,7 @@ mod sequence {
             }
         }
         Err(Refusal {
+            candidates: Vec::new(),
             reason: "sequence-contended",
             detail: format!(
                 "the {counter} counter moved under {MAX_CLAIM_ATTEMPTS} claims in a row; no number was claimed, run the command again"
@@ -211,6 +213,7 @@ mod sequence {
                 kind.counter(),
                 e.cause
             ),
+            candidates: Vec::new(),
         })?;
         let tip = driver
             .sequence_tip(&repo, &home, kind.counter())
@@ -234,6 +237,7 @@ mod sequence {
     /// Different for every claim: the commit of a claim must differ from a racing claim's.
     fn claimant() -> Result<String, Refusal> {
         let bytes = random_bytes::<8>().map_err(|e| Refusal {
+            candidates: Vec::new(),
             reason: "random-unavailable",
             detail: e.to_string(),
         })?;

@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Shell commands that must pass before work returns or merges.
+invariantChecks:
+  # @fgos:doc Shell commands run at return and merge; each must exit 0, and an empty list runs no check. Default: [].
+  commands: []

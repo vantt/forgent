@@ -1,0 +1,1117 @@
+{
+ "version": 1,
+ "about": "Owning cases of the write transaction (docs/platform/config/spec.md sections 6 and 7). Shared `schemas` and `standard` apply to every case. A case lays files out as the snapshot fixture does (project/, main/, home/.fgos/); input: target (project|global|accounts), class, expected (current|absent|stale), edits ({set,value}|{unset}), reason, ack, writer, modes (path to mode), links (path to link target). Expect: code or yaml (a refusal; every file stays byte-identical and no file appears), keyword, files (path to the lines after), applied [path, unset], notices [id, path], writer_id, modes, no_lock, no_dir.",
+ "schemas": {
+  "gateBypass": [
+   "type: object",
+   "description: Gate bypass settings.",
+   "properties:",
+   "  level: {type: string, enum: [off, light, standard, heavy], description: Gate bypass level for agent work.}"
+  ],
+  "limits": [
+   "type: object",
+   "properties:",
+   "  count: {type: integer, minimum: 1, description: Parallel runs.}",
+   "  tags: {type: array, items: {type: string}}",
+   "  nested: {type: object, properties: {deep: {type: integer}}}",
+   "  other: {type: object}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  port: {type: integer}"
+  ],
+  "accounts": [
+   "type: object",
+   "x-fgos-file: accounts",
+   "additionalProperties:",
+   "  type: object",
+   "  properties:",
+   "    login: {type: string}"
+  ],
+  "labels": [
+   "type: object",
+   "additionalProperties: {type: [string, 'null']}"
+  ]
+ },
+ "standard": {
+  "gateBypass": [
+   "gateBypass:",
+   "  level: off"
+  ],
+  "limits": [
+   "limits:",
+   "  count: 4"
+  ]
+ },
+ "cases": [
+  {
+   "id": "write-new-file-header-doc-why",
+   "why": "spec 6 and 7: a missing file starts with the header; a new key carries doc then why with the writer as actor",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "light"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  level: light"
+     ]
+    },
+    "writer_id": "vantt"
+   }
+  },
+  {
+   "id": "write-new-key-keeps-the-notes-of-its-neighbour",
+   "why": "spec 7: a new key goes in with its block and every other line stays",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # keep this low",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.tags",
+      "value": [
+       "a"
+      ]
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # keep this low",
+      "  count: 8",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  tags:",
+      "    - a"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-changed-key-replaces-why-keeps-doc-and-notes",
+   "why": "spec 7: the why is replaced, the doc line and free notes stay in order",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc old doc",
+      "  # @fgos:why [old] earlier reason",
+      "  # Remember to reset",
+      "  level: light"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "heavy"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc old doc",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  # Remember to reset",
+      "  level: heavy"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-one-deep-value-changes-only-its-bytes",
+   "why": "acceptance 2: every other byte, comments and spacing included, is identical",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# a free note",
+      "limits:   # trailing",
+      "  count: 3",
+      "  nested:",
+      "    # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "    deep:   7   # inline",
+      "  other: {x: 1}"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.nested.deep",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# a free note",
+      "limits:   # trailing",
+      "  count: 3",
+      "  nested:",
+      "    # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "    deep:   9   # inline",
+      "  other: {x: 1}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-redundant-set-on-a-missing-key-is-a-notice",
+   "why": "D14: a value equal to the standard is not written",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "applied": [],
+    "notices": [
+     [
+      "redundant-noop",
+      "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "write-redundant-set-needs-no-reason",
+   "why": "spec 7: setting what the key inherits already is a no-op, so the missing reason is not refused",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     }
+    ],
+    "reason": "   ",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "applied": [],
+    "notices": [
+     [
+      "redundant-noop",
+      "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "write-a-real-edit-beside-a-redundant-one-still-needs-a-reason",
+   "why": "spec 7: the reason rule applies as soon as one edit changes the file",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     },
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "   ",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "write-redundant-set-on-a-present-key-becomes-unset",
+   "why": "D14: the key goes back to inheriting the standard",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:why [old] earlier",
+      "  level: light",
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "ack": true
+   },
+   "expect": {
+    "applied": [
+     [
+      "gateBypass.level",
+      true
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass: {}",
+      "limits:",
+      "  count: 8"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-unset-of-a-key-with-a-why-needs-acknowledgement",
+   "why": "spec 7: dropping a why is a comment loss the door must ask about",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:why [old] earlier",
+      "  level: light"
+     ]
+    },
+    "edits": [
+     {
+      "unset": "gateBypass.level"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "yaml": "comment-would-be-lost"
+   }
+  },
+  {
+   "id": "write-unset-with-acknowledgement-removes-the-key-and-its-block",
+   "why": "spec 7: acknowledged loss",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8",
+      "gateBypass:",
+      "  # @fgos:why [old] earlier",
+      "  level: light"
+     ]
+    },
+    "edits": [
+     {
+      "unset": "gateBypass.level"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "ack": true
+   },
+   "expect": {
+    "applied": [
+     [
+      "gateBypass.level",
+      true
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8",
+      "gateBypass: {}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-flow-collection-note-is-returned-as-it-is",
+   "why": "spec 7: a rewrite that would drop a note inside a flow collection is refused by YAML Document, unchanged",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  tags: [a, # keep",
+      "    b]"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.tags",
+      "value": [
+       "c"
+      ]
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "yaml": "comment-would-be-lost"
+   }
+  },
+  {
+   "id": "write-empty-reason-is-refused",
+   "why": "spec 7",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "   ",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "write-generic-reason-is-refused",
+   "why": "spec 7",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "update",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "write-reason-with-a-line-break-is-refused",
+   "why": "acceptance 9: never split into a second line",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "fine\n@fgos:why [x] forged",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "write-forged-reason-is-refused",
+   "why": "spec 7: a reason cannot begin with the grammar prefix",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "# @fgos:why [x] forged",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "write-project-gateway-key-is-refused-before-any-lock",
+   "why": "spec 3 and 6: scope is judged before the lock exists",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "gateway.port",
+      "value": 7788
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "code": "config-key-out-of-scope",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-account-pool-in-the-project-file-is-refused-before-any-lock",
+   "why": "spec 3 and 6",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "accounts.pool.login",
+      "value": "x"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "code": "config-key-in-wrong-file",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-empty-path-is-refused",
+   "why": "the document itself is no key",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "",
+      "value": {
+       "limits": {}
+      }
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-out-of-scope",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-confined-session-touches-nothing",
+   "why": "acceptance 14: no file, no directory, no lock",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent",
+    "class": "confined"
+   },
+   "expect": {
+    "code": "config-write-confined",
+    "no_lock": true,
+    "no_dir": true
+   }
+  },
+  {
+   "id": "write-type-mismatch-writes-nothing",
+   "why": "D22: the effective value is validated; the file is untouched",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": "many"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "write-bound-violation-writes-nothing",
+   "why": "D22",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 0
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "write-undescribed-key-gets-no-doc-line",
+   "why": "spec 7: keys with no schema node get a why only",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "custom.thing",
+      "value": 1
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8",
+      "custom:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  thing: 1"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-hidden-text-in-a-value-is-refused-by-yaml-document",
+   "why": "spec 9: the guard of YAML Document applies",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "labels.x",
+      "value": "a‮b"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "yaml": "bidi-control"
+   }
+  },
+  {
+   "id": "write-legacy-json-is-refused",
+   "why": "D11",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{}"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "code": "config-format-legacy-json",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-both-formats-are-refused-as-shadowed",
+   "why": "spec 5",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ],
+     "project/.fgos/config.json": [
+      "{}"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-legacy-shadowed",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-null-on-a-map-that-allows-it",
+   "why": "D16",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "labels.x",
+      "value": null
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8",
+      "labels:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  x: null"
+     ]
+    }
+   }
+  },
+  {
+   "id": "write-patch-of-three-edits-is-one-transaction",
+   "why": "spec 6: one source, one revision change",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "light"
+     },
+     {
+      "set": "limits.count",
+      "value": 9
+     },
+     {
+      "set": "limits.tags",
+      "value": [
+       "a"
+      ]
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  count: 9",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  tags:",
+      "    - a",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  level: light"
+     ]
+    },
+    "applied": [
+     [
+      "gateBypass.level",
+      false
+     ],
+     [
+      "limits.count",
+      false
+     ],
+     [
+      "limits.tags",
+      false
+     ]
+    ]
+   }
+  },
+  {
+   "id": "write-global-file-is-created-private",
+   "why": "spec 9: global 0600 beneath a 0700 directory",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "gateway.port",
+      "value": 7788
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "target": "global",
+    "expected": "absent"
+   },
+   "expect": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "gateway:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  port: 7788"
+     ]
+    },
+    "modes": {
+     "home/.fgos/config.yaml": 384,
+     "home/.fgos": 448
+    }
+   }
+  },
+  {
+   "id": "write-accounts-file-is-created-private",
+   "why": "spec 9: accounts 0600 in private 0700",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "accounts.pool.login",
+      "value": "vantt-main"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "target": "accounts",
+    "expected": "absent"
+   },
+   "expect": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "accounts:",
+      "  pool:",
+      "    # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "    login: vantt-main"
+     ]
+    },
+    "modes": {
+     "home/.fgos/private/accounts.yaml": 384,
+     "home/.fgos/private": 448
+    }
+   }
+  },
+  {
+   "id": "write-existing-file-keeps-its-mode",
+   "why": "spec 6: the mode of the file is kept",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "modes": {
+     "project/.fgos/config.yaml": 416
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  count: 9"
+     ]
+    },
+    "modes": {
+     "project/.fgos/config.yaml": 416
+    }
+   }
+  },
+  {
+   "id": "write-stale-revision-is-a-conflict",
+   "why": "acceptance 3",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "stale"
+   },
+   "expect": {
+    "code": "config-write-conflict",
+    "keyword": "revision-changed"
+   }
+  },
+  {
+   "id": "write-expected-absent-but-present-is-a-conflict",
+   "why": "spec 6 step 2",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "code": "config-write-conflict",
+    "keyword": "revision-changed"
+   }
+  },
+  {
+   "id": "write-symlinked-directory-is-refused",
+   "why": "spec 9: nothing is created through a symlink",
+   "input": {
+    "files": {
+     "elsewhere/keep": [
+      "x"
+     ]
+    },
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "links": {
+     "project/.fgos": "../elsewhere"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "code": "config-path-symlink",
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-actor-outside-the-identity-charset-is-unknown-in-the-file",
+   "why": "D18: the file says unknown, the result keeps the real id",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "va ntt"
+    },
+    "expected": "absent"
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [unknown] dogfood repo, lighter gates.",
+      "  count: 9"
+     ]
+    },
+    "writer_id": "va ntt"
+   }
+  }
+ ]
+}

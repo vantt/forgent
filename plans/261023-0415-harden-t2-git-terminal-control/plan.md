@@ -503,6 +503,35 @@ The big lead re-checked the evidence for every deviation before answering.
 
 10. **Owner answers, 2026-10-23 11:10: Q0a Q1a Q2a, Q3 A1 and A2** (parent plan decisions 18–22). Phases 10, 11, 12 and 13 run; phases 14, 15 and 16 do not. Q0 being yes lifts the assumption behind phases 1–9 and 17. The rest of phase 6 runs as one lead, Rust first, then Node: E-26, F-8, the core half of E-14, the D6 test swap, then E-13, E-15, E-16, the Node half of E-14 and the test retirements. It runs in parallel with phase 4.
 
+11. **Landing order agreed with WORK (2026-10-23 11:20; owner 11:17: WORK and HARDEN settle landing times between them on fg-server2; the owner machine still needs the owner's go).**
+   - T2 lands first, when phase 17's gates pass. HARDEN sends WORK the quiet-window start and its expected length (≈ 20 min) beforehand.
+   - WORK then rebases. Its Work cutover (stop-everything, 30–45 min, with a migrate of tracked event files) is proposed by WORK after wave 2 and its proof gate, and HARDEN stays quiet for it.
+   - If WORK's cutover is ready while T2 is still far off, the cutover goes first and T2 merges main.
+   - WORK's wave 1 edits `driver.rs` `read_paths_at` only, plus a new batch entry point, and leaves the error ladders at ~:2430/:2450 to the `layout_cause` fold of phase 5.
+12. **Terminal layout and naming review** ([report](../reports/research-261023-1112-harden-t2-terminal-layout-naming.md); owner decision 22).
+   - Taken as bug fixes in a small slice after phase 6's rest lead, with no owner choice needed:
+     - P0, geometry measured once per allocate instead of about (N+1)² herdr spawns;
+     - P4, numbered overflow tab labels;
+     - worker panes get a label, and `role` reaches the driver;
+     - P5, the unreachable 30/21/15 fallback is deleted.
+   - Asked of the owner as Q4–Q6:
+     - P1 + P2a, an `even-split` policy and whether it becomes the default;
+     - P3, the visible label format;
+     - P2b, rebalancing when the batch size is unknown.
+
+13. **Slice 5C, the publication ceremony (2026-10-23 14:35, OPC's note from WORK's measurement).**
+   - **What it addresses.** A Work `move` seal costs 29 git children; 15 of them are the publication ceremony (candidate pin, CAS, release). Together with HEAD, these make up most of the gap between WORK's branch and main in `loop.test` (387 against 191 git children per case).
+   - **What 5C does.** After 5B merges, 5C folds only the ceremony children whose answers are already known in-process.
+   - **What must hold.**
+     - The CAS stays exact-old.
+     - Recovery must still tell an interrupted publication from a finished one.
+     - The owning proofs are the crash matrices and `tests/publication.rs`.
+     - A trim that weakens either rule is dropped and named in the report.
+   - **Report.** Children per seal, before and after.
+   - **Not in T2.** The terminal layout and naming questions Q4–Q6 are still open with the owner.
+
+14. **Phase 10 dropped** (owner, 2026-10-23 17:20; parent decision 23). The macOS `relation_of` and the holder-lock macOS build fix are on the track (`e36ca7eb8`, `789ca69e7`), after the owner confirmed macOS is supported. The whole workspace compile-checks for `aarch64-apple-darwin`; it has never run on a Mac.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.

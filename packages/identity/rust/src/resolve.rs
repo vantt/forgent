@@ -72,6 +72,24 @@ impl WriterIdentity {
     }
 }
 
+/// A session id as a hook or env carries it, with the env variable that names
+/// its CLI. The only place that decides whether such a pair is a writer id.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WriterKey<'a> {
+    /// The env variable the value came from: one of [`ENV_ORDER`].
+    pub source: &'a str,
+    pub value: &'a str,
+}
+
+impl<'a> WriterKey<'a> {
+    /// The rule's env variable and the trimmed id, or `None` when `source` is
+    /// not one of the rule's env variables or the value is not usable.
+    pub fn checked(&self) -> Option<(&'static str, &'a str)> {
+        let source = ENV_ORDER.iter().find(|known| **known == self.source)?;
+        Some((*source, usable(self.value)?))
+    }
+}
+
 fn usable(value: &str) -> Option<&str> {
     let trimmed = value.trim();
     let ok = !trimmed.is_empty()
@@ -102,7 +120,8 @@ pub fn env_identity(
 ) -> Option<WriterIdentity> {
     ENV_ORDER.iter().find_map(|key| {
         let value = lookup(key)?;
-        let id = usable(&value)?.to_string();
+        let (_, id) = WriterKey { source: key, value: &value }.checked()?;
+        let id = id.to_string();
         let source = if registry_confirms(fgos_dir, &id) {
             Source::Registry
         } else {

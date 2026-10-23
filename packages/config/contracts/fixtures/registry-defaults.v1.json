@@ -1,0 +1,115 @@
+{
+ "version": 1,
+ "about": "What fgos setup seeds today for the 13 small sections, dumped once from the registry, against the bundled standard files. The runner section is the authoring equivalence fixture's. Owning test: tests/registry_defaults.rs.",
+ "source": "src/setup/registrations.mjs at commit 5a33989fa (the 14 registerConfigDefault calls)",
+ "how": "node scratch script: import CONFIG_DEFAULT_REGISTRATIONS from src/setup/registrations.mjs and print { [key]: shape } as JSON; the runner entry dropped",
+ "defaults": {
+  "gateBypass": {
+   "level": "off"
+  },
+  "cleanup": {
+   "ttlDays": 7,
+   "leafTtlDays": 0
+  },
+  "workerSlots": {
+   "ceiling": null
+  },
+  "invariantChecks": {
+   "commands": []
+  },
+  "checkpoint": {
+   "fallbackIntervalSec": 3600
+  },
+  "worktreeSetup": {
+   "commands": []
+  },
+  "ironLaw": {
+   "level": "ask"
+  },
+  "gateway": {
+   "port": 4170,
+   "token": null
+  },
+  "herdrOrchestrator": {
+   "autoDiscover": false,
+   "autoMerge": false,
+   "autoRetro": false,
+   "autoCleanup": false
+  },
+  "herdrWebDashboard": {
+   "staticServing": true
+  },
+  "docRegistry": {
+   "enforce": false
+  },
+  "terminal": {
+   "allocationGraceMs": 60000,
+   "retainFailedPaneMs": null,
+   "layout": {
+    "policy": "measured-split",
+    "minCols": 80,
+    "minRows": 20,
+    "maxPanesPerTab": 8
+   }
+  },
+  "eventStore": {
+   "remote": "origin"
+  }
+ },
+ "known-differences": [
+  {
+   "path": "gateway.token",
+   "registry": {
+    "value": null
+   },
+   "standard": {
+    "absent": true
+   },
+   "reason": "the token leaves config for the private token file (spec section 8); a standard holds no secret"
+  },
+  {
+   "path": "gateway.bind",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": "0.0.0.0"
+   },
+   "reason": "the Rust reader's DEFAULT_BIND, apps/fgos-gateway/src/gateway.rs; setup never seeded it"
+  },
+  {
+   "path": "eventStore.seal.intervalSec",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 300
+   },
+   "reason": "EVENT_STORE_DEFAULTS in src/event-store/config.mjs, what the reader assumes; the registration seeds only remote"
+  },
+  {
+   "path": "eventStore.sync.intervalSec",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 300
+   },
+   "reason": "EVENT_STORE_DEFAULTS in src/event-store/config.mjs; the registration seeds only remote"
+  },
+  {
+   "path": "eventStore.rebuild.maxAttempts",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 5
+   },
+   "reason": "EVENT_STORE_DEFAULTS in src/event-store/config.mjs; the registration seeds only remote"
+  }
+ ],
+ "schema-only": [
+  "secrets",
+  "bin"
+ ]
+}

@@ -1,0 +1,3868 @@
+{
+ "version": 1,
+ "about": "Owning cases of the snapshot: layers, merge, provenance, trusted root, confined accounts and refusals. A case writes files under project/, main/ (the trusted root, when present) and home/.fgos/ (global; private/accounts.yaml) and takes detected values from `detect`. Expect: at (path to value), absent, prov [path, layer, role, file, line, column], undescribed, described, accounts, absent_sources, errors [code, path, file, line, column, keyword, layers].",
+ "cases": [
+  {
+   "id": "snapshot-standard-only-with-provenance",
+   "why": "a file-less snapshot is the standard, each value naming its bundled file, line and column",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {},
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.a": 1,
+     "s.cat.alpha.k": "v"
+    },
+    "prov": [
+     [
+      "s.a",
+      "standard",
+      "standard",
+      "s.yaml",
+      2,
+      3
+     ],
+     [
+      "s.m.two.y",
+      "standard",
+      "standard",
+      "s.yaml",
+      8,
+      17
+     ]
+    ],
+    "absent_sources": [
+     "project",
+     "global",
+     "accounts"
+    ]
+   }
+  },
+  {
+   "id": "snapshot-project-over-global-over-standard",
+   "why": "spec 3: precedence per key",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  a: 3"
+     ],
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  a: 2",
+      "  b: g"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.a": 3,
+     "s.b": "g",
+     "s.note": "x"
+    },
+    "prov": [
+     [
+      "s.a",
+      "project",
+      "project",
+      "project:config.yaml",
+      2,
+      3
+     ],
+     [
+      "s.b",
+      "global",
+      "global",
+      "global:config.yaml",
+      3,
+      3
+     ],
+     [
+      "s.note",
+      "standard",
+      "standard",
+      "s.yaml",
+      4,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-map-merges-per-entry",
+   "why": "acceptance 5: one overridden field inherits its siblings from the standard",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  m:",
+      "    one:",
+      "      x: 9"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.m.one.x": 9,
+     "s.m.one.y": 2,
+     "s.m.two.x": 3
+    },
+    "prov": [
+     [
+      "s.m.one.x",
+      "project",
+      "project",
+      "project:config.yaml",
+      4,
+      7
+     ],
+     [
+      "s.m.one.y",
+      "standard",
+      "standard",
+      "s.yaml",
+      7,
+      17
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-replace-takes-the-map-whole",
+   "why": "x-fgos-merge: replace on a map drops the lower entries",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  rep: {z: 7}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.rep": {
+      "z": 7
+     }
+    }
+   }
+  },
+  {
+   "id": "snapshot-null-wins-and-missing-falls-through",
+   "why": "absent is not null",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  note: null"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.note": null,
+     "s.b": "std"
+    },
+    "prov": [
+     [
+      "s.note",
+      "project",
+      "project",
+      "project:config.yaml",
+      2,
+      3
+     ],
+     [
+      "s.b",
+      "standard",
+      "standard",
+      "s.yaml",
+      3,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-null-switches-off-a-standard-entry",
+   "why": "a map entry set to null where its type allows null",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  cat:",
+      "    beta: null"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cat.beta": null,
+     "s.cat.alpha.k": "v"
+    }
+   }
+  },
+  {
+   "id": "snapshot-null-where-the-type-forbids-it",
+   "why": "a null on an integer key is a schema error naming file, line, column and keyword, never the value",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  a: null"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-schema",
+      "s.a",
+      "project:config.yaml",
+      2,
+      3,
+      "type",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-lists-are-leaves",
+   "why": "acceptance 5: a list is taken whole from the highest layer",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  list: [p]"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.list": [
+      "p"
+     ]
+    },
+    "prov": [
+     [
+      "s.list[0]",
+      "project",
+      "project",
+      "project:config.yaml",
+      2,
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-a-list-over-a-map-is-a-type-error",
+   "why": "a leaf-merged list wins the layer whole and the schema reports the wrong type at the list",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  m: [1]"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-schema",
+      "s.m",
+      "project:config.yaml",
+      2,
+      3,
+      "type",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-deep-layers-of-different-kinds-name-both",
+   "why": "a deep-merged path whose layers differ in kind is never repaired: config-schema naming both layers",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  dm: [1]"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-schema",
+      "s.dm",
+      null,
+      null,
+      null,
+      "merge-type-mismatch",
+      "project,standard"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-undescribed-keys-are-kept-and-flagged",
+   "why": "a key no schema describes is kept with described false",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "extra: 1",
+      "s:",
+      "  zz: 2"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "extra": 1,
+     "s.zz": 2
+    },
+    "undescribed": [
+     "extra",
+     "s.zz"
+    ],
+    "described": [
+     "s.a"
+    ]
+   }
+  },
+  {
+   "id": "snapshot-detected-fills-an-absent-key",
+   "why": "spec 8: a detected value, provenance detected and no file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {},
+    "class": "unconfined",
+    "detect": {
+     "s.executor": "claude"
+    }
+   },
+   "expect": {
+    "at": {
+     "s.executor": "claude"
+    },
+    "prov": [
+     [
+      "s.executor",
+      "detected",
+      "detected",
+      null,
+      null,
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-detected-ranks-below-global",
+   "why": "a file value always wins over a detected one",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  executor: g"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {
+     "s.executor": "claude"
+    }
+   },
+   "expect": {
+    "at": {
+     "s.executor": "g"
+    },
+    "prov": [
+     [
+      "s.executor",
+      "global",
+      "global",
+      "global:config.yaml",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-detected-is-not-applied-where-the-standard-holds-a-value",
+   "why": "the standard value stays",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {},
+    "class": "unconfined",
+    "detect": {
+     "s.stdDetected": "claude"
+    }
+   },
+   "expect": {
+    "at": {
+     "s.stdDetected": "fromstd"
+    },
+    "prov": [
+     [
+      "s.stdDetected",
+      "standard",
+      "standard",
+      "s.yaml",
+      15,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-project-value-on-a-global-only-key-is-refused",
+   "why": "spec 3: refused naming the global role, with line and column",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateway:",
+      "  port: 1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-key-out-of-scope",
+      "gateway.port",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-project-null-on-a-global-only-section-is-refused",
+   "why": "spec 3 rule 2: null at the section",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateway: null"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-key-out-of-scope",
+      "gateway",
+      "project:config.yaml",
+      1,
+      1,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-global-file-may-hold-a-global-only-key",
+   "why": "the same value in the global file is accepted",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.yaml": [
+      "gateway:",
+      "  port: 4170"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "gateway.port": 4170
+    },
+    "prov": [
+     [
+      "gateway.port",
+      "global",
+      "global",
+      "global:config.yaml",
+      2,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-command-value-comes-from-the-trusted-root",
+   "why": "acceptance 13: the worktree copy cannot change what runs",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /evil}"
+     ],
+     "main/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /trusted}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd.run.exe": "/trusted"
+    },
+    "prov": [
+     [
+      "s.cmd.run.exe",
+      "project",
+      "project@trusted",
+      "project@trusted:config.yaml",
+      3,
+      11
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-command-subtree-is-replaced-whole",
+   "why": "args, env and an added entry in the worktree copy change nothing",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /t, args: [a, evil], env: {X: 1}}",
+      "    extra: {exe: /e}"
+     ],
+     "main/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /t, args: [a]}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd": {
+      "run": {
+       "exe": "/t",
+       "args": [
+        "a"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "snapshot-command-key-missing-from-the-trusted-file-is-removed",
+   "why": "the worktree adds a command the main checkout lacks: it falls through to the lower layers",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /evil}"
+     ],
+     "main/.fgos/config.yaml": [
+      "s:",
+      "  a: 1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd.run.exe": "/std"
+    }
+   }
+  },
+  {
+   "id": "snapshot-command-key-deleted-in-the-worktree-stays",
+   "why": "the worktree deletes a command the main checkout has",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  a: 5"
+     ],
+     "main/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /trusted}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd.run.exe": "/trusted",
+     "s.a": 5
+    }
+   }
+  },
+  {
+   "id": "snapshot-one-root-means-no-substitution",
+   "why": "when the roots are equal the project file is the trusted file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /mine}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd.run.exe": "/mine"
+    },
+    "prov": [
+     [
+      "s.cmd.run.exe",
+      "project",
+      "project",
+      "project:config.yaml",
+      3,
+      11
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-global-command-values-are-used-as-they-are",
+   "why": "a command from the global file is the user's own",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  a: 5"
+     ],
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  cmd:",
+      "    run: {exe: /mine}"
+     ],
+     "main/.fgos/config.yaml": [
+      "s:",
+      "  a: 1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.cmd.run.exe": "/mine"
+    }
+   }
+  },
+  {
+   "id": "snapshot-accounts-layer-for-its-own-keys",
+   "why": "spec 3: the accounts file is a source for its own keys",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "s:",
+      "  pool:",
+      "    a: tok"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.pool.a": "tok"
+    },
+    "prov": [
+     [
+      "s.pool.a",
+      "accounts",
+      "accounts",
+      "accounts:accounts.yaml",
+      3,
+      5
+     ]
+    ],
+    "accounts": "present"
+   }
+  },
+  {
+   "id": "snapshot-account-key-in-the-project-file-is-refused",
+   "why": "config-key-in-wrong-file naming the accounts file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  pool:",
+      "    a: x"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-key-in-wrong-file",
+      "s.pool",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-config-key-in-the-accounts-file-is-refused",
+   "why": "the accounts file holds its own keys only",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "s:",
+      "  a: 1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-key-in-wrong-file",
+      "s.a",
+      "accounts:accounts.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-confined-session-has-no-accounts-layer",
+   "why": "spec 9: no accounts source is opened and require_accounts refuses by name",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "s:",
+      "  pool:",
+      "    a: tok"
+     ]
+    },
+    "class": "confined",
+    "detect": {}
+   },
+   "expect": {
+    "absent": [
+     "s.pool"
+    ],
+    "accounts": "unavailable-confined",
+    "no_revision": [
+     "accounts"
+    ]
+   }
+  },
+  {
+   "id": "snapshot-missing-files-are-empty-sources",
+   "why": "spec 5 rule 2: missing is not malformed",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {},
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.b": "std"
+    },
+    "absent_sources": [
+     "project",
+     "global",
+     "accounts"
+    ]
+   }
+  },
+  {
+   "id": "snapshot-malformed-global-file-fails-and-names-no-value",
+   "why": "a malformed file is an error for every caller",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  b: sentinel-9c2e",
+      "  a: [1,"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-parse",
+      null,
+      "global:config.yaml",
+      null,
+      null,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-both-yaml-and-json-in-one-scope",
+   "why": "config-legacy-shadowed, never a guess",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  a: 1"
+     ],
+     "project/.fgos/config.json": [
+      "{}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-legacy-shadowed",
+      null,
+      ".fgos/config.json",
+      null,
+      null,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tombstone-is-no-source",
+   "why": "a migrated project's config.json holds only the tombstone",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.a": 1
+    },
+    "absent_sources": [
+     "project"
+    ]
+   }
+  },
+  {
+   "id": "snapshot-legacy-json-project-file-is-read",
+   "why": "the same pipeline, strict-config over JSON text",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"s\": {\"a\": 7}}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.a": 7
+    },
+    "prov": [
+     [
+      "s.a",
+      "project",
+      "project",
+      "project:config.json",
+      1,
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-proto-key-is-refused-by-the-profile",
+   "why": "plain data: the profile refuses __proto__ before any merge",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  __proto__: 1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-parse",
+      null,
+      "global:config.yaml",
+      null,
+      null,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-every-source-error-is-listed",
+   "why": "a bad value in two files: both refusals, ordered by file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "s:",
+      "  b: 5"
+     ],
+     "home/.fgos/config.yaml": [
+      "s:",
+      "  a: x"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-schema",
+      "s.a",
+      "global:config.yaml",
+      2,
+      3,
+      "type",
+      ""
+     ],
+     [
+      "config-schema",
+      "s.b",
+      "project:config.yaml",
+      2,
+      3,
+      "type",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-wildcard-merge-rules-at-three-depths",
+   "why": "additionalProperties nodes carry the rule at depth three; a literal key beats the wildcard",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "w:",
+      "  p:",
+      "    literal: {c: 3}",
+      "    other: {c: 3}",
+      "    q:",
+      "      r: {k3: 3}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "w.p.q.r": {
+      "k3": 3
+     },
+     "w.p.literal": {
+      "c": 3
+     },
+     "w.p.other": {
+      "a": 1,
+      "b": 2,
+      "c": 3
+     }
+    }
+   }
+  }
+ ]
+}
