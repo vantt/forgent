@@ -261,21 +261,18 @@ Cross-machine delivery stays off in production through X6. Each rung proves noth
 
 ## 15.2.10 Questions for the owner
 
-### Q-X1. Is a message body allowed in the shared chain?
+### Q-X1. Body retention (owner decided 2026-10-23 12:39: option B)
 
-**What is happening.** A remote message is an Event Store event, and Event Store history is never rewritten. A body in the event stays in every clone of the project forever, a mistaken secret included.
+The Event Store is append-only, so anything sent through it stays in the shared repository history forever. Once a message has been handled, its body no longer needs to be kept.
 
-**Cause.** Event Store sections 10 and 14 (refs only move forward); council round 1 (body size matters more than event count). The local body cap is 16 KiB (`mailbox.maxBodyBytes`).
+**Decision B.**
+- **Only metadata goes into the permanent Event Store stream:** id, `from`, `to`, `reply_to`, depth, `body_sha256`, `body_bytes`, signature and dispositions. This is roughly 200 bytes per message and serves as the audit trail.
+- **The body travels in a temporary Event Store stream, cut into periods** (for example one per day). A period is dropped whole once every machine has fetched it and every message in it has a disposition from its receiver, and the body retention has passed (`record.bodyRetentionSec`, the same rule as on one machine).
+- MAIL still uses no transport of its own: the temporary stream is an Event Store feature, and MAIL is only a consumer of it.
 
-**Options.**
+**Prerequisite.** The ES lane builds "a temporary stream, dropped by period" (the fallback that Event Store §15.2 mentions, "a separate stream per period, dropped once every machine has fetched it", which is not verified yet). If ES cannot build it, the owner revisits this choice. The interim fallback is A (small bodies inline, with a tight cap, stored forever), with that consequence stated plainly.
 
-- **(a) Inline, small cap, larger refused with "send a link".** Simple, and one transport. Harm: bodies are permanent; the cap value is a new owner number. Cost: one key, one refusal text, about 30 lines plus vectors.
-- **(b) Hash only in the chain, body carried outside it.** History holds only about 100 bytes per message. Harm: it needs a second carrier (a deletable ref or a store), which is either a new Event Store feature or a second transport (forbidden). Cost: an Event Store design item and days.
-- **(c) Inline at the local cap of 16 KiB.** No new number. Harm: the most growth, and permanent.
-
-**Recommendation.** (a). The signed bytes keep (b) open later with no format change, because the signature already covers `body_sha256`.
-
-**Scope of the answer.** A yes fixes the body policy and authorizes a proposed cap key, with its value set from X6's measurement. It does not set the value and does not authorize any out-of-chain carrier.
+**Rejected:** A (bodies stay forever), C (gateway as the body carrier, which stays the later upgrade path; see Q-X2), and D (no cross-machine bodies).
 
 ### Q-X2. Does MAIL ask the Event Store for an on-demand trigger before delivery?
 
@@ -292,6 +289,8 @@ Cross-machine delivery stays off in production through X6. Each rung proves noth
 **Recommendation.** (b). The sender is the party that chose to send now. The receiver keeps ES's cadence, which no MAIL rule may shorten from a hook.
 
 **Scope of the answer.** A yes authorizes MAIL to request the door from the ES lane. ES decides its form and locks. It does not authorize MAIL to run git or to sync from a hook.
+
+**Owner direction 2026-10-23 12:35.** For now the owner accepts the latency of the Git and Event Store path, which is several minutes. When delivery has to be faster, the candidate is **the gateway** (`fgos-gateway`) as the fast path. It is recorded as the swap trigger of 15.2.5 and is not built now. Q-X2 (publish right after `send`) is still open, as the cheap way to cut latency while the transport stays the Event Store.
 
 ### Q-X3. Which cross-machine policies are enforced per machine and which globally?
 
