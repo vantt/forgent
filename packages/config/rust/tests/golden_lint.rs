@@ -3,7 +3,7 @@
 mod common;
 
 use common::{cases, files, refs};
-use fgos_config::lint::lint;
+use fgos_config::lint::{cross_node, lint};
 use fgos_config::schema::Schemas;
 use fgos_config::standard::Standard;
 
@@ -21,7 +21,7 @@ fn lint_cases() {
         );
         let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
         let standard = Standard::parse(&refs(&standard_files), &schemas).unwrap();
-        let found = lint(&schemas, &standard);
+        let found = cross_node(&schemas, &standard);
         let mut ids: Vec<&str> = found.iter().map(|f| f.id).collect();
         ids.sort();
         let mut want: Vec<&str> = expect["findings"]

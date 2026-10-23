@@ -14,8 +14,13 @@ are added as the phases that own them land.
 | `grammar.v1.json` | `tests/golden_grammar.rs` | reasons, actors, doc and why lines, header, comment blocks |
 | `schema.v1.json` | `tests/golden_schema.rs` | loading, path resolution, annotation inheritance, bundle digest |
 | `standard.v1.json` | `tests/golden_standard.rs` | the standard layer: values, merge order, provenance |
-| `lint.v1.json` | `tests/golden_lint.rs` | cross-node and cross-file lint rules |
-| `meta.v1.json` | the validator wrapper's test (not yet written) | one failing section schema per meta-schema rule, plus passing ones |
+| `lint.v1.json` | `tests/golden_lint.rs` | cross-node and cross-file lint rules, `standard-invalid` |
+| `validate.v1.json` | `tests/golden_validate.rs` | the effective value against the section schemas: paths, `required` on the merge, null, order |
+| `meta.v1.json` | `tests/golden_meta.rs` | one failing section schema per meta-schema rule, plus passing ones |
+
+`json-schema-suite/` is the official JSON-Schema-Test-Suite (draft 2020-12), vendored verbatim for the
+keywords fgOS schemas use; see its README. It is run by `tests/validator_acceptance.rs` and is not
+in the case format below.
 
 `tests/fixture_shape.rs` owns only fixture integrity (well-formed JSON, unique ids, known failure
 ids); it proves no behaviour.

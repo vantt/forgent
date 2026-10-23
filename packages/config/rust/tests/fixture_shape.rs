@@ -19,6 +19,10 @@ fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();
     for entry in std::fs::read_dir(dir).unwrap_or_else(|e| panic!("{}: {e}", dir.display())) {
         let path = entry.expect("dir entry").path();
+        // The vendored official suite is third-party data in its own format.
+        if path.file_name().is_some_and(|n| n == "json-schema-suite") {
+            continue;
+        }
         if path.is_dir() {
             found.extend(json_files(&path));
         } else if path.extension().is_some_and(|e| e == "json") {

@@ -18,6 +18,7 @@ pub struct StandardFile {
 pub struct Standard {
     pub files: Vec<StandardFile>,
     value: Value,
+    layer: fgos_yaml_doc::Value,
 }
 
 impl Standard {
@@ -44,6 +45,7 @@ impl Standard {
         let merged = merge(&layers, &NoRules).map_err(ConfigRefusal::parse)?;
         Ok(Standard {
             value: merged.value.to_json(),
+            layer: merged.value,
             files,
         })
     }
@@ -55,6 +57,11 @@ impl Standard {
     /// The merged standard layer; null when there is no standard file.
     pub fn value(&self) -> &Value {
         &self.value
+    }
+
+    /// The merged layer as the YAML Document value, the form the validator takes.
+    pub fn layer(&self) -> &fgos_yaml_doc::Value {
+        &self.layer
     }
 
     pub fn value_at(&self, path: &[Segment]) -> Option<&Value> {

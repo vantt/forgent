@@ -23,7 +23,7 @@ pub mod schema;
 mod scope;
 mod snapshot;
 pub mod standard;
-mod validate;
+pub mod validate;
 mod write;
 
 pub use error::ConfigRefusal;

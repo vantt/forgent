@@ -11,3 +11,9 @@ fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-identity = { path = "../../identity/rust", default-features = false }
 serde_json.workspace = true
 sha2.workspace = true
+jsonschema.workspace = true
+
+[dev-dependencies]
+# The feature set a product build has (apps/fgos, work-state and distribution turn these on and Cargo
+# unifies them), so the acceptance tests exercise the validator crate as the product runs it.
+serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

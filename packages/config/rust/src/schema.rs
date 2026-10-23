@@ -5,9 +5,11 @@
 //! themselves belongs to `lint`.
 use std::sync::OnceLock;
 
+use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, Document, Profile, Segment};
 use serde_json::Value;
 
+use crate::validate::Checker;
 use crate::{bundle, ConfigRefusal};
 
 fn contract() -> &'static Value {
@@ -72,6 +74,8 @@ pub(crate) fn descend(
 
 pub struct Schemas {
     pub(crate) sections: Vec<Section>,
+    /// The composite validator, compiled on first use (`validate.rs`).
+    pub(crate) checker: OnceLock<Result<Checker, ConfigRefusal>>,
 }
 
 /// A schema node with where it sits: the section and its YAML location in that file.
@@ -158,7 +162,10 @@ impl Schemas {
                 root,
             });
         }
-        Ok(Schemas { sections })
+        Ok(Schemas {
+            sections,
+            checker: OnceLock::new(),
+        })
     }
 
     /// The bundled schemas and the bundle digest (schemas and standard files together).
@@ -267,6 +274,8 @@ impl Schemas {
             }
             known
         });
+        // A JSON object keeps key order or sorts it by serde_json feature; the answer must not.
+        out.sort_by_cached_key(|path| format_path(path));
         out
     }
 }

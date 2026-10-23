@@ -369,6 +369,73 @@
    "expect": {
     "findings": []
    }
+  },
+  {
+   "id": "lint-standard-invalid",
+   "why": "the standard layer is judged by its own schema: a value of the wrong type is refused at its place",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a:",
+      "    type: integer",
+      "    description: A.",
+      "  b:",
+      "    type: string",
+      "    description: B."
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: 2"
+     ]
+    }
+   },
+   "expect": {
+    "findings": [
+     "standard-invalid"
+    ],
+    "at": [
+     {
+      "id": "standard-invalid",
+      "file": "s.yaml",
+      "line": 3,
+      "column": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "lint-standard-required-is-for-the-merge",
+   "why": "a standard file holds differences only, so a missing required key is not an error there",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a:",
+      "    type: integer",
+      "    description: A.",
+      "  b:",
+      "    type: string",
+      "    description: B."
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  b: x"
+     ]
+    }
+   },
+   "expect": {
+    "findings": []
+   }
   }
  ]
 }

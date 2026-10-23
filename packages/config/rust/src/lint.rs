@@ -7,6 +7,7 @@ use fgos_yaml_doc::{Document, Segment};
 
 use crate::schema::{descend, own, At, Schemas};
 use crate::standard::Standard;
+use crate::validate::meta_check;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Finding {
@@ -29,7 +30,35 @@ fn finding(id: &'static str, doc: &Document, at: &[Segment], path: &[Segment]) -
     }
 }
 
+/// Every rule: the meta-schema's per-node rules, then the cross-node and standard rules.
 pub fn lint(schemas: &Schemas, standard: &Standard) -> Vec<Finding> {
+    let mut out = meta(schemas);
+    out.extend(cross_node(schemas, standard));
+    out.sort();
+    out.dedup();
+    out
+}
+
+/// The per-node rules, stated as data in `contracts/config-schema.meta.v1.json`.
+pub fn meta(schemas: &Schemas) -> Vec<Finding> {
+    let mut out = Vec::new();
+    for section in &schemas.sections {
+        // A meta-schema that cannot compile judges nothing: the file counts as not a 2020-12 schema.
+        let broken = meta_check(section.doc.value())
+            .unwrap_or_else(|_| vec![("schema-dialect", Vec::new())]);
+        out.extend(
+            broken
+                .iter()
+                .map(|(id, at)| finding(id, &section.doc, at, at)),
+        );
+    }
+    out.sort();
+    out.dedup();
+    out
+}
+
+/// The rules that read more than one node or file, and the standard files.
+pub fn cross_node(schemas: &Schemas, standard: &Standard) -> Vec<Finding> {
     let mut out = Vec::new();
     for (sec, section) in schemas.sections.iter().enumerate() {
         let id = section.root["$id"].as_str().unwrap_or_default();
@@ -49,6 +78,7 @@ pub fn lint(schemas: &Schemas, standard: &Standard) -> Vec<Finding> {
         );
     }
     standard_files(schemas, standard, &mut out);
+    standard_valid(schemas, standard, &mut out);
     out.sort();
     out.dedup();
     out
@@ -134,6 +164,29 @@ fn standard_files(schemas: &Schemas, standard: &Standard, out: &mut Vec<Finding>
                 out.push(finding("standard-forbidden-key", &file.doc, path, path));
             }
             !leaf
+        });
+    }
+}
+
+/// The standard layer against its own schemas. A standard file holds differences only, so a
+/// missing `required` key is for the merge to judge, not for the standard.
+fn standard_valid(schemas: &Schemas, standard: &Standard, out: &mut Vec<Finding>) {
+    if standard.files.is_empty() {
+        return;
+    }
+    let Ok(violations) = schemas.validate(standard.layer()) else {
+        return;
+    };
+    for v in violations.iter().filter(|v| v.keyword != "required") {
+        let (file, span) = standard
+            .span_of(&v.path)
+            .map_or((None, None), |(f, s)| (Some(f), Some(s)));
+        out.push(Finding {
+            id: "standard-invalid",
+            file: file.unwrap_or_default().to_string(),
+            path: format_path(&v.path),
+            line: span.map(|s| s.line),
+            column: span.map(|s| s.column),
         });
     }
 }

@@ -84,7 +84,7 @@
     {
       "prefix": "standard-",
       "owner": "lint of the standard files",
-      "meaning": "Rule ids of src/lint.rs: standard-orphan, standard-forbidden-key."
+      "meaning": "Rule ids of src/lint.rs: standard-orphan, standard-forbidden-key, standard-invalid."
     }
   ],
   "not-produced-here": [

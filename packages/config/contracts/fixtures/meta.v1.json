@@ -1,6 +1,6 @@
 {
  "version": 1,
- "about": "Inputs for the meta-schema ../config-schema.meta.v1.json: each case is a section schema document (JSON form) and expects either valid or the rule id (the $defs name up to the first dot) of the refusal. Runner: the validator wrapper (phase 04b).",
+ "about": "Inputs for the meta-schema ../config-schema.meta.v1.json: each case is a section schema document (JSON form) and expects either valid or the rule id (the $defs name up to the first dot) of the refusal. Runner: tests/golden_meta.rs.",
  "cases": [
   {
    "id": "meta-valid-minimal",
@@ -307,6 +307,148 @@
    },
    "expect": {
     "rule": "schema-file-placement"
+   }
+  },
+  {
+   "id": "meta-valid-scalar-enum-unique",
+   "why": "a scalar enum, a scalar const and uniqueItems over scalar items pass",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "description": "Mode.",
+      "enum": [
+       "a",
+       "b"
+      ],
+      "const": "a"
+     },
+     "tags": {
+      "type": "array",
+      "description": "Tags.",
+      "uniqueItems": true,
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-pattern-length",
+   "why": "a pattern of 257 characters is refused (a long pattern compiles in more than linear time)",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "pattern": "^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-pattern-length"
+   }
+  },
+  {
+   "id": "meta-pattern-length-limit",
+   "why": "a pattern of exactly 256 characters passes",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "pattern": "^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-object-const",
+   "why": "a const that holds an object is refused (the crate compares objects wrongly when key order is kept)",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "const": {
+       "a": 1
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
+   }
+  },
+  {
+   "id": "meta-object-enum",
+   "why": "an enum member that is an object is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "enum": [
+       {
+        "a": 1
+       },
+       "b"
+      ]
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
+   }
+  },
+  {
+   "id": "meta-object-unique-items",
+   "why": "uniqueItems over items that are not scalar-typed is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "list": {
+      "type": "array",
+      "description": "List.",
+      "uniqueItems": true,
+      "items": {
+       "type": "object"
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
    }
   }
  ]
