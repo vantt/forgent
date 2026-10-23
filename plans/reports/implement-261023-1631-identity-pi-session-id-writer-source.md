@@ -1,8 +1,39 @@
-# Implement report: PI_SESSION_ID as writer-id source (stopped at probe)
+# Implement report: PI_SESSION_ID as writer-id source
 
 Date: 2026-10-23 16:45 (Asia/Saigon). Branch `ident/pi-session-id`. No code changed.
 
-## Result
+## Update 16:54
+
+Owner decided: add `PI_SESSION_ID` after `CODEX_THREAD_ID`; the CLI label (`pi` or `omp`) is read from the process ancestry, never from env. Implemented below. The section after this one is the first stop report, kept as the probe record.
+
+## Ancestry probe (pi 1.4.0, omp 18.12.6, `-p`, one run each; tool process up to the terminal)
+
+| CLI | chain, tool upward: comm / exe / argv[0..1] |
+|---|---|
+| pi | python3 (`/usr/bin/python3.14`, `python3 -I`) > bash (`/usr/bin/bash`, `/bin/bash -c`) > **pi** (exe `~/.nvm/versions/node/v24.21.0/bin/node`, argv `pi ''`) > zsh (wrapper `zsh -ic`) > timeout > zsh > claude > zsh |
+| omp | python3 > **omp** (exe `~/.local/bin/omp`, argv `omp --profile=openai-tetnu`) > zsh (`zsh -ic`) > timeout > zsh > claude > zsh > ... herdr |
+
+Conclusions: pi is node whose process title is `pi` (comm `pi`, exe is a version-specific node path); omp is its own ELF (comm `omp`). Only the kernel command name is stable for both, so the rule matches comm. omp's tool runs directly under omp (no bash in between). In both, the nearest `pi`/`omp` ancestor is the CLI; the terminal head is the user's shell above it, so `terminal_head` is not used.
+
+## Implementation
+
+Label rule: from a reference pid upward (itself included), the nearest ancestor whose command name is `omp` gives `omp`, one named `pi` gives `pi`; none gives `pi`.
+
+Final signature: `session_for(state_root: &Path, key: &WriterKey, head_pid: Option<u32>) -> Result<CurrentSession, Refusal>`; `register_writer` passes `Some(head_pid)`; `resolve` uses the caller pid.
+
+Files changed:
+- `packages/process/rust/src/{facts.rs,platform/mod.rs,platform/linux.rs}`: `facts::command_name_of` and `parse_command_name` (one stat parser; `Relation` stays `Copy`), with a parser test.
+- `packages/identity/rust/src/{resolve.rs,session.rs,current.rs,directory.rs,launcher.rs,proc_tree.rs,lib.rs}`: `ENV_ORDER` gains `PI_SESSION_ID`; `ProcessTree::comm` (default `None`); `pi_family_cli`, `ancestry_cli`; `WriterIdentity.cli`; `cli_of` maps `PI_SESSION_ID` to neutral `pi`; `session_for` gains `head_pid`; `SCRUBBED` gains `PI_SESSION_ID` and `PI_SESSION_FILE`.
+- Contracts: `identity.writer.v1.json` (`x-envOrder`), `identity.writer.golden.v1.json` (5 env cases: pi alone, codex over pi, pi over claude, fgos over pi, invalid pi falls through), `attempt-writer-id.v1.json` (`scrubbed`).
+- Node: `src/util/session-identity.mjs` (cache key list), `src/runner/dispatch/adapters.mjs` (`workerBaseEnv` drops both), `src/cli/command-registry.mjs` (help text), `scripts/event-store/v-spawn-bench.mjs`.
+- Tests: `packages/identity/rust/tests/{session.rs,directory.rs,attempt_writer_id.rs}`, `apps/fgos/tests/cli_tests.rs` (env removal list), `test/session-identity/attempt-writer-id.test.mjs`, `test/run-supervisor/contracts-terminal.test.mjs`.
+- Docs: `docs/platform/identity/spec.md` (sections 4, 7a L3, L5, L5a, L6, 10), `docs/io-contract.md`, `docs/specs/observe.md`, `CHANGELOG.md`.
+
+Scrub decision: both `PI_SESSION_ID` and `PI_SESSION_FILE` are scrubbed (Rust launcher and Node `workerBaseEnv`), because pi and omp pass both to children and a worker would otherwise claim its parent's session.
+
+Note: the Node facade's `ENV_ORDER` is a cache key list that already existed; the door does not expose the Rust list, so it was moved, not added.
+
+## First stop report (kept as probe record)
 
 Re-probe contradicts the 10-20 report for omp: **omp 18.12.6 exports `PI_SESSION_ID`** (and `PI_SESSION_FILE`) to its Bash tool, same name and shape as pi. Per the brief ("if omp DOES export a session id variable, do NOT add it") implementation was not started. The owner approved `PI_SESSION_ID` with CLI name `pi`; the same variable also appears under omp, so adding it would label omp sessions `pi-xxxx@machine`. That is an owner question.
 
