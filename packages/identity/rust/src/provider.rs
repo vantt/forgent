@@ -91,7 +91,7 @@ pub enum Verb {
     /// `session [--register [--role lead:<LANE> [--take]] | --drop-role lead:<LANE>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
-    /// `resolve <handle|lead:<LANE>>`: the one live session it names.
+    /// `resolve <handle|lead:<LANE>|full id>`: the one live session it names.
     Resolve { query: String },
     /// `list [--project] [--prune]`: the sessions the machine knows.
     List { project: bool, prune: bool },

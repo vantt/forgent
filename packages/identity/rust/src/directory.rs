@@ -12,7 +12,7 @@
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
 
-use crate::current::{current_session, os_record, session_for, CurrentSession};
+use crate::current::{current_session, machine_info, os_record, session_for, CurrentSession};
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use crate::project;
 use crate::refusal::{Candidate, Liveness, Refusal};
@@ -482,12 +482,17 @@ pub fn drop_current_role(
     drop_role(state_root, &current.info.id, role, &judge_here)
 }
 
-/// The live session `query` names: a handle, or a role alias `lead:<LANE>`.
-/// Exactly one, else `ambiguous` or `not-found` with the candidates in the
-/// detail and in `Refusal::candidates` (Identity's own codes; the mailbox maps
-/// them to its names).
+/// The live session `query` names: a handle, a role alias `lead:<LANE>`, or a
+/// full id `<machine-id>/<local id>`. Exactly one, else `ambiguous` or
+/// `not-found` with the candidates in the detail and in `Refusal::candidates`
+/// (Identity's own codes; the mailbox maps them to its names). A full id of
+/// another machine is `not-found`: only this machine's directory is read until
+/// the shared directory exists.
 pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal> {
     let query = query.trim();
+    if let Some((machine_id, _)) = query.split_once('/') {
+        return resolve_full_id(root, machine_id, query, judge);
+    }
     let live = scan(root, judge)?
         .rows
         .into_iter()
@@ -545,6 +550,21 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
             })
         }
     }
+}
+
+fn resolve_full_id(root: &Path, machine_id: &str, id: &str, judge: Judge) -> Result<Listed, Refusal> {
+    let not_found = |detail: String| Refusal { reason: "not-found", detail, candidates: Vec::new() };
+    if machine_info(root)?.id != machine_id {
+        return Err(not_found(format!(
+            "{id:?} names a session of machine {machine_id:?}, not this one; cross-machine resolution arrives with the shared directory"
+        )));
+    }
+    scan(root, judge)?
+        .rows
+        .iter()
+        .find(|row| row.entry.id == id && row.verdict != Verdict::Dead)
+        .map(|row| Listed::of(&row.entry, row.verdict))
+        .ok_or_else(|| not_found(format!("no live session has the id {id:?}")))
 }
 
 fn join(names: &[String]) -> String {

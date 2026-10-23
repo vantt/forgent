@@ -369,3 +369,24 @@ fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing
     assert_eq!(files(&root), 0, "a refused registration leaves no entry");
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn a_full_id_resolves_the_exact_live_entry_of_this_machine_and_never_another_machines() {
+    let root = machine_root();
+    let alive = judge(&[]);
+    let a = entry("alpha", Some(1), &[]);
+    directory::register(&root, a.clone(), false, &alive).unwrap();
+    directory::register(&root, entry("beta", Some(2), &[]), false, &alive).unwrap();
+    directory::register(&root, entry("gone", Some(3), &[]), false, &alive).unwrap();
+
+    assert_eq!(directory::resolve(&root, "fg-abc234/alpha", &alive).unwrap().handle, a.handle);
+    assert_eq!(directory::resolve(&root, " fg-abc234/alpha ", &alive).unwrap().handle, a.handle);
+    let missing = directory::resolve(&root, "fg-abc234/nobody", &alive).unwrap_err();
+    assert_eq!(missing.reason, "not-found");
+    assert_eq!(directory::resolve(&root, "fg-abc234/gone", &judge(&[3])).unwrap_err().reason, "not-found", "a dead head is not resolved");
+
+    let other = directory::resolve(&root, "fg-other99/alpha", &alive).unwrap_err();
+    assert_eq!(other.reason, "not-found");
+    assert!(other.detail.contains("shared directory"), "{}", other.detail);
+    let _ = fs::remove_dir_all(root);
+}

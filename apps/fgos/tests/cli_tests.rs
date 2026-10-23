@@ -1373,6 +1373,8 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
 
     assert_eq!(identity_data(&run("beta", &["resolve", &a, "--json"]))["id"], "fg-server-abc234/alpha");
     assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], a.as_str());
+    assert_eq!(identity_data(&run("beta", &["resolve", "fg-server-abc234/alpha", "--json"]))["handle"], a.as_str());
+    assert_eq!(run("beta", &["resolve", "fg-other-xyz789/alpha"]).status.code(), Some(65));
     assert_eq!(identity_data(&run("beta", &["list", "--json"]))["sessions"].as_array().unwrap().len(), 2);
 
     let held = run("beta", &["session", "--role", "lead:MAIL"]);
