@@ -152,15 +152,14 @@ function targetDir(root) {
 
 const headCommit = (root) => spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim();
 
-/** Every Codex account home of the owner's table: each one is masked. */
-function codexAccountHomes() {
-  return live.accountNames(CODEX_TEST_ACCOUNT).flatMap((name) => {
-    try {
-      return [live.accountHome('codex', name)];
-    } catch {
-      return [];
-    }
-  });
+/**
+ * The allow-list of a run's view of the home (scripts/lib/mailbox-live-confined.mjs
+ * `maskPlan`): the pinned Codex release, the pinned Claude Code binary and the Node install
+ * the dry runs' stub executes, and for a dry run the stub itself. Nothing else under the home.
+ */
+function confinedMasks(dry) {
+  const allow = [cliBinary('codex').release, cliBinary('claude').bin, path.dirname(path.dirname(process.execPath)), ...(dry ? [STUB] : [])];
+  return confined.maskPlan({ allow });
 }
 
 /** A dry run's login: scratch bytes in a scratch home, never a real login. */
@@ -220,7 +219,7 @@ function context({ dry, stage = null }) {
   const addendum = readAddendum();
   const broken = freezeBroken(readJson(PREREGISTRATION));
   if (broken.length) die(`frozen files changed: ${broken.join(', ')}`);
-  const masks = confined.maskPlan({ codexAccountHomes: codexAccountHomes(), codexRelease: cliBinary('codex').release });
+  const masks = confinedMasks(dry);
   const windowSec = readJson(path.join(CONTRACTS, 'limits.v1.json')).keys.find((k) => k.key === 'mailbox.human.fallbackWindowSec').default;
   const needle = v7.pointerNeedle(REPO_ROOT);
   const measured = addendum ? {
@@ -295,10 +294,12 @@ function context({ dry, stage = null }) {
 
 /** At every harness start: no orphan left, and every unfinished ledger entry recorded `error`. */
 function recover(ctx) {
-  const { appended, left, asides } = runs.recoverLedger(ctx.base, ctx.resultsFile);
+  const { appended, left, asides, unsettled } = runs.recoverLedger(ctx.base, ctx.resultsFile);
   for (const line of appended) say(`${line.runId}: recorded error (${line.error})`);
+  if (asides.length) say(asides.map((a) => `${a.runId}: ${a.stop}: ${a.aside}`).join('; '));
+  if (unsettled.length) die(`login copies left unsettled: ${unsettled.map((u) => `${u.runId} ${u.copy} (${u.reason})`).join('; ')}`);
   if (left.length) die(`orphaned processes still run: ${left.join(', ')}`);
-  if (asides.length) die(asides.map((a) => `${a.runId}: ${a.stop}: ${a.aside}`).join('; '));
+  if (asides.length) die('a login copy was set aside; ask the owner');
 }
 
 // ---------------------------------------------------------------- freeze and pin
@@ -658,6 +659,7 @@ async function cmdSmoke(cli, dry) {
   fs.mkdirSync(base, { recursive: true });
   live.assertOutsideCheckout(base);
   const orphans = confined.sweepOrphans(base);
+  if (orphans.unsettled.length) die(`login copies left unsettled: ${orphans.unsettled.map((u) => `${u.runId} ${u.copy}`).join('; ')}`);
   if (orphans.left.length) die(`orphaned processes still run: ${orphans.left.join(', ')}`);
   if (orphans.asides.length) die(orphans.asides.map((a) => `${a.runId}: ${a.stop}: ${a.aside}`).join('; '));
   const binary = cliBinary(cli);
@@ -677,10 +679,10 @@ async function cmdSmoke(cli, dry) {
   const data = readData();
   const runId = `smoke-${cli}-${Date.now()}`;
   const paths = confined.runPaths(base, runId);
-  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin') });
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: runs.cliRunEnv(cli) });
   const { lastMessage } = paths;
   const args = runs.cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: null, prompt: data.task, models });
-  const masks = confined.maskPlan({ codexAccountHomes: codexAccountHomes(), codexRelease: cliBinary('codex').release });
+  const masks = confinedMasks(dry);
   const command = dry ? [cli === 'codex' ? codexStubBin(base) : process.execPath, STUB, cli] : [binary.bin];
   const prepared = confined.prepareConfinedRun({ base, runId, command: command[0], args: [...command.slice(1), ...args], env, login, masks, readOnly: [paths.installation] });
   const hooks = confined.layOutRunProject(paths, { cli, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
@@ -758,6 +760,71 @@ async function cmdSmoke(cli, dry) {
   return failed.length === 0;
 }
 
+// ---------------------------------------------------------------- the Claude Code MCP proof
+
+/** The MCP servers and tools Claude Code's stream-json `system/init` record names, and whether any is a claude.ai connector. */
+export function mcpOfInit(stdout) {
+  const init = stdout.split('\n').filter(Boolean).flatMap((l) => {
+    try {
+      return [JSON.parse(l)];
+    } catch {
+      return [];
+    }
+  }).find((r) => r.type === 'system' && r.subtype === 'init');
+  if (!init) return null;
+  const servers = (init.mcp_servers ?? []).map((m) => `${m.name}:${m.status}`);
+  const mcpTools = (init.tools ?? []).filter((t) => t.startsWith('mcp__'));
+  return { servers, mcpTools, connectors: [...servers, ...mcpTools].filter((x) => /claude[._ ]?ai/i.test(x)) };
+}
+
+/**
+ * One benign confined Claude Code print-mode run (`haiku`, the owner's login copied), reading
+ * the MCP servers and tools its startup record lists, under the exact confined launch of the
+ * behaviour suite (`--strict-mcp-config`, an empty `--mcp-config` and
+ * `ENABLE_CLAUDEAI_MCP_SERVERS=false`), or with `--without-off` the same launch without them
+ * (the falsifier). Its own home `mailbox-mcp-probe-live`; one invocation each.
+ */
+async function cmdMcpProbe(cli, { off, dry }) {
+  if (cli !== 'claude') die('mcp-probe takes claude', 2);
+  const base = path.join(TMP, 'fgos-work', `mailbox-mcp-probe-live${dry ? '-dry' : ''}`);
+  const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry });
+  if (problem) die(problem);
+  fs.mkdirSync(base, { recursive: true });
+  live.assertOutsideCheckout(base);
+  const orphans = confined.sweepOrphans(base);
+  if (orphans.left.length || orphans.unsettled.length || orphans.asides.length) die('orphans or login copies left in the probe home');
+  const binary = cliBinary(cli);
+  const login = dry ? stubLogin(base, cli) : { cli, home: os.homedir(), account: 'owner' };
+  if (!dry && confined.loginFreshness(login) !== 'fresh') die('login near expiry: stale; wait for the owner\'s sessions to refresh it');
+  const runId = `mcp-${off ? 'off' : 'on'}-${Date.now()}`;
+  const paths = confined.runPaths(base, runId);
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: off ? runs.cliRunEnv(cli) : {} });
+  const args = runs.cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage: paths.lastMessage, instruction: null, prompt: 'Reply with the single word OK and nothing else. Use no tool.' });
+  // The falsifier drops the three contiguous MCP-off arguments, and nothing else.
+  if (!off) args.splice(args.indexOf(runs.CLAUDE_NO_MCP[0]), runs.CLAUDE_NO_MCP.length);
+  const command = dry ? [process.execPath, STUB, cli] : [binary.bin];
+  const masks = confinedMasks(dry);
+  const prepared = confined.prepareConfinedRun({ base, runId, command: command[0], args: [...command.slice(1), ...args], env, login, masks, readOnly: [paths.installation] });
+  const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
+  confined.layOutRunProject(paths, { cli, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
+  live.seedClaudeState({ home: paths.home, version: binary.version, trusted: [paths.ws] });
+  fs.mkdirSync(paths.capture, { recursive: true });
+  const stdoutFile = path.join(paths.capture, 'stdout.txt');
+  const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(stdoutFile, 'w'), fs.openSync(path.join(paths.capture, 'stderr.txt'), 'w')] });
+  const timeout = setTimeout(() => confined.endConfinedRun(run), runs.CLI_TIMEOUT_MS);
+  const exit = await run.exited;
+  clearTimeout(timeout);
+  const end = await confined.endConfinedRun(run);
+  const settled = confined.settleLoginCopy(prepared);
+  const mcp = mcpOfInit(fs.readFileSync(stdoutFile, 'utf8'));
+  const logs = fs.existsSync(path.join(paths.home, '.cache')) ? fs.readdirSync(path.join(paths.home, '.cache'), { recursive: true }).map(String).filter((f) => /mcp-logs-claude-ai/i.test(f)) : [];
+  const result = { runId, off, version: binary.version, invocations: dry ? 0 : 1, argv: prepared.launch.argv.map((a) => (a.startsWith('Reply with') ? '<prompt>' : a)), env: off ? runs.cliRunEnv(cli) : {}, exit, left: end.left.length, settled, mcp, claudeAiLogs: logs };
+  writeJson(path.join(base, 'results', `${runId}.json`), result);
+  say(`mcp-probe ${off ? 'confined' : 'without the off switches'}: exit ${exit.code}; servers ${JSON.stringify(mcp?.servers ?? null)}; mcp tools ${mcp?.mcpTools.length ?? '-'}; claude.ai connectors ${JSON.stringify(mcp?.connectors ?? null)}; ${path.join(base, 'results', `${runId}.json`)}`);
+  if (settled) die(`${settled.stop}: ${settled.aside}`);
+  return mcp;
+}
+
 // ---------------------------------------------------------------- main
 
 const [command, ...rest] = process.argv.slice(2);
@@ -792,6 +859,9 @@ if (process.argv[1] === SCRIPT) {
         break;
       case 'report':
         cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare') });
+        break;
+      case 'mcp-probe':
+        await cmdMcpProbe(rest[0], { off: !flag('--without-off'), dry: flag('--dry') });
         break;
       case 'stub':
         runStub(rest[0], rest.slice(1));

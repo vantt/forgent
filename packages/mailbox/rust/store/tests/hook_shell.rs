@@ -112,7 +112,7 @@ fn gated_call(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _| None,
+        handle_of: &|_, _, _| None,
         gate,
     };
     run(input, &mut &stdin[..], stdout)
@@ -541,7 +541,7 @@ fn call_as(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _| None,
+        handle_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     run(input, &mut &stdin[..], stdout)
@@ -626,7 +626,7 @@ fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_bef
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _| None,
+        handle_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     let outcome = run(input, &mut watched, &mut Vec::new());
@@ -928,7 +928,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _| None,
+        handle_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     let mut out = Vec::new();
@@ -965,7 +965,7 @@ fn a_malformed_payload_never_opens_or_creates_the_record() {
             clock: &clock,
             ancestry: &ancestry,
             resolve: &resolve,
-            handle_of: &|_, _| None,
+            handle_of: &|_, _, _| None,
             gate: WriteGate::new(),
         };
         let outcome = run(input, &mut &stdin[..], &mut Vec::new());

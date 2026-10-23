@@ -12,6 +12,17 @@ pub struct HookLimits {
     pub stop_block: StopBlockLimits,
     pub hook: HookCallLimits,
     pub post_tool_use: PostToolUseLimits,
+    pub verbs: VerbLimits,
+}
+
+/// How long the verbs a person or agent waits on (`send`, `inbox`,
+/// `inbox --claim`) wait for the mailbox lock.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct VerbLimits {
+    /// The longest wait for the lock in milliseconds, polling with backoff,
+    /// before the verb answers `lock-busy`.
+    pub lock_wait_ms: u64,
 }
 
 /// How a `PostToolUse` drain delivers.

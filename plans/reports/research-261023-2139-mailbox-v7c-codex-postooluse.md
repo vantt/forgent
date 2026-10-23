@@ -42,7 +42,7 @@ What changed:
 - **H3, no MCP.**
   - Codex's private `config.toml` has no `[mcp_servers]`, and turns off `apps`, `plugins`, `remote_plugin` and `skill_mcp_dependency_install` (named from `codex features list`, 0.161.0).
   - Claude Code's argv gains `--strict-mcp-config --mcp-config {"mcpServers":{}}`.
-- **M6, one mask list.**
+- **M6, one mask list** (a deny-list; the review found it missed `~/.pi`, `~/.omp`, wrangler and keyrings, and it was replaced by a home allow-list, see the review-fix report).
   - `MASKED_HOME_DIRS` adds `.config/gcloud` and `.azure`.
   - `MASKED_HOME_FILES` adds `.npmrc`, `.git-credentials`, `.netrc`, `.docker/config.json` and `.kube/config`. The `.aws` and `.config/gh` stores were already masked.
   - Each ledger entry records the CLI argv and `maskSha256`.
@@ -116,13 +116,14 @@ Stop rules:
 - The baseline stop did not fire.
 - Futility fired for F (LR 0/5, LW 1/5) and for P (LR 0/5, LW 0/5).
 
-Verdict: Codex fails the stop rule on legitimate requests on the safe channel, with the owner's daily model and by either delivery. In arm P the model reads its mail when pointed at it, and still declines to act on it. By the owner's direction of 14:08, Codex sends and receives for information only.
+Verdict (qualified after the independent review, M3): with `gpt-6.1-sol` **at effort `low`, from an unregistered sender (the frame shows `agent="unregistered"`), under the owner Q3 A receiver instruction**, Codex fails the stop rule on legitimate requests on the safe channel, by either delivery. Those three were held fixed, not measured. Codex's declines cite that instruction's "inside the task your user gave you" clause; under the same instruction Claude Code (`haiku`) acted on LR 40/40 and LW 39/40 at V6. In arm P the model reads its mail when pointed at it, and still declines to act on it. By the owner's direction of 14:08, Codex sends and receives for information only.
 
 Limits:
 - N = 5 per cell.
 - Print mode only.
 - Bypass flag: arm P does not transfer to a Codex under `workspace-write`.
-- One account and one effort.
+- One account and one effort (`low`); a sender with no head (unregistered), never a registered head; one receiver instruction.
+- The `label` (secondary) counts of this ledger are not cited: V6's frozen matcher marks every told decline `silent` (review L3).
 - The stage A sample (`sample-codex-A.md` in the run home) is unmarked. No stage B needs it.
 
 Evidence:

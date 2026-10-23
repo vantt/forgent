@@ -21,6 +21,42 @@ impl MailboxState {
         self.forget_old_notice_marks(now, limits);
     }
 
+    /// Whether a sweep as of `now` would change anything: some time rule of
+    /// [`MailboxState::sweep`] is due. A drain that may skip its write asks
+    /// this first, so skipping never holds back a refusal, an expiry or a
+    /// retirement the next operation owes.
+    pub fn time_rule_due(&self, now: Timestamp, limits: &Limits) -> bool {
+        let now = self.last_now.max(now);
+        let claim_expired = self
+            .messages
+            .iter()
+            .any(|h| matches!(h.state, MessageState::InFlight { deadline, .. } if now > deadline));
+        let stale_record = self.messages.iter().any(|h| {
+            h.state == MessageState::Recorded && now.is_past(h.recorded_at, limits.record.ttl_sec)
+        });
+        let settled = |state: &MessageState| {
+            matches!(
+                state,
+                MessageState::Offered { .. } | MessageState::Refused { .. }
+            )
+        };
+        let retiring = self.messages.iter().any(|h| {
+            settled(&h.state)
+                && (now.is_past(h.changed_at, limits.header_horizon_sec())
+                    || (h.body_kept && now.is_past(h.changed_at, limits.record.body_retention_sec)))
+        });
+        let notice_due = self.notices.iter().any(|n| {
+            matches!(n.state, NoticeState::InFlight { deadline, .. } if now > deadline)
+                || now.is_past(n.created_at, limits.record.ttl_sec)
+                || self.bindings.get(&n.to).map(|b| b.generation) != Some(n.to_generation)
+        });
+        let mark_due = self
+            .notice_last
+            .values()
+            .any(|at| now.is_past(*at, limits.notices.window_sec));
+        claim_expired || stale_record || retiring || notice_due || mark_due
+    }
+
     /// An in-flight message past its deadline returns to `recorded` (its
     /// offer was counted at the claim), or is refused once it has used
     /// every allowed offer.

@@ -262,6 +262,10 @@ pub struct MailFrom {
     pub has_head: bool,
     /// The sender's writer key, from which the store derives its handle.
     pub key: WriterKey,
+    /// The sender binding's stored head text, with which the store's handle
+    /// derivation names the sender's process; `None` for a sender with no
+    /// head. A copy of what the binding already holds, never stored again.
+    pub head: Option<String>,
     /// The sender's Identity handle, derived by the store at render and
     /// never stored (the core leaves it `None`): it is a function of the
     /// key, the CLI and the machine handle, so a stored copy would go stale.
@@ -525,15 +529,10 @@ impl MailboxState {
         // A bounded step that would take nothing but a pointer, already
         // stamped since the newest pending item, changes nothing: a pointer
         // repeating at every tool call writes the snapshot once per new mail.
-        // An item in flight may expire at the sweep and become claimable, so
-        // its presence always takes the full path.
-        let in_flight = self.messages.iter().any(|h| {
-            &h.to == key
-                && h.to_generation == generation
-                && matches!(h.state, MessageState::InFlight { .. })
-        });
+        // When a time rule is due (a claim expired, a record past its TTL, …)
+        // the sweep must run, so the full path is taken.
         if matches!(checkpoint, Checkpoint::BoundedStep(_))
-            && !in_flight
+            && !self.time_rule_due(now, limits)
             && self.drained_since_newest(key, generation)
         {
             let (picks, too_large) = self.select(key, generation, checkpoint, limits);
@@ -575,8 +574,9 @@ impl MailboxState {
     /// The pointer drain of a CLI in pointer mode: claims nothing and
     /// counts what a full step would take. It sweeps and stamps
     /// `last_drain_at` only when the stamp is older than the newest pending
-    /// item, so a pointer repeating at every tool call changes the state
-    /// once per new mail; otherwise it reads the state and changes nothing.
+    /// item or a time rule is due, so a pointer repeating at every tool call
+    /// changes the state once per new mail and never holds back a refusal;
+    /// otherwise it reads the state and changes nothing.
     pub fn point(
         &mut self,
         key: &WriterKey,
@@ -591,7 +591,8 @@ impl MailboxState {
                 changed: false,
             };
         }
-        let changed = !self.drained_since_newest(key, generation);
+        let changed =
+            !self.drained_since_newest(key, generation) || self.time_rule_due(now, limits);
         if changed {
             self.sweep(now, limits, ids);
             let now = self.last_now;
@@ -710,6 +711,7 @@ impl MailboxState {
                 cli: sender.map(|b| b.cli.clone()),
                 has_head: sender.is_some(),
                 key: header.from.clone(),
+                head: sender.map(|b| b.head.clone()),
                 handle: None,
             }),
         }

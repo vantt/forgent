@@ -307,7 +307,7 @@ fn list(long: bool, json: bool) -> MailboxAnswer {
         .map(|head| ListRow {
             handle: root
                 .as_deref()
-                .and_then(|root| session_of(root, &head.key, &head.cli))
+                .and_then(|root| session_of(root, &head.key, &head.cli, Some(&head.head)))
                 .map(|info| info.handle),
             tier: TestedClis::embedded().tier(&head.cli),
             name: head.name,
@@ -456,7 +456,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 codex_program: PathBuf::from("codex"),
                 max_read_bytes: loaded.hook.hook.max_read_bytes,
             };
-            let wait = Wait::Ms(loaded.hook.hook.lock_wait_ms);
+            let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
             let (recipient, role_holder) = if is_alias(to) {
                 let heads = match verbs::heads(&fgos_dir, &loaded.limits) {
                     Ok(heads) => heads,
@@ -521,7 +521,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             match verbs::inbox(
                 &record,
                 &key,
-                Wait::Ms(loaded.hook.hook.lock_wait_ms),
+                Wait::Ms(loaded.hook.verbs.lock_wait_ms),
                 now(),
                 &loaded.limits,
             ) {
@@ -545,14 +545,17 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             let root = state_root();
-            let handle_of = |key: &WriterKey, cli: &fgos_mailbox_core::Cli| {
-                session_of(root.as_deref()?, key, cli).map(|info| info.handle)
-            };
+            let handle_of =
+                |key: &WriterKey,
+                 cli: &fgos_mailbox_core::Cli,
+                 head: Option<&fgos_process::facts::Record>| {
+                    session_of(root.as_deref()?, key, cli, head).map(|info| info.handle)
+                };
             let mut stdout = std::io::stdout().lock();
             match verbs::inbox_claim(
                 &record,
                 &key,
-                Wait::Ms(loaded.hook.hook.lock_wait_ms),
+                Wait::Ms(loaded.hook.verbs.lock_wait_ms),
                 &now,
                 &loaded.limits,
                 &handle_of,

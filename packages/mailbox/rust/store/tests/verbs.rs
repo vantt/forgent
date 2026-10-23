@@ -347,7 +347,7 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
         Wait::Try,
         &clock,
         &limits(),
-        &|_, _| None,
+        &|_, _, _| None,
         &mut Broken,
     )
     .unwrap();
@@ -369,7 +369,7 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
         Wait::Try,
         &clock,
         &limits(),
-        &|_, _| None,
+        &|_, _, _| None,
         &mut out,
     )
     .unwrap();
@@ -389,7 +389,7 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
         Wait::Try,
         &clock,
         &limits(),
-        &|_, _| None,
+        &|_, _, _| None,
         &mut out,
     )
     .unwrap();
@@ -437,7 +437,7 @@ fn inbox_claim_after_a_pointer_line_offers_every_pending_message_once() {
         Wait::Try,
         &clock,
         &limits(),
-        &|_, _| None,
+        &|_, _, _| None,
         &mut out,
     )
     .unwrap();
@@ -455,7 +455,7 @@ fn inbox_claim_after_a_pointer_line_offers_every_pending_message_once() {
         Wait::Try,
         &clock,
         &limits(),
-        &|_, _| None,
+        &|_, _, _| None,
         &mut again,
     )
     .unwrap();
@@ -477,7 +477,7 @@ fn inbox_claim_of_an_unregistered_caller_answers_no_address() {
             Wait::Try,
             &clock,
             &limits(),
-            &|_, _| None,
+            &|_, _, _| None,
             &mut out,
         )
         .unwrap();

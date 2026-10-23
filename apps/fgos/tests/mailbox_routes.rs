@@ -1392,3 +1392,62 @@ fn a_head_that_registered_before_the_machine_had_an_id_is_registered_with_identi
         "the repaired outcome is cleared"
     );
 }
+
+/// Holds the scene's mailbox lock for `ms` in a thread, as a hook writing a
+/// registration does; returns once the lock is held.
+fn hold_lock(scene: &Scene, ms: u64) -> std::thread::JoinHandle<()> {
+    let fgos_dir = scene.main().join(".fgos");
+    let (held, wait) = std::sync::mpsc::channel();
+    let holder = std::thread::spawn(move || {
+        let record = fgos_mailbox::record::Record::open(fgos_dir).unwrap();
+        let limits = fgos_mailbox::limits::load(None).unwrap().limits;
+        let now = fgos_mailbox_core::Timestamp::from_millis(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_millis() as u64,
+        );
+        record
+            .hold(fgos_mailbox::record::Wait::Try, now, &limits, |_, _| {
+                held.send(()).unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(ms));
+                fgos_mailbox::record::Reported {
+                    value: (),
+                    changed: false,
+                }
+            })
+            .unwrap();
+    });
+    wait.recv().unwrap();
+    holder
+}
+
+#[test]
+fn a_send_racing_a_hook_that_holds_the_lock_longer_than_the_hooks_skip_budget_waits_and_records() {
+    let scene = Scene::new("send-waits");
+    let first = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(first.status.code(), Some(0));
+    let name = scene.head_name();
+    let send = ["mailbox", "send", "--to", name.as_str(), "after the hook"];
+
+    let holder = hold_lock(&scene, 400);
+    let sent = scene.run(&scene.main(), Some("sender-a"), &send, b"");
+    holder.join().unwrap();
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    assert!(String::from_utf8_lossy(&sent.stdout).starts_with("recorded "));
+
+    // The falsifier: with the hook's 100 ms as the verbs' wait, the same race is refused.
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"verbs":{"lockWaitMs":100}}}"#,
+    )
+    .unwrap();
+    let holder = hold_lock(&scene, 400);
+    let refused = scene.run(&scene.main(), Some("sender-a"), &send, b"");
+    holder.join().unwrap();
+    assert_eq!(refused.status.code(), Some(1), "{refused:?}");
+    assert!(
+        String::from_utf8_lossy(&refused.stdout).contains("lock-busy"),
+        "{refused:?}"
+    );
+}

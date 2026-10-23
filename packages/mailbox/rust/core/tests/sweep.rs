@@ -1,6 +1,6 @@
 mod common;
 
-use common::{key, t, Pair, B_NAME};
+use common::{key, t, Pair, A_NAME, B_NAME};
 use fgos_mailbox_core::{
     Checkpoint, CounterReason, Generation, Kind, MessageState, NoticeState, RefusalReason,
 };
@@ -388,4 +388,115 @@ fn one_saturated_sender_stops_growing_at_the_derived_header_ceiling() {
     assert_eq!(most, ceiling, "the ceiling is reached and never passed");
     let last = &counts[counts.len() - 2..];
     assert_eq!(last[0], last[1], "not steady at the end: {last:?}");
+}
+
+/// The state without the clock a sweep always advances: what a write would
+/// persist beyond `last_now`.
+fn persisted(state: &fgos_mailbox_core::MailboxState) -> serde_json::Value {
+    let mut value = serde_json::to_value(state).unwrap();
+    value.as_object_mut().unwrap().remove("last_now");
+    value
+}
+
+#[test]
+fn a_time_rule_is_due_exactly_when_a_sweep_would_change_the_state() {
+    let mut pair = Pair::new(t(100));
+    let l = pair.limits.clone();
+    // Every rule gets an item: a claim left in flight, a message never read
+    // (refused at the record TTL, which leaves a notice and its mark), and a
+    // message offered and settled (its body and then its header retire).
+    let lost = pair.send("a", B_NAME, "claimed, never finished", t(100));
+    let claim = pair.state.claim(
+        &key("b"),
+        fgos_mailbox_core::Generation::FIRST,
+        fgos_mailbox_core::Checkpoint::Step,
+        t(110),
+        &l,
+        &mut pair.ids,
+    );
+    assert_eq!(claim.items.len(), 1);
+    let _ = lost;
+    let read = pair.send("b", A_NAME, "read at once", t(120));
+    let claim = pair.state.claim(
+        &key("a"),
+        fgos_mailbox_core::Generation::FIRST,
+        fgos_mailbox_core::Checkpoint::Step,
+        t(121),
+        &l,
+        &mut pair.ids,
+    );
+    pair.state.finish(
+        &key("a"),
+        fgos_mailbox_core::Generation::FIRST,
+        claim.token.as_ref().unwrap(),
+        t(122),
+    );
+    assert!(matches!(
+        pair.state.message(&read).unwrap().state,
+        fgos_mailbox_core::MessageState::Offered { .. }
+    ));
+    pair.send("b", A_NAME, "never read", t(130));
+
+    // The contract makes the body retention and the header horizon equal to
+    // the record TTL; the timeline relies on that, so it is checked.
+    assert_eq!(l.record.body_retention_sec, l.record.ttl_sec);
+    assert_eq!(l.header_horizon_sec(), l.record.ttl_sec);
+    let ttl = l.record.ttl_sec;
+    let window = l.notices.window_sec;
+    // Each step names the one rule that falls due at it, in time order.
+    let steps: [(u64, Option<&str>, &str); 9] = [
+        (131, None, "nothing"),
+        (110 + l.in_flight_ttl_sec + 1, None, "the claim expires"),
+        (
+            100 + ttl + 2,
+            None,
+            "the claimed-then-expired message passes its record TTL",
+        ),
+        (122 + ttl + 1, None, "the offered message retires"),
+        (
+            130 + ttl + 1,
+            None,
+            "the unread message passes its record TTL",
+        ),
+        (
+            100 + ttl + 2 + window + 1,
+            None,
+            "the first notice mark is forgotten",
+        ),
+        (
+            100 + ttl + 2 + window + 3,
+            Some("a"),
+            "a's generation changed: its notice drops",
+        ),
+        (
+            130 + ttl + 1 + window + 1,
+            None,
+            "the second notice mark is forgotten",
+        ),
+        (130 + ttl + 1 + window + 2, None, "nothing"),
+    ];
+    let mut due_seen = 0;
+    for (secs, takes_over, rule) in steps {
+        if let Some(who) = takes_over {
+            pair.take_over(who, "claude", t(secs - 1));
+        }
+        let now = t(secs);
+        let due = pair.state.time_rule_due(now, &l);
+        let mut swept = pair.state.clone();
+        swept.sweep(now, &l, &mut pair.ids.clone());
+        assert_eq!(
+            due,
+            persisted(&swept) != persisted(&pair.state),
+            "at {secs}s ({rule})"
+        );
+        assert_eq!(due, rule != "nothing", "at {secs}s ({rule})");
+        due_seen += usize::from(due);
+        // Move on as the next operation would: apply what was due.
+        pair.state = swept;
+        assert!(
+            !pair.state.time_rule_due(now, &l),
+            "nothing is due right after a sweep at {secs}s"
+        );
+    }
+    assert_eq!(due_seen, 7);
 }

@@ -16,7 +16,9 @@ pub use drain::{
     HookReply, PointerOnly, PointerReason, QuietReason,
 };
 pub(crate) use drain::{claim_inbox, InboxClaim};
-pub use limits::{BreakerLimits, HookCallLimits, HookLimits, PostToolUseLimits, StopBlockLimits};
+pub use limits::{
+    BreakerLimits, HookCallLimits, HookLimits, PostToolUseLimits, StopBlockLimits, VerbLimits,
+};
 
 use fgos_mailbox_core::Cli;
 

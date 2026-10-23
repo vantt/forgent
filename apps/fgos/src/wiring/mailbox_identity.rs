@@ -22,7 +22,7 @@ use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, Sessio
 use fgos_mailbox::hook::shell::BoundHead;
 use fgos_mailbox::verbs::HeadView;
 use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Cli, Liveness, WriterKey};
-use fgos_process::facts::judge_here;
+use fgos_process::facts::{judge_here, Record};
 use std::path::{Path, PathBuf};
 
 /// Identity's state root, as the `identity` verbs resolve it (an explicit
@@ -57,15 +57,30 @@ pub fn is_alias(to: &str) -> bool {
 }
 
 /// The Identity session of a mailbox head: its full id and handle, derived
-/// by Identity from the head's key and CLI. `None` when Identity has no
-/// session-id variable for that CLI or no machine id yet.
-pub fn session_of(state_root: &Path, key: &WriterKey, cli: &Cli) -> Option<SessionInfo> {
+/// by Identity from the head's key, CLI and process, the binding's stored
+/// head, exactly as the registration passed it, so a shared session
+/// variable (pi, omp) gets the label Identity registered. `None` when
+/// Identity has no session-id variable for that CLI or no machine id yet.
+pub fn session_of(
+    state_root: &Path,
+    key: &WriterKey,
+    cli: &Cli,
+    head: Option<&Record>,
+) -> Option<SessionInfo> {
     let key = identity_key(key, cli)?;
-    // No head pid here: only a pi or omp key reads its CLI label from the
-    // ancestry, and neither CLI has a mailbox adapter yet.
-    session_for(state_root, &key, None)
+    let head = head.and_then(head_ref);
+    session_for(state_root, &key, head.as_ref())
         .ok()
         .map(|session| session.info)
+}
+
+/// Identity's reference to a head process: its pid and start time, when the
+/// record has both.
+fn head_ref(record: &Record) -> Option<HeadRef> {
+    Some(HeadRef {
+        pid: record.pid?.0,
+        start_time: record.start_time.clone()?,
+    })
 }
 
 /// The head's key as Identity takes it: the session-id variable Identity
@@ -100,13 +115,8 @@ pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Opti
     let Some(key) = identity_key(&head.writer, cli) else {
         return refused("no-session-variable");
     };
-    let record = &head.head.record;
-    let (Some(pid), Some(start_time)) = (record.pid, record.start_time.clone()) else {
+    let Some(head_ref) = head_ref(&head.head.record) else {
         return refused("head-unknown");
-    };
-    let head_ref = HeadRef {
-        pid: pid.0,
-        start_time,
     };
     let own = match session_for(state_root, &key, Some(&head_ref)) {
         Ok(session) => session.info,
@@ -141,7 +151,12 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
     };
     let ours: Vec<(&HeadView, SessionInfo)> = heads
         .iter()
-        .filter_map(|head| Some((head, session_of(root, &head.key, &head.cli)?)))
+        .filter_map(|head| {
+            Some((
+                head,
+                session_of(root, &head.key, &head.cli, Some(&head.head))?,
+            ))
+        })
         .collect();
     let is_role = to.starts_with(ROLE_PREFIX);
     let by_handle = to.contains('@');
@@ -218,7 +233,12 @@ pub struct HandleConflict {
 pub fn handle_conflicts(state_root: &Path, heads: &[HeadView]) -> Vec<HandleConflict> {
     let ours: Vec<(&HeadView, SessionInfo)> = heads
         .iter()
-        .filter_map(|head| Some((head, session_of(state_root, &head.key, &head.cli)?)))
+        .filter_map(|head| {
+            Some((
+                head,
+                session_of(state_root, &head.key, &head.cli, Some(&head.head))?,
+            ))
+        })
         .collect();
     let mut conflicts = Vec::new();
     for (view, info) in &ours {
@@ -305,6 +325,94 @@ mod tests {
                 .count()
             })
             .unwrap_or(0)
+    }
+
+    /// A child process whose kernel command name is `omp`: a copy of `sleep`
+    /// under that name, killed on drop.
+    struct Omp(std::process::Child, PathBuf);
+
+    impl Omp {
+        fn start(tag: &str) -> Self {
+            let dir = std::env::temp_dir().join(format!("mbx-omp-{tag}-{}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let bin = dir.join("omp");
+            std::fs::copy("/bin/sleep", &bin).unwrap();
+            let child = std::process::Command::new(&bin).arg("60").spawn().unwrap();
+            Self(child, dir)
+        }
+
+        fn record(&self) -> fgos_process::facts::Record {
+            fgos_process::facts::identity_of(fgos_process::ProcId(self.0.id()))
+                .unwrap()
+                .to_record()
+        }
+    }
+
+    impl Drop for Omp {
+        fn drop(&mut self) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+            let _ = std::fs::remove_dir_all(&self.1);
+        }
+    }
+
+    fn view(key: &str, name: &str, head: fgos_process::facts::Record) -> super::HeadView {
+        super::HeadView {
+            key: WriterKey::new(key).unwrap(),
+            name: serde_json::from_value(serde_json::json!(name)).unwrap(),
+            cli: Cli::new("pi").unwrap(),
+            liveness: fgos_mailbox_core::Liveness::Alive,
+            head,
+        }
+    }
+
+    #[test]
+    fn an_omp_head_renders_and_is_addressed_by_the_handle_identity_registered_from_its_ancestry_among_two_heads(
+    ) {
+        let root = state_root("omp");
+        let omp = Omp::start("omp");
+        let pi = Cli::new("pi").unwrap();
+        // The omp head sorts last among this record's two heads.
+        let mut head = bound("zz-omp-session", None);
+        head.head.record = omp.record();
+        assert_eq!(ensure_registered(&root, &pi, &head), None);
+        let registered = std::fs::read_dir(fgos_identity::directory::directory(&root))
+            .unwrap()
+            .map(|e| std::fs::read_to_string(e.unwrap().path()).unwrap())
+            .collect::<String>();
+        let handle = super::session_of(&root, &head.writer, &pi, Some(&omp.record()))
+            .unwrap()
+            .handle;
+        assert!(handle.starts_with("omp-"), "{handle}");
+        assert!(
+            registered.contains(&format!("\"{handle}\"")),
+            "the frame's handle is the one registered: {registered}"
+        );
+        // The falsifier: derived without the head, the same key reads as pi.
+        let neutral = super::session_of(&root, &head.writer, &pi, None)
+            .unwrap()
+            .handle;
+        assert!(neutral.starts_with("pi-"), "{neutral}");
+
+        let heads = [
+            view("aa-pi-session", "forgent-pi-aa", self_record()),
+            view("zz-omp-session", "forgent-pi-zz", omp.record()),
+        ];
+        match super::address(Some(&root), &handle, &heads) {
+            super::Addressed::Head { key, .. } => assert_eq!(key.as_str(), "zz-omp-session"),
+            super::Addressed::Refused(refusal) => panic!("{refusal:?}"),
+        }
+        assert!(
+            super::handle_conflicts(&root, &heads).is_empty(),
+            "no false conflict"
+        );
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    fn self_record() -> fgos_process::facts::Record {
+        fgos_process::facts::identity_of(fgos_process::ProcId(std::process::id()))
+            .unwrap()
+            .to_record()
     }
 
     #[test]

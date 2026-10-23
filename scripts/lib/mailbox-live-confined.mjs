@@ -4,7 +4,7 @@
  * The confined launch of every live CLI of the mailbox behaviour suite
  * (docs/platform/agent-mailbox/spec.md §11 "Safety of the live suites", the V4
  * review's H2): fgOS's own bwrap driver, a run directory as the only writable
- * host path, the real login stores and listed secrets masked, a private home
+ * host path, the whole real home hidden but for an allow-list, a private home
  * holding a copy (never a link) of the one login file the CLI needs, and an
  * end that leaves no process behind. Node built-ins and the driver only.
  *
@@ -20,10 +20,12 @@
  * the CLI's output) and `<base>/attestations/`.
  *
  * Order of the bwrap argv: the driver's base flags (`--ro-bind / /`, a private
- * `/tmp`, `--unshare-pid --as-pid-1`), then the masks and the base bound
+ * `/tmp`, `--unshare-pid --as-pid-1`), then the hidden home and runtime
+ * directory with the allow-listed paths bound back, and the base bound
  * read-only (added here), then the driver's resource binds (the run directory
  * and its private home, writable), then the read-only binds the caller names
- * (added here), then the driver's command.
+ * (added here), then each hidden tmpfs made read-only, then the driver's
+ * command.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -45,20 +47,6 @@ export const LOGINS = Object.freeze({
   claude: { layout: 'claude-credentials-json', file: path.join('.claude', '.credentials.json'), homeEnv: 'HOME', source: (home) => ({ kind: 'home-files', home, files: [path.join('.claude', '.credentials.json')] }) },
   codex: { layout: 'codex-auth-json', file: 'auth.json', homeEnv: 'CODEX_HOME', source: (home) => ({ kind: 'codex-home', home }) },
 });
-
-/**
- * The one list of known credential stores every confined launch masks, relative to the home.
- * Directories get an empty read-only tmpfs: the CLIs' login stores, fgOS's own, SSH and GnuPG
- * keys, and the GitHub, AWS, Google Cloud and Azure CLIs' stores.
- */
-export const MASKED_HOME_DIRS = Object.freeze(['.claude', '.codex', '.fgos', '.ssh', '.gnupg', '.aws', path.join('.config', 'gh'), path.join('.config', 'gcloud'), '.azure', '.agy-homes', '.gemini']);
-/**
- * Files masked by an empty file, besides every `secrets.local.env` found under the secret
- * roots: Claude Code's account file, the npm, git, netrc, Docker and Kubernetes credentials.
- */
-export const MASKED_HOME_FILES = Object.freeze(['.claude.json', '.npmrc', '.git-credentials', '.netrc', path.join('.docker', 'config.json'), path.join('.kube', 'config')]);
-const SECRET_FILE = 'secrets.local.env';
-const SECRET_DEPTH = 4;
 
 /** A launch refused before any CLI started. */
 export class ConfinedLaunchError extends Error {
@@ -144,56 +132,28 @@ export function installRunRows(paths, cli) {
   return hooks;
 }
 
-/** Every `secrets.local.env` under `roots`, at most four levels down, never through a symlink. */
-function secretFiles(roots) {
-  const found = [];
-  const walk = (dir, depth) => {
-    let entries;
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isFile() && entry.name === SECRET_FILE) found.push(full);
-      else if (entry.isDirectory() && depth < SECRET_DEPTH) walk(full, depth + 1);
-    }
-  };
-  for (const root of roots) walk(root, 1);
-  return found;
-}
-
 /**
- * The masks of one launch, from what exists at launch: the home's login and secret
- * directories plus each Codex account home (`dirs`, an empty read-only tmpfs each), the
- * home's `.claude.json` and every `secrets.local.env` under `secretRoots` (`files`,
- * an empty file each), and the pinned Codex release directory bound back read-only when a
- * mask hides it (`bindBack`).
+ * The one confinement of a run's view of the host, an allow-list: the whole real home and the
+ * user's runtime directory (its keyring and D-Bus sockets) are each an empty tmpfs, and only the
+ * paths in `allow` that lie inside the home are bound back read-only: the pinned CLI installs and
+ * the toolchain the CLI executes. The launch itself binds the base read-only and the run's own
+ * directory and private home writable; everything else under the home stays unreadable. The plan
+ * goes into every ledger entry in full, with its sha256.
  */
-export function maskPlan({ home = os.homedir(), codexAccountHomes = [], secretRoots = [path.join(home, 'projects')], codexRelease = null } = {}) {
-  const dirs = [...new Set([...MASKED_HOME_DIRS.map((d) => path.join(home, d)), ...codexAccountHomes])].filter(isDir);
-  const files = [...MASKED_HOME_FILES.map((f) => path.join(home, f)), ...secretFiles(secretRoots)].filter(exists);
-  const bindBack = codexRelease && dirs.some((d) => inside(codexRelease, d)) ? [codexRelease] : [];
-  return { dirs, files, bindBack };
+export function maskPlan({ home = os.homedir(), runtimeDir = `/run/user/${os.userInfo().uid}`, allow = [] } = {}) {
+  const hidden = [home, runtimeDir].filter(isDir);
+  const bindBack = [...new Set(allow.filter(Boolean).map((p) => path.resolve(p)))].filter((p) => inside(p, home) && exists(p)).sort();
+  return { hidden, bindBack };
 }
 
-/** The sha256 of a mask plan, recorded in each run's ledger entry as the masks in force. */
-export const maskPlanSha256 = (masks) => crypto.createHash('sha256').update(JSON.stringify({ dirs: masks.dirs, files: masks.files, bindBack: masks.bindBack })).digest('hex');
+/** The sha256 of a mask plan, recorded in each run's ledger entry beside the plan itself. */
+export const maskPlanSha256 = (masks) => crypto.createHash('sha256').update(JSON.stringify({ hidden: masks.hidden, bindBack: masks.bindBack })).digest('hex');
 
-/**
- * The bwrap arguments of a mask plan: tmpfs, binds back, each tmpfs made read-only, and
- * each masked file replaced by `empty`, an empty regular file (bwrap binds without device
- * access, so /dev/null bound over a file would read as EACCES, not as empty).
- */
-export function maskArgs({ dirs, files, bindBack }, empty) {
-  return [
-    ...dirs.flatMap((d) => ['--tmpfs', d]),
-    ...bindBack.flatMap((b) => ['--ro-bind', b, b]),
-    ...dirs.flatMap((d) => ['--remount-ro', d]),
-    ...files.flatMap((f) => ['--ro-bind', empty, f]),
-  ];
-}
+/** The bwrap arguments that hide: an empty tmpfs over each hidden path, then each allowed path bound back read-only. */
+export const maskArgs = ({ hidden, bindBack }) => [...hidden.flatMap((d) => ['--tmpfs', d]), ...bindBack.flatMap((b) => ['--ro-bind', b, b])];
+
+/** The bwrap arguments that make each hidden tmpfs read-only, last, once every mount point inside it exists. */
+export const maskSealArgs = ({ hidden }) => hidden.flatMap((d) => ['--remount-ro', d]);
 
 /**
  * Prepares run `runId` under `base` through the bwrap driver: the run directory (or the
@@ -235,15 +195,10 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
   if (afterBase === 0 || separator < afterBase) throw new ConfinedLaunchError('the driver argv has no base flags or no command separator');
   const tail = argv.splice(separator);
   const head = argv.splice(0, afterBase);
-  const empty = path.join(base, 'masks', 'empty');
-  if (!exists(empty)) {
-    fs.mkdirSync(path.dirname(empty), { recursive: true });
-    fs.writeFileSync(empty, '', { mode: 0o444 });
-  }
-  const confined = [...head, ...maskArgs(masks, empty), '--ro-bind', base, base, ...argv, ...readOnly.flatMap((p) => ['--ro-bind', p, p]), ...tail];
+  const confined = [...head, ...maskArgs(masks), '--ro-bind', base, base, ...argv, ...readOnly.flatMap((p) => ['--ro-bind', p, p]), ...maskSealArgs(masks), ...tail];
   const copy = spec ? path.join(paths.home, spec.file) : null;
   // `launch` goes into the ledger entry: the CLI's own argv as given, and the masks in force.
-  const launch = { argv: [command, ...args], maskSha256: maskPlanSha256(masks) };
+  const launch = { argv: [command, ...args], masks: { hidden: masks.hidden, bindBack: masks.bindBack }, maskSha256: maskPlanSha256(masks) };
   return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, copy, snapshot: copy ? loginDigest(copy) : null, launch };
 }
 
@@ -383,17 +338,22 @@ export async function endConfinedRun(run, { waitMs = 5000, outcome = null } = {}
 /**
  * At every harness start: each ledger entry under `base` without an end is an orphan of a
  * harness that died. Its processes are killed (matched by recorded start times and its pid
- * namespace, or by the run directory), its login copy is settled like a finished run's
- * (`settleCopy`), and it is recorded `error` (`orphan`). Returns the swept run ids, the pids
- * left and the copies set aside; the caller starts no run while any pid is left, and stops
- * the batch for a copy set aside.
+ * namespace, or by the run directory), and its login copy is settled like a finished run's
+ * (`settleCopy`) whether or not the kill worked: a copy whose bytes changed is set aside and
+ * stops the batch, an unchanged one is removed. The entry is recorded `error` (`orphan`) and
+ * ended only once no process of it is left; until then it stays open, every later sweep kills
+ * and settles it again (a surviving CLI may write a new copy), and its pids are returned in
+ * `left`, so no run starts. A copy that cannot be settled (one is already set aside there) is
+ * returned in `unsettled`, which also refuses every run. Returns the swept run ids, the pids
+ * left, the copies set aside and the copies left unsettled.
  */
 export function sweepOrphans(base, { waitMs = 5000 } = {}) {
   const dir = path.join(base, 'ledger');
   const swept = [];
   const left = [];
   const asides = [];
-  if (!isDir(dir)) return { swept, left, asides };
+  const unsettled = [];
+  if (!isDir(dir)) return { swept, left, asides, unsettled };
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort()) {
     const file = path.join(dir, name);
     const entry = readJson(file);
@@ -403,12 +363,23 @@ export function sweepOrphans(base, { waitMs = 5000 } = {}) {
     killIfSame(entry.bwrapPid, entry.bwrapStart);
     const still = killRunProcesses(entry.dir, pidNs, waitMs);
     left.push(...still);
-    const settled = entry.login && !still.length ? settleCopy(entry.login, entry.dir) : null;
+    let settled = null;
+    let loginSettled = entry.loginSettled ?? false;
+    // A copy settled by an earlier sweep is gone; only a copy written since is settled again.
+    if (entry.login && (!loginSettled || exists(entry.login.copy))) {
+      try {
+        settled = settleCopy(entry.login, entry.dir);
+        loginSettled = true;
+      } catch (error) {
+        unsettled.push({ runId: entry.runId, copy: entry.login.copy, reason: error.message });
+      }
+    }
     if (settled) asides.push({ runId: entry.runId, ...settled });
-    writeJson(file, { ...entry, endedAt: new Date().toISOString(), outcome: 'error', reason: 'orphan', left: still.length, ...(settled ? { loginAside: settled.aside } : {}) });
+    const record = { ...entry, outcome: 'error', reason: 'orphan', left: still.length, loginSettled, ...(settled ? { loginAside: settled.aside } : {}) };
+    writeJson(file, still.length ? { ...record, sweptAt: new Date().toISOString() } : { ...record, endedAt: new Date().toISOString() });
     swept.push(entry.runId);
   }
-  return { swept, left, asides };
+  return { swept, left, asides, unsettled };
 }
 
 // ---------------------------------------------------------------- the login guard

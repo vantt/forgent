@@ -82,6 +82,9 @@ pub struct HeadView {
     pub cli: Cli,
     /// The store's judgement of the head's process; never `Dead` here.
     pub liveness: Liveness,
+    /// The head process the binding stores, from which Identity labels a
+    /// shared session variable's CLI.
+    pub head: fgos_process::facts::Record,
 }
 
 /// Every head of the record whose process the store does not judge dead,
@@ -106,6 +109,7 @@ fn live_heads(state: &fgos_mailbox_core::MailboxState) -> Vec<HeadView> {
             name: b.name.clone(),
             cli: b.cli.clone(),
             liveness: stored_liveness(b),
+            head: crate::head::record_of_head_text(&b.head),
         })
         .filter(|h| h.liveness != Liveness::Dead)
         .collect()

@@ -119,19 +119,19 @@ export const cellOpen = (progress, target) => progress.valid < target && progres
  * and the pids still left (no run starts while any is left).
  */
 export function recoverLedger(base, resultsFile) {
-  const { left, asides } = confined.sweepOrphans(base);
+  const { left, asides, unsettled } = confined.sweepOrphans(base);
   const done = new Set(readResults(resultsFile).map((r) => r.runId));
   const appended = [];
   const ledger = path.join(base, 'ledger');
   for (const name of fs.existsSync(ledger) ? fs.readdirSync(ledger).filter((n) => n.endsWith('.json')).sort() : []) {
     const entry = readJson(path.join(ledger, name));
-    if (done.has(entry.runId) || entry.outcome !== 'error' || !RUN_ID.test(entry.runId)) continue;
+    if (done.has(entry.runId) || entry.outcome !== 'error' || !entry.endedAt || !RUN_ID.test(entry.runId)) continue;
     const cell = cellOfRunId(entry.runId);
     const line = { runId: entry.runId, cell: cell.id, cli: cell.cli, ...(cell.arm ? { arm: cell.arm } : {}), variant: cell.variant, channel: cell.channel, outcome: 'error', error: entry.reason ?? 'unfinished', invocations: 1 };
     appendResult(resultsFile, line);
     appended.push(line);
   }
-  return { appended, left, asides };
+  return { appended, left, asides, unsettled };
 }
 
 /** The real CLI invocations spent: one ledger entry per confined start. */
@@ -247,31 +247,23 @@ const snapshotOf = (ws) => {
 };
 const stateName = (m) => (typeof m?.state === 'string' ? m.state : Object.keys(m?.state ?? {})[0] ?? null);
 
-/** How often the harness's own send is tried when the record's lock is busy: a refused send changed nothing. */
-export const SEND_TRIES = 3;
-const SEND_RETRY_MS = 300;
-
 /**
  * The harness's own send, from outside every sandbox, through the run's shim, as `sender` (a
- * session id with no head). A send refused with `lock-busy` (the head's hook still holds the
- * record's lock right after writing its registration) changed nothing and is tried again, up
- * to SEND_TRIES in all; `tries` says how many it took. Every other answer is final.
+ * session id with no head): one product `send`, which itself waits `mailbox.verbs.lockWaitMs`
+ * for a lock a hook holds, so the harness gets what a user gets.
  */
 export function harnessSend(ws, to, body, { wake = false, sender }) {
   const env = { PATH: process.env.PATH, HOME: os.homedir(), LANG: 'C.UTF-8', FGOS_SESSION_ID: sender };
-  for (let tries = 1; ; tries += 1) {
-    const out = spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body], { cwd: ws, env, encoding: 'utf8' });
-    const text = `${out.stdout}${out.stderr}`.trim();
-    if (out.status !== 0 && /\(lock-busy\)/.test(text) && tries < SEND_TRIES) {
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, SEND_RETRY_MS);
-      continue;
-    }
-    return { status: out.status, text, id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now(), tries };
-  }
+  const out = spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body], { cwd: ws, env, encoding: 'utf8' });
+  return { status: out.status, text: `${out.stdout}${out.stderr}`.trim(), id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now() };
 }
 
 /** Claude Code's MCP servers for a confined run: none, and no other MCP configuration is read. */
 export const CLAUDE_NO_MCP = Object.freeze(['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']);
+/** The second layer: Claude Code's own switch that keeps the account's claude.ai connectors off. */
+export const CLAUDE_NO_CONNECTORS_ENV = Object.freeze({ ENABLE_CLAUDEAI_MCP_SERVERS: 'false' });
+/** The environment a confined run of `cli` adds to its base: Claude Code's connector switch. */
+export const cliRunEnv = (cli) => (cli === 'claude' ? { ...CLAUDE_NO_CONNECTORS_ENV } : {});
 
 /** The CLI argv of a run: print mode, the model (`models`, V6's by default), no MCP server, the hook rows, the instruction, the task. */
 export function cliArgs(cli, { settings, ws, lastMessage, instruction, prompt, models = score.MODELS }) {
@@ -352,7 +344,7 @@ export async function runOne(ctx, cell, runId) {
   const instruction = renderInstruction(data.instruction, [score.SENDERS.trusted.label]);
   const { lastMessage } = paths;
   const args = cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
-  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {} });
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: { ...cliRunEnv(cell.cli), ...(ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {}) } });
   const prepared = confined.prepareConfinedRun({ base, runId, command: ctx.cliBin[cell.cli][0], args: [...ctx.cliBin[cell.cli].slice(1), ...args], env, login: ctx.login[cell.cli], masks: ctx.masks, readOnly: [paths.installation] });
   const hooks = confined.layOutRunProject(paths, { cli: cell.cli, release: ctx.release, shim: ctx.shim, ...(ctx.projectConfig ? { config: ctx.projectConfig(cell) } : {}) });
   seedWorkspace(paths.ws);
@@ -449,7 +441,6 @@ export async function runOne(ctx, cell, runId) {
     stalled,
     error,
     sentStatus: sent?.status ?? null,
-    ...(sent && sent.tries > 1 ? { sendTries: sent.tries } : {}),
     recordedAt: message?.recorded_at ?? null,
     offeredAt: message?.state?.offered?.at ?? null,
     latencyMs: message?.state?.offered?.at && message?.recorded_at ? message.state.offered.at - message.recorded_at : null,
@@ -542,7 +533,7 @@ export async function runLoop(ctx, config, runId) {
     const { lastMessage } = paths;
     const prompt = `${loopPrompt(data, config.scenario, role, peerName)}${ctx.dryPrompt ? `\n${ctx.dryPrompt(role, peerName)}` : ''}`;
     const args = cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: renderInstruction(data.instruction, trusted), prompt, models: ctx.models });
-    const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', headId), pathPrefix: path.join(paths.installation, 'bin') });
+    const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', headId), pathPrefix: path.join(paths.installation, 'bin'), extra: cliRunEnv(cli) });
     const prepared = confined.prepareConfinedRun({ base, runId: headId, workspace, command: ctx.cliBin[cli][0], args: [...ctx.cliBin[cli].slice(1), ...args], env, login: ctx.login[cli], masks: ctx.masks, readOnly: [paths.installation] });
     const first = !Object.keys(heads).length;
     const hooks = first

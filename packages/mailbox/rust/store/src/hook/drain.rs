@@ -31,7 +31,7 @@
 //! process's entry can have the head CLI as its parent pid (V5).
 use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
-use crate::head::{head_text, is_complete, judge_stored};
+use crate::head::{head_text, is_complete, judge_stored, record_of_head_text};
 use fgos_mailbox_core::{
     mode_pointer, render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat,
     Cli, Finished, Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal,
@@ -215,10 +215,13 @@ impl Begun {
     }
 }
 
-/// Derives a sender's Identity handle from its writer key and CLI when a
-/// frame is rendered; `None` when it cannot be derived. The wiring builds
-/// it from Identity's doors; the store never derives a handle itself.
-pub type HandleOf<'a> = dyn Fn(&WriterKey, &Cli) -> Option<String> + 'a;
+/// Derives a sender's Identity handle from its writer key, its CLI and its
+/// head process (the binding's stored head, so the handle is the one
+/// Identity registered: a shared session variable labels its CLI from that
+/// process's ancestry) when a frame is rendered; `None` when it cannot be
+/// derived. The wiring builds it from Identity's doors; the store never
+/// derives a handle itself.
+pub type HandleOf<'a> = dyn Fn(&WriterKey, &Cli, Option<&Record>) -> Option<String> + 'a;
 
 /// What the shell writes to stdout; empty when quiet.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -391,7 +394,11 @@ pub fn render_reply(
         .map(|item| {
             let mut item = item.clone();
             if let ClaimedWhat::Mail(from) = &mut item.what {
-                from.handle = from.cli.as_ref().and_then(|cli| handle_of(&from.key, cli));
+                let head = from.head.as_deref().map(record_of_head_text);
+                from.handle = from
+                    .cli
+                    .as_ref()
+                    .and_then(|cli| handle_of(&from.key, cli, head.as_ref()));
             }
             render(&item, bodies(&item.id).as_deref(), limits)
         })

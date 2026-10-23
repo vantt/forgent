@@ -228,7 +228,7 @@ impl Drain {
         let reply = render_reply(
             claimed,
             &|id| bodies.get(id).cloned(),
-            &|_, _| None,
+            &|_, _, _| None,
             &limits(),
         );
         let now = self.tick();
@@ -884,13 +884,40 @@ fn a_codex_binding_that_already_holds_stop_blocks_answers_stop_channel_off_and_k
 }
 
 #[test]
-fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_and_cli() {
+fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_cli_and_stored_head() {
     let mut drain = Drain::registered(Adapter::Claude);
-    drain.add_peer("peer");
+    // A peer whose binding stores a real head process of its own.
+    let now = drain.tick();
+    let peer = Sleeper::start();
+    let peer_head = peer.record();
+    drain
+        .state
+        .register(
+            RegisterRequest {
+                key: WriterKey::new("peer").unwrap(),
+                cli: fgos_mailbox_core::Cli::new("codex").unwrap(),
+                project: PROJECT.to_string(),
+                own_suffix: None,
+                head: fgos_mailbox::head::head_text(&peer_head),
+                handle: None,
+            },
+            None,
+            now,
+            &limits(),
+            &mut drain.ids,
+        )
+        .unwrap();
     drain.send("peer", "hello", false);
     let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-    let handle_of =
-        |key: &WriterKey, cli: &Cli| Some(format!("{}-{}@fg-test", cli.as_str(), key.as_str()));
+    // The derivation gets the head the binding stores, as Identity's door takes it.
+    let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&Record>| {
+        assert_eq!(
+            head,
+            Some(&peer_head),
+            "the sender's stored head reaches the derivation"
+        );
+        Some(format!("{}-{}@fg-test", cli.as_str(), key.as_str()))
+    };
 
     let reply = render_reply(&claimed, &|_| None, &handle_of, &limits());
 
@@ -1020,4 +1047,33 @@ fn a_claim_left_in_flight_beside_too_large_mail_is_offered_again_once_its_deadli
         vec![(small, 2)]
     );
     assert_eq!(again.too_large, 1);
+}
+
+#[test]
+fn a_pointer_call_past_a_messages_record_ttl_refuses_it_writes_once_and_then_changes_nothing() {
+    let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
+    for (mut drain, body) in [
+        (pointer_mode(Adapter::Codex), "small".to_string()),
+        (Drain::registered(Adapter::Codex), too_large),
+    ] {
+        drain.add_peer("peer");
+        let id = drain.send("peer", &body, false);
+        let first = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+        assert!(Begun::Pointer(first).state_changed());
+
+        // Ignored past the record TTL: the next pointer call runs the sweep.
+        drain.now += limits().record.ttl_sec + 1;
+        let late = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+        assert!(late.state_changed(), "the due refusal is written");
+        assert!(matches!(
+            drain.state_of(&id),
+            MessageState::Refused {
+                reason: fgos_mailbox_core::RefusalReason::RecordTtl,
+                ..
+            }
+        ));
+        assert!(!drain
+            .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
+            .state_changed());
+    }
 }

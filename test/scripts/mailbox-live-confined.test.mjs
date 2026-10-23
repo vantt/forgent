@@ -16,8 +16,6 @@ import { fileURLToPath } from 'node:url';
 
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import {
-  MASKED_HOME_DIRS,
-  MASKED_HOME_FILES,
   endConfinedRun,
   layOutRunProject,
   maskPlan,
@@ -62,7 +60,8 @@ function codexRelease() {
   }
 }
 
-const codexAccountHomes = () => fs.readdirSync(HOME).filter((n) => n.startsWith('.codex-')).map((n) => path.join(HOME, n)).filter((d) => fs.statSync(d).isDirectory());
+/** The allow-list the tests' launches bind back: the pinned Codex release, Node's install and the stub, as the harness's dry runs do. */
+const ALLOW = () => [codexRelease(), path.dirname(path.dirname(process.execPath)), STUB];
 
 /**
  * One base (under /tmp) with a private release of the host under test, a planted login home (scratch
@@ -81,15 +80,16 @@ function world() {
   const login = path.join(loginHome, '.claude', '.credentials.json');
   fs.mkdirSync(path.dirname(login), { recursive: true });
   fs.writeFileSync(login, '{"claudeAiOauth":{"accessToken":"SCRATCH-NOT-A-TOKEN","expiresAt":1}}\n', { mode: 0o600 });
-  const secretRoot = makeFixtureDir('mbx-secrets-');
-  const secret = path.join(secretRoot, 'project', '.fgos', 'secrets.local.env');
+  // A project secret under the real home, as every project's is: inside this checkout's runtime scratch.
+  const secret = path.join(REPO, '.fgos', 'runtime', `mbx-confined-secret-${process.pid}`, 'project', '.fgos', 'secrets.local.env');
   fs.mkdirSync(path.dirname(secret), { recursive: true });
   fs.writeFileSync(secret, 'PLANTED_SECRET=1\n');
+  process.once('exit', () => fs.rmSync(path.join(REPO, '.fgos', 'runtime', `mbx-confined-secret-${process.pid}`), { recursive: true, force: true }));
   const planted = path.join(makeFixtureDir('mbx-planted-'), 'host-file.txt');
   fs.writeFileSync(planted, 'PLANTED\n');
   const sibling = path.join(base, 'run-sibling');
   fs.mkdirSync(sibling, { recursive: true });
-  const masks = maskPlan({ codexAccountHomes: codexAccountHomes(), secretRoots: [secretRoot], codexRelease: codexRelease() });
+  const masks = maskPlan({ allow: ALLOW() });
   return { base, release, loginHome, login, secret, planted, sibling, masks };
 }
 
@@ -147,12 +147,14 @@ test('a confined run writes its own run directory and nothing else', async (t) =
   const { stdout } = await runConfined(w, 'run-write', process.execPath, nodeProbe(WRITE_PROBE), { env: { PROBE: JSON.stringify(targets) } });
   const seen = JSON.parse(stdout);
   for (const own of ['ws', 'mailbox', 'home']) assert.equal(seen[own], 'ok', `${own}: ${stdout}`);
-  for (const other of ['sibling', 'base', 'repo', 'planted', 'realClaude']) assert.equal(seen[other], 'EROFS', `${other}: ${stdout}`);
+  for (const other of ['sibling', 'base', 'planted']) assert.equal(seen[other], 'EROFS', `${other}: ${stdout}`);
+  // Under the hidden home the parent directories do not exist and cannot be made.
+  for (const hidden of ['repo', 'realClaude']) assert.ok(['EROFS', 'ENOENT'].includes(seen[hidden]), `${hidden}: ${stdout}`);
   assert.equal(sha256(w.planted), before, 'the planted host file is unchanged');
   for (const other of ['sibling', 'base', 'repo', 'realClaude']) assert.equal(fs.existsSync(targets[other]), false, other);
 });
 
-test('a confined run cannot read a real login store or a listed secret, and reads its own login copy', async (t) => {
+test('a confined run cannot read a real login store or a project secret, and reads its own login copy', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
   const w = world();
   const targets = readTargets(w, 'run-read');
@@ -160,8 +162,8 @@ test('a confined run cannot read a real login store or a listed secret, and read
   const seen = JSON.parse(stdout);
   if (targets.claudeLogin) assert.equal(seen.claudeLogin, 'ENOENT');
   if (targets.codexLogin) assert.equal(seen.codexLogin, 'ENOENT');
-  assert.equal(seen.claudeJson, fs.existsSync(targets.claudeJson) ? 0 : 'ENOENT', 'the masked ~/.claude.json reads as empty');
-  assert.equal(seen.secret, 0, 'the planted secrets.local.env reads as empty');
+  assert.equal(seen.claudeJson, 'ENOENT', 'the hidden home has no ~/.claude.json');
+  assert.equal(seen.secret, 'ENOENT', 'a project secret under the home is hidden');
   assert.equal(seen.ownCopy, fs.statSync(w.login).size, 'the run reads its own copy');
 
   const release = codexRelease();
@@ -318,6 +320,53 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
   assert.equal(next.exit.code, 0);
 });
 
+test('an orphan whose processes survive the kill still has its login copy settled, stays open and refuses runs until a later sweep ends it, settling a copy written since', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const prepared = prepareConfinedRun({ base: w.base, runId: 'run-survivor', command: 'true', env: baseEnv(), masks: w.masks, login: { cli: 'claude', home: w.loginHome } });
+  const run = startConfinedRun(prepared);
+  await run.exited;
+  // The harness died before ending the run, and a process of the run (by its cwd) outlives it.
+  const survivor = cp.spawn('sleep', ['600'], { cwd: prepared.paths.dir, stdio: 'ignore', detached: true });
+  t.after(() => { try { process.kill(survivor.pid, 'SIGKILL'); } catch { /* gone */ } });
+  await sleep(100);
+  const ledger = prepared.paths.ledger;
+
+  // A sweep that cannot end the process (no time to wait) still settles the unchanged copy.
+  const first = sweepOrphans(w.base, { waitMs: 0 });
+  assert.deepEqual(first.left, [survivor.pid]);
+  assert.deepEqual(first.asides, []);
+  assert.deepEqual(first.unsettled, []);
+  assert.equal(fs.existsSync(prepared.copy), false, 'the unchanged copy is removed although the run is not ended');
+  let entry = JSON.parse(fs.readFileSync(ledger, 'utf8'));
+  assert.equal(entry.endedAt, undefined, 'the entry stays open');
+  assert.equal(entry.loginSettled, true);
+  // The harness starts no run while `left` is not empty (test/live/mailbox-behaviour.live.mjs `recover`).
+
+  // The surviving CLI writes a new copy; the next sweep ends the process and sets that copy aside.
+  fs.writeFileSync(prepared.copy, 'REFRESHED');
+  const second = sweepOrphans(w.base);
+  assert.deepEqual(second.left, []);
+  assert.deepEqual(second.asides.map((a) => [a.runId, a.aside]), [['run-survivor', path.join(prepared.paths.dir, ROTATED_AUTH)]]);
+  assert.equal(fs.readFileSync(second.asides[0].aside, 'utf8'), 'REFRESHED');
+  entry = JSON.parse(fs.readFileSync(ledger, 'utf8'));
+  assert.ok(entry.endedAt);
+  assert.deepEqual(sweepOrphans(w.base), { swept: [], left: [], asides: [], unsettled: [] }, 'an ended entry is not swept again');
+});
+
+test('a login copy the sweep cannot set aside, because one is set aside there already, is reported unsettled and refuses runs', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const w = world();
+  const prepared = prepareConfinedRun({ base: w.base, runId: 'run-unsettled', command: 'true', env: baseEnv(), masks: w.masks, login: { cli: 'claude', home: w.loginHome } });
+  const run = startConfinedRun(prepared);
+  await run.exited;
+  fs.writeFileSync(path.join(prepared.paths.dir, ROTATED_AUTH), 'EARLIER');
+  fs.appendFileSync(prepared.copy, 'CHANGED');
+  const { unsettled } = sweepOrphans(w.base);
+  assert.deepEqual(unsettled.map((u) => [u.runId, u.copy]), [['run-unsettled', prepared.copy]]);
+  assert.ok(fs.existsSync(prepared.copy), 'nothing is deleted');
+});
+
 test('two heads in two sandboxes share one record, and each receives the other\'s frame', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
   const w = world();
@@ -376,58 +425,52 @@ test('a changed login copy is set aside, never deleted, keeps its run directory 
   assert.ok(fs.existsSync(same.paths.home), 'the home with its transcripts stays');
 });
 
-/** A scratch home holding a planted file at every credential store of the one mask list. */
+/** A scratch home with credential-like files at paths no list names, one allow-listed tool, and a scratch runtime directory. */
 function plantedHome() {
   const home = makeFixtureDir('mbx-cred-home-');
+  const runtimeDir = makeFixtureDir('mbx-cred-run-');
   const planted = {};
-  for (const dir of MASKED_HOME_DIRS) {
-    const file = path.join(home, dir, 'planted-credential');
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, 'PLANTED-CREDENTIAL\n');
-    planted[`dir:${dir}`] = file;
-  }
-  for (const rel of MASKED_HOME_FILES) {
+  for (const rel of [path.join('.pi', 'agent', 'auth.json'), path.join('.pi', 'accounts', 'openrouter', 'auth.json'), path.join('.omp', 'agent', 'auth.json'), path.join('.config', '.wrangler', 'config', 'default.toml'), path.join('.local', 'share', 'keyrings', 'login.keyring'), '.npmrc', path.join('some-new-cli', 'deep', 'token.json')]) {
     const file = path.join(home, rel);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, 'PLANTED-CREDENTIAL\n');
-    planted[`file:${rel}`] = file;
+    planted[rel] = file;
   }
-  return { home, planted };
+  planted.runtime = path.join(runtimeDir, 'keyring', 'control');
+  fs.mkdirSync(path.dirname(planted.runtime), { recursive: true });
+  fs.writeFileSync(planted.runtime, 'PLANTED-CREDENTIAL\n');
+  const tool = path.join(home, '.local', 'share', 'tool', 'bin', 'tool');
+  fs.mkdirSync(path.dirname(tool), { recursive: true });
+  fs.writeFileSync(tool, 'TOOL\n');
+  return { home, runtimeDir, planted, tool };
 }
 
-test('every credential store on the one mask list is masked in each CLI\'s confined argv, and a planted file at each path is unreadable inside the sandbox', async (t) => {
+test('the whole home and the runtime directory are hidden but for the allow-list: a file at any other home path is unreadable inside the sandbox, and the plan is recorded in full', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
-  for (const store of ['.npmrc', '.git-credentials', '.netrc', path.join('.docker', 'config.json'), path.join('.kube', 'config')]) assert.ok(MASKED_HOME_FILES.includes(store), store);
-  for (const store of ['.aws', path.join('.config', 'gh'), path.join('.config', 'gcloud'), '.azure', '.ssh', '.gnupg', '.claude', '.codex']) assert.ok(MASKED_HOME_DIRS.includes(store), store);
-  const { home, planted } = plantedHome();
-  const masks = maskPlan({ home, secretRoots: [] });
-  assert.equal(masks.dirs.length, MASKED_HOME_DIRS.length);
-  assert.equal(masks.files.length, MASKED_HOME_FILES.length);
+  const { home, runtimeDir, planted, tool } = plantedHome();
+  const masks = maskPlan({ home, runtimeDir, allow: [path.dirname(path.dirname(tool)), path.join(home, 'not-there'), '/usr/bin'] });
+  assert.deepEqual(masks, { hidden: [home, runtimeDir], bindBack: [path.dirname(path.dirname(tool))] }, 'only an existing path inside the home is bound back');
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-cred-'));
   const loginHome = makeFixtureDir('mbx-cred-login-');
-  fs.mkdirSync(path.join(loginHome, '.claude'));
-  fs.writeFileSync(path.join(loginHome, '.claude', '.credentials.json'), '{"claudeAiOauth":{"accessToken":"SCRATCH","expiresAt":1}}');
   fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH"}}');
-  for (const cli of ['claude', 'codex']) {
-    const prepared = prepareConfinedRun({ base, runId: `run-cred-${cli}`, command: process.execPath, args: nodeProbe(READ_PROBE), env: baseEnv({ PROBE: JSON.stringify(planted) }), masks, login: { cli, home: loginHome } });
-    for (const dir of masks.dirs) assert.ok(prepared.args.join('\0').includes(['--tmpfs', dir].join('\0')), `${cli}: ${dir}`);
-    for (const file of masks.files) assert.ok(prepared.args.join('\0').includes(['--ro-bind', path.join(base, 'masks', 'empty'), file].join('\0')), `${cli}: ${file}`);
-    assert.equal(prepared.launch.maskSha256, maskPlanSha256(masks));
-    const run = startConfinedRun(prepared);
-    let stdout = '';
-    run.child.stdout.on('data', (d) => { stdout += d; });
-    run.child.stderr.resume();
-    await run.exited;
-    await endConfinedRun(run);
-    const seen = JSON.parse(stdout);
-    for (const key of Object.keys(planted)) assert.equal(seen[key], key.startsWith('dir:') ? 'ENOENT' : 0, `${cli} ${key}: ${stdout}`);
-    const entry = JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8'));
-    assert.deepEqual(entry.argv, [process.execPath, ...nodeProbe(READ_PROBE)], 'the ledger entry records the argv');
-    assert.equal(entry.maskSha256, maskPlanSha256(masks), 'the ledger entry records the masks in force');
-  }
+  const probe = { ...planted, tool };
+  const prepared = prepareConfinedRun({ base, runId: 'run-allow', command: process.execPath, args: nodeProbe(READ_PROBE), env: baseEnv({ PROBE: JSON.stringify(probe) }), masks, login: { cli: 'codex', home: loginHome } });
+  const run = startConfinedRun(prepared);
+  let stdout = '';
+  run.child.stdout.on('data', (d) => { stdout += d; });
+  run.child.stderr.resume();
+  await run.exited;
+  await endConfinedRun(run);
+  const seen = JSON.parse(stdout);
+  for (const key of Object.keys(planted)) assert.equal(seen[key], 'ENOENT', `${key}: ${stdout}`);
+  assert.equal(seen.tool, 'TOOL\n'.length, 'the allow-listed tool is readable');
+  const entry = JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8'));
+  assert.deepEqual(entry.masks, masks, 'the ledger entry records the plan itself');
+  assert.equal(entry.maskSha256, maskPlanSha256(masks));
+  assert.deepEqual(entry.argv, [process.execPath, ...nodeProbe(READ_PROBE)]);
   // The falsifier: the same probe without the confined launch reads every planted file.
-  const open = cp.spawnSync(process.execPath, nodeProbe(READ_PROBE), { env: baseEnv({ PROBE: JSON.stringify(planted) }), encoding: 'utf8' });
-  for (const [key, value] of Object.entries(JSON.parse(open.stdout))) assert.equal(value, 'PLANTED-CREDENTIAL\n'.length, key);
+  const open = cp.spawnSync(process.execPath, nodeProbe(READ_PROBE), { env: baseEnv({ PROBE: JSON.stringify(probe) }), encoding: 'utf8' });
+  for (const [key, value] of Object.entries(JSON.parse(open.stdout))) assert.equal(value, key === 'tool' ? 'TOOL\n'.length : 'PLANTED-CREDENTIAL\n'.length, key);
 });
 
 test('a confined Codex run lists no MCP server and has its connectors off, and the same launch with a planted server and without the off switches lists one', async (t) => {
@@ -437,7 +480,7 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-mcp-'));
   const loginHome = makeFixtureDir('mbx-mcp-login-');
   fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH-NOT-A-TOKEN"}}');
-  const masks = maskPlan({ codexAccountHomes: codexAccountHomes(), secretRoots: [], codexRelease: release });
+  const masks = maskPlan({ allow: ALLOW() });
   const codex = path.join(release, 'bin', 'codex');
   const zeroModel = async (runId, args, config) => {
     const prepared = prepareConfinedRun({ base, runId, command: codex, args, env: baseEnv(), masks, login: { cli: 'codex', home: loginHome } });

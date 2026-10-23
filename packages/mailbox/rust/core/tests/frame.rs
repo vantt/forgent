@@ -17,6 +17,7 @@ fn item(from_label: &str, has_head: bool) -> ClaimedItem {
             cli: has_head.then(|| Cli::new("claude").unwrap()),
             has_head,
             key: fgos_mailbox_core::WriterKey::new("sender-key").unwrap(),
+            head: None,
             handle: None,
         }),
     }

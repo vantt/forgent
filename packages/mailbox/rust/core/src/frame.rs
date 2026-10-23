@@ -289,6 +289,7 @@ pub fn worst_case_len(item: &ClaimedItem, body_bytes: u64, limits: &Limits) -> u
             // The handle is derived after the claim, so the frame around
             // the body is measured with the longest handle a header holds.
             let longest = MailFrom {
+                head: None,
                 handle: Some("x".repeat(limits.frame.max_header_chars as usize)),
                 ..from.clone()
             };

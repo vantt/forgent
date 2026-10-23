@@ -32,8 +32,6 @@ import {
   stepFinished,
   writeCodexConfig,
   CODEX_FEATURES_OFF,
-  harnessSend,
-  SEND_TRIES,
 } from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import { SENDERS, cellTable } from '../../scripts/lib/mailbox-behaviour-score.mjs';
 
@@ -187,26 +185,4 @@ test('an arm\'s run id names its arm, and an unfinished arm run is recovered int
   const results = path.join(base, 'results.jsonl');
   const { appended } = recoverLedger(base, results);
   assert.deepEqual(appended.map((l) => [l.runId, l.cell, l.arm]), [['codex.P.LR.PT.007', 'codex/P/LR/PT', 'P']]);
-});
-
-test('the harness\'s own send is tried again only while the record\'s lock is busy, and says how many tries it took', () => {
-  const ws = scratch('send-ws-');
-  const bin = path.join(ws, '.fgos', 'installation', 'bin', 'fgos');
-  fs.mkdirSync(path.dirname(bin), { recursive: true });
-  // The shim's stand-in answers from a script of replies, one per call.
-  const shim = (replies) => {
-    fs.writeFileSync(path.join(ws, 'replies'), replies.join('\n'));
-    fs.rmSync(path.join(ws, 'calls'), { force: true });
-    fs.writeFileSync(bin, `#!/bin/sh\necho x >> calls\nn=$(wc -l < calls)\nline=$(sed -n "\${n}p" replies)\ncase "$line" in ok) echo "recorded m-$n for head"; exit 0;; *) echo "$line"; exit 1;; esac\n`, { mode: 0o755 });
-  };
-  const busy = 'Not done: the mailbox record failed (lock-busy) and nothing was changed. Try once more later; do not loop.';
-  shim([busy, 'ok']);
-  const second = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
-  assert.deepEqual([second.status, second.id, second.tries], [0, 'm-2', 2]);
-  shim(Array(SEND_TRIES).fill(busy));
-  const gaveUp = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
-  assert.deepEqual([gaveUp.status, gaveUp.tries], [1, SEND_TRIES]);
-  shim(['Refused: unknown-name (to=head).', 'ok']);
-  const refused = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
-  assert.deepEqual([refused.status, refused.tries], [1, 1], 'any other refusal is final');
 });

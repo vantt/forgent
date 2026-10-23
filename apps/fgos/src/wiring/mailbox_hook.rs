@@ -113,8 +113,8 @@ fn run(args: &[OsString]) {
     let ancestry = || ancestry_of(std::process::id());
     // HOME is set (checked first), so Identity's state root resolves here.
     let identity_root = state_root();
-    let handle_of = |key: &WriterKey, cli: &Cli| {
-        session_of(identity_root.as_deref()?, key, cli).map(|info| info.handle)
+    let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
+        session_of(identity_root.as_deref()?, key, cli, head).map(|info| info.handle)
     };
     let input = ShellInput {
         adapter,
