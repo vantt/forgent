@@ -152,8 +152,15 @@ fn named(machine: &MachineInfo, local: Local) -> CurrentSession {
 /// own env does not carry it (`invalid-writer-key` when `key.source` is not
 /// one of the writer-id rule's env variables or the value is not a usable id).
 /// Same id, handle and CLI as [`current_session`] gives a process whose env
-/// holds the same key.
-pub fn session_for(state_root: &Path, key: &WriterKey) -> Result<CurrentSession, Refusal> {
+/// holds the same key. `head_pid` is the process the CLI label of a shared
+/// variable ([`crate::resolve::PI_SESSION_VAR`]) is read from, upward and
+/// itself included; the other keys ignore it, and `None` gives the neutral
+/// label.
+pub fn session_for(
+    state_root: &Path,
+    key: &WriterKey,
+    head_pid: Option<u32>,
+) -> Result<CurrentSession, Refusal> {
     let local = session::key_local(key).ok_or_else(|| Refusal {
         reason: "invalid-writer-key",
         detail: format!(
@@ -164,5 +171,8 @@ pub fn session_for(state_root: &Path, key: &WriterKey) -> Result<CurrentSession,
         ),
         candidates: Vec::new(),
     })?;
+    let tree = crate::proc_tree::os_process_tree();
+    let cli = crate::resolve::ancestry_cli(key.source, tree.as_ref(), head_pid);
+    let local = Local { cli: cli.unwrap_or(local.cli), ..local };
     Ok(named(&machine_info(state_root)?, local))
 }

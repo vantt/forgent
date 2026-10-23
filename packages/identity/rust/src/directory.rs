@@ -421,7 +421,7 @@ pub fn register_writer(
     roles: &[String],
     take: bool,
 ) -> Result<Listed, Refusal> {
-    let session = session_for(state_root, key)?;
+    let session = session_for(state_root, key, Some(head_pid))?;
     let head = os_record(head_pid)
         .filter(|record| judge_here(record) == Verdict::Alive)
         .ok_or_else(|| Refusal {

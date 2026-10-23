@@ -77,6 +77,8 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
         ("FGOS_SESSION_ID", "parent-session"),
         ("CLAUDE_CODE_SESSION_ID", "claude-parent"),
         ("CODEX_THREAD_ID", "codex-parent"),
+        ("PI_SESSION_ID", "pi-parent"),
+        ("PI_SESSION_FILE", "/sessions/pi-parent.jsonl"),
         ("FGOS_PARENT_WRITER_ID", "grandparent"),
     ]);
     scrub_and_set(&mut env, "att-a1", Some("ctl-1")).unwrap();
@@ -85,6 +87,8 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
     assert_eq!(env.get("PATH").map(String::as_str), Some("/usr/bin"));
     assert!(!env.contains_key("CLAUDE_CODE_SESSION_ID"));
     assert!(!env.contains_key("CODEX_THREAD_ID"));
+    assert!(!env.contains_key("PI_SESSION_ID"));
+    assert!(!env.contains_key("PI_SESSION_FILE"));
 }
 
 #[test]
