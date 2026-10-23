@@ -77,10 +77,15 @@
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "targetAnchor": "runtime-identity-and-activation",
       "targetUnitDigest": "35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "reviewStatus": "pending",
-      "rationale": "The original top-level runtime-identity heading and complete metadata carrier survive with additive promotion fields. A repeated source heading creates a native ambiguity gap; this real root-heading successor preserves the full old direct payload. No identity is grafted and no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetAncestry": []
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:1-1#runtime-identity-and-activation; SHA256 35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetAncestry": [
+        "Runtime Identity And Activation"
+      ],
+      "bindingSha256": "baa47bfceee4edd45d484dd2432bbdf2da449c393c26daf8e1ec161d26cf1084",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_27b1af759fb21ff4f449727ff648a319",
@@ -573,5 +578,5 @@
       "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
     }
   ],
-  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+  "correctionSession": "fgos-run_unit-run-1792750955a733"
 }

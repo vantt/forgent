@@ -3909,13 +3909,17 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#runtime-identity-and-activation, under \"Runtime Identity And Activation\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#runtime-identity-and-activation-1. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:140-140#runtime-identity-and-activation-1; SHA256 54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd",
       "targetAncestry": [
         "Runtime Identity And Activation",
-        "Retained Runtime Identity And Activation Source Detail"
-      ]
+        "Retained Runtime Identity And Activation Source Detail",
+        "Runtime Identity And Activation"
+      ],
+      "bindingSha256": "a7a868355850fdb908e6cca984647c371b72bdd29aa6df22b75d6063eaeb67e2",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_b6c7e0cf73c35dad866f2dd1d7a2a3e2",
@@ -3993,14 +3997,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#how-to-use-this-document, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#how-to-use-this-document. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:174-174#how-to-use-this-document; SHA256 09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "How To Use This Document"
+      ],
+      "bindingSha256": "72804164c0c040cedcb6d740a28257662a8d1834dfbd9f3f42f71e0fde6ca44b",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_6f1dc76a5f99b9f747725aef60bd5d12",
@@ -4044,34 +4052,55 @@
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "targetAnchor": "historical-decisions-promoted-or-tracked",
       "claimKind": "architecture",
-      "disposition": "partial-carry",
+      "disposition": "split",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The source heading and its title are retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked. Its compound settled-facts table is handled separately by the required dev-source deferral; the non-dev clauses appear in the labelled stub companion table. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "remainder": "The full compound settled-facts table, including the dev:<rev> clause, is deferred as a separate source unit to the Dev Source Activation Restoration Stub. Its other clauses are retained in that stub companion table; dev restoration remains Plan C.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:194-194#historical-decisions-promoted-or-tracked; SHA256 6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry. Split accounting: No deferred documentation remainder: the complete compound settled-facts table is restored at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-60 (SHA256 b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295). The dev-source claim text is conserved; its status is explicitly selected design, mechanism unimplemented. Plan C is implementation-only, not a cutover dependency. The heading and table have separate bound placements.",
+      "remainder": "No deferred documentation remainder: the complete compound settled-facts table is restored at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-60 (SHA256 b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295). The dev-source claim text is conserved; its status is explicitly selected design, mechanism unimplemented. Plan C is implementation-only, not a cutover dependency. The heading and table have separate bound placements.",
       "targetUnitDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Historical Decisions Promoted Or Tracked"
+      ],
+      "bindingSha256": "b256b84d9cd7144b0c19e8681e97c728071091e9c0333d9399cfed788fdf50f8",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "priorRemainder": "The full compound settled-facts table, including the dev:<rev> clause, is deferred as a separate source unit to the Dev Source Activation Restoration Stub. Its other clauses are retained in that stub companion table; dev restoration remains Plan C.",
+      "additionalBindings": [
+        {
+          "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+          "targetAnchor": "unheaded-block-60",
+          "targetUnitDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
+          "targetAncestry": [
+            "Runtime Identity And Activation",
+            "Settled Facts"
+          ],
+          "bindingSha256": "120f8a805cb8e22758f7e041e71d63b3cc7a88b75c9df6b0862dbd688711d9f5"
+        }
+      ],
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_12d5dbb269ca537c8e1923d57274a43f",
       "sourceUnitDigest": "0266dc3bbac745ba6953a93d03d3ccb6a9cfb9c06d3dfc4f760b28f5b9224bcf",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-60",
       "claimKind": "decision",
-      "disposition": "defer-with-owner",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-7 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:407-426#unheaded-block-60; SHA256 b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "b44c3e178244710d1e0d616064bc5ffd82ddb5a6f6c176336a46f877c5f61295",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Settled Facts"
+      ],
+      "bindingSha256": "120f8a805cb8e22758f7e041e71d63b3cc7a88b75c9df6b0862dbd688711d9f5",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_66b58ad141eda076944d47edf360f2e1",
@@ -4081,14 +4110,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#1-core-position, under \"1. Core Position\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#1-core-position-1. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:196-196#1-core-position-1; SHA256 d8443cfa2f90ab369871a7afb68ef2e5c9552854977a85ca831db6fa3661f2a5. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "d8443cfa2f90ab369871a7afb68ef2e5c9552854977a85ca831db6fa3661f2a5",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "1. Core Position"
+      ],
+      "bindingSha256": "19fed959121f30b0cb08406bb5750f63242167ae1adebb4d9c2450983220919c",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_b3a8dbb74fb0731a881627328e2e80fa",
@@ -4152,14 +4185,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#2-runtime-lifecycle, under \"2. Runtime Lifecycle\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#2-runtime-lifecycle. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:217-217#2-runtime-lifecycle; SHA256 ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "2. Runtime Lifecycle"
+      ],
+      "bindingSha256": "63087ec328106bb84b70fe1e7592114e1e8e3877e1fbd940add7dabce6de91af",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_74c5730141447c8e8ba33ab0cf2d3d66",
@@ -4563,14 +4600,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#4-record-types, under \"4. Record Types\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#4-record-types. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:241-241#4-record-types; SHA256 e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "4. Record Types"
+      ],
+      "bindingSha256": "9fbf9b214e9c9c54412312c0074cccb189eb0a6f31fb29010e903e053b5bc1f4",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_0372b73a7a1a072a8835ecde7be7d1df",
@@ -4616,13 +4657,17 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/architect/packaging-distribution/runtime-identity-and-activation.md:295-295#5-releasemanifest (current lines); unit SHA256 b801deec612f9c048de490e35353b38f99031f2bac692e2955b64c7b1411587b.\nTarget: docs/platform/packaging-distribution/contracts/release-manifest.md:146-146#5-releasemanifest (current lines); unit SHA256 dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"Legacy CLI Transition\" (../host-invocation-routing/legacy-cli-transition.md) → \"Legacy CLI Transition\" (../../../architect/host-invocation-routing/legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/architect/host-invocation-routing/legacy-cli-transition.md.\nHeading depth: 2 → 4; title \"5. ReleaseManifest\" → \"5. ReleaseManifest\".\nWhole direct section differs; depth 2 → 4; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/runtime-identity-and-activation.md#5-releasemanifest under docs/platform/packaging-distribution/contracts/release-manifest.md#5-releasemanifest; source context \"Runtime Identity And Activation\", target context \"Contract: Release Manifest / Retained Runtime Identity And Activation Source Detail\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/release-manifest.md:180-180#5-releasemanifest; SHA256 dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee",
       "targetAncestry": [
         "Contract: Release Manifest",
-        "Retained Runtime Identity And Activation Source Detail"
-      ]
+        "Retained Runtime Identity And Activation Source Detail",
+        "5. ReleaseManifest"
+      ],
+      "bindingSha256": "df06eccecadb2c995e6694ce2a1d74388378de2d44b43d009736f87e78b243fa",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
@@ -4740,14 +4785,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#release-tree-canonicalization, under \"Release Tree Canonicalization\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#release-tree-canonicalization. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/release-manifest.md:256-256#release-tree-canonicalization; SHA256 e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
-        "5. ReleaseManifest"
-      ]
+        "5. ReleaseManifest",
+        "Release Tree Canonicalization"
+      ],
+      "bindingSha256": "29c98d83bdfcc4a2f448b63032b256ddd3d0903411ecdfc589cc94373c628531",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_e53e994efd41de413243c7feb18609f5",
@@ -4907,15 +4956,19 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "6-workspaceactivationbinding",
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Heading depth changes; the target also adds the labelled Retained dated design — status note (2026-10-14) before the bootstrap-context permission and the labelled Status note (2026-10-14) after the candidate permission paragraph; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "3305f6f8a67977b7a193fd41e3bb536fecad7b707fffa45853625c7bcfb14e4c",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/activation-binding.md:153-153#6-workspaceactivationbinding; SHA256 523c6fe2380a7e02bcdd814d7bb4d9129c2afccdc1cbb425204cfb1db2dfd88a. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetUnitDigest": "523c6fe2380a7e02bcdd814d7bb4d9129c2afccdc1cbb425204cfb1db2dfd88a",
       "targetAncestry": [
         "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail"
-      ]
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "bindingSha256": "db4db000a32d07d61d8e3a81e484bb3cd07af4eaed60e7625564e13033d4998b",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
@@ -5195,13 +5248,17 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#7-invocation-lease, under \"7. Invocation Lease\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#7-invocation-lease. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/activation-binding.md:266-266#7-invocation-lease; SHA256 9cf64d9a62542a96c82cedc1b87194e9ab1f8b1e6b6b468c23290d7588dc94e8. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "9cf64d9a62542a96c82cedc1b87194e9ab1f8b1e6b6b468c23290d7588dc94e8",
       "targetAncestry": [
         "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail"
-      ]
+        "Retained Runtime Identity And Activation Source Detail",
+        "7. Invocation Lease"
+      ],
+      "bindingSha256": "23f071d50c4ac6420743b09c3a91987ef9ec8fa304df84bf37633960feabeba1",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
@@ -5850,13 +5907,17 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#10-migrationjournal, under \"10. MigrationJournal\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#10-migrationjournal. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/activation-binding.md:361-361#10-migrationjournal; SHA256 911c580691fc66e1f9485c40795ff51655e76d27689a05f11f7b50899a18f46a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "911c580691fc66e1f9485c40795ff51655e76d27689a05f11f7b50899a18f46a",
       "targetAncestry": [
         "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail"
-      ]
+        "Retained Runtime Identity And Activation Source Detail",
+        "10. MigrationJournal"
+      ],
+      "bindingSha256": "3af2b6475acdb174b319729002016832d0526348aa30590e9c6973e3e44a8d09",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
@@ -6118,14 +6179,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#existing-project-adoption, under \"Existing Project Adoption\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#existing-project-adoption. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/activation-binding.md:443-443#existing-project-adoption; SHA256 fb1fd721f45cd646c9b1e55e905c9b96ceb0250986e0e1c9bcee142e38c5b1e9. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "fb1fd721f45cd646c9b1e55e905c9b96ceb0250986e0e1c9bcee142e38c5b1e9",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
-        "10. MigrationJournal"
-      ]
+        "10. MigrationJournal",
+        "Existing Project Adoption"
+      ],
+      "bindingSha256": "a1705d11f385abf3900a21173712b63ddcc7a781207bbf6eb63fb8fbed170ee8",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
@@ -6283,103 +6348,127 @@
       "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
       "sourceUnitDigest": "54e58acdabc49d0aefb2cf037f6a476f121008c99a25bd0eaad2b33b8284adab",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "dev-source-activation",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The heading at docs/architect/packaging-distribution/runtime-identity-and-activation.md#dev-source-activation is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:371-371#dev-source-activation; SHA256 9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "99c2491259347450585dba48b8f0decb8c210e53cf256f7381294c3de681fcd8",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_c95bf4f07595cb9b849208efc61e76fb",
       "sourceUnitDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-54",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-123 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:376-377#unheaded-block-54; SHA256 12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "12a6c926f8c2c640b2a3b32069da45936488d40fc9512a28acc3c71e75632004",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "6c1ac16019984278c0dba22faadb2df9ba2f55e3daff92cfd35401dc48c0bd2d",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_865a8350c10fa2d9cc73ba3edb8b0520",
       "sourceUnitDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-55",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-124 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:379-379#unheaded-block-55; SHA256 5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "5c2bcca41b6bdea7c18a1fb420ab27f7404c32ef2240ab0eb8ef9370b7122872",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "51b5e00873ed4c0b0f25bb6a0680ff4b8f60bc2b7d682abd1d34762f6ada8b47",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_3b0ea2eb26b63bcfe3c447bcce51d96c",
       "sourceUnitDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-56",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-125 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:381-386#unheaded-block-56; SHA256 fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "fbf2d2af13ec036d421e8ed1fb30ffc5cc600b77e97fbeedcf934348cf3a6291",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "f855cf265da372b869b50daaf8560c4fee26bd151187490b66b142a1ea9e2c8f",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_3b558cb40f932564057bd64e5d7e024b",
       "sourceUnitDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-57",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-126 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:388-395#unheaded-block-57; SHA256 c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "c5b60269a59c089f5f65d887f3c94aad46db63cb786f98293fb892cb3ed6ed86",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "dfbd027cb6fd722465fe3cc81caa2d6a660f5592a7902305659525855da45137",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_b4018a4e982ca86c1f265cfe32a05494",
       "sourceUnitDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
-      "targetAnchor": "dev-source-activation-restoration-stub",
+      "targetAnchor": "unheaded-block-58",
       "claimKind": "architecture",
-      "disposition": "defer-with-owner",
+      "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The unheaded-block at docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-127 is one of the seven registered dev/source activation units. Restore remains owned by Plan C; the labelled stub tracks this exact unit. For the compound table, all non-dev clauses are retained in the stub companion table. No implementation or retirement verdict is asserted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:397-399#unheaded-block-58; SHA256 7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93. restored dev-source occurrence selected by native source identity/content; old stub is navigation only; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; complete selected design restored, mechanism remains absent and Plan C does not block cutover; the compound table preserves every claim and explicitly qualifies dev-source as selected design, not implemented. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "stubAnchor": "dev-source-activation-restoration-stub",
-      "targetUnitDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "targetUnitDigest": "7e3f5e9aeda86c61f68de30e4d5a9b2b817a0dfb720845d3464c86832cf88b93",
       "targetAncestry": [
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "Dev / Source Activation"
+      ],
+      "bindingSha256": "7291ecb5199f8220ddffc0b2be0717120f0f859c0dc27d2ce01c6e5083e68a25",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_bc6c80a5dbb5b49aa616db0b538022ba",
@@ -6389,14 +6478,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#11-drift-repair-rollback-and-quarantine, under \"11. Drift, Repair, Rollback, And Quarantine\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#11-drift-repair-rollback-and-quarantine. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:254-254#11-drift-repair-rollback-and-quarantine; SHA256 825d187be82f486aaca968ce8ad77b74803e4d5067824980233f9fb4f8f18d0d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "825d187be82f486aaca968ce8ad77b74803e4d5067824980233f9fb4f8f18d0d",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "11. Drift, Repair, Rollback, And Quarantine"
+      ],
+      "bindingSha256": "993e24ed0a12b7e57d2109bc959714f3bc9a9533f7fe0871562c1f397d960620",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_822b8a0d68b2d83e3d093e45be2e77e8",
@@ -6718,14 +6811,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#14-walking-skeleton, under \"14. Walking Skeleton\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#14-walking-skeleton. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:309-309#14-walking-skeleton; SHA256 47e5788489aaa121a477f7acf7281b6124aeb528c86bd34358ae2cb9ab1d8024. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "47e5788489aaa121a477f7acf7281b6124aeb528c86bd34358ae2cb9ab1d8024",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "14. Walking Skeleton"
+      ],
+      "bindingSha256": "9e5cf2f8deb2df014e39984c01a4b9daf5bfbd5c2c372ea59bb7bdc2160322cd",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_c0afc8b40e3422d6dbd55aad9f6388bf",
@@ -6771,14 +6868,18 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#15-open-decisions, under \"15. Open Decisions\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#15-open-decisions. Only heading depth changes; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:347-347#15-open-decisions; SHA256 3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
-        "Runtime Identity And Activation"
-      ]
+        "Runtime Identity And Activation",
+        "15. Open Decisions"
+      ],
+      "bindingSha256": "a0387d13fcb0c7342f85fa3dc0a74fd13cb1711a3426294e91e44750c70f89a3",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_b19d5177a72889440523f68acc63caaa",
@@ -6824,103 +6925,117 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#packaging-distribution-scope-map, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#packaging-distribution-scope-map. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:272-272#packaging-distribution-scope-map; SHA256 5ed2f9d1174332ae7c94a4760f7b93b006433d24fe88195bfc8b8642cc393d7d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "5ed2f9d1174332ae7c94a4760f7b93b006433d24fe88195bfc8b8642cc393d7d",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
-        "Retained Scope Map Source Detail"
-      ]
+        "Retained Scope Map Source Detail",
+        "Packaging Distribution Scope Map"
+      ],
+      "bindingSha256": "cd396522e9070b3ee663b9ecdbbef9c9f99f76415ae2904ad80747ed79bf657b",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_125cef1cef30d1dea90c511b9f6283e0",
       "sourceUnitDigest": "9ae4027c698a260c41546f5626709450f3aae967ca65fc0d58ddff4b11d2bc1d",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-52",
+      "targetAnchor": "unheaded-block-55",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-1, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-51. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-52 SHA256 9ae4027c698a260c41546f5626709450f3aae967ca65fc0d58ddff4b11d2bc1d; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:274-284#unheaded-block-55; SHA256 9ae4027c698a260c41546f5626709450f3aae967ca65fc0d58ddff4b11d2bc1d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "9ae4027c698a260c41546f5626709450f3aae967ca65fc0d58ddff4b11d2bc1d",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "b6a737afd6c963e15a748e8d0a76d1d9eedd5d86965f12d225cdd8b5077c946a",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_c2e23dcc565a90df0c229c276f49cda6",
       "sourceUnitDigest": "d527fba547b6071149691131690420a9da22d5511573ad030e94396d129aeab3",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-53",
+      "targetAnchor": "unheaded-block-56",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-2, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-52. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-53 SHA256 4c64deca5d4e97eaeb5c2f052964c5763c07cdcf27fd6e09287efa5a3c5fae70; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:286-290#unheaded-block-56; SHA256 4c64deca5d4e97eaeb5c2f052964c5763c07cdcf27fd6e09287efa5a3c5fae70. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "4c64deca5d4e97eaeb5c2f052964c5763c07cdcf27fd6e09287efa5a3c5fae70",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "5700e379968799b17fb20ada30219ed579194e97c829395328e7d22d205aa4a0",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_1b386ff42da1ea6faffd434fd4600efe",
       "sourceUnitDigest": "afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-54",
+      "targetAnchor": "unheaded-block-57",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-3, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-53. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-54 SHA256 afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:292-296#unheaded-block-57; SHA256 afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "0e79a4e6a4701303029cd960e5568bb294de39ccb4513e73573522f406a9630a",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_6f29738146b71d6c8fe18454fa54170d",
       "sourceUnitDigest": "81b159cc1b99959cb3ac045db0225689aeb8276838282bc59d57bb1513defbd3",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-55",
+      "targetAnchor": "unheaded-block-58",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-4, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-54. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-55 SHA256 81b159cc1b99959cb3ac045db0225689aeb8276838282bc59d57bb1513defbd3; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:298-301#unheaded-block-58; SHA256 81b159cc1b99959cb3ac045db0225689aeb8276838282bc59d57bb1513defbd3. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "81b159cc1b99959cb3ac045db0225689aeb8276838282bc59d57bb1513defbd3",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "30878f21eb7f9df3c2b001b9ccedb18aaab5c82efe180d345f73e5a3dc79fb55",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_e6e67bbd91d38440145b2cac743c3983",
       "sourceUnitDigest": "e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-56",
+      "targetAnchor": "unheaded-block-59",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-5, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-55. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-56 SHA256 e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:303-304#unheaded-block-59; SHA256 e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "5688ccc921e4cc2e60693527fff659730d520a654eaf80a7944f6ad790ee8be7",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_3483ab5f8b28bfbeaca48258d6128c1c",
@@ -6930,25 +7045,29 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#1-concern-map, under \"1. Concern Map\", is retained at docs/platform/packaging-distribution/spec.md#1-concern-map. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:306-306#1-concern-map; SHA256 74a93ee0e5cae1031098470874012122913b61d666c545ccb1c79b62eb0205fb. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "74a93ee0e5cae1031098470874012122913b61d666c545ccb1c79b62eb0205fb",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
-        "Packaging Distribution Scope Map"
-      ]
+        "Packaging Distribution Scope Map",
+        "1. Concern Map"
+      ],
+      "bindingSha256": "681542e51ccf20edb2c330ddfdeaf8fff236ee3d0ff7a2a5d321445ca3a41633",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_9e77c50e995716e7f23813013c466c3d",
       "sourceUnitDigest": "f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-57",
+      "targetAnchor": "unheaded-block-60",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-6, under \"1. Concern Map\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-56. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-57 SHA256 f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:308-324#unheaded-block-60; SHA256 f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -6956,7 +7075,9 @@
         "Packaging Distribution Scope Map",
         "1. Concern Map"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "15956b5af5afb51f6575fd380541d168e33f64ddf38b361525bd5d8e574f1101",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_0126dcd017d4604b384236e046fadd82",
@@ -6964,27 +7085,31 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "2-historical-document-split",
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#2-historical-document-split, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#2-historical-document-split. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "5373a570cdf8056e0c304e6f7e49845e6ae094cfe54619cb65a980f4f82cb68e",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:326-326#2-historical-document-split; SHA256 697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetUnitDigest": "697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
-        "Packaging Distribution Scope Map"
-      ]
+        "Packaging Distribution Scope Map",
+        "2. Historical Document Split"
+      ],
+      "bindingSha256": "e4feeea476edb2c5cee152fa6da90b206e965876abe5e72ad788d24e4b3ece2f",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_b43688fff7d34b97772efcb6d81018bf",
       "sourceUnitDigest": "1b87605b5ce482ef0e0333ddf175c524f78a4d623b8c66572c4e559afbf420f7",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-58",
+      "targetAnchor": "unheaded-block-61",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-7, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-57. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-58 SHA256 1b87605b5ce482ef0e0333ddf175c524f78a4d623b8c66572c4e559afbf420f7; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:328-329#unheaded-block-61; SHA256 1b87605b5ce482ef0e0333ddf175c524f78a4d623b8c66572c4e559afbf420f7. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "1b87605b5ce482ef0e0333ddf175c524f78a4d623b8c66572c4e559afbf420f7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -6992,18 +7117,20 @@
         "Packaging Distribution Scope Map",
         "2. Historical Document Split"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "c203cb6292f475ffbb945284694aa7f959c6116cc8d6b7ed33513ebf52c71752",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_73ffcd717dc2650f8713bb90547198d4",
       "sourceUnitDigest": "c658779d98cafcee3b3c0eeb9413b4d7bf827a21660f4c2bdb5892e7a3ce7f6d",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-59",
+      "targetAnchor": "unheaded-block-62",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-8, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-58. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-59 SHA256 c658779d98cafcee3b3c0eeb9413b4d7bf827a21660f4c2bdb5892e7a3ce7f6d; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:331-359#unheaded-block-62; SHA256 c658779d98cafcee3b3c0eeb9413b4d7bf827a21660f4c2bdb5892e7a3ce7f6d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "c658779d98cafcee3b3c0eeb9413b4d7bf827a21660f4c2bdb5892e7a3ce7f6d",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7011,26 +7138,30 @@
         "Packaging Distribution Scope Map",
         "2. Historical Document Split"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "db95b47d8a4e85e159f7c9995eb88d7c80aa7d47ae6bdab881139409808c025c",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_9881ddf76dc1db230f605f5ea5af6bc3",
       "sourceUnitDigest": "a7d460bcd431f7b0ac3348dbaba93c71692578e2901a812224ad558b1d26cd24",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-60",
+      "targetAnchor": "unheaded-block-63",
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-9, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-59. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-60 SHA256 f27a31d2c4b1b629627bf0d316a268aa31c8c40632534b157a59c6e66a6bac7f; source identity unchanged, no native identity assignment or approval carry.",
-      "targetUnitDigest": "f27a31d2c4b1b629627bf0d316a268aa31c8c40632534b157a59c6e66a6bac7f",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:361-366#unheaded-block-63; SHA256 0963efc29ce84598b9296ee2a2d8cb02b825693121516fb939830568a5b639fc. full passage equals explicit topology-link correction with same named ancestry; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; restore exact legacy topology destination docs/architect/workspace-topology.md to comply with retained source-status record. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetUnitDigest": "0963efc29ce84598b9296ee2a2d8cb02b825693121516fb939830568a5b639fc",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map",
         "2. Historical Document Split"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "5b1d361db8b211790cc9aa27afb6fbf83a3503bb282a9e11ae903bd19e41ea60",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_7c93e9a44c1e8eb580ebb1c28fbc9d3f",
@@ -7040,25 +7171,29 @@
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#3-boundary-rule, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#3-boundary-rule. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:368-368#3-boundary-rule; SHA256 95f27f77881c7880d7a6cdd068afdf0f4ff5e1f3b77fb09685326e0b3bbf384e. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "95f27f77881c7880d7a6cdd068afdf0f4ff5e1f3b77fb09685326e0b3bbf384e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
-        "Packaging Distribution Scope Map"
-      ]
+        "Packaging Distribution Scope Map",
+        "3. Boundary Rule"
+      ],
+      "bindingSha256": "5a734586767f3a53cdaecf6c8ac249eeca0d96889b48c9205c475e0e907a5362",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_32e7f978ade53ffcc2e0d133ea0add0b",
       "sourceUnitDigest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-61",
+      "targetAnchor": "unheaded-block-64",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-10, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-60. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-61 SHA256 0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:370-370#unheaded-block-64; SHA256 0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7066,18 +7201,20 @@
         "Packaging Distribution Scope Map",
         "3. Boundary Rule"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "a568e10594107c9d1a86c54064257bee8fe5b68e89fe7ff454de82abf82695f5",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_0d5683e5cddc8d54df2796cbb0cffad8",
       "sourceUnitDigest": "45f24c6d010b8e4fc85161342ecf8338d5a0cb71f91007f80badef2718daa6a8",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-62",
+      "targetAnchor": "unheaded-block-65",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-11, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-61. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-62 SHA256 45f24c6d010b8e4fc85161342ecf8338d5a0cb71f91007f80badef2718daa6a8; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:372-376#unheaded-block-65; SHA256 45f24c6d010b8e4fc85161342ecf8338d5a0cb71f91007f80badef2718daa6a8. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "45f24c6d010b8e4fc85161342ecf8338d5a0cb71f91007f80badef2718daa6a8",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7085,18 +7222,20 @@
         "Packaging Distribution Scope Map",
         "3. Boundary Rule"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "8b6a38bea9b8c829404ac9531de1bbb7a8b0a05104c836f3a38fb277bd672368",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_04e662788ab02accc67a57eda408fa7c",
       "sourceUnitDigest": "707a2f98d8a91c48287589feda663d0cd5c1b11bf1f6dc141e167989b4f815d9",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-63",
+      "targetAnchor": "unheaded-block-66",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-12, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-62. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-63 SHA256 707a2f98d8a91c48287589feda663d0cd5c1b11bf1f6dc141e167989b4f815d9; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:378-378#unheaded-block-66; SHA256 707a2f98d8a91c48287589feda663d0cd5c1b11bf1f6dc141e167989b4f815d9. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "707a2f98d8a91c48287589feda663d0cd5c1b11bf1f6dc141e167989b4f815d9",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7104,18 +7243,20 @@
         "Packaging Distribution Scope Map",
         "3. Boundary Rule"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "103c83ddbe0d57ce74b78356a0aef1b33dc7c05f63b2ab467a2113575f13c18c",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_85042d69edd2c1710bf4a9a5321cafe8",
       "sourceUnitDigest": "8e3b4c4a303cab1f6461da7545f2a23adfc7904f3fcec08689a4483c0865eeb5",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-64",
+      "targetAnchor": "unheaded-block-67",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-13, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-63. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-64 SHA256 8e3b4c4a303cab1f6461da7545f2a23adfc7904f3fcec08689a4483c0865eeb5; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:380-384#unheaded-block-67; SHA256 8e3b4c4a303cab1f6461da7545f2a23adfc7904f3fcec08689a4483c0865eeb5. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "8e3b4c4a303cab1f6461da7545f2a23adfc7904f3fcec08689a4483c0865eeb5",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7123,18 +7264,20 @@
         "Packaging Distribution Scope Map",
         "3. Boundary Rule"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "2475e5217357cbec408e88ba956c40e4c5ae4aa51dabe3d95a339153356d7889",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_a9679b20b8c65b854853c43ac50534ef",
       "sourceUnitDigest": "985161aeb93aa559790ec6a90663d092cad3660c07a797bd690d693b631a38dd",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-65",
+      "targetAnchor": "unheaded-block-68",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-14, under \"3. Boundary Rule\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-64. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-65 SHA256 985161aeb93aa559790ec6a90663d092cad3660c07a797bd690d693b631a38dd; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:386-401#unheaded-block-68; SHA256 985161aeb93aa559790ec6a90663d092cad3660c07a797bd690d693b631a38dd. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "985161aeb93aa559790ec6a90663d092cad3660c07a797bd690d693b631a38dd",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7142,7 +7285,9 @@
         "Packaging Distribution Scope Map",
         "3. Boundary Rule"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "7eec3db160db886d7527cf0835f21034212fb721702254c34c3c4189e4a1f957",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_18896f5dc88690abd1dea714b43da23f",
@@ -7152,25 +7297,29 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#4-historical-architecture-position, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#4-historical-architecture-position. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:403-403#4-historical-architecture-position; SHA256 c5cff96236021d7f8a60a12c4c10acfd1d3940013a858d08887e43952422e10e. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "c5cff96236021d7f8a60a12c4c10acfd1d3940013a858d08887e43952422e10e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
-        "Packaging Distribution Scope Map"
-      ]
+        "Packaging Distribution Scope Map",
+        "4. Historical Architecture Position"
+      ],
+      "bindingSha256": "24534d0ebc7d0220c53c17a87ff5e54cbffaea97f08c5d5f83d37084070b25fc",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_fd4ef508d9b08945c7592b9cff52303e",
       "sourceUnitDigest": "00bd2aa432ff7e0b7a314e0190d40f8656d8067825906ca5bd91ed7622fe68fd",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-66",
+      "targetAnchor": "unheaded-block-69",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-15, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-65. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-66 SHA256 00bd2aa432ff7e0b7a314e0190d40f8656d8067825906ca5bd91ed7622fe68fd; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:405-405#unheaded-block-69; SHA256 00bd2aa432ff7e0b7a314e0190d40f8656d8067825906ca5bd91ed7622fe68fd. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "00bd2aa432ff7e0b7a314e0190d40f8656d8067825906ca5bd91ed7622fe68fd",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7178,18 +7327,20 @@
         "Packaging Distribution Scope Map",
         "4. Historical Architecture Position"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "2267c1f291eba8ffc129b4f87595a736116901cc78f22083218f7f73f1e9ebb1",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_099829ace5237fb150e7e2112ec87508",
       "sourceUnitDigest": "3e6ff28ccbdb496a38e60ec04e65a4f2f5dced64e85943d31eab6f6f49fb1e53",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-67",
+      "targetAnchor": "unheaded-block-70",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-16, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-66. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-67 SHA256 3e6ff28ccbdb496a38e60ec04e65a4f2f5dced64e85943d31eab6f6f49fb1e53; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:407-426#unheaded-block-70; SHA256 3e6ff28ccbdb496a38e60ec04e65a4f2f5dced64e85943d31eab6f6f49fb1e53. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "3e6ff28ccbdb496a38e60ec04e65a4f2f5dced64e85943d31eab6f6f49fb1e53",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7197,18 +7348,20 @@
         "Packaging Distribution Scope Map",
         "4. Historical Architecture Position"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "3add540e046c209b6b004fce8dd7f8b91e9fa6d54a9313bc3a67d4813c434ff0",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_d6c0ad62259e8ebcf4ad364e7e0a0972",
       "sourceUnitDigest": "88635d84f2c24f8a9f7275e4ebb40f9e0a85aa4dc9df23893415af18f390927a",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-68",
+      "targetAnchor": "unheaded-block-71",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-17, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-67. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-68 SHA256 88635d84f2c24f8a9f7275e4ebb40f9e0a85aa4dc9df23893415af18f390927a; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:428-428#unheaded-block-71; SHA256 88635d84f2c24f8a9f7275e4ebb40f9e0a85aa4dc9df23893415af18f390927a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "88635d84f2c24f8a9f7275e4ebb40f9e0a85aa4dc9df23893415af18f390927a",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7216,18 +7369,20 @@
         "Packaging Distribution Scope Map",
         "4. Historical Architecture Position"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "756dcf56f83c21b46af50a22355a635d909db239b6ed2acb774b68615714caba",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_8946f48631858996b29154c5a81920ca",
       "sourceUnitDigest": "5343fbfd729fe3fadf948f37abb54f197b5a03f80b3abda7894a9c6bb7934a63",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-69",
+      "targetAnchor": "unheaded-block-72",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-18, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-68. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-69 SHA256 5343fbfd729fe3fadf948f37abb54f197b5a03f80b3abda7894a9c6bb7934a63; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:430-435#unheaded-block-72; SHA256 5343fbfd729fe3fadf948f37abb54f197b5a03f80b3abda7894a9c6bb7934a63. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "5343fbfd729fe3fadf948f37abb54f197b5a03f80b3abda7894a9c6bb7934a63",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7235,18 +7390,20 @@
         "Packaging Distribution Scope Map",
         "4. Historical Architecture Position"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "576a7b811dcd53158606e540041a1bf0c14a61a08242f23ec6331859cda024a7",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_dd97ded8ab424ffd24d50cbafc620757",
       "sourceUnitDigest": "ee2c9e5b5ba499dd52e19900174103c8de441bb92887653e5aaa94fe6883e75a",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-70",
+      "targetAnchor": "unheaded-block-73",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-19, under \"4. Historical Architecture Position\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-69. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-70 SHA256 ee2c9e5b5ba499dd52e19900174103c8de441bb92887653e5aaa94fe6883e75a; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:437-439#unheaded-block-73; SHA256 ee2c9e5b5ba499dd52e19900174103c8de441bb92887653e5aaa94fe6883e75a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "ee2c9e5b5ba499dd52e19900174103c8de441bb92887653e5aaa94fe6883e75a",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7254,7 +7411,9 @@
         "Packaging Distribution Scope Map",
         "4. Historical Architecture Position"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "555fcaeb56b139dc399a28edefe64f12e216a3ff53525bb410df4efce3b8c2f9",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_6fa26e8fdaaf86bd7e75de5bf28bfea9",
@@ -7264,25 +7423,29 @@
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#5-activation-boundary, under \"5. Activation Boundary\", is retained at docs/platform/packaging-distribution/spec.md#5-activation-boundary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:441-441#5-activation-boundary; SHA256 79e788d6f659642e119268f22b143b493915deedb8c1ab850af730165af51180. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "79e788d6f659642e119268f22b143b493915deedb8c1ab850af730165af51180",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
-        "Packaging Distribution Scope Map"
-      ]
+        "Packaging Distribution Scope Map",
+        "5. Activation Boundary"
+      ],
+      "bindingSha256": "f5112d26ddbe4467daebd3e815638a5bc2f4bdf47071dd2d6e09cdbd8f9bf614",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_075bcdb88bc8989bf347f84bcf8b6bb8",
       "sourceUnitDigest": "99029fbd090749e3dd3c7abfb6f4767de2d1542b4d04952b908be8c8979841a0",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-71",
+      "targetAnchor": "unheaded-block-74",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-20, under \"5. Activation Boundary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-70. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-71 SHA256 99029fbd090749e3dd3c7abfb6f4767de2d1542b4d04952b908be8c8979841a0; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:443-443#unheaded-block-74; SHA256 99029fbd090749e3dd3c7abfb6f4767de2d1542b4d04952b908be8c8979841a0. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "99029fbd090749e3dd3c7abfb6f4767de2d1542b4d04952b908be8c8979841a0",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7290,18 +7453,20 @@
         "Packaging Distribution Scope Map",
         "5. Activation Boundary"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "ade417115577afee7baa4754641c866b596ef2c4eddc401841c4d4527296b346",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_707c20d97af0d6e733b8defcf4d62394",
       "sourceUnitDigest": "15c51ab594f77c06ab7efbc76008b37c258c66dfbca33297a2357cca853854a8",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-72",
+      "targetAnchor": "unheaded-block-75",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-21, under \"5. Activation Boundary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-71. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-72 SHA256 15c51ab594f77c06ab7efbc76008b37c258c66dfbca33297a2357cca853854a8; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:445-452#unheaded-block-75; SHA256 15c51ab594f77c06ab7efbc76008b37c258c66dfbca33297a2357cca853854a8. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "15c51ab594f77c06ab7efbc76008b37c258c66dfbca33297a2357cca853854a8",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7309,18 +7474,20 @@
         "Packaging Distribution Scope Map",
         "5. Activation Boundary"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "5afaa7ef00ccdb404ead9164f6b7ce5290145c41e33a60a543bddad756e0e5fe",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_80e603db238925ca6f81c14d52b10436",
       "sourceUnitDigest": "089f097d4b57980bac6e716054fad8083f991e38a768a387f59aa7c6465b5148",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-73",
+      "targetAnchor": "unheaded-block-76",
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-22, under \"5. Activation Boundary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-72. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-73 SHA256 089f097d4b57980bac6e716054fad8083f991e38a768a387f59aa7c6465b5148; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:454-459#unheaded-block-76; SHA256 089f097d4b57980bac6e716054fad8083f991e38a768a387f59aa7c6465b5148. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "089f097d4b57980bac6e716054fad8083f991e38a768a387f59aa7c6465b5148",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -7328,7 +7495,9 @@
         "Packaging Distribution Scope Map",
         "5. Activation Boundary"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "9f44d70c0be2c14aaffdfd118ccc79952282c7d4930300ada6c8b0f4e57e2d4d",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_163988c8973416bdd64781cc7c667f65",
@@ -7336,123 +7505,139 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "workspace-runtime-model",
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/architect/packaging-distribution/workspace-runtime-model.md:1-1#workspace-runtime-model (current lines); unit SHA256 b40b26ddf0efce28d42470472e5c0ff0ec8976b3a7c2e8793bfd9bfef47c06b0.\nTarget: docs/platform/packaging-distribution/spec.md:425-425#workspace-runtime-model (current lines); unit SHA256 d53ab4e2ea878a02f665cfaa616e61dbd2a988f027669faff34b62bd1834ad2e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest d53ab4e2ea878a02f665cfaa616e61dbd2a988f027669faff34b62bd1834ad2e at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 3, target 3; 3 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"docs/architect/workspace-topology.md\" (../workspace-topology.md) → \"docs/architect/workspace-topology.md\" (../../architect/workspace-topology.md); resolved docs/architect/workspace-topology.md → docs/architect/workspace-topology.md.\nLink 2: \"docs/platform/packaging-distribution/\" (../../platform/packaging-distribution/README.md) → \"docs/platform/packaging-distribution/\" (README.md); resolved docs/platform/packaging-distribution/README.md → docs/platform/packaging-distribution/README.md.\nLink 3: \"Workspace Topology Architecture\" (../workspace-topology.md) → \"Workspace Topology Architecture\" (../system-architecture/architecture/workspace-topology.md); resolved docs/architect/workspace-topology.md → docs/platform/system-architecture/architecture/workspace-topology.md.\nHeading depth: 1 → 3; title \"Workspace Runtime Model\" → \"Workspace Runtime Model\".\nWhole direct section differs; depth 1 → 3; 3 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/workspace-runtime-model.md#workspace-runtime-model under docs/platform/packaging-distribution/spec.md#workspace-runtime-model; source context \"workspace-runtime-model\", target context \"Spec: Packaging-Distribution / Retained Workspace Runtime Model Source Detail\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "d53ab4e2ea878a02f665cfaa616e61dbd2a988f027669faff34b62bd1834ad2e",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:467-467#workspace-runtime-model; SHA256 bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetUnitDigest": "bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
-        "Retained Workspace Runtime Model Source Detail"
-      ]
+        "Retained Workspace Runtime Model Source Detail",
+        "Workspace Runtime Model"
+      ],
+      "bindingSha256": "a218847c0dc267868d87feace3e3c1044ee6e08ed240cb2441bf903867c8b1ce",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_da41a9786ba80d8a51c540a03d4dc2c6",
       "sourceUnitDigest": "25b0152eb0224cc8800a2d0284f2b62c6bab8d4933b1122da4e834e7bd922fdf",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-75",
+      "targetAnchor": "unheaded-block-78",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-1, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-74. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-75 SHA256 25b0152eb0224cc8800a2d0284f2b62c6bab8d4933b1122da4e834e7bd922fdf; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:469-478#unheaded-block-78; SHA256 25b0152eb0224cc8800a2d0284f2b62c6bab8d4933b1122da4e834e7bd922fdf. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "25b0152eb0224cc8800a2d0284f2b62c6bab8d4933b1122da4e834e7bd922fdf",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "cf63ca311f11ba808d7267b5051353a1c825c8048d19680e5d3e68fc93b0a08d",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_d6701453661c34a2331f9d9bd12ef843",
       "sourceUnitDigest": "4b5c6ec34731f2d032006f5fdd787ef8207452a06456fb639c11a3c1df6c6b39",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-76",
+      "targetAnchor": "unheaded-block-79",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "Source: docs/architect/packaging-distribution/workspace-runtime-model.md:14-18#unheaded-block-2 (current lines); unit SHA256 4b5c6ec34731f2d032006f5fdd787ef8207452a06456fb639c11a3c1df6c6b39.\nTarget: docs/platform/packaging-distribution/spec.md:438-442#unheaded-block-75 (current lines); unit SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 9aefc76daebb502839626d20f26342d459be16ca0412bed1a7d4d3af5dd4ea9c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 2, target 2; 2 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"docs/architect/workspace-topology.md\" (../workspace-topology.md) → \"docs/architect/workspace-topology.md\" (../../architect/workspace-topology.md); resolved docs/architect/workspace-topology.md → docs/architect/workspace-topology.md.\nLink 2: \"docs/platform/packaging-distribution/\" (../../platform/packaging-distribution/README.md) → \"docs/platform/packaging-distribution/\" (README.md); resolved docs/platform/packaging-distribution/README.md → docs/platform/packaging-distribution/README.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-2 under docs/platform/packaging-distribution/spec.md#unheaded-block-75; source context \"Workspace Runtime Model\", target context \"Spec: Packaging-Distribution / Retained Workspace Runtime Model Source Detail / Workspace Runtime Model\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-76 SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:480-484#unheaded-block-79; SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "94e9cccdde4f85fc355c2cfff74692b9559f947cb35f9213575b4a3a1c9b2771",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_d897f2b8b6a0fc956ef2232d1d7b90c3",
       "sourceUnitDigest": "4b22d8634e39a4e2aa3c77b4c64890ec5ad33a5702e1297815320411bcc766b6",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-77",
+      "targetAnchor": "unheaded-block-80",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-3, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-76. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-77 SHA256 4b22d8634e39a4e2aa3c77b4c64890ec5ad33a5702e1297815320411bcc766b6; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:486-487#unheaded-block-80; SHA256 4b22d8634e39a4e2aa3c77b4c64890ec5ad33a5702e1297815320411bcc766b6. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "4b22d8634e39a4e2aa3c77b4c64890ec5ad33a5702e1297815320411bcc766b6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "68be56e4f725f5356fad1d51c95c9490dc58cb0b1b9fa15583080fdba83be9c8",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_0acb3fce7151b23ecb8e2f00e867edb3",
       "sourceUnitDigest": "b0517b50aef316291d132b925956dbbc2ed40d6dbc4239d918082e9f88b82653",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-78",
+      "targetAnchor": "unheaded-block-81",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-4, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-77. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-78 SHA256 b0517b50aef316291d132b925956dbbc2ed40d6dbc4239d918082e9f88b82653; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:489-490#unheaded-block-81; SHA256 b0517b50aef316291d132b925956dbbc2ed40d6dbc4239d918082e9f88b82653. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "b0517b50aef316291d132b925956dbbc2ed40d6dbc4239d918082e9f88b82653",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "c5e7c8e0f57e81a47078574fca74dbfb75f516a2bb3b1f6540d25c915a01ad39",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_249083eda8db1792917b6bc5239e48dd",
       "sourceUnitDigest": "c15ce32e107e8db4e484bf0b0304e1e42dbcc984a4e8f80766a5ba788cba907f",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-79",
+      "targetAnchor": "unheaded-block-82",
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-5, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-78. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-79 SHA256 90fe2ceaeaddd20677f3b4740a9a6f34912bae20dea39e1ebbd453a224ebf173; source identity unchanged, no native identity assignment or approval carry.",
-      "targetUnitDigest": "90fe2ceaeaddd20677f3b4740a9a6f34912bae20dea39e1ebbd453a224ebf173",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:492-492#unheaded-block-82; SHA256 cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5. full passage equals explicit topology-link correction with same named ancestry; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move; restore exact legacy topology destination docs/architect/workspace-topology.md to comply with retained source-status record. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetUnitDigest": "cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "09b0908c0599d673e14dc6f72d4f3e3b5c112fc1c4fa6ec58da5b05f4bb8dcc5",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_ffe2d79ceecc8d5f4c380c2ecbaa86ed",
       "sourceUnitDigest": "fa062476e5a57e2ecf6e260fcde316a50dce52c3ba7dc17265c9c373bdf51efe",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-80",
+      "targetAnchor": "unheaded-block-83",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-6, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-79. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-80 SHA256 fa062476e5a57e2ecf6e260fcde316a50dce52c3ba7dc17265c9c373bdf51efe; source identity unchanged, no native identity assignment or approval carry.",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:494-497#unheaded-block-83; SHA256 fa062476e5a57e2ecf6e260fcde316a50dce52c3ba7dc17265c9c373bdf51efe. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "fa062476e5a57e2ecf6e260fcde316a50dce52c3ba7dc17265c9c373bdf51efe",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "4f74bebbea54ed9ce8035d7b691716e41ff0535f0cadf9b1a566c569f2467116",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     }
   ],
   "files": [
@@ -7547,5 +7732,5 @@
       "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md"
     }
   ],
-  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+  "correctionSession": "fgos-run_unit-run-1792750955a733"
 }

@@ -1,0 +1,19 @@
+✔ knowledge-bootstrap - missing field rejects before writing entries (5.026248ms)
+✔ knowledge-bootstrap - idempotency and invariant check (39.023061ms)
+✔ knowledge-bootstrap - refuses (does not silently skip) a topic whose purposeSlug drifted from the registry (8.172286ms)
+✔ knowledge-bootstrap - refuses (does not silently skip) a doc whose currentPath drifted from the registry (6.558028ms)
+✔ knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial write from earlier rows in the same run (6.923402ms)
+✔ knowledge-bootstrap - a later row that fails the REDUCER's own validation (e.g. invalid mode) leaves an earlier row's topic/doc uncreated too (1.097938ms)
+✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc the registry already retired (8.490614ms)
+✔ knowledge-bootstrap - refuses a doc the registry already superseded (8.087844ms)
+✔ knowledge-bootstrap - refuses a topic the registry already retired (14.256594ms)
+✔ knowledge-bootstrap - refuses a live doc whose framework or mode drifted from the registry (8.290221ms)
+✔ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (7.931434ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 241.339053

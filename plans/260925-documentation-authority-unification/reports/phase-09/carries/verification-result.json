@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "claims": 44,
+  "candidateUnits": 1009,
+  "refreshedDecisions": 121,
+  "droppedClaims": 17,
+  "pointerFiles": 24,
+  "currentSourceUnits": 415,
+  "sourceParityQualification": "link destinations/heading depth not certified by normalized text; the sole textual delta is dev-source implementation-status qualification; see source-parity.json",
+  "reviewStatus": "pending; no gate accepted"
+}

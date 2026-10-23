@@ -16,14 +16,18 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
-      "rationale": "The source unit is carried to docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_2d8114529b804f49494e6d42548e1372). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:86-86#luật-nền-platform-forgent-phase-0-compound-learning-stack; SHA256 e21714ad09a8c40f44e5a35635b288d3b0a533f093d9c3e31c89ff84ca886526. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "e21714ad09a8c40f44e5a35635b288d3b0a533f093d9c3e31c89ff84ca886526",
       "targetAncestry": [
-        "Platform Foundations"
-      ]
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "bindingSha256": "2c14a921a6138743a8f49c69d75138f6312471c7bf8752c04e32209641312519",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_c35726c310bf820e3cda599f084761e2",
@@ -79,15 +83,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state to docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:113-113#l1-hai-vật-lý-của-tri-thức-log-vs-state; SHA256 a91884401af9fbe75d19fac880431be98aa8fc3e683655fcedcfb0ba711e082f. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "a91884401af9fbe75d19fac880431be98aa8fc3e683655fcedcfb0ba711e082f",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "bindingSha256": "6762d4223cfa7aa0f23030934f37c3b86893131930bc6fa0ce480e985853c875",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_1a46379988ff3344860104a51037903a",
@@ -197,15 +205,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l2-kiến-trúc-memory-hai-tầng",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng to docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:137-137#l2-kiến-trúc-memory-hai-tầng; SHA256 102b3fdf09dcc2c19e795ab43974fca95d02a62f8cc7f6f495cb09192a66fc1a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "102b3fdf09dcc2c19e795ab43974fca95d02a62f8cc7f6f495cb09192a66fc1a",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "bindingSha256": "f19bc0c5f0d21ac632523f88b795bff1046693d30adaaa673b3b8dff47e082b9",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_46875e137b716d373f8e9fcff9ff6400",
@@ -315,15 +327,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view to docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:165-165#l3-luật-store-truth-ở-jsonl-db-là-view; SHA256 4646882af7c897c30136d0f7981840f4208c3ae75c5ba38960b383129c092a5a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "4646882af7c897c30136d0f7981840f4208c3ae75c5ba38960b383129c092a5a",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "bindingSha256": "bf7daacf21afca6b27d391a32828c69cc52ab3eb60df718ade232ddd4fc6e5b2",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_513c6011284c4b74249f89883c5c2b36",
@@ -416,15 +432,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l4-routing-model-theo-audience-của-từng-interface",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface to docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:195-195#l4-routing-model-theo-audience-của-từng-interface; SHA256 9487ad11b57fe44ce79ecf697c6aa04c6070ce673f399dada389e6d3ea6f5d9e. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "9487ad11b57fe44ce79ecf697c6aa04c6070ce673f399dada389e6d3ea6f5d9e",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "bindingSha256": "b177f473630605d54074b9b781c7d957f536d05b53a2d147d1a2484229f6c26c",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_75504d48b9a81174ef19731cb714ae79",
@@ -517,15 +537,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l5-definition-of-done-sáu-câu-hỏi",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi to docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:222-222#l5-definition-of-done-sáu-câu-hỏi; SHA256 95645c6fe8d0405f1b99510819ef57fbe638e49192a0b25137bce960f0cf63fb. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "95645c6fe8d0405f1b99510819ef57fbe638e49192a0b25137bce960f0cf63fb",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "bindingSha256": "e939bb925deaa9b706ffbebf452f7d8d6de98e3fb3b6930abdc6ab3b51739b65",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_7877a2ddfb8ee8075a7148c52ea4fc5c",
@@ -618,15 +642,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l6-maturity-ladder-f0f5",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l6-maturity-ladder-f0f5 to docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:239-239#l6-maturity-ladder-f0f5; SHA256 b7fc052954d0e46c38c18dfd1c81c0ed879138f5bdc57214e67ad60f3cddecd0. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "b7fc052954d0e46c38c18dfd1c81c0ed879138f5bdc57214e67ad60f3cddecd0",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "bindingSha256": "ede3e422b4d8b41d3db349172b14619be7e0208eda8c8c928553382a3be63d59",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_82e4dc848455dbc8e136055038463e18",
@@ -719,15 +747,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l7-durability-ladder",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l7-durability-ladder to docs/platform/platform-foundations.md#l7-durability-ladder. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:267-267#l7-durability-ladder; SHA256 b00bf8a32401dbbd9edd32dd0fa477121115c7e37ed06e9bc6dc10e76ba9e548. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "b00bf8a32401dbbd9edd32dd0fa477121115c7e37ed06e9bc6dc10e76ba9e548",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L7 — Durability ladder"
+      ],
+      "bindingSha256": "161292dfb900815050d32dc4184043b36aae2103201c61e5d8ef993acf78f3ad",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_404167805085c5145681f309b696b18a",
@@ -803,15 +835,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l8-doctrine-placement-rule-always-loaded-layer",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer to docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:285-285#l8-doctrine-placement-rule-always-loaded-layer; SHA256 a125f0eb5bb4bb2db411f00b029236074d88ba3aa0d9e299f4d6aff6e4843aa9. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "a125f0eb5bb4bb2db411f00b029236074d88ba3aa0d9e299f4d6aff6e4843aa9",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "bindingSha256": "10d3e2acdd6dc18ff7126fddcfa59ed76b91284edb796c423212dc75472b9ef2",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_142412881aab59902a2000fce053ce1b",
@@ -904,15 +940,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable to docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:309-309#l9-thang-hoàn-tất-của-một-việc-run-merge-durable; SHA256 27ceb54327fef2cd68c7c03c0ac2cd712c1120cc04d8f1d54bc2647d9df1e06a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "27ceb54327fef2cd68c7c03c0ac2cd712c1120cc04d8f1d54bc2647d9df1e06a",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "bindingSha256": "abc2061385d379cddcb854d6194fa67ac39934b62e73fbccf4be24071be43b1f",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_936d30d6aa5cc64b54e8596bca6f4a5e",
@@ -1022,15 +1062,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa to docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:339-339#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa; SHA256 f1fa60caa80a3173c98c3613923ba9a0da0b92b4545090020f5413f0ba2845c3. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "f1fa60caa80a3173c98c3613923ba9a0da0b92b4545090020f5413f0ba2845c3",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "bindingSha256": "4d008e089e13e0dba6907e2e3d8659b4fc2644e74db7142e886c8341ce4b2301",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_e9aac1ae38314d17c62385ad187e022f",
@@ -1123,15 +1167,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "trình-tự-thi-công-phía-trên-các-luật",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#trình-tự-thi-công-phía-trên-các-luật to docs/platform/platform-foundations.md#trình-tự-thi-công-phía-trên-các-luật. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:371-371#trình-tự-thi-công-phía-trên-các-luật; SHA256 9bdd1413c48a0b13b192d0e8578a9b9560f97a85fff67e75c5e469795a2c58ff. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "targetUnitDigest": "9bdd1413c48a0b13b192d0e8578a9b9560f97a85fff67e75c5e469795a2c58ff",
       "targetAncestry": [
         "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "Trình tự thi công phía trên các luật"
+      ],
+      "bindingSha256": "499733a211ab8cfe0dbd1e54ecda657fdde223f870011a99e5c8ea7c4028b57a",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_45311733787f5c97253a7f73114d7b45",
@@ -1783,5 +1831,5 @@
       "targetAncestry": []
     }
   ],
-  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+  "correctionSession": "fgos-run_unit-run-1792750955a733"
 }

@@ -1,0 +1,174 @@
+✔ knowledge-bootstrap - missing field rejects before writing entries (6.602653ms)
+✖ knowledge-bootstrap - idempotency and invariant check (8.612484ms)
+✖ knowledge-bootstrap - refuses (does not silently skip) a topic whose purposeSlug drifted from the registry (3.003268ms)
+✖ knowledge-bootstrap - refuses (does not silently skip) a doc whose currentPath drifted from the registry (2.767273ms)
+✖ knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial write from earlier rows in the same run (3.071222ms)
+✔ knowledge-bootstrap - a later row that fails the REDUCER's own validation (e.g. invalid mode) leaves an earlier row's topic/doc uncreated too (1.935239ms)
+✖ knowledge-bootstrap - refuses (does not report idempotent success) a doc the registry already retired (2.909228ms)
+✖ knowledge-bootstrap - refuses a doc the registry already superseded (2.350563ms)
+✖ knowledge-bootstrap - refuses a topic the registry already retired (3.197009ms)
+✖ knowledge-bootstrap - refuses a live doc whose framework or mode drifted from the registry (2.590644ms)
+✖ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.669335ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 2
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 248.0378
+
+✖ failing tests:
+
+test at test/state/knowledge-bootstrap.test.mjs:33:1
+✖ knowledge-bootstrap - idempotency and invariant check (8.612484ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:43:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:68:1
+✖ knowledge-bootstrap - refuses (does not silently skip) a topic whose purposeSlug drifted from the registry (3.003268ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:76:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:96:1
+✖ knowledge-bootstrap - refuses (does not silently skip) a doc whose currentPath drifted from the registry (2.767273ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:104:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:124:1
+✖ knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial write from earlier rows in the same run (3.071222ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:134:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:186:1
+✖ knowledge-bootstrap - refuses (does not report idempotent success) a doc the registry already retired (2.909228ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:194:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:210:1
+✖ knowledge-bootstrap - refuses a doc the registry already superseded (2.350563ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:218:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:229:1
+✖ knowledge-bootstrap - refuses a topic the registry already retired (3.197009ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:237:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:253:1
+✖ knowledge-bootstrap - refuses a live doc whose framework or mode drifted from the registry (2.590644ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at bootstrapRegistry (file:///home/vantt/projects/forgentX-p9-w1-d1/scripts/knowledge-bootstrap.mjs:216:7)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:261:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-bootstrap.test.mjs:276:1
+✖ knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row's own oldPath (2.669335ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-bootstrap.test.mjs:286:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }

@@ -20,25 +20,28 @@ Supersedes: None; legacy sources remain in place during migration
 Superseded by: None recorded
 ```
 
-## 1. Provenance Of Retired Decisions
+## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
-## 2. ADR 0002 Flat Work Model
 
-> **Một phần đã supersede bởi [0012](#8-adr-0012-unified-typed-edge-graph-model):**
+### 0002 — Mô hình việc phẳng
+
+> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**
 > "deps và parent tách rời có chủ đích" nay đọc là "tách rời về lưu trữ và ngữ
 > nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive". Phần còn lại của
 > record này (mô hình việc phẳng, một FSM, "epic" là item thường) vẫn hiện hành.
 
-### 0002 Context
+# 0002 — Mô hình việc phẳng
+
+#### Bối cảnh
 
 forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng
 nhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity
 riêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái
 và khoá độ mịn công việc vào schema.
 
-### 0002 Decision
+#### Quyết định
 
 - **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.
 - **"Epic" chỉ là một item thường** được các item khác trỏ deps tới — không phải một
@@ -48,7 +51,7 @@ và khoá độ mịn công việc vào schema.
 - **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**
   từ trạng thái — không phải danh sách duy trì bằng tay.
 
-### 0002 Consequences
+#### Hệ quả
 
 - **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay
   bất kể chúng thuộc "epic" nào.
@@ -59,15 +62,15 @@ và khoá độ mịn công việc vào schema.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 3. ADR 0003 Naming And Data Layout
+### 0003 — Đặt tên & bố cục dữ liệu
 
-### 0003 Context
+#### Bối cảnh
 
 Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết
 code, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong
 layout.
 
-### 0003 Decision
+#### Quyết định
 
 - **CLI = `fgos`** (cửa lệnh của sản phẩm).
 - **Entity đơn vị việc = `work`.**
@@ -76,7 +79,7 @@ layout.
   - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải
     sự thật).
 
-### 0003 Consequences
+#### Hệ quả
 
 - **Brand nhất quán** giữa CLI, tài liệu và data dir.
 - **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một
@@ -86,9 +89,9 @@ layout.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 4. ADR 0004 Scope And Non-Goals
+### 0004 — Phạm vi & non-goal
 
-### 0004 Context
+#### Bối cảnh
 
 Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ
 thế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính
@@ -98,7 +101,7 @@ forgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.
 > bộ của dự án. Ở đây viết thuần theo sản phẩm — "harness phát triển" — không phụ
 > thuộc tên công cụ cụ thể nào.
 
-### 0004 Decision
+#### Quyết định
 
 1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của
    repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn
@@ -108,7 +111,7 @@ forgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.
    Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent
    lạ tự tìm được việc kế tiếp từ chính state của forgent.
 
-### 0004 Consequences
+#### Hệ quả
 
 - **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung
   chứng minh work-state tự-quản trước.
@@ -117,9 +120,9 @@ forgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 5. ADR 0006 Proposed Status
+### 0006 — Trạng thái `proposed`
 
-### 0006 Context
+#### Bối cảnh
 
 Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:
 
@@ -128,7 +131,7 @@ Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều 
 2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.
 3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM.
 
-### 0006 Decision
+#### Quyết định
 
 Thêm trạng thái **`proposed`** vào FSM, với các cạnh:
 
@@ -146,7 +149,7 @@ Ngữ nghĩa:
 - **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ
   chạy trên nền thiếu code A.
 
-### 0006 Consequences
+#### Hệ quả
 
 - **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.
 - **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai
@@ -158,15 +161,15 @@ Ngữ nghĩa:
 - Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 6. ADR 0007 Schema And Event Evolution
+### 0007 — Tiến hoá schema & event
 
-### 0007 Context
+#### Bối cảnh
 
 Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên
 một nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục
 đọc được dưới code mới, nếu không nguyên lý "log là sự thật dựng-lại-được" sụp.
 
-### 0007 Decision
+#### Quyết định
 
 Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 
@@ -178,7 +181,7 @@ Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code
    đọc biết mình đang replay shape nào.
 
-### 0007 Consequences
+#### Hệ quả
 
 - **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event
   mới, không sửa event cũ.
@@ -189,9 +192,9 @@ Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 7. ADR 0011 Explicit Version For Every Contract
+### 0011 — Version tường minh cho mọi contract
 
-### 0011 Context
+#### Bối cảnh
 
 0007 đã khoá "mỗi **event** mang trường schema version". Nhưng fgOS không chỉ
 expose event ra ngoài code của nó — nó còn expose **schema** (shape của
@@ -210,7 +213,7 @@ nhúng thẳng trong định danh — đọc được bằng mắt (không cần
 và bằng code (regex/parse một field), khác với version-là-field-số-rời mà
 0007 dùng cho event.
 
-### 0011 Decision
+#### Quyết định
 
 Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu
 bền: work item, state.json), **artifact** (file sinh cho người/agent khác:
@@ -231,7 +234,7 @@ version tường minh trong định danh của chính nó, theo mẫu `<name>/v<
    `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc
    shape nào).
 
-### 0011 Consequences
+#### Hệ quả
 
 - **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,
   +artifact), không đổi luật event đã có.
@@ -243,9 +246,9 @@ version tường minh trong định danh của chính nó, theo mẫu `<name>/v<
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 8. ADR 0012 Unified Typed-Edge Graph Model
+### 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
 
-### 0012 Context
+#### Bối cảnh
 
 0002 khoá "deps và parent là hai quan hệ tách rời có chủ đích": `deps` là cạnh
 phụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage
@@ -268,7 +271,7 @@ không tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó
 `parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán
 và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng.
 
-### 0012 Decision
+#### Quyết định
 
 - **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu
   DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành
@@ -307,7 +310,7 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),
   mọi event cũ replay y hệt (RUL11 (tiến hóa schema)).
 
-### 0012 Consequences
+#### Hệ quả
 
 - `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,
   hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để
@@ -320,9 +323,9 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 9. ADR 0013 Report-Not-Write Channel For Discovered-From
+### 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
 
-### 0013 Context
+#### Bối cảnh
 
 work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn
 ghi lại "việc này lộ ra trong lúc làm việc kia". Trường đã có hai nhà sản xuất:
@@ -337,7 +340,7 @@ chạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo i
 runner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán
 việc worker làm, không phải report của nó).
 
-### 0013 Decision
+#### Quyết định
 
 Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,
 mở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:
@@ -369,7 +372,7 @@ mở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:
    `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn
    fan-out.
 
-### 0013 Consequences
+#### Hệ quả
 
 - **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có
   đường ghi song song mới nào mở ra.
@@ -380,7 +383,7 @@ mở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:
   thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không
   row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ.
 
-### 0013 Trust Boundary
+#### Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)
 
 `title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do
 chính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó
@@ -396,7 +399,7 @@ bắt buộc trước khi một item runner-tự-tạo được dispatch tự đ
 `clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để
 cân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện.
 
-### 0013 Delivery Guarantee
+#### Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)
 
 Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI
 ít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại
@@ -404,7 +407,7 @@ kết cục cuối của lượt dispatch; nếu tiến trình runner chết gi�
 `addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã
 lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hiện từ trợ lý" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm).
 
-### 0013 Alternatives Considered
+#### Phương án đã cân nhắc và bỏ
 
 - **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report
   của worker thành đường ghi không qua goal-check.
@@ -413,9 +416,9 @@ lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hi
 - **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra
   item trùng; parse một lần tại kết cục cuối là điểm đúng.
 
-## 10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule
+### 0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)
 
-### 0019 Context
+#### Bối cảnh
 
 `RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7428`) cấm tường minh: "Nhật ký
 đã commit bất khả xâm phạm — không bao giờ migration ghi đè". Luật này nằm trong
@@ -429,7 +432,7 @@ worktree, kho `dogfood-fixture` (git-theo-dõi trong chính repo sản phẩm), 
 `fgos-test-drive`. Không viết lại các kho này thì replay sẽ đọc vĩnh viễn hai tên
 cho cùng một trường.
 
-### 0019 Decision
+#### Quyết định
 
 Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: trong lúc sản phẩm còn chưa
 phát hành, một thao tác migration được phép **viết lại tại chỗ** (ghi đè
@@ -466,7 +469,7 @@ và chính dòng `RUL11 (tiến hóa schema)` trong `docs/specs/work-state.md` �
 ngược lại bản ghi này — văn xuôi làm việc mà `superseded_by` sẽ làm nếu mục tiêu
 là một decision record.
 
-### 0019 Consequences
+#### Hệ quả
 
 - **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và
   `fgos rebuild`, mọi bản chiếu dựng từ log chỉ còn thấy `role`/`claimRole`.
@@ -476,9 +479,9 @@ là một decision record.
   — nó không bị đưa vào bất kỳ lần viết lại nào, kể cả lần này.
 - Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 11. ADR 0024 Rename Proposed Status To Awaiting-Approval
+### 0024 — Đổi tên status `proposed` thành `awaiting-approval`
 
-### 0024 Context
+#### Bối cảnh
 
 `0006` đặt tên status `proposed` cho trạng thái "goal-check đạt, đề xuất nằm
 trên nhánh chờ duyệt". Quan sát người dùng (2026-07-28, `tsk-66l`): `proposed`
@@ -498,7 +501,7 @@ field lẽ ra domain-agnostic.
 Dictionary #4 và O4 cùng dùng chuỗi này cho cùng 1 khái niệm) — đổi một nơi mà
 bỏ nơi kia sẽ tái tạo đúng khoảng ambiguity giữa 2 field lẽ ra đồng nghĩa.
 
-### 0024 Decision
+#### Quyết định
 
 Đổi tên giá trị `proposed` → `awaiting-approval`, đồng nhất ở CẢ HAI nơi dùng
 chung từ vựng: `work.status` (1 trong 7 giá trị enum, `src/state/work.mjs`
@@ -516,7 +519,7 @@ dry-run, seq-contiguity check) để ghi đè tại chỗ 3 kho `.fgos` trong ph
 — KHÔNG đụng `test/fixtures/phase1-events.jsonl` (đã đo: 0 chỗ chứa
 `"proposed"`, loại trừ vô hại).
 
-### 0024 Consequences
+#### Hệ quả
 
 - Mọi consumer đọc `.status === 'proposed'` hoặc `.outcome === 'proposed'`
   phải đổi sang `'awaiting-approval'` cùng lúc với migration — không có
@@ -533,9 +536,9 @@ dry-run, seq-contiguity check) để ghi đè tại chỗ 3 kho `.fgos` trong ph
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-## 12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary
+### 0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)
 
-### 0027 Context
+#### Bối cảnh
 
 `base-workflow-model` (git content-hash `2ae492d8`) không tồn tại như một file
 `docs/decisions/` đánh số riêng — nó chỉ sống dưới dạng trích dẫn nội tuyến
@@ -583,7 +586,7 @@ khác (skill), cleanup cũng sẽ có cách dọn khác (skill)") là quyết đ
 được chốt — record này formalize đúng, không phải khung rộng ban đầu của
 report.
 
-### 0027 Decision
+#### Quyết định
 
 **Phạm vi supersede CHÍNH XÁC — chỉ ĐOẠN ĐẦU, không phải toàn bộ FSM.** 10
 status hôm nay chia làm hai nhóm bản chất khác nhau, theo tiêu chí "domain có
@@ -642,7 +645,7 @@ cho dữ liệu nested per-domain, optional-additive, ghi đè toàn object mỗ
 độc lập với phần status/category ở trên, KHÔNG được implement trong record này
 (ngoài phạm vi `tsk-38t-1`, thuộc `tsk-38t-2` trở đi).
 
-### 0027 Consumer Audit
+#### Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay
 
 Quét bằng `rg -n "STATUSES|TRANSITIONS" src/ bin/ --glob '*.mjs'` và
 `rg -n "'todo'|'doing'|'blocked'|'awaiting-approval'|'awaiting-human'|
@@ -655,7 +658,7 @@ acceptance của `tsk-38t`. Cột "Đổi?" nói rõ consumer này có cần đ�
 `statusCategory` (hoặc bảng transition riêng của domain) hay giữ nguyên literal
 mãi mãi theo đúng ranh giới đầu/đuôi vừa chốt ở trên.
 
-#### 0027 Audit 1 Status Source Of Truth
+##### 1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)
 
 | File:line | Vai trò | Đổi? |
 |---|---|---|
@@ -664,7 +667,7 @@ mãi mãi theo đúng ranh giới đầu/đuôi vừa chốt ở trên.
 | `src/state/status-fsm.mjs:99-152` (`TRANSITIONS`, 24 cạnh) | Bảng chuyển-status PHẲNG duy nhất, validate mọi `transitionWork` | Có, nhưng CHỈ phần đoạn đầu (19/24 cạnh chạm 6 status đoạn đầu) — 5 cạnh đoạn đuôi (`delivered→retrospective`, `retrospective→cleanup`, `cleanup→done`, `cleanup→blocked`, `blocked→delivered`) giữ nguyên, dùng chung mọi domain |
 | `src/state/status-fsm.mjs:193-256` (`transitionWork`) | Hàm validate + sinh event, đọc `TRANSITIONS` trực tiếp | Có — cần tham số hoá theo `work.domain` cho phần đoạn đầu |
 
-#### 0027 Audit 2 Resolved Statuses Set
+##### 2. `RESOLVED_STATUSES` (tập "giống category" viết tay, trộn cả 2 nhóm)
 
 `src/state/frontier.mjs:186` khai `RESOLVED_STATUSES = new Set(['delivered',
 'retrospective', 'cleanup', 'done', 'wontfix'])` — trộn 4 status ĐUÔI (cố
@@ -686,7 +689,7 @@ cùng category) — không còn là 1 Set string thuần.
 | `src/report/entropy.mjs:15,17,41,96` | Import `RESOLVED_STATUSES` + `FINAL_STATUSES` cục bộ riêng (`awaiting-approval`,`blocked`,`done`) cho báo cáo entropy/stale-clarify | Có — `FINAL_STATUSES` cục bộ này TỰ Ý trộn 1 status đầu (`awaiting-approval`,`blocked`) với 1 status đuôi (`done`), là một bản sao lệch nghĩa của `RESOLVED_STATUSES` cần rà lại cùng lúc |
 | `bin/fgos.mjs:33,544,1373` | Import `RESOLVED_STATUSES` + `FINAL_STATUSES` cục bộ (`awaiting-approval`,`blocked`,`delivered`,`retrospective`,`cleanup`,`done`) cho outcome-backfill check và ready-view filter | Có — cùng lý do, cần đối chiếu lại theo ranh giới đầu/đuôi mới |
 
-#### 0027 Audit 3 CLI Status Literals
+##### 3. Literal status trong verb logic của `bin/fgos.mjs` (tầng CLI/store — chính là "bảng transition của domain coding" hôm nay)
 
 | File:line (khu vực) | Vai trò | Đổi? |
 |---|---|---|
@@ -701,7 +704,7 @@ cùng category) — không còn là 1 Set string thuần.
 | `bin/fgos.mjs:1042-1082,1114` | `case 'cleanup'`: yêu cầu `status === 'cleanup'`, chuyển `cleanup → done`/`cleanup → blocked`; `case 'compound'` yêu cầu `status === 'retrospective'` | **Đuôi — KHÔNG đổi** cạnh transition; nhưng verb `cleanup`/skill chạy `retrospective` là nơi gap thật của `skillMap.retrospective` sẽ cắm vào (chưa code — `tsk-38t` decompose kế tiếp) |
 | `bin/fgos.mjs:658-672` (`collectRollupData`) | `w.status === 'done'` — đếm con `done`/tổng con cho verb `rollup` | **Đuôi — KHÔNG đổi** (`done` là literal cố định) |
 
-#### 0027 Audit 4 Runner Consumers
+##### 4. `runner/` — vòng tự hành, tiêu thụ nặng nhóm đầu
 
 | File:line | Vai trò | Đổi? |
 |---|---|---|
@@ -716,7 +719,7 @@ cùng category) — không còn là 1 Set string thuần.
 | `src/runner/promote-engine.mjs:79` | `outcome: 'blocked'` | Như trên |
 | `src/runner/recovery.mjs:131,133` | Crash-recovery resolve `to: 'awaiting-approval'` / `to: 'blocked'` | Đoạn đầu — domain-owned |
 
-#### 0027 Audit 5 Other Domain-Agnostic Mechanisms
+##### 5. Cơ chế domain-agnostic khác (được DISCUSSION.md liệt tường minh)
 
 | File:line | Vai trò | Đổi? |
 |---|---|---|
@@ -725,7 +728,7 @@ cùng category) — không còn là 1 Set string thuần.
 | `docs/reference/triage-table-columns.md:18` | Bảng cột hiển thị CLI liệt kê CHỈ 7 status cũ (`todo`/`doing`/`blocked`/`awaiting-human`/`awaiting-approval`/`done`), "rendered as-is" — literal, đã lệch 10 status thật hôm nay (thiếu `delivered`/`retrospective`/`cleanup`/`wontfix`) | **Gap có thật, ĐỘC LẬP với quyết định category** (DISCUSSION.md §3 #6) — cần sửa dù thiết kế category chốt kiểu gì; hiển thị "as-is" hôm nay đã ngầm giả định 1 domain, sẽ hiện sai khi domain khác dùng nhãn khác cho cùng category |
 | `packages/herdr-fgos-common/rust/src/fgos.rs:46,101,110,203-272` | Tiến trình Rust NGOÀI runtime Node — parse `fgos list --all --json` stdout, lọc `item.status == "doing" \|\| item.status == "awaiting-approval"` (tsk-4vo) để hiển thị pane "in-process" | **Consumer NGOÀI biên `src/`/`bin/`, qua ranh giới CLI/JSON** — domain-owned, đọc literal string coding hôm nay; nếu domain khác đổi nhãn 2 status này, `herdr-dashboard` vỡ ngầm trừ khi tự đọc `statusCategory` thay literal — phải liệt vào backlog migrate-consumer của `tsk-38t-3` (consumer-migration), không chỉ audit mã nguồn `.mjs` |
 
-#### 0027 Audit 6 Adjacent Gaps
+##### 6. Gap liên quan nhưng KHÔNG phải phạm vi audit status literal (ghi nhận để không lặp lại công sức)
 
 `fgos-coding-compounding` bị gọi CỨNG cho mọi item tới `retrospective`
 (`src/state/retro-pool.mjs`, `bin/fgos.mjs:1012,1088`) — không tham số hoá
@@ -733,7 +736,7 @@ theo domain. Đây là gap đã chốt hướng xử lý (mở rộng `skillMap`
 `retrospective`) nhưng CHƯA code — thuộc `tsk-38t` decompose kế tiếp, không
 phải một "consumer literal status" cần audit ở record này.
 
-### 0027 Consequences
+#### Hệ quả
 
 - **Record này là tiền điều kiện bắt buộc cho `tsk-38t-2` đến `tsk-38t-7`**
   (schema `statusCategory`/`STATUS_CATEGORIES`, migration backfill,
@@ -764,7 +767,7 @@ phải một "consumer literal status" cần audit ở record này.
   gap có thật nhưng ĐỘC LẬP khỏi quyết định category — không chặn record này,
   nhưng nên sửa cùng đợt `tsk-38t-3` để tránh phải quét lại 2 lần.
 
-## 13. ADR 0032 Multi-Role Team Harness
+### 0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
 
 > Bằng chứng distill của 24 vòng thảo luận (2026-08-15, item `tsk-2t9c`),
 > người dùng duyệt từng cụm qua các vòng và duyệt bản distill này ở vòng
@@ -777,7 +780,17 @@ phải một "consumer literal status" cần audit ở record này.
 > copy đã đóng dấu quyết định (nguồn sống, đầy đủ nhất vẫn là
 > `docs/history/fgos-marketing-domain-foundation/`).
 
-### 0032 Foundation Architecture
+#### Hành trình
+
+Xuất phát từ yêu cầu so sánh cơ chế điều phối fgOS vs marketing-cockpit
+(2 scout haiku + phản biện fable, vòng 1–2), thảo luận mở rộng thành
+thiết kế **core harness tổng quát cho team agent đa role** — absorption
+cockpit trở thành *khách hàng đầu tiên* của harness thay vì mục tiêu duy
+nhất. Hội tụ lần 1 ở vòng 8 (exploring + planning đã chạy), người
+dùng dừng trước implement rồi đào sâu thêm 16 vòng ra, và
+planning chi tiết per-file (vòng 22).
+
+#### I. Kiến trúc nền (seq 18029, 18031)
 
 - **Mechanism vs Policy**: harness (cơ học) chỉ gác legality + ghi sự
   thật vào event log + đánh thức đúng vai — *không bao giờ phán đoán*.
@@ -792,7 +805,7 @@ phải một "consumer literal status" cần audit ở record này.
   roleGraph + gates) / Dispatch (executor nào chạy —
   `src/runner/dispatch.mjs` decide/execute, một cửa).
 
-### 0032 Handoff
+#### II. Handoff — trái tim của tính uyển chuyển (seq 18032, 18070, 18058)
 
 - **Hai loại handoff**: **Call** (round-trip, bóng về người gửi) với 4
   reason do người dùng định nghĩa: `advise` / `assist` (tay chân) /
@@ -814,7 +827,7 @@ phải một "consumer literal status" cần audit ở record này.
   *bắt buộc ghi reason* → rework thành tín hiệu compound-learn. Áp
   nguyên xi cho marketing (publish = hard, editorial approval = soft).
 
-### 0032 Declarative Structure
+#### III. Cấu trúc khai báo (seq 18059, 18060, 18110, 18189, 18232, 18242)
 
 - **Hierarchy: domain → N workflow → item**. Coding đang gộp 1
   workflow (bằng chứng gồng: discovery-verdict skip là nhánh vá; luật
@@ -883,7 +896,7 @@ phải một "consumer literal status" cần audit ở record này.
   LLM sinh, đồng thời cảnh báo enforcement không có đường sửa thì item
   kẹt.
 
-### 0032 Implementation Sequence
+#### IV. Trình tự triển khai (seq 18030)
 
 **Coding trước** (quyết định người dùng, đảo đề xuất marketing-first ban
 đầu): coding đã chứa đủ 4 tương tác call ở dạng ngầm — chỉ nâng thành
@@ -900,7 +913,7 @@ Thứ tự: ① role-axis + handoff đáp lên graph đơn hiện tại → ② 
 coding thành 3 workflow → ③ task-spec A-lite (~13 phiếu, chạy song song
 ①② được) → ④ marketing (DOMAINS entry + port + template + judge-gate).
 
-### 0032 Marketing Cockpit Comparison Conclusion
+#### V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững)
 
 **Lấy về fgOS**: 39 skills + 30 task-spec (tài sản chính); signal →
 biểu diễn lại thành event typed-payload + projection theo consumer
@@ -923,7 +936,7 @@ liability — 1 DOMAINS entry engine-enforced thay thế); phần lớn
 checkpoint machinery (có free từ event log + worktree commit); adapter
 đa nền tảng (scope cut ghi nhận tường minh — fgOS Claude-native trước).
 
-### 0032 Deliberately Deferred Questions
+#### VI. Treo có chủ đích (không phải quên)
 
 1. **#7 — Judge-gate (LLM-graded rubric) có tính là "proof" theo luật L5
    DoD không?** Rủi ro sắc nhất: nếu không chấp nhận, mọi item marketing
@@ -938,8 +951,61 @@ checkpoint machinery (có free từ event log + worktree commit); adapter
 5. **Human modeling đa người** — pull-door verbs đủ cho tới khi có team
    nhiều người thật.
 
-## 14. Related Files
+#### VII. Trạng thái tại thời điểm distill (2026-08-15)
 
-- [Work State area portal](../README.md)
-- [Work State spec](../spec.md)
-- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)
+- **Validating đã chạy xong**: reality gate 6/6 PASS, feasibility matrix
+  có bằng chứng thật từng dòng, verdict **READY WITH CONSTRAINTS**; gate
+  `validateApprove` hỏi người (`canAutoApprove: false` — hard-gate
+  keyword `schema`/`migration`, true positive), người dùng chọn
+  mechanism-first → **D7a** (seq 18248). `fgos plan --verdict decompose`
+  materialize **3 item con** ở stage `executing`: `tsk-2t9c-1` (role
+  axis, heavy), `tsk-2t9c-2` (workflow hierarchy, heavy, `deps:
+  [tsk-2t9c-1]`), `tsk-2t9c-3` (task-spec + doctor check, standard).
+- 13 D-ID khớp ở 3 nơi: event log, bảng §4 `DISCUSSION.md`,
+  bảng Locked decisions `CONTEXT.md`.
+- Hai bẫy ghi lại trong plan: `src/state/handoff.mjs` phải có row trong
+  `docs/architecture-manifest.json` (không thì `test/architecture.
+  test.mjs` đỏ), và file đó phải PURE (cap/depth do caller truyền —
+  khuôn `hasWorkerSlotRoom({ceiling})`).
+
+#### VIII. Sau distill — implement, review độc lập, và verify thật (2026-08-15/16)
+
+Phần này KHÔNG có trong bản distill gốc — thêm khi copy sang
+`docs/decisions/` để bản ghi không đứng yên khi thực tế đã đi xa hơn.
+Toàn bộ chi tiết per-D-ID, per-commit sống ở
+`docs/history/fgos-marketing-domain-foundation/CONTEXT.md` (bảng)
+và `DISCUSSION.md` (Q&A theo round); đây chỉ là điểm mốc.
+
+Ba mảnh ①②③ implement, test, tự review, commit tuần tự trên chính branch
+`fgw/tsk-2t9c` theo lệnh người dùng ("mọi thứ tự quyết"). Sau đó, theo
+yêu cầu review nghiêm túc của người dùng:
+
+- **Nối dây handoff thật**: 5 skill coding-domain (`fgos-coding-implement`/
+  `discovering`/`exploring`/`planning`/`validating`) nối dây thật vào
+  `handoff`/`handoff-return` — không chỉ có cơ chế, mà skill THẬT gọi nó.
+- **Review độc lập**: review độc lập (agent `code-reviewer` mới, không chia sẻ
+  context) tìm ra 2 lỗi HIGH + 3 MED + 4 LOW trong chính cách nối dây
+  handoff thật vừa làm ở trên — tất cả đã sửa (chi tiết: giữ role/holder axis nhất quán qua
+  reclaim lặp tới khi về `implementer`, `roleGraph` phủ cả stage
+  `decompose` legacy, v.v.).
+- **Khoá `kind` sau khi rời `todo`**: một câu hỏi kiến trúc của người dùng ("`fgos-coding-driving`
+  có nên là cross-workflow router?") dẫn tới tư vấn Opus độc lập, phát
+  hiện `kind` (field chọn workflow của item) sửa tự do không kiểm soát —
+  fix: khoá `kind` một khi `status` rời `todo`, không cần field
+  `workflow` riêng.
+- **Chuyển lệnh review vào ENGINE**: một lần chạy AGENT THẬT (không phải test đơn vị) theo đúng
+  prose của `fgos-coding-implement`, trên một item thật, phát hiện
+  handoff `review` KHÔNG bắn được trong thực tế dù prose ra lệnh rõ ràng
+  — nguyên nhân: lệnh nằm cuối, lặp lại 2 lần (return/catchup), không gì
+  kiểm tra khi bị bỏ sót. Fix: chuyển lệnh vào ENGINE (`moveWork` tự bắn
+  khi `status` chạm `awaiting-approval`), không còn phụ thuộc agent đọc
+  hết prose. Xác nhận lại bằng agent thật lần nữa (`tsk-3vk`,
+  2026-08-16): `work.handoff` với `reason: "review"` bắn đúng, agent
+  không hề tự gọi.
+
+Bài học chung xuyên suốt ba mục trên: **test đơn vị/tích hợp chứng minh
+engine đúng, không chứng minh agent theo prose sẽ hành xử đúng** — chỉ
+một lần chạy thật, agent thật, theo đúng hướng dẫn, trên item thật, mới
+lộ ra khoảng cách đó. Nơi khoảng cách này lặp lại (một hành vi bắt buộc
+nhưng không gì kiểm tra khi bị bỏ sót), hướng sửa đúng là chuyển bảo
+đảm vào engine, không phải viết prose mạnh hơn.

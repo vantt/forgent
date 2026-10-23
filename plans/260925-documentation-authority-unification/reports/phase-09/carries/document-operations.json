@@ -1,0 +1,133 @@
+{
+  "sourcePin": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "operations": [
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "kind": "edit",
+      "beforeSha256": "74180607361d52d8e71b46d2cc315ad828e9f84d55631e497e924fb64c052980",
+      "expectedAfterSha256": "87a6a9af2251e06e320f06e9095009942f96889d3a045f54301d1f8750c5dc84",
+      "candidateUnits": 8,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "kind": "create",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "dafec153b7ce7843f58deb24361899283e18b9a8b85e693c6e18480c402e1479",
+      "candidateUnits": 8,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "kind": "edit",
+      "beforeSha256": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e",
+      "expectedAfterSha256": "1b4d2eb962f9dfc69dda609fdbac536e392a1a63d0ddd296f1c3d501aba96739",
+      "candidateUnits": 84,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "kind": "edit",
+      "beforeSha256": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "expectedAfterSha256": "3724d01710c74f42b2ec13d5a9c8d2c20bf5436c09ab8b4bd273a943068f7a49",
+      "candidateUnits": 95,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "kind": "edit",
+      "beforeSha256": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "expectedAfterSha256": "6ba03ea038f541b938c14ab4d084d9a7d00a33516870db6ac8ee1bb1fc668b51",
+      "candidateUnits": 59,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "kind": "edit",
+      "beforeSha256": "1c86d535fba854a9a31f095fdf182eb8ea84f53c8bfa6114461f7a36ce7a7b25",
+      "expectedAfterSha256": "823892cf039968300c4bb5032a2b4985e10ca53a601cb0e542c9b17479aedf31",
+      "candidateUnits": 45,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "kind": "create",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "26f9b96b976700b52bd594e890ef9882bc0e7f76babb1a2acf3d3853eb608e63",
+      "candidateUnits": 4,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "kind": "edit",
+      "beforeSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+      "expectedAfterSha256": "15ccb66386fe1b44a154c8555dfdef1ba8eba6a464487f31e7673225f51da7c0",
+      "candidateUnits": 148,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "kind": "edit",
+      "beforeSha256": "f64194e4f363c1202f0309c9c07dfc309fe401e62f3712353e845334e5cee09d",
+      "expectedAfterSha256": "d1a96186d7786548c8795ad6cf278e5b5f19a5f3f22d6cd5f5483d0cbff1276f",
+      "candidateUnits": 31,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "kind": "edit",
+      "beforeSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "expectedAfterSha256": "dadfff52aa1925ab33c1b0f0c6cc1ac404c8a94eba518d4f7713170758321dcc",
+      "candidateUnits": 211,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "kind": "edit",
+      "beforeSha256": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6",
+      "expectedAfterSha256": "c636d7cc4539adb8ef7ab50114f8aa200195ffce421a9192bb9a50addb1fb7dc",
+      "candidateUnits": 15,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "kind": "create",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "25f52c5e6c2ac74ec3edbc322b5b3084b6e9590aefcc08bc24ce434a3f9aa6c1",
+      "candidateUnits": 13,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "kind": "edit",
+      "beforeSha256": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667",
+      "expectedAfterSha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f",
+      "candidateUnits": 14,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/work-state/contracts/knowledge-registry.md",
+      "kind": "create",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "cb3cbf6b24536c8bbb442de37f046e19026881e1df9b82afbb387a207e54601c",
+      "candidateUnits": 96,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "kind": "create",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedAfterSha256": "93e2f580c741f1deec19600323137eb1c105eb2cf996b1a31a6877edc9dd6cdb",
+      "candidateUnits": 11,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "kind": "edit",
+      "beforeSha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "expectedAfterSha256": "102da3a330f336342acbfffb6efafa360d3d36d5fee87c6aeeec58df25cf67e7",
+      "candidateUnits": 167,
+      "rationale": "Authored candidate conservation; per-unit bindings, complete text and neighbors are in s11-preflip-carries.json. No canonical switch or independent approval."
+    }
+  ]
+}

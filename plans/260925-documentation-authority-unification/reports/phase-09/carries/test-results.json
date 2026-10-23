@@ -1,0 +1,800 @@
+[
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul11-anchor-phrase.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/candidate-tests",
+    "exit": 0,
+    "durationSeconds": 0.162,
+    "summary": [
+      "ℹ tests 5",
+      "ℹ pass 5",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "08592f61b4d868c6fc1a60e19e4b54320f11fab0063a1aa1ef6311fb8c907377",
+    "scratchLog": "/tmp/fgos-work/w1-d1/candidate-rul11.tap",
+    "evidenceRef": "test-evidence/candidate-rul11.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul104-anchor-phrase.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/candidate-tests",
+    "exit": 0,
+    "durationSeconds": 0.152,
+    "summary": [
+      "ℹ tests 2",
+      "ℹ pass 2",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "588f45097c42b29dd31a9eb220917aa779568e4bd1b9833a2d1368dd314b264b",
+    "scratchLog": "/tmp/fgos-work/w1-d1/candidate-rul104.tap",
+    "evidenceRef": "test-evidence/candidate-rul104.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/decisions-corpus-retired.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/candidate-tests",
+    "exit": 0,
+    "durationSeconds": 0.211,
+    "summary": [
+      "ℹ tests 7",
+      "ℹ pass 7",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "41ae4861c6897ff7ac8cad41f98bd7d4db6385fcc5afd304485a0ed15a7f37b0",
+    "scratchLog": "/tmp/fgos-work/w1-d1/candidate-corpus.tap",
+    "evidenceRef": "test-evidence/candidate-corpus.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-registry.test.mjs"
+    ],
+    "cwd": "/home/vantt/projects/forgentX-p9-w1-d1",
+    "exit": 1,
+    "durationSeconds": 0.41,
+    "summary": [
+      "ℹ tests 31",
+      "ℹ pass 5",
+      "ℹ fail 26",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "1fd02443558554552a9d760f8ef36f461978e95b4fe5c4c6d6218cfa3041b878",
+    "scratchLog": "/tmp/fgos-work/w1-d1/registry-schema.tap",
+    "evidenceRef": "test-evidence/registry-schema.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover.",
+    "failureClassification": "fixture-native-addon-unavailable"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-bootstrap.test.mjs"
+    ],
+    "cwd": "/home/vantt/projects/forgentX-p9-w1-d1",
+    "exit": 1,
+    "durationSeconds": 0.328,
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 2",
+      "ℹ fail 9",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "401e3dfac249bf04f3f321e3b8f95bab627fa8a13cb40f3e6e66933f9182da03",
+    "scratchLog": "/tmp/fgos-work/w1-d1/registry-bootstrap.tap",
+    "evidenceRef": "test-evidence/registry-bootstrap.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover.",
+    "failureClassification": "fixture-native-addon-unavailable"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "cwd": "/home/vantt/projects/forgentX-p9-w1-d1",
+    "exit": 1,
+    "durationSeconds": 0.657,
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 35",
+      "ℹ fail 1",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "b51f43c3226ba511654b159d8fff36510992645b6d128bd943f1b12849e5a273",
+    "scratchLog": "/tmp/fgos-work/w1-d1/operation-templates.tap",
+    "evidenceRef": "test-evidence/operation-templates.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover.",
+    "failureClassification": "fixture-native-addon-unavailable"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/util/yaml.test.mjs"
+    ],
+    "cwd": "/home/vantt/projects/forgentX-p9-w1-d1",
+    "exit": 0,
+    "durationSeconds": 0.358,
+    "summary": [
+      "ℹ tests 15",
+      "ℹ pass 15",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "f4133b5dde87685f81846b8e795dc278079158c8b92f3dc0f2cc48b6d3465c3a",
+    "scratchLog": "/tmp/fgos-work/w1-d1/vendored-yaml.tap",
+    "evidenceRef": "test-evidence/vendored-yaml.tap",
+    "purpose": "Owning proof replay; tests unchanged except composed filesystem destination edits in the three scratch documentation tests. The remaining current production tests exercise schema/bootstrap/template/parser semantics, not the entire documentation cutover."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-registry.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "exit": 0,
+    "durationSeconds": 0.574,
+    "summary": [
+      "ℹ tests 31",
+      "ℹ pass 31",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "30b7c8635413ed6457d05217edf206e1823ba8132be353d0cff76f1093c31a77",
+    "evidenceRef": "test-evidence/staged-registry-schema.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-bootstrap.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "exit": 0,
+    "durationSeconds": 0.313,
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "938ae9bcf34fed594ef8d4227b734897b7b6695c2365769d61f960c70f56a1f1",
+    "evidenceRef": "test-evidence/staged-registry-bootstrap.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "exit": 1,
+    "durationSeconds": 0.264,
+    "summary": [
+      "ℹ tests 1",
+      "ℹ pass 0",
+      "ℹ fail 1",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "750397ab1bb8cbece0248efd53df87bccf2909a1367d2f5e15d73237c5a29dca",
+    "evidenceRef": "test-evidence/staged-operation-templates.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness.",
+    "failureClassification": "scratch-fixture-contract-file-missing"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "exit": 1,
+    "durationSeconds": 0.455,
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 35",
+      "ℹ fail 1",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "73eec999de90eb09f4f8266c4a44224fe2a435617c4bf741430264b897af7b96",
+    "evidenceRef": "test-evidence/staged-operation-templates-complete-fixture.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness.",
+    "failureClassification": "real-state-root-read-only; attempted write refused"
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1/runtime-state",
+      "HOME": "/tmp/fgos-work/w1-d1/runtime-home"
+    },
+    "exit": 0,
+    "durationSeconds": 2.109,
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 36",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "78ab88cc13ca7a8382476299fef24fada467cb66f674f3b0e598d62abb88bc98",
+    "evidenceRef": "test-evidence/staged-operation-templates-isolated-state.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness."
+  },
+  {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/cli/knowledge-verbs.test.mjs"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1/runtime-proof",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1/runtime-state",
+      "HOME": "/tmp/fgos-work/w1-d1/runtime-home"
+    },
+    "exit": 0,
+    "durationSeconds": 10.467,
+    "summary": [
+      "ℹ tests 3",
+      "ℹ pass 3",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "stdoutSha256": "17b2d7c797483a8210b49da571e9024b748b4d02578fc615b06717034831a245",
+    "evidenceRef": "test-evidence/staged-knowledge-cli.tap",
+    "purpose": "Current source bytes and unchanged owning tests copied into scratch; existing production native-addon.json package door loads exact digest-verified activated addon and helper. No env bypass, source patch, runtime native change or checkout state write. This proves current Node behavior against the installed release ABI, not Rust working-tree freshness."
+  },
+  {
+    "test": "test/docs/rul11-anchor-phrase.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul11-anchor-phrase.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "aa6439525a089b2517794317314dc351399d947971ffa285a1573c92cb6cccf4",
+    "summary": [
+      "ℹ tests 5",
+      "ℹ pass 5",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-01.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/docs/rul104-anchor-phrase.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul104-anchor-phrase.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "49555d87765de02975e58d1dc2cfee8d08b30e834e8d634c300f313cc5dd3bb6",
+    "summary": [
+      "ℹ tests 2",
+      "ℹ pass 2",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-02.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/docs/decisions-corpus-retired.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/decisions-corpus-retired.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "01be1cacc45394b5e611719a629e95980ad4438765d0070ba7eb2bee3b35b913",
+    "summary": [
+      "ℹ tests 7",
+      "ℹ pass 7",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-03.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/state/knowledge-registry.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-registry.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "7b112810a823f1fd4d63b251b9704286b9b7fec57b65372f078af302d41a5017",
+    "summary": [
+      "ℹ tests 31",
+      "ℹ pass 31",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-04.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/state/knowledge-bootstrap.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-bootstrap.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "d5761b8add915c3684a715b5ff64749b68b35fe492bd1d9432503ac9482a4403",
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-05.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/runner/operation-prompt-templates.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "861688578afb4c2851014f780971775014ec0f772fd76c057c7bfdfe635b39cf",
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 36",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-06.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/util/yaml.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/util/yaml.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "5139efa714bf441e237e863d0b9e5c4b94150b2dbe1ec95986cd94869336fea8",
+    "summary": [
+      "ℹ tests 15",
+      "ℹ pass 15",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-07.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/cli/knowledge-verbs.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/cli/knowledge-verbs.test.mjs"
+    ],
+    "exit": 1,
+    "stdoutSha256": "d0f7cea4b49dfd965586f34f05db5992490dde8583742df09cd14b115c4a4081",
+    "summary": [
+      "ℹ tests 3",
+      "ℹ pass 0",
+      "ℹ fail 3",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-final-replay/checkout",
+    "evidenceRef": "test-evidence/first-complete-replay-08.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-final-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-final-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-final-replay/state"
+    },
+    "failureClassification": "precreated fixture state root mode 0775 refused by production Git trust check; fixed fixture to 0700, no production check skipped"
+  },
+  {
+    "test": "test/docs/rul11-anchor-phrase.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul11-anchor-phrase.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "1468263bc9589d3f683fd0cab358b398d241e98e2f75a22b00ce7bd1aa2a6757",
+    "summary": [
+      "ℹ tests 5",
+      "ℹ pass 5",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-01.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/docs/rul104-anchor-phrase.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/rul104-anchor-phrase.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "51240fa119974f88999c69a3f5055bbf450567e8f112e8de286d13368ad1685e",
+    "summary": [
+      "ℹ tests 2",
+      "ℹ pass 2",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-02.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/docs/decisions-corpus-retired.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/docs/decisions-corpus-retired.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "1a383e1d018dc175d8972071854d9cefd4d9376651cc661dd424cca11e1831f2",
+    "summary": [
+      "ℹ tests 7",
+      "ℹ pass 7",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-03.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/state/knowledge-registry.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-registry.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "51c298b6882719c97ba0e66f750b996983123fd4d35a040a9b690a9f948300a0",
+    "summary": [
+      "ℹ tests 31",
+      "ℹ pass 31",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-04.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/state/knowledge-bootstrap.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/state/knowledge-bootstrap.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "5f2eaf6e46835d8364b5af5ee22ea13bbd8ff8dc0adffbb254c03913e8b177fe",
+    "summary": [
+      "ℹ tests 11",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-05.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/runner/operation-prompt-templates.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/runner/operation-prompt-templates.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "a186ff19575a2195eb7d1955473e63acf75400db91426876a7801848ababfc4c",
+    "summary": [
+      "ℹ tests 36",
+      "ℹ pass 36",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-06.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/util/yaml.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/util/yaml.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "90bb54d48505acfd9b972881ef5846d09c09129d57415b7c9cf5a6f8d562fff1",
+    "summary": [
+      "ℹ tests 15",
+      "ℹ pass 15",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-07.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  },
+  {
+    "test": "test/cli/knowledge-verbs.test.mjs",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+      "node",
+      "--test",
+      "test/cli/knowledge-verbs.test.mjs"
+    ],
+    "exit": 0,
+    "stdoutSha256": "4e0b7b4addfa58d95b561d0edc8255eb67025ae1aee2d2eb2401dadcf7a105a5",
+    "summary": [
+      "ℹ tests 3",
+      "ℹ pass 3",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ],
+    "cwd": "/tmp/fgos-work/w1-d1-verified-replay/checkout",
+    "evidenceRef": "test-evidence/verified-replay-08.log",
+    "fixtureEnvironment": {
+      "TMPDIR": "/tmp/fgos-work/w1-d1-verified-replay/tmp",
+      "HOME": "/tmp/fgos-work/w1-d1-verified-replay/home",
+      "FGOS_STATE_ROOT": "/tmp/fgos-work/w1-d1-verified-replay/state"
+    },
+    "failureClassification": null
+  }
+]

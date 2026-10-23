@@ -202,11 +202,9 @@ Added in candidate — complete source units from `docs/specs/distribution.md` a
   a value the caller already customized at the global level is never
   overwritten. The lock directories of row 5g are created when missing:
   `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);
-  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the
-  defaults the fill-missing-only merge adds. Because setup runs every
-  registered fix, it also attempts the `lock-fences` cutover step (row 7b),
-  which places nothing unless the workspace's activated release already
-  runs holder-lock and no other fgOS process of the workspace is running.
+  the `terminal` section of row 5h is one of the defaults the
+  fill-missing-only merge adds; `<stateRoot>/terminal` is created with mode 0700 (the
+  `terminal-dir` fix).
 - **Side effects:** the caller's own shell profile file(s), local project
   config file, global config file (`~/.fgos/config.json`), and the two lock
   directories may be created or modified; nothing outside the caller's own

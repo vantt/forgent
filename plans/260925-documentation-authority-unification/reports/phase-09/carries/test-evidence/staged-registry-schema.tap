@@ -1,0 +1,39 @@
+✔ foldKnowledgeEvents - basic topic and doc fold (2.642673ms)
+✔ activeDoc(topicId, role) <= 1 - second active doc throws (0.730935ms)
+✔ topic.split keeps lineage and source capture ids (1.116011ms)
+✔ doc.promote from reserved is rejected (0.413516ms)
+✔ docLifecycle rejects draft (0.215238ms)
+✔ concurrent registerDocStore enforces lock serialization (63.778358ms)
+✔ doc slot cardinality - a second non-retired/non-superseded doc for the same (topicId, role) is refused even below active (12.166338ms)
+✔ doc.reserve is create-only - reserving an existing docId again is refused (8.014243ms)
+✔ topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage (6.197185ms)
+✔ topic.merge refuses a role collision atomically -- nothing mutates when it throws (11.828605ms)
+✔ topic.merge succeeds when the colliding source doc is already superseded (11.938963ms)
+✔ a retired topic refuses new doc writes (reserve, register, mark-rendered, promote) (15.526955ms)
+✔ resolveDocId finds a doc by (topicId, role) after topic.split moved its topicId without renaming its docId (7.431468ms)
+✔ framework/mode/role vocabulary - unknown framework, unknown mode, and role-vs-mode collisions are refused (11.86845ms)
+✔ topic.split refuses a self-referencing successor, a duplicate successor id, and an existing topicId -- atomically (12.997331ms)
+✔ topic.merge refuses a self-merge, a missing source, and a duplicate source -- atomically (15.214779ms)
+✔ doc.register refuses to change an existing docId's topicId, role, or currentPath (13.033347ms)
+✔ doc.supersede and doc.retire fail closed (throw) when the doc does not exist, instead of silently no-oping (6.291471ms)
+✔ doc.attest rejects a retired doc and a doc under a retired topic -- enforced in the reducer, not only the CLI (17.272363ms)
+✔ doc.register never moves lifecycle on an existing docId except the reserved -> provisional bridge (20.101256ms)
+✔ doc.attest rejects a superseded doc the same way it rejects a retired one (8.803383ms)
+✔ topic.merge refuses a non-active target; topic.split refuses a non-active source (14.873456ms)
+✔ topic.retire fails closed on a nonexistent topicId instead of a silent no-op (2.348252ms)
+✔ doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets (22.625496ms)
+✔ doc.supersede refuses a supersededBy target whose doc lifecycle is live but whose OWN topic is retired (14.227116ms)
+✔ doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op (8.416381ms)
+✔ doc.demote moves an active doc back to provisional; refuses any other lifecycle (16.530902ms)
+✔ doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote (9.229388ms)
+✔ topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId (21.769972ms)
+✔ doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role (21.315662ms)
+✔ topic.split refuses a live doc left unassigned by every successor's rolesToMove, and a role duplicated across successors (15.406053ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 533.37043

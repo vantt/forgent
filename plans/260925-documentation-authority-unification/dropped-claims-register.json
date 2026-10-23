@@ -7,7 +7,7 @@
       "id": "dropped-001",
       "title": "Dev / Source Activation",
       "recordedAt": "2026-10-06",
-      "status": "dropped-needs-restoration",
+      "status": "restored-pending-review",
       "intentional": false,
       "intentionalEvidence": "Owner confirmed on 2026-10-06 that the drop was not intended (plans/261006-1445-fgctl-dev-activation/plan.md, Questions section, main checkout).",
       "source": {
@@ -25,13 +25,23 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "docs/platform/packaging-distribution/ (runtime identity and activation; no row or section names dev-source activation today)",
+      "expectedTarget": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#dev-source-activation",
       "absenceCheck": "rtk proxy grep -rn -i 'activationKind\\|dev-source\\|source activation' docs/platform/packaging-distribution returns nothing at branch head after the 2026-10-06 sync",
       "relatedOverclaim": "docs/platform/host-invocation-routing/intent-preservation-ledger.md:81 (HI-I027) states '`dev:<rev>` and staged release use same mechanism' with status 'implemented preview'; Plan C reports the dev path is not implemented in code. Not verified in this record.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition: before cutover, 'restore after cutover via Plan C (draft, unscheduled)'; if Plan C lands first, a pointer at the restored anchor.",
+      "restorationOwner": "Packaging-distribution candidate documentation restored now; Plan C owns the unimplemented mechanism separately, without a cutover dependency.",
+      "gate": "Documentation restoration is PRE-FLIP and independently reviewable at the target; the unimplemented dev-source mechanism does not block documentation cutover.",
       "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "dev-source-activation",
+        "unitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+        "rationale": "Full source Dev / Source Activation design and its settled-facts clause restored now; npm run fgos:dev is not represented as this mechanism. Plan C remains implementation-only and does not reverse-block cutover."
+      },
+      "priorReviewedDisposition": {
         "decision": "defer-with-owner",
         "owner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
         "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
@@ -46,13 +56,76 @@
         "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
         "reviewMode": "ordinary",
         "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "dev-source-activation",
+        "unitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+        "binding": {
+          "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+          "targetAnchor": "dev-source-activation",
+          "targetUnitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+          "targetAncestry": [
+            "Runtime Identity And Activation",
+            "Dev / Source Activation"
+          ],
+          "bindingSha256": "99c2491259347450585dba48b8f0decb8c210e53cf256f7381294c3de681fcd8"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "Full source Dev / Source Activation design and its settled-facts clause restored now; npm run fgos:dev is not represented as this mechanism. Plan C remains implementation-only and does not reverse-block cutover.",
+        "priorIndependentDispositionPreserved": false,
+        "contentChanged": true,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "dev-source-activation",
+            "unitKind": "heading",
+            "title": "Dev / Source Activation",
+            "textDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+            "startLine": 371,
+            "endLine": 371,
+            "ancestry": [
+              "Runtime Identity And Activation",
+              "Dev / Source Activation"
+            ]
+          },
+          "content": "## Dev / Source Activation",
+          "previous": {
+            "anchor": "unheaded-block-52",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 52",
+            "textDigest": "41822b1f6683edd47fc34cd25c33ce061591aeea5f528e07bdc3baa02984ac76",
+            "startLine": 354,
+            "endLine": 368,
+            "ancestry": [
+              "Runtime Identity And Activation",
+              "Retained Runtime Identity And Activation Source Detail",
+              "Runtime Identity And Activation",
+              "15. Open Decisions"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-53",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 53",
+            "textDigest": "6f845062783fb297127d85634103450fd3d63a9f33825b347bf3198ccb3d6684",
+            "startLine": 373,
+            "endLine": 373,
+            "ancestry": [
+              "Runtime Identity And Activation",
+              "Dev / Source Activation"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-002",
       "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -75,11 +148,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"version pair|best-effort\",\"range intersection\",\"never invents\",\"retry-safe\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -99,13 +172,74 @@
         "reviewNote": "Literal in component-protocol.md. Status says exact version-pair matching only; range intersection and transforms are selected design. operation_provider_router.rs:108-119 does exact request/outcome version compare; contracts.rs:174-203 is ContractRef with id and version.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-contract-versioning",
+        "unitDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-contract-versioning",
+          "targetUnitDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored contract versioning"
+          ],
+          "bindingSha256": "d8bd9c805324a3244b4ac5e497cf019c4148223008312989bfcc39deb2cfb4a1"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-contract-versioning",
+            "unitKind": "heading",
+            "title": "Restored contract versioning",
+            "textDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
+            "startLine": 55,
+            "endLine": 55,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored contract versioning"
+            ]
+          },
+          "content": "## Restored contract versioning",
+          "previous": {
+            "anchor": "unheaded-block-6",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 6",
+            "textDigest": "d2dc42410b86e4004253a702c22b7f47949517395d6d341f898310fd3f717415",
+            "startLine": 49,
+            "endLine": 53,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "4. Related Files"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-7",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 7",
+            "textDigest": "1e313be65b6cb8352fa2e5fe8f284c24e56eac64cdab728b44d0fb82bf387c2c",
+            "startLine": 57,
+            "endLine": 57,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored contract versioning"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-003",
       "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -126,11 +260,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"admission-refused\",\"selection-refused\",\"grant-refused\",\"semantic-failed\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -150,13 +284,74 @@
         "reviewNote": "Literal arrow chain. Status says the chain is vocabulary, not separately persisted states. invocation_service.rs:161-234 has the terminal enum incl. Parked and the lifecycle record; 494-570 shows received and admit. Nit: the select stage (line 586) and grant stage (line 642) that back the admits-before-selection and grants-before-dispatch sentence sit just past the cited range; consider extending to 494-660.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+        "unitDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+          "targetUnitDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te"
+          ],
+          "bindingSha256": "99d571126454e72d36736c1683de97383221c6edc888a74ed59200764f4a84fc"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+            "unitKind": "heading",
+            "title": "Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te",
+            "textDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
+            "startLine": 71,
+            "endLine": 71,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te"
+            ]
+          },
+          "content": "## Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te",
+          "previous": {
+            "anchor": "unheaded-block-11",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 11",
+            "textDigest": "6c62145d25bfed816fd10849d6c144d1bbca64f8e198db51d398034eb8344982",
+            "startLine": 67,
+            "endLine": 69,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored contract versioning"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-12",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 12",
+            "textDigest": "1e313be65b6cb8352fa2e5fe8f284c24e56eac64cdab728b44d0fb82bf387c2c",
+            "startLine": 73,
+            "endLine": 73,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-004",
       "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -177,11 +372,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"workspace root\",\"herdr-plugin\",\"excluded in R1\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -201,13 +396,74 @@
         "reviewNote": "Marked illustrative, not a directory listing. Cargo.toml:1-17 shows members apps/fgos, packages/host-runtime/rust and the apps/fgos-gateway exclude; registry.rs:19-69 is build_snapshot (not registry_linker.rs). Claims match.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-physical-placement-layout-tree",
+        "unitDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "targetAnchor": "restored-physical-placement-layout-tree",
+          "targetUnitDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
+          "targetAncestry": [
+            "Architecture: Release Boundaries",
+            "Restored physical placement layout tree"
+          ],
+          "bindingSha256": "05abe9784eb64e4d67ba05dea541359b43b6cf2a1a31ac2b8221ec73a44e61ae"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-physical-placement-layout-tree",
+            "unitKind": "heading",
+            "title": "Restored physical placement layout tree",
+            "textDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
+            "startLine": 62,
+            "endLine": 62,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored physical placement layout tree"
+            ]
+          },
+          "content": "## Restored physical placement layout tree",
+          "previous": {
+            "anchor": "unheaded-block-6",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 6",
+            "textDigest": "dd2365f988e5303e317e680a0dba513ec33c351e74c3335b04075f4aecf0d678",
+            "startLine": 54,
+            "endLine": 60,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "4. Related Files"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-7",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 7",
+            "textDigest": "1e313be65b6cb8352fa2e5fe8f284c24e56eac64cdab728b44d0fb82bf387c2c",
+            "startLine": 64,
+            "endLine": 64,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored physical placement layout tree"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-005",
       "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -244,11 +500,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"atomically\",\"statically linked\",\"corrupt core\",\"two mistakes\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (class vs mechanism, ",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -267,13 +523,74 @@
         "reviewNote": "All 9 literal. Qualified as design policy; contracts.rs:377-393 ProviderDescriptor has open Cow string component_class and mechanism, which is exactly what the note says.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-class-definitions",
+        "unitDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "targetAnchor": "restored-class-definitions",
+          "targetUnitDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
+          "targetAncestry": [
+            "Architecture: Release Boundaries",
+            "Restored class definitions"
+          ],
+          "bindingSha256": "45832f85267f1b1634f9183fd13383857e7ee7de73fa5e888fb0e529d81b9875"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-class-definitions",
+            "unitKind": "heading",
+            "title": "Restored class definitions",
+            "textDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
+            "startLine": 98,
+            "endLine": 98,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored class definitions"
+            ]
+          },
+          "content": "## Restored class definitions",
+          "previous": {
+            "anchor": "unheaded-block-10",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 10",
+            "textDigest": "d6fcc6cfd6c69e8a58b5c5855b503a2a4e90f7387c63cb62e19732d1ce12f475",
+            "startLine": 70,
+            "endLine": 96,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored physical placement layout tree"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-11",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 11",
+            "textDigest": "674ba03eab8c863edd05344feea1b0ec761561faf1c8883f206ccbff9bbe1220",
+            "startLine": 100,
+            "endLine": 100,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored class definitions"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-006",
       "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -300,11 +617,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Cold process startup\",\"batch\",\"one-shot\",\"hot\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (protocol placement; ",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -324,13 +641,74 @@
         "reviewNote": "Literal. Note says typed input plus framed JSON-RPC and no performance measurement. contracts.rs:205-220 OperationRequest has Box dyn Any input; frame_codec.rs:1-16 is the 4-byte length-prefixed JSON-RPC codec.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+        "unitDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+          "targetUnitDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored same process built ins vs runtime extensions and cross process cost"
+          ],
+          "bindingSha256": "cd8321181e43bb8f970a6cba1c9a996979e53e453314a4c88845d3f77d499720"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+            "unitKind": "heading",
+            "title": "Restored same process built ins vs runtime extensions and cross process cost",
+            "textDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
+            "startLine": 90,
+            "endLine": 90,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored same process built ins vs runtime extensions and cross process cost"
+            ]
+          },
+          "content": "## Restored same process built ins vs runtime extensions and cross process cost",
+          "previous": {
+            "anchor": "unheaded-block-15",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 15",
+            "textDigest": "02e983470c13a110b83e44f87229756fde1e295324587790175b9192fd2ccb4a",
+            "startLine": 79,
+            "endLine": 88,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored lifecycle state chain received admitted refused selected refused granted refused dispatched te"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-16",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 16",
+            "textDigest": "674ba03eab8c863edd05344feea1b0ec761561faf1c8883f206ccbff9bbe1220",
+            "startLine": 92,
+            "endLine": 92,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored same process built ins vs runtime extensions and cross process cost"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-007",
       "title": "Semantic contract stays transport-neutral (a future binary codec or local socket may replace framing)",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -351,11 +729,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"transport-neutral\",\"binary codec\",\"local socket\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules'; HI-I021",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -374,13 +752,74 @@
         "reviewNote": "Literal. Binary codec or socket labelled future design; frame_codec.rs:1-16 confirms only the length-prefixed JSON-RPC codec exists.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-semantic-contract-stays-transport-neutral",
+        "unitDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-semantic-contract-stays-transport-neutral",
+          "targetUnitDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored semantic contract stays transport neutral"
+          ],
+          "bindingSha256": "4e75458152d406f4e2cbc81bb6bb38f38f7881ca34ca7d23fa3ce8b3193ebf66"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-semantic-contract-stays-transport-neutral",
+            "unitKind": "heading",
+            "title": "Restored semantic contract stays transport neutral",
+            "textDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
+            "startLine": 114,
+            "endLine": 114,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored semantic contract stays transport neutral"
+            ]
+          },
+          "content": "## Restored semantic contract stays transport neutral",
+          "previous": {
+            "anchor": "unheaded-block-22",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 22",
+            "textDigest": "d5edc533de375703849f9b4dbf62ea3845697b0e0a7953e7aad877186fd6b60b",
+            "startLine": 110,
+            "endLine": 112,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored same process built ins vs runtime extensions and cross process cost"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-23",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 23",
+            "textDigest": "674ba03eab8c863edd05344feea1b0ec761561faf1c8883f206ccbff9bbe1220",
+            "startLine": 116,
+            "endLine": 116,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored semantic contract stays transport neutral"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-008",
       "title": "Registry linker procedure and its input/output formula (partly carried: the linker exists in code and proofs; the formula and the procedure steps are missing)",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found for the missing part. A linker is described in docs/platform/host-invocation-routing/spec.md and roadmap.md, in the R2 proof (refusal cases) and RegistrySnapshot in architecture/provider-routing.md, so the carried part is not missing; the missing part is the authored input list, the input/output formula and the scan/validate/verify procedure of the legacy source (never present under the promoted area according to git log -S on those phrases).",
       "source": {
@@ -405,11 +844,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"linker\",\"RegistrySnapshot\",\"immutable\",\"source fingerprint\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (registry/linker mean Existing carriers of the partly carried topic: spec.md, roadmap.md, architecture/provider-routing.md, verification/r2-external-process-proof.md.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -429,13 +868,74 @@
         "reviewNote": "Literal. Note says only duplicate-binding validation is implemented; registry.rs:19-69 does exactly that (panic on duplicate bindings, replacement pair exempt) and operation_provider_router.rs:24-40 shows RouterPolicy as an unused placeholder and SelectionInput.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "anchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+        "unitDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "targetAnchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+          "targetUnitDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
+          "targetAncestry": [
+            "Verification: Compatibility Harness",
+            "Restored registry linker procedure and its input output formula"
+          ],
+          "bindingSha256": "c59eacf01fce72d8c6229046524df0c3e81161dd05f075cfdaaae8fad27cf7fc"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+            "unitKind": "heading",
+            "title": "Restored registry linker procedure and its input output formula",
+            "textDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
+            "startLine": 54,
+            "endLine": 54,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "Restored registry linker procedure and its input output formula"
+            ]
+          },
+          "content": "## Restored registry linker procedure and its input output formula",
+          "previous": {
+            "anchor": "unheaded-block-6",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 6",
+            "textDigest": "1c48ed72e5ca0c7ba3980eb03fbf61e149bb85f1f5177479511ad50ac369f467",
+            "startLine": 48,
+            "endLine": 52,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "4. Related Files"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-7",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 7",
+            "textDigest": "674ba03eab8c863edd05344feea1b0ec761561faf1c8883f206ccbff9bbe1220",
+            "startLine": 56,
+            "endLine": 56,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "Restored registry linker procedure and its input output formula"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-009",
       "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -458,11 +958,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"complete use case\",\"state transaction\",\"host-owned projection\",\"semantic validation\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -482,13 +982,74 @@
         "reviewNote": "Literal. legacy_exec.rs:69-154 resolves the payload through the manifest and verify_legacy_node; 242-253 spawns node with the forwarded args and inherited stdio. Note claims no more than that.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-both-adapters-delegate-a-complete-use-case",
+        "unitDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-both-adapters-delegate-a-complete-use-case",
+          "targetUnitDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored both adapters delegate a complete use case"
+          ],
+          "bindingSha256": "325a1752cd94da3515fbf7f9310aebe9a852e22189cf7269a729ab5e83a8e7b7"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-both-adapters-delegate-a-complete-use-case",
+            "unitKind": "heading",
+            "title": "Restored both adapters delegate a complete use case",
+            "textDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
+            "startLine": 126,
+            "endLine": 126,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored both adapters delegate a complete use case"
+            ]
+          },
+          "content": "## Restored both adapters delegate a complete use case",
+          "previous": {
+            "anchor": "unheaded-block-26",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 26",
+            "textDigest": "5f5a86a062ee9441866f13a2b6c066180b101278b8010cc73aaf372a33be1310",
+            "startLine": 122,
+            "endLine": 124,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored semantic contract stays transport neutral"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-27",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 27",
+            "textDigest": "541d70670c37245dba4ac2bd92cb9920971987e0779e5064698508becaa475d1",
+            "startLine": 128,
+            "endLine": 128,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored both adapters delegate a complete use case"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-010",
       "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "superseded-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -509,11 +1070,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"bin\\\\.fgos\",\"fgos-runner\",\"AGENTS\\\\.md\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
@@ -562,13 +1123,74 @@
         "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
         "reviewMode": "ordinary",
         "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
+      },
+      "preflipDisposition": {
+        "decision": "superseded by decision",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "targetAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+          "targetUnitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+          "targetAncestry": [
+            "Architecture: Release Boundaries",
+            "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+          ],
+          "bindingSha256": "e8490f9630cdef486dc66d774b2dfc628483c8a2522f096f64da962f1167c763"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "Superseded by decision: the same-day ownership header and the dated coordinator window show intentional coexistence; the coordinator 30-day window is the successor to the automatic installed-default trigger.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+            "unitKind": "heading",
+            "title": "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea",
+            "textDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+            "startLine": 152,
+            "endLine": 152,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+            ]
+          },
+          "content": "## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea",
+          "previous": {
+            "anchor": "unheaded-block-22",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 22",
+            "textDigest": "4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900",
+            "startLine": 148,
+            "endLine": 150,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored class definitions"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-23",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 23",
+            "textDigest": "541d70670c37245dba4ac2bd92cb9920971987e0779e5064698508becaa475d1",
+            "startLine": 154,
+            "endLine": 154,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-011",
       "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -589,11 +1211,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"launcher\",\"Node startup\",\"both runtimes\",\"compatibility failures\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -612,13 +1234,74 @@
         "reviewNote": "Literal. legacy_exec.rs:242-253 Command::new node from the Rust adapter supports the structural two-runtime cost; no latency claim made.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rust-host-first-cost",
+        "unitDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-rust-host-first-cost",
+          "targetUnitDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored rust host first cost"
+          ],
+          "bindingSha256": "7f36d942a5b8458459c889fd59b03af1407a35878070e6ce7c6f16d5bc420474"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-rust-host-first-cost",
+            "unitKind": "heading",
+            "title": "Restored rust host first cost",
+            "textDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
+            "startLine": 142,
+            "endLine": 142,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rust host first cost"
+            ]
+          },
+          "content": "## Restored rust host first cost",
+          "previous": {
+            "anchor": "unheaded-block-31",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 31",
+            "textDigest": "2d7eb1122a3d9d5be86e94f2a29fd9b1b8bea6ff1a5a8240b1c724593506de9e",
+            "startLine": 138,
+            "endLine": 140,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored both adapters delegate a complete use case"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-32",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 32",
+            "textDigest": "541d70670c37245dba4ac2bd92cb9920971987e0779e5064698508becaa475d1",
+            "startLine": 144,
+            "endLine": 144,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rust host first cost"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-012",
       "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -639,11 +1322,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Component Boundary Advisory\",\"Component Boundary\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -662,13 +1345,74 @@
         "reviewNote": "Literal. Marked engineering guidance not a gate; Cargo.toml:1-17 is the real current placement.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-scope",
+        "unitDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "targetAnchor": "restored-scope",
+          "targetUnitDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
+          "targetAncestry": [
+            "Architecture: Release Boundaries",
+            "Restored scope"
+          ],
+          "bindingSha256": "a27c03934285f261f7237957ebacab8d9dd89446f24bbaf573ba74ea6c040fcd"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-scope",
+            "unitKind": "heading",
+            "title": "Restored scope",
+            "textDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
+            "startLine": 164,
+            "endLine": 164,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored scope"
+            ]
+          },
+          "content": "## Restored scope",
+          "previous": {
+            "anchor": "unheaded-block-26",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 26",
+            "textDigest": "4b8e6e49ab656716db8d5ca78704eb66ca6a362c33ff2a5bb93d24cd21783d69",
+            "startLine": 160,
+            "endLine": 162,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-27",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 27",
+            "textDigest": "5c2c225a6f83277637126f5607484227d63f0c326113ad951f1bfbc71d06f39e",
+            "startLine": 166,
+            "endLine": 166,
+            "ancestry": [
+              "Architecture: Release Boundaries",
+              "Restored scope"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-013",
       "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found for the missing part. The rejected migration choices themselves are carried (the old audit lists Node-thinning-first and the big-bang rewrite as preserved rejected choices); the rationale of the rejected options (the Option A and Option C reasoning and the cost argument) was never present under the promoted area according to git log -S on those phrases.",
       "source": {
@@ -703,11 +1447,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Node-thinning\",\"monotonic\",\"gradient\",\"temporary cost\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -727,13 +1471,74 @@
         "reviewNote": "All 8 literal. Marked dated reasoning, not measurement; cites are consistent with manifest-owned CLI delegation and make no big-bang claim.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rejected-options-rationale",
+        "unitDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-rejected-options-rationale",
+          "targetUnitDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored rejected options rationale"
+          ],
+          "bindingSha256": "a57a7311e784a683234d802097f00f9cb6445b73a8ef4d04688f8ce40c8c8b4b"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-rejected-options-rationale",
+            "unitKind": "heading",
+            "title": "Restored rejected options rationale",
+            "textDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
+            "startLine": 154,
+            "endLine": 154,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rejected options rationale"
+            ]
+          },
+          "content": "## Restored rejected options rationale",
+          "previous": {
+            "anchor": "unheaded-block-35",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 35",
+            "textDigest": "eead6c3f51a2d96d9e881dc091e734bebefd4c60f14554b729f8f62324a2cd5b",
+            "startLine": 150,
+            "endLine": 152,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rust host first cost"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-36",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 36",
+            "textDigest": "5c2c225a6f83277637126f5607484227d63f0c326113ad951f1bfbc71d06f39e",
+            "startLine": 156,
+            "endLine": 156,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rejected options rationale"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-014",
       "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -760,11 +1565,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"shared fixtures\",\"Component Boundary Advisory\",\"decode\",\"frontier\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -784,13 +1589,74 @@
         "reviewNote": "Literal. Ten-step list called manual guidance, not registered automation. invocation_service.rs:161-209 shows Parked distinct from Succeeded; package.json:27-35 is the real scripts block.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-per-component-repeat-procedure",
+        "unitDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-per-component-repeat-procedure",
+          "targetUnitDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored per component repeat procedure"
+          ],
+          "bindingSha256": "3ab28916c00be538790196797d4ffbec1eabd5864541f179aae1a3ff280cb0d3"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-per-component-repeat-procedure",
+            "unitKind": "heading",
+            "title": "Restored per component repeat procedure",
+            "textDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
+            "startLine": 215,
+            "endLine": 215,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored per component repeat procedure"
+            ]
+          },
+          "content": "## Restored per component repeat procedure",
+          "previous": {
+            "anchor": "unheaded-block-46",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 46",
+            "textDigest": "f90c02079ba66b8c25efe660600e4553b34e85cecfff0b8775801dc484201a7d",
+            "startLine": 208,
+            "endLine": 213,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rejected options rationale"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-47",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 47",
+            "textDigest": "5c2c225a6f83277637126f5607484227d63f0c326113ad951f1bfbc71d06f39e",
+            "startLine": 217,
+            "endLine": 217,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored per component repeat procedure"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-015",
       "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -811,11 +1677,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"observation window\",\"last written\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -835,13 +1701,74 @@
         "reviewNote": "Literal. Called manual selected policy, not executed rollback; operation_provider_router.rs:74-119 select reads snapshot bindings with no override and registry.rs:41-69 builds the snapshot.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rollback-bullets",
+        "unitDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-rollback-bullets",
+          "targetUnitDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored rollback bullets"
+          ],
+          "bindingSha256": "b509fcb774ceea6d09bda6cf1f0c6531b914077b289f96f47ba9a7ef2821c7c0"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-rollback-bullets",
+            "unitKind": "heading",
+            "title": "Restored rollback bullets",
+            "textDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
+            "startLine": 257,
+            "endLine": 257,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rollback bullets"
+            ]
+          },
+          "content": "## Restored rollback bullets",
+          "previous": {
+            "anchor": "unheaded-block-53",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 53",
+            "textDigest": "a00bfd0814432838322fcf7d93d781b4e91b1b546b11724cafa513266b2ade98",
+            "startLine": 247,
+            "endLine": 255,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored per component repeat procedure"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-54",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 54",
+            "textDigest": "5c2c225a6f83277637126f5607484227d63f0c326113ad951f1bfbc71d06f39e",
+            "startLine": 259,
+            "endLine": 259,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rollback bullets"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-016",
       "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -874,11 +1801,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"p50\",\"25 ms\",\"injected difference\",\"envelope-contract\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (P0-P9 proof graph, test gates); HI-I029 names veri",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -898,13 +1825,74 @@
         "reviewNote": "All 7 literal. 25 ms and 10 ms budgets stated as source placeholders, UNPROVEN as measurements, not inferred from any run. package.json test script and legacy_exec.rs:242-253 exist as cited.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-p1-compatibility-harness",
+        "unitDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "targetAnchor": "restored-p1-compatibility-harness",
+          "targetUnitDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
+          "targetAncestry": [
+            "Contract: Component Protocol",
+            "Restored p1 compatibility harness"
+          ],
+          "bindingSha256": "b48d010107dc70c91f5b72166ef8d5a940d73a164765266b2d93040a47bd2d37"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-p1-compatibility-harness",
+            "unitKind": "heading",
+            "title": "Restored p1 compatibility harness",
+            "textDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
+            "startLine": 275,
+            "endLine": 275,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored p1 compatibility harness"
+            ]
+          },
+          "content": "## Restored p1 compatibility harness",
+          "previous": {
+            "anchor": "unheaded-block-57",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 57",
+            "textDigest": "c821bc4af3055d12e29d8151ff3b576c54b5b8c8180b9713be1cd49d903115c7",
+            "startLine": 265,
+            "endLine": 273,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored rollback bullets"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-58",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 58",
+            "textDigest": "ad9881bf5cd816280faaed7562381db6cc2c308660f8ec758eaebfd1dd49d27e",
+            "startLine": 277,
+            "endLine": 277,
+            "ancestry": [
+              "Contract: Component Protocol",
+              "Restored p1 compatibility harness"
+            ]
+          }
+        }
       }
     },
     {
       "id": "dropped-017",
       "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules…",
       "recordedAt": "2026-10-07",
-      "status": "dropped-needs-review",
+      "status": "restored-pending-review",
       "intentional": null,
       "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
       "source": {
@@ -933,11 +1921,11 @@
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
-      "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+      "expectedTarget": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"process-spy\",\"Per commit\",\"timestamp\",\"Rust re-parses legacy flags\"] returns no hit that states the claim",
       "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (test gates, risk controls)",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+      "restorationOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
         "decision": "restored",
@@ -956,6 +1944,67 @@
         "reviewNote": "All 5 literal. Stated as dated acceptance policy, no suite claimed run. package.json:27-35 contains the real test entry.",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
         "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+      },
+      "preflipDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "anchor": "restored-test-and-review-gates-table",
+        "unitDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
+        "binding": {
+          "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "targetAnchor": "restored-test-and-review-gates-table",
+          "targetUnitDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
+          "targetAncestry": [
+            "Verification: Compatibility Harness",
+            "Restored test and review gates table"
+          ],
+          "bindingSha256": "7eaf00347a7fcf9030e354c2389893561c2f02a424a1943f9ad90538392d7c4d"
+        },
+        "reviewStatus": "pending",
+        "authoredBy": "fgos-run_unit-run-1792750955a733",
+        "rationale": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised.",
+        "priorIndependentDispositionPreserved": true,
+        "contentChanged": false,
+        "placement": {
+          "method": "full content + named heading ancestry + adjacent-unit witnesses; not a positional ordinal lookup",
+          "selected": {
+            "anchor": "restored-test-and-review-gates-table",
+            "unitKind": "heading",
+            "title": "Restored test and review gates table",
+            "textDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
+            "startLine": 81,
+            "endLine": 81,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "Restored test and review gates table"
+            ]
+          },
+          "content": "## Restored test and review gates table",
+          "previous": {
+            "anchor": "unheaded-block-12",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 12",
+            "textDigest": "9ea19b8b48d28620af3205728a338a0597d2cd47cf59fee7d6e015d670646c7c",
+            "startLine": 70,
+            "endLine": 79,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "Restored registry linker procedure and its input output formula"
+            ]
+          },
+          "next": {
+            "anchor": "unheaded-block-13",
+            "unitKind": "unheaded-block",
+            "title": "Unheaded block 13",
+            "textDigest": "ad9881bf5cd816280faaed7562381db6cc2c308660f8ec758eaebfd1dd49d27e",
+            "startLine": 83,
+            "endLine": 83,
+            "ancestry": [
+              "Verification: Compatibility Harness",
+              "Restored test and review gates table"
+            ]
+          }
+        }
       }
     }
   ]

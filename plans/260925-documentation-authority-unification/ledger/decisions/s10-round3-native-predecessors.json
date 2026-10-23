@@ -40,17 +40,19 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-76",
-      "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-76 SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a; source identity unchanged, no native identity assignment or approval carry.",
+      "targetAnchor": "unheaded-block-79",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:480-484#unheaded-block-79; SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "94e9cccdde4f85fc355c2cfff74692b9559f947cb35f9213575b4a3a1c9b2771",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_c0f157804addf46fdb20b9c61882794b",
@@ -93,5 +95,5 @@
       "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
-  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+  "correctionSession": "fgos-run_unit-run-1792750955a733"
 }

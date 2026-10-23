@@ -157,19 +157,21 @@
       "claimId": "claim_83a4a91369ae5c2fd8959d7835a2f76e",
       "sourceUnitDigest": "06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa",
       "claimKind": "architecture",
-      "disposition": "merge",
+      "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-19",
-      "targetUnitDigest": "06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa",
-      "rationale": "L11-21 mechanical main-import accounting: complete source unit docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-54 (SHA256 06a65a23a4ff32fbdf33181cf55915a10195d91ec9b84c0e6764c356891947fa) occurs byte-identically as the unique same-kind unit in the existing mapped owner docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-15. Reuses the established mapped owner and Unit-exact conservation mechanism. No new authority, current-truth verdict or approval. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-15 -> unheaded-block-19. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending.",
+      "targetUnitDigest": "e617921c8ecf306dfb0696615b79118ceef471617f10b30aed32ed7f25406844",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/activation-binding.md:190-198#unheaded-block-19; SHA256 e617921c8ecf306dfb0696615b79118ceef471617f10b30aed32ed7f25406844. same complete first line and full named heading ancestry; exact content delta recorded; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
       "targetAncestry": [
         "Contract: Activation Binding",
         "Retained Runtime Identity And Activation Source Detail",
         "6. WorkspaceActivationBinding"
       ],
-      "reviewNote": "Step 0 imported target binding changed; independent review pending; no approval carried."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "bindingSha256": "f4cc42b033f08cb7b25e05415441b774bb00e7da1b608b3aad2d95643af28b1f",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_240a46117d7036e9e968f5697cf36506",
@@ -179,9 +181,18 @@
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "targetAnchor": "unheaded-block-49",
       "targetUnitDigest": "178b806951b4e6718609d611a379b8469a5714cc9c2a815e9761fe4fcdd1e436",
-      "rationale": "L11-21 mechanical main-import accounting: complete source unit docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-146 (SHA256 178b806951b4e6718609d611a379b8469a5714cc9c2a815e9761fe4fcdd1e436) occurs byte-identically as the unique same-kind unit in the existing mapped owner docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-49. Reuses the established mapped owner and Unit-exact conservation mechanism. No new authority, current-truth verdict or approval. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md:313-340#unheaded-block-49; SHA256 178b806951b4e6718609d611a379b8469a5714cc9c2a815e9761fe4fcdd1e436. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18"
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "targetAncestry": [
+        "Runtime Identity And Activation",
+        "Retained Runtime Identity And Activation Source Detail",
+        "Runtime Identity And Activation",
+        "14. Walking Skeleton"
+      ],
+      "bindingSha256": "cf5db45c4c5f70765073045ea6722c1a0b6be713e9f749bf9c9a866e45d1f454",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_59d4d57deb98003edbed72c8b85465a1",
@@ -335,9 +346,17 @@
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "unheaded-block-30",
       "targetUnitDigest": "de512fc35653f628ee098d92cceaaaf232ee38360bc4e20639d54753ae9c8442",
-      "rationale": "L11-21 mechanical main-import conservation: the complete source note docs/platform-foundations.md#unheaded-block-20 (SHA256 79fbaccd21320acdb764180299f8c300eb41e2d68e9a9a18d253c9945625b440) occurs in the existing mapped owner docs/platform/platform-foundations.md#unheaded-block-30 (SHA256 de512fc35653f628ee098d92cceaaaf232ee38360bc4e20639d54753ae9c8442) after exactly one relative Markdown destination relocation: platform/event-store/spec.md -> event-store/spec.md. Both spellings resolve to docs/platform/event-store/spec.md; label, words and all other bytes match. Existing link-relocation conservation precedent reused. This records imported supersession wording without changing a law, candidate content, authority or approval. Independent review pending.",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/platform-foundations.md:186-186#unheaded-block-30; SHA256 de512fc35653f628ee098d92cceaaaf232ee38360bc4e20639d54753ae9c8442. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18"
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "bindingSha256": "e39649d04300f766e1ecc80b810d62bf9247b2ae1690e9e4de5abd243aa159f1",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     }
   ],
   "closingCarries": [
@@ -6268,12 +6287,19 @@
       "sourceUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-76",
+      "targetAnchor": "unheaded-block-79",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/packaging-distribution/spec.md#unheaded-block-75 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a) is present as the unique complete unit at frozen e6b7efeec:docs/platform/packaging-distribution/spec.md#unheaded-block-75 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates. L12-27 merge 1a0f61ac53433292e08fb378ebbb6c1c72fd3b74: Full prior passage equal with same named ancestry; shifted ordinals are resolved by content. Target unheaded-block-76 SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a; source identity unchanged, no native identity assignment or approval carry.",
-      "reviewNote": "L12-27 imported binding repair; independent review pending; no approval carry."
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:480-484#unheaded-block-79; SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Workspace Runtime Model Source Detail",
+        "Workspace Runtime Model"
+      ],
+      "bindingSha256": "94e9cccdde4f85fc355c2cfff74692b9559f947cb35f9213575b4a3a1c9b2771",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_c3d76ad2ec1234576e2dffba0b2980b9",
@@ -6337,8 +6363,15 @@
       "targetAnchor": "unheaded-block-3",
       "targetUnitDigest": "7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/work-state/README.md#unheaded-block-3 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f) is present as the unique complete unit at frozen e6b7efeec:docs/platform/work-state/README.md#unheaded-block-3 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/work-state/README.md:34-34#unheaded-block-3; SHA256 7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetAncestry": [
+        "Work State",
+        "1. Purpose And Audience"
+      ],
+      "bindingSha256": "07ff947ac5fd74103f647038e3f793946cc938c1a789819d4a72e44f79bf8f02",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_cfd5521d6c7f6d2ef7bf91e5d87d7c59",
@@ -6350,8 +6383,15 @@
       "targetAnchor": "unheaded-block-6",
       "targetUnitDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/work-state/README.md#unheaded-block-6 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994) is present as the unique complete unit at frozen e6b7efeec:docs/platform/work-state/README.md#unheaded-block-6 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/work-state/README.md:62-62#unheaded-block-6; SHA256 19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetAncestry": [
+        "Work State",
+        "4. Legacy Source Pointers"
+      ],
+      "bindingSha256": "0e2b20cc1c056bb6126e0f3322de29e6ad59c8be73e93b39ab4e8d63220eff49",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_3301f241ae14c5f317abe23dcecdb700",
@@ -6363,8 +6403,15 @@
       "targetAnchor": "unheaded-block-7",
       "targetUnitDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/work-state/README.md#unheaded-block-7 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793) is present as the unique complete unit at frozen e6b7efeec:docs/platform/work-state/README.md#unheaded-block-7 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/work-state/README.md:64-64#unheaded-block-7; SHA256 4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetAncestry": [
+        "Work State",
+        "4. Legacy Source Pointers"
+      ],
+      "bindingSha256": "ba8fd0e96a31138d4148c527a8b0dd32ca7d5f8db230b2de59c9e2dd417d526e",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_3e7d96cb9ba40105c67c9f10b5b90f37",
@@ -6376,8 +6423,15 @@
       "targetAnchor": "unheaded-block-8",
       "targetUnitDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
-      "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/work-state/README.md#unheaded-block-8 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561) is present as the unique complete unit at frozen e6b7efeec:docs/platform/work-state/README.md#unheaded-block-8 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/work-state/README.md:68-78#unheaded-block-8; SHA256 d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
+      "targetAncestry": [
+        "Work State",
+        "5. Related Files"
+      ],
+      "bindingSha256": "eb087a37c18c34c3792b46c3c5d1ce90ad361ea30193b49f7bd3bfdf174de69e",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
     },
     {
       "claimId": "claim_679bf517a1831f6c2a5dd74c478ed811",
@@ -6392,5 +6446,6 @@
       "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
       "rationale": "L11-21 mechanical predecessor accounting using the s10-round4-native-predecessors registryGaps mechanism: historical source docs/platform/work-state/spec.md#unheaded-block-99 at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a (SHA256 43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4) is present as the unique complete unit at frozen e6b7efeec:docs/platform/work-state/spec.md#unheaded-block-99 (same SHA256). Distinct source commit and native predecessor/current IDs are explicit; no identity reassignment or approval. Supersede records conservation only; current truth and authority await their existing gates."
     }
-  ]
+  ],
+  "correctionSession": "fgos-run_unit-run-1792750955a733"
 }

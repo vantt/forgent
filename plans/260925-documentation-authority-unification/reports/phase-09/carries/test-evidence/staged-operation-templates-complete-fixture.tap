@@ -1,0 +1,66 @@
+fgos: ProviderAdapter argv divergence (falling back to legacy) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node legacyArgs=["/tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/mock-executor.mjs","Assignment: asgn_rev01_runner\nWork: (none)\nStage operation: planning.validate-plan\n\n# Pinned Dispatch Template\nRole: tester\nObjective: Test runner retry snapshot retention\n\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-result.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-report.md -- REQUIRED for this read-only operation: a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: read-only\n- Claim path: /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-result.json\n- Timeout: 5000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: instructed"] renderedArgs=["/tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/mock-executor.mjs","Assignment: asgn_rev01_runner\nWork: (none)\nStage operation: planning.validate-plan\n\n# Pinned Dispatch Template\nRole: tester\nObjective: Test runner retry snapshot retention\n\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-result.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-report.md -- REQUIRED for this read-only operation: a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: read-only\n- Claim path: /tmp/fgos-work/w1-d1/fgos-tp-x05QAI/fgos-rev01-runner-AvW1f9/.fgos/assignments/asgn_rev01_runner/runs/01/agent-result.json\n- Timeout: 5000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: instructed","--model","test-model"]
+✔ discoverOperationPromptTemplates discovers shipped core templates cleanly (13.38284ms)
+✔ discoverOperationPromptTemplates is deterministic across repeated runs (3.765214ms)
+✔ precedence: project tier overrides domain and core tiers (0.866907ms)
+✔ precedence: domain tier overrides core tier when project is absent (0.589619ms)
+✔ missing template throws template-not-found (1.9815ms)
+✔ duplicate template in same directory with different extensions throws template-ambiguous (0.801841ms)
+✔ colliding template IDs across different domains throws template-ambiguous (0.830859ms)
+✔ path-escape symlink pointing outside scan root throws template-path-escape (0.615147ms)
+✔ validateOperationPromptTemplate accepts all bounded variables (0.199986ms)
+✔ validateOperationPromptTemplate rejects unknown or malicious variables (0.501988ms)
+✔ renderOperationPromptTemplate substitutes bounded variables and strips internal stamps (0.373698ms)
+✔ renderOperationPromptTemplate handles empty arrays with - (none) (0.157465ms)
+✔ renderOperationPromptTemplate supports {artifactRefs} alias for {contextRefs} (0.096572ms)
+✔ resolveAndRenderOperationPrompt produces rendered body and complete template provenance (1.802572ms)
+✔ renderAssignmentPrompt uses contractTemplate when declared (1.814715ms)
+✔ renderAssignmentPrompt preserves explicit legacy objective path when contractTemplate is omitted (0.162897ms)
+✔ renderAssignmentPrompt fails loudly on missing template (2.762468ms)
+✔ buildEffectiveExecutionContract attaches template provenance without secrets (51.939495ms)
+✔ domain-neutral proof: 1 plan-loop + 2 advisory operations resolve via identical mechanism (0.26313ms)
+✔ Unit I22: every architecture-advisory-panel-v1 operation resolves and renders its own real template with bounded variables only (0.269685ms)
+✔ Unit I22 fix round 1: a real inline coordination Assignment (architecture-advisory-panel-v1) renders its actual constraints, never a false "(none)" (9.807836ms)
+✔ Unit I34: every declared task.contractTemplate resolves, for every registered CoordinationProtocol that currently has authored templates (0.182084ms)
+✔ Unit I34: every allowlisted no-templates-yet protocol still has zero resolving contractTemplate references (allowlist honesty check) (0.101401ms)
+✔ retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes (0.845038ms)
+✔ operation-prompt-templates-valid doctor check is registered and passes on repository (1.809261ms)
+✔ operation-prompt-templates-valid doctor check fails when a malformed template is present (0.620549ms)
+✔ I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted (0.797868ms)
+✖ I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted (55.331753ms)
+✔ I04-REV-02 negative: resolver refuses corrupted contentDigest on pinned template with template-provenance-mismatch (0.293978ms)
+✔ I04-REV-02 negative: resolver refuses malformed contentDigest or renderedPromptDigest on pinned template (0.312304ms)
+✔ I04-REV-02 negative: resolver refuses corrupted or missing templateSnapshot on pinned provenance (0.213412ms)
+✔ I04-REV-02 negative: resolver refuses corrupted renderedPromptDigest when prompt recomputed on retry does not match (0.235571ms)
+✔ I04-REV-02 negative: resolver refuses templateId mismatch between contractTemplate and pinnedTemplate.id (0.171722ms)
+✔ I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance (2.801345ms)
+✔ I04-REV-03 negative: resolver refuses pinned template provenance with missing contentDigest (0.234904ms)
+✔ I04-REV-03 negative: resolver refuses pinned template provenance with missing renderedPromptDigest (0.211083ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 35
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 411.116156
+
+✖ failing tests:
+
+test at test/runner/operation-prompt-templates.test.mjs:766:1
+✖ I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted (55.331753ms)
+  Error: EROFS: read-only file system, open '/home/vantt/.local/state/fgos/attestations/disp_1792758926488_1dfb567c.plan.json.tmp.3601-0-1792758926490-f93b86ca'
+      at Object.writeFileSync (node:fs:2422:20)
+      at savePlanRecord (file:///tmp/fgos-work/w1-d1/runtime-proof/src/runner/dispatch/confinement/attestation-store.mjs:215:6)
+      at assessAndPrepare (file:///tmp/fgos-work/w1-d1/runtime-proof/src/runner/dispatch/confinement/authority.mjs:914:5)
+      at prepareConfinementForLaunch (file:///tmp/fgos-work/w1-d1/runtime-proof/src/runner/dispatch/confinement/authority.mjs:1353:22)
+      at executeAssignment (file:///tmp/fgos-work/w1-d1/runtime-proof/src/runner/dispatch/assignment-runner.mjs:1959:28)
+      at file:///tmp/fgos-work/w1-d1/runtime-proof/test/helpers/work-seat-config.mjs:35:75
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w1-d1/runtime-proof/test/runner/operation-prompt-templates.test.mjs:816:24)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18) {
+    errno: -30,
+    code: 'EROFS',
+    syscall: 'open',
+    path: '/home/vantt/.local/state/fgos/attestations/disp_1792758926488_1dfb567c.plan.json.tmp.3601-0-1792758926490-f93b86ca'
+  }

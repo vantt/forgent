@@ -1,0 +1,21 @@
+{
+  "releasePath": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+  "artifactDigest": "sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+  "nativeAddon": {
+    "path": "libexec/native/fgos.node",
+    "digest": "412b90334f418cedebd6d94b09892bdccebfb1ff6c6be3b2c1ac4fdf50c28c79",
+    "target": "linux-x64",
+    "napiVersion": 8,
+    "crateChecksums": {
+      "napi@2.16.17": "55740c4ae1d8696773c78fdafd5d0e5fe9bc9f1b071c7ba493ba5c413a9184f3",
+      "napi-build@2.2.4": "3ae82775d1b06f3f07efd0666e59bbc175da8383bc372051031d7a447e94fbea",
+      "napi-derive@2.16.13": "7cbe2585d8ac223f7d34f13701434b9d5f4eb9c332cccce8dee57ea18ab8ab0c"
+    },
+    "capabilities": [
+      "git-wal-v1"
+    ]
+  },
+  "stagedAt": "/tmp/fgos-work/w1-d1/runtime-proof",
+  "descriptorSha256": "2de8590ad04aa0fc74bb4b215a96a01416554dae55b98b69aaed591fcedd0d3e",
+  "method": "Existing package descriptor door with an exact copy of the activated release manifest, addon and helper; current unmodified source/test trees. Scratch only; neither FGOS_HOST_BIN nor any test-only switch bypasses payload ownership."
+}

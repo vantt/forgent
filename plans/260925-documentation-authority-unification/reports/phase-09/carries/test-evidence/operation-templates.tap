@@ -1,0 +1,63 @@
+✔ discoverOperationPromptTemplates discovers shipped core templates cleanly (29.212942ms)
+✔ discoverOperationPromptTemplates is deterministic across repeated runs (6.589531ms)
+✔ precedence: project tier overrides domain and core tiers (1.414484ms)
+✔ precedence: domain tier overrides core tier when project is absent (1.48245ms)
+✔ missing template throws template-not-found (5.150426ms)
+✔ duplicate template in same directory with different extensions throws template-ambiguous (1.772214ms)
+✔ colliding template IDs across different domains throws template-ambiguous (1.953275ms)
+✔ path-escape symlink pointing outside scan root throws template-path-escape (1.330108ms)
+✔ validateOperationPromptTemplate accepts all bounded variables (0.48899ms)
+✔ validateOperationPromptTemplate rejects unknown or malicious variables (1.193066ms)
+✔ renderOperationPromptTemplate substitutes bounded variables and strips internal stamps (0.804553ms)
+✔ renderOperationPromptTemplate handles empty arrays with - (none) (0.389409ms)
+✔ renderOperationPromptTemplate supports {artifactRefs} alias for {contextRefs} (0.297883ms)
+✔ resolveAndRenderOperationPrompt produces rendered body and complete template provenance (4.728039ms)
+✔ renderAssignmentPrompt uses contractTemplate when declared (4.525864ms)
+✔ renderAssignmentPrompt preserves explicit legacy objective path when contractTemplate is omitted (0.388294ms)
+✔ renderAssignmentPrompt fails loudly on missing template (5.805465ms)
+✔ buildEffectiveExecutionContract attaches template provenance without secrets (6.664512ms)
+✔ domain-neutral proof: 1 plan-loop + 2 advisory operations resolve via identical mechanism (0.310678ms)
+✔ Unit I22: every architecture-advisory-panel-v1 operation resolves and renders its own real template with bounded variables only (0.257037ms)
+✔ Unit I22 fix round 1: a real inline coordination Assignment (architecture-advisory-panel-v1) renders its actual constraints, never a false "(none)" (9.885318ms)
+✔ Unit I34: every declared task.contractTemplate resolves, for every registered CoordinationProtocol that currently has authored templates (0.323324ms)
+✔ Unit I34: every allowlisted no-templates-yet protocol still has zero resolving contractTemplate references (allowlist honesty check) (0.263325ms)
+✔ retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes (1.872717ms)
+✔ operation-prompt-templates-valid doctor check is registered and passes on repository (4.217284ms)
+✔ operation-prompt-templates-valid doctor check fails when a malformed template is present (1.05392ms)
+✔ I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted (1.852171ms)
+✖ I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted (9.038506ms)
+✔ I04-REV-02 negative: resolver refuses corrupted contentDigest on pinned template with template-provenance-mismatch (0.575941ms)
+✔ I04-REV-02 negative: resolver refuses malformed contentDigest or renderedPromptDigest on pinned template (0.789269ms)
+✔ I04-REV-02 negative: resolver refuses corrupted or missing templateSnapshot on pinned provenance (0.542907ms)
+✔ I04-REV-02 negative: resolver refuses corrupted renderedPromptDigest when prompt recomputed on retry does not match (0.703656ms)
+✔ I04-REV-02 negative: resolver refuses templateId mismatch between contractTemplate and pinnedTemplate.id (0.488977ms)
+✔ I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance (4.576379ms)
+✔ I04-REV-03 negative: resolver refuses pinned template provenance with missing contentDigest (0.610953ms)
+✔ I04-REV-03 negative: resolver refuses pinned template provenance with missing renderedPromptDigest (0.568127ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 35
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 590.611902
+
+✖ failing tests:
+
+test at test/runner/operation-prompt-templates.test.mjs:766:1
+✖ I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted (9.038506ms)
+  Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+      at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d1/src/native/door.mjs:14:46)
+      at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d1/src/native/door.mjs:35:117)
+      at nativeDoor (file:///home/vantt/projects/forgentX-p9-w1-d1/src/native/door.mjs:70:41)
+      at durable (file:///home/vantt/projects/forgentX-p9-w1-d1/src/native/door.mjs:94:16)
+      at installOnce (file:///home/vantt/projects/forgentX-p9-w1-d1/src/native/door.mjs:89:56)
+      at publishImmutableProof (file:///home/vantt/projects/forgentX-p9-w1-d1/src/runner/dispatch/proof-helpers.mjs:66:10)
+      at executeAssignment (file:///home/vantt/projects/forgentX-p9-w1-d1/src/runner/dispatch/assignment-runner.mjs:1134:31)
+      at file:///home/vantt/projects/forgentX-p9-w1-d1/test/helpers/work-seat-config.mjs:35:75
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/runner/operation-prompt-templates.test.mjs:816:24)
+      at Test.runInAsyncScope (node:async_hooks:227:14) {
+    code: 'git-addon-not-shipped',
+    installed: 'none'
+  }

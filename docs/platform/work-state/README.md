@@ -38,7 +38,7 @@ The documents listed here are candidate material. No reader reads them yet. The 
 | Reader goal | Read |
 | --- | --- |
 | Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |
-| Review schema/event evolution before changing a field or verb | [ADR 0007](decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution) |
+| Review schema/event evolution before changing a field or verb | [ADR 0007](decisions/retired-decision-history.md#0007--tiến-hoá-schema--event) |
 | Open the candidate spec | [spec.md](spec.md) |
 | Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |
 | Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |
@@ -51,6 +51,8 @@ The documents listed here are candidate material. No reader reads them yet. The 
 | --- | --- |
 | [spec.md](spec.md) | Spec |
 | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |
+| [Knowledge registry state](contracts/knowledge-registry.md) | Maintained identity, lifecycle, role and attestation contract |
+| [Non-transitioning records](contracts/non-transitioning-records.md) | Decision/outcome precedent |
 | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) | Architecture |
 | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) | Decision |
 | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) | History |

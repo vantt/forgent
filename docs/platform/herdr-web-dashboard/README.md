@@ -27,6 +27,7 @@ Start with [spec.md](spec.md). These files preserve source text for independent 
 
 - [operations/operator-runbook.md](operations/operator-runbook.md)
 - [contracts/fgos-gateway-api-v1.yaml](contracts/fgos-gateway-api-v1.yaml)
+- [Gateway readiness](contracts/gateway-readiness.md) — machine-token refusal and the client-only baseUrl observation; not a new startup path.
 
 ## Added in candidate: Verification and change boundary
 

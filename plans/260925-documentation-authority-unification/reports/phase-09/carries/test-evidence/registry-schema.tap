@@ -1,0 +1,522 @@
+✔ foldKnowledgeEvents - basic topic and doc fold (3.623315ms)
+✔ activeDoc(topicId, role) <= 1 - second active doc throws (1.164386ms)
+✔ topic.split keeps lineage and source capture ids (1.385358ms)
+✔ doc.promote from reserved is rejected (0.520555ms)
+✔ docLifecycle rejects draft (0.256904ms)
+✖ concurrent registerDocStore enforces lock serialization (6.862758ms)
+✖ doc slot cardinality - a second non-retired/non-superseded doc for the same (topicId, role) is refused even below active (2.530145ms)
+✖ doc.reserve is create-only - reserving an existing docId again is refused (2.585372ms)
+✖ topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage (1.999816ms)
+✖ topic.merge refuses a role collision atomically -- nothing mutates when it throws (2.860253ms)
+✖ topic.merge succeeds when the colliding source doc is already superseded (2.201412ms)
+✖ a retired topic refuses new doc writes (reserve, register, mark-rendered, promote) (2.181435ms)
+✖ resolveDocId finds a doc by (topicId, role) after topic.split moved its topicId without renaming its docId (2.891718ms)
+✖ framework/mode/role vocabulary - unknown framework, unknown mode, and role-vs-mode collisions are refused (2.4939ms)
+✖ topic.split refuses a self-referencing successor, a duplicate successor id, and an existing topicId -- atomically (2.843753ms)
+✖ topic.merge refuses a self-merge, a missing source, and a duplicate source -- atomically (2.290249ms)
+✖ doc.register refuses to change an existing docId's topicId, role, or currentPath (3.569651ms)
+✖ doc.supersede and doc.retire fail closed (throw) when the doc does not exist, instead of silently no-oping (4.436583ms)
+✖ doc.attest rejects a retired doc and a doc under a retired topic -- enforced in the reducer, not only the CLI (3.06642ms)
+✖ doc.register never moves lifecycle on an existing docId except the reserved -> provisional bridge (2.98924ms)
+✖ doc.attest rejects a superseded doc the same way it rejects a retired one (2.946412ms)
+✖ topic.merge refuses a non-active target; topic.split refuses a non-active source (3.183089ms)
+✖ topic.retire fails closed on a nonexistent topicId instead of a silent no-op (3.51523ms)
+✖ doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets (3.148001ms)
+✖ doc.supersede refuses a supersededBy target whose doc lifecycle is live but whose OWN topic is retired (3.097052ms)
+✖ doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op (3.152352ms)
+✖ doc.demote moves an active doc back to provisional; refuses any other lifecycle (3.187128ms)
+✖ doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote (3.143249ms)
+✖ topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId (3.509881ms)
+✖ doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role (4.283503ms)
+✖ topic.split refuses a live doc left unassigned by every successor's rolesToMove, and a role duplicated across successors (3.153627ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 5
+ℹ fail 26
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 325.720311
+
+✖ failing tests:
+
+test at test/state/knowledge-registry.test.mjs:158:1
+✖ concurrent registerDocStore enforces lock serialization (6.862758ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:162:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:187:1
+✖ doc slot cardinality - a second non-retired/non-superseded doc for the same (topicId, role) is refused even below active (2.530145ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:191:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:215:1
+✖ doc.reserve is create-only - reserving an existing docId again is refused (2.585372ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:219:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:230:1
+✖ topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage (1.999816ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:234:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:244:1
+✖ topic.merge refuses a role collision atomically -- nothing mutates when it throws (2.860253ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:248:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:268:1
+✖ topic.merge succeeds when the colliding source doc is already superseded (2.201412ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:272:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:288:1
+✖ a retired topic refuses new doc writes (reserve, register, mark-rendered, promote) (2.181435ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:292:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:316:1
+✖ resolveDocId finds a doc by (topicId, role) after topic.split moved its topicId without renaming its docId (2.891718ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:320:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:345:1
+✖ framework/mode/role vocabulary - unknown framework, unknown mode, and role-vs-mode collisions are refused (2.4939ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:349:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:374:1
+✖ topic.split refuses a self-referencing successor, a duplicate successor id, and an existing topicId -- atomically (2.843753ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:378:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:422:1
+✖ topic.merge refuses a self-merge, a missing source, and a duplicate source -- atomically (2.290249ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:426:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:459:1
+✖ doc.register refuses to change an existing docId's topicId, role, or currentPath (3.569651ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:463:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:493:1
+✖ doc.supersede and doc.retire fail closed (throw) when the doc does not exist, instead of silently no-oping (4.436583ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /doc\.supersede: doc 'does-not-exist' not found/. Input:
+  
+  'WriterIdentityError: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:498:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: WriterIdentityError: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+        at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+        at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+        at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+        at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+        at supersedeDocStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2220:10)
+        at file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:499:7
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:498:12)
+        at Test.runInAsyncScope (node:async_hooks:227:14),
+    expected: /doc\.supersede: doc 'does-not-exist' not found/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/state/knowledge-registry.test.mjs:514:1
+✖ doc.attest rejects a retired doc and a doc under a retired topic -- enforced in the reducer, not only the CLI (3.06642ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:523:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:543:1
+✖ doc.register never moves lifecycle on an existing docId except the reserved -> provisional bridge (2.98924ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:547:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:586:1
+✖ doc.attest rejects a superseded doc the same way it rejects a retired one (2.946412ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:590:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:602:1
+✖ topic.merge refuses a non-active target; topic.split refuses a non-active source (3.183089ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:606:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:628:1
+✖ topic.retire fails closed on a nonexistent topicId instead of a silent no-op (3.51523ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /topic\.retire: topic 'does-not-exist' not found/. Input:
+  
+  'WriterIdentityError: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:632:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: WriterIdentityError: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+        at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+        at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+        at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+        at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+        at retireTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2196:10)
+        at file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:633:7
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:632:12)
+        at Test.runInAsyncScope (node:async_hooks:227:14),
+    expected: /topic\.retire: topic 'does-not-exist' not found/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/state/knowledge-registry.test.mjs:640:1
+✖ doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets (3.148001ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:644:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:678:1
+✖ doc.supersede refuses a supersededBy target whose doc lifecycle is live but whose OWN topic is retired (3.097052ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:687:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:706:1
+✖ doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op (3.152352ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:710:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:724:1
+✖ doc.demote moves an active doc back to provisional; refuses any other lifecycle (3.187128ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:728:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:749:1
+✖ doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote (3.143249ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:753:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:771:1
+✖ topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId (3.509881ms)
+  AssertionError [ERR_ASSERTION]: purposeSlug "../evil" must be refused
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:777:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: WriterIdentityError: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+        at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+        at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+        at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+        at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+        at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+        at file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:778:9
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:777:14)
+        at Test.runInAsyncScope (node:async_hooks:227:14),
+    expected: /must be a safe single path segment/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/state/knowledge-registry.test.mjs:806:1
+✖ doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role (4.283503ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:810:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }
+
+test at test/state/knowledge-registry.test.mjs:837:1
+✖ topic.split refuses a live doc left unassigned by every successor's rolesToMove, and a role duplicated across successors (3.153627ms)
+  Error [WriterIdentityError]: writer identity (host-missing): git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`; run through the `fgos` command of an activated workspace, or from a checkout through `npm run fgos:dev`
+      at door (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:21:11)
+      at resolveWriterIdentity (file:///home/vantt/projects/forgentX-p9-w1-d1/src/util/session-identity.mjs:30:18)
+      at resolveWriterLogPath (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:160:27)
+      at appendKnowledgeEvent (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2169:19)
+      at registerTopicStore (file:///home/vantt/projects/forgentX-p9-w1-d1/src/state/store.mjs:2180:10)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d1/test/state/knowledge-registry.test.mjs:841:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    code: 'host-missing',
+    category: 'precondition'
+  }

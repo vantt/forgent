@@ -1,0 +1,23 @@
+✔ mappings, sequences and scalars parse to plain values (20.599595ms)
+✔ malformed input throws an error naming the file, the line and the column (2.66298ms)
+✔ empty, whitespace-only and comment-only input return null, as do a bare document marker and ~ (0.986584ms)
+✔ more than one document throws, naming the file and the count (1.043518ms)
+✔ a duplicate key throws (0.987431ms)
+✔ core schema: yes/no/on/off and an unquoted ISO date stay strings, << is an ordinary key (2.206583ms)
+✔ an unknown tag throws, including !!binary (1.547131ms)
+✔ an alias bomb throws once aliases pass the limit, flat or nested (4.760133ms)
+✔ aliases within the limit still resolve (0.582712ms)
+✔ a self-referencing map is refused as an endless expansion and does not hang (40.402466ms)
+✔ nested aliases under the alias limit still throw when they expand past the value budget (3.198917ms)
+✔ a large flat document under the value budget parses (326.275105ms)
+✔ __proto__ and constructor.prototype keys become own keys and never reach Object.prototype (0.867978ms)
+✔ indented block mappings and whitespace-only block scalars parse as the YAML spec intends (4.47706ms)
+✔ the vendored js-yaml file is byte-identical to the release it names (1.41582ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 717.745653

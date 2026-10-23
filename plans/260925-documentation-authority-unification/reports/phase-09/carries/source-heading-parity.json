@@ -1,0 +1,2286 @@
+[
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "packaging-and-distribution-architecture",
+    "sourceUnitDigest": "43d5b8508099a9bb30ead5a267ab8d7e61f2c85130336e53870ddbc8f50085b7",
+    "sourceLevel": 1,
+    "title": "Packaging And Distribution Architecture",
+    "sourceDirectPayloadDigest": "fde444075200017ff755de881d44e2862c72523a1f2c2b3fd17453c75434d8c3",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "packaging-and-distribution-architecture",
+        "targetUnitDigest": "7162f8e811cea27ac4ffa4a795009a8f98d96b10999e321a82d62d33f59270f8",
+        "level": 3,
+        "directPayloadDigest": "4e3f16f9f16872be4681e9e6fa7b0fd135980396024af26c15e0a18f22c3bb2e"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4",
+      "unheaded-block-5"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "1-historical-read-order",
+    "sourceUnitDigest": "bbe95d34035f20022d650b13187b26135df1ee2f77dddb5bd7dbd0ddd641b9b1",
+    "sourceLevel": 2,
+    "title": "1. Historical Read Order",
+    "sourceDirectPayloadDigest": "b298db8b766fa639bb931e3746a89bf9beab6c25bf7c5259f28836a9332d9f20",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "1-historical-read-order",
+        "targetUnitDigest": "0de78d892454a177993573aa2e504c9d01a038f1715a5e711668e586c4a36bf8",
+        "level": 4,
+        "directPayloadDigest": "9d820879ce24217cb6fd40de4f4fdfcd31b36987167d49382ff44fae2e199408"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-6",
+      "unheaded-block-7",
+      "unheaded-block-8"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "2-historical-supersession-table",
+    "sourceUnitDigest": "70847eb505d007a2f2d5667bd66ecb218b1714f49112e48163ab449ad74f5dc8",
+    "sourceLevel": 2,
+    "title": "2. Historical Supersession Table",
+    "sourceDirectPayloadDigest": "302168079cde3ef23795b07c1b04407141262f1af1a9586a56c7e39059878d29",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "2-historical-supersession-table",
+        "targetUnitDigest": "7a121f1faaa77b183e3e2d5b187d1ae7a2d65980bfa7a3a4ead0088e25ef938e",
+        "level": 4,
+        "directPayloadDigest": "8938a4cbe3f1099f298566f2fd822d2745030454f4f50025e8f9ff685a38f405"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-9"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "3-boundary-rule",
+    "sourceUnitDigest": "9228108e0d5497dd10dc107ece2808b149a3b791de5da8db82f9b1c1ac8d2103",
+    "sourceLevel": 2,
+    "title": "3. Boundary Rule",
+    "sourceDirectPayloadDigest": "d87412cd51ee8040c0cb352abc382b7d9ab9c632329a22d9c2535311aa885113",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "3-boundary-rule",
+        "targetUnitDigest": "d03d88bb8cf5b0f6f33ec75596e194e5b1e06243ab88d4ae77413714509d2e7c",
+        "level": 4,
+        "directPayloadDigest": "d87412cd51ee8040c0cb352abc382b7d9ab9c632329a22d9c2535311aa885113"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "3-boundary-rule",
+        "targetUnitDigest": "95f27f77881c7880d7a6cdd068afdf0f4ff5e1f3b77fb09685326e0b3bbf384e",
+        "level": 4,
+        "directPayloadDigest": "df38b873362c61e6af7013b420dc24145bbeac0576c663acfaa7688de868f1f1"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-10",
+      "unheaded-block-11",
+      "unheaded-block-12",
+      "unheaded-block-13"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "4-vocabulary",
+    "sourceUnitDigest": "2db527ce06af8c9d7ef5c2dee5de5dd0b6ecb5dd7fae5080af3e5cec8146bfbc",
+    "sourceLevel": 2,
+    "title": "4. Vocabulary",
+    "sourceDirectPayloadDigest": "0bdf31457ee770dfc66c1d4bd8e1a779e304668a18676942a42a4483e7d579fc",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "4-vocabulary",
+        "targetUnitDigest": "ffff2b7a3d064d22a14a5bdd418804d487e8974a116b70bcbf1270584822d5cc",
+        "level": 4,
+        "directPayloadDigest": "0bdf31457ee770dfc66c1d4bd8e1a779e304668a18676942a42a4483e7d579fc"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-14"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "5-historical-design-position",
+    "sourceUnitDigest": "59c1f6cb2795050263d881ffeba30a6819b8ef0592bfc1a6e691a60f5bc55ea9",
+    "sourceLevel": 2,
+    "title": "5. Historical Design Position",
+    "sourceDirectPayloadDigest": "09f5f1b6f5789398d26a3949a474ca14d2bf3254b4c090cc625abe425a897fb0",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "5-historical-design-position",
+        "targetUnitDigest": "feb175bf0848b0faaf2d7e608f2f6e825aa4a44ab294b8dfc61e343c0ba2b94c",
+        "level": 4,
+        "directPayloadDigest": "09f5f1b6f5789398d26a3949a474ca14d2bf3254b4c090cc625abe425a897fb0"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-15",
+      "unheaded-block-16",
+      "unheaded-block-17"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "6-do-not-collapse-these-boundaries",
+    "sourceUnitDigest": "3cd26e8417711e7ca378591b5220bfad88dfb390cb6ecf29de4d87108cca529c",
+    "sourceLevel": 2,
+    "title": "6. Do Not Collapse These Boundaries",
+    "sourceDirectPayloadDigest": "3d80b91f5319e44deeec9df53bd55663c46a0ff28d433a5b495a3e3d29c071ee",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "6-do-not-collapse-these-boundaries",
+        "targetUnitDigest": "0cee1c12bf1da6c391baf0730f7c18b4eb02fea1b9a9d202d8869f9718d8ece9",
+        "level": 4,
+        "directPayloadDigest": "3d80b91f5319e44deeec9df53bd55663c46a0ff28d433a5b495a3e3d29c071ee"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-18"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/README.md",
+    "sourceAnchor": "7-historical-delivery-spine",
+    "sourceUnitDigest": "1cc1e334bff36d96536140dd30e74e994ffd1ea1d03bcfab887cd789249678fd",
+    "sourceLevel": 2,
+    "title": "7. Historical Delivery Spine",
+    "sourceDirectPayloadDigest": "2c2901b94c6df5c64633516c19af2ccbea55803cbf15b4ad5b244f61ab0c95c9",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "7-historical-delivery-spine",
+        "targetUnitDigest": "770f72b401b0fcdad24e2e8dbf5a8eff808b066013f32f54bcb87947451c9610",
+        "level": 4,
+        "directPayloadDigest": "2c2901b94c6df5c64633516c19af2ccbea55803cbf15b4ad5b244f61ab0c95c9"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-19",
+      "unheaded-block-20",
+      "unheaded-block-21"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/future-constraints.md",
+    "sourceAnchor": "future-constraints-shared-gateway-adapter-and-substrate",
+    "sourceUnitDigest": "8e8989079b3334c4b5f18b4d65d6170587d5ce58237c13d594696555b676ce23",
+    "sourceLevel": 1,
+    "title": "Future Constraints: Shared Gateway, Adapter, And Substrate",
+    "sourceDirectPayloadDigest": "db766abc51ea4be4a49546700704f911d302d67abf73eb2bb7d169d763edc5f9",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "future-constraints-shared-gateway-adapter-and-substrate",
+        "targetUnitDigest": "d863752f9a2e603603e399c4dc7f7dae9de1a7f5b2dc9b1c627cfae188cc24be",
+        "level": 3,
+        "directPayloadDigest": "e1feedb123237450cfb89d075d8bd2667789900f1f37499a355ae13578a8ed9b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/future-constraints.md",
+    "sourceAnchor": "1-shared-web-and-gateway-position",
+    "sourceUnitDigest": "e163500c8a2477a1913e15d3be6fc71262e79a7b17d692ad036e8f367b8b6e82",
+    "sourceLevel": 2,
+    "title": "1. Shared Web And Gateway Position",
+    "sourceDirectPayloadDigest": "11f9a6363950ffd2056368327f959074e98d4149a254a4bc4c3329bbbd145e5a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "1-shared-web-and-gateway-position",
+        "targetUnitDigest": "6af601d1286ca48aea1619cd6204f8872506a5683a1bb0a30613c24469a63368",
+        "level": 4,
+        "directPayloadDigest": "11f9a6363950ffd2056368327f959074e98d4149a254a4bc4c3329bbbd145e5a"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5",
+      "unheaded-block-6",
+      "unheaded-block-7"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/future-constraints.md",
+    "sourceAnchor": "2-project-runtime-adapter-constraint",
+    "sourceUnitDigest": "69298097d39b30513b74935fc9509650175c6555632d07b13d062a44412f2572",
+    "sourceLevel": 2,
+    "title": "2. Project Runtime Adapter Constraint",
+    "sourceDirectPayloadDigest": "f56e8e94d563ecc5a634ffa84e58a6e3cc0f6a7e76c114bb6d677895e232e73b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "2-project-runtime-adapter-constraint",
+        "targetUnitDigest": "679ab1cc8b4cfa572246343ccc4d767bd07685d5cf5e326e1a88362a794b84f3",
+        "level": 4,
+        "directPayloadDigest": "f56e8e94d563ecc5a634ffa84e58a6e3cc0f6a7e76c114bb6d677895e232e73b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-8",
+      "unheaded-block-9",
+      "unheaded-block-10",
+      "unheaded-block-11",
+      "unheaded-block-12",
+      "unheaded-block-13"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/future-constraints.md",
+    "sourceAnchor": "3-future-gateway-safety-constraints",
+    "sourceUnitDigest": "579051fc11d4b423165db062ad87e5e8560d42697b07cef583d64aae24a85583",
+    "sourceLevel": 2,
+    "title": "3. Future Gateway Safety Constraints",
+    "sourceDirectPayloadDigest": "3322c4bb04dd692d995dc1f193759623d409d2639979890efeb14d61e6d6a224",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "3-future-gateway-safety-constraints",
+        "targetUnitDigest": "ef02a776c038539e326465381803c99920509d94bb44ae3a0013e6aa1205df57",
+        "level": 4,
+        "directPayloadDigest": "3322c4bb04dd692d995dc1f193759623d409d2639979890efeb14d61e6d6a224"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-14",
+      "unheaded-block-15",
+      "unheaded-block-16"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/future-constraints.md",
+    "sourceAnchor": "4-mcp-global-substrate-constraint",
+    "sourceUnitDigest": "7be5c712696c659dcd10409d858655f51c446d2f22cbd531fd22e70e1dc94009",
+    "sourceLevel": 2,
+    "title": "4. MCP / Global Substrate Constraint",
+    "sourceDirectPayloadDigest": "8db856fc4da7fbb1c7c91793e6b835a05f2ab6824c35774831d20ef3c0b868e4",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "4-mcp-global-substrate-constraint",
+        "targetUnitDigest": "25a9fe76054e520f9ddf345e0075531e10db2ac999ae3b5ac4e7a878fbe5238c",
+        "level": 4,
+        "directPayloadDigest": "8db856fc4da7fbb1c7c91793e6b835a05f2ab6824c35774831d20ef3c0b868e4"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-17",
+      "unheaded-block-18",
+      "unheaded-block-19",
+      "unheaded-block-20"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "distribution-baseline-and-scattered-spec-fragments",
+    "sourceUnitDigest": "e01445cc31e3c304322e2d91470933c1f7394477d4c08c7e46fca9f42e26e393",
+    "sourceLevel": 1,
+    "title": "Distribution Baseline And Scattered Spec Fragments",
+    "sourceDirectPayloadDigest": "6dc4cde2935344d6b4deef1a02ac342cfce900ff076d430c802284aff536ce51",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "distribution-baseline-and-scattered-spec-fragments",
+        "targetUnitDigest": "cd639ea9673971d04f7780ecd0a823917af0f7431ad6ea9cba3a69c9fabad214",
+        "level": 3,
+        "directPayloadDigest": "a5fb2c77be96b70be2a4abf3279754e3a678feb0118c0118e1235347b52472be"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "1-current-nodenpm-baseline",
+    "sourceUnitDigest": "7aefc75222982e0bd30b4d7adb7ef3c0924835b20d31973f93b15e34a8056353",
+    "sourceLevel": 2,
+    "title": "1. Current Node/npm Baseline",
+    "sourceDirectPayloadDigest": "2636ae0ad08a994148653b96a54260a27d866805f80bea5968c8f67e80702910",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "1-current-nodenpm-baseline",
+        "targetUnitDigest": "932956f14bd1d1bb0e86bee154dcb56823d3918e033b1feefa6cb28d8a7e6381",
+        "level": 4,
+        "directPayloadDigest": "2636ae0ad08a994148653b96a54260a27d866805f80bea5968c8f67e80702910"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5",
+      "unheaded-block-6",
+      "unheaded-block-7"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "2-scattered-spec-fragments-to-preserve",
+    "sourceUnitDigest": "7216f0eb5715627553aea32c2a6a8f53f5d4ceb4372500fef132b2c278bc2840",
+    "sourceLevel": 2,
+    "title": "2. Scattered Spec Fragments To Preserve",
+    "sourceDirectPayloadDigest": "90dd7799301c44caa78bb65a068a8a90758bc76d0b1b16c8fecd7fd4254b8bcd",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "2-scattered-spec-fragments-to-preserve",
+        "targetUnitDigest": "44f93e307a07d16cfd7a5bdd2f9692808236b60abf263bd7bb0c0f805e317ee4",
+        "level": 4,
+        "directPayloadDigest": "90dd7799301c44caa78bb65a068a8a90758bc76d0b1b16c8fecd7fd4254b8bcd"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-8"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "3-old-design-pressure-from-tsk-1fp",
+    "sourceUnitDigest": "0c1759c08fdd291c8f738f235341a66f20f5cc1a17ac7cc6ff8fd8e0b19c6ec8",
+    "sourceLevel": 2,
+    "title": "3. Old Design Pressure From `tsk-1fp`",
+    "sourceDirectPayloadDigest": "08c891774960a1b1c7aedffc8b3cacbe1c4ac4c639860be1766bc25487385669",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "3-old-design-pressure-from-tsk-1fp",
+        "targetUnitDigest": "e7b9fcb229be4d12dddb524adfc1e518b7d31684b3532a07a4020ad478e8a2a6",
+        "level": 4,
+        "directPayloadDigest": "08c891774960a1b1c7aedffc8b3cacbe1c4ac4c639860be1766bc25487385669"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-9",
+      "unheaded-block-10",
+      "unheaded-block-11",
+      "unheaded-block-12"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "4-old-install-contexts",
+    "sourceUnitDigest": "cd4476eae111047946aabb34c3d4ee474fbbe055ead77b0e40ca7001155293c5",
+    "sourceLevel": 2,
+    "title": "4. Old Install Contexts",
+    "sourceDirectPayloadDigest": "9b62986c0913acd9393e3acf74e3767e0f4ec98a72d3297dcb52ca69c668c829",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "4-old-install-contexts",
+        "targetUnitDigest": "7b68e828ddadbeb27eb7323d4bd604bd5c37517451f3f22a7307814ae32ac7c1",
+        "level": 4,
+        "directPayloadDigest": "9b62986c0913acd9393e3acf74e3767e0f4ec98a72d3297dcb52ca69c668c829"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-13",
+      "unheaded-block-14"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "sourceAnchor": "5-source-hygiene-note",
+    "sourceUnitDigest": "85efb4e146e9c218f7fa9ff23f3f107fa5c932853be196ace5ac2e563768434f",
+    "sourceLevel": 2,
+    "title": "5. Source Hygiene Note",
+    "sourceDirectPayloadDigest": "92b343bde57b0b79ae99d3dfefda08bcd2243a7a2b33b51191d023651a37d834",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "5-source-hygiene-note",
+        "targetUnitDigest": "fcc902d402856838843b7c97b8bee23c6a6b09070fe5b4fe7d2b689efe2f8120",
+        "level": 4,
+        "directPayloadDigest": "92b343bde57b0b79ae99d3dfefda08bcd2243a7a2b33b51191d023651a37d834"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-15",
+      "unheaded-block-16"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "1-purpose",
+    "sourceUnitDigest": "9c5f771a64b54710e26063a46dc0e481aef023244329ee208ea5cb4d3d730177",
+    "sourceLevel": 1,
+    "title": "1. Purpose",
+    "sourceDirectPayloadDigest": "257b59cf981cbde49b685791dd54e555594b587191ad3b595a4e53c728e767d0",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "6ba5c7a895d85cfd4d3930b5ca0e0b6b2be5613e4134861ec9f71e6fde5702da",
+        "level": 2,
+        "directPayloadDigest": "3c76670d64b958df50e5d2f779735ad03650b38afa2c078137d39f45cd1dd8e3"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "aa90bf0b7a51a8cac91cd9cc621a351801b16909367a9aee76bb6c859501b7f2",
+        "level": 2,
+        "directPayloadDigest": "f1d7b10b6811bb9cf94ca43d4f68fb52dd99267819bc31adf9fcecff99733099"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "cc3975ebb6672b00fde69cd397d4ea235f21eb81c2435537a3be3b6d60d1371b",
+        "level": 2,
+        "directPayloadDigest": "6c89f18756f1f71dd38157733357d4b284ee7baa0e9100f4fe8e341d6c6d4e85"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "0a2ea80f9441566a9c567056d1e2cd637837b67983b6b51be8d592c318df4566",
+        "level": 2,
+        "directPayloadDigest": "47edad57f62b31944fd26a46db3a910297ce7b97a7fd8961e6235e17d136cf00"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "6e64e86f75591170c686251d2e25bc0abc0d0e50ca683f05a851a9d616879790",
+        "level": 2,
+        "directPayloadDigest": "57227574462f9e7202dc09bf603ddfb898e7694a976d15e21a5290eeee5131eb"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "7fd77bc7c17a3ef8a1f81f3fe35b3ecc315b4dee2faef0f5d2f463e8926d0ef9",
+        "level": 2,
+        "directPayloadDigest": "0069bcb18ac4d94f0c68eb163b92fdd79247be9a3604410e4b47e5d1166dafd3"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "405890737d6d1ab3b62d5e422fae5ab739717051180d7f381493bde5e0885dc9",
+        "level": 2,
+        "directPayloadDigest": "526dfb3161f1a342dc606b251fa7dcf5499fb38963a788f76d693df2cdff7ad2"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "ddb1f2d748ee389a0d0687251368ad9a7daf89b2fd5c941bf4be6547537d5af9",
+        "level": 2,
+        "directPayloadDigest": "1c98b0d3baf429ee9b473287f777fb5b8903ecb4f07afa3c5675de305a0d6dae"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+        "level": 2,
+        "directPayloadDigest": "d8a9ddcaaef66bf045879c2099f8e7460998bd53c89d76c1fc4016a740d94a18"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "a6ae5859d58abeb45fe4a6f047f3bd2b24d0efe8dce2744672e5a3ad9ea8651e",
+        "level": 2,
+        "directPayloadDigest": "a0ddbb32ad6ded5522a7113da5110dda1143109fa71e640c7fa97bc7437f7272"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "1fe2f28adc528c09558e1c57248236012f4e5123f8b37b9b8aa8936ab84c2c7f",
+        "level": 2,
+        "directPayloadDigest": "a1a615b6bdcf91b9afe66e5967fdfa7c99e8b014041c1dae875ecf6d2e2ffeb2"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "ad45e659a6444e6939d39eedb3126e760aaac325cbacc6ddad9157157bae2ec4",
+        "level": 3,
+        "directPayloadDigest": "257b59cf981cbde49b685791dd54e555594b587191ad3b595a4e53c728e767d0"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "4fea3f1c943cf21ac7cecd558b406fcb61f6a481e668347adfdebc7079a7b8ba",
+        "level": 2,
+        "directPayloadDigest": "c47cfa4a6bbdeaec57a6154d37ab9e4b9af1c1806dec0fbdde8b3ae8ff58e16e"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "b6be14e65e9ff78bea247a36bc70f33e4fbff0aefed29448db602b4b9d84ffde",
+        "level": 2,
+        "directPayloadDigest": "9f5656f9b64599d6f0b8d1587cc540675c99951e3c559a86d37c9ddfc506fd10"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "3495fb28bd2769a7d2020511167b124af881ea89256231c3d1f4c3cb165fbd9f",
+        "level": 2,
+        "directPayloadDigest": "1996100141dc9de2d0048c191dd0e56b04e116358b617b558709c55ea200a204"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "af53692ca91c1ae5896ad776233cc2cd0307b2a09f5fffc2515250b73ddd6ce7",
+        "level": 2,
+        "directPayloadDigest": "d6fc5e26bdb2c1f8019dbc71d3e2d8b0dd98225d894fc0ceddaabd3af95d200e"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/vision.md",
+        "anchor": "1-purpose",
+        "targetUnitDigest": "80d64a114571aba5776a54699630f3db8f9273706c15e96eb0eb811e4e9a9619",
+        "level": 2,
+        "directPayloadDigest": "713470262c18eb92c00ac9ff70a1ae17739c6d4f5f39077de188c88e9a25c06b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "2-target-area-shape",
+    "sourceUnitDigest": "a3e09519046a3e674f37e48b04d3e801c231c18940934e390a2614af034f47e9",
+    "sourceLevel": 1,
+    "title": "2. Target Area Shape",
+    "sourceDirectPayloadDigest": "6d8e01ea29ff241ff6513af7ed38927634132cb1d1595da92c6de676281b847c",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "2-target-area-shape",
+        "targetUnitDigest": "d3a013c8083653fb903de0ad5fa50c89e0c477a76dbaf7251a3299216d58b0d1",
+        "level": 3,
+        "directPayloadDigest": "6d8e01ea29ff241ff6513af7ed38927634132cb1d1595da92c6de676281b847c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "3-authority-classes",
+    "sourceUnitDigest": "4d1df3764b6bd5581538aad04eff697acbd104f61cef3190d34efd508529af34",
+    "sourceLevel": 1,
+    "title": "3. Authority Classes",
+    "sourceDirectPayloadDigest": "1e9bc29ac191a164fb0f590adbe892e8be728f5f8b9b541ea775aeabbf57226f",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "3-authority-classes",
+        "targetUnitDigest": "b74599857e2eaadccfae964bcf563215df98d57c695420deba461d997ede85ea",
+        "level": 3,
+        "directPayloadDigest": "1e9bc29ac191a164fb0f590adbe892e8be728f5f8b9b541ea775aeabbf57226f"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "4-document-migration-map",
+    "sourceUnitDigest": "d9dd4d26092cf0f9b2a8685022e08ecd16eb4f68d0a3753f725d7efa0f9f629a",
+    "sourceLevel": 1,
+    "title": "4. Document Migration Map",
+    "sourceDirectPayloadDigest": "a8caea8bf46c393f8bef012c2cba506abe9eb272c3d866604f381f3238359402",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "4-document-migration-map",
+        "targetUnitDigest": "350648ca2d4ba0238116b3dade42fd132d4c97b6189de9b6295b8dec1c7bdd80",
+        "level": 3,
+        "directPayloadDigest": "a8caea8bf46c393f8bef012c2cba506abe9eb272c3d866604f381f3238359402"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-7"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "5-implementation-evidence-map",
+    "sourceUnitDigest": "2cc90afa58b17e66ef2079740274ddea6d06076be263a5cc257550154cadc90a",
+    "sourceLevel": 1,
+    "title": "5. Implementation Evidence Map",
+    "sourceDirectPayloadDigest": "fbf77057b451aaca6d734b89c0c955c0993bb5aba58830db0865398953134994",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "5-implementation-evidence-map",
+        "targetUnitDigest": "b5e2a9a4f3df1f8eb1c7744045897b6bf560fee3524c7eb74c6413c0a97f2171",
+        "level": 3,
+        "directPayloadDigest": "fbf77057b451aaca6d734b89c0c955c0993bb5aba58830db0865398953134994"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-8"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "6-implementation-alignment-seed",
+    "sourceUnitDigest": "c606ffe902ed8ce96a6eb5f3949f527d31d928b0c04fdc1b05817a1de14ec3d7",
+    "sourceLevel": 1,
+    "title": "6. Implementation Alignment Seed",
+    "sourceDirectPayloadDigest": "9bfdce297a7bdd137a1db5d12eb52b91d8cf6ccd1b35377b9362f0911aa2def9",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "6-implementation-alignment-seed",
+        "targetUnitDigest": "5c357d5b4f2818b9fcef4b3539ed7951668017a81d3005d101eb952ddd010d8b",
+        "level": 3,
+        "directPayloadDigest": "9bfdce297a7bdd137a1db5d12eb52b91d8cf6ccd1b35377b9362f0911aa2def9"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-9",
+      "unheaded-block-10"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "7-rewrite-work-order",
+    "sourceUnitDigest": "0a9efeb204ecce7324d2104d413c9e4d77fd62588f886ed5946660705c3f27ed",
+    "sourceLevel": 1,
+    "title": "7. Rewrite Work Order",
+    "sourceDirectPayloadDigest": "bcbafef180a7f04bb4cb3ace2d6bd797ed81dadccd421ad9abffcfc1c2c8cbd0",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "7-rewrite-work-order",
+        "targetUnitDigest": "185bc9c01fee33e4473ad1d2c2e6c5121ede15ffcd1b562d9cefbb97a9eae4e9",
+        "level": 3,
+        "directPayloadDigest": "bcbafef180a7f04bb4cb3ace2d6bd797ed81dadccd421ad9abffcfc1c2c8cbd0"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-11"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "8-open-questions-before-canonical-rewrite",
+    "sourceUnitDigest": "d006198ab46c31cead0ccd5cfd2312e23577deb1ef7670d1e9ade47f9d55d060",
+    "sourceLevel": 1,
+    "title": "8. Open Questions Before Canonical Rewrite",
+    "sourceDirectPayloadDigest": "04d2225bd027ba368e6ed35e0082f86bfa49c7102857031e5990f7c2cde1d48a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "8-open-questions-before-canonical-rewrite",
+        "targetUnitDigest": "f3cbbcbafa9b0449a0dcba8faac94d461016b3769380dc24d70db0f4f24127ed",
+        "level": 3,
+        "directPayloadDigest": "04d2225bd027ba368e6ed35e0082f86bfa49c7102857031e5990f7c2cde1d48a"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-12"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/migration-map.md",
+    "sourceAnchor": "9-promotion-checklist",
+    "sourceUnitDigest": "9ed66c72ce36f6b149f124250841e2dba9f879778041806aa6f42a214fae42ff",
+    "sourceLevel": 1,
+    "title": "9. Promotion Checklist",
+    "sourceDirectPayloadDigest": "25b59daedf544857103fb4ea53d973946d636bf198f18bb773a8270b9274c316",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "anchor": "9-promotion-checklist",
+        "targetUnitDigest": "85a7c9808233f682f3e87f67bfb2ea2eeaf737ca4714f2d398949eeb71a4573e",
+        "level": 3,
+        "directPayloadDigest": "25b59daedf544857103fb4ea53d973946d636bf198f18bb773a8270b9274c316"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-13",
+      "unheaded-block-14"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "1-goal",
+    "sourceUnitDigest": "63ee56628abecac4f1f7bfad92b9f7720a65f3d41406ece88b9f1d517aeacb45",
+    "sourceLevel": 1,
+    "title": "1. Goal",
+    "sourceDirectPayloadDigest": "7b22a3d98dd9385f99bb3ffa132a5e81c66ae1e424e8a18f03c493da22e6adb5",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "1-goal",
+        "targetUnitDigest": "ce6c76eea64e8b9672f669b182f5bd571ea2509373bbfdfc9ec5b24944d3c65f",
+        "level": 3,
+        "directPayloadDigest": "7b22a3d98dd9385f99bb3ffa132a5e81c66ae1e424e8a18f03c493da22e6adb5"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "2-scan-result",
+    "sourceUnitDigest": "e496dd43a1ab1a982adb1bc34407361ea9a3b1c172efe623ad8c806cea6cdedd",
+    "sourceLevel": 1,
+    "title": "2. Scan Result",
+    "sourceDirectPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "2-scan-result",
+        "targetUnitDigest": "c59729906b2a3f52a3f9e2d264acf14af6cb72d237304cde98689afa67462070",
+        "level": 3,
+        "directPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "directSourceBlocks": [],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "21-primary-source-documents",
+    "sourceUnitDigest": "c31e44aa1de210d48e14dc0f818210ed61697f62c28b8c5f77f08485c8e1c010",
+    "sourceLevel": 2,
+    "title": "2.1 Primary Source Documents",
+    "sourceDirectPayloadDigest": "d16e4a105df90204fcb14afbda59adc92b170987f6902a3309ebe938e2ee6f0a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "21-primary-source-documents",
+        "targetUnitDigest": "48f59a512ef2d7f4db8f5f958684845c4f1f29b750e32f8f4f4b660fbbff3af7",
+        "level": 4,
+        "directPayloadDigest": "d16e4a105df90204fcb14afbda59adc92b170987f6902a3309ebe938e2ee6f0a"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "22-related-implementation-surface-found-in-code-scan",
+    "sourceUnitDigest": "3fe26df2c3d779723efb90f6ca4e7190df039aa14169dc58807427c6bcac144e",
+    "sourceLevel": 2,
+    "title": "2.2 Related Implementation Surface Found In Code Scan",
+    "sourceDirectPayloadDigest": "29e6c4b0086af528b1503042a4375867f85a77254647745e012c7661cbb33a97",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "22-related-implementation-surface-found-in-code-scan",
+        "targetUnitDigest": "8060d6447b472549d65eb0e7a6be63ac239884bf103e79d6c2335c3c2254a6bd",
+        "level": 4,
+        "directPayloadDigest": "29e6c4b0086af528b1503042a4375867f85a77254647745e012c7661cbb33a97"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "3-documentation-standard-gap",
+    "sourceUnitDigest": "bc9a3a6a9fe8c8a13b18e489b684f55a28fb1e378d3244a134a3df6e0a77c29d",
+    "sourceLevel": 1,
+    "title": "3. Documentation Standard Gap",
+    "sourceDirectPayloadDigest": "e97a18bfd312b8949f5174e52c5a44b70e9d2195c0e248a8830c03ef47cd970b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "3-documentation-standard-gap",
+        "targetUnitDigest": "b8cf1c7f0d4e6db18e6192989c4217649c727e5620ae1a0eff98a9cc4e1a3908",
+        "level": 3,
+        "directPayloadDigest": "e97a18bfd312b8949f5174e52c5a44b70e9d2195c0e248a8830c03ef47cd970b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-7",
+      "unheaded-block-8",
+      "unheaded-block-9",
+      "unheaded-block-10"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "4-proposed-target-shape",
+    "sourceUnitDigest": "3ee29620433d45f30066cf47beef9e27cdbb47120c43c0f2365b0a616a89655d",
+    "sourceLevel": 1,
+    "title": "4. Proposed Target Shape",
+    "sourceDirectPayloadDigest": "6698b01e2afaecce36654fb1f38d532e40f35340076f08a37b5c2d7363c1d422",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "4-proposed-target-shape",
+        "targetUnitDigest": "8002c4c3283634a4f25ab0175eeab30f54b78259b20dd620179ab056d0179cdd",
+        "level": 3,
+        "directPayloadDigest": "6698b01e2afaecce36654fb1f38d532e40f35340076f08a37b5c2d7363c1d422"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-11",
+      "unheaded-block-12",
+      "unheaded-block-13",
+      "unheaded-block-14",
+      "unheaded-block-15",
+      "unheaded-block-16"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "5-rewrite-method",
+    "sourceUnitDigest": "dc674f6d9d22cc7821ebc58aa11fcd4fd19593a26f09861fd3f273c6c9562361",
+    "sourceLevel": 1,
+    "title": "5. Rewrite Method",
+    "sourceDirectPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "5-rewrite-method",
+        "targetUnitDigest": "c995b961171b99d06641bf6b9d98eb01dac730a0c575619afb4e26d22f76316c",
+        "level": 3,
+        "directPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "directSourceBlocks": [],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "51-phase-1---freeze-inventory",
+    "sourceUnitDigest": "6095c15219684973d7266cb5ae6bfa515f62f4b633d65082f5d3951b609da839",
+    "sourceLevel": 2,
+    "title": "5.1 Phase 1 - Freeze Inventory",
+    "sourceDirectPayloadDigest": "d26ec75e4aa4794e28d5caa74629272690bccb76629a7db4e8c63921f15c4fe2",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "51-phase-1---freeze-inventory",
+        "targetUnitDigest": "890cbf563f8f9f5c0f8cff7e2ebf6b74183259c123c5ab09fc43ea0901b0d750",
+        "level": 4,
+        "directPayloadDigest": "d26ec75e4aa4794e28d5caa74629272690bccb76629a7db4e8c63921f15c4fe2"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-17",
+      "unheaded-block-18",
+      "unheaded-block-19"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "52-phase-2---decide-authority-model",
+    "sourceUnitDigest": "cb230738c4a549ce21bf8d84abc23dfebcdea437040ecc81ce283e0dba1764fd",
+    "sourceLevel": 2,
+    "title": "5.2 Phase 2 - Decide Authority Model",
+    "sourceDirectPayloadDigest": "2aa8a68fb816f5fba95f674fc9f186f9b55ab0d08393179137d5d9cf2991c633",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "52-phase-2---decide-authority-model",
+        "targetUnitDigest": "157bed93a190b148677871b5f6f6217f713dbe288fb14f606fc4d8d1baaa9cd7",
+        "level": 4,
+        "directPayloadDigest": "2aa8a68fb816f5fba95f674fc9f186f9b55ab0d08393179137d5d9cf2991c633"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-20",
+      "unheaded-block-21"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "53-phase-3---write-the-area-portal",
+    "sourceUnitDigest": "dab9556af36a50b2aa823b055d0874047ffd3a0b72392685c67fc9a9abf8720d",
+    "sourceLevel": 2,
+    "title": "5.3 Phase 3 - Write The Area Portal",
+    "sourceDirectPayloadDigest": "3771a7a66c02ca84058098461c3130b8ba8c40436247ccd4c917dda66338d335",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "53-phase-3---write-the-area-portal",
+        "targetUnitDigest": "3e265cd1325200c1f754b13641eaf318ca417d3fb6c70a62759588b023f7bd57",
+        "level": 4,
+        "directPayloadDigest": "3771a7a66c02ca84058098461c3130b8ba8c40436247ccd4c917dda66338d335"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-22",
+      "unheaded-block-23",
+      "unheaded-block-24"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "54-phase-4---rewrite-the-spec",
+    "sourceUnitDigest": "04c79b5b6cab80fedfcc81cbb8d6833c01d5597c85f546d9cc8c2f6986d67f1f",
+    "sourceLevel": 2,
+    "title": "5.4 Phase 4 - Rewrite The Spec",
+    "sourceDirectPayloadDigest": "7413a866edaa94e610b3828199aed62d0f8c49294e3febb07c86b923f5fb8720",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "54-phase-4---rewrite-the-spec",
+        "targetUnitDigest": "bb67e1028dc8294657694d5e9b4d295c27e81cc1c98601589616c4ce7d8cfbba",
+        "level": 4,
+        "directPayloadDigest": "7413a866edaa94e610b3828199aed62d0f8c49294e3febb07c86b923f5fb8720"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-25",
+      "unheaded-block-26",
+      "unheaded-block-27",
+      "unheaded-block-28"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "55-phase-5---promote-architecture",
+    "sourceUnitDigest": "5250420533ab23aed13b83cf586273b7d658e9f9624dd1ff906b10c8b7598946",
+    "sourceLevel": 2,
+    "title": "5.5 Phase 5 - Promote Architecture",
+    "sourceDirectPayloadDigest": "0f5637bb34b9ca5f8d1932a8428149467a9dcd9023b90e4b61173034acc5f9a4",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "55-phase-5---promote-architecture",
+        "targetUnitDigest": "2d99577bf038b4bac789411ce9b9f58424055d990f4965f1d03bb63ac2e52da0",
+        "level": 4,
+        "directPayloadDigest": "0f5637bb34b9ca5f8d1932a8428149467a9dcd9023b90e4b61173034acc5f9a4"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-29",
+      "unheaded-block-30",
+      "unheaded-block-31"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "56-phase-6---extract-contracts",
+    "sourceUnitDigest": "2335f09d25316202656b61b89ea69e12503632915083a2de3f454faccd5b5347",
+    "sourceLevel": 2,
+    "title": "5.6 Phase 6 - Extract Contracts",
+    "sourceDirectPayloadDigest": "e8c2afbd8405ab8c3bd70a43d71d5d881c5597e9de003dd813b70ce341066b80",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "56-phase-6---extract-contracts",
+        "targetUnitDigest": "57ecf72e125aa99e4b7ebc7fbc8a1ff72f0d50b8850263ae20e2caa593d03362",
+        "level": 4,
+        "directPayloadDigest": "e8c2afbd8405ab8c3bd70a43d71d5d881c5597e9de003dd813b70ce341066b80"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-32",
+      "unheaded-block-33",
+      "unheaded-block-34"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "57-phase-7---build-verification-view",
+    "sourceUnitDigest": "3053f69602eb4494f8a6408fc90ceedc9a580f50e6111a5379e4825535334ca0",
+    "sourceLevel": 2,
+    "title": "5.7 Phase 7 - Build Verification View",
+    "sourceDirectPayloadDigest": "268dab0cd9d3f002236c3a4c853b9a6bb234eb025f4135b7bbbd91c3bcc1e098",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "57-phase-7---build-verification-view",
+        "targetUnitDigest": "0552ede78512241565ad3042fad8798a1e7d16c5e1ebecff888bdd4a85c6cfe1",
+        "level": 4,
+        "directPayloadDigest": "268dab0cd9d3f002236c3a4c853b9a6bb234eb025f4135b7bbbd91c3bcc1e098"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-35",
+      "unheaded-block-36",
+      "unheaded-block-37"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "58-phase-8---redirect-and-retire-legacy-docs",
+    "sourceUnitDigest": "1579fd12289c6f1d9b6e6ded10c03c606352abf5eea72821809666bc4cda2ccb",
+    "sourceLevel": 2,
+    "title": "5.8 Phase 8 - Redirect And Retire Legacy Docs",
+    "sourceDirectPayloadDigest": "aef2fda7ae04df6e3d6b4b463a25f36829c7c91b92e40862f13bd54158a8916b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "58-phase-8---redirect-and-retire-legacy-docs",
+        "targetUnitDigest": "873a911f9a1795dd7aab6fc036baf8b6c4f5d1365f40b1f07c51c70ac25117af",
+        "level": 4,
+        "directPayloadDigest": "aef2fda7ae04df6e3d6b4b463a25f36829c7c91b92e40862f13bd54158a8916b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-38",
+      "unheaded-block-39"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "6-recommended-document-structure",
+    "sourceUnitDigest": "a20f2d48c7c24cb7686ce5f4369240852327ca8d48eec80ffcc7d2db4e9e59fa",
+    "sourceLevel": 1,
+    "title": "6. Recommended Document Structure",
+    "sourceDirectPayloadDigest": "0b602da034bbda024a6bd7a7a57424466a3d285c552049e4ae0ed18d20be189f",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "6-recommended-document-structure",
+        "targetUnitDigest": "da9e38e8a44023c71a1ba01e75749dee1c69bfa2a0a8353843f6007c827dec6c",
+        "level": 3,
+        "directPayloadDigest": "0b602da034bbda024a6bd7a7a57424466a3d285c552049e4ae0ed18d20be189f"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-40",
+      "unheaded-block-41",
+      "unheaded-block-42",
+      "unheaded-block-43",
+      "unheaded-block-44"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "7-open-decisions",
+    "sourceUnitDigest": "b9982e3a2ce1532775a57eca8fd35a42e3674d85e5c30bdc22778932d777d16c",
+    "sourceLevel": 1,
+    "title": "7. Open Decisions",
+    "sourceDirectPayloadDigest": "448b8acd52ff9a8d8201151b8e21d69187c26f2fde2c6f3919a8273f2bf40e60",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "7-open-decisions",
+        "targetUnitDigest": "f630b4cc6e77113871f1e05ab85ebb3933363ae201baefe3ea11bbdd7fc01c1a",
+        "level": 3,
+        "directPayloadDigest": "448b8acd52ff9a8d8201151b8e21d69187c26f2fde2c6f3919a8273f2bf40e60"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-45"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "8-non-negotiable-rules-for-the-rewrite",
+    "sourceUnitDigest": "5ffec9aa3c63e6d07951f0d2135c8aaa4c0adb02f8951c26c785a0a3e6d0e92b",
+    "sourceLevel": 1,
+    "title": "8. Non-Negotiable Rules For The Rewrite",
+    "sourceDirectPayloadDigest": "853d4cfc177da7487a96e0db1c759a18d6104fa079657e4ad15e1d1c6761ea75",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "8-non-negotiable-rules-for-the-rewrite",
+        "targetUnitDigest": "7e4e23608956013ba24a733a73b73a4a2ac2fe9ce3f9d8d221fe901192447586",
+        "level": 3,
+        "directPayloadDigest": "853d4cfc177da7487a96e0db1c759a18d6104fa079657e4ad15e1d1c6761ea75"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-46"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/rewrite-plan.md",
+    "sourceAnchor": "9-first-concrete-next-step",
+    "sourceUnitDigest": "416a4d0c0c76164ef24b066d8ce0edd6a324801c8e0d10786b8170c142355ecb",
+    "sourceLevel": 1,
+    "title": "9. First Concrete Next Step",
+    "sourceDirectPayloadDigest": "35c43974fa52b890a91250e6c2f2ecc48bf93bf3734fad899740437f45f05bde",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "anchor": "9-first-concrete-next-step",
+        "targetUnitDigest": "feb0a6c5804c704d6b398263b0a44c1c99478118ba618bd4a1f723a471095288",
+        "level": 3,
+        "directPayloadDigest": "35c43974fa52b890a91250e6c2f2ecc48bf93bf3734fad899740437f45f05bde"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-47",
+      "unheaded-block-48",
+      "unheaded-block-49"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "runtime-identity-and-activation",
+    "sourceUnitDigest": "b0443ae563d60b4c86e1a73c3187615831c3cd8c21cd015488f9e2695a68ac96",
+    "sourceLevel": 1,
+    "title": "Runtime Identity And Activation",
+    "sourceDirectPayloadDigest": "21e896a473b555bbdfa05d0bb9c442cc3aac543bfd21a6a2f74833a27378cf2e",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "runtime-identity-and-activation",
+        "targetUnitDigest": "35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371",
+        "level": 1,
+        "directPayloadDigest": "b9c0f64986bfc20a1c8a2c79c4922b1e4db19e2a687a2275876185a7402ad0fc"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "runtime-identity-and-activation-1",
+        "targetUnitDigest": "54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd",
+        "level": 3,
+        "directPayloadDigest": "e26ae439a869999641d248f04d157f140247284397fc6b19b583c6d5e9aa709c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "how-to-use-this-document",
+    "sourceUnitDigest": "43afffffa5c14ced4d88b4f77dd85918110522d11d204d3ccdb266b7d4cfdb1f",
+    "sourceLevel": 2,
+    "title": "How To Use This Document",
+    "sourceDirectPayloadDigest": "43fe07f0e22ffbe9aad1665ce1c29dacbdba2662f177433eb22e6ba795e5a1d5",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "how-to-use-this-document",
+        "targetUnitDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
+        "level": 4,
+        "directPayloadDigest": "009dbfe4c98ed34380fa6414fb37dc67f0a565334b3cf49353a13211c7d8f47b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5",
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "historical-decisions-promoted-or-tracked",
+    "sourceUnitDigest": "3b4563ef12a08c63362ee6a262109828d32f9515918343fe1ae56a55e54ece59",
+    "sourceLevel": 2,
+    "title": "Historical Decisions Promoted Or Tracked",
+    "sourceDirectPayloadDigest": "0266dc3bbac745ba6953a93d03d3ccb6a9cfb9c06d3dfc4f760b28f5b9224bcf",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "historical-decisions-promoted-or-tracked",
+        "targetUnitDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
+        "level": 4,
+        "directPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-7"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "1-core-position",
+    "sourceUnitDigest": "208048747e295cc9bf730f72f78c838bf349edee7ae900887cb351e2b6eeba65",
+    "sourceLevel": 2,
+    "title": "1. Core Position",
+    "sourceDirectPayloadDigest": "42540f6b6e17dae8573d6e3bfdd0a37176a0ff34a1f3f82b7f1c2eb04b318d1c",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "1-core-position",
+        "targetUnitDigest": "e7e70e2718a3133c91f86209b417253e38f3db16b1ca4e98e720ffc5a46e6e54",
+        "level": 2,
+        "directPayloadDigest": "d3fcb3b83acda584e228dee939f5bf08987d829f5d13e90afcf2207cc42a4455"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "1-core-position-1",
+        "targetUnitDigest": "d8443cfa2f90ab369871a7afb68ef2e5c9552854977a85ca831db6fa3661f2a5",
+        "level": 4,
+        "directPayloadDigest": "42540f6b6e17dae8573d6e3bfdd0a37176a0ff34a1f3f82b7f1c2eb04b318d1c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-8",
+      "unheaded-block-9",
+      "unheaded-block-10"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "2-runtime-lifecycle",
+    "sourceUnitDigest": "8996967b902aee535019572e8977eec933f206af22143c70a777877bf9f76011",
+    "sourceLevel": 2,
+    "title": "2. Runtime Lifecycle",
+    "sourceDirectPayloadDigest": "a7b058260f19a61a8a515f5f5595940c19e07a6bf3f0403d0c2fc6f4014c430f",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "2-runtime-lifecycle",
+        "targetUnitDigest": "ea8fc72b458939fea472d94d2c8d3c516dc13a412e087cf565da924b621460a9",
+        "level": 4,
+        "directPayloadDigest": "a7b058260f19a61a8a515f5f5595940c19e07a6bf3f0403d0c2fc6f4014c430f"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-11",
+      "unheaded-block-12",
+      "unheaded-block-13",
+      "unheaded-block-14"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "3-roots-and-on-disk-shape",
+    "sourceUnitDigest": "40874b077f4b93dbd41734fd38add2dfd5ab1d1e671400da86fa0134e7355b4c",
+    "sourceLevel": 2,
+    "title": "3. Roots And On-Disk Shape",
+    "sourceDirectPayloadDigest": "3033aed6d06d8b830c463bf446871b3209a62db4a25c830631f92f06eb74be5a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+        "anchor": "3-roots-and-on-disk-shape",
+        "targetUnitDigest": "f27a4d488bfa8429baf9251542681223386ff2a8f9ab636ee3fb65ba814e4e8e",
+        "level": 4,
+        "directPayloadDigest": "529cd4fadb4785e77b835e270c5438f9779ecf0d420bb7647ba88b818524d74b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-15",
+      "unheaded-block-16",
+      "unheaded-block-17",
+      "unheaded-block-18",
+      "unheaded-block-19",
+      "unheaded-block-20",
+      "unheaded-block-21",
+      "unheaded-block-22",
+      "unheaded-block-23",
+      "unheaded-block-24",
+      "unheaded-block-25",
+      "unheaded-block-26",
+      "unheaded-block-27",
+      "unheaded-block-28",
+      "unheaded-block-29",
+      "unheaded-block-30",
+      "unheaded-block-31",
+      "unheaded-block-32",
+      "unheaded-block-33",
+      "unheaded-block-34"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "4-record-types",
+    "sourceUnitDigest": "c30ccfd7fcd9ae71c2668b81f1718ecad1b070c88bfddac47843fdccc3a0f53d",
+    "sourceLevel": 2,
+    "title": "4. Record Types",
+    "sourceDirectPayloadDigest": "b783b86fd26a02c293d18b2e7a9ea6b2f0b101675246ed96709f6753d9fe0131",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "4-record-types",
+        "targetUnitDigest": "e802c4d389cea6a3c74d266fabab17ec424c135cc92dd2e63589b010caca2083",
+        "level": 4,
+        "directPayloadDigest": "b783b86fd26a02c293d18b2e7a9ea6b2f0b101675246ed96709f6753d9fe0131"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-35",
+      "unheaded-block-36"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "5-releasemanifest",
+    "sourceUnitDigest": "b801deec612f9c048de490e35353b38f99031f2bac692e2955b64c7b1411587b",
+    "sourceLevel": 2,
+    "title": "5. ReleaseManifest",
+    "sourceDirectPayloadDigest": "1e987d5b136479f6f16636112e57ec8b9d76b0ea043407de92210bbc8869a764",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "anchor": "5-releasemanifest",
+        "targetUnitDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee",
+        "level": 4,
+        "directPayloadDigest": "23dd0f374a857b3b3912f626a41495bee1c99a69fed52240d99a181c7d0bec4b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-37",
+      "unheaded-block-38",
+      "unheaded-block-39",
+      "unheaded-block-40",
+      "unheaded-block-41",
+      "unheaded-block-42"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "release-tree-canonicalization",
+    "sourceUnitDigest": "fe23874c284a1ce551815f8f69081e047472f13b62fa1ac1bd9301501c354007",
+    "sourceLevel": 3,
+    "title": "Release Tree Canonicalization",
+    "sourceDirectPayloadDigest": "6035e67ac35da5a2bc1c1bc8620ffd7c10455a7575af0a6b21b8b6911317ddca",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "anchor": "release-tree-canonicalization",
+        "targetUnitDigest": "e5a1f647f9052ce79f148d74ecc48822debe0894583bee4117ebebcf5a525162",
+        "level": 5,
+        "directPayloadDigest": "6035e67ac35da5a2bc1c1bc8620ffd7c10455a7575af0a6b21b8b6911317ddca"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "anchor": "release-tree-canonicalization-1",
+        "targetUnitDigest": "fe23874c284a1ce551815f8f69081e047472f13b62fa1ac1bd9301501c354007",
+        "level": 3,
+        "directPayloadDigest": "6035e67ac35da5a2bc1c1bc8620ffd7c10455a7575af0a6b21b8b6911317ddca"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-43",
+      "unheaded-block-44",
+      "unheaded-block-45",
+      "unheaded-block-46",
+      "unheaded-block-47",
+      "unheaded-block-48",
+      "unheaded-block-49",
+      "unheaded-block-50"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "6-workspaceactivationbinding",
+    "sourceUnitDigest": "a2d61c4348b7c2aeb2c0f29b6710e7fd0b3c800fa763de771a64ad66f9d71896",
+    "sourceLevel": 2,
+    "title": "6. WorkspaceActivationBinding",
+    "sourceDirectPayloadDigest": "8bf5e02b592d35f77bb95131e3337bd10f5b4d15fb560ed563b7af5cccc78c3d",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "6-workspaceactivationbinding",
+        "targetUnitDigest": "523c6fe2380a7e02bcdd814d7bb4d9129c2afccdc1cbb425204cfb1db2dfd88a",
+        "level": 4,
+        "directPayloadDigest": "fa7a50e7cf6a1625ad24d26b1707daada6ac7bdac12e7df63c4fc92810ea4b47"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-51",
+      "unheaded-block-52",
+      "unheaded-block-53",
+      "unheaded-block-54",
+      "unheaded-block-55",
+      "unheaded-block-56",
+      "unheaded-block-57",
+      "unheaded-block-58",
+      "unheaded-block-59",
+      "unheaded-block-60",
+      "unheaded-block-61",
+      "unheaded-block-62",
+      "unheaded-block-63",
+      "unheaded-block-64",
+      "unheaded-block-65",
+      "unheaded-block-66"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "7-invocation-lease",
+    "sourceUnitDigest": "99f45b97f4f4b91e26788bc9d3b584e40ad6c9945533ae13a2869cd8adc66852",
+    "sourceLevel": 2,
+    "title": "7. Invocation Lease",
+    "sourceDirectPayloadDigest": "d37609a96288e2bc30083a478c8bdd399072466eea01c1b1ac891f5eb19a566c",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "7-invocation-lease",
+        "targetUnitDigest": "9cf64d9a62542a96c82cedc1b87194e9ab1f8b1e6b6b468c23290d7588dc94e8",
+        "level": 4,
+        "directPayloadDigest": "d37609a96288e2bc30083a478c8bdd399072466eea01c1b1ac891f5eb19a566c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-67",
+      "unheaded-block-68",
+      "unheaded-block-69",
+      "unheaded-block-70",
+      "unheaded-block-71",
+      "unheaded-block-72",
+      "unheaded-block-73",
+      "unheaded-block-74",
+      "unheaded-block-75",
+      "unheaded-block-76",
+      "unheaded-block-77",
+      "unheaded-block-78"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "8-pin",
+    "sourceUnitDigest": "144862b42e821c608f6ee8e1371a770aaf9eaba4887c172aea10923b4533201c",
+    "sourceLevel": 2,
+    "title": "8. Pin",
+    "sourceDirectPayloadDigest": "e9b4cc4fbb45b8ee3ce3fbda8645c231041d189132769c1e53023922c28d899b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "anchor": "8-pin",
+        "targetUnitDigest": "0161405f328c7b384ad2516777bc2229203e0e8e8475853c7635243904641e79",
+        "level": 4,
+        "directPayloadDigest": "e9b4cc4fbb45b8ee3ce3fbda8645c231041d189132769c1e53023922c28d899b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-79",
+      "unheaded-block-80",
+      "unheaded-block-81",
+      "unheaded-block-82",
+      "unheaded-block-83",
+      "unheaded-block-84",
+      "unheaded-block-85",
+      "unheaded-block-86"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "9-projectionledger",
+    "sourceUnitDigest": "514e33c19e1461dae232ceba7e30e01212a76dd1955e433649107329e824cd31",
+    "sourceLevel": 2,
+    "title": "9. ProjectionLedger",
+    "sourceDirectPayloadDigest": "87fe09529829aecb6399b4bdf3cb06a76890993feb518c9b8cec95f99675cfac",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+        "anchor": "9-projectionledger",
+        "targetUnitDigest": "ba4c239d03cb07df326478a7175dc3f6161398499f8666f93c706b0ad7d894cc",
+        "level": 4,
+        "directPayloadDigest": "87fe09529829aecb6399b4bdf3cb06a76890993feb518c9b8cec95f99675cfac"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-87",
+      "unheaded-block-88",
+      "unheaded-block-89",
+      "unheaded-block-90",
+      "unheaded-block-91",
+      "unheaded-block-92",
+      "unheaded-block-93",
+      "unheaded-block-94",
+      "unheaded-block-95",
+      "unheaded-block-96",
+      "unheaded-block-97",
+      "unheaded-block-98",
+      "unheaded-block-99",
+      "unheaded-block-100",
+      "unheaded-block-101"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "10-migrationjournal",
+    "sourceUnitDigest": "0ff84bbd74e6a3abe8de2c145a229b7d721d29679e206e46f48a1ee7b2fba9bb",
+    "sourceLevel": 2,
+    "title": "10. MigrationJournal",
+    "sourceDirectPayloadDigest": "1158a9b849960211c11340d40cf65e19fbb504ee9889b521fd8997a4422782ca",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "10-migrationjournal",
+        "targetUnitDigest": "911c580691fc66e1f9485c40795ff51655e76d27689a05f11f7b50899a18f46a",
+        "level": 4,
+        "directPayloadDigest": "1158a9b849960211c11340d40cf65e19fbb504ee9889b521fd8997a4422782ca"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-102",
+      "unheaded-block-103",
+      "unheaded-block-104",
+      "unheaded-block-105",
+      "unheaded-block-106",
+      "unheaded-block-107",
+      "unheaded-block-108",
+      "unheaded-block-109",
+      "unheaded-block-110",
+      "unheaded-block-111",
+      "unheaded-block-112",
+      "unheaded-block-113",
+      "unheaded-block-114",
+      "unheaded-block-115"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "existing-project-adoption",
+    "sourceUnitDigest": "87c50c8516e8e94bdf62183a8c57ddbf0ba1e8c3672f66630fe47106de4e0fd2",
+    "sourceLevel": 3,
+    "title": "Existing Project Adoption",
+    "sourceDirectPayloadDigest": "940394edacf466bbea8af937d7550983a085d13e189006b3bdaa24a406878e99",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "existing-project-adoption",
+        "targetUnitDigest": "fb1fd721f45cd646c9b1e55e905c9b96ceb0250986e0e1c9bcee142e38c5b1e9",
+        "level": 5,
+        "directPayloadDigest": "940394edacf466bbea8af937d7550983a085d13e189006b3bdaa24a406878e99"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-116",
+      "unheaded-block-117",
+      "unheaded-block-118",
+      "unheaded-block-119",
+      "unheaded-block-120",
+      "unheaded-block-121",
+      "unheaded-block-122",
+      "unheaded-block-123"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "dev-source-activation",
+    "sourceUnitDigest": "54e58acdabc49d0aefb2cf037f6a476f121008c99a25bd0eaad2b33b8284adab",
+    "sourceLevel": 3,
+    "title": "Dev / Source Activation",
+    "sourceDirectPayloadDigest": "a39caa1db5bb6448a17e827d51f6c4ca33b439b8f197c737f2f930db5f8f51f2",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "dev-source-activation",
+        "targetUnitDigest": "9d34488da7e7519001ae2092e7014e5f6efd7f4c427c36c592fa098e2012430e",
+        "level": 2,
+        "directPayloadDigest": "5e553387b0f9b4aafb2823350ea180460dbc3bfa3f39f10469eee1d29ea8dbf6"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-124",
+      "unheaded-block-125",
+      "unheaded-block-126",
+      "unheaded-block-127",
+      "unheaded-block-128"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "11-drift-repair-rollback-and-quarantine",
+    "sourceUnitDigest": "6a37fc07266052c74e57040a68f547acd666f004c57467289b7d085a8c457aaf",
+    "sourceLevel": 2,
+    "title": "11. Drift, Repair, Rollback, And Quarantine",
+    "sourceDirectPayloadDigest": "7c0d36f5fc26282eae099b08dfe378f22dbd59ec6f1475dba46e56a9eeda6a89",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "11-drift-repair-rollback-and-quarantine",
+        "targetUnitDigest": "825d187be82f486aaca968ce8ad77b74803e4d5067824980233f9fb4f8f18d0d",
+        "level": 4,
+        "directPayloadDigest": "7c0d36f5fc26282eae099b08dfe378f22dbd59ec6f1475dba46e56a9eeda6a89"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-129",
+      "unheaded-block-130",
+      "unheaded-block-131",
+      "unheaded-block-132",
+      "unheaded-block-133",
+      "unheaded-block-134",
+      "unheaded-block-135",
+      "unheaded-block-136"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "12-command-authority-matrix",
+    "sourceUnitDigest": "6a943609628d25d000536330e47f40ed919eb319b1db69b8d960f6262e0df341",
+    "sourceLevel": 2,
+    "title": "12. Command Authority Matrix",
+    "sourceDirectPayloadDigest": "23c19d900d8f500d5e8c23470a8514902d16b5eca60069178062e7b4af3435ac",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "anchor": "12-command-authority-matrix",
+        "targetUnitDigest": "afd739eccbb21c60ad472bd711a301800f874448ba1b8e930f178af2cfaf0760",
+        "level": 4,
+        "directPayloadDigest": "23c19d900d8f500d5e8c23470a8514902d16b5eca60069178062e7b4af3435ac"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-137"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "13-fgctl-form-and-v1-acquisition-sources",
+    "sourceUnitDigest": "d9941af0fab55e3c2a8ad8ba99c011a38fd305570a9f540ac29e7975bb5a72e8",
+    "sourceLevel": 2,
+    "title": "13. `fgctl` Form And V1 Acquisition Sources",
+    "sourceDirectPayloadDigest": "9d9635236ee20bac206464f7e656225ebda2a45b930d9dfaf09561f167edfcfc",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "anchor": "13-fgctl-form-and-v1-acquisition-sources",
+        "targetUnitDigest": "9cce52e54486b39bf811aee6ff427a43e05b9001f24c815e5e75184a5d18df5f",
+        "level": 4,
+        "directPayloadDigest": "9d9635236ee20bac206464f7e656225ebda2a45b930d9dfaf09561f167edfcfc"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-138",
+      "unheaded-block-139",
+      "unheaded-block-140",
+      "unheaded-block-141",
+      "unheaded-block-142",
+      "unheaded-block-143",
+      "unheaded-block-144"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "14-walking-skeleton",
+    "sourceUnitDigest": "eaa3c2584b1cc9f7b4546f80066e373bf87ab789ef6bbe7349a91d43065c398c",
+    "sourceLevel": 2,
+    "title": "14. Walking Skeleton",
+    "sourceDirectPayloadDigest": "2d75a881a2d1c612a3cecaf372a24f421619ca10fb7572e3d3a25491de0c9fe6",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "14-walking-skeleton",
+        "targetUnitDigest": "47e5788489aaa121a477f7acf7281b6124aeb528c86bd34358ae2cb9ab1d8024",
+        "level": 4,
+        "directPayloadDigest": "2d75a881a2d1c612a3cecaf372a24f421619ca10fb7572e3d3a25491de0c9fe6"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-145",
+      "unheaded-block-146",
+      "unheaded-block-147"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "sourceAnchor": "15-open-decisions",
+    "sourceUnitDigest": "f6121d1e3ec24049b74048ef2b7faf156624646494368ce4212b7a85d207700f",
+    "sourceLevel": 2,
+    "title": "15. Open Decisions",
+    "sourceDirectPayloadDigest": "1aca346ddbc70758c8ffe6825e3a85ab4db051da5c94d09deb7d0bc7eba8faef",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "15-open-decisions",
+        "targetUnitDigest": "3ab4151c537f00a4e994ee3e8ddbd727c4160c965eb50c2d03db237286df4976",
+        "level": 4,
+        "directPayloadDigest": "1aca346ddbc70758c8ffe6825e3a85ab4db051da5c94d09deb7d0bc7eba8faef"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-148",
+      "unheaded-block-149"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "packaging-distribution-scope-map",
+    "sourceUnitDigest": "a4662e51b8e00012069dc6288fafe9a3543cab8567d41656dcb8fb52df99f784",
+    "sourceLevel": 1,
+    "title": "Packaging Distribution Scope Map",
+    "sourceDirectPayloadDigest": "1cd8ab9b1ff579796660629acb872da8785319516d197e41147127ec141e975a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "packaging-distribution-scope-map",
+        "targetUnitDigest": "5ed2f9d1174332ae7c94a4760f7b93b006433d24fe88195bfc8b8642cc393d7d",
+        "level": 3,
+        "directPayloadDigest": "7e9924c62b1479526fbe460e02d8bf8058ad31dcc0713141a86e45cc656cbc19"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4",
+      "unheaded-block-5"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "1-concern-map",
+    "sourceUnitDigest": "8e3e24ff06efd7934dd68d0c08ef4137ff109d6808a95aa1cef42cfd16cb4035",
+    "sourceLevel": 2,
+    "title": "1. Concern Map",
+    "sourceDirectPayloadDigest": "f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "1-concern-map",
+        "targetUnitDigest": "74a93ee0e5cae1031098470874012122913b61d666c545ccb1c79b62eb0205fb",
+        "level": 4,
+        "directPayloadDigest": "f14ef8dfb699884c5004a9c10c4e6a7b2133ad6aa7310ecb57c51bc5a6db2d81"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "2-historical-document-split",
+    "sourceUnitDigest": "44d80ce41b99b1994d0c1f216606224be37eab7cf3f0f34a3a8b886704a9e350",
+    "sourceLevel": 2,
+    "title": "2. Historical Document Split",
+    "sourceDirectPayloadDigest": "1668bdfc116cd2c962fc5c83ea2aca8dce31ec88262f47c0e338f7cd17d7285a",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "2-historical-document-split",
+        "targetUnitDigest": "697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7",
+        "level": 4,
+        "directPayloadDigest": "7bf38deb1cf81ebf37ea915139cc2be715b5bfe530fdca67b18798bade482734"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-7",
+      "unheaded-block-8",
+      "unheaded-block-9"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "3-boundary-rule",
+    "sourceUnitDigest": "cc53d9a75dabde52b73f7eeb4dc777801d325a5de4a0a5ca4528d7b34901229a",
+    "sourceLevel": 2,
+    "title": "3. Boundary Rule",
+    "sourceDirectPayloadDigest": "df38b873362c61e6af7013b420dc24145bbeac0576c663acfaa7688de868f1f1",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/README.md",
+        "anchor": "3-boundary-rule",
+        "targetUnitDigest": "d03d88bb8cf5b0f6f33ec75596e194e5b1e06243ab88d4ae77413714509d2e7c",
+        "level": 4,
+        "directPayloadDigest": "d87412cd51ee8040c0cb352abc382b7d9ab9c632329a22d9c2535311aa885113"
+      },
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "3-boundary-rule",
+        "targetUnitDigest": "95f27f77881c7880d7a6cdd068afdf0f4ff5e1f3b77fb09685326e0b3bbf384e",
+        "level": 4,
+        "directPayloadDigest": "df38b873362c61e6af7013b420dc24145bbeac0576c663acfaa7688de868f1f1"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-10",
+      "unheaded-block-11",
+      "unheaded-block-12",
+      "unheaded-block-13",
+      "unheaded-block-14"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "4-historical-architecture-position",
+    "sourceUnitDigest": "b5f91deeffe4b99347a4ef8ac3090d826a6db38d0d6e2aaab3169d46bb3bea0f",
+    "sourceLevel": 2,
+    "title": "4. Historical Architecture Position",
+    "sourceDirectPayloadDigest": "1d338422da6f43c42b935dbafeb0f08d38e2679d22e3c1d027ed719182a3ed68",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "4-historical-architecture-position",
+        "targetUnitDigest": "c5cff96236021d7f8a60a12c4c10acfd1d3940013a858d08887e43952422e10e",
+        "level": 4,
+        "directPayloadDigest": "1d338422da6f43c42b935dbafeb0f08d38e2679d22e3c1d027ed719182a3ed68"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-15",
+      "unheaded-block-16",
+      "unheaded-block-17",
+      "unheaded-block-18",
+      "unheaded-block-19"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/scope-map.md",
+    "sourceAnchor": "5-activation-boundary",
+    "sourceUnitDigest": "6b34727fcaa6338d9558002d5fedc78882b20cd8f42509034166431ff11c124f",
+    "sourceLevel": 2,
+    "title": "5. Activation Boundary",
+    "sourceDirectPayloadDigest": "198a4d34f31daf43e58060b99fb31e0626dc61557b5e8c56439976c930f2708c",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "5-activation-boundary",
+        "targetUnitDigest": "79e788d6f659642e119268f22b143b493915deedb8c1ab850af730165af51180",
+        "level": 4,
+        "directPayloadDigest": "198a4d34f31daf43e58060b99fb31e0626dc61557b5e8c56439976c930f2708c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-20",
+      "unheaded-block-21",
+      "unheaded-block-22"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+    "sourceAnchor": "workspace-runtime-model",
+    "sourceUnitDigest": "b40b26ddf0efce28d42470472e5c0ff0ec8976b3a7c2e8793bfd9bfef47c06b0",
+    "sourceLevel": 1,
+    "title": "Workspace Runtime Model",
+    "sourceDirectPayloadDigest": "0054459610cb5b1fb0798f7c067eaf97f953d048eb04d96f2c3a4339c6a3a055",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "workspace-runtime-model",
+        "targetUnitDigest": "bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6",
+        "level": 3,
+        "directPayloadDigest": "2dd1888de1190ee6af8e3f3f7a16ea79cba219f26c27bb122dba86810fcfd932"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-1",
+      "unheaded-block-2",
+      "unheaded-block-3",
+      "unheaded-block-4",
+      "unheaded-block-5",
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "spec-distribution",
+    "sourceUnitDigest": "1c988598ecab9fafad8791366e0117bbe4c10e7428e0e63631ce34eafb617553",
+    "sourceLevel": 1,
+    "title": "Spec: Distribution",
+    "sourceDirectPayloadDigest": "38e7467e63d434cad969f415699ed7a67abeaa8becb100975d091f9ad55a7074",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "spec-distribution",
+        "targetUnitDigest": "86f1d1773ee8d8e8784f7912f29ba493e083a2764d888ffc06e84715864e91f9",
+        "level": 3,
+        "directPayloadDigest": "38e7467e63d434cad969f415699ed7a67abeaa8becb100975d091f9ad55a7074"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-3"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "entry-points-triggers",
+    "sourceUnitDigest": "32bf8a8058d616a0195321f207b338d93da160f7823512f29f99558c13516765",
+    "sourceLevel": 2,
+    "title": "Entry Points & Triggers",
+    "sourceDirectPayloadDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "entry-points-triggers",
+        "targetUnitDigest": "e633ae89d8b3f6aadd36c0fe352566ec1b9835923dafdc33731eda22da2867fa",
+        "level": 4,
+        "directPayloadDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-4"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "5778eb04067fe3263755aa2183a8fa30e77ee1a86b25330171ae084cb8f53828",
+    "sourceLevel": 2,
+    "title": "Data Dictionary",
+    "sourceDirectPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "data-dictionary",
+        "targetUnitDigest": "8614119392e90a5380a4a517637f837d0b55045239e9dbcee00c3d3c6579f1b2",
+        "level": 4,
+        "directPayloadDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-5"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "behaviors-operations",
+    "sourceUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+    "sourceLevel": 2,
+    "title": "Behaviors & Operations",
+    "sourceDirectPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "behaviors-operations",
+        "targetUnitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+        "level": 4,
+        "directPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "directSourceBlocks": [],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "install",
+    "sourceUnitDigest": "3bb1d36bf1c9b29ac125118cf740d2eb1da152171f94e2cabcc92a9cfdfc0df6",
+    "sourceLevel": 3,
+    "title": "Install",
+    "sourceDirectPayloadDigest": "ddee3916eeb71a2e1df124e5b3b2737128f48fa21494c2720fd4284db23a9941",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "install",
+        "targetUnitDigest": "b7d85aac05e3f18b60cac3e1be0688b3d4aa516ab673a004c43f09d42acf2f77",
+        "level": 5,
+        "directPayloadDigest": "ddee3916eeb71a2e1df124e5b3b2737128f48fa21494c2720fd4284db23a9941"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-6"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "dev-checkout-shell-helpers",
+    "sourceUnitDigest": "97fc95ea5f018f08406d0c65ac1aeda3d0cf24da6ccf47b447b7d555cf7cafdf",
+    "sourceLevel": 3,
+    "title": "Dev checkout shell helpers",
+    "sourceDirectPayloadDigest": "29db1d0b391ac93fe635489740b466a4285c3c06d6afcc67e40e7a76d841c91c",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "dev-checkout-shell-helpers",
+        "targetUnitDigest": "098dc1daf6dc0682b944b0dcd6b41799b44c5a46ff036b93e1bb19e374a0f565",
+        "level": 5,
+        "directPayloadDigest": "29db1d0b391ac93fe635489740b466a4285c3c06d6afcc67e40e7a76d841c91c"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-7"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "contributor-hooks-setup",
+    "sourceUnitDigest": "bc2cf68b62efb7443a726062ce1b1aa5e98f7eb197f4a5c97eb296a87aa17982",
+    "sourceLevel": 3,
+    "title": "Contributor hooks setup",
+    "sourceDirectPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "anchor": "contributor-hooks-setup",
+        "targetUnitDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+        "level": 5,
+        "directPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-8"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "setup",
+    "sourceUnitDigest": "3100ba971aa49e17d071b3ba3eefb5f0d2e6749b9df553c0baba5ed0dabeee32",
+    "sourceLevel": 3,
+    "title": "Setup",
+    "sourceDirectPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "anchor": "setup",
+        "targetUnitDigest": "67db6969421f5b23163946c68822bc23b2272a1e04afae0da23b7f7bf5d09d9e",
+        "level": 5,
+        "directPayloadDigest": "4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-9"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "doctor",
+    "sourceUnitDigest": "8d25b828a29b29e73a59733bd60b85a767da5ee25e5fb2aa35958b8b6745c9c7",
+    "sourceLevel": 3,
+    "title": "Doctor",
+    "sourceDirectPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "anchor": "doctor",
+        "targetUnitDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+        "level": 5,
+        "directPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-10"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "actors-access",
+    "sourceUnitDigest": "19301e3c105b042002ad2b76536887c2fb0dd105217608e06c8ba4781c0bd82a",
+    "sourceLevel": 2,
+    "title": "Actors & Access",
+    "sourceDirectPayloadDigest": "8a7f8b1ec294e660bb2f226cadfbb2ce6fd85e6d65417ba4122b18bb2fc81825",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "actors-access",
+        "targetUnitDigest": "a6d34c55620f48713afb89fa7b97344e4b2041cf0cf93165cf6c3bbe657bc3ea",
+        "level": 4,
+        "directPayloadDigest": "8a7f8b1ec294e660bb2f226cadfbb2ce6fd85e6d65417ba4122b18bb2fc81825"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-11"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "business-rules",
+    "sourceUnitDigest": "f15d85de438adbc466873ed6d47a3dd9801c6f90f4a83b9eecaa6bf2c3661db9",
+    "sourceLevel": 2,
+    "title": "Business Rules",
+    "sourceDirectPayloadDigest": "233c7995e671dd467bcea75efcb0d0ca360441e23e274722b97c1f54354b78ce",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "business-rules",
+        "targetUnitDigest": "66ec4b8568f3c061110d78146cf13062280b7eb8655d5d1bcb669cb47b07460d",
+        "level": 4,
+        "directPayloadDigest": "647e6a167d1504a959c35b9cba7f7e1d5ca5a9e5a581da5bb4c074b1e8902ec2"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-12",
+      "unheaded-block-13",
+      "unheaded-block-14",
+      "unheaded-block-15",
+      "unheaded-block-16"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "lịch-sử-quyết-định",
+    "sourceUnitDigest": "47bfb367bca0ebe24218306cee85aa15d771c58bf035ee5cf528ba75c50de8f9",
+    "sourceLevel": 2,
+    "title": "Lịch sử quyết định",
+    "sourceDirectPayloadDigest": "3c7ba0e6537412e9c5cce6ec07b613bceec2be1fc6ab3f2eb42721250381ab3b",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "lịch-sử-quyết-định",
+        "targetUnitDigest": "27d7a05d471a4ffc3af8d8404aed76c501ce7697f1cff50a85b004a9ce09bc4f",
+        "level": 4,
+        "directPayloadDigest": "e46f089b62f42f44e10657d90ec73a4b1eb8983fe22eb06a6196d257e11e82b0"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-17",
+      "unheaded-block-18",
+      "unheaded-block-19",
+      "unheaded-block-20",
+      "unheaded-block-21",
+      "unheaded-block-22"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "edge-cases-settled",
+    "sourceUnitDigest": "1222a356730459a58d03ca68ada07f9dbd0d21cc6d6dcfba18067b6fddf7902d",
+    "sourceLevel": 2,
+    "title": "Edge Cases Settled",
+    "sourceDirectPayloadDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "edge-cases-settled",
+        "targetUnitDigest": "70b3e24c7665deb086b89512653742923101d6225f10fe0b71857316abd91708",
+        "level": 4,
+        "directPayloadDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-23"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "open-gaps",
+    "sourceUnitDigest": "2d111809d1df3c0a73705ed19792a4096aa30c155891982e6af1bf70d935ff35",
+    "sourceLevel": 2,
+    "title": "Open Gaps",
+    "sourceDirectPayloadDigest": "dc9b318832164ced2b10b5b6f6e837772607bb55e77f39a1e92f3e350cf5faf5",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "open-gaps",
+        "targetUnitDigest": "3c9b4fc33a1e34edca18ff8772fa5723ac85887b6ed36b987245a612c5f6e06e",
+        "level": 4,
+        "directPayloadDigest": "dc9b318832164ced2b10b5b6f6e837772607bb55e77f39a1e92f3e350cf5faf5"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-24",
+      "unheaded-block-25"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "visuals",
+    "sourceUnitDigest": "03682969962ed31c046c8a9de64dc0e02755ac7a97c42f286059251298f3e856",
+    "sourceLevel": 2,
+    "title": "Visuals",
+    "sourceDirectPayloadDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "visuals",
+        "targetUnitDigest": "89ef28e9d464cbb1c6c1edb1b7fd5eaf494a10dc6b24f8af7d5be75ff6bd916d",
+        "level": 4,
+        "directPayloadDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-26"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  },
+  {
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "pointers-implementation",
+    "sourceUnitDigest": "f45aeba53fa3144eaec9bf04c50a58c55356471c3dc0e3e0af31be4a6e027db9",
+    "sourceLevel": 2,
+    "title": "Pointers (implementation)",
+    "sourceDirectPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+    "targets": [
+      {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "pointers-implementation",
+        "targetUnitDigest": "851884c939509226f78c3caadf8509ec1afffbe99c5067cf97630ae6887b01ab",
+        "level": 4,
+        "directPayloadDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9"
+      }
+    ],
+    "directSourceBlocks": [
+      "unheaded-block-27"
+    ],
+    "method": "Exact full title locates corresponding headings. Direct sections are conserved by their complete ordered source block membership in source-parity.json, not by a false single-target payload-equality claim; blocks may split into multiple live contracts and retained-source evidence. Depth/destination changes remain explicit."
+  }
+]

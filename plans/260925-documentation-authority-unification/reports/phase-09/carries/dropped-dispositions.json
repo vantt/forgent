@@ -1,0 +1,107 @@
+{
+  "sourcePin": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "entries": [
+    {
+      "id": "dropped-001",
+      "decision": "restored",
+      "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": "dev-source-activation"
+    },
+    {
+      "id": "dropped-002",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-contract-versioning"
+    },
+    {
+      "id": "dropped-003",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te"
+    },
+    {
+      "id": "dropped-004",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-physical-placement-layout-tree"
+    },
+    {
+      "id": "dropped-005",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-class-definitions"
+    },
+    {
+      "id": "dropped-006",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost"
+    },
+    {
+      "id": "dropped-007",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-semantic-contract-stays-transport-neutral"
+    },
+    {
+      "id": "dropped-008",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "anchor": "restored-registry-linker-procedure-and-its-input-output-formula"
+    },
+    {
+      "id": "dropped-009",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-both-adapters-delegate-a-complete-use-case"
+    },
+    {
+      "id": "dropped-010",
+      "decision": "superseded by decision",
+      "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea"
+    },
+    {
+      "id": "dropped-011",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-rust-host-first-cost"
+    },
+    {
+      "id": "dropped-012",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-scope"
+    },
+    {
+      "id": "dropped-013",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-rejected-options-rationale"
+    },
+    {
+      "id": "dropped-014",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-per-component-repeat-procedure"
+    },
+    {
+      "id": "dropped-015",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-rollback-bullets"
+    },
+    {
+      "id": "dropped-016",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "anchor": "restored-p1-compatibility-harness"
+    },
+    {
+      "id": "dropped-017",
+      "decision": "restored",
+      "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "anchor": "restored-test-and-review-gates-table"
+    }
+  ]
+}

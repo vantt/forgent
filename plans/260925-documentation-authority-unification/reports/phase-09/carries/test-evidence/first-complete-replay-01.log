@@ -1,0 +1,13 @@
+✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (2.187942ms)
+✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (0.899759ms)
+✔ the RUL11 line matches the locked law text word-for-word (0.784333ms)
+✔ the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử quyết định" section (0.706681ms)
+✔ AGENTS.md carries the decision-question template law and points at its shared fragment (1.30623ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86.190418

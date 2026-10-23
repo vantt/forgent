@@ -1,0 +1,10 @@
+✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL104 anchor phrase on one unwrapped line (3.130347ms)
+✔ the RUL104 line in the platform-foundations Business Rules matches the locked law text word-for-word (1.35198ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 92.118111

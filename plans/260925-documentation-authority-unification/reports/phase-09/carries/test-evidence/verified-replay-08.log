@@ -1,0 +1,11 @@
+✔ knowledge-verbs - topic register, rename, split, merge, retire (4005.060497ms)
+✔ knowledge-verbs - doc verbs resolve by (topicId, role) after topic split, not by a stale docId string (4628.205705ms)
+✔ knowledge-verbs - doc lifecycle and promote preconditions (11381.8807ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20363.987941

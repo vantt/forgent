@@ -192,9 +192,8 @@ workspace binding, never a half-prepared runtime.
 rolling back, or quarantining release content. It must also hold the workspace
 activation lock (kernel lock `.fgos/locks/activation.lock`) before writing that
 workspace's `activation.json`. Both are kernel locks without TTL or stale
-reclaim: a killed holder frees the lock at once. On Windows, `fgctl init`,
-`upgrade` and `repair` refuse with `lock-driver-unavailable` until the Windows
-lock driver exists. Projection writes are not part of the activation publish;
+reclaim: a killed holder frees the lock at once. On Windows the same
+locks work through the Windows lock driver (`LockFileEx`). Projection writes are not part of the activation publish;
 they belong to local `fgos init` / `fgos doctor --fix` under projection locks
 defined by workspace topology.
 
@@ -479,3 +478,96 @@ fgctl init on existing .fgos/
 
 Missing schema record means "legacy schema 1" for V1, not "unknown, refuse".
 This keeps existing projects adoptable without automatic migration.
+
+## Init Pipeline And Root Binding
+
+`init.rs` uses the repository/workspace roots of [Repository runtime layout](repository-runtime-layout.md), the transaction and static-preflight rules of this activation contract, and the following common pipeline. `fgctl` never executes candidate code before ready publication; the restricted candidate-execution text in retained historical detail is superseded by static preflight.
+
+
+
+```txt
+select/acquire release
+  -> stage
+  -> verify
+  -> run candidate preflight without host-visible projection writes
+  -> ensure workspace installation capsule and stable shims
+  -> publish workspace activation binding as ready
+  -> invoke active local fgos init
+  -> invoke active local fgos doctor --fix
+  -> invoke active local fgos doctor
+```
+
+They differ by selection input, not by having separate repair semantics. The
+transaction reaches `complete` only after the active local init/fix/check tail
+finishes. If the post-publish tail fails, the new binding remains authoritative
+but the transaction is `ready-degraded` and local doctor reports the needed
+repair. Candidate preflight failure before publish leaves the previous
+workspace activation binding authoritative and gives the candidate no writer
+authority.
+
+Local `fgos doctor --fix` may not change active runtime identity or patch
+immutable release files. Runtime repair stays `fgctl` authority.
+
+Rollback unit:
+
+```txt
+ActivationRecord.previousArtifactDigest
+  + preserved release directory
+  + state-schema compatibility check
+```
+
+If rollback cannot safely write current state, it may still allow read-only
+diagnostics if the old runtime declares read compatibility.
+
+Quarantine rule:
+
+```txt
+If an immutable release payload fails identity verification, move or mark it as
+quarantined and refuse activation/use until `fgctl repair` reacquires a trusted
+artifact.
+```
+
+### Walking Skeleton Evidence
+
+This is the original proof-slice design, not a second authority: its candidate-preflight line means current static `fgctl` preflight (not candidate execution), its install-lock spelling is superseded by `<stateRoot>/locks/install.lock`, and its old Node-first payload sketch is superseded by the native-first release boundaries. Those checked amendments above govern.
+
+
+The first proof slice should be deliberately small:
+
+```txt
+fgctl reads tracked .fgos/distribution.json or explicit source
+fgctl resolves TopologyContext:
+  repositoryId, workspaceId, workStateId,
+  machineReleaseStore, workHistoryRoot, runtimeCoordinationRoot,
+  workspace installation root
+fgctl acquires the install lock (<store>/locks/install.lock)
+fgctl obtains a release payload
+fgctl stages release under machineReleaseStore/releases/<artifactDigest>/
+fgctl verifies ReleaseManifest
+fgctl verifies runtime dependencies such as Node when required
+fgctl runs candidate preflight without host-visible projection writes
+fgctl ensures stable local shim exists at .fgos/installation/bin/fgos
+fgctl publishes workspace .fgos/installation/activation.json with status ready
+fgctl invokes active local fgos init / doctor --fix / doctor
+.fgos/installation/bin/fgos version --runtime-json resolves activation.json and reports:
+  project root
+  workspaceId
+  workHistoryRoot
+  workStateId
+  machineReleaseStore
+  active artifact digest
+  release version
+  manifest schema
+  state schema read/write range
+  legacy Node payload identity
+  host implementation kind: node | rust | dev-source
+```
+
+This proof does not need shared gateway/web. It only needs to prove that the
+Rust `fgctl`, stable local shim, and local `fgos` payload can agree on runtime
+identity. The first release tree may use the existing Node `fgos` host; Rust
+`fgos` can replace it later without changing packaging shape.
+
+### Git Common Directory Discovery
+
+Workspace discovery resolves the main checkout with `git rev-parse --path-format=absolute --git-common-dir`, never `--show-toplevel` (which returns the linked worktree instead of the main checkout). The workspace installation capsule remains workspace-local; resolving the main root does not create one repository-wide activation pointer. The implementation is `packages/distribution/rust/src/workspace.rs`; shell-helper proof is `test/scripts/fgos-shell-integration.test.mjs`.

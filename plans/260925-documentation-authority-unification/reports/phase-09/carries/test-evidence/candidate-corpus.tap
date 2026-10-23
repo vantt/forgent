@@ -1,0 +1,15 @@
+✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files (4.355073ms)
+✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists (0.544576ms)
+✔ docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ lại là thư mục") (0.326457ms)
+✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md "Lịch sử quyết định" section (8.215293ms)
+✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped) (4.151206ms)
+✔ each target spec file carries the "Lịch sử quyết định retired" section heading exactly once (4.380425ms)
+✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order (0.671923ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 137.46359

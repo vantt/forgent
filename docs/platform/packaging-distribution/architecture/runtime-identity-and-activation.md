@@ -367,11 +367,42 @@ proof lands, and any override is recorded there first.
    and rollback references.
 7. Exact quarantine location and user recovery command.
 
-## Dev Source Activation Restoration Stub
 
-Added in candidate — not carried; restoration tracked by dropped-001 and Plan C.
+## Dev / Source Activation
 
-Restoration owner: Plan C (`plans/261006-1445-fgctl-dev-activation/`, draft, unscheduled). This is an explicit deferral of the seven source units, not an implementation or retirement verdict. The six units under Dev / Source Activation and the dev-source clause in the compound settled-facts table remain tracked in the source register. All other clauses of that table are retained below without promoting dev activation.
+**Status: conserved selected V1 design; not implemented.** The claim below is restored now; it is not a claim that the release activation schema accepts `activationKind`, or that `fgctl` can activate a source checkout. Plan C (`plans/261006-1445-fgctl-dev-activation/`) remains draft/unscheduled implementation work, not a dependency of documentation cutover. `npm run fgos:dev` is an invocation bridge, not this activation mechanism.
+
+
+fgOS self-development needs a dogfood path that does not require nested repos
+and does not pretend a source checkout is an immutable release.
+
+V1 supports an explicit dev activation kind:
+
+```txt
+artifactDigest: dev:<sourceRevisionOrWorktreeId>
+activationKind: dev-source
+activeReleasePath: <source checkout path>
+distributable: false
+```
+
+Dev activation rules:
+
+- must be explicit; never selected as an accidental PATH fallback;
+- skips immutable release file digest guarantees;
+- still reports runtime identity as `dev:*`;
+- still uses the same command authority, work-state root, projection ownership,
+  and state-schema compatibility rules;
+- is not valid for a distributable install package.
+
+This preserves dogfood without turning dogfood into the product mission and
+without solving self-development by nesting a product repo inside a workshop
+repo.
+
+### Dev Source Activation Restoration Stub
+
+The documentation claim is restored in [Dev / Source Activation](#dev--source-activation). Only its implementation remains deferred; Plan C is not a cutover prerequisite.
+
+## Settled Facts
 
 | Decision | Status |
 |---|---|
@@ -389,7 +420,7 @@ Restoration owner: Plan C (`plans/261006-1445-fgctl-dev-activation/`, draft, uns
 | V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |
 | `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |
 | Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |
-| Dev / source activation restoration is tracked by dropped-001 and Plan C. | Deferred; not carried in this candidate. |
+| Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Selected V1 design conserved above; mechanism unimplemented, Plan C not a cutover prerequisite. |
 | `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |
 | Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |
 | Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |

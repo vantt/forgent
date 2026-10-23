@@ -42,6 +42,7 @@ Start with [spec.md](spec.md) for the carried preamble and source identity. The 
 - [dispatch-operability-implementation-slice-2026-09-16](architecture/h-69197b459754.md) — Architecture.
 - [lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4](decisions/h-36d872fbb0e5.md) — Decision record.
 - [Routing handoff contract](contracts/routing-handoff.md) — carried in an earlier batch; unchanged here.
+- [Conserved dispatch and session contracts](contracts/conserved-dispatch-doctrine.md) — Native-First rationale, session/merge distinction and maintained operation templates; no retired engine revival.
 
 ## Added in candidate: Verification and boundary
 
