@@ -410,3 +410,11 @@ pub fn sync_directory(dir: &Path) -> io::Result<()> {
     let file = fs::File::open(dir)?;
     file.sync_all()
 }
+
+#[cfg(unix)]
+mod beneath;
+#[cfg(unix)]
+pub use beneath::{
+    ensure_dir_beneath, open_beneath, open_beneath_with, BeneathError, BeneathRefusal, Dir,
+    DirIdentity, OpenedFile, Read, Strategy,
+};

@@ -1,0 +1,10 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:ironLaw:v1
+$comment: "owner: work-state"
+description: "How the merge gate treats a failing iron-law check."
+type: object
+properties:
+  level:
+    description: What the merge gate does when the iron-law check fails; ask stops and asks a person, warn reports and continues.
+    type: string
+    enum: [ask, warn]

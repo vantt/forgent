@@ -30,8 +30,8 @@ Danh bạ do IDENT dựng từ các dòng `IDENT roster` mà chính các máy gh
 
 | Handle máy | Machine id | Ghi chú | IDENT trên release đang chạy |
 |---|---|---|---|
-| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ (release `94e26894`, dòng roster SEAT 11:15; owner xác nhận 11:24) |
-| `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ (release main `5f7825163`, 10-23 10:34) |
+| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ đến thư viện cửa MAIL (release `447cb9a4` từ main `e604ec15f`, có `3cee85c9a`; dòng SEAT 13:45) |
+| `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ đến thư viện cửa MAIL (release `e5b640fc` từ main `88f3ecf06`, 10-23 13:40) |
 | `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ (release main `199d85223`, 10-23 08:57) |
 
 Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (handle phiên và máy, đọc từ `fgos identity session`) và nhận vai trên máy mình; cột "Máy" có dấu `?` là IDENT suy từ log board, lead xác nhận hoặc sửa.
@@ -45,7 +45,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
 | WORK | `lead:WORK`, `lead:ES` | `claude-uygd@fg-server2` (phiên `forgent-cd`) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
-| CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
+| CFG | `lead:CFG` | `claude-hrpe@fg-server` | **Slice A landed** 10-23 (crate `fgos-yaml-doc`, bỏ `serde_yaml`). **Slice B landed** 10-23 15:00: crate `fgos-config` (2.372 dòng; schema JSON Schema 2020-12 + meta-schema, validator `jsonschema` =0.60.0, snapshot có provenance, luật phạm vi, transaction ghi, luật comment, che bí mật), schema `core/config-schema/` + bộ chuẩn `core/config-standard/` cho 15 section, lock `project-config`/`global-config`, `open_beneath` trong Durable File; chưa nối caller. Tiếp: Slice D migrate rồi Slice C nối Node (D19: file project của repo bị snapshot mới từ chối tới khi migrate)
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
 | RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:12; owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên. phiên này còn giữ thêm vai `lead:PROSE`; từ main `3cee85c9a` nhả được bằng `fgos identity session --drop-role lead:PROSE`) | `fg-server` |
 | DOC | `lead:DOC` | `claude-4c3b@design-lap` (đã nhận vai 10-23 11:30) | `design-lap` |

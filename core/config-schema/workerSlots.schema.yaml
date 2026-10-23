@@ -1,0 +1,10 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:workerSlots:v1
+$comment: "owner: work-state"
+description: "The ceiling on work items running at one time."
+type: object
+properties:
+  ceiling:
+    description: Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused.
+    type: [integer, "null"]
+    minimum: 1

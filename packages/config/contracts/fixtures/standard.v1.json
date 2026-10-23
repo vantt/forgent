@@ -1,0 +1,220 @@
+{
+ "version": 1,
+ "about": "Owning cases of Standard: what the standard layer holds and where each value came from. Every case is built twice and must be identical (determinism).",
+ "cases": [
+  {
+   "id": "standard-scalar-and-catalog-values",
+   "why": "a standard file holds plain values and a catalog is just a map value",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  catalog:",
+      "    x:",
+      "      k: v"
+     ]
+    }
+   },
+   "expect": {
+    "value": {
+     "s": {
+      "a": 1,
+      "catalog": {
+       "x": {
+        "k": "v"
+       }
+      }
+     }
+    },
+    "spans": [
+     {
+      "path": "s.a",
+      "file": "s.yaml",
+      "line": 2,
+      "column": 3
+     },
+     {
+      "path": "s.catalog.x.k",
+      "file": "s.yaml",
+      "line": 5,
+      "column": 7
+     }
+    ]
+   }
+  },
+  {
+   "id": "standard-section-without-a-file",
+   "why": "a section with no standard file simply has no standard value",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ],
+     "t": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "t": [
+      "t:",
+      "  a: 1"
+     ]
+    }
+   },
+   "expect": {
+    "value": {
+     "t": {
+      "a": 1
+     }
+    },
+    "absent": [
+     "s.a",
+     "s"
+    ]
+   }
+  },
+  {
+   "id": "standard-merge-follows-schema-order",
+   "why": "files merge in schema-set order, not listing order",
+   "input": {
+    "schemas": {
+     "a": [
+      "type: object"
+     ],
+     "b": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "b": [
+      "b:",
+      "  x: 1"
+     ],
+     "a": [
+      "a:",
+      "  y: 2"
+     ]
+    }
+   },
+   "expect": {
+    "order": [
+     "a",
+     "b"
+    ],
+    "value": {
+     "a": {
+      "y": 2
+     },
+     "b": {
+      "x": 1
+     }
+    }
+   }
+  },
+  {
+   "id": "standard-file-without-schema-follows",
+   "why": "a file with no schema stays loaded (lint refuses it) after the scheduled ones",
+   "input": {
+    "schemas": {
+     "a": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "z": [
+      "z:",
+      "  q: 1"
+     ],
+     "a": [
+      "a:",
+      "  y: 2"
+     ]
+    }
+   },
+   "expect": {
+    "order": [
+     "a",
+     "z"
+    ]
+   }
+  },
+  {
+   "id": "standard-provenance-names-second-file",
+   "why": "a value keeps the file, line and column of the file it came from",
+   "input": {
+    "schemas": {
+     "a": [
+      "type: object"
+     ],
+     "b": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "a": [
+      "a:",
+      "  y: 2"
+     ],
+     "b": [
+      "# note",
+      "b:",
+      "  x: 1"
+     ]
+    }
+   },
+   "expect": {
+    "spans": [
+     {
+      "path": "b.x",
+      "file": "b.yaml",
+      "line": 3,
+      "column": 3
+     }
+    ]
+   }
+  },
+  {
+   "id": "standard-empty-set",
+   "why": "no standard file is a null value, not a refusal",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ]
+    },
+    "standard": {}
+   },
+   "expect": {
+    "value": null,
+    "order": []
+   }
+  },
+  {
+   "id": "standard-parse-refusal",
+   "why": "a standard file is read under strict-config; an alias is config-parse",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: &x 1",
+      "  b: *x"
+     ]
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  }
+ ]
+}

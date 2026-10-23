@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:worktreeSetup:v1
+$comment: "owner: runner"
+description: "Commands every runner-created worktree runs after its dependency install."
+type: object
+properties:
+  commands:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; each project states its own checks"
+    description: Shell commands run in a new worktree after its dependency install; an empty list runs nothing beyond the install.
+    type: array
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: both
+    x-fgos-sensitivity: command

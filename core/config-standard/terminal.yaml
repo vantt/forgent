@@ -1,0 +1,18 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Slot grace, failed-pane retention and pane layout of terminal control.
+terminal:
+  # @fgos:doc Milliseconds a slot may wait for its worker before it is reported as stuck; must exceed the ready timeout by 30000. Minimum: 1. Default: 60000.
+  allocationGraceMs: 60000
+  # @fgos:doc Milliseconds a failed pane is kept before it is closed; null keeps it until a person closes it. Minimum: 1.
+  retainFailedPaneMs: null
+  # @fgos:doc Where new panes are placed and how small they may get.
+  layout:
+    # @fgos:doc The placement policy the Rust core registers. Values: measured-split. Default: measured-split.
+    policy: measured-split
+    # @fgos:doc Smallest pane width in columns; the agent CLIs were measured to start at 40. Minimum: 40. Default: 80.
+    minCols: 80
+    # @fgos:doc Smallest pane height in rows; the agent CLIs were measured to start at 8. Minimum: 8. Default: 20.
+    minRows: 20
+    # @fgos:doc Most panes placed in one tab before a new tab is opened. Minimum: 1. Default: 8.
+    maxPanesPerTab: 8

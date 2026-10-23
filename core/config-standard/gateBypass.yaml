@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc How far agent work may skip human approval gates.
+gateBypass:
+  # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
+  level: off

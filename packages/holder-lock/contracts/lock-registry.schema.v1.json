@@ -45,7 +45,7 @@
         "scope": { "enum": ["repo", "machine", "run"] },
         "rank": { "type": "integer", "minimum": 1 },
         "v3Path": { "type": ["string", "null"] },
-        "owner": { "enum": ["4.2", "4.3", "4.4", "6.2", "event-store", "git", "mailbox"] },
+        "owner": { "enum": ["4.2", "4.3", "4.4", "6.2", "event-store", "git", "config", "mailbox"] },
         "note": { "type": "string" }
       }
     }

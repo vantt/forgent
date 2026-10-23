@@ -9,16 +9,16 @@ Layout follows `packages/yaml-doc` (`rust/` + `contracts/` + fixtures with one r
 ## Files it may touch
 
 - Root `Cargo.toml`: one line in `members`: `packages/config/rust`.
-- `packages/config/rust/Cargo.toml`: name `fgos-config`, `version.workspace`, `edition.workspace`; dependencies `fgos-yaml-doc`, `fgos-durable-file`, `fgos-holder-lock`, `fgos-identity` (default features, no `provider`), `serde_json.workspace`, `sha2.workspace`, `thiserror.workspace`, `libc` under `cfg(unix)`. No new third-party crate.
-- `packages/config/rust/src/lib.rs` (module declarations, crate doc with the seal sentences: `#![deny(unsafe_code)]` with exactly one allowed module (`files::sys`, phase 07, decision D17), no panic across the public API (every public entry runs through `fgos_yaml_doc`'s guard pattern or is total), refusals carry no value), `src/error.rs` (the `ConfigRefusal` type: closed `code`, optional wrapped yaml refusal, file, path, line, column, descriptor path; `Display` and `Debug` never print a value), empty stub files for every later module (`descriptor`, `pattern`, `bundle`, `lint`, `check`, `standard`, `scope`, `files`, `grammar`, `snapshot`, `cache`, `detect`, `write`, `redact`, `locks`).
-- `packages/config/contracts/failure-codes.v1.json`, `descriptor-dialect.v1.json`, `fixtures/README.md`.
+- `packages/config/rust/Cargo.toml`: name `fgos-config`, `version.workspace`, `edition.workspace`; dependencies `fgos-yaml-doc`, `fgos-durable-file`, `fgos-holder-lock`, `fgos-identity` (default features, no `provider`), `serde_json.workspace`, `sha2.workspace`, `thiserror.workspace`, `libc` under `cfg(unix)`. No new third-party crate; the validator crate is added by phase 04b only after the owner signs phase 03.
+- `packages/config/rust/src/lib.rs` (module declarations, crate doc with the seal sentences: `#![deny(unsafe_code)]` with exactly one allowed module (`files::sys`, phase 07, decision D17), no panic across the public API (every public entry runs through `fgos_yaml_doc`'s guard pattern or is total), refusals carry no value), `src/error.rs` (the `ConfigRefusal` type: closed `code`, optional wrapped yaml refusal, file, path, line, column, schema path; `Display` and `Debug` never print a value), empty stub files for every later module (`schema`, `bundle`, `lint`, `validate`, `standard`, `scope`, `files`, `grammar`, `snapshot`, `cache`, `detect`, `write`, `redact`, `locks`).
+- `packages/config/contracts/failure-codes.v1.json`, `annotations.v1.json`, `fixtures/README.md`.
 - `packages/config/rust/tests/fixture_shape.rs`.
 
 ## Contract files
 
-`failure-codes.v1.json` is the closed list of ids the crate can produce, each with the spec section that names it: spec-named verbatim (`config-legacy-shadowed`, `config-write-conflict`, `config-comment-reason-required`, `config-write-confined`, `config-path-symlink`, `config-key-in-wrong-file`, `config-accounts-unavailable-confined`), chosen here (D12: `config-parse`, `config-schema`, `config-key-out-of-scope`, `config-format-legacy-json`, `config-platform-unsupported`), and the lint rule ids (filled by phase 04, listed here as a reserved prefix `descriptor-`). The yaml-doc rule ids pass through unchanged and are not copied here (one list owns them: `packages/yaml-doc/contracts/refusal-rules.v1.json`). Codes the crate cannot produce (addon missing) are listed under `not-produced-here` with the slice that owns them.
+`failure-codes.v1.json` is the closed list of ids the crate can produce, each with the spec section that names it: spec-named verbatim (`config-legacy-shadowed`, `config-write-conflict`, `config-comment-reason-required`, `config-write-confined`, `config-path-symlink`, `config-key-in-wrong-file`, `config-accounts-unavailable-confined`), chosen here (D12: `config-parse`, `config-schema`, `config-key-out-of-scope`, `config-format-legacy-json`, `config-platform-unsupported`), and the lint rule ids (filled by phase 04, listed here as reserved prefixes `schema-` and `standard-`). The yaml-doc rule ids pass through unchanged and are not copied here (one list owns them: `packages/yaml-doc/contracts/refusal-rules.v1.json`). Codes the crate cannot produce (addon missing) are listed under `not-produced-here` with the slice that owns them.
 
-`descriptor-dialect.v1.json` is the machine-readable form of spec section 4's field table: field name, required or optional, allowed values, which types it applies to, plus D5's `justification`. Phase 03's parser and phase 04's lint read the same table, so the dialect is stated once.
+`annotations.v1.json` is the machine-readable form of spec section 4's `x-fgos-` annotation table: annotation name, allowed values, where it may appear (root only, any node), the closed list of five (`scope`, `sensitivity`, `file`, `merge`, `absent`; D5), with the `$id` and `$comment` conventions (`owner:`, `justification:`) stated beside it. Phase 04's lint reads it, so the closed list is stated once. The JSON Schema keywords themselves are the standard's and are not copied here.
 
 `fixtures/README.md`: file-to-runner table (filled as phases land), the case shape (`id`, `why`, `input`, `expect`), the rule "a case belongs to exactly one runner".
 
@@ -30,7 +30,7 @@ Layout follows `packages/yaml-doc` (`rust/` + `contracts/` + fixtures with one r
 
 ## Owning proofs
 
-Fixture integrity: `tests/fixture_shape.rs` (the one proof of "the contract files are well formed"). The dialect table has no second reader test; phase 03 and 04 runners exercise it.
+Fixture integrity: `tests/fixture_shape.rs` (the one proof of "the contract files are well formed"). The annotation table has no second reader test; phase 04's lint runner exercises it.
 
 ## Validation
 

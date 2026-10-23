@@ -13,8 +13,8 @@ Spec section 9, "File rules": the project file resolves inside the worktree root
 ## Design
 
 - `Root` (a directory the file must stay beneath: project worktree root, `~/.fgos`, `~/.fgos/private`) and `open_beneath(root, relative) -> Result<OpenFile, ConfigRefusal>`:
-  - Linux: `openat2(root_fd, relative, RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS)` through `libc::syscall(SYS_openat2, ...)`; the one `unsafe` block lives in this module, because `fgos-config` is the first caller. **Conflict:** the crate doc promises no `unsafe` (phase 01). Resolution: the crate is `#![deny(unsafe_code)]` with a single `#[allow(unsafe_code)]` module `files::sys` of at most 40 lines, each call justified by a comment; the alternative (a `forbid`) would force a lower-layer crate. If the owner prefers zero `unsafe` in `fgos-config`, the primitive moves to `fgos-durable-file` or `fgos-process` (idea I3 territory) and this phase waits for that change; default here: contained `unsafe`, recorded as decision D17 in the phase commit and mentioned in plan.md at closeout.
-  - Kernel without `openat2` (`ENOSYS`) and macOS: walk components with `openat(dirfd, component, O_NOFOLLOW | O_DIRECTORY)` for each directory and `O_NOFOLLOW` for the leaf; `ELOOP` maps to `config-path-symlink`.
+  - Linux: `openat2(root_fd, relative, RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS)` through `rustix::fs::openat2` in Durable File's `open_beneath` (D17); no `unsafe` in Durable File or in `fgos-config`, which stays `forbid(unsafe_code)` and only maps Durable File's refusals to `config-path-symlink`.
+  - Kernel without `openat2` (`ENOSYS`) and macOS: Durable File walks components with `rustix::fs::openat(dirfd, component, O_NOFOLLOW | O_DIRECTORY)` for each directory and `O_NOFOLLOW` for the leaf; `ELOOP` maps to `config-path-symlink`.
   - A leaf that does not exist is `Ok(None)` (missing is not malformed); a missing directory component is also `Ok(None)`; a symlink anywhere, a component escaping the root (`..`), or a non-regular leaf is a refusal.
 - `ensure_dir_beneath(root, relative, mode) -> Result<DirHandle, ConfigRefusal>`: `mkdirat` per missing component with the same no-follow walk (project `.fgos` and `~/.fgos` 0755 as `mkdirSync` creates them today, `~/.fgos/private` 0700); returns the directory descriptor phase 10 keeps for its identity re-check. Existing directories are never chmod-ed by a read or a write (fixing a loose mode is doctor's, Slice D).
 - `OpenFile` offers `read_all()` (bounded by the profile's input bound plus one, so oversize is refused before parse), `revision()` (sha256 of exactly the bytes read from this descriptor; same string format as `Document::revision`, `packages/yaml-doc/rust/src/document.rs:181`), `metadata_mode()`, `dir_identity()` (dev, ino of the parent directory fd, used by phase 10's pre-replace re-check).
@@ -24,7 +24,7 @@ Spec section 9, "File rules": the project file resolves inside the worktree root
 
 ## Steps
 
-1. Merge `origin/main`. Write `files::sys` first with its own tests, then the selection logic.
+1. Merge `origin/main`. Write `open_beneath` in Durable File first with its own tests, then the selection logic in `src/files.rs`.
 2. Tests on real temp dirs (about 24): regular file read; missing leaf; missing directory; file symlink; directory symlink at `.fgos`; symlink at an intermediate component; `..` in the relative path; absolute relative path; root itself is a symlink (the caller-supplied root is resolved once and the refusal names it); non-regular leaf (FIFO, with `O_NONBLOCK` so the test cannot hang); oversize file; revision equals the sha256 of the bytes **read** when the file is replaced between `open` and `read` (open the descriptor, rename another file over the path, read: the revision is of the old bytes); selection matrix (yaml only, json only, both, tombstone only, tombstone plus yaml); mode of a created private dir is 0700 and global file 0600 under a 022 and a 077 umask; the `ENOSYS` fallback is exercised by calling the fallback walker directly (a plain function, not a switch).
 3. Fallback walker and `openat2` path must give the same refusals on the same cases: one parametrized test table runs both implementations over the same temp tree.
 
@@ -44,7 +44,7 @@ Spec section 9, "File rules": the project file resolves inside the worktree root
 
 | Risk | L x I | Mitigation |
 |---|---|---|
-| `unsafe` in a crate that promised none (D17) | M x M | contained module, 3 syscalls at most, each tested; owner can redirect to a lower crate before merge; reviewer checks every call |
+| `rustix` API differs between kernels (no `openat2`) | L x M | fallback walk tested on the same machine by forcing the fallback path through a function parameter, not an env switch; reviewer checks every mapping of errno to refusal |
 | `openat2` flags wrong, silently following a symlink | L x H | tests with a symlink at every position under both implementations; the table test compares them |
 | Path-based Durable File replace afterwards (check-to-rename window) | L x H | `dir_identity()` re-check in phase 10; residual window named; idea I3 |
 | Linked worktrees: each worktree's `.fgos` must be a real directory | L x M | test with a real `git worktree` layout (a directory named `.fgos` inside a second root); no symlinked `.fgos` support is added |

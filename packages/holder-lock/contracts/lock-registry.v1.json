@@ -217,6 +217,24 @@
       "rank": 80,
       "v3Path": "<fgosDir>/locks/mailbox.lock",
       "owner": "mailbox"
+    },
+    {
+      "name": "project-config",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<fgosDir>/locks/project-config.lock",
+      "owner": "config",
+      "note": "new lock, no v1 predecessor; serializes writes to .fgos/config.yaml"
+    },
+    {
+      "name": "global-config",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/global-config.lock",
+      "owner": "config",
+      "note": "new lock, no v1 predecessor; serializes writes to the three global files: ~/.fgos/config.yaml, ~/.fgos/private/accounts.yaml and ~/.fgos/private/gateway-token"
     }
   ]
 }

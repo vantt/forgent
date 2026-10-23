@@ -1,0 +1,401 @@
+{
+ "version": 1,
+ "about": "Owning cases of Schemas: loading, path resolution with annotation inheritance, bundle digest, undescribed paths. Schema files are arrays of lines; the runner adds the $id line.",
+ "cases": [
+  {
+   "id": "schema-resolve-properties",
+   "why": "spec 4: a path walks properties",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a:",
+      "    type: string",
+      "    x-fgos-scope: project-only"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "node_type": "string",
+    "scope": "project-only",
+    "sensitivity": "public",
+    "file": "config"
+   }
+  },
+  {
+   "id": "schema-resolve-additional-properties",
+   "why": "a name no property lists takes additionalProperties",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "type: object",
+      "additionalProperties:",
+      "  type: integer"
+     ]
+    },
+    "path": "s.anything"
+   },
+   "expect": {
+    "node_type": "integer"
+   }
+  },
+  {
+   "id": "schema-resolve-dotted-key",
+   "why": "a bracket-quoted key containing a dot is one segment",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "additionalProperties:",
+      "  type: integer"
+     ]
+    },
+    "path": "s[\"a.b\"]"
+   },
+   "expect": {
+    "node_type": "integer"
+   }
+  },
+  {
+   "id": "schema-resolve-properties-wins",
+   "why": "properties wins over additionalProperties, so there is no ambiguity to lint",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    type: string",
+      "additionalProperties:",
+      "  type: integer"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "node_type": "string"
+   }
+  },
+  {
+   "id": "schema-resolve-local-ref",
+   "why": "a local $ref is followed and the referrer's own annotations win over the target's",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    $ref: '#/$defs/t'",
+      "    x-fgos-sensitivity: command",
+      "$defs:",
+      "  t:",
+      "    type: boolean",
+      "    x-fgos-sensitivity: secret-value"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "node_type": "boolean",
+    "sensitivity": "command"
+   }
+  },
+  {
+   "id": "schema-resolve-cross-section-ref",
+   "why": "a $ref by another section's $id reaches that section",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    $ref: 'urn:fgos:config-schema:t:v1#/$defs/x'"
+     ],
+     "t": [
+      "$defs:",
+      "  x:",
+      "    type: number"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "node_type": "number"
+   }
+  },
+  {
+   "id": "schema-resolve-array-items",
+   "why": "an index takes items",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  l:",
+      "    type: array",
+      "    items:",
+      "      type: string"
+     ]
+    },
+    "path": "s.l[2]"
+   },
+   "expect": {
+    "node_type": "string"
+   }
+  },
+  {
+   "id": "schema-inherit-from-ancestor",
+   "why": "a node that states nothing takes the nearest ancestor's annotation",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "x-fgos-scope: global-only",
+      "properties:",
+      "  a:",
+      "    x-fgos-merge: replace",
+      "    properties:",
+      "      b:",
+      "        x-fgos-absent: required",
+      "        type: string"
+     ]
+    },
+    "path": "s.a.b"
+   },
+   "expect": {
+    "scope": "global-only",
+    "merge": "replace",
+    "absent": "required"
+   }
+  },
+  {
+   "id": "schema-inherit-child-override",
+   "why": "a child that states its own value replaces the ancestor's for itself only",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "x-fgos-sensitivity: secret-reference",
+      "properties:",
+      "  a:",
+      "    x-fgos-sensitivity: public",
+      "  b:",
+      "    type: string"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "sensitivity": "public"
+   }
+  },
+  {
+   "id": "schema-inherit-sibling-keeps-ancestor",
+   "why": "the override above does not leak to a sibling",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "x-fgos-sensitivity: secret-reference",
+      "properties:",
+      "  a:",
+      "    x-fgos-sensitivity: public",
+      "  b:",
+      "    type: string"
+     ]
+    },
+    "path": "s.b"
+   },
+   "expect": {
+    "sensitivity": "secret-reference"
+   }
+  },
+  {
+   "id": "schema-resolve-miss",
+   "why": "a path with no schema node, or an unknown section, resolves to nothing",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    type: string"
+     ]
+    },
+    "path": "s.nope"
+   },
+   "expect": {
+    "miss": true
+   }
+  },
+  {
+   "id": "schema-annotation-bad-value-not-a-loader-error",
+   "why": "a wrong annotation value reaches lint (the meta-schema), not the loader; resolve ignores it",
+   "input": {
+    "op": "resolve",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    x-fgos-scope: global"
+     ]
+    },
+    "path": "s.a"
+   },
+   "expect": {
+    "scope": "both"
+   }
+  },
+  {
+   "id": "schema-parse-refusal",
+   "why": "strict-config refuses an alias; the loader wraps it as config-parse",
+   "input": {
+    "op": "load",
+    "schemas": {
+     "s": [
+      "a: &x 1",
+      "b: *x"
+     ]
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "schema-digest-changes-with-one-byte",
+   "why": "the cache key must change when any bundled byte changes",
+   "input": {
+    "op": "digest",
+    "a": {
+     "schemas": [
+      [
+       "s",
+       "a: 1\n"
+      ]
+     ],
+     "standard": [
+      [
+       "s",
+       "s:\n  a: 1\n"
+      ]
+     ]
+    },
+    "b": {
+     "schemas": [
+      [
+       "s",
+       "a: 1\n"
+      ]
+     ],
+     "standard": [
+      [
+       "s",
+       "s:\n  a: 2\n"
+      ]
+     ]
+    }
+   },
+   "expect": {
+    "equal": false
+   }
+  },
+  {
+   "id": "schema-digest-order-independent",
+   "why": "listing order is not content",
+   "input": {
+    "op": "digest",
+    "a": {
+     "schemas": [
+      [
+       "a",
+       "x: 1\n"
+      ],
+      [
+       "b",
+       "y: 2\n"
+      ]
+     ],
+     "standard": []
+    },
+    "b": {
+     "schemas": [
+      [
+       "b",
+       "y: 2\n"
+      ],
+      [
+       "a",
+       "x: 1\n"
+      ]
+     ],
+     "standard": []
+    }
+   },
+   "expect": {
+    "equal": true
+   }
+  },
+  {
+   "id": "schema-digest-kind-matters",
+   "why": "the same bytes as a schema and as a standard file are different bundles",
+   "input": {
+    "op": "digest",
+    "a": {
+     "schemas": [
+      [
+       "a",
+       "x: 1\n"
+      ]
+     ],
+     "standard": []
+    },
+    "b": {
+     "schemas": [],
+     "standard": [
+      [
+       "a",
+       "x: 1\n"
+      ]
+     ]
+    }
+   },
+   "expect": {
+    "equal": false
+   }
+  },
+  {
+   "id": "schema-undescribed-lists-paths-without-a-node",
+   "why": "spec 4: a present path with no schema node is listed, once, at its top",
+   "input": {
+    "op": "undescribed",
+    "schemas": {
+     "s": [
+      "properties:",
+      "  a:",
+      "    type: string"
+     ]
+    },
+    "value": {
+     "s": {
+      "a": "x",
+      "extra": {
+       "deep": 1
+      }
+     },
+     "other": 1
+    }
+   },
+   "expect": {
+    "paths": [
+     "other",
+     "s.extra"
+    ]
+   }
+  }
+ ]
+}
