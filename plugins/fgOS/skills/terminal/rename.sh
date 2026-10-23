@@ -67,10 +67,10 @@ command -v herdr >/dev/null 2>&1 || exit 0
 command -v fgos >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
 # HERDR_PANE_ID can be inherited from a shared agent daemon and name a dead
-# pane or another session's pane: act only on this caller's own live pane.
-. "$(dirname "$0")/pane-owned.sh"
+# pane or another session's pane. The port's attach takes only a pane whose
+# shell is an ancestor of this process, so a foreign pane stops at the attach
+# below.
 . "$(dirname "$0")/terminal-port.sh"
-fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
 # fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else the
 # activated host's writer identity (`fgos identity`: its env/registry/pid
@@ -98,8 +98,9 @@ label="$task_id"
 [ -n "$a_ssid" ] && label="$label | a.ssid:$a_ssid"
 
 # The terminal-control port takes the pane (attach, keyed by this session's
-# writer id; idempotent) and then writes the label. Either step failing is
-# the same silent no-op as every guard above.
+# writer id; idempotent; refused unless the pane is this caller's own) and then
+# writes the label. Either step failing is the same silent no-op as every
+# guard above.
 key=$(fgos_terminal_key "$project_root")
 fgos_terminal_attach "$key" "$HERDR_PANE_ID" || exit 0
 fgos_terminal_call label "{\"key\":$(fgos_json_str "$key"),\"display\":{\"label\":$(fgos_json_str "$label")}}" >/dev/null || true

@@ -203,6 +203,7 @@ fn attach_records_the_pane_and_release_never_closes_it() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("attach"));
     let own = core.allocate(&request("own", "g")).unwrap().slot;
+    run_caller_in(&driver, &own.pane_id);
     let attached = core.attach("att", &own.pane_id, None, None).unwrap();
     assert_eq!(attached.origin, Origin::Attached);
     let out = core.release("att", Disposition::Close, None).unwrap();
@@ -212,11 +213,59 @@ fn attach_records_the_pane_and_release_never_closes_it() {
 }
 
 #[test]
+fn attach_takes_only_a_pane_whose_shell_is_the_caller_or_one_of_its_ancestors() {
+    let driver = MemDriver::new(352, 69);
+    let root = state_dir("attach-owner");
+    let core = core(&driver, &MeasuredSplit, root.clone());
+    let pane = core.allocate(&request("own", "g")).unwrap().slot.pane_id;
+    let not_owned = |outcome: Result<Allocation, Refusal>| match outcome {
+        Err(Refusal::Unknown { reason }) if reason.starts_with("pane-not-owned:") => reason,
+        other => panic!("expected pane-not-owned, got {other:?}"),
+    };
+
+    // A live process that is not an ancestor of the caller: it descends from the caller, not the other way round.
+    let mut stranger = std::process::Command::new("sleep").arg("30").spawn().expect("spawn sleep");
+    driver.set_foreground(&pane, stranger.id(), vec![], stranger.id());
+    let reason = not_owned(core.attach("a-stranger", &pane, None, None));
+    assert!(reason.contains(&stranger.id().to_string()) && reason.contains(&std::process::id().to_string()), "the refusal names both: {reason}");
+    let _ = stranger.kill();
+    let _ = stranger.wait();
+
+    // The caller's own shell is the pane's shell.
+    run_caller_in(&driver, &pane);
+    assert_eq!(core.attach("a-own", &pane, None, None).unwrap().origin, Origin::Attached);
+
+    // An ancestor's shell counts: the caller runs inside it (a pane's shell starts the agent that starts the caller).
+    #[cfg(target_os = "linux")]
+    {
+        let parent = fgos_terminal_control::identity::parent_of_this_process().filter(|p| *p > 1).expect("a test process has a parent");
+        driver.set_foreground(&pane, parent, vec![], parent);
+        assert_eq!(core.attach("a-ancestor", &pane, None, None).unwrap().origin, Origin::Attached);
+    }
+}
+
+#[test]
+fn a_caller_the_os_does_not_name_never_takes_a_pane_even_through_a_key_already_bound_to_it() {
+    let driver = MemDriver::new(352, 69);
+    let root = state_dir("attach-unnamed-caller");
+    let pane = core(&driver, &MeasuredSplit, root.clone()).allocate(&request("own", "g")).unwrap().slot.pane_id;
+    run_caller_in(&driver, &pane);
+    core(&driver, &MeasuredSplit, root.clone()).attach("bound", &pane, None, None).unwrap();
+
+    for caller in [None, Some(u32::MAX - 1), Some(1)] {
+        let outcome = core(&driver, &MeasuredSplit, root.clone()).with_caller(caller).attach("bound", &pane, None, None);
+        assert!(matches!(&outcome, Err(Refusal::Unknown { reason }) if reason.starts_with("pane-not-owned:")), "caller {caller:?}: {outcome:?}");
+    }
+}
+
+#[test]
 fn a_caller_closes_its_own_attached_pane_and_no_other() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("attach-close-own"));
     let mine = core.allocate(&request("mine", "g")).unwrap().slot;
     let other = core.allocate(&request("other", "g")).unwrap().slot;
+    run_caller_in(&driver, &mine.pane_id);
+    run_caller_in(&driver, &other.pane_id);
     core.attach("att-mine", &mine.pane_id, None, None).unwrap();
     core.attach("att-other", &other.pane_id, None, None).unwrap();
 
@@ -251,6 +300,7 @@ fn an_attached_pane_joins_the_group_it_names_and_the_next_pane_opens_beside_it()
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("attach-group"));
     let own = core.allocate(&request("own", "other")).unwrap().slot;
+    run_caller_in(&driver, &own.pane_id);
     let attached = core.attach("anchor", &own.pane_id, Some("batch"), None).unwrap();
     assert_eq!(attached.origin, Origin::Attached);
     let next = core.allocate(&request("seat", "batch")).unwrap().slot;

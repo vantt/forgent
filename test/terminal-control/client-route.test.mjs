@@ -37,7 +37,8 @@ after(() => {
   fs.rmSync(scratch, { recursive: true, force: true });
 });
 
-const herdrEnv = { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: socketPath, HERDR_SOCKET_PATH: socketPath };
+// The caller of every route call is this process, so its shell is the pane's shell: attach takes the pane.
+const herdrEnv = { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: socketPath, HERDR_SOCKET_PATH: socketPath, FAKE_HERDR_SHELL_PID: String(process.pid) };
 
 /** One route call with no client in between: the answer line, flattened as the contract says. */
 function route(op, request, { env = herdrEnv, config } = {}) {
@@ -88,6 +89,9 @@ test('every operation of the port answers through the route', () => {
   const attached = tc.attach({ key: 'k-attached', pane: 'wS:p552', display });
   assert.equal(attached.result, 'slot');
   assert.equal(attached.origin, 'attached');
+  const foreign = route('attach', { key: 'k-foreign', pane: 'wS:p553' }, { env: { ...herdrEnv, FAKE_HERDR_SHELL_PID: '999999999' } });
+  assert.equal(foreign.result, 'unknown');
+  assert.match(foreign.reason, /^pane-not-owned: /, 'a pane whose shell is not an ancestor of the caller is refused by name');
 
   assert.equal(route('label', { key: 'k-one', display: { label: 'renamed' } }, shellForeground).result, 'ok');
   // Only the pane's shell holds the foreground: nothing is typed, and the route names why.

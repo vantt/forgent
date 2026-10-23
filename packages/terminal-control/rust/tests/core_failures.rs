@@ -264,6 +264,7 @@ fn the_core_never_launches_into_an_attached_or_released_slot() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("launch-guards"));
     let own = core.allocate(&request("own", "g")).unwrap().slot;
+    run_caller_in(&driver, &own.pane_id);
     core.attach("att", &own.pane_id, None, None).unwrap();
     assert!(core.launch("att", &launch_spec()).is_err());
     core.release("own", Disposition::Retain, None).unwrap();
@@ -578,7 +579,7 @@ fn an_attached_pane_is_created_with_no_env() {
     driver.tabs.borrow_mut().push((tab.clone(), "ext".into()));
     driver.panes.borrow_mut().insert(
         pane.clone(),
-        MemPane::new(&pane, tab, driver.area, bare(500), vec![]),
+        MemPane::new(&pane, tab, driver.area, bare(std::process::id()), vec![]),
     );
 
     let tab_creates_before = driver.calls("tab.create").len();

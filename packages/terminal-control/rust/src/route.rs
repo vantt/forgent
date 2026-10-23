@@ -8,6 +8,7 @@
 
 use crate::core::{Core, CoreConfig, Want};
 use crate::driver::herdr::{HerdrConfig, HerdrDriver};
+use crate::identity;
 use crate::policy::{policy_by_name, Limits, PlacementPolicy, DEFAULT_POLICY, POLICY_NAMES};
 use crate::port::*;
 use serde::de::DeserializeOwned;
@@ -402,7 +403,8 @@ pub fn main(args: &[String]) -> i32 {
     };
     let request = envelope.get("request").cloned().unwrap_or_else(|| json!({}));
     let driver = HerdrDriver::new(herdr);
-    let core = Core::new(&driver, policy.as_ref(), config);
+    // The route is a child of its caller: the OS names the caller, the request never does.
+    let core = Core::new(&driver, policy.as_ref(), config).with_caller(identity::parent_of_this_process());
     match dispatch(op, &core, &request, anchor_pane(&envelope)) {
         Ok((result, fields)) => {
             let mut fields = fields;

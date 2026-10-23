@@ -433,7 +433,7 @@ mod incarnation {
         let fake = Fake::new("count");
         let sock = fake.dir.join("s");
         let _listener = UnixListener::bind(&sock).unwrap();
-        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
+        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell").env("FAKE_HERDR_SHELL_PID", &std::process::id().to_string());
         let driver = fake.driver();
         let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
         let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { label: key.into(), ..Default::default() }, cwd: None, env: Default::default() };
@@ -473,7 +473,7 @@ mod incarnation {
                 ("allocate beside two live panes", 7),
                 ("allocate beside three live panes", 8),
                 ("allocate beside four live panes", 9),
-                ("attach", 2),
+                ("attach", 3),
                 ("launch refused for an attached pane", 1),
                 ("send refused at a shell", 2),
                 ("read", 2),

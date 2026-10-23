@@ -2,6 +2,7 @@
 
 use crate::driver::{ForegroundProcess, ProcessInfo};
 use crate::port::{ExpectedProcess, ProcessIdentity};
+use fgos_process::facts::ProcTuple;
 use fgos_process::{facts, ProcId};
 use std::path::Path;
 
@@ -54,6 +55,25 @@ pub fn identity_of(pid: u32, pgid: u32) -> Option<ProcessIdentity> {
     })
 }
 
+/// `pid` and its ancestors, nearest first, each with the tuple (pid, start time, boot) the OS
+/// reports. The walk stops at pid 1, at a loop and at the first process that cannot be read, so an
+/// unreadable `pid` gives an empty chain; where the OS gives no parent only `pid` itself is listed.
+pub fn ancestry(pid: u32) -> Vec<ProcTuple> {
+    let mut chain: Vec<ProcTuple> = Vec::new();
+    let mut next = Some(pid);
+    while let Some(pid) = next.take().filter(|p| *p > 1 && !chain.iter().any(|t| t.pid.0 == *p)) {
+        let Some(tuple) = facts::identity_of(ProcId(pid)) else { break };
+        chain.push(tuple);
+        next = facts::relation_of(ProcId(pid)).map(|r| r.parent);
+    }
+    chain
+}
+
+/// The process that started this one, as the OS reports it.
+pub fn parent_of_this_process() -> Option<u32> {
+    facts::relation_of(ProcId(std::process::id())).map(|r| r.parent)
+}
+
 /// Whether the process `recorded` names is still running under that pid with
 /// the same start time and boot: a reused pid, an exited process or an
 /// unreadable tuple all answer `false`.
@@ -75,6 +95,16 @@ mod tests {
 
     fn expect(argv0: &str, command: &str, args: &[&str]) -> ExpectedProcess {
         ExpectedProcess { argv0: argv0.into(), command: command.into(), args: args.iter().map(|a| a.to_string()).collect() }
+    }
+
+    #[test]
+    fn the_chain_starts_at_the_process_and_an_unreadable_one_gives_none() {
+        let chain = ancestry(std::process::id());
+        assert_eq!(chain[0].pid.0, std::process::id());
+        assert!(chain.iter().all(|t| t.pid.0 > 1), "pid 1 is never an owner");
+        assert!(ancestry(u32::MAX - 1).is_empty());
+        #[cfg(target_os = "linux")]
+        assert_eq!(chain.get(1).map(|t| t.pid.0), parent_of_this_process().filter(|p| *p > 1));
     }
 
     #[test]

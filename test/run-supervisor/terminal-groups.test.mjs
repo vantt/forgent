@@ -89,7 +89,8 @@ test('a batch whose first pane is already closed continues in a new tab with the
 });
 
 test('a caller anchor pane joins the group, so the batch opens beside it and never closes it', { skip, timeout: 120_000 }, async () => {
-  const { dir, fake } = fakeWith({ panes: [{}, {}] });
+  // The anchor is the caller's own pane: its shell is this process.
+  const { dir, fake } = fakeWith({ panes: [{}, {}], shellPid: process.pid });
   try {
     const own = createTerminalControl({ herdrBin: fake.herdrBin }).allocate({ key: 'caller-own', groupKey: 'caller-tab', display: { label: 'caller' } });
     assert.equal(own.result, 'slot');
