@@ -389,3 +389,7 @@ One line per existing decision, grouped by work. These are pointers/summaries, n
 ## Next concrete action
 
 Lead checks this bounded repair and the three r2 verdicts, accounts the actual runner commit (never pre-accounted), and replays both unchanged recipes and the owning reproduction test on clean committed bytes. L12-131 attribution and the quiet-machine A/B replay are supplied; do not request their classification again. Review A r2 confirms the 32+1=33 source-count correction. Full-suite acceptance/fresh independent closure are still not claimed; Phase 8 remains open until the required closing proofs exist. Phase 9 remains separately unauthorized. Before any cutover Land, discharge the twelve indexed PRE-FLIP gates, including archive-ref/reader retirement with measured checkout, new-pin source re-checks, post-route staged release and final-code holder Land after shrink. Markdown preview remains Lead custody under this records-only/no-runtime boundary.
+
+### Closure review round 4 (C) and L12-135
+
+A-r3 APPROVE, B-r3 APPROVE, C-r3 REWORK → L12-134, C-r4 REWORK (12 unrecorded historical-replay readers, sibling inconsistency, fence@N wording) → L12-135 (Lead, records-only; manifest 48 inputs / 135 joins / 47 reader files in the L12-129 gate; assembler rerun twice byte-identical; determinism record refreshed after 7adba4a48 left it stale).

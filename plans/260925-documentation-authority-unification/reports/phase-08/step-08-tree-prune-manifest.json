@@ -46,7 +46,7 @@
       "command": "python3 -B /tmp/fgos-work/closure-r3/scan.py (final recipe embedded in step-08-closure-r3-reader-audit.json); manual context/read-write/liveness triage and 121 exact joins verified by python3 -B",
       "exitCodes": [0, 0],
       "recipeAndTriage": "step-08-closure-r3-reader-audit.json",
-      "readerPathBase": "Directory containing this manifest; # suffix identifies decoded source field or Markdown fence start (physical line); line is 1-based within that decoded source/fence, not the JSON physical line.",
+      "readerPathBase": "Directory containing this manifest; # suffix identifies decoded source field or Markdown fence (fence@N = physical line of the first line inside the code fence); line is 1-based within that decoded source/fence, not the JSON physical line.",
       "limits": "Static, pin-bounded scan and manually resolved read/write/directory contexts, not arbitrary-program reachability proof. Historical replays are not run or made current. Whole-plan re-enumeration remains required before archive Land. Earlier zero-additional-reader claims do not apply outside their narrow scope."
     },
     "committedTextFilesScanned": 7732,
@@ -11716,9 +11716,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/runner-final-verification.json#/reproduction/checkHelper","line":7,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
       "action": "remove"
@@ -11816,9 +11816,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/runner-final-verification.json#/reproduction/checkHelper","line":7,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
       "action": "remove"
@@ -11916,9 +11916,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/runner-final-verification.json#/reproduction/checkHelper","line":7,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151",
       "action": "remove"
@@ -12412,9 +12412,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-06/review-10-checkpoint.md",
         "plans/260925-documentation-authority-unification/reports/phase-06/step10-evidence.md"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/review-10-checkpoint.md","line":51,"kind":"command-argument","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "b4acd75708c3b620931488fe08fe8f8500744631247d5ef4ff1c84accb002240",
       "action": "remove"
@@ -12427,9 +12427,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-06/review-6-checkpoint.md",
         "plans/260925-documentation-authority-unification/reports/phase-06/step10-evidence.md"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/review-6-checkpoint.md","line":29,"kind":"command-argument","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "82effc38cc41febf5e20d30b1665c2710595d1d6ede1ff23fc7468abbf2bd0d1",
       "action": "remove"
@@ -21882,9 +21882,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/step8-committed-native-verification.json#/reproduction/verification","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
       "action": "remove"
@@ -21979,9 +21979,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/step8-committed-native-verification.json#/reproduction/verification","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
       "action": "remove"
@@ -22076,9 +22076,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/step8-committed-native-verification.json#/reproduction/verification","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "7003d282618711e666961c7e4e2d668ea4a1bd7b69a338e6e9c2974888cd661f",
       "action": "remove"
@@ -24246,9 +24246,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/step9-native-verification.json#/reproduction/checkHelperSource","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
       "action": "remove"
@@ -24350,9 +24350,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5g-protected-bindings.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-06/step9-native-verification.json#/reproduction/checkHelperSource","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "ecaba9ddfe17ba3c9f8cac1175222da9cb61bfbfb9cb3a7a17f366202847e21e",
       "action": "remove"
@@ -28433,9 +28433,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-07/step-09-close-n1-compare-reproduce.mjs","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "d6ae3cbf9a7b061ca9f6d3078d6be1c8591304db0760b4644150ed5274757bd1",
       "action": "remove"
@@ -28450,9 +28450,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-07/step-09-close-n1-compare-reproduce.mjs","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "d6ae3cbf9a7b061ca9f6d3078d6be1c8591304db0760b4644150ed5274757bd1",
       "action": "remove"
@@ -28632,9 +28632,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-07/step-09-close-n1-r03-compare-reproduce.mjs","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "97896ce1de1c3e451c05e4e86471031ceaad87fb57310a565a09efad8297e31b",
       "action": "remove"
@@ -28651,9 +28651,9 @@
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-101-merge-accounting.json",
         "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json"
       ],
-      "scriptRefs": [],
+      "scriptRefs": [{"readerPath":"../phase-07/step-09-close-n1-r03-compare-reproduce.mjs","line":10,"kind":"constructed","liveness":"historical-replay"}],
       "class": "superseded intermediate",
-      "reason": "Superseded intermediate: historical repeated checker/scan/binding/preview output; no direct/constructed-name committed script reader or current owning-record input found. Dated citations resolve via retained blob/sha256/size, not a live evidence claim.",
+      "reason": "Historical replay input discovered by the Lead after review C round 4 (L12-135; constructed-name loop or recorded command argument); not a current owning check. Retain TIP removal; repoint these readers to the archive ref or retire them under L12-129. Exact bytes remain recoverable by gitBlob, SHA-256 and size.",
       "regenerateCommand": null,
       "sha256": "97896ce1de1c3e451c05e4e86471031ceaad87fb57310a565a09efad8297e31b",
       "action": "remove"
