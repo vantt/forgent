@@ -40,7 +40,8 @@ Adding the crate adds **55 entries to `Cargo.lock` and changes none** (`serde_js
 | Test | Proves |
 |---|---|
 | `validator_acceptance.rs` `official_suite_...` | the official JSON-Schema-Test-Suite draft 2020-12 files for `type`, `enum`, `const`, `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `minLength`, `maxLength`, `pattern`, `properties`, `additionalProperties`, `required`, `items`, `$defs`, `$ref` pass (vendored in `contracts/fixtures/json-schema-suite/`, commit recorded in its README); one known failure (F3), groups needing a remote document skipped |
-| `validator_acceptance.rs` F1, F2, F3 tests | each defect below still reproduces against the crate, and the guard holds |
+| `validator_acceptance.rs` F1 and F3 tests | each defect below still reproduces against the crate, and the guard holds |
+| F2 (manual, at every bump) | time `compile` on `^\d{500}$` and `^\d{2000}$` on an idle machine; a ratio near 4 means upstream made it linear and the 256-character rule can be reviewed. Not an automated test: a wall-clock ratio is not stable while other tests run (it failed under the workspace run on 2026-10-23 at 2.6x). |
 | `golden_meta.rs` | every meta-schema rule fires on its case and only there (`contracts/fixtures/meta.v1.json`, 21 cases) |
 | `golden_lint.rs` | `standard-invalid` and that `required` is the merge's to judge |
 | `golden_validate.rs` | the wiring: section lookup, paths, `required` on the merged value, null, sorted output, no input value in a finding |
@@ -68,7 +69,7 @@ Each regression test states what its failure means: when a bump makes it fail, u
 ## 8. Bump procedure
 
 1. Change the pin in the root `Cargo.toml` (`jsonschema = "=<new>"`); never a range.
-2. `cargo test -p fgos-config --jobs 4`. A failure of an F1, F2 or F3 test means upstream changed that defect: act on its comment. A failure of the suite test means a keyword changed meaning: stop.
+2. `cargo test -p fgos-config --jobs 4`. Run the manual F2 timing above. A failure of the F1 or F3 test means upstream changed that defect: act on its comment. A failure of the suite test means a keyword changed meaning: stop.
 3. Read the source diff of the four family crates between the versions (`cargo vendor` or the tarballs against the public git tag); repeat the scans of section 2 on the changed files; re-check the transitive crate list (new entries in `Cargo.lock`) and rerun `cargo deny --config .github/cargo-deny.toml check advisories bans sources`.
 4. Update this record: version, read scope, crate table, deny result, F1 to F3 rows, sign-off line.
 5. Owner sign-off, then the bump lands. A bump with any step missing does not land.

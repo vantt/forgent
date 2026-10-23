@@ -105,26 +105,6 @@ fn out_of_range_number_panics_the_crate_and_cannot_reach_it_through_the_port() {
     assert!(yaml.and_then(|d| d.to_json()).is_err());
 }
 
-/// F2. A `pattern` compiles in more than linear time (the crate re-parses the whole pattern once per
-/// `\d`, `\s` or `\w`). Guard: `schema-pattern-length` (at most 256 characters), proven by
-/// `golden_meta`. When a bump makes the ratio fall to about 4 (linear), upstream fixed F2: review
-/// whether the 256 limit can go.
-#[test]
-fn pattern_compile_time_grows_faster_than_the_pattern() {
-    let time = |digits: usize| {
-        let schema = serde_json::json!({ "pattern": format!("^{}$", "\\d".repeat(digits)) });
-        let start = std::time::Instant::now();
-        compile(&schema).unwrap();
-        start.elapsed().as_secs_f64()
-    };
-    let (small, large) = (time(500), time(2000));
-    assert!(
-        large > small * 8.0,
-        "F2 is fixed upstream: 4x the pattern took {:.1}x the time",
-        large / small
-    );
-}
-
 /// F3. With serde_json keeping key order, two objects with the same members in another order
 /// compare unequal. Guard: `schema-object-comparison` keeps object values out of `const`, `enum`
 /// and `uniqueItems`, proven by `golden_meta`. When a bump makes this valid, upstream fixed F3:
