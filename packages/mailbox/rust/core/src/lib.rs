@@ -30,8 +30,8 @@ mod wake;
 
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
-    Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom, MessageView, NoticeFacts,
-    Refusal, SendOutcome, SendRequest,
+    AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
+    MessageView, NoticeFacts, Refusal, SendOutcome, SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use frame::{
@@ -50,7 +50,7 @@ pub use policy::LifetimeKey;
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use report::{
     delivery_report, inbox_text, record_error_text, record_unavailable_text, refusal_text,
-    VersionClause,
+    role_holder_text, VersionClause,
 };
 pub use state::{MailboxState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
 pub use time::Timestamp;

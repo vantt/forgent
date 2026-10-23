@@ -6,6 +6,7 @@ use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, 
 use crate::limits::Limits;
 use crate::names::{self, ResolveRefusal};
 use crate::notices::{Notice, NoticeState};
+use crate::registry::Liveness;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 use crate::wake::{WakeDrop, WakeParties};
@@ -49,6 +50,36 @@ pub struct SendRequest<'a> {
     /// `channels.stop.deliver`). A recipient of any other CLI has no channel
     /// a wake could use: its wake takes no effect and spends no allowance.
     pub stop_drains: BTreeSet<Cli>,
+    /// Set when `to` was an alias (an Identity handle, full id or role) the
+    /// caller could not turn into a head of this record: check 2 refuses
+    /// with it in place of name resolution. `None` for a mailbox name, or an
+    /// alias that resolved, whose key is then `to`.
+    pub alias_refusal: Option<AliasRefusal>,
+}
+
+/// A session an alias refusal points at, as Identity names it: plain data,
+/// shown to the sender.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AliasCandidate {
+    /// `<machine-id>/<local id>`.
+    pub id: String,
+    pub handle: String,
+    pub liveness: Liveness,
+}
+
+/// Why an alias names no head of this record.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AliasRefusal {
+    /// No session, or none this record can deliver to; the candidates are
+    /// this record's heads only.
+    Unknown {
+        candidates: Vec<AliasCandidate>,
+        /// The alias names a live session that is not a head of this
+        /// record, so the answer says it has no address here.
+        no_address_here: bool,
+    },
+    /// Several sessions, each a head of this record.
+    Ambiguous { candidates: Vec<AliasCandidate> },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -110,6 +141,8 @@ pub enum Refusal {
     SenderKeyTooLong {
         max_chars: u32,
     },
+    /// An alias that names no head of this record, or several.
+    Alias(AliasRefusal),
 }
 
 impl Refusal {
@@ -134,6 +167,8 @@ impl Refusal {
             Self::QueueFull { .. } => CounterReason::QueueFull,
             Self::SenderShareFull { .. } => CounterReason::SenderShareFull,
             Self::SenderKeyTooLong { .. } => CounterReason::SenderKeyTooLong,
+            Self::Alias(AliasRefusal::Unknown { .. }) => CounterReason::UnknownName,
+            Self::Alias(AliasRefusal::Ambiguous { .. }) => CounterReason::AmbiguousName,
         }
     }
 }

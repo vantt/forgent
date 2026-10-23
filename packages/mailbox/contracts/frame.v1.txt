@@ -12,9 +12,11 @@
 #
 # Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
 # {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
-# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}}. Every value taken from the
+# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}} {{role}} {{handle}}. Every value taken from the
 # record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
-# {{to}} {{from_label}} {{candidates}} {{version}}) goes through the header escape.
+# {{to}} {{from_label}} {{candidates}} {{version}}) goes through the header escape,
+# except an Identity handle or role ({{role}} {{handle}}, and the candidates of an
+# alias refusal), which goes through the handle escape: the header alphabet plus @ and :.
 # The others are fixed by the code and inserted as they are: the words
 # {{code}}, {{kind}} and {{state}}, the numbers {{attempt}}, {{offers}} and {{count}},
 # and {{limit}}, a refusal's own fields as name=value pairs, in field
@@ -65,6 +67,8 @@ The wake quota of this exchange is used up; it will see this at its next checkpo
 The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.
 [report.wake-no-channel]
 Its CLI has no channel that can wake it; the wake was not used.
+[report.role-holder]
+delivered to the current holder of {{role}}, {{handle}}
 [refusal.policy]
 Refused: {{code}} ({{limit}}). Do not retry; ask your user.
 [refusal.loop]
@@ -75,6 +79,8 @@ Refused: too-large ({{limit}}). Send a path or link instead.
 Refused: {{code}}. Candidates: {{candidates}}.
 [refusal.argument]
 Refused: {{code}}.
+[refusal.alias.no-address]
+That session has no mailbox address in this project.
 [record.error]
 Not done: the mailbox record failed ({{code}}) and nothing was changed. Try once more later; do not loop.
 [record.unavailable]

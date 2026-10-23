@@ -415,3 +415,49 @@ fn inbox_claim_of_an_unregistered_caller_answers_no_address() {
         assert!(answer.claimed.is_empty() && answer.written);
     }
 }
+
+#[test]
+fn heads_lists_every_head_not_judged_dead_with_its_name_cli_and_liveness_and_writes_nothing() {
+    use fgos_mailbox::verbs::heads;
+    use fgos_mailbox_core::Liveness;
+    let fgos = TempFgos::new("verb-heads");
+    let live = Child::spawn();
+    let live_name = with_cli_head(&fgos, "head-live", "codex", &live.head_text());
+    let dead = Child::spawn();
+    with_cli_head(&fgos, "head-dead", "claude", &dead.head_text());
+    drop(dead);
+    let unknown_name = with_cli_head(&fgos, "head-unknown", "claude", "not a process record");
+    let before = std::fs::read(fgos.paths().snapshot()).unwrap();
+
+    let listed = heads(&fgos.record(), Wait::Try, T0, &limits()).unwrap();
+
+    let rows: Vec<(String, String, String, Liveness)> = listed
+        .iter()
+        .map(|h| {
+            (
+                h.key.as_str().to_string(),
+                h.name.as_str().to_string(),
+                h.cli.as_str().to_string(),
+                h.liveness,
+            )
+        })
+        .collect();
+    assert_eq!(
+        rows,
+        vec![
+            (
+                "head-live".to_string(),
+                live_name,
+                "codex".to_string(),
+                Liveness::Alive
+            ),
+            (
+                "head-unknown".to_string(),
+                unknown_name,
+                "claude".to_string(),
+                Liveness::Unknown
+            ),
+        ]
+    );
+    assert_eq!(std::fs::read(fgos.paths().snapshot()).unwrap(), before);
+}

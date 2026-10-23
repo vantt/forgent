@@ -1,10 +1,12 @@
 //! The `send`, read-only `inbox` and `inbox --claim` verbs (spec §6.1)
+//! and the read-only listing of the record's heads
 //! over the record: what a caller is answered comes from the frame
 //! contract through the core's renderers. An entry wires the caller's
 //! identity, the clock and the output; nothing here prints, and only
 //! `inbox --claim` writes, to the stdout it is handed.
 use crate::adapters::version::{recipient_version, VersionSources};
 use crate::adapters::TestedClis;
+use crate::head::stored_liveness;
 use crate::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
 use crate::hook::{claim_inbox, InboxClaim};
 use crate::record::{Record, Reported, Wait};
@@ -12,7 +14,7 @@ use fgos_mailbox_core::{
     delivery_report, record_error_text, refusal_text, Limits, SendOutcome, SendRequest, Timestamp,
     VersionClause, WriterKey,
 };
-use fgos_mailbox_core::{inbox_text, MessageId};
+use fgos_mailbox_core::{inbox_text, Cli, Liveness, MessageId, ShortName};
 use std::collections::BTreeMap;
 use std::io::Write;
 
@@ -70,6 +72,46 @@ pub fn inbox(
         .map_err(|error| record_error_text(error.code()))?;
     let (bound, items) = held.value.value;
     Ok(inbox_text(bound.then_some(items.as_slice()), limits))
+}
+
+/// One head of the record, as a caller that addresses heads sees it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeadView {
+    pub key: WriterKey,
+    pub name: ShortName,
+    pub cli: Cli,
+    /// The store's judgement of the head's process; never `Dead` here.
+    pub liveness: Liveness,
+}
+
+/// Every head of the record whose process the store does not judge dead,
+/// ordered by key, read in one hold that changes nothing. A runner
+/// attempt's key is never listed (it is never registered either). `Err`
+/// carries the record-error text.
+pub fn heads(
+    record: &Record,
+    wait: Wait,
+    now: Timestamp,
+    limits: &Limits,
+) -> Result<Vec<HeadView>, String> {
+    let held = record
+        .hold(wait, now, limits, |state, _| {
+            Reported::unchanged(
+                state
+                    .bindings()
+                    .filter(|b| !fgos_identity::is_attempt_writer_id(b.key.as_str()))
+                    .map(|b| HeadView {
+                        key: b.key.clone(),
+                        name: b.name.clone(),
+                        cli: b.cli.clone(),
+                        liveness: stored_liveness(b),
+                    })
+                    .filter(|h| h.liveness != Liveness::Dead)
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .map_err(|error| record_error_text(error.code()))?;
+    Ok(held.value.value)
 }
 
 /// What the delivery report says of the recipient's CLI version.

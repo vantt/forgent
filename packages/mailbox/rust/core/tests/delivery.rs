@@ -616,3 +616,68 @@ fn mail_recorded_with_an_effective_wake_before_the_stop_channel_was_turned_off_i
         vec![old.id]
     );
 }
+
+fn alias_candidate(handle: &str) -> fgos_mailbox_core::AliasCandidate {
+    fgos_mailbox_core::AliasCandidate {
+        id: format!("m1/{handle}"),
+        handle: handle.to_string(),
+        liveness: fgos_mailbox_core::Liveness::Alive,
+    }
+}
+
+#[test]
+fn an_alias_refusal_is_counted_toward_the_budget_and_the_lifetime_cap_and_refused_with_its_own_reason_and_candidates(
+) {
+    let mut pair = Pair::new(t(100));
+    pair.limits.session.lifetime_cap = 1;
+    let refusal = fgos_mailbox_core::AliasRefusal::Unknown {
+        candidates: vec![alias_candidate("codex-ab12@fg-server")],
+        no_address_here: true,
+    };
+    let mut req = plain("a", "codex-ab12@fg-server", "hi");
+    req.alias_refusal = Some(refusal.clone());
+
+    let refused = pair.try_send(req, t(100)).unwrap_err();
+
+    assert_eq!(refused, Refusal::Alias(refusal));
+    assert_eq!(refused.code(), "unknown-name");
+    assert!(pair.state.messages().next().is_none());
+    // The refused attempt spent the sender's one lifetime attempt.
+    assert_eq!(
+        pair.try_send(plain("a", B_NAME, "next"), t(101))
+            .unwrap_err()
+            .code(),
+        "lifetime-cap"
+    );
+    let counted = serde_json::to_value(&pair.state).unwrap()["counters"].to_string();
+    assert!(counted.contains("unknown-name"), "{counted}");
+}
+
+#[test]
+fn an_ambiguous_alias_is_refused_ambiguous_name_with_every_candidate() {
+    let mut pair = Pair::new(t(100));
+    let candidates = vec![
+        alias_candidate("claude-aaaa@m"),
+        alias_candidate("claude-bbbb@m"),
+    ];
+    let mut req = plain("a", "lead:MAIL", "hi");
+    req.alias_refusal = Some(fgos_mailbox_core::AliasRefusal::Ambiguous {
+        candidates: candidates.clone(),
+    });
+
+    let refused = pair.try_send(req, t(100)).unwrap_err();
+
+    assert_eq!(refused.code(), "ambiguous-name");
+    assert_eq!(
+        refused,
+        Refusal::Alias(fgos_mailbox_core::AliasRefusal::Ambiguous { candidates })
+    );
+}
+
+#[test]
+fn an_alias_resolving_to_the_sender_itself_is_refused_as_self() {
+    let mut pair = Pair::new(t(100));
+    // The caller resolved the alias to a's own key and passes the key.
+    let refused = pair.try_send(plain("a", "a", "hi"), t(100)).unwrap_err();
+    assert_eq!(refused, Refusal::SelfSend);
+}

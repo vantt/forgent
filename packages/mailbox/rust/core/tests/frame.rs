@@ -338,6 +338,8 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             &["next tool call", "no mail when its turn ends"][..],
         ),
         ("report.wake-no-channel", &["wake was not used"][..]),
+        ("report.role-holder", &["{{role}}", "{{handle}}"][..]),
+        ("refusal.alias.no-address", &["no mailbox address"][..]),
         (
             "refusal.policy",
             &["{{code}}", "{{limit}}", "Do not retry; ask your user."][..],

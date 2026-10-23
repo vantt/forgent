@@ -5,13 +5,16 @@
 //! writer (attribution only, spec §5.1). Every answer is the frame
 //! contract's text; `--json` wraps it in the `fgos.v1` envelope.
 //!
-//! Straight-line: root, config and limits, then one or two `Record` holds;
-//! this process takes the mailbox lock with no other lock held.
+//! Straight-line: root, config and limits, then one or two `Record` holds
+//! (a send to an Identity alias reads the record's heads in one more,
+//! read-only hold first, `mailbox_alias`); this process takes the mailbox
+//! lock with no other lock held, and reads Identity's directory outside it.
 //!
 //! `inbox --claim` writes its frames to stdout itself, through the store's
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
+use super::mailbox_alias::{address, is_alias, Addressed};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
@@ -23,7 +26,8 @@ use fgos_mailbox::limits::{load, read_project_config, Loaded};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
-    record_error_text, record_unavailable_text, MessageId, SendRequest, Timestamp, WriterKey,
+    record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, Liveness,
+    MessageId, SendRequest, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -246,6 +250,34 @@ fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<Mai
     Ok((fgos_dir, record, loaded, warning))
 }
 
+/// Identity's state root, as the `identity` verbs resolve it; `None` without
+/// a `HOME`, the hook's rule, so a sender with no home reads no machine state.
+fn identity_state_root() -> Option<PathBuf> {
+    std::env::var_os("HOME")
+        .filter(|home| !home.is_empty())
+        .map(|_| fgos_holder_lock::state_root::state_root().0)
+}
+
+/// An alias refusal's candidates as typed objects for `--json`.
+fn typed_candidates(refusal: &AliasRefusal) -> Value {
+    let (AliasRefusal::Unknown { candidates, .. } | AliasRefusal::Ambiguous { candidates }) =
+        refusal;
+    candidates
+        .iter()
+        .map(|c| {
+            json!({
+                "id": c.id,
+                "handle": c.handle,
+                "liveness": match c.liveness {
+                    Liveness::Alive => "alive",
+                    Liveness::Dead => "dead",
+                    Liveness::Unknown => "unknown",
+                },
+            })
+        })
+        .collect()
+}
+
 /// The caller's writer key: session identity's, attribution only.
 fn caller(fgos_dir: &Path) -> Option<WriterKey> {
     WriterKey::new(
@@ -292,25 +324,47 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 codex_program: PathBuf::from("codex"),
                 max_read_bytes: loaded.hook.hook.max_read_bytes,
             };
+            let wait = Wait::Ms(loaded.hook.hook.lock_wait_ms);
+            let (to_key, alias_refusal, role_holder) = if is_alias(to) {
+                let heads = match verbs::heads(&record, wait, now(), &loaded.limits) {
+                    Ok(heads) => heads,
+                    Err(text) => return failed(text, *json, warning),
+                };
+                match address(identity_state_root().as_deref(), to, &heads) {
+                    Addressed::Head { key, role_holder } => {
+                        (key.as_str().to_string(), None, role_holder)
+                    }
+                    Addressed::Refused(refusal) => (to.clone(), Some(refusal), None),
+                }
+            } else {
+                (to.clone(), None, None)
+            };
+            let candidates = alias_refusal.as_ref().map(typed_candidates);
             let req = SendRequest {
                 from,
-                to: to.clone(),
+                to: to_key,
                 body,
                 wake: *wake,
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
                 dead_keys: Default::default(),
                 stop_drains: TestedClis::embedded().stop_drains(),
+                alias_refusal,
             };
-            let sent = verbs::send(
-                &record,
-                req,
-                Wait::Ms(loaded.hook.hook.lock_wait_ms),
-                now(),
-                &loaded.limits,
-                &versions,
-            );
+            let mut sent = verbs::send(&record, req, wait, now(), &loaded.limits, &versions);
+            if let (true, Some((role, handle))) = (sent.recorded, role_holder) {
+                sent.text = format!(
+                    "{}\n{}",
+                    sent.text,
+                    role_holder_text(&role, &handle, &loaded.limits)
+                );
+            }
+            let mut data =
+                json!({ "ok": sent.recorded, "recorded": sent.recorded, "text": sent.text });
+            if let Some(candidates) = candidates {
+                data["candidates"] = candidates;
+            }
             MailboxAnswer {
-                data: json!({ "ok": sent.recorded, "recorded": sent.recorded, "text": sent.text }),
+                data,
                 text: sent.text,
                 json: *json,
                 exit: if sent.recorded {

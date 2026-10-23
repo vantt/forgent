@@ -97,6 +97,25 @@ pub(crate) fn escape_header(value: &str, limits: &Limits) -> String {
         .collect()
 }
 
+/// An Identity handle (`<cli>-<suffix>@<machine-handle>`) or role alias
+/// (`lead:<LANE>`): the header alphabet plus `@` and `:`, every other
+/// character `_`, at most `frame.maxHeaderChars` characters. Kept apart
+/// from [`escape_header`], so short names and every other header value
+/// keep their alphabet.
+pub(crate) fn escape_handle(value: &str, limits: &Limits) -> String {
+    value
+        .chars()
+        .map(|c| {
+            if in_name_alphabet(c) || matches!(c, '@' | ':') {
+                c
+            } else {
+                '_'
+            }
+        })
+        .take(limits.frame.max_header_chars as usize)
+        .collect()
+}
+
 /// Code points invisible to a person and still read by a model: every
 /// format character (Unicode 16.0 category Cf), every Default_Ignorable_Code_Point
 /// (the Hangul fillers, the combining grapheme joiner, both blocks of

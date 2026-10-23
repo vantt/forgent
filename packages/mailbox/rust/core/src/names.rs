@@ -38,6 +38,13 @@ impl fmt::Display for ResolveRefusal {
 
 impl std::error::Error for ResolveRefusal {}
 
+/// Whether a typed name addresses several heads at once (check 1).
+pub(crate) fn is_group(query: &str) -> bool {
+    query
+        .chars()
+        .any(|c| c == ',' || c == '*' || c.is_whitespace())
+}
+
 pub(crate) fn in_name_alphabet(c: char) -> bool {
     c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-')
 }
@@ -119,10 +126,7 @@ impl MailboxState {
         let unknown = || ResolveRefusal::Unknown {
             candidates: names_of(live()),
         };
-        if query
-            .chars()
-            .any(|c| c == ',' || c == '*' || c.is_whitespace())
-        {
+        if is_group(query) {
             return Err(ResolveRefusal::Group);
         }
         if query.is_empty() {

@@ -877,3 +877,145 @@ fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_en
     let _ = head.kill();
     let _ = head.wait();
 }
+
+/// Identity's state root of the scene: the default under its `HOME`, with a
+/// machine id minted the way `fgos doctor --fix` mints it.
+fn identity_root(scene: &Scene) -> PathBuf {
+    let root = scene.home().join(".local/state/fgos");
+    fs::create_dir_all(&root).unwrap();
+    fgos_identity::machine::mint(&root, "routes-test").unwrap();
+    root
+}
+
+/// Identity's id and handle of the session `key` of `source`.
+fn identity_of(root: &Path, source: &str, key: &str) -> fgos_identity::SessionInfo {
+    fgos_identity::session_for(
+        root,
+        &fgos_identity::resolve::WriterKey { source, value: key },
+    )
+    .unwrap()
+    .info
+}
+
+/// Registers a session in Identity's directory through Identity's own door,
+/// with this test process as its live head.
+fn register_identity(root: &Path, source: &str, key: &str, roles: &[&str]) -> String {
+    let info = identity_of(root, source, key);
+    let entry = fgos_identity::directory::Entry::new(
+        info.id,
+        info.handle.clone(),
+        "claude".to_string(),
+        None,
+        None,
+        roles.iter().map(|r| r.to_string()).collect(),
+        fgos_identity::current::os_record(std::process::id()),
+    );
+    fgos_identity::directory::register(root, entry, false, &fgos_process::facts::judge_here)
+        .unwrap();
+    info.handle
+}
+
+/// A scene whose record holds one live Claude Code head (this test process,
+/// key `WRITER`), and Identity's root.
+fn scene_with_head(tag: &str) -> (Scene, PathBuf) {
+    let scene = Scene::new(tag);
+    let root = identity_root(&scene);
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    (scene, root)
+}
+
+fn send_to(scene: &Scene, to: &str, json: bool) -> Output {
+    let mut args = vec!["mailbox", "send", "--to", to];
+    if json {
+        args.push("--json");
+    }
+    args.push("hi");
+    scene.run(&scene.main(), Some("sender-a"), &args, b"")
+}
+
+#[test]
+fn a_handle_identity_resolves_to_a_session_that_is_not_a_head_of_this_record_is_refused_unknown_name_and_says_it_has_no_address_here(
+) {
+    let (scene, root) = scene_with_head("alias-elsewhere");
+    let elsewhere = register_identity(
+        &root,
+        "CLAUDE_CODE_SESSION_ID",
+        "00000000-0000-4000-8000-0000000000ee",
+        &[],
+    );
+
+    let out = send_to(&scene, &elsewhere, false);
+
+    assert_eq!(out.status.code(), Some(1), "{out:?}");
+    assert_eq!(
+        String::from_utf8_lossy(&out.stdout),
+        "Refused: unknown-name. Candidates: none.\nThat session has no mailbox address in this project.\n"
+    );
+    assert!(scene.message_states().is_empty());
+}
+
+#[test]
+fn send_to_a_role_reaches_the_head_of_this_record_that_holds_it_and_names_the_holder() {
+    let (scene, root) = scene_with_head("alias-role");
+    let handle = register_identity(&root, "CLAUDE_CODE_SESSION_ID", WRITER, &["lead:MAIL"]);
+
+    let out = send_to(&scene, "lead:MAIL", false);
+
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        text.starts_with("recorded ") && text.contains(&format!(" for {}", scene.head_name())),
+        "{text}"
+    );
+    assert!(
+        text.ends_with(&format!(
+            "delivered to the current holder of lead:MAIL, {handle}\n"
+        )),
+        "{text}"
+    );
+    assert_eq!(scene.message_states(), vec!["recorded".to_string()]);
+}
+
+#[test]
+fn send_to_an_alias_lists_only_this_records_heads_as_candidates() {
+    let (scene, root) = scene_with_head("alias-candidates");
+    let ours = register_identity(&root, "CLAUDE_CODE_SESSION_ID", WRITER, &[]);
+    let foreign = register_identity(
+        &root,
+        "CLAUDE_CODE_SESSION_ID",
+        "00000000-0000-4000-8000-0000000000ff",
+        &[],
+    );
+
+    let out = send_to(&scene, "@", true);
+
+    assert_eq!(out.status.code(), Some(1), "{out:?}");
+    let envelope: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    let data = &envelope["data"];
+    let text = data["text"].as_str().unwrap();
+    assert!(text.contains(&ours), "{text}");
+    assert!(!text.contains(&foreign), "{text}");
+    let candidates = data["candidates"].as_array().unwrap();
+    assert_eq!(candidates.len(), 1, "{candidates:?}");
+    assert_eq!(candidates[0]["handle"], ours);
+    assert_eq!(
+        candidates[0]["id"],
+        identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER).id
+    );
+    assert_eq!(candidates[0]["liveness"], "alive");
+}
+
+#[test]
+fn a_handle_identity_does_not_know_reaches_the_head_whose_derived_handle_it_is() {
+    let (scene, root) = scene_with_head("alias-derived");
+    let handle = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER).handle;
+
+    let out = send_to(&scene, &handle, false);
+
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(
+        String::from_utf8_lossy(&out.stdout).contains(&format!(" for {}", scene.head_name())),
+        "{out:?}"
+    );
+}

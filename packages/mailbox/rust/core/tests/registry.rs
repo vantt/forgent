@@ -291,6 +291,12 @@ fn a_folder_name_with_spaces_or_non_ascii_is_reduced_to_the_name_alphabet_and_a_
     let name = register_new(&mut state, spaced, t(100), &limits, &mut ids);
     assert!(name.starts_with("my-proj--eta_v1.2-codex-"), "{name}");
 
+    // A folder name holding `@` never gives a name that reads as an alias.
+    let mut at = request("k3", "codex", None, "h3");
+    at.project = "team@lab".to_string();
+    let name = register_new(&mut state, at, t(100), &limits, &mut ids);
+    assert!(name.starts_with("team-lab-codex-"), "{name}");
+
     let mut long = request("k2", "codex", None, "h2");
     long.project = "p".repeat(bound * 2);
     let name = register_new(&mut state, long, t(100), &limits, &mut ids);

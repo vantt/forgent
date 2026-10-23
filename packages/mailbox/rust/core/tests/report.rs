@@ -275,3 +275,34 @@ fn the_too_large_pointer_names_the_count_and_the_claim_command() {
     assert!(text.ends_with("fgos mailbox inbox --claim"), "{text}");
     assert!(!text.contains('\n'));
 }
+
+#[test]
+fn an_alias_refusal_lists_handles_through_the_handle_escape_and_adds_its_note() {
+    use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Liveness};
+    let limits = spec_limits();
+    let refusal = Refusal::Alias(AliasRefusal::Unknown {
+        candidates: vec![AliasCandidate {
+            id: "m1/k".to_string(),
+            handle: "codex-ab12@fg-server <x>".to_string(),
+            liveness: Liveness::Alive,
+        }],
+        no_address_here: true,
+    });
+    assert_eq!(
+        refusal_text(&refusal, &limits),
+        "Refused: unknown-name. Candidates: codex-ab12@fg-server__x_.\n\
+         That session has no mailbox address in this project."
+    );
+    let bare = Refusal::Alias(AliasRefusal::Unknown {
+        candidates: Vec::new(),
+        no_address_here: false,
+    });
+    assert_eq!(
+        refusal_text(&bare, &limits),
+        "Refused: unknown-name. Candidates: none."
+    );
+    assert_eq!(
+        fgos_mailbox_core::role_holder_text("lead:MAIL", "claude-5v7u@fg-server", &limits),
+        "delivered to the current holder of lead:MAIL, claude-5v7u@fg-server"
+    );
+}

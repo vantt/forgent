@@ -115,6 +115,7 @@ pub fn send_req<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
         reply_to: None,
         dead_keys: Default::default(),
         stop_drains: fgos_mailbox::adapters::TestedClis::embedded().stop_drains(),
+        alias_refusal: None,
     }
 }
 

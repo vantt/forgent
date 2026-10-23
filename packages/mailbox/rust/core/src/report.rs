@@ -4,9 +4,9 @@
 //! Every sentence comes from the frame contract and is filled by the
 //! frame's one filler; every value taken from the record goes through the
 //! frame's header escape.
-use crate::delivery::{MessageView, Refusal, SendOutcome};
+use crate::delivery::{AliasRefusal, MessageView, Refusal, SendOutcome};
 use crate::envelope::Kind;
-use crate::frame::{escape_header, fill, section};
+use crate::frame::{escape_handle, escape_header, fill, section};
 use crate::limits::Limits;
 use crate::wake::WakeDrop;
 
@@ -79,7 +79,9 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
         | Refusal::SenderShareFull { .. } => "refusal.policy",
         Refusal::Loop { .. } => "refusal.loop",
         Refusal::TooLarge { .. } => "refusal.too-large",
-        Refusal::UnknownName { .. } | Refusal::AmbiguousName { .. } => "refusal.name",
+        Refusal::UnknownName { .. } | Refusal::AmbiguousName { .. } | Refusal::Alias(_) => {
+            "refusal.name"
+        }
         Refusal::Group
         | Refusal::SelfSend
         | Refusal::ReplyToNotOffered
@@ -87,24 +89,57 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
     };
     let candidates = match refusal {
         Refusal::UnknownName { candidates } | Refusal::AmbiguousName { candidates } => {
-            let names: Vec<String> = candidates
+            listed(candidates.iter().map(|c| c.as_str()), limits)
+        }
+        Refusal::Alias(
+            AliasRefusal::Unknown { candidates, .. } | AliasRefusal::Ambiguous { candidates },
+        ) => {
+            let handles: Vec<String> = candidates
                 .iter()
-                .map(|c| escape_header(c.as_str(), limits))
+                .map(|c| escape_handle(&c.handle, limits))
                 .collect();
-            if names.is_empty() {
+            if handles.is_empty() {
                 "none".to_string()
             } else {
-                names.join(", ")
+                handles.join(", ")
             }
         }
         _ => String::new(),
     };
-    fill(
+    let text = fill(
         section(name),
         &[
             ("code", code),
             ("limit", &limit),
             ("candidates", &candidates),
+        ],
+    );
+    match refusal {
+        Refusal::Alias(AliasRefusal::Unknown {
+            no_address_here: true,
+            ..
+        }) => format!("{text}\n{}", section("refusal.alias.no-address")),
+        _ => text,
+    }
+}
+
+/// Candidates joined by a comma through the header escape, or `none`.
+fn listed<'a>(names: impl Iterator<Item = &'a str>, limits: &Limits) -> String {
+    let names: Vec<String> = names.map(|n| escape_header(n, limits)).collect();
+    if names.is_empty() {
+        "none".to_string()
+    } else {
+        names.join(", ")
+    }
+}
+
+/// The line a send to a role alias adds: who holds the role now.
+pub fn role_holder_text(role: &str, handle: &str, limits: &Limits) -> String {
+    fill(
+        section("report.role-holder"),
+        &[
+            ("role", &escape_handle(role, limits)),
+            ("handle", &escape_handle(handle, limits)),
         ],
     )
 }
@@ -149,7 +184,8 @@ fn limit_text(refusal: &Refusal) -> String {
         | Refusal::UnknownName { .. }
         | Refusal::AmbiguousName { .. }
         | Refusal::SelfSend
-        | Refusal::ReplyToNotOffered => Vec::new(),
+        | Refusal::ReplyToNotOffered
+        | Refusal::Alias(_) => Vec::new(),
     };
     pairs
         .iter()

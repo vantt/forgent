@@ -1,7 +1,7 @@
 mod common;
 
 use common::{key, plain, t, Pair, A_NAME, B_NAME};
-use fgos_mailbox_core::{CounterReason, MessageId, Refusal};
+use fgos_mailbox_core::{AliasRefusal, CounterReason, MessageId, Refusal};
 
 fn code(result: &Result<fgos_mailbox_core::SendOutcome, Refusal>) -> &'static str {
     match result {
@@ -546,7 +546,20 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
     let not_offered = MessageId::from_text("never-offered");
 
     let mut checked = Vec::new();
+    let unknown_alias = || AliasRefusal::Unknown {
+        candidates: Vec::new(),
+        no_address_here: false,
+    };
+    let ambiguous_alias = || AliasRefusal::Ambiguous {
+        candidates: Vec::new(),
+    };
     for (expected, later) in [
+        ("sender-key-too-long", "alias:unknown-name"),
+        ("group", "alias:unknown-name"),
+        // An alias refusal takes check 2's place: it is never resolved, so
+        // it comes before everything resolution would reach.
+        ("alias:unknown-name", "reply-to-not-offered"),
+        ("alias:ambiguous-name", "too-large"),
         ("sender-key-too-long", "group"),
         ("group", "unknown-name"),
         // `self` is judged on the resolved name, so it can never fail
@@ -565,8 +578,11 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         let mut from = "a".to_string();
         let mut to = B_NAME.to_string();
         let mut hint = None;
+        let mut alias = None;
         for failing in [expected, later] {
             match failing {
+                "alias:unknown-name" => alias = Some(unknown_alias()),
+                "alias:ambiguous-name" => alias = Some(ambiguous_alias()),
                 "sender-key-too-long" => from = long_key(&pair),
                 "group" => to = "x,y".to_string(),
                 // "x,y" also names nobody, so a group stays unknown too.
@@ -586,11 +602,16 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         }
         let mut req = plain(&from, &to, "body");
         req.reply_to = hint;
+        req.alias_refusal = alias;
 
         let result = pair.try_send(req, t(3));
 
-        assert_eq!(code(&result), expected, "{expected} before {later}");
+        assert_eq!(
+            code(&result),
+            expected.trim_start_matches("alias:"),
+            "{expected} before {later}"
+        );
         checked.push(expected);
     }
-    assert_eq!(checked.len(), 11);
+    assert_eq!(checked.len(), 15);
 }
