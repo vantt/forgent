@@ -1,7 +1,7 @@
 //! Explicit non-event transfers. Remote transport is never enabled by another port.
 use crate::{
     driver::{Output, Policy},
-    refs::{admission, direct, pending, receipt, sync_refs, tip, Authority},
+    refs::{admission, direct, pending, receipt, sync_refs, tip, zero_oid, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -46,12 +46,7 @@ impl GitDriver {
         repo: &RepoHandle,
         grant: &RemoteGrant,
     ) -> Result<(String, &'static str)> {
-        if grant.name.is_empty()
-            || !grant
-                .name
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-        {
+        if !wal::valid_id(&grant.name) {
             return Err(failure("remote-not-granted"));
         }
         let out = self.checked(repo, &["remote", "get-url", "--", &grant.name], Policy::Inspect)?;
@@ -461,11 +456,7 @@ impl GitDriver {
                         observations.push((name.as_str().into(), tip(&direct(self, repo, name)?)));
                         continue;
                     }
-                    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-                        40
-                    } else {
-                        64
-                    });
+                    let zero = zero_oid(repo.object_format());
                     let prior = old.clone();
                     let old = match old {
                         ExpectedTip::Oid(o) => o.as_str(),

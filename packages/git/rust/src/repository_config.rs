@@ -50,11 +50,7 @@ fn receipt(id: &str, digest: &str) -> Receipt {
 /// A wildcard also matches the empty suffix, preserving the legacy mirror name
 /// while allowing ordinary fetch to succeed before the cutover creates the ref.
 pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
-    if remote.is_empty()
-        || !remote
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b"-_".contains(&b))
-    {
+    if !wal::valid_id(remote) {
         return Err(failure("invalid-fetch-mapping-remote"));
     }
     Ok(vec![

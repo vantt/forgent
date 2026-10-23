@@ -463,10 +463,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         old: &ExpectedTip,
         next: &ExpectedTip,
     ) -> Result<Output> {
-        let zero = "0".repeat(match repo.object_format() {
-            ObjectFormat::Sha1 => 40,
-            ObjectFormat::Sha256 => 64,
-        });
+        let zero = crate::refs::zero_oid(repo.object_format());
         let old = match old {
             ExpectedTip::Absent => &zero,
             ExpectedTip::Oid(o) => o.as_str(),

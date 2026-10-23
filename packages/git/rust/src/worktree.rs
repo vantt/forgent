@@ -1,7 +1,7 @@
 //! Worktree administration. One rank-40 hold spans inspection and mutation.
 use crate::{
     driver::Policy,
-    refs::{admission, install_pin, pending, release_pin, Authority},
+    refs::{admission, byte_path, install_pin, pending, release_pin, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -702,17 +702,9 @@ impl GitDriver {
                 return Err(failure("worktree-branch-invalid"));
             }
             for fact in &rows {
-                if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
-                    return Err(failure("worktree-registration-uncertain"));
-                }
                 // Reuse Git's inventory for HEAD facts, but retain reciprocal
                 // topology and rebase/bisect branch reservations on disk.
-                let target = if fact.bare { None } else {
-                    match self.resolve_topology(&byte_path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(target) => Some(target),
-                        _ => return Err(failure("worktree-registration-uncertain")),
-                    }
-                };
+                let target = self.registered_topology(repo, fact)?;
                 if crate::refs::branch_in_use(fact, target.as_ref(), branch)? {
                     return Err(failure("branch-in-use"));
                 }
@@ -1592,18 +1584,6 @@ impl GitDriver {
         Ok(())
     }
 }
-fn byte_path(bytes: &[u8]) -> Result<PathBuf> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStrExt;
-        Ok(Path::new(std::ffi::OsStr::from_bytes(bytes)).into())
-    }
-    #[cfg(not(unix))]
-    {
-        Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))
-    }
-}
-
 fn admin_identity(path: &Path) -> Result<String> {
     let m = fs::symlink_metadata(path).map_err(failure)?;
     if !m.is_dir() || m.file_type().is_symlink() {

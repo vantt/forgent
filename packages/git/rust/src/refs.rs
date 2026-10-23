@@ -12,6 +12,10 @@ use std::{
     time::Duration,
 };
 
+/// The all-zero id `update-ref` reads as "no such ref", in the repository's hash length.
+pub(crate) fn zero_oid(format: ObjectFormat) -> String {
+    "0".repeat(if format == ObjectFormat::Sha1 { 40 } else { 64 })
+}
 pub(crate) fn tip(value: &ExpectedTip) -> Tip {
     match value {
         ExpectedTip::Absent => Tip::Absent,
@@ -272,7 +276,7 @@ pub(crate) fn pending(mut e: OperationError, id: &str) -> OperationError {
     e.operation_id = Some(id.into());
     e
 }
-fn path(bytes: &[u8]) -> Result<PathBuf> {
+pub(crate) fn byte_path(bytes: &[u8]) -> Result<PathBuf> {
     #[cfg(unix)]
     {
         use std::os::unix::ffi::OsStrExt;
@@ -292,11 +296,6 @@ pub(crate) fn install_pin(
 ) -> Result<()> {
     let pin =
         RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
-    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-        40
-    } else {
-        64
-    });
     // A durable intent can outlive pin installation but precede Prepared.
     // Reuse only the exact candidate; a different/symbolic pin still refuses.
     if direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
@@ -308,7 +307,7 @@ pub(crate) fn install_pin(
                 "--no-deref",
                 pin.as_str(),
                 candidate.as_str(),
-                &zero,
+                &zero_oid(repo.object_format()),
             ]),
             &[],
             false,
@@ -429,6 +428,24 @@ impl GitDriver {
             .collect())
     }
 
+    /// The topology of a registered checkout, `None` for a bare one. A registration that is
+    /// prunable, still initializing or does not resolve is uncertain, and nothing proceeds on it.
+    pub(crate) fn registered_topology(
+        &self,
+        repo: &RepoHandle,
+        fact: &WorktreeFact,
+    ) -> Result<Option<RepoHandle>> {
+        if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
+            return Err(failure("worktree-registration-uncertain"));
+        }
+        if fact.bare {
+            return Ok(None);
+        }
+        match self.resolve_topology(&byte_path(&fact.path)?, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => Ok(Some(r)),
+            _ => Err(failure("worktree-registration-uncertain")),
+        }
+    }
     pub(crate) fn checkouts(
         &self,
         repo: &RepoHandle,
@@ -438,33 +455,26 @@ impl GitDriver {
         loop {
             let page = self.list_worktrees(repo, cursor, 4096)?;
             for fact in page.entries {
-                if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
-                    return Err(failure("worktree-registration-uncertain"));
-                }
-                let resolved = if fact.bare {
-                    None
-                } else {
-                    match self.resolve_topology(&path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(mut r) => {
-                            // Same checkout, same operation: reuse stamp-validated facts.
-                            // Other worktrees can have different worktree config.
-                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
-                                r.object_format = repo.object_format;
-                                r.layout = repo.layout.clone();
-                                r.checkout_config = Some(std::sync::Mutex::new(
-                                    config.lock()
-                                        .map_err(|_| failure("config-cache-poisoned"))?.clone(),
-                                ));
-                            } else {
-                                r = match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
-                                    ResolveRepo::Repository(r) => r,
-                                    _ => return Err(failure("worktree-registration-uncertain")),
-                                };
-                            }
-                            Some(r)
-                        },
-                        _ => return Err(failure("worktree-registration-uncertain")),
+                let resolved = match self.registered_topology(repo, &fact)? {
+                    Some(mut r) => {
+                        // Same checkout, same operation: reuse stamp-validated facts.
+                        // Other worktrees can have different worktree config.
+                        if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
+                            r.object_format = repo.object_format;
+                            r.layout = repo.layout.clone();
+                            r.checkout_config = Some(std::sync::Mutex::new(
+                                config.lock()
+                                    .map_err(|_| failure("config-cache-poisoned"))?.clone(),
+                            ));
+                        } else {
+                            r = match self.resolve_repo(&byte_path(&fact.path)?, repo.trusted_main_root())? {
+                                ResolveRepo::Repository(r) => r,
+                                _ => return Err(failure("worktree-registration-uncertain")),
+                            };
+                        }
+                        Some(r)
                     }
+                    None => None,
                 };
                 // Resolve registered admin HEAD, never a worker gitfile.
                 if let Some(r) = &resolved {
@@ -810,11 +820,7 @@ impl GitDriver {
                     return Err(recovery("checkout-dirty-recovery-required"));
                 }
             }
-            let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-                40
-            } else {
-                64
-            });
+            let zero = zero_oid(repo.object_format());
             let old_text = match old {
                 ExpectedTip::Absent => zero.as_str(),
                 ExpectedTip::Oid(o) => o.as_str(),
