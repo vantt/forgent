@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2a6a9b5ec29dbb131b5a42e1881a1906db36c8d25618b59ed0279fd8cf2902a5",
+  "payloadDigest": "25175cd40630c82399b37905a330d3b6e1d032e6ed8aa409c26f5ff9e889401c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -64,7 +64,7 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
-    ".githooks/pre-commit": "418a1c5f9969b3a9a1f2e13a77e2a7fe60e5ddb93e78bc2b25e47a70e9ea29f4",
+    ".githooks/pre-commit": "94710941654152ef539508ecfb6e25198b0fd9b41bc81c667f52ae9eddeb85ab",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
@@ -1159,7 +1159,11 @@
         ".githooks/pre-commit:53",
         ".githooks/pre-commit:58",
         ".githooks/pre-commit:63",
-        ".githooks/pre-commit:68"
+        ".githooks/pre-commit:68",
+        ".githooks/pre-commit:462",
+        ".githooks/pre-commit:464",
+        ".githooks/pre-commit:469",
+        ".githooks/pre-commit:472"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1167,7 +1171,11 @@
         "diff",
         "diff",
         "show",
-        "diff"
+        "diff",
+        "ls-files",
+        "diff",
+        "cat-file",
+        "show"
       ]
     },
     {
@@ -1177,7 +1185,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:515"
+        ".githooks/pre-commit:545"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1191,7 +1199,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:551"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1205,7 +1213,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:551"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1219,7 +1227,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:578"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1233,7 +1241,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:578"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1247,7 +1255,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:578"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1261,7 +1269,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:548"
+        ".githooks/pre-commit:584"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1275,7 +1283,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:548"
+        ".githooks/pre-commit:584"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1289,7 +1297,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:548"
+        ".githooks/pre-commit:584"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1303,7 +1311,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:548"
+        ".githooks/pre-commit:584"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1317,7 +1325,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1331,7 +1339,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1345,7 +1353,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1359,7 +1367,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:539"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1373,7 +1381,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:539"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1387,7 +1395,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:539"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1401,7 +1409,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:539"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1415,7 +1423,37 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:533"
+        ".githooks/pre-commit:51",
+        ".githooks/pre-commit:53",
+        ".githooks/pre-commit:58",
+        ".githooks/pre-commit:63",
+        ".githooks/pre-commit:68",
+        ".githooks/pre-commit:462",
+        ".githooks/pre-commit:464",
+        ".githooks/pre-commit:469",
+        ".githooks/pre-commit:472"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse",
+        "diff",
+        "diff",
+        "show",
+        "diff",
+        "ls-files",
+        "diff",
+        "cat-file",
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 485,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:569"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1424,12 +1462,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 493,
+      "line": 523,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:516"
+        ".githooks/pre-commit:546"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1438,19 +1476,19 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 497,
+      "line": 527,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 507,
+      "line": 537,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:617"
+        ".githooks/pre-commit:653"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1459,14 +1497,14 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 561,
+      "line": 597,
       "spawn": "mainLockVerdict -> .githooks/pre-commit:165",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 588,
+      "line": 624,
       "spawn": "identityData -> .githooks/pre-commit:117",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
