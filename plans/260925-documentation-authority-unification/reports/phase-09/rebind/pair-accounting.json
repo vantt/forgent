@@ -1,0 +1,39 @@
+{
+  "authority": "L12-137",
+  "sourceHead": "dbf8ad715f44bee2199c0fe199427e5cecdfef18",
+  "method": "Exact first-parent, no-merges A offender-pair recipe; one known historical pair appended before array anchor. Future runner commit not guessed. Existing allowed paths, B pins, baselines and all non-accounting checker bytes unchanged.",
+  "items": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "appended": [
+        {
+          "commit": "dbf8ad715f44bee2199c0fe199427e5cecdfef18",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/w5-rebind-brief.md",
+          "authority": "L12-137"
+        }
+      ],
+      "beforeSha256": "5f637d0c21595108bcc816a189adc450c35bce4d57b87dbddcd58a903be69cbd",
+      "afterSha256": "2a2d2853600a56c2fe5418f93873561362064755c91055917cf6e04651137860",
+      "exceptionCountBefore": 4979,
+      "exceptionCountAfter": 4980,
+      "allNonAccountingBytesUnchanged": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "appended": [
+        {
+          "commit": "dbf8ad715f44bee2199c0fe199427e5cecdfef18",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-09/w5-rebind-brief.md",
+          "authority": "L12-137"
+        }
+      ],
+      "beforeSha256": "5d89f87b355c0167399542603eba9e55a6807296144ff29eacf8b44320b2aa89",
+      "afterSha256": "bb140c008a2071d8e143c0222ca05154f374072f852363fdd33645714b6b9f73",
+      "exceptionCountBefore": 4979,
+      "exceptionCountAfter": 4980,
+      "allNonAccountingBytesUnchanged": true
+    }
+  ],
+  "ownFutureCommitAccounting": "Lead after runner commit",
+  "actualChecksAandB": "blocked by native git-floor-probe read-only-filesystem refusal; no successful A/B claim"
+}

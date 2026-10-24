@@ -1,0 +1,176 @@
+{
+  "sourceHead": "dbf8ad715f44bee2199c0fe199427e5cecdfef18",
+  "outputPlumbingOnly": "Original __file__, ROOT, inputs and assertions retained. Only scratch prefixes, scratch-relative module import resolution, and final report destinations relocated. Scoped reruns, not literal-command pass claims.",
+  "recipesTestHost": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+  "commands": [
+    {
+      "label": "misc-preimage-check",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/w5-rebind/misc-rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"changedRows\": 27, \"contentChangedRows\": 21, \"effectiveBindingsChecked\": 283, \"sourceHead\": \"23f6eaccf5eb195a8f50e5788d38f386a901b6d2\"}\n",
+      "stderr": ""
+    },
+    {
+      "label": "misc-verifier",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/w5-rebind/misc-verify.py"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-work/w5-rebind/misc-verify.py\", line 3, in <module>\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 85, in <module>\n    if __name__=='__main__':main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py\", line 53, in main\n    assert a==b==(ROOT/G6/name).read_bytes(),name\nAssertionError: proof.json\n"
+    },
+    {
+      "label": "preserve-verifier",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/w5-rebind/preserve-verify.py"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-work/w5-rebind/preserve-verify.py\", line 3, in <module>\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 168, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 37, in main\n    assert run.returncode == 0, run.stderr.decode()\nAssertionError: fatal: path 'packages/config/rust/src/doctor.rs' exists on disk, but not in '3d0169f390e21c67bc3fc69081fd1bc07186599f'\nTraceback (most recent call last):\n  File \"/tmp/fgos-work/w5-rebind/join.py\", line 3, in <module>\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py\", line 385, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py\", line 297, in main\n    judged_sources = {file:sha(git('show',judgment_pin+':'+file)) for file in {r['file'] for r in dynamic_delta}}\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py\", line 297, in <dictcomp>\n    judged_sources = {file:sha(git('show',judgment_pin+':'+file)) for file in {r['file'] for r in dynamic_delta}}\n  File \"/home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py\", line 14, in git\n    return subprocess.check_output(['git', '-C', str(ROOT), *args])\n  File \"/usr/lib/python3.10/subprocess.py\", line 421, in check_output\n    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,\n  File \"/usr/lib/python3.10/subprocess.py\", line 526, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['git', '-C', '/home/vantt/projects/forgentX-p9-w1-d3', 'show', '3d0169f390e21c67bc3fc69081fd1bc07186599f:packages/config/rust/src/doctor.rs']' returned non-zero exit status 128.\n\n"
+    },
+    {
+      "label": "audit-report",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/w5-rebind/audit-report.py"
+      ],
+      "exit": 1,
+      "stdout": "Large stdout summarized separately; no successful audit claim.",
+      "stderr": "",
+      "auditSummary": [
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+          "commands": [
+            {
+              "script": "ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "audit-ownership.mjs",
+              "exit": 1
+            },
+            {
+              "script": "checks.mjs",
+              "exit": 1
+            }
+          ],
+          "failingRows": 217,
+          "ownership": {
+            "noNewDoubleOwnership": false,
+            "nativePlatformTargetIdentityDuplicates": 0,
+            "newActiveSourcePairCollisions": []
+          },
+          "checks": null,
+          "checkStderr": "file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16\n    facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };\n                                                                 ^\n\nError: {\"cause\":\"git-floor-probe-failed: git-driver-io: Read-only file system (os error 30)\",\"code\":\"refused\",\"detail\":null,\"exitCode\":null,\"operationId\":null,\"receipt\":null,\"retryable\":false,\"signal\":null,\"stderr\":[]}\n    at facade.<computed> [as trackedPaths] (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16:66)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:47\n    at inspectEntries (file:///home/vantt/projects/forgentX-p9-w1-d3/src/util/git-paths.mjs:57:18)\n    at trackedPlatformDocs (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:17)\n    at file:///tmp/fgos-work/w5-rebind/p8-audit-5fzuxxzb/step10-round5/checks.mjs:19:13 {\n  code: 'GenericFailure'\n}\n\nNode.js v24.18.0\n"
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+          "commands": [
+            {
+              "script": "ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "audit-ownership.mjs",
+              "exit": 1
+            },
+            {
+              "script": "checks.mjs",
+              "exit": 1
+            }
+          ],
+          "failingRows": 217,
+          "ownership": {
+            "noNewDoubleOwnership": false,
+            "nativePlatformTargetIdentityDuplicates": 0,
+            "newActiveSourcePairCollisions": []
+          },
+          "checks": null,
+          "checkStderr": "file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16\n    facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };\n                                                                 ^\n\nError: {\"cause\":\"git-floor-probe-failed: git-driver-io: Read-only file system (os error 30)\",\"code\":\"refused\",\"detail\":null,\"exitCode\":null,\"operationId\":null,\"receipt\":null,\"retryable\":false,\"signal\":null,\"stderr\":[]}\n    at facade.<computed> [as trackedPaths] (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16:66)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:47\n    at inspectEntries (file:///home/vantt/projects/forgentX-p9-w1-d3/src/util/git-paths.mjs:57:18)\n    at trackedPlatformDocs (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:17)\n    at file:///tmp/fgos-work/w5-rebind/p8-audit-5fzuxxzb/step10-sync4d/checks.mjs:19:13 {\n  code: 'GenericFailure'\n}\n\nNode.js v24.18.0\n"
+        }
+      ]
+    },
+    {
+      "label": "recipe-tests",
+      "argv": [
+        "node",
+        "--test",
+        "/tmp/fgos-work/w5-rebind/doc-rationale-reproduction.test.mjs"
+      ],
+      "exit": 1,
+      "stdout": "✔ reproduction rejects missing or repository output [\"consistency\"] (20.818239ms)\n✔ reproduction rejects missing or repository output [\"consistency\",\"--output\",\"/home/vantt/projects/forgentX-p9-w1-d3/plans/unsafe.json\"] (20.791078ms)\n✔ reproduction rejects missing or repository output [\"consistency\",\"--output\",\"relative.json\"] (22.818228ms)\n✔ direct audit rejects a symlink output before reading the corpus (24.780072ms)\n✔ direct audit rejects a dangling-symlink output before reading the corpus (25.090519ms)\n✔ direct audit rejects a hardlink output before reading the corpus (30.227008ms)\n✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (11649.761298ms)\n✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (12846.816736ms)\nℹ tests 8\nℹ suites 0\nℹ pass 6\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 24684.791137\n\n✖ failing tests:\n\ntest at ../../../../tmp/fgos-work/w5-rebind/doc-rationale-reproduction.test.mjs:23:131\n✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (11649.761298ms)\n  AssertionError [ERR_ASSERTION]: audit-ownership.mjs\n  \n  node:internal/modules/run_main:107\n      triggerUncaughtException(\n      ^\n  \n  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n  \n    assert(current.noNewDoubleOwnership)\n  \n      at file:///tmp/fgos-work/w5-rebind/reviewer-fresh-jdbNYq/audit-ownership.mjs:8:56 {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: '==',\n    diff: 'simple'\n  }\n  \n  Node.js v24.18.0\n  \n  \n  1 !== 0\n  \n      at TestContext.<anonymous> (file:///tmp/fgos-work/w5-rebind/doc-rationale-reproduction.test.mjs:30:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1325:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)\n      at Test.postRun (node:internal/test_runner/test:1465:19)\n      at Test.run (node:internal/test_runner/test:1390:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 1,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ../../../../tmp/fgos-work/w5-rebind/doc-rationale-reproduction.test.mjs:23:131\n✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (12846.816736ms)\n  AssertionError [ERR_ASSERTION]: audit-ownership.mjs\n  \n  node:internal/modules/run_main:107\n      triggerUncaughtException(\n      ^\n  \n  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n  \n    assert(current.noNewDoubleOwnership)\n  \n      at file:///tmp/fgos-work/w5-rebind/reviewer-fresh-8NSza7/audit-ownership.mjs:8:56 {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: '==',\n    diff: 'simple'\n  }\n  \n  Node.js v24.18.0\n  \n  \n  1 !== 0\n  \n      at TestContext.<anonymous> (file:///tmp/fgos-work/w5-rebind/doc-rationale-reproduction.test.mjs:30:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1325:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)\n      at Test.postRun (node:internal/test_runner/test:1465:19)\n      at Test.run (node:internal/test_runner/test:1390:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 1,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": ""
+    },
+    {
+      "label": "check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 1,
+      "stdout": "Large stdout summarized separately; no successful audit claim.",
+      "stderr": ""
+    },
+    {
+      "label": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "authorPreflight": {
+    "status": "blocked",
+    "counts": {
+      "driftingRows": 217,
+      "proposedByKind": {
+        "content": 124,
+        "anchor-only": 93
+      },
+      "applied": 0
+    },
+    "blockers": [
+      {
+        "kind": "required-proof-preimage-conflict",
+        "proof": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
+        "error": "('stale preimage', 'plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json', '/claims/26')",
+        "noRepositoryRowsChanged": true
+      }
+    ]
+  },
+  "minimalPreimageConflict": {
+    "method": "No repository mutation: in-memory only hypothetical direct-row rebind; original misc generate() assertions unchanged; scratch path relocated.",
+    "sourceHead": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+    "result": {
+      "type": "AssertionError",
+      "error": "('stale preimage', 'plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json', '/claims/26')"
+    },
+    "hypotheticalClaimIds": [
+      "claim_aa28053a8a4b2ff13690fc6a20044b9f",
+      "claim_b5695d38282e111f8ed06656b2efa433",
+      "claim_4eeb2f406288458e61bad21531966ab1",
+      "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+      "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+      "claim_daaf3726036adad15b2529ad43f71d44"
+    ],
+    "repositoryWrites": 0
+  }
+}
