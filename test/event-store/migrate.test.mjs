@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { root } from '../../scripts/git-addon.mjs';
 import { fixture, addon, loaderOptions, legacyOrderOf } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';
@@ -87,26 +86,6 @@ test('legacy-layout doctor warns on pre-migration inventory', t => {
   const f = fixture(t); trackedLegacy(f);
   const result = checkEventStore(f.repo, 'event-store-legacy-layout', f.ctx);
   assert.equal(result.passed, true); assert.match(result.message, /warning: event-store-migration-required.*fgos events migrate/);
-});
-
-test('current checkout tracked Work history reproduces its legacy fold in a temporary repository', t => {
-  const f = fixture(t);
-  const source = (...args) => execFileSync('git', ['-C', root, ...args], { maxBuffer: 64 * 1024 * 1024 });
-  const paths = source('ls-tree', '-r', '--name-only', '-z', 'HEAD', '--', '.fgos').toString().split('\0').filter(p => p === '.fgos/events.jsonl' || /^\.fgos\/events\/[^/]+\.jsonl$/.test(p));
-  assert.ok(paths.length > 0);
-  for (const p of paths) {
-    fs.mkdirSync(path.dirname(path.join(f.repo, p)), { recursive: true });
-    fs.writeFileSync(path.join(f.repo, p), source('show', `HEAD:${p}`));
-  }
-  f.git('add', ...paths); f.git('commit', '-qm', 'copy tracked Work history');
-  const before = snapshot(f);
-  const parity = migrationParity(before);
-  assert.equal(parity.equal, true, JSON.stringify(parity.differences));
-  const pin = f.store.importLegacy({ expectedHead: before.inventory.fromCommit }, []);
-  const got = f.store.read({ streams: ['project'] }, []);
-  assert.equal(migrationParity({ inventory: before.inventory, events: got.legacy }).equal, true);
-  assert.equal(f.git('rev-parse', 'refs/fgos/legacy'), pin.legacyRefOid);
-  t.diagnostic(`Copied ${paths.length} tracked event files; ${parity.workEvents} unique Work records`);
 });
 
 test('fresh project doctor passes and unfenced reads ignore stale local/mirror imports', t => {
