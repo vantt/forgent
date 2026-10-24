@@ -78,6 +78,8 @@ import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-coordination.mjs';
 import { maintainEventStore } from '../src/event-store/maintenance.mjs';
+import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
+import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
 import { currentDispatchDepth } from '../src/runner/dispatch/transport.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
@@ -2960,6 +2962,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { statusUseCase } = await import('../src/verbs/events/status.mjs');
         return statusUseCase(ctx, { remote: flags.remote });
       }
+      if (sub === 'seal') {
+        const { sealUseCase } = await import('../src/verbs/events/seal.mjs');
+        return sealUseCase(ctx, { stream: flags.stream, history: flags.history });
+      }
       if (sub === 'export') {
         const { exportUseCase } = await import('../src/verbs/events/export.mjs');
         return exportUseCase(ctx, { out: flags.out, format: flags.format, stream: flags.stream, since: flags.since });
@@ -2968,7 +2974,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
         return migrateUseCase({ ...ctx, writer: String(resolveWriterIdentity(dir).id) }, { baseline: flags.baseline, check: flags.check });
       }
-      throw new StoreError('validation', 'events requires sync|status|export|migrate');
+      throw new StoreError('validation', 'events requires sync|status|seal|export|migrate');
     }
 
     case 'rebuild': {
@@ -4809,6 +4815,14 @@ const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild
 function landsWork(verb, positional) {
   return verb === 'approve' || verb === 'sync-root' || verb === 'promote-to-component' || (verb === 'merge' && positional[0] === 'next');
 }
+// A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
+// `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
+// nothing: the events are durable and the next command or doctor `event-store-unsealed` covers them (spec §16).
+function handSealsToChild() {
+  for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
+    spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
+  }
+}
 function opensEventStore(entry, verb, positional) {
   // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
   if (verb === 'events' && positional[0] === 'migrate') return false;
@@ -5105,6 +5119,7 @@ async function main() {
   // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
   let eventStoreLifecycle = null;
   let sweepsLand = false;
+  processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
 
@@ -5274,6 +5289,7 @@ async function main() {
   } finally {
     // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
     // not a dispatched worker publishes (D13); sealing is always safe.
+    handSealsToChild();
     if (eventStoreLifecycle) {
       maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
       // A dispatched worker never releases: only the clone owner's own session does (D13).

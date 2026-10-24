@@ -1531,11 +1531,12 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'events',
-    invoke: 'fgos events <sync|status|export|migrate>',
+    invoke: 'fgos events <sync|status|seal|export|migrate>',
     description: 'Synchronize, inspect, export or migrate the repository Event Store. `sync` and `migrate` write (sync pushes event refs to the remote); `status` and `export` only read.',
     subcommands: {
       sync: { description: 'Fetch event refs and publish this clone\'s own, unless --no-push.', examples: ['fgos events sync', 'fgos events sync --no-push'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' }, 'no-push': { type: 'boolean', description: 'Fetch only; publish nothing.' } }, required: [] } },
       status: { description: 'Inspect integrity and publication state: refs, streams, unsealed events, deferred and missing predecessors.', examples: ['fgos events status'], parameters: { type: 'object', properties: { remote: { type: 'string', description: 'Remote name (default: eventStore.remote).' } }, required: [] } },
+      seal: { description: 'Certify the open events of one stream now, waiting for the seal lock; the detached child every Work command hands its seal to.', examples: ['fgos events seal --stream project'], parameters: { type: 'object', properties: { stream: { type: 'string', description: 'Stream to seal (for Work: project).' }, history: { type: 'string', description: 'History checkpoint file under .fgos/cache that the seal extends.' } }, required: ['stream'] } },
       export: { description: 'Write event history to a new directory, as canonical JSONL or the legacy file layout.', examples: ['fgos events export --out ./export', 'fgos events export --out ./legacy --format legacy-layout'], parameters: { type: 'object', properties: { out: { type: 'string', description: 'Directory to create; refused when it exists.' }, format: { type: 'string', enum: ['jsonl', 'legacy-layout'] }, stream: { type: 'string' }, since: { type: 'string', description: 'A cursor, as JSON.' } }, required: ['out'] } },
       migrate: { description: 'Import the tracked legacy event files into the store and install the fence that retires them.', examples: ['fgos events migrate --check', 'fgos events migrate'], parameters: { type: 'object', properties: { check: { type: 'boolean', description: 'Plan and report parity; change nothing.' }, baseline: { type: 'string', description: 'A recorded view to compare parity against.' } }, required: [] } },
     },

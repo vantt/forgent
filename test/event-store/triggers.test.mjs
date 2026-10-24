@@ -133,7 +133,7 @@ test('a CLI verb that opens the store runs both triggers on maintenance facts, a
   assert.deepEqual(status.calls.filter((call) => call === 'maintenance'), ['maintenance', 'maintenance'], 'one trigger at each end of the verb');
   // Whatever migrate answers in a fixture with nothing to import, no trigger opened the store around it.
   assert.deepEqual(cli(['events', 'migrate', '--check']).calls, []);
-  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|export\|migrate/);
+  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|seal\|export\|migrate/);
 });
 
 test('only a Land verb in a non-dispatched session sweeps retained Land candidates, at the end of the command', (t) => {
