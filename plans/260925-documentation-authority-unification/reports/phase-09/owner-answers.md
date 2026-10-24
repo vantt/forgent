@@ -81,3 +81,20 @@ Disk: the machine reached 97%; the Lead removed this session's reviewer scratch 
 Both are under the 120 s Git driver deadline. `verify-design.py` exits 0 at its pin.
 
 **Work cutover stop.** WORK ordered every machine to stop Work writes at 15:00 (board line 14:00). DOC missed that line and launched Doer turns 688 and 689 at 15:01 and 15:08, then let them finish and launched no new turn. DOC's late "đã dừng" line is on origin/main at 7cd761949 (posted by SEAT). DOC launches no `fgos run`, pull or push until "cutover xong".
+
+## L13-10 — G6 exhaustive reviews and file-level framing (Lead, 2026-10-24 21:00)
+
+Exhaustive G6 reviews:
+- **Parks** (`reviews/w8-g6-parks-review`): 1,220 APPROVE / 40 REWORK. There are 15 operand-normalization bugs and 25 removed rows that have no next action.
+- **Judgments** (`reviews/w8-g6-judgments-review`): 163 APPROVE / 1 REWORK. f07526 needs lines 22, 33 and 37 of the same file handled together.
+
+**Ruling (A42):** add two file-level evidence rules, one for distillery files whose header says they describe an outside or upstream repo, and one for dated reports under `archive/plans/` or `plans/reports/`. Each rule needs negative controls and a quoted marker.
+- **Why:** the reviewer's sample found 29 of 40 unconfirmed parks have a real premise outside the one-sentence rule. About 334 rows are affected. Every park is a pre-flip Lead action, so over-parking delays the cutover without making it safer.
+- **Scope:** this stays inside the approved G6 method, which is evidence for a preserve premise. It adds no product mechanism.
+- Live conventions such as `docs/history/<feature>/` stay parked.
+
+Brief: `w8-g6-fix-brief.md`. It is launched after WORK's "cutover xong" line, because the stop order covers `fgos run`.
+
+**Lead-fix review** (`reviews/w8-lead-fixes-review`): 8 APPROVE / 4 REWORK, all fixed in 25e8842d3.
+- The misc, rebind and archive receipts are now current.
+- G5 is lowered to `partial`: `docs/reading-map.md` restates the L11-25 banner in English and keeps line 34 only with a Truth-correction suffix. Accepting that restatement goes to the owner in the cutover packet.
