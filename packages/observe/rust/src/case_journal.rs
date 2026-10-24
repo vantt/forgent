@@ -4,15 +4,13 @@
 //! Manages open/close transitions, prevents overlapping open cases, and provides
 //! lookup and listing capabilities.
 
-use crate::shard;
-use crate::store_lock::{acquire_store_lock, format_iso_now};
+use crate::shard::{self, InvalidLine, StoredRecord, TornTail, UnsafeShard};
+use crate::store_lock::acquire_store_lock;
+use crate::time::now_iso;
 use serde::{Deserialize, Serialize};
-use std::fs::{self, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
-/// Maximum allowable line length (1 MiB) to guard against corrupted or huge lines.
-const MAX_LINE_BYTES: usize = 1024 * 1024;
+const STORE: &str = "cases";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "type")]
@@ -110,56 +108,37 @@ pub enum CaseError {
 
 /// Helper to get current git rev-parse HEAD if in a git repo.
 pub fn get_git_head(root: &Path) -> Option<String> {
-    if let Ok(head) = std::env::var("FGOS_GIT_HEAD") {
-        let trimmed = head.trim();
-        if !trimmed.is_empty() {
-            return Some(trimmed.to_string());
-        }
-    }
     let (driver, repo) = crate::sources::repo::open_repository(root)?;
     let head = driver.resolve_commit_ref(&repo, "HEAD").ok()??;
     Some(head.as_str().to_string())
 }
 
-/// Reads all valid case records from `.fgos/observe/cases/*.jsonl`, skipping
-/// incomplete or corrupted lines.
+/// Reads all valid case records from `.fgos/observe/cases/*.jsonl` ordered by
+/// timestamp. A line that is not a case record is named on stderr and skipped;
+/// an unreadable store is an error.
 pub fn read_all_case_records(root: &Path) -> Result<Vec<CaseRecord>, std::io::Error> {
-    let dir = root.join(".fgos").join("observe").join("cases");
-    if !dir.exists() {
-        return Ok(Vec::new());
-    }
-
-    let mut records_with_ts: Vec<(String, CaseRecord)> = Vec::new();
-    let entries = fs::read_dir(&dir)?;
-    for entry in entries {
-        let entry = entry?;
-        let p = entry.path();
-        if p.is_file() && p.extension().and_then(|s| s.to_str()) == Some("jsonl") {
-            let file = fs::File::open(&p)?;
-            let reader = BufReader::new(file);
-            for line in reader.lines() {
-                let line = match line {
-                    Ok(l) => l,
-                    Err(_) => continue, // skip broken bytes / interrupted read
+    let store = shard::read_store(root, STORE, UnsafeShard::Fail)?;
+    let mut invalid = store.invalid;
+    let mut records: Vec<(String, CaseRecord)> = Vec::new();
+    for StoredRecord { value, shard, line } in store.records {
+        match serde_json::from_value::<CaseRecord>(value) {
+            Ok(rec) => {
+                let ts = match &rec {
+                    CaseRecord::Opened(o) => o.ts.clone(),
+                    CaseRecord::Closed(c) => c.ts.clone(),
                 };
-                let trimmed = line.trim();
-                if trimmed.is_empty() || trimmed.len() > MAX_LINE_BYTES {
-                    continue;
-                }
-                if let Ok(rec) = serde_json::from_str::<CaseRecord>(trimmed) {
-                    let ts = match &rec {
-                        CaseRecord::Opened(o) => o.ts.clone(),
-                        CaseRecord::Closed(c) => c.ts.clone(),
-                    };
-                    records_with_ts.push((ts, rec));
-                }
+                records.push((ts, rec));
             }
+            Err(e) => invalid.push(InvalidLine {
+                file: format!(".fgos/observe/{STORE}/{shard}.jsonl"),
+                line,
+                reason: e.to_string(),
+            }),
         }
     }
-
-    // Sort by timestamp ascending
-    records_with_ts.sort_by(|a, b| a.0.cmp(&b.0));
-    Ok(records_with_ts.into_iter().map(|(_, r)| r).collect())
+    shard::warn_skipped(STORE, &invalid);
+    records.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(records.into_iter().map(|(_, r)| r).collect())
 }
 
 /// Materializes state of all cases from records.
@@ -209,20 +188,11 @@ pub fn find_currently_open(cases: &[CaseWindow]) -> Option<&CaseWindow> {
     cases.iter().find(|c| c.until.is_none())
 }
 
-/// Appends a serialized JSON line to the writer's shard under `.fgos/observe/cases/`
-/// using O_APPEND and fsync.
+/// Appends one record to the writer's shard under `.fgos/observe/cases/`; the
+/// caller holds the store lock.
 fn append_record(root: &Path, record: &CaseRecord) -> Result<(), CaseError> {
-    let shard_file_path = shard::shard_path(root, "cases")?;
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&shard_file_path)?;
-
-    let mut json = serde_json::to_string(record)?;
-    json.push('\n');
-
-    file.write_all(json.as_bytes())?;
-    file.sync_all()?;
+    let line = shard::encode_line(record).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
+    shard::append_lines(root, STORE, TornTail::Heal, &[line])?;
     Ok(())
 }
 
@@ -265,7 +235,7 @@ pub fn open_case(
     }
 
     let head_at_open = get_git_head(root);
-    let ts = format_iso_now();
+    let ts = now_iso();
 
     let project = if let Ok(p) = std::env::var("FGOS_PROJECT_NAME") {
         let trimmed = p.trim();
@@ -337,7 +307,7 @@ pub fn close_case(
     }
 
     let head_at_close = get_git_head(root);
-    let ts = format_iso_now();
+    let ts = now_iso();
 
     let close_rec = CaseClosedRecord {
         v: 1,
@@ -388,6 +358,8 @@ pub fn list_cases(root: &Path, only_open: bool) -> Result<Vec<CaseWindow>, CaseE
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::io::Write;
     use std::path::PathBuf;
     fn create_test_dir(name: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!(
@@ -483,7 +455,7 @@ mod tests {
 
         // Inject incomplete/corrupted JSON line into shard
         let shard_path = shard::shard_path(&root, "cases").unwrap();
-        let mut f = OpenOptions::new().append(true).open(&shard_path).unwrap();
+        let mut f = std::fs::OpenOptions::new().append(true).open(&shard_path).unwrap();
         f.write_all(b"{\"v\":1,\"type\":\"case-open\n").unwrap(); // malformed
         f.flush().unwrap();
 
@@ -492,21 +464,5 @@ mod tests {
         assert_eq!(records.len(), 1);
 
         let _ = fs::remove_dir_all(&root);
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn a_symlinked_case_shard_is_refused_and_its_target_never_changes() {
-        let root = create_test_dir("symlink");
-        let external = create_test_dir("symlink-external");
-        let target = external.join("outside.jsonl");
-        fs::write(&target, "original external bytes\n").unwrap();
-        std::os::unix::fs::symlink(&target, shard::shard_path(&root, "cases").unwrap()).unwrap();
-
-        assert!(open_case(&root, "c-1", "plain", None).is_err(), "open_case wrote through a symlinked shard");
-        assert_eq!(fs::read_to_string(&target).unwrap(), "original external bytes\n");
-
-        let _ = fs::remove_dir_all(&root);
-        let _ = fs::remove_dir_all(&external);
     }
 }

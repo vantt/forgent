@@ -1,6 +1,12 @@
 use fgos_observe::case_journal::{materialize_cases, read_all_case_records};
-use fgos_observe::shard::read_all_json;
+use fgos_observe::shard::{read_store, UnsafeShard};
 use std::path::Path;
+
+fn read_values(root: &Path, store: &str) -> Vec<serde_json::Value> {
+    let read = read_store(root, store, UnsafeShard::Fail).expect("should read the golden fixture store");
+    assert!(read.invalid.is_empty(), "golden fixture has invalid lines: {:?}", read.invalid);
+    read.records.into_iter().map(|record| record.value).collect()
+}
 
 #[test]
 fn test_observe_golden_fixtures() {
@@ -34,8 +40,7 @@ fn test_observe_golden_fixtures() {
     assert_eq!(case.sessions, vec!["coord-golden-01"]);
 
     // 2. Assert friction shard can be read
-    let friction_records = read_all_json(&fixture_root, "friction")
-        .expect("should read friction records from golden fixture");
+    let friction_records = read_values(&fixture_root, "friction");
     assert!(
         friction_records.len() >= 4,
         "expected at least 4 friction records (migrated recorded+resolved, migration marker, new recorded+resolved)"
@@ -59,8 +64,7 @@ fn test_observe_golden_fixtures() {
     );
 
     // 3. Assert snapshots shard can be read
-    let snapshot_records = read_all_json(&fixture_root, "snapshots")
-        .expect("should read snapshot records from golden fixture");
+    let snapshot_records = read_values(&fixture_root, "snapshots");
     assert_eq!(snapshot_records.len(), 1, "expected 1 snapshot record");
     assert_eq!(snapshot_records[0]["type"], "snapshot");
     assert_eq!(snapshot_records[0]["case"], "golden-case-1");

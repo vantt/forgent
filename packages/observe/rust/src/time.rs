@@ -1,7 +1,11 @@
 //! Temporal comparison for discussion summaries and their read-side windows.
 
 use crate::contract::Window;
-use fgos_host_runtime::civil_time::{parse_date_midnight_millis, parse_rfc3339_millis};
+use fgos_host_runtime::civil_time::{
+    format_unix_millis_rfc3339, parse_date_midnight_millis, parse_rfc3339_millis,
+};
+use std::sync::atomic::{AtomicI64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ParsedWindow {
@@ -46,9 +50,38 @@ pub fn parse_timestamp_millis(timestamp: &str) -> Option<i64> {
     parse_rfc3339_millis(timestamp)
 }
 
+/// The current time as an RFC 3339 UTC stamp with milliseconds. Within one
+/// process every call is later than the one before, so a record and the resolve
+/// that follows it never share an instant even in the same millisecond.
+pub fn now_iso() -> String {
+    static LAST_MILLIS: AtomicI64 = AtomicI64::new(0);
+    let wall = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| i64::try_from(elapsed.as_millis()).unwrap_or(i64::MAX));
+    let millis = loop {
+        let last = LAST_MILLIS.load(Ordering::SeqCst);
+        let next = wall.max(last.saturating_add(1));
+        if LAST_MILLIS
+            .compare_exchange(last, next, Ordering::SeqCst, Ordering::SeqCst)
+            .is_ok()
+        {
+            break next;
+        }
+    };
+    format_unix_millis_rfc3339(millis, 0).expect("a zero offset is always formattable")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn now_is_strictly_increasing_within_a_process_and_parses() {
+        let stamps: Vec<String> = (0..50).map(|_| now_iso()).collect();
+        let instants: Vec<i64> = stamps.iter().map(|s| parse_timestamp_millis(s).expect(s)).collect();
+        assert!(instants.windows(2).all(|pair| pair[0] < pair[1]), "{stamps:?}");
+        assert!(stamps.iter().all(|s| s.ends_with('Z')));
+    }
 
     #[test]
     fn windows_are_temporal_inclusive_and_date_bounds_are_utc_midnight() {

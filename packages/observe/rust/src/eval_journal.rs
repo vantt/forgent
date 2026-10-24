@@ -1,14 +1,13 @@
 //! Append-only rubric evaluations in `.fgos/observe/evals/<writerId>.jsonl`.
 
-use crate::shard;
-use crate::store_lock::{acquire_store_lock, format_iso_now};
+use crate::shard::{self, StoredRecord, TornTail, UnsafeShard};
+use crate::store_lock::acquire_store_lock;
+use crate::time::now_iso;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
-use std::fs::{self, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
-const MAX_LINE_BYTES: usize = 1024 * 1024;
+const STORE: &str = "evals";
 const DISCUSSION_QUALITY_CRITERIA: [&str; 5] = [
     "perspective-spread",
     "decision-clarity",
@@ -139,138 +138,12 @@ fn validate_record(record: &EvalRecord) -> Result<(), String> {
     )
 }
 
-/// Preflight each store component without following links. Queries do not create
-/// missing directories; writers create them before locking. This is not an
-/// atomic directory walk.
-fn eval_store_exists(root: &Path, create: bool) -> Result<bool, String> {
-    let mut path = root.to_path_buf();
-    for component in [".fgos", "observe", "evals"] {
-        path.push(component);
-        if create {
-            match fs::create_dir(&path) {
-                Ok(()) => {}
-                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {}
-                Err(e) => return Err(e.to_string()),
-            }
-        }
-        match fs::symlink_metadata(&path) {
-            Ok(metadata) if metadata.file_type().is_dir() => {}
-            Ok(_) => {
-                return Err(format!(
-                    "eval store component must be a real directory: {}",
-                    path.display()
-                ))
-            }
-            Err(e) if !create && e.kind() == std::io::ErrorKind::NotFound => return Ok(false),
-            Err(e) => return Err(e.to_string()),
-        }
-    }
-    Ok(true)
-}
-
-/// Refuse a non-regular shard before opening, then verify the opened descriptor.
-/// O_NOFOLLOW closes the final-component symlink race on supported Unix hosts.
-fn open_append_shard(path: &Path) -> Result<fs::File, std::io::Error> {
-    match fs::symlink_metadata(path) {
-        Ok(metadata) if !metadata.file_type().is_file() => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "eval shard must be a regular file, not a symlink",
-            ));
-        }
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => return Err(e),
-    }
-    let mut options = OpenOptions::new();
-    options.create(true).append(true);
-    #[cfg(any(target_os = "linux", target_os = "android"))]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        // Target-specific no-follow and nonblock flags; the latter prevents a
-        // raced FIFO from hanging before descriptor verification.
-        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
-    }
-    #[cfg(any(
-        target_os = "macos",
-        target_os = "ios",
-        target_os = "freebsd",
-        target_os = "openbsd",
-        target_os = "netbsd",
-        target_os = "dragonfly"
-    ))]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
-    }
-    #[cfg(not(any(
-        target_os = "linux",
-        target_os = "android",
-        target_os = "macos",
-        target_os = "ios",
-        target_os = "freebsd",
-        target_os = "openbsd",
-        target_os = "netbsd",
-        target_os = "dragonfly"
-    )))]
-    {
-        // Without an atomic no-follow open, only a newly created shard is safe.
-        // Existing shards fail closed rather than follow a raced link.
-        options.create_new(true);
-    }
-    let file = options.open(path)?;
-    if !file.metadata()?.is_file() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "eval shard descriptor must be a regular file",
-        ));
-    }
-    Ok(file)
-}
-
-/// Retain at most cap+1 bytes, draining an overflowing logical line in place.
-/// Returns None at EOF, or whether the returned logical line exceeded the cap.
-fn read_bounded_line(
-    reader: &mut impl BufRead,
-    line: &mut Vec<u8>,
-) -> std::io::Result<Option<bool>> {
-    line.clear();
-    let mut seen = false;
-    let mut overflow = false;
-    loop {
-        let buffer = reader.fill_buf()?;
-        if buffer.is_empty() {
-            return Ok(seen.then_some(overflow));
-        }
-        seen = true;
-        let newline = buffer.iter().position(|byte| *byte == b'\n');
-        let content_len = newline.unwrap_or(buffer.len());
-        let remaining = (MAX_LINE_BYTES + 1).saturating_sub(line.len());
-        let retained = content_len.min(remaining);
-        line.extend_from_slice(&buffer[..retained]);
-        overflow |= retained < content_len || line.len() > MAX_LINE_BYTES;
-        let consumed = content_len + usize::from(newline.is_some());
-        reader.consume(consumed);
-        if newline.is_some() {
-            return Ok(Some(overflow));
-        }
-    }
-}
-
 pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     validate_input(&input)?;
-    let writer_id = shard::writer_shard_name();
-    let mut components = Path::new(&writer_id).components();
-    if writer_id.contains(['/', '\\'])
-        || !matches!(components.next(), Some(std::path::Component::Normal(_)))
-        || components.next().is_some()
-    {
-        return Err("eval writer identifier must be a single filename component".into());
-    }
     let record = EvalRecord {
         v: 1,
         kind: "eval".into(),
-        ts: format_iso_now(),
+        ts: now_iso(),
         eval_id: input.eval_id,
         harness: input.harness,
         question: input.question,
@@ -281,13 +154,10 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
         run_refs: input.run_refs,
     };
     validate_record(&record)?;
-    let mut line = serde_json::to_vec(&record).map_err(|e| e.to_string())?;
-    if line.len() > MAX_LINE_BYTES {
-        return Err("eval record exceeds 1 MiB line limit".into());
-    }
-    line.push(b'\n');
-    // Same global Observe lock, shard identity, O_APPEND and fsync as case/friction.
-    eval_store_exists(root, true)?;
+    let line = shard::encode_line(&record)?;
+    // Same global Observe lock, shard door and fsync as case/friction. The store
+    // directories are checked and created before the lock is taken.
+    shard::shard_path(root, STORE).map_err(|e| e.to_string())?;
     let _guard = acquire_store_lock(root).map_err(|e| e.to_string())?;
     // Check every shard under the same lock as append. Invalid tracked records
     // may conceal an identity, so fail closed until the store is repaired.
@@ -302,17 +172,7 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     if !existing.invalid.is_empty() {
         return Err(invalid_store_error(&existing.invalid));
     }
-    let path = shard::shard_path(root, "evals").map_err(|e| e.to_string())?;
-    if path
-        != root
-            .join(".fgos/observe/evals")
-            .join(format!("{}.jsonl", writer_id))
-    {
-        return Err("eval writer shard path changed during record".into());
-    }
-    let mut file = open_append_shard(&path).map_err(|e| e.to_string())?;
-    file.write_all(&line).map_err(|e| e.to_string())?;
-    file.sync_all().map_err(|e| e.to_string())?;
+    shard::append_lines(root, STORE, TornTail::Refuse, &[line]).map_err(|e| e.to_string())?;
     Ok(record)
 }
 
@@ -341,92 +201,40 @@ pub fn list(
     harness: Option<&str>,
     question: Option<&str>,
 ) -> Result<EvalList, String> {
-    let dir = root.join(".fgos/observe/evals");
-    let mut result = EvalList::default();
-    if !eval_store_exists(root, false)? {
-        return Ok(result);
-    }
-    let entries = match fs::read_dir(&dir) {
-        Ok(entries) => entries,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(result),
-        Err(e) => return Err(e.to_string()),
+    let store = shard::read_store(root, STORE, UnsafeShard::Report).map_err(|e| e.to_string())?;
+    let mut result = EvalList {
+        evals: Vec::new(),
+        invalid: store
+            .invalid
+            .into_iter()
+            .map(|item| InvalidEvalLine { file: item.file, line: item.line, error: item.reason })
+            .collect(),
     };
-    let mut paths = Vec::new();
-    for entry in entries {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let path = entry.path();
-        if path.extension().and_then(|s| s.to_str()) != Some("jsonl") {
-            continue;
-        }
-        if entry.file_type().map_err(|e| e.to_string())?.is_file() {
-            paths.push(path);
-        } else {
-            result.invalid.push(InvalidEvalLine {
-                file: path
-                    .strip_prefix(root)
-                    .unwrap_or(&path)
-                    .to_string_lossy()
-                    .into_owned(),
-                line: 0,
-                error: "eval shard must be a regular file, not a symlink".into(),
-            });
-        }
-    }
-    paths.sort();
     let mut seen_ids = HashSet::new();
-    for path in paths {
-        let file = fs::File::open(&path).map_err(|e| e.to_string())?;
-        let mut reader = BufReader::new(file);
-        let mut line = Vec::new();
-        let mut line_number = 0;
-        while let Some(overflow) =
-            read_bounded_line(&mut reader, &mut line).map_err(|e| e.to_string())?
-        {
-            line_number += 1;
-            let parsed = if overflow {
-                Err("eval line exceeds 1 MiB limit".into())
-            } else if line.iter().all(|byte| byte.is_ascii_whitespace()) {
-                continue;
-            } else {
-                serde_json::from_slice::<EvalRecord>(&line)
-                    .map_err(|e| e.to_string())
-                    .and_then(|record| {
-                        validate_record(&record)?;
-                        Ok(record)
-                    })
-            };
-            match parsed {
-                Ok(record) => {
-                    if !seen_ids.insert(record.eval_id.clone()) {
-                        result.invalid.push(InvalidEvalLine {
-                            file: path
-                                .strip_prefix(root)
-                                .unwrap_or(&path)
-                                .to_string_lossy()
-                                .into_owned(),
-                            line: line_number,
-                            error: format!("duplicate evalId: {}", record.eval_id),
-                        });
-                        continue;
-                    }
-                    if harness.is_none_or(|h| record.harness == h)
-                        && question.is_none_or(|q| record.question == q)
-                    {
-                        result.evals.push(record);
-                    }
-                }
-                Err(error) => result.invalid.push(InvalidEvalLine {
-                    file: path
-                        .strip_prefix(root)
-                        .unwrap_or(&path)
-                        .to_string_lossy()
-                        .into_owned(),
-                    line: line_number,
-                    error,
-                }),
+    for StoredRecord { value, shard, line } in store.records {
+        let file = format!(".fgos/observe/{STORE}/{shard}.jsonl");
+        let parsed = serde_json::from_value::<EvalRecord>(value)
+            .map_err(|e| e.to_string())
+            .and_then(|record| {
+                validate_record(&record)?;
+                Ok(record)
+            });
+        match parsed {
+            Ok(record) if !seen_ids.insert(record.eval_id.clone()) => {
+                let error = format!("duplicate evalId: {}", record.eval_id);
+                result.invalid.push(InvalidEvalLine { file, line, error });
             }
+            Ok(record) => {
+                if harness.is_none_or(|h| record.harness == h)
+                    && question.is_none_or(|q| record.question == q)
+                {
+                    result.evals.push(record);
+                }
+            }
+            Err(error) => result.invalid.push(InvalidEvalLine { file, line, error }),
         }
     }
+    result.invalid.sort_by(|a, b| (&a.file, a.line).cmp(&(&b.file, b.line)));
     result
         .evals
         .sort_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.eval_id.cmp(&b.eval_id)));

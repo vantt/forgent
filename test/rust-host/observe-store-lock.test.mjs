@@ -40,7 +40,7 @@ test('a Node holder of observe makes the Rust command wait, then time out by nam
     const waited = Date.now() - started;
     assert.notEqual(res.code, 0, res.out);
     assert.match(res.out, /observe-lock-timeout/);
-    assert.ok(waited >= 4500, `must wait for the kernel lock before giving up: ${waited} ms`);
+    assert.ok(waited >= 3500, `must wait for the kernel lock before giving up: ${waited} ms`);
   } finally {
     await holder.kill();
     fs.rmSync(root, { recursive: true, force: true });

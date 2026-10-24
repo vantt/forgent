@@ -7,12 +7,10 @@
 use crate::case_journal;
 use crate::contract::{ObserveRequest, WorkObservationSource};
 use crate::metrics_cli::entropy::calculate_entropy_score_and_parts;
-use crate::shard;
+use crate::shard::{self, TornTail};
 use crate::store_lock::acquire_store_lock;
-use fgos_host_runtime::civil_time::format_system_time_utc;
+use crate::time::now_iso;
 use serde_json::json;
-use std::fs::OpenOptions;
-use std::io::Write;
 
 pub fn dispatch_snapshot(
     req: &ObserveRequest,
@@ -35,7 +33,7 @@ pub fn dispatch_snapshot(
     let ws =
         work_source.ok_or_else(|| "work source not available for metrics snapshot".to_string())?;
     let entropy_calc = calculate_entropy_score_and_parts(&req.root, ws)?;
-    let now = chrono_now_iso();
+    let now = now_iso();
 
     // Check currently open case if any
     let active_case = case_journal::list_cases(&req.root, true)
@@ -65,18 +63,10 @@ pub fn dispatch_snapshot(
 
     // Two processes sharing a writer id share a shard; the append is one
     // observe-lock critical section so their lines cannot interleave.
+    let line = shard::encode_line(&record)?;
     let _lock = acquire_store_lock(&req.root).map_err(|e| e.to_string())?;
-    let shard_file = shard::shard_path(&req.root, "snapshots").map_err(|e| e.to_string())?;
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&shard_file)
-        .map_err(|e| format!("cannot open snapshot shard: {}", e))?;
-
-    let line = serde_json::to_string(&record).map_err(|e| e.to_string())?;
-    writeln!(file, "{}", line).map_err(|e| format!("cannot write snapshot: {}", e))?;
-    file.sync_all()
-        .map_err(|e| format!("cannot sync snapshot: {}", e))?;
+    let shard_file = shard::append_lines(&req.root, "snapshots", TornTail::Heal, &[line])
+        .map_err(|e| format!("cannot write snapshot: {}", e))?;
 
     Ok(json!({
         "ok": true,
@@ -84,51 +74,4 @@ pub fn dispatch_snapshot(
         "record": record,
         "path": shard_file.to_string_lossy(),
     }))
-}
-
-fn chrono_now_iso() -> String {
-    format_system_time_utc(std::time::SystemTime::now())
-}
-
-#[cfg(all(test, unix))]
-mod tests {
-    use super::*;
-    use crate::contract::{SourceError, WorkEntropySignalsRecord, WorkOutcomesRecord};
-    use std::fs;
-    use std::path::Path;
-
-    struct EmptyWork;
-
-    impl WorkObservationSource for EmptyWork {
-        fn read_outcomes_report(&self, _root: &Path, _filter_id: Option<&str>) -> Result<WorkOutcomesRecord, SourceError> {
-            Ok(WorkOutcomesRecord { outcomes: Vec::new(), settlement: None, learning: None, missing_outcome_nag: None })
-        }
-
-        fn read_entropy_signals(&self, _root: &Path) -> Result<WorkEntropySignalsRecord, SourceError> {
-            Ok(WorkEntropySignalsRecord::default())
-        }
-    }
-
-    #[test]
-    fn a_symlinked_snapshot_shard_is_refused_and_its_target_never_changes() {
-        let base = std::env::temp_dir().join(format!("fgos-snapshot-symlink-{}", std::process::id()));
-        let _ = fs::remove_dir_all(&base);
-        let (root, external) = (base.join("root"), base.join("external"));
-        fs::create_dir_all(&root).unwrap();
-        fs::create_dir_all(&external).unwrap();
-        let target = external.join("outside.jsonl");
-        fs::write(&target, "original external bytes\n").unwrap();
-        std::os::unix::fs::symlink(&target, shard::shard_path(&root, "snapshots").unwrap()).unwrap();
-        let req = ObserveRequest {
-            operation: "observe.metrics".into(),
-            sub: "snapshot".into(),
-            args: Vec::new(),
-            root: root.clone(),
-            stdin: None,
-        };
-
-        assert!(dispatch_snapshot(&req, Some(&EmptyWork)).is_err(), "snapshot wrote through a symlinked shard");
-        assert_eq!(fs::read_to_string(&target).unwrap(), "original external bytes\n");
-        let _ = fs::remove_dir_all(&base);
-    }
 }

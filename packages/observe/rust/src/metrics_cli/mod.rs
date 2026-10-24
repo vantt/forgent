@@ -30,6 +30,17 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "snapshot",
 ];
 
+/// Whether the verb appends to an Observe store (case open/close, eval record, snapshot).
+pub fn writes(req: &ObserveRequest) -> bool {
+    let action = req.args.first().map(String::as_str);
+    match req.sub.as_str() {
+        "snapshot" => true,
+        "case" => matches!(action, Some("open" | "close")),
+        "eval" => action == Some("record"),
+        _ => false,
+    }
+}
+
 pub fn dispatch(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],

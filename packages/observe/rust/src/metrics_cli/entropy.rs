@@ -7,6 +7,7 @@
 
 use crate::contract::{ObserveRequest, WorkObservationSource};
 use crate::shard;
+use crate::time::parse_timestamp_millis;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::path::Path;
@@ -99,9 +100,20 @@ pub fn calculate_entropy_score_and_parts(
     })
 }
 
-pub fn read_last_snapshot(root: &Path) -> Option<Value> {
-    let records = shard::read_all_json(root, "snapshots").ok()?;
-    records.into_iter().next_back()
+/// The most recent snapshot by instant; an unreadable store is an error, a bad
+/// line is named and skipped.
+pub fn read_last_snapshot(root: &Path) -> Result<Option<Value>, String> {
+    let store = shard::read_store(root, "snapshots", shard::UnsafeShard::Fail).map_err(|e| e.to_string())?;
+    shard::warn_skipped("snapshots", &store.invalid);
+    Ok(store
+        .records
+        .into_iter()
+        .filter_map(|record| {
+            let millis = record.value.get("ts").and_then(Value::as_str).and_then(parse_timestamp_millis)?;
+            Some((millis, record.value))
+        })
+        .max_by_key(|(millis, _)| *millis)
+        .map(|(_, value)| value))
 }
 
 pub fn dispatch_entropy(
@@ -125,7 +137,7 @@ pub fn dispatch_entropy(
     let ws =
         work_source.ok_or_else(|| "work source not available for metrics entropy".to_string())?;
     let calc = calculate_entropy_score_and_parts(&req.root, ws)?;
-    let last_snap = read_last_snapshot(&req.root);
+    let last_snap = read_last_snapshot(&req.root)?;
 
     let trend = if let Some(snap) = &last_snap {
         let prev_score = snap
