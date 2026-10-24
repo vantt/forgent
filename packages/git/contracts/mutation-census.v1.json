@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7cf042f728a7cec3eb200a2cc28a68bdd787f9bca2af87d0add70834326709c1",
+  "payloadDigest": "ceb8b65e0dbfc481d8c93db7de62c50dc61f55ff03a1e6be330c5f3e306fae5b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -867,9 +867,9 @@
     "src/runner/dispatch/confinement/cleanup.mjs": "9d498d83b5eaba5f23964ce8b683cb511656de43787a52811404ad094ce36d19",
     "src/runner/dispatch/confinement/drivers/bwrap.mjs": "e7ab1058f20053a3b5891df503faa3b07e5f5e5e98a5b8159cb6897c28d0628d",
     "src/runner/dispatch/confinement/policies.mjs": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
-    "src/runner/dispatch/confinement/probes/harness.mjs": "0f5d8fa32539505269526681f4cbf1e868af1ee525e10ccedb1ddec9f47a1cda",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "587ac8b6f6ac8394bb05852233f365df738dbf5f9d401c3f7896c78ab26ce69f",
     "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
-    "src/runner/dispatch/confinement/resources.mjs": "eba2be834c96cd01c882bd0e537704fb5e96fb504ef2facf72d80f92c05dfe01",
+    "src/runner/dispatch/confinement/resources.mjs": "da535d6288dc015f8167d2abe41250f7245aff6a9ea9338c087af9b5d61c8f64",
     "src/runner/dispatch/cwd-lock.mjs": "3ea87d04c00433f2d410b02fc5b971d681acbc744de6d3587269bc20f57b2e23",
     "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
@@ -3118,7 +3118,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5549,
-      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:703",
+      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:728",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -3132,7 +3132,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5597,
-      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:522",
+      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:524",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

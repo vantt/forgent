@@ -1,7 +1,8 @@
 // dispatch-confinement-machine-private.test.mjs — machine-private roots (spec section 9.3): a
 // directory listed in MACHINE_PRIVATE_ROOTS is masked for every confined dispatch, whatever its
 // hostRead. The pure side: the list, the resolver, the refusal and the argv order. The proof that a
-// real worker cannot read it is the harness probe `machine-private-hidden` (real bwrap), run below.
+// real worker cannot read it, nor reach a Claude Code session socket, is the harness probe
+// `machine-private-hidden` (real bwrap), run below.
 
 import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
@@ -17,6 +18,7 @@ import {
   MACHINE_PRIVATE_ROOTS,
   resolveConfinementResources,
   resolveMachinePrivateRoots,
+  userRuntimeDir,
 } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { BUILTIN_POLICY_IDS, resolveConfinementPolicy } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { computeProbeFingerprint, probeMachinePrivateHidden } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
@@ -30,29 +32,41 @@ after(() => {
   for (const dir of fixtures) fs.rmSync(dir, { recursive: true, force: true });
 });
 
-/** A host home with (or without) the private directory, and a project with the run directory a dispatch needs. */
-function makeHost({ withPrivate = true } = {}) {
+/**
+ * A host home with (or without) the private directory, a runtime directory with (or without) the
+ * Claude Code socket directory, and a project with the run directory a dispatch needs.
+ */
+function makeHost({ withPrivate = true, withSessionSockets = false } = {}) {
   const root = fs.realpathSync(makeFixtureDir('fgos-machine-private-'));
   fixtures.push(root);
   const home = path.join(root, 'home');
   const privateDir = path.join(home, '.fgos', 'private');
   fs.mkdirSync(withPrivate ? privateDir : home, { recursive: true });
+  const runtimeDir = path.join(root, 'run-user');
+  const sessionSockets = path.join(runtimeDir, 'cc-socks');
+  fs.mkdirSync(withSessionSockets ? sessionSockets : runtimeDir, { recursive: true });
   const project = path.join(root, 'project');
   const fgosDir = path.join(project, '.fgos');
   const runDir = path.join(fgosDir, 'assignments', 'u1', 'self', '1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
-  return { root, home, privateDir, project, fgosDir, runDir, tempRoot: path.join(root, 'confinement-temp') };
+  return { root, home, privateDir, runtimeDir, sessionSockets, project, fgosDir, runDir, tempRoot: path.join(root, 'confinement-temp') };
 }
 
-/** `os.homedir()` is what the driver resolves `{home}` from; point it at the fixture for one call. */
-async function withHome(home, fn) {
-  const previous = process.env.HOME;
-  process.env.HOME = home;
+/**
+ * `os.homedir()` and `$XDG_RUNTIME_DIR` are what the driver resolves `{home}` and `{runtimeDir}`
+ * from; point them at the fixture for one call, so the real host's directories never leak in.
+ */
+async function withHome(host, fn) {
+  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR };
+  process.env.HOME = host.home;
+  process.env.XDG_RUNTIME_DIR = host.runtimeDir;
   try {
     return await fn();
   } finally {
-    if (previous === undefined) delete process.env.HOME;
-    else process.env.HOME = previous;
+    for (const [name, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
   }
 }
 
@@ -72,7 +86,7 @@ function requestFor(host, { policyId = 'workspace-write', blind = false, cwd = h
 }
 
 async function prepared(host, options) {
-  return withHome(host.home, async () => {
+  return withHome(host, async () => {
     const request = requestFor(host, options);
     const assessment = assessBwrap(request, backendFor(host));
     assert.deepEqual(assessment.mismatches, []);
@@ -94,56 +108,75 @@ test('every confined launch sets the one marker variable the Config session clas
   assert.match(rustSource, new RegExp(`pub const CONFINED_MARKER: &str = "${CONFINED_MARKER_ENV}";`), 'the crate and the driver name the same variable');
 });
 
-test('the machine-private roots are data in the contract, first entry the private directory of the host home', () => {
-  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private']);
+test('the machine-private roots are data in the contract: the private directory of the host home and the Claude Code session sockets', () => {
+  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}/cc-socks']);
+});
+
+test('the runtime directory is $XDG_RUNTIME_DIR when absolute, else /run/user/<uid>', () => {
+  assert.equal(userRuntimeDir({ env: { XDG_RUNTIME_DIR: '/run/user/4242' }, uid: 7 }), '/run/user/4242');
+  assert.equal(userRuntimeDir({ env: {}, uid: 7 }), '/run/user/7');
+  assert.equal(userRuntimeDir({ env: { XDG_RUNTIME_DIR: 'relative/dir' }, uid: 7 }), '/run/user/7');
 });
 
 test('a machine-private root resolves from the injected home and is skipped when absent or not a directory', () => {
+  const roots = (host) => resolveMachinePrivateRoots({ homeDir: host.home, runtimeDir: host.runtimeDir });
   const host = makeHost();
-  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: host.home }), [host.privateDir]);
+  assert.deepEqual(roots(host), [host.privateDir]);
+
+  const both = makeHost({ withSessionSockets: true });
+  assert.deepEqual(roots(both), [both.privateDir, both.sessionSockets]);
+
+  const sockets = makeHost({ withPrivate: false, withSessionSockets: true });
+  assert.deepEqual(roots(sockets), [sockets.sessionSockets]);
 
   const without = makeHost({ withPrivate: false });
-  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: without.home }), []);
+  assert.deepEqual(roots(without), []);
 
   const asFile = makeHost({ withPrivate: false });
   fs.mkdirSync(path.join(asFile.home, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(asFile.home, '.fgos', 'private'), 'a file, not a directory');
-  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: asFile.home }), []);
+  assert.deepEqual(roots(asFile), []);
 });
 
 test('the resolver yields a machine-private hidden-root for a non-blind request, and none when the host has no such directory', () => {
   const host = makeHost();
   const grants = [{ resource: 'run-output', access: 'write', scope: 'dispatch' }];
   const context = { cwd: host.project, repoRoot: host.project, runDir: host.runDir, fgosDir: host.fgosDir };
-  const resolve = (homeDir, extra = {}) => resolveConfinementResources({ dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.tempRoot }, homeDir, ...extra });
+  const resolve = (on, extra = {}) => resolveConfinementResources({ dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.tempRoot }, homeDir: on.home, runtimeDir: on.runtimeDir, ...extra });
 
-  const hidden = resolve(host.home).filter((r) => r.resource === 'hidden-root');
+  const hidden = resolve(host).filter((r) => r.resource === 'hidden-root');
   assert.equal(hidden.length, 1);
   assert.equal(hidden[0].hostTarget, host.privateDir);
   assert.equal(hidden[0].machinePrivate, true);
   assert.equal(hidden[0].delivery, 'mask');
 
+  const sockets = makeHost({ withPrivate: false, withSessionSockets: true });
+  const socketMask = resolve(sockets).filter((r) => r.resource === 'hidden-root');
+  assert.deepEqual(socketMask.map((r) => [r.hostTarget, r.machinePrivate]), [[sockets.sessionSockets, true]]);
+
   const without = makeHost({ withPrivate: false });
-  assert.equal(resolve(without.home).some((r) => r.resource === 'hidden-root'), false);
+  assert.equal(resolve(without).some((r) => r.resource === 'hidden-root'), false);
 
   // A root that blind would hide too is listed once: here the confinement temp root is the private directory.
   const blind = resolveConfinementResources({
-    dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.privateDir }, homeDir: host.home, blind: true,
+    dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.privateDir }, homeDir: host.home, runtimeDir: host.runtimeDir, blind: true,
   }).filter((r) => r.resource === 'hidden-root' && r.hostTarget === host.privateDir);
   assert.equal(blind.length, 1);
 });
 
 for (const policyId of BUILTIN_POLICY_IDS) {
-  test(`${policyId}: the private directory is masked after the mounts and remounted read-only after the attempt binds, without a blind override`, async (t) => {
+  test(`${policyId}: the private directory and the session socket directory are masked after the mounts and remounted read-only after the attempt binds, without a blind override`, async (t) => {
     if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
-    const host = makeHost();
+    const host = makeHost({ withSessionSockets: true });
     const { head } = await prepared(host, { policyId });
-    const mask = indexOfFlag(head, '--tmpfs', host.privateDir);
-    const remount = indexOfFlag(head, '--remount-ro', host.privateDir);
     const lastMount = Math.max(...head.map((arg, i) => ((arg === '--bind' || arg === '--ro-bind') && i > 6 ? i : -1)));
-    assert.ok(mask > 0 && remount > mask, 'masked, then remounted read-only');
-    assert.ok(lastMount < mask, 'every mount comes before the mask');
-    assert.deepEqual(head.slice(-2), ['--remount-ro', host.privateDir], 'the read-only remount is last');
+    for (const root of [host.privateDir, host.sessionSockets]) {
+      const mask = indexOfFlag(head, '--tmpfs', root);
+      const remount = indexOfFlag(head, '--remount-ro', root);
+      assert.ok(mask > 0 && remount > mask, `${root} masked, then remounted read-only`);
+      assert.ok(lastMount < mask, 'every mount comes before the mask');
+    }
+    assert.deepEqual(head.slice(-4), ['--remount-ro', host.privateDir, '--remount-ro', host.sessionSockets], 'the read-only remounts are last');
     assert.equal(head.includes('--unshare-pid'), true, 'every launch has its pid namespace');
   });
 
@@ -173,12 +206,12 @@ test('a workspace, cwd or repo root inside a machine-private root is refused bef
   const inside = path.join(host.privateDir, 'worktree');
   fs.mkdirSync(inside, { recursive: true });
   for (const blind of [false, true]) {
-    const mismatches = await withHome(host.home, () => assessBwrap(requestFor(host, { blind, cwd: inside }), backendFor(host)).mismatches);
+    const mismatches = await withHome(host, () => assessBwrap(requestFor(host, { blind, cwd: inside }), backendFor(host)).mismatches);
     const codes = mismatches.map((m) => m.code);
     assert.ok(codes.includes('machine-private-hides-workspace'), `refused with blind=${blind}: ${JSON.stringify(mismatches)}`);
     assert.equal(codes.includes('blind-hides-workspace'), false, 'the blind refusal does not repeat the machine-private one');
   }
-  const ok = await withHome(host.home, () => assessBwrap(requestFor(host), backendFor(host)).mismatches);
+  const ok = await withHome(host, () => assessBwrap(requestFor(host), backendFor(host)).mismatches);
   assert.deepEqual(ok, []);
 });
 
@@ -206,6 +239,7 @@ test('the machine-private probe passes on the real argv and its falsifier reads 
     assert.equal(broken.passed, false, 'the falsifier must read the planted files');
     assert.match(broken.detail, /"accounts":"ok"/);
     assert.match(broken.detail, /"token":"ok"/);
+    assert.match(broken.detail, /"socketStat":"ok","socketConnect":"ok"/, 'without the mask the worker reaches the session socket');
     assert.match(broken.detail, /host-write-denied/);
     assert.match(broken.detail, /workspace-write/);
     if (blind) assert.match(broken.detail, /\+blind/);

@@ -35,12 +35,22 @@ export const BLIND_HIDDEN_ROOTS = Object.freeze([
 /**
  * Host directories that hold per-machine private files and are hidden from EVERY confined
  * dispatch, whatever its `hostRead` (spec section 9.3). `{home}` is the host user's home, not a
- * dispatch's private home. A listed path is a directory: the mask is `--tmpfs`. A path another
- * component owns (Config's accounts and token directory today) enters here as one more entry.
+ * dispatch's private home; `{runtimeDir}` is the host user's runtime directory (userRuntimeDir).
+ * A listed path is a directory: the mask is `--tmpfs`. A path another component owns (Config's
+ * accounts and token directory) enters here as one more entry. `cc-socks` holds one control
+ * socket per open Claude Code session: a write into it starts a turn in that session, so a worker
+ * that could connect there could steer the owner's sessions.
  */
 export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{home}/.fgos/private',
+  '{runtimeDir}/cc-socks',
 ]);
+
+/** The host user's runtime directory: `$XDG_RUNTIME_DIR` when it is absolute, else `/run/user/<uid>`. */
+export function userRuntimeDir({ env = process.env, uid = process.getuid?.() ?? 0 } = {}) {
+  const xdg = env.XDG_RUNTIME_DIR;
+  return typeof xdg === 'string' && path.isAbsolute(xdg) ? xdg : path.join('/run/user', String(uid));
+}
 
 /** Whether a confinement request asks for `hostRead: blind`, by override or by its policy. */
 export function requestIsBlind(request) {
@@ -239,11 +249,11 @@ export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {}, env = pro
 }
 
 /**
- * The absolute machine-private roots (MACHINE_PRIVATE_ROOTS with `{home}` filled in) that exist
- * on this host. A root that does not exist is skipped: there is nothing to hide.
+ * The absolute machine-private roots (MACHINE_PRIVATE_ROOTS with `{home}` and `{runtimeDir}`
+ * filled in) that exist on this host. A root that does not exist is skipped: there is nothing to hide.
  */
-export function resolveMachinePrivateRoots({ homeDir = os.homedir() } = {}) {
-  return existingDirectories(MACHINE_PRIVATE_ROOTS, { '{home}': path.resolve(homeDir) });
+export function resolveMachinePrivateRoots({ homeDir = os.homedir(), runtimeDir = userRuntimeDir() } = {}) {
+  return existingDirectories(MACHINE_PRIVATE_ROOTS, { '{home}': path.resolve(homeDir), '{runtimeDir}': path.resolve(runtimeDir) });
 }
 
 /** The templates with their tokens filled in, real-pathed, kept when they are directories, without repeats. */
@@ -279,6 +289,7 @@ export function resolveConfinementResources({
   providerSources = {},
   blind = false,
   homeDir = os.homedir(),
+  runtimeDir = userRuntimeDir(),
 } = {}) {
   if (!dispatchId || typeof dispatchId !== 'string') {
     throw new ConfinementResourceError('confinement-grant-invalid', 'dispatchId is required.');
@@ -467,7 +478,7 @@ export function resolveConfinementResources({
     allocation: 'existing',
     ...extra,
   });
-  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir });
+  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, runtimeDir });
   for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true }));
 
   // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
