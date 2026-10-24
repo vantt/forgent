@@ -20655,8 +20655,8 @@
       "sourceUnitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
       "targetOwner": "docs/platform/seat-binding/spec.md",
       "targetAnchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
-      "bindingSha256": "33a4aaf86066dc1cbad8e8c3353d7633c3edd04602eef8911e83c75394c1d6c5",
-      "targetUnitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
+      "bindingSha256": "70b5f688a0cb551c1e13e9949b4a02573e02ee1c54318bca02131fbde002617c",
+      "targetUnitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
       "targetAncestry": [
         "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
         "9. Chuyển đổi (đã xong, mã chuyển đổi đã gỡ)"
@@ -20669,7 +20669,8 @@
         "resolvedFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
         "resolvedPointer": "/bindingRefresh/464"
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",
@@ -20699,8 +20700,8 @@
       "sourceUnitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
       "targetOwner": "docs/platform/seat-binding/spec.md",
       "targetAnchor": "unheaded-block-38",
-      "bindingSha256": "1ddb2018d9c4447dd5323a62fc6ddda0b3e1b9bd5d362b3453056ea963394a20",
-      "targetUnitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
+      "bindingSha256": "06a86eabdd69af7871c66b61804d7ea056fcaa590d35e481325ab77951a0e28a",
+      "targetUnitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
       "targetAncestry": [
         "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
         "9. Chuyển đổi (đã xong, mã chuyển đổi đã gỡ)"
@@ -20713,7 +20714,8 @@
         "resolvedFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
         "resolvedPointer": "/bindingRefresh/466"
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",
@@ -20721,8 +20723,8 @@
       "sourceUnitDigest": "0d673b41c2eaae9d13882ccb96bf669948ddcf5b46a4550ec5bab9ccaf1f2151",
       "targetOwner": "docs/platform/seat-binding/spec.md",
       "targetAnchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
-      "bindingSha256": "385c2e38989a65dc5e90ff6e14080ddf693b0cdfefe1584f8bc3e2e4882a799a",
-      "targetUnitDigest": "3bcb37dfba85d429a7167b65360b530a6ad1bbadcd5e67060c439504081831ed",
+      "bindingSha256": "161b52c433620a701736ae612bc2697a08fce2b91102e854ab5c388f7a36ca2c",
+      "targetUnitDigest": "6c9dc51206ce3c376b57d629d5e92db9266a4c7c1611e6240d77eb72a7a48e3b",
       "targetAncestry": [
         "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
         "15. Lịch sử quyết định",
@@ -20736,7 +20738,8 @@
         "resolvedFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
         "resolvedPointer": "/bindingRefresh/467"
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",
@@ -20744,8 +20747,8 @@
       "sourceUnitDigest": "34882abdfde2a615b6d662879789b29d7496af5302912c2323a1c192744eccb4",
       "targetOwner": "docs/platform/seat-binding/spec.md",
       "targetAnchor": "unheaded-block-62",
-      "bindingSha256": "7152c74d99cb17c86624dfb86e726f162ddce3ea0b43772f9fe31bda136b0f4b",
-      "targetUnitDigest": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
+      "bindingSha256": "743ee4ba0b23a78ae26911cfed46d0bd0cccd3cd88f01748ec126d4bc1c5b1f1",
+      "targetUnitDigest": "5a418963fe6553424ca817fd3f5930c8520cf98e15b8bbcb029464f439dc9475",
       "targetAncestry": [
         "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
         "15. Lịch sử quyết định",
@@ -20759,7 +20762,8 @@
         "resolvedFile": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
         "resolvedPointer": "/bindingRefresh/468"
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",

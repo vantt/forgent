@@ -1,5 +1,5 @@
 {
-  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
   "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
   "extractors": [
     {
@@ -245,5 +245,5 @@
     }
   ],
   "changedRows": 0,
-  "status": "read-only Step 0 check; rebindings not applied because the turn stopped on its exact writable boundary"
+  "status": "read-only Step 0 check on the four incoming docs; W11 continuation carriage/rebindings are separately authenticated in binding-refresh.json"
 }

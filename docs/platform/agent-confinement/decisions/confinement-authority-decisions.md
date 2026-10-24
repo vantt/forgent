@@ -37,6 +37,7 @@ Superseded by: None
 | Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |
 | Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |
 | Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |
+| 2026-10-23: danh sách `MACHINE_PRIVATE_ROOTS` (mục đầu `{home}/.fgos/private`) che với mọi dispatch có mount view, bất kể `hostRead`; một danh sách, cơ chế `hidden-root`/`--tmpfs` sẵn có, không file mask; Secrets thêm đường dẫn của mình bằng cách thêm một mục và một case probe (§9.3). Chủ sở hữu giao hướng "D trước C" ngày 2026-10-23 | Config spec §9 và cổng G6 cần `~/.fgos/private` bị che với mọi worker, và Secrets câu hỏi 4 cần cùng một thứ cho đường dẫn bí mật; hai nhu cầu một danh sách, không có cơ chế thứ hai |
 
 ### 13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên
 

@@ -1,179 +1,627 @@
 {
-  "version": 1,
-  "status": "blocked",
-  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
-  "authority": "w10-import3-brief / L12-137 / L13-6",
-  "blocker": "Required retained navigation holder docs/reading-map.md is outside the exact writable list. Global drift scanner separately fails on an absent prepared-only component-boundary history holder.",
-  "needsWrites": [
-    "docs/reading-map.md"
-  ],
+  "version": 2,
+  "status": "done",
+  "qualification": "Authored and verified within W11 scope; independent review pending. Not gate acceptance, final-pin composition acceptance or authority cutover.",
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+  "authority": "L12-137 / L13-6 / w10-import3-brief + w11-import3-resume-brief",
+  "needsWrites": [],
   "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
   "counts": {
     "importedCommits": 69,
-    "changedPaths": 119,
+    "changedPathsInImport": 119,
     "changedDocumentation": 8,
     "incomingPlatformDocuments": 4,
     "completeIncomingUnits": 608,
-    "effectiveBindingsChecked": 1,
-    "failingIncomingBindings": 0,
-    "carriedUnits": 0,
-    "changedLedgerRows": 0,
-    "ratchetEntriesChanged": 0,
-    "boundedUnprovenUnits": 24
+    "incomingEffectiveBindingsChecked": 1,
+    "intakeUnits": 24,
+    "intakeBySource": {
+      "confinement": 18,
+      "navigation": 2,
+      "seat-binding": 4
+    },
+    "exactCarriedUnits": 16,
+    "adaptedBindings": 8,
+    "refreshedEffectiveRows": 63,
+    "contentRows": 33,
+    "placementOrAnchorRows": 30,
+    "directOriginMaterializations": 11,
+    "overlayPredecessorIdentityRefreshes": 11,
+    "generatedExistingShardsRewritten": 5,
+    "historicalOverlayPredecessorsNotRewritten": 171,
+    "currentEffectiveBindingsChecked": 314,
+    "ratchetEntriesChanged": 3,
+    "liveFiles": 33,
+    "missingCurrentUnits": 0,
+    "missingChangedUnits": 0,
+    "preparedOperativeOverlayRows": 134,
+    "preparedHistoricalLookupRows": 44,
+    "composedConservativeMissingChangedUnits": 2
   },
-  "sourceTriage": [
+  "carriedUnits": [
     {
       "sourcePath": "docs/specs/confinement-authority.md",
-      "unprovenUnits": 18,
-      "details": "source-triage.json#/records/0"
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
+      "targetAncestry": [],
+      "bindingSha256": "be8ef793b3d770a06be3b116d1cbd86b32153877189062635eab3906fe488402",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/0"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "spec-agent-confinement-authority",
+      "sourceUnitDigest": "3c9d1b21b98860d8e4a837e2ad0587a11914fb8ec578138971d38e200e4d77f5",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "spec-agent-confinement-authority",
+      "targetUnitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority"
+      ],
+      "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/1"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "1b18b268a3762b32609e047a78b2e7be9a1a5ff47823061c265f006775de6146",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority"
+      ],
+      "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/2"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
+      "sourceUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
+      "targetUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "bindingSha256": "f20d1fd5d2951fd2f7eae95620eaf417514e37e0b007da9a85026ebffaa3f2a2",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/3"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-122",
+      "sourceUnitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-55",
+      "targetUnitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "bindingSha256": "59d8546feae2be9672cccd642a63fe9651db98cd7f902d8aa8a9c52d67909afb",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/4"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-126",
+      "sourceUnitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-59",
+      "targetUnitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "bindingSha256": "6e7965700de00173017308d8a55048e8da6277a41549b552eba89b92bb965230",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/5"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker",
+      "sourceUnitDigest": "b4af3b71458ce9be6e2930e2864505e9b721c6b7844db40620b21865f7e381bf",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker",
+      "targetUnitDigest": "b4af3b71458ce9be6e2930e2864505e9b721c6b7844db40620b21865f7e381bf",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.3 Machine-private roots — thư mục riêng của máy, che với mọi worker"
+      ],
+      "bindingSha256": "9ba6d697bc236c92a4b877ff365079fc1c3a44f791b315f646a32c771140876a",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/6"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-127",
+      "sourceUnitDigest": "9707fdb03297472fba4230c69cee21cf696f226e23556dba590d4270d4839fb9",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-60",
+      "targetUnitDigest": "9707fdb03297472fba4230c69cee21cf696f226e23556dba590d4270d4839fb9",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.3 Machine-private roots — thư mục riêng của máy, che với mọi worker"
+      ],
+      "bindingSha256": "d6d067c24a06843eba728c01c7b305b1f9faa15dfa4cf335d3253efe8c6a471c",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/7"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-128",
+      "sourceUnitDigest": "860ee4f53d93c38433e0f1240f975584889e34afdcad07b34497ee415d3a54d7",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-61",
+      "targetUnitDigest": "860ee4f53d93c38433e0f1240f975584889e34afdcad07b34497ee415d3a54d7",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.3 Machine-private roots — thư mục riêng của máy, che với mọi worker"
+      ],
+      "bindingSha256": "326a95160f02648e7fd34148b7fcd9d3d1c75cf69fef5aee9e138ea20a07b76c",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/8"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-129",
+      "sourceUnitDigest": "220056fad10663b6b883613750b8dc896aae160d0af2cab28d9aab6c67ba426b",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-62",
+      "targetUnitDigest": "220056fad10663b6b883613750b8dc896aae160d0af2cab28d9aab6c67ba426b",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.3 Machine-private roots — thư mục riêng của máy, che với mọi worker"
+      ],
+      "bindingSha256": "ee2bca68a11a65f210f1e1e4ce96bf977656a79aed9975f3c8b83bc112f8e105",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/9"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
+      "sourceUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
+      "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "targetAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
+      "targetUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
+      "targetAncestry": [
+        "Added in candidate: rollout and settled facts",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "bindingSha256": "16a7175ced9e4cf2a4c24b77f290f5e942fbe6110ade59c96a2fab90e9d80e93",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/10"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-130",
+      "sourceUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
+      "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
+      "targetAncestry": [
+        "Added in candidate: rollout and settled facts",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "bindingSha256": "a8a147207f44a978516a101f1d8b0ffb120e4dfc3eac0403b69c742d232e2a4d",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/11"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "113-behavior-probes",
+      "sourceUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "113-behavior-probes",
+      "targetUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "bindingSha256": "42fb71c72a7dc31885ad795345e6890be265ebb7c13109b611377dfc7d570256",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/12"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-135",
+      "sourceUnitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-66",
+      "targetUnitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "bindingSha256": "5b9e72c944582dc6c65f887da1ad1cf8a1f9c381867c630638eb38f47d40d53c",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/13"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "12-quyết-định-của-proposal",
+      "sourceUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
+      "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "targetAnchor": "12-quyết-định-của-proposal",
+      "targetUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
+      "targetAncestry": [
+        "Added in candidate: confinement authority decisions",
+        "12. Quyết định của proposal"
+      ],
+      "bindingSha256": "78879f4952a9081cbf7a0a6270bc1f826876712e5871acd70df2c8b12dc00f22",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/14"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-139",
+      "sourceUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
+      "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
+      "targetAncestry": [
+        "Added in candidate: confinement authority decisions",
+        "12. Quyết định của proposal"
+      ],
+      "bindingSha256": "ffe781f3cc9b4573afaec6196236559cc01f9f7e3aa1bad9a100b37ea9b3974e",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/15"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
+      "sourceUnitDigest": "0bd4425818ed437564b0fdc57f3f359f1f6ecaa57f00b82161fc94b71e242859",
+      "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "targetAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
+      "targetUnitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
+      "targetAncestry": [
+        "Added in candidate: rollout and settled facts",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/16"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceAnchor": "unheaded-block-141",
+      "sourceUnitDigest": "c67ba6862d5dfcc4170707858622d69a0eeeb5d31807f6e698d2731c10fe9635",
+      "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
+      "targetAncestry": [
+        "Added in candidate: rollout and settled facts",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/17"
     },
     {
       "sourcePath": "docs/specs/reading-map.md",
-      "unprovenUnits": 2,
-      "details": "source-triage.json#/records/1"
+      "sourceAnchor": "reading-map-sản-phẩm",
+      "sourceUnitDigest": "aeff62494cd65c49a3ae6f214402d93b96e511cc7fba10f6365dc19eb73405ab",
+      "targetOwner": "docs/reading-map.md",
+      "targetAnchor": "5-detailed-product-and-source-map",
+      "targetUnitDigest": "8138321891e5475c175c2159e09be0cd0695fac0de0c533149f98c584c079937",
+      "targetAncestry": [
+        "Documentation Reading Map",
+        "5. Detailed Product And Source Map"
+      ],
+      "bindingSha256": "5215dbaa1fa31046d8bcc0874b3c224b934f990bddf8802e51f825d332e8c069",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/18"
+    },
+    {
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "1cf4ea2cc73a32773c8ac4435aaa84e9afafd6b230b45eb533575d5a5f7f9217",
+      "targetOwner": "docs/reading-map.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "1348d23834e11f314424df0a58e5888be52f93bb30e9d7fbf4a74f8c38b4a06f",
+      "targetAncestry": [
+        "Documentation Reading Map",
+        "5. Detailed Product And Source Map"
+      ],
+      "bindingSha256": "d38a90c8c2a6ad0fc81fbcce4556e8b0c3364369c5845fd2ea205f32140e445a",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/19"
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",
-      "unprovenUnits": 4,
-      "details": "source-triage.json#/records/2"
+      "sourceAnchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
+      "sourceUnitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
+      "targetOwner": "docs/platform/seat-binding/spec.md",
+      "targetAnchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
+      "targetUnitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
+      "targetAncestry": [
+        "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+        "9. Chuyển đổi (đã xong, mã chuyển đổi đã gỡ)"
+      ],
+      "bindingSha256": "70b5f688a0cb551c1e13e9949b4a02573e02ee1c54318bca02131fbde002617c",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/20"
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "sourceAnchor": "unheaded-block-36",
+      "sourceUnitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
+      "targetOwner": "docs/platform/seat-binding/spec.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
+      "targetAncestry": [
+        "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+        "9. Chuyển đổi (đã xong, mã chuyển đổi đã gỡ)"
+      ],
+      "bindingSha256": "06a86eabdd69af7871c66b61804d7ea056fcaa590d35e481325ab77951a0e28a",
+      "kind": "exact-unit-digest",
+      "ledgerPointer": "/sourceBindings/21"
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "sourceAnchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
+      "sourceUnitDigest": "d938c35389eea356e8a79214c0b42056986291a75315cc4b0bb67c5e8d34cc4f",
+      "targetOwner": "docs/platform/seat-binding/spec.md",
+      "targetAnchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
+      "targetUnitDigest": "6c9dc51206ce3c376b57d629d5e92db9266a4c7c1611e6240d77eb72a7a48e3b",
+      "targetAncestry": [
+        "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+        "15. Lịch sử quyết định",
+        "D-ADR0072 (Seat Binding: one authority for agent seat choice) — một authority cho ghế agent; project thắng; tier khai trực tiếp; supersede phần chọn ghế của RUL80 (an account is chosen first, then a CLI), RUL91 (a person may pin the provider account of a unit run), RUL98 (workflow start passes --timeout and --account to each Unit), RUL102 (a tier cell names its pool; one family has one executor), RUL103 (runner.maxTier caps every seat), RUL106 (a seat walks a tier declared order and its cell entries)"
+      ],
+      "bindingSha256": "161b52c433620a701736ae612bc2697a08fce2b91102e854ab5c388f7a36ca2c",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/22"
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "sourceAnchor": "unheaded-block-60",
+      "sourceUnitDigest": "477e55b22636016eb029dff55ad9e60ea8f2b165446dc5e60425b1ea50e4b352",
+      "targetOwner": "docs/platform/seat-binding/spec.md",
+      "targetAnchor": "unheaded-block-62",
+      "targetUnitDigest": "5a418963fe6553424ca817fd3f5930c8520cf98e15b8bbcb029464f439dc9475",
+      "targetAncestry": [
+        "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")",
+        "15. Lịch sử quyết định",
+        "D-ADR0072 (Seat Binding: one authority for agent seat choice) — một authority cho ghế agent; project thắng; tier khai trực tiếp; supersede phần chọn ghế của RUL80 (an account is chosen first, then a CLI), RUL91 (a person may pin the provider account of a unit run), RUL98 (workflow start passes --timeout and --account to each Unit), RUL102 (a tier cell names its pool; one family has one executor), RUL103 (runner.maxTier caps every seat), RUL106 (a seat walks a tier declared order and its cell entries)"
+      ],
+      "bindingSha256": "743ee4ba0b23a78ae26911cfed46d0bd0cccd3cd88f01748ec126d4bc1c5b1f1",
+      "kind": "explicit-adapted-binding",
+      "ledgerPointer": "/sourceBindings/23"
     }
   ],
-  "carriedUnits": [],
-  "successorAnchorsAdded": [],
-  "ratchetEntriesChanged": [],
-  "ratchetMismatchesUnchanged": [
+  "ratchetEntriesChanged": [
     "docs/specs/confinement-authority.md",
     "docs/specs/reading-map.md",
     "docs/specs/seat-binding.md"
   ],
-  "globalDrift": {
-    "status": "failed-before-writing",
-    "savedArtifactChanged": false,
-    "savedSourcePin": "5965143b4fd56df6698b2096df1a672d26293c90",
-    "savedZeroMissingIsNotHEADProof": true
+  "scanner": {
+    "change": "Only appliedToDocs === false shards are withheld from live resolution and reported with row counts; old rows stay effective. No other scan algorithm changed.",
+    "live": "legacy-drift.json / checks-w11.json",
+    "preparedPendingApply": [
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json",
+        "rowCount": 44,
+        "historicalLookupRowCount": 44
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/w9-component-carriage-body-overlays.json",
+        "rowCount": 90,
+        "historicalLookupRowCount": 0
+      }
+    ],
+    "unflaggedMissingHolder": {
+      "exit": 1,
+      "error": "ENOENT",
+      "path": "docs/platform/w11-required-missing-holder.md",
+      "outputUnchanged": true
+    },
+    "preparedComposition": {
+      "exit": 0,
+      "resolvedOperativeOverlays": 134,
+      "fullRollbackExact": true,
+      "missingChangedUnits": 2,
+      "explanation": "Existing scanner source-binding join does not inherit sourcePath from superseded rows. The moved README/repo-layout-vision units need final-pin source-join materialization by the composition owner; all 134 operative targets independently resolve against exact composed bytes. No live patch/flag changed."
+    }
   },
   "checks": [
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/0",
       "name": "accounting",
-      "exit": 0
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/0"
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/1",
+      "name": "binding-and-conservation",
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/1"
+    },
+    {
+      "name": "scanner-boundary-probes",
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/2"
+    },
+    {
       "name": "legacy-drift-at-head",
-      "exit": 1
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/3"
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/2",
+      "name": "legacy-drift-replay",
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/4"
+    },
+    {
       "name": "rebind-check",
-      "exit": 0
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/5"
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/3",
       "name": "ownership-audit",
-      "exit": 1
+      "exit": 1,
+      "commandRef": "checks-w11.json#/checks/6",
+      "requiredOwnershipPassed": true
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/4",
       "name": "ratchet",
-      "exit": 1
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/7"
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/5",
       "name": "ratchet-owning-test",
-      "exit": 1
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/8"
     },
     {
-      "record": "checks.json",
-      "commandRef": "checks.json#/checks/6",
-      "name": "evidence-relocation-before",
-      "exit": 2
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/0",
-      "name": "accounting",
-      "exit": 0
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/1",
-      "name": "legacy-drift-at-head",
-      "exit": 1
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/2",
-      "name": "rebind-check",
-      "exit": 0
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/3",
-      "name": "ownership-audit",
-      "exit": 1
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/4",
-      "name": "ratchet",
-      "exit": 1
-    },
-    {
-      "record": "checks-replay.json",
-      "commandRef": "checks-replay.json#/checks/5",
-      "name": "ratchet-owning-test",
-      "exit": 1
+      "name": "diff-whitespace",
+      "exit": 0,
+      "commandRef": "checks-w11.json#/checks/9"
     }
   ],
-  "additionalCommands": [
+  "ownershipAudit": [
     {
-      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/import3/account.py",
-      "exit": 1,
-      "meaning": "Initial author attempt: overstrict all-docs-equal-main assertion; corrected using exact parent diffs, then rerun with exit 0."
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRowCount": 0,
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      }
     },
     {
-      "command": "git diff --check",
-      "exit": 0
-    },
-    {
-      "command": "JSON parse / Python AST parse for import3 artifacts",
-      "exit": 0
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "commands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "failingRowCount": 0,
+      "ownership": {
+        "noNewDoubleOwnership": true,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      }
     }
   ],
   "evidenceRelocation": {
-    "exit": 2,
-    "verdict": null,
-    "incident": "Explicit release-addon preload did not prevent ensureScriptAddon invoking checkout staging on its next load. Cargo reported an incremental build; the native door refused the second file. Ignored build/.fgos runtime artifacts may have been populated outside scope; not inspected or cleaned afterward.",
-    "repeatDisabledInSafeDriver": true
+    "status": "not-run",
+    "exit": null,
+    "reason": "The --before checker calls inspectRepo -> ensureScriptAddon. That can load or stage a native addon; W11 explicitly forbids loading one. No attempt made."
   },
-  "artifactEncoding": "Large ownership-audit stdout is stored losslessly in deterministic gzip, authenticated by stdoutSha256 in each command record. Other command outputs are inline.",
+  "additionalCommands": [
+    {
+      "command": "node reports/phase-09/late-areas/scan-legacy-drift.mjs (repo-relative plan prefix)",
+      "exit": 0,
+      "result": "Initial live scan after the prepared-flag repair: 24 missing; after holder edits, 8; final scan 0."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/resync.py (repo-relative plan prefix)",
+      "exit": 0,
+      "result": "Prepared 63 effective-row rebindings / 24 source bindings without applying."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/resync.py --write (repo-relative plan prefix)",
+      "exit": 0,
+      "result": "First application left 11 superseded direct origins stale for the frozen direct-claim reader; corrected by explicit terminal materialization and predecessor-identity refresh, then rerun successfully."
+    },
+    {
+      "command": "rebind/rebind.py --check, same runpy scratch wrapper as checks-w11.json",
+      "exit": 1,
+      "result": "Initial diagnostic: exactly 11 stale historical direct origins. Final unchanged check exits 0, drift 0."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/prove-scanner.py (repo-relative plan prefix)",
+      "exit": 1,
+      "result": "First proof-author attempt asserted 178 operative overlays; corrected to 134 operative rows plus 44 historical lookup entries."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/prove-scanner.py (repo-relative plan prefix)",
+      "exit": 1,
+      "result": "Second proof-author attempt expected composed global scan zero. Actual unchanged source-join reports 2 conservative changed-unit gaps; the final proof retains this result rather than changing scanner logic."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/refresh-ratchet.py (repo-relative plan prefix)",
+      "exit": 0,
+      "result": "Exactly three existing exception digests refreshed; immutable previous accounting authenticated at input HEAD."
+    },
+    {
+      "command": "python3 -B reports/phase-09/import3/verify.py (repo-relative plan prefix)",
+      "exit": 0,
+      "result": "Full intake/source-binding join, record integrity, 3-only ratchet delta, false prepared flags and exact writable scope."
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "result": "Read-only whitespace check."
+    },
+    {
+      "command": "Read-only git status/log/show/diff/rev-parse/merge-base investigations",
+      "exit": 0,
+      "result": "Path history, exact merge parents/base, symbol prior art and scope checks only; no repository Git write."
+    }
+  ],
+  "auditNativeDiagnostic": {
+    "loaded": true,
+    "context": "audit-report.py invokes the unchanged checks.mjs child, whose trackedPlatformDocs uses the native Git Inspect door.",
+    "result": "Both checks.mjs children exited 1 before a checks verdict: git-floor-probe-failed, read-only file system. Their exact stdout/stderr are retained in checks-w11.json subcommandOutputs.",
+    "staging": "Existing cached addon was loaded; no Cargo/build output and no new staging attempt observed. No explicit preload, addon build, .fgos inspection or cleanup was performed. The evidence --before checker was never invoked."
+  },
+  "proofEncoding": "binding-refresh.json interns long strings in a digest-authenticated textCatalog, expanded by resync.py --check. Original blocked artifacts remain historical.",
+  "impactAnalysis": "degraded/unqueried under the no-fgos-CLI brief; only the records scanner changed, no production symbol change.",
   "scratch": {
-    "path": "/tmp/fgos-work/w10-import3",
+    "path": "/tmp/fgos-work/w11-import3",
     "removedAtHandback": true
   },
-  "impactAnalysis": "degraded/unqueried under no-CLI brief; no production symbols changed",
   "boundaries": {
-    "candidateDocumentsChanged": false,
-    "ledgerChanged": false,
-    "exceptionsChanged": false,
-    "legacyDriftChanged": false,
-    "repositoryGitMutationCommands": false,
+    "repositoryGitWrites": false,
     "fgosCLI": false,
+    "workLifecycle": false,
+    "broadSuites": false,
     "pairAccounting": false,
     "gateAcceptance": false,
-    "authorityCutover": false
+    "authorityCutover": false,
+    "livePreparedFlagsChanged": false
   },
-  "nextActions": [
-    "Grant docs/reading-map.md for its two imported entry updates while retaining the transition banner, knowledge fixes and later truth/link corrections.",
-    "Have the composition owner resolve prepared-only overlays versus the current scanner before requiring a successful global HEAD scan.",
-    "Resume the 24 bounded unit carries and rebindings, scan globally, then refresh only the three ratchet digests with truthful provenance.",
-    "Retry evidence relocation only in a sanctioned isolated native-payload fixture."
+  "followup": [
+    "Independent review of 24 source bindings, 63 effective rebindings, 11 direct-origin materializations and 11 overlay predecessor identities.",
+    "At final pin, the composition owner materializes source joins for the relocated README/repo-layout-vision; scratch composed scan conservatively reports 2 changed units despite 134 valid overlay targets.",
+    "The combined audit checks.mjs verdict is unavailable on this sandbox native floor; do not call it a check-A result. Both required ownership proofs already pass."
   ]
 }

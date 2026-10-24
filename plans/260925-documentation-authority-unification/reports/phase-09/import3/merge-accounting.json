@@ -1,6 +1,6 @@
 {
-  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
-  "decision": "L12-137 / L13-6 / w10-import3-brief; accounting only; resync blocked by exact writable scope",
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+  "decision": "L12-137 / L13-6 / w10-import3-brief + w11-import3-resume-brief; accounting and author resync, no gate acceptance",
   "merges": [
     {
       "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
@@ -584,15 +584,16 @@
     "independentReview": "pending"
   },
   "sourceResync": {
-    "status": "blocked before any carry/rebind/exception edit",
-    "diagnostic": "source-triage.json",
-    "authoritativeScanner": "failed with ENOENT; saved legacy-drift.json remains historical, not HEAD evidence"
+    "status": "authored-pending-independent-review",
+    "intake": "source-triage.json",
+    "diagnostic": "current-source-triage.json",
+    "shard": "ledger/decisions/s18-import3-resync.json",
+    "freshSourceBindings": 24,
+    "authoritativeScanner": "legacy-drift.json / scanner-proof.json; prepared shards reported, not applied to the live tree"
   },
   "limits": [
     "No pair accounting, content approval, authority promotion, cutover, fgOS CLI, repository Git write or production-symbol edit.",
-    "impact-analysis: degraded/unqueried under the no-CLI brief; no product symbol changed."
+    "impact-analysis: degraded/unqueried under the no-CLI brief; only the records scanner changed, no product symbol changed."
   ],
-  "needsWrites": [
-    "docs/reading-map.md"
-  ]
+  "needsWrites": []
 }

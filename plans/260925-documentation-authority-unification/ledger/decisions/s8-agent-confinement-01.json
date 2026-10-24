@@ -27,17 +27,13 @@
       "targetAnchor": "unheaded-block-1",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/confinement-authority.md#unheaded-block-1 (source lines 1-5) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-1 (candidate lines 1-5). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "mechanical: unheaded-block-1 lines 1-5 -> spec.md#unheaded-block-1 lines 1-5; both digests recomputed equal, line slices identical, anchors exist, unique-match and equal-ancestry proof recomputed as Unit-exact; no text read beyond the mechanical comparison; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-01-1276467f3.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
       "targetAncestry": [],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      "bindingSha256": "be8ef793b3d770a06be3b116d1cbd86b32153877189062635eab3906fe488402"
     },
     {
       "claimId": "claim_15b8c9068c1c07bed6aa09b4234faf4f",
@@ -46,17 +42,15 @@
       "targetAnchor": "spec-agent-confinement-authority",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
-      "reviewNote": "deep: title section = metadata block plus labelled Added-in-candidate note (A40/A19 label names evidence) plus the status-paragraph bwrap sentence corrected (diff read); extractor digests recomputed equal; supersede is true because a corrected sentence lives in this section",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-      "targetAncestry": [],
-      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority"
+      ],
+      "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a"
     },
     {
       "claimId": "claim_ba0b2e1a3bc56167392758ded5e83687",
@@ -65,19 +59,15 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
-      "reviewNote": "deep: diff is exactly the three status lines (executor ids and live-migration claim) replaced; rest of the block byte-equal; digests recomputed; anchor checked; supersede true",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
       "targetAncestry": [
         "Spec: Agent Confinement Authority"
       ],
-      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
+      "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5"
     },
     {
       "claimId": "claim_f28782f0b3d1c34833072a10b026b808",
@@ -3518,20 +3508,17 @@
       "targetAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/specs/confinement-authority.md:1188-1188#92-hostread-blind-worker-mù-trước-run-state-của-peer (current lines); unit SHA256 28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc.\nTarget: docs/platform/agent-confinement/spec.md:454-454#92-hostread-blind-worker-mù-trước-run-state-của-peer (current lines); unit SHA256 28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"9.2 `hostRead: blind` — worker mù trước run state của peer\" → \"9.2 `hostRead: blind` — worker mù trước run state của peer\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#92-hostread-blind-worker-mù-trước-run-state-của-peer under docs/platform/agent-confinement/spec.md#92-hostread-blind-worker-mù-trước-run-state-của-peer; source context \"Spec: Agent Confinement Authority / 9. Default implementation đầu tiên\", target context \"Spec: Agent Confinement Authority / 9. Default implementation đầu tiên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: move of 9.2 hostRead blind from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
-        "9. Default implementation đầu tiên"
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
       ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      "bindingSha256": "f20d1fd5d2951fd2f7eae95620eaf417514e37e0b007da9a85026ebffaa3f2a2"
     },
     {
       "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
@@ -3540,22 +3527,17 @@
       "targetAnchor": "unheaded-block-55",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-123 (source lines 1190-1194) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-57 (candidate lines 456-460). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-57 -> docs/platform/agent-confinement/spec.md#unheaded-block-55; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-57 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated; digests re-hashed independently in Python (seed 20261017)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
+      "targetUnitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "9. Default implementation đầu tiên",
         "9.2 `hostRead: blind` — worker mù trước run state của peer"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "9214f7bba7d50a0fa8d6ff8498e34bcf663f7c133803fbb18e75f04221f4c6a6"
+      "bindingSha256": "59d8546feae2be9672cccd642a63fe9651db98cd7f902d8aa8a9c52d67909afb"
     },
     {
       "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
@@ -3636,22 +3618,17 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-127 (source lines 1233-1245) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-61 (candidate lines 499-511). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-61 -> docs/platform/agent-confinement/spec.md#unheaded-block-59; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-61 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
+      "targetUnitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "9. Default implementation đầu tiên",
         "9.2 `hostRead: blind` — worker mù trước run state của peer"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "47bf361203cb70c39dd6e1ed39fc49b66db4aae351e7c1a4d86b5e780b0cd1f4"
+      "bindingSha256": "6e7965700de00173017308d8a55048e8da6277a41549b552eba89b92bb965230"
     },
     {
       "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
@@ -3663,10 +3640,13 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "Source: docs/specs/confinement-authority.md:1247-1247#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:24-24#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"10. Lộ trình rollout và trạng thái hoàn thành\" → \"10. Lộ trình rollout và trạng thái hoàn thành\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
+      "targetUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
       "targetAncestry": [
-        "Added in candidate: rollout and settled facts"
-      ]
+        "Added in candidate: rollout and settled facts",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "bindingSha256": "16a7175ced9e4cf2a4c24b77f290f5e942fbe6110ade59c96a2fab90e9d80e93",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json."
     },
     {
       "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
@@ -3678,11 +3658,13 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "Source: docs/specs/confinement-authority.md:1249-1258#unheaded-block-128 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:26-35#unheaded-block-3 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-128 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-3; source context \"Spec: Agent Confinement Authority / 10. Lộ trình rollout và trạng thái hoàn thành\", target context \"Added in candidate: rollout and settled facts / 10. Lộ trình rollout và trạng thái hoàn thành\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "targetUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "10. Lộ trình rollout và trạng thái hoàn thành"
-      ]
+      ],
+      "bindingSha256": "a8a147207f44a978516a101f1d8b0ffb120e4dfc3eac0403b69c742d232e2a4d",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json."
     },
     {
       "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
@@ -3747,25 +3729,20 @@
       "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
       "sourceUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-60",
+      "targetAnchor": "unheaded-block-63",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-130 (source lines 1266-1274) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-62 (candidate lines 517-525). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-62 -> docs/platform/agent-confinement/spec.md#unheaded-block-60; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-62 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.1 Contract tests"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "75db7d435ac473ddde2c1b95927cfc62b74f4a1d166e0aff14c53af8b5233d83"
+      "bindingSha256": "799851b325632c10f6f1b0d563fde09d6af256eba0879322e265a7ed7227b11f"
     },
     {
       "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
@@ -3793,25 +3770,20 @@
       "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
       "sourceUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-61",
+      "targetAnchor": "unheaded-block-64",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-131 (source lines 1278-1287) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-63 (candidate lines 529-538). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-63 -> docs/platform/agent-confinement/spec.md#unheaded-block-61; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-63 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.2 One-door tests"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "541817a8eb3c4439df7e23b66cce38657caa15934fd2c0647c869748263fb0d1"
+      "bindingSha256": "7f527cc5843b2a42b07e09276746cf5b60bd2eeef70fe6b6d1c3bb2f75cb030c"
     },
     {
       "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
@@ -3820,92 +3792,74 @@
       "targetAnchor": "113-behavior-probes",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/specs/confinement-authority.md:1289-1289#113-behavior-probes (current lines); unit SHA256 a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311.\nTarget: docs/platform/agent-confinement/spec.md:540-540#113-behavior-probes (current lines); unit SHA256 a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"11.3 Behavior probes\" → \"11.3 Behavior probes\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#113-behavior-probes under docs/platform/agent-confinement/spec.md#113-behavior-probes; source context \"Spec: Agent Confinement Authority / 11. Proof và Definition of Done\", target context \"Spec: Agent Confinement Authority / 11. Proof và Definition of Done\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: 11.3 Behavior probes read in both files (probe bullets and closing paragraph), byte-identical, no links, both under Proof and Definition of Done; equal-section and move wording is true and the old invented label sentence is gone; last-reviewed digest unchanged at 62751458b.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
-        "11. Proof và Definition of Done"
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
       ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      "bindingSha256": "42fb71c72a7dc31885ad795345e6890be265ebb7c13109b611377dfc7d570256"
     },
     {
       "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
       "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-62",
+      "targetAnchor": "unheaded-block-65",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-132 (source lines 1291-1291) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-64 (candidate lines 542-542). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-64 -> docs/platform/agent-confinement/spec.md#unheaded-block-62; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-64 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "5dcead3e763261c77fece3735b2c86c4391e434dc5b2bc29575cf4290476b1aa"
+      "bindingSha256": "17cbc8a63a586c568a9adc5d1cc103c5b15ef6561424c803a1c2f1c0447f9cca"
     },
     {
       "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
       "sourceUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-63",
+      "targetAnchor": "unheaded-block-66",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-133 (source lines 1293-1302) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-65 (candidate lines 544-553). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-65 -> docs/platform/agent-confinement/spec.md#unheaded-block-63; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-65 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated; digests re-hashed independently in Python (seed 20261017)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
+      "targetUnitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "b3d0b6324414d835282124b070681171deb854235061fb12b275e527da481a4a"
+      "bindingSha256": "5b9e72c944582dc6c65f887da1ad1cf8a1f9c381867c630638eb38f47d40d53c"
     },
     {
       "claimId": "claim_34983077687032d7a49ecc61907a6806",
       "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-64",
+      "targetAnchor": "unheaded-block-67",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-134 (source lines 1304-1306) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-66 (candidate lines 555-557). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-66 -> docs/platform/agent-confinement/spec.md#unheaded-block-64; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-134 (L1304-1306) to docs/platform/agent-confinement/spec.md#unheaded-block-66 (L555-557): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens 'Probe input/assertion độc lập với declar'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says equal ancestry and that is true (source and target both under '11. Proof và Definition of Done / 11.3 Behavior probes'); the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "91e89358d3623c125b2e35a4da246f9ab2f98002c0fe46636ff19991a6f909ec"
+      "bindingSha256": "9d1ec0a59f63dcf593e6d595e1e2b8e8a2a758be8018eb0ea32dfc2186f8f9ca"
     },
     {
       "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
@@ -3933,25 +3887,20 @@
       "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
       "sourceUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-65",
+      "targetAnchor": "unheaded-block-68",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-135 (source lines 1310-1314) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-67 (candidate lines 561-565). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-67 -> docs/platform/agent-confinement/spec.md#unheaded-block-65; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-135 (L1310-1314) to docs/platform/agent-confinement/spec.md#unheaded-block-67 (L561-565): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens '- Pin posture của cả 17 executor hiện tạ'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says equal ancestry and that is true (source and target both under '11. Proof và Definition of Done / 11.4 Observability'); the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.4 Observability"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "d82f45af084045d9f69d28985569bffa0e26784cc7a7fa9c906487092bdd4e78"
+      "bindingSha256": "c9215d4af0e060fcfceed7a673afba44619b5032ee1d3a78d6f429ef47bf4913"
     },
     {
       "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
@@ -3979,25 +3928,20 @@
       "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
       "sourceUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-66",
+      "targetAnchor": "unheaded-block-69",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-136 (source lines 1318-1324) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-68 (candidate lines 569-575). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-68 -> docs/platform/agent-confinement/spec.md#unheaded-block-66; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-136 (L1318-1324) to docs/platform/agent-confinement/spec.md#unheaded-block-68 (L569-575): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens 'Mỗi backend driver đăng ký check schema/'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says equal ancestry and that is true (source and target both under '11. Proof và Definition of Done / 11.5 Doctor/setup'); the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "11. Proof và Definition of Done",
         "11.5 Doctor/setup"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "f981e0ae7a32a1c907d05b0ba0bf520914b885aa08dec641c2d51e72f20fa565"
+      "bindingSha256": "16d89fead5b97aa6cf3f4b90f9fc87887e0387f49e1118682a4e683cdbeb5738"
     },
     {
       "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
@@ -4006,19 +3950,16 @@
       "targetAnchor": "12-quyết-định-của-proposal",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/specs/confinement-authority.md:1326-1326#12-quyết-định-của-proposal (current lines); unit SHA256 52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f.\nTarget: docs/platform/agent-confinement/decisions/confinement-authority-decisions.md:24-24#12-quyết-định-của-proposal (current lines); unit SHA256 52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"12. Quyết định của proposal\" → \"12. Quyết định của proposal\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#12-quyết-định-của-proposal under docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#12-quyết-định-của-proposal; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: confinement authority decisions\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate decisions carrier, as named); I did not re-read the text beyond the rationale.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
       "targetAncestry": [
-        "Added in candidate: confinement authority decisions"
+        "Added in candidate: confinement authority decisions",
+        "12. Quyết định của proposal"
       ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      "bindingSha256": "78879f4952a9081cbf7a0a6270bc1f826876712e5871acd70df2c8b12dc00f22"
     },
     {
       "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
@@ -4027,20 +3968,16 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/specs/confinement-authority.md:1328-1341#unheaded-block-137 (current lines); unit SHA256 92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1.\nTarget: docs/platform/agent-confinement/decisions/confinement-authority-decisions.md:26-39#unheaded-block-3 (current lines); unit SHA256 92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-137 under docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-3; source context \"Spec: Agent Confinement Authority / 12. Quyết định của proposal\", target context \"Added in candidate: confinement authority decisions / 12. Quyết định của proposal\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: move confinement-authority.md:1328-1341#unheaded-block-137 -> confinement-authority-decisions.md:26-39#unheaded-block-3; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json.",
+      "targetUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
       "targetAncestry": [
         "Added in candidate: confinement authority decisions",
         "12. Quyết định của proposal"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "bindingSha256": "ffe781f3cc9b4573afaec6196236559cc01f9f7e3aa1bad9a100b37ea9b3974e"
     },
     {
       "claimId": "claim_7aede254166851de375089f4b0160ca6",
@@ -4052,10 +3989,13 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "Source: docs/specs/confinement-authority.md:1343-1343#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39-39#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\" → \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
+      "targetUnitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
       "targetAncestry": [
-        "Added in candidate: rollout and settled facts"
-      ]
+        "Added in candidate: rollout and settled facts",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json."
     },
     {
       "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
@@ -4083,11 +4023,13 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "rationale": "Source: docs/specs/confinement-authority.md:1347-1353#unheaded-block-139 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:43-49#unheaded-block-6 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-139 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-6; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
+      "targetUnitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
-      ]
+      ],
+      "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
+      "reviewNote": "W11 import3: materialized the existing terminal overlay for the frozen direct-claim ownership reader; original row and overlay identity preserved in binding-refresh.json."
     },
     {
       "claimId": "claim_39c40cef341e227d936ea768b12ba435",
@@ -4112,7 +4054,7 @@
       "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
       "sourceUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-67",
+      "targetAnchor": "unheaded-block-70",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4124,13 +4066,14 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "bindingSha256": "2c56b85fbb1be6eb70a9c72e5146696fe40338ca18fb9ff8d09587b9615a0ca1"
+      "bindingSha256": "bbd93ecebe495a64ff053685c592e1335ba47a24416eb2f20b2dbe12cb5b2893",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
       "sourceUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-68",
+      "targetAnchor": "unheaded-block-71",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4142,14 +4085,14 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "bindingSha256": "1a7dfbad64738775ee919f732b4e4ad31ab35c3f9cfa4c1e156bf4202e1c60cc",
-      "reviewNote": "Independent re-review required for changed content; no approval carried."
+      "bindingSha256": "493b46b961114840912b5f765bea0e7cb99f7cd289d3e399d585804b238907b4",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
       "sourceUnitDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-69",
+      "targetAnchor": "unheaded-block-72",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4161,14 +4104,14 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "bindingSha256": "4b9774cf142c7cac67910ffe6ef0baa9dac9abe529e5d13c661dd1d2f0642fac",
-      "reviewNote": "Independent re-review required for changed content; no approval carried."
+      "bindingSha256": "48e9f04e2b9ba6cd123f5ba639940e7281fe68f51f52b60a21d2be351248c861",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
       "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-70",
+      "targetAnchor": "unheaded-block-73",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4180,7 +4123,8 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "bindingSha256": "2c18a76a56f38a9623f29d719ad26c28e121b953fb464d48ab6f292fb07f0087"
+      "bindingSha256": "07fd3eca0a14bbd4877d4551eb6ec059f52c09ec563482d8a775f57e9d937e2a",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
@@ -4208,49 +4152,39 @@
       "claimId": "claim_022af2ccb616ad85400526fd94408258",
       "sourceUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-71",
+      "targetAnchor": "unheaded-block-74",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: ancestor headings differ. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-144 (source lines 1369-1369) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-69 (candidate lines 581-581). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-69 -> docs/platform/agent-confinement/spec.md#unheaded-block-71; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-144 (L1369-1369) to docs/platform/agent-confinement/spec.md#unheaded-block-69 (L581-581): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens 'Private home nhận một **bản chép** của l'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says ancestor headings differ and that is true (source parent '13. Kết quả giải quyết rủi ro...' versus target parent 'Added in candidate: Current settled facts and deferred items'), the original numbered heading 13 is kept at docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39; the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "Added in candidate: Current settled facts and deferred items",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "9a02a442da80ac8203d776f03b6fc8f300c18bc3055507cde0f1efcf5f16926d"
+      "bindingSha256": "e29d548d303ddfba74785c3e29e7bb61a5fb0af9c2ea1fb550e637d8cb8282be"
     },
     {
       "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
       "sourceUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-72",
+      "targetAnchor": "unheaded-block-75",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: ancestor headings differ. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-145 (source lines 1371-1372) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-70 (candidate lines 583-584). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-70 -> docs/platform/agent-confinement/spec.md#unheaded-block-72; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-145 (L1371-1372) to docs/platform/agent-confinement/spec.md#unheaded-block-70 (L583-584): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens '- **Kho SQLite chép dạng snapshot.** Fil'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says ancestor headings differ and that is true (source parent '13. Kết quả giải quyết rủi ro...' versus target parent 'Added in candidate: Current settled facts and deferred items'), the original numbered heading 13 is kept at docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39; the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "Added in candidate: Current settled facts and deferred items",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "001e15f4ba9f0a53ad7fdc9d6e85390deb820eb690f449cba2f2726b6e17d399"
+      "bindingSha256": "d6fe5528fd29476558185d80e5ea4093adb9d2da500e8b14ee496c997b439b41"
     },
     {
       "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
@@ -4385,25 +4319,20 @@
       "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
       "sourceUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-73",
+      "targetAnchor": "unheaded-block-76",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: ancestor headings differ. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-150 (source lines 1386-1389) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-71 (candidate lines 588-591). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by unique full text digest. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 c02: anchors and line ranges refreshed after the labelled binding paragraph; complete direct unit remains byte-equal.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-71 -> docs/platform/agent-confinement/spec.md#unheaded-block-73; existing explicit supersession chain, authenticated against current dual extractors; complete digest preserved.",
-      "reviewNote": "deep: docs/specs/confinement-authority.md#unheaded-block-150 (L1386-1389) to docs/platform/agent-confinement/spec.md#unheaded-block-71 (L588-591): hand-sha256 recomputed equal, source and target digests equal and the digest occurs once in the target, text byte-equal (opens '- **P04 M-3 (Inherited unconfined anchor'); rationale anchors and both line ranges equal the live units (checked by script); anchor ok; rationale says ancestor headings differ and that is true (source parent '13. Kết quả giải quyết rủi ro...' versus target parent 'Added in candidate: Current settled facts and deferred items'), the original numbered heading 13 is kept at docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39; the rationale still carries the authoring-time sentence that the binding is pending review, now historical, binding itself unchanged since 345f15d95",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
       "targetUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "Added in candidate: Current settled facts and deferred items",
         "Tồn đọng mở (Open Deferred Items):"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
-      "bindingSha256": "d85488773718c9f532cd243b93786b917a1a8bbd94d0b33ac1d57f3bd4641551"
+      "bindingSha256": "88474b80230e9e91c5c594141ab51af1287e782cffd05a1119d5f55788c00172"
     },
     {
       "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
@@ -4427,7 +4356,7 @@
       "claimId": "claim_c491a724bb730522215633d79a66e5b3",
       "sourceUnitDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-74",
+      "targetAnchor": "unheaded-block-77",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -4438,8 +4367,8 @@
         "Spec: Agent Confinement Authority",
         "14. Pointers hiện tại"
       ],
-      "bindingSha256": "69d85eb5eb412c845fed5896554ed1b7506c6c658345b933c73a97ff733faf95",
-      "reviewNote": "Independent re-review required for changed content; no approval carried."
+      "bindingSha256": "74a23facaa894da50437319f4a66bf20e15ef4266413d2ab7409b3e393758fcb",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     }
   ],
   "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"

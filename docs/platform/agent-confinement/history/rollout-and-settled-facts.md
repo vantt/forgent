@@ -28,7 +28,7 @@ Superseded by: None
 | S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |
 | S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |
 | S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |
-| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |
+| S3 - Prove | Probe harness committed (9 falsification probes: 8 probe gốc cộng `machine-private-hidden` từ §9.3; thứ mười `peer-run-hidden` chỉ cho blind) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |
 | S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |
 | S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |
 | Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |
@@ -44,7 +44,7 @@ Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P
 2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).
 3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).
 4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).
-5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).
+5. **Probe harness:** 9 bài probe falsification độc lập (8 bài gốc cộng `machine-private-hidden` thêm theo §9.3; bài thứ mười `peer-run-hidden` chỉ chạy cho dispatch blind) đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).
 6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).
 7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR011 (`confinement-authority.v1`, nhãn registry chỉ có trong tài liệu) được đăng ký trong bản đồ kiến trúc candidate; A45 đổi số cũ CTR010 để CTR010 tiếp tục thuộc Gateway REST API. Legacy `docs/architecture-map.md` chỉ đổi tại Phase 9 cutover (P07).
 

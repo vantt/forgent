@@ -1,5 +1,6 @@
 """Read-only merge/Step 0 accounting, adapted from import2/account.py.
-Only writes this turn's import3 reports; never repairs rows or refreshes the ratchet.
+Only writes import3 accounting/current-check reports; never repairs rows or refreshes the ratchet.
+The original source-triage.json is the immutable 24-unit intake for W11.
 Run from repository root with python3 -B.
 """
 import collections
@@ -97,15 +98,15 @@ for source in legacy:
 dump('binding-check.json',dict(inputHEAD=head,merge=merge,extractors=data['extractors'],candidateChecks=candidate_checks,
     checkedEffectiveDirectBindings=len(checks),failingBindings=sum(not c['currentUnitValid'] or not c['bindingHashValid'] for c in checks),
     historicalOverlayPredecessorsNotRewritten=len(historical),checks=checks,
-    changedRows=0,status='read-only Step 0 check; rebindings not applied because the turn stopped on its exact writable boundary'))
-dump('source-triage.json',dict(inputHEAD=head,method='Bounded diagnostic using import2 frozen dual extractors and the three existing successor sets. Not a replacement for the unchanged global scanner, which fails on an absent prepared-only holder.',
+    changedRows=0,status='read-only Step 0 check on the four incoming docs; W11 continuation carriage/rebindings are separately authenticated in binding-refresh.json'))
+dump('current-source-triage.json',dict(inputHEAD=head,method='Current bounded diagnostic using the unchanged frozen dual extractors. Original source-triage.json retains the 24-unit intake; the live scanner supplies global proof.',
     records=triage,counts=dict(sourceFiles=3,unprovenUnits=sum(r['unprovenUnitCount'] for r in triage)),
-    carriedUnits=[],needsWrites=['docs/reading-map.md']))
+    carriage='s18-import3-resync.json / binding-refresh.json; independent review pending',needsWrites=[]))
 unchanged=[]
 for p in ['AGENTS.md','CLAUDE.md','docs/transitional-switchboard.md',str(P/'transitional-switchboard.json')]: 
     unchanged.append(dict(path=p,changedFromFirstParent=p in changed,changedOnMain=p in main_changed,
         firstParentSha256=sha(blob(fp,p)),mergeSha256=sha(blob(merge,p))))
-account=dict(inputHEAD=head,decision='L12-137 / L13-6 / w10-import3-brief; accounting only; resync blocked by exact writable scope',
+account=dict(inputHEAD=head,decision='L12-137 / L13-6 / w10-import3-brief + w11-import3-resume-brief; accounting and author resync, no gate acceptance',
     merges=[dict(merge=merge,firstParent=fp,main=main,base=base,mainCommitCount=69,
         mainCommits=git('log','--format=%H %s',fp+'..'+main).splitlines(),changedPathCount=len(changed),changedPaths=changed,
         mainChangedPaths=main_changed,families=dict(sorted(collections.Counter(p.split('/')[0] for p in changed).items())),
@@ -115,10 +116,11 @@ account=dict(inputHEAD=head,decision='L12-137 / L13-6 / w10-import3-brief; accou
     step0=dict(method='Same dual byte-frozen extractors as import2; full unit digest and self-inclusive ancestry, never an ordinal alone.',
         checkedEffectiveDirectBindings=len(checks),failingBindings=sum(not c['currentUnitValid'] or not c['bindingHashValid'] for c in checks),
         changedRowsIncludingPlacement=0,witnesses='binding-check.json',independentReview='pending'),
-    sourceResync=dict(status='blocked before any carry/rebind/exception edit',diagnostic='source-triage.json',
-        authoritativeScanner='failed with ENOENT; saved legacy-drift.json remains historical, not HEAD evidence'),
+    sourceResync=dict(status='authored-pending-independent-review',intake='source-triage.json',diagnostic='current-source-triage.json',
+        shard='ledger/decisions/s18-import3-resync.json',freshSourceBindings=24,
+        authoritativeScanner='legacy-drift.json / scanner-proof.json; prepared shards reported, not applied to the live tree'),
     limits=['No pair accounting, content approval, authority promotion, cutover, fgOS CLI, repository Git write or production-symbol edit.',
-        'impact-analysis: degraded/unqueried under the no-CLI brief; no product symbol changed.'],needsWrites=['docs/reading-map.md'])
+        'impact-analysis: degraded/unqueried under the no-CLI brief; only the records scanner changed, no product symbol changed.'],needsWrites=[])
 assert {r['path'] for r in provenance if not r['mergeEqualsMain']} == {'docs/platform/git/spec.md','docs/platform/holder-lock/spec.md','docs/specs/reading-map.md'}
 dump('merge-accounting.json',account)
 print(json.dumps(dict(inputHEAD=head,commits=69,changedPaths=len(changed),changedDocumentation=len(docpaths),candidateChecks=candidate_checks,

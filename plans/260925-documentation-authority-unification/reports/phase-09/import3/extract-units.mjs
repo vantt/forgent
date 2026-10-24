@@ -4,7 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 const P='plans/260925-documentation-authority-unification';
-const scratch='/tmp/fgos-work/w10-import3/extractors';
+const scratch='/tmp/fgos-work/w11-import3/extractors';
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const input=JSON.parse(fs.readFileSync(0,'utf8')),libs=[],proofs=[];
 for(const [i,[name,key,lib]] of [

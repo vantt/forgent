@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "L13-4 section 4; w2-d6-brief task 3",
-  "head": "5965143b4fd56df6698b2096df1a672d26293c90",
+  "head": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
   "finalSourcePin": "5e03159334df726e43ffe9505ad4ed43f72ba94d",
   "finalSourcePinEvidence": "reports/phase-08/step-07-final-determinism.json sourceCommit; L12-124",
   "inventoryPin": "f0c76c5e590339d9c815038539ff1f4a072c64e4",
@@ -22,13 +22,14 @@
     "Original-unit deletions/replacements list remaining exact occurrences for owner triage; adaptation can still conceal stale text."
   ],
   "counts": {
-    "postFinalPinFiles": 5,
+    "postFinalPinFiles": 6,
     "postInventoryPinFiles": 33,
     "files": 33,
     "filesWithUnprovenChange": 0,
     "missingChangedUnits": 0
   },
   "postFinalPinPaths": [
+    "docs/specs/confinement-authority.md",
     "docs/specs/distribution.md",
     "docs/specs/observe.md",
     "docs/specs/reading-map.md",
@@ -77,7 +78,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
-      "sha256": "c328784acc56db7a1e3d99e0ac8cde05423f71a864bef5c3466a42f17d56e766"
+      "sha256": "80bdc23844e9bfebba1cdba3651a7c51a8ebbe3c21bbfe131eafbb21b3130df0"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
@@ -101,15 +102,15 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
-      "sha256": "a7e34298dcc93e1749662fe0c852c2c1d69c2699c171ea21709c971e659a19f4"
+      "sha256": "4aefbd6f5c38176a44adc15fe95b879f64e7fc568dba7ab0de5a436ba98c79ce"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "sha256": "dc827c6fc9eb89e1272238ddaedc908bc1173cbfb91aee6b3399bb62ef996c47"
+      "sha256": "03131a55d36b6cbdb4d896f40741ee3fa1cde66c7a07f83ffc92fb93a6b2e25f"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
-      "sha256": "478fb71a6ec05c1545f944f6a66f8142ab197aed5589b8db23bb71a3db80241d"
+      "sha256": "02fcb65e50cf47e172759103775c050ed51b10160f1d7cb189236aca8fe5263a"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
@@ -117,7 +118,15 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
-      "sha256": "8f46a01870801406ad1e512cbdd2863f63cc25cf1ea9f283b8506406cc01951b"
+      "sha256": "5d6417422c11037c861150cc107313643c0aba0827c1d2202a101c692e545cc7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+      "sha256": "6e332409a54e9993bf23a22508eb23016a015874da871fc078713e1fead8f088"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json",
+      "sha256": "47858cadc3e2f6a0cd6afe710ada2d7aab2b60fe847fa7ff635f22ccb1db9331"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
@@ -325,7 +334,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
-      "sha256": "577a506a740f499099f160d77972937d2fd1a87c9979532f2b1726eda3b33690"
+      "sha256": "ba67aa4614d5f0a884b8585e3bd4b583ff3db8732f69840e5538c46762688bda"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-consumer-project.json",
@@ -345,7 +354,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
-      "sha256": "1ec39753ab4fdb67897dfc42c1d589f8e6a9cd71dffcb9fbd89da8699667b7e4"
+      "sha256": "552bcf6d43682d3a3977be5541adfb48a382846aec648edd3d514ae644674724"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
@@ -357,7 +366,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
-      "sha256": "3f9cfc788d4ffec523da77c40857f04629966b9e1b440af38eb6a42675e01619"
+      "sha256": "2cb9b83a0e898743c66437faba6a3ffc5fac66cf775d1338ee3b6d335055f9d2"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
@@ -365,15 +374,15 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
-      "sha256": "5b989328d48648d6b44957ce641d05a66e2c71c04d6218f9b995cc62b66219d5"
+      "sha256": "f18c498eeececddc99b404b10e5485343a97756769d2842855b5ae54faed3657"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
-      "sha256": "7dbdbcc5b2998400de5a3c945f4e56f83487212a4282bcc29dd3d205037c7807"
+      "sha256": "9bcbae00dd65d3184a22b965bf60af59a77cba8322764ab0299def85a35f9ba9"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
-      "sha256": "8a92d4c9a5e8a6a5e0fd123fd248c68c0e8215cbbcb1e4722a0fdaee084b03f1"
+      "sha256": "e0a80111b73742ac2db2701e4e50022b956f12365974c8959955081233351469"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
@@ -385,7 +394,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
-      "sha256": "9393a1f46c341dc1d057f138574a9badb6ef455bd846fe1641ccbe9536736e27"
+      "sha256": "4a9a4b8cf0ffa6a50c91ff59c85a49d99e7aa6f8de491ca861621e256b65b1e6"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
@@ -397,7 +406,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
-      "sha256": "ef3d744f35c9c989982dc5dcaebc4b29684dc2d948a6f45233cd9bf28b1c1c43"
+      "sha256": "ee71b8a7c4f594e9fc25bfbe0819e28318f801340cbc56afa842b813c60f2b43"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
@@ -441,7 +450,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
-      "sha256": "094f0cb862ccaff183539e86c8c67161b8562cc893dd7bee861b576758f613b4"
+      "sha256": "8890682d213960966e637abd056161412d086d49386c4b17f0cb5a9ca04c372d"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
@@ -465,7 +474,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
-      "sha256": "ab9453214632535fc96d6e375b68e93b29e8af422d7dc9e3e6bc0fc7d1c70aeb"
+      "sha256": "7d2400d1209505e40d3341ac744b70c121396fa9b7f301dfc588400491a1727c"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
@@ -585,7 +594,7 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
-      "sha256": "b6d997c55c38b7cfc21cc920a292fecb74135277744a20b28f72bb44219b97a5"
+      "sha256": "6d60a1ec7764a8ecf27854c7b32bb93ddbcbd39e429d968d2a7b05dd4b404893"
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
@@ -617,7 +626,27 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
-      "sha256": "dcfa1d3567c3c23cd10094252ec5d621f65475099141e38401f2aa3298a9caee"
+      "sha256": "785da92b5429c19a0cd2790aa75fc202c11b197a7518617daf76cecc199525c0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json",
+      "sha256": "f5b22edcf27215c602363c4bf7d2d1d1d641718e9db3d07b3c8780846b8d17a3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w9-component-carriage-body-overlays.json",
+      "sha256": "ca6b27cceb744afcb6ee4edba1c0bb9d8ce0e0dc50cb8c5f2d146e592c412e0b"
+    }
+  ],
+  "preparedPendingApply": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json",
+      "rowCount": 44,
+      "historicalLookupRowCount": 44
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w9-component-carriage-body-overlays.json",
+      "rowCount": 90,
+      "historicalLookupRowCount": 0
     }
   ],
   "records": [
@@ -33864,9 +33893,9 @@
     {
       "sourcePath": "docs/specs/confinement-authority.md",
       "status": "modified",
-      "postFinalPin": false,
+      "postFinalPin": true,
       "postInventoryPin": true,
-      "sourceSha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
+      "sourceSha256": "f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564",
       "sourceAtFinalPinSha256": "7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e",
       "sourceAtInventoryPinSha256": "418268c84f64896ac35c827896b5685703b7caef7098be729d7aba84637fdb0c",
       "candidateSuccessors": [
@@ -33877,17 +33906,17 @@
         },
         {
           "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-          "sha256": "5feffde597de5d2bd666fbaf06096f3e1bf0e1f3059f07144f560a33cf644290",
+          "sha256": "8a9fb141177b482648240bbcc30385c68a43d86737e3004b85b299b2309b6677",
           "samePath": false
         },
         {
           "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-          "sha256": "bd26ff8474267ab4e565b56141bb25267f0d246a9b9207b60b5e22f2a1360580",
+          "sha256": "07c52fe3fa4533cb6c07414b639cf8e7eb4ea8d888c912d2e557cc6231a6279f",
           "samePath": false
         },
         {
           "path": "docs/platform/agent-confinement/spec.md",
-          "sha256": "51dc306ed3d1e37df50b86102fcef8e5deeb1ac7545f72e99747cd616ce5ac4d",
+          "sha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10",
           "samePath": false
         }
       ],
@@ -33895,9 +33924,9 @@
       "candidateCarriesPostFinalChange": true,
       "allCurrentUnitsCarried": true,
       "counts": {
-        "currentUnits": 200,
-        "changedSinceInventory": 39,
-        "changedSinceFinal": 0,
+        "currentUnits": 204,
+        "changedSinceInventory": 54,
+        "changedSinceFinal": 18,
         "missingCurrent": 0,
         "missingChangedSinceInventory": 0,
         "missingChangedSinceFinal": 0
@@ -33906,64 +33935,72 @@
         {
           "sourceAnchor": "unheaded-block-1",
           "unitKind": "unheaded-preamble",
-          "sourceUnitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
+          "sourceUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
           "location": {
             "startLine": 1,
             "endLine": 5
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-1",
-              "unitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49"
+              "unitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-1",
+              "unitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
+              "bindingSha256": "be8ef793b3d770a06be3b116d1cbd86b32153877189062635eab3906fe488402",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
           "sourceAnchor": "spec-agent-confinement-authority",
           "unitKind": "heading",
-          "sourceUnitDigest": "d616d06522982d87caf2b59041a80220005e76ba36608070ce92bfb7644a45a3",
+          "sourceUnitDigest": "3c9d1b21b98860d8e4a837e2ad0587a11914fb8ec578138971d38e200e4d77f5",
           "location": {
             "startLine": 7,
             "endLine": 7
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "explicit-adapted-binding",
           "exactMatches": [],
           "adaptedBindings": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "spec-agent-confinement-authority",
-              "unitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-              "bindingSha256": "3b8b7ab17864992a68bd6d26bf4d7c631076aa77a0605a65f0ab5eeba15b5228",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+              "unitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+              "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
         {
           "sourceAnchor": "unheaded-block-2",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+          "sourceUnitDigest": "1b18b268a3762b32609e047a78b2e7be9a1a5ff47823061c265f006775de6146",
           "location": {
             "startLine": 9,
             "endLine": 22
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "explicit-adapted-binding",
           "exactMatches": [],
           "adaptedBindings": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-4",
-              "unitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
-              "bindingSha256": "b2a089f57f993e11173efad9346c86c52a685ef7eaa19811e9e1cb9b0920fe0e",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+              "unitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
+              "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -37034,50 +37071,66 @@
         {
           "sourceAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
           "unitKind": "heading",
-          "sourceUnitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
+          "sourceUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
           "location": {
             "startLine": 1188,
             "endLine": 1188
           },
-          "changedSinceFinalPin": false,
+          "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
-              "unitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc"
+              "unitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
+              "unitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
+              "bindingSha256": "f20d1fd5d2951fd2f7eae95620eaf417514e37e0b007da9a85026ebffaa3f2a2",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
           "sourceAnchor": "unheaded-block-122",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "sourceUnitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
           "location": {
             "startLine": 1190,
-            "endLine": 1194
+            "endLine": 1195
           },
-          "changedSinceFinalPin": false,
+          "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-55",
-              "unitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb"
+              "unitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-55",
+              "unitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
+              "bindingSha256": "59d8546feae2be9672cccd642a63fe9651db98cd7f902d8aa8a9c52d67909afb",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
           "sourceAnchor": "unheaded-block-123",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
           "location": {
-            "startLine": 1196,
-            "endLine": 1205
+            "startLine": 1197,
+            "endLine": 1206
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37096,8 +37149,8 @@
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
           "location": {
-            "startLine": 1207,
-            "endLine": 1222
+            "startLine": 1208,
+            "endLine": 1223
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37116,8 +37169,8 @@
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
           "location": {
-            "startLine": 1224,
-            "endLine": 1231
+            "startLine": 1225,
+            "endLine": 1232
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37134,70 +37187,206 @@
         {
           "sourceAnchor": "unheaded-block-126",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "sourceUnitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
           "location": {
-            "startLine": 1233,
-            "endLine": 1245
+            "startLine": 1234,
+            "endLine": 1248
           },
-          "changedSinceFinalPin": false,
+          "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-59",
-              "unitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8"
+              "unitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-59",
+              "unitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
+              "bindingSha256": "6e7965700de00173017308d8a55048e8da6277a41549b552eba89b92bb965230",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker",
+          "unitKind": "heading",
+          "sourceUnitDigest": "b4af3b71458ce9be6e2930e2864505e9b721c6b7844db40620b21865f7e381bf",
+          "location": {
+            "startLine": 1250,
+            "endLine": 1250
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker",
+              "unitDigest": "b4af3b71458ce9be6e2930e2864505e9b721c6b7844db40620b21865f7e381bf"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker",
+              "unitDigest": "b4af3b71458ce9be6e2930e2864505e9b721c6b7844db40620b21865f7e381bf",
+              "bindingSha256": "9ba6d697bc236c92a4b877ff365079fc1c3a44f791b315f646a32c771140876a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "unheaded-block-127",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "9707fdb03297472fba4230c69cee21cf696f226e23556dba590d4270d4839fb9",
+          "location": {
+            "startLine": 1252,
+            "endLine": 1260
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-60",
+              "unitDigest": "9707fdb03297472fba4230c69cee21cf696f226e23556dba590d4270d4839fb9"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-60",
+              "unitDigest": "9707fdb03297472fba4230c69cee21cf696f226e23556dba590d4270d4839fb9",
+              "bindingSha256": "d6d067c24a06843eba728c01c7b305b1f9faa15dfa4cf335d3253efe8c6a471c",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "unheaded-block-128",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "860ee4f53d93c38433e0f1240f975584889e34afdcad07b34497ee415d3a54d7",
+          "location": {
+            "startLine": 1262,
+            "endLine": 1289
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-61",
+              "unitDigest": "860ee4f53d93c38433e0f1240f975584889e34afdcad07b34497ee415d3a54d7"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-61",
+              "unitDigest": "860ee4f53d93c38433e0f1240f975584889e34afdcad07b34497ee415d3a54d7",
+              "bindingSha256": "326a95160f02648e7fd34148b7fcd9d3d1c75cf69fef5aee9e138ea20a07b76c",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "unheaded-block-129",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "220056fad10663b6b883613750b8dc896aae160d0af2cab28d9aab6c67ba426b",
+          "location": {
+            "startLine": 1291,
+            "endLine": 1294
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-62",
+              "unitDigest": "220056fad10663b6b883613750b8dc896aae160d0af2cab28d9aab6c67ba426b"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-62",
+              "unitDigest": "220056fad10663b6b883613750b8dc896aae160d0af2cab28d9aab6c67ba426b",
+              "bindingSha256": "ee2bca68a11a65f210f1e1e4ce96bf977656a79aed9975f3c8b83bc112f8e105",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
           "sourceAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
           "unitKind": "heading",
-          "sourceUnitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
+          "sourceUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
           "location": {
-            "startLine": 1247,
-            "endLine": 1247
+            "startLine": 1296,
+            "endLine": 1296
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
               "anchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
-              "unitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d"
+              "unitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+              "anchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
+              "unitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
+              "bindingSha256": "16a7175ced9e4cf2a4c24b77f290f5e942fbe6110ade59c96a2fab90e9d80e93",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
-          "sourceAnchor": "unheaded-block-127",
+          "sourceAnchor": "unheaded-block-130",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+          "sourceUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
           "location": {
-            "startLine": 1249,
-            "endLine": 1258
+            "startLine": 1298,
+            "endLine": 1307
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
               "anchor": "unheaded-block-3",
-              "unitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f"
+              "unitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+              "anchor": "unheaded-block-3",
+              "unitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
+              "bindingSha256": "a8a147207f44a978516a101f1d8b0ffb120e4dfc3eac0403b69c742d232e2a4d",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
-          "sourceAnchor": "unheaded-block-128",
+          "sourceAnchor": "unheaded-block-131",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
           "location": {
-            "startLine": 1260,
-            "endLine": 1260
+            "startLine": 1309,
+            "endLine": 1309
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37216,8 +37405,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "57cf348eee6c014023677b375f253194430c8b05e051987ccbb1ad56e611e828",
           "location": {
-            "startLine": 1262,
-            "endLine": 1262
+            "startLine": 1311,
+            "endLine": 1311
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37236,8 +37425,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "6d170846be1146514c997c484be5a940415a4a695507cfad1750510d531bd0d9",
           "location": {
-            "startLine": 1264,
-            "endLine": 1264
+            "startLine": 1313,
+            "endLine": 1313
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37252,12 +37441,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-129",
+          "sourceAnchor": "unheaded-block-132",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
           "location": {
-            "startLine": 1266,
-            "endLine": 1274
+            "startLine": 1315,
+            "endLine": 1323
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37265,7 +37454,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-60",
+              "anchor": "unheaded-block-63",
               "unitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396"
             }
           ],
@@ -37276,8 +37465,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "82ad2c5e239e041eee2e98c16e8b463b09fb944eade7c446627ee3509bf79fc8",
           "location": {
-            "startLine": 1276,
-            "endLine": 1276
+            "startLine": 1325,
+            "endLine": 1325
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37292,92 +37481,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-130",
+          "sourceAnchor": "unheaded-block-133",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
           "location": {
-            "startLine": 1278,
-            "endLine": 1287
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-61",
-              "unitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "113-behavior-probes",
-          "unitKind": "heading",
-          "sourceUnitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
-          "location": {
-            "startLine": 1289,
-            "endLine": 1289
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "113-behavior-probes",
-              "unitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-131",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
-          "location": {
-            "startLine": 1291,
-            "endLine": 1291
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-62",
-              "unitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-132",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
-          "location": {
-            "startLine": 1293,
-            "endLine": 1302
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-63",
-              "unitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-133",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
-          "location": {
-            "startLine": 1304,
-            "endLine": 1306
+            "startLine": 1327,
+            "endLine": 1336
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37386,6 +37495,102 @@
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-64",
+              "unitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd"
+            }
+          ],
+          "adaptedBindings": []
+        },
+        {
+          "sourceAnchor": "113-behavior-probes",
+          "unitKind": "heading",
+          "sourceUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+          "location": {
+            "startLine": 1338,
+            "endLine": 1338
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "113-behavior-probes",
+              "unitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "113-behavior-probes",
+              "unitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+              "bindingSha256": "42fb71c72a7dc31885ad795345e6890be265ebb7c13109b611377dfc7d570256",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "unheaded-block-134",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "location": {
+            "startLine": 1340,
+            "endLine": 1340
+          },
+          "changedSinceFinalPin": false,
+          "changedSinceInventoryPin": false,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-65",
+              "unitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8"
+            }
+          ],
+          "adaptedBindings": []
+        },
+        {
+          "sourceAnchor": "unheaded-block-135",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
+          "location": {
+            "startLine": 1342,
+            "endLine": 1352
+          },
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-66",
+              "unitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868"
+            }
+          ],
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-66",
+              "unitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
+              "bindingSha256": "5b9e72c944582dc6c65f887da1ad1cf8a1f9c381867c630638eb38f47d40d53c",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
+        },
+        {
+          "sourceAnchor": "unheaded-block-136",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "location": {
+            "startLine": 1354,
+            "endLine": 1356
+          },
+          "changedSinceFinalPin": false,
+          "changedSinceInventoryPin": false,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-67",
               "unitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7"
             }
           ],
@@ -37396,8 +37601,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "3ab503ef0253b33caddd6ae3e969b0ca08877af01ef959ca2fcbce54b548419e",
           "location": {
-            "startLine": 1308,
-            "endLine": 1308
+            "startLine": 1358,
+            "endLine": 1358
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37412,12 +37617,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-134",
+          "sourceAnchor": "unheaded-block-137",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
           "location": {
-            "startLine": 1310,
-            "endLine": 1314
+            "startLine": 1360,
+            "endLine": 1364
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37425,7 +37630,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-65",
+              "anchor": "unheaded-block-68",
               "unitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc"
             }
           ],
@@ -37436,8 +37641,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "2bcf45ee10d616e860737c38258d6a819c63e4a5f86ef7668e37abf3d6b9a3fe",
           "location": {
-            "startLine": 1316,
-            "endLine": 1316
+            "startLine": 1366,
+            "endLine": 1366
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37452,12 +37657,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-135",
+          "sourceAnchor": "unheaded-block-138",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
           "location": {
-            "startLine": 1318,
-            "endLine": 1324
+            "startLine": 1368,
+            "endLine": 1374
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37465,7 +37670,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-66",
+              "anchor": "unheaded-block-69",
               "unitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5"
             }
           ],
@@ -37474,72 +37679,88 @@
         {
           "sourceAnchor": "12-quyết-định-của-proposal",
           "unitKind": "heading",
-          "sourceUnitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
+          "sourceUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
           "location": {
-            "startLine": 1326,
-            "endLine": 1326
+            "startLine": 1376,
+            "endLine": 1376
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
               "anchor": "12-quyết-định-của-proposal",
-              "unitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f"
+              "unitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+              "anchor": "12-quyết-định-của-proposal",
+              "unitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
+              "bindingSha256": "78879f4952a9081cbf7a0a6270bc1f826876712e5871acd70df2c8b12dc00f22",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
-          "sourceAnchor": "unheaded-block-136",
+          "sourceAnchor": "unheaded-block-139",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+          "sourceUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
           "location": {
-            "startLine": 1328,
-            "endLine": 1341
+            "startLine": 1378,
+            "endLine": 1392
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "exact-unit-digest",
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
               "anchor": "unheaded-block-3",
-              "unitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1"
+              "unitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33"
             }
           ],
-          "adaptedBindings": []
+          "adaptedBindings": [
+            {
+              "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+              "anchor": "unheaded-block-3",
+              "unitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
+              "bindingSha256": "ffe781f3cc9b4573afaec6196236559cc01f9f7e3aa1bad9a100b37ea9b3974e",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
+            }
+          ]
         },
         {
           "sourceAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
           "unitKind": "heading",
-          "sourceUnitDigest": "5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f",
+          "sourceUnitDigest": "0bd4425818ed437564b0fdc57f3f359f1f6ecaa57f00b82161fc94b71e242859",
           "location": {
-            "startLine": 1343,
-            "endLine": 1343
+            "startLine": 1394,
+            "endLine": 1394
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "explicit-adapted-binding",
           "exactMatches": [],
           "adaptedBindings": [
             {
               "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
               "anchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
-              "unitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
-              "bindingSha256": "a8936d7de48d9c7019cec2ed7bfaaa0afe433c11d9a5ef7a82cf69939193c675",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+              "unitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
+              "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
         {
-          "sourceAnchor": "unheaded-block-137",
+          "sourceAnchor": "unheaded-block-140",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
           "location": {
-            "startLine": 1345,
-            "endLine": 1345
+            "startLine": 1396,
+            "endLine": 1396
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37554,24 +37775,24 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-138",
+          "sourceAnchor": "unheaded-block-141",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+          "sourceUnitDigest": "c67ba6862d5dfcc4170707858622d69a0eeeb5d31807f6e698d2731c10fe9635",
           "location": {
-            "startLine": 1347,
-            "endLine": 1353
+            "startLine": 1398,
+            "endLine": 1404
           },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": false,
+          "changedSinceFinalPin": true,
+          "changedSinceInventoryPin": true,
           "status": "explicit-adapted-binding",
           "exactMatches": [],
           "adaptedBindings": [
             {
               "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
               "anchor": "unheaded-block-6",
-              "unitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
-              "bindingSha256": "046ef9fec04afd22aa6c86fb58c346d0db49bef9da6178756844c219bc3b890c",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+              "unitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
+              "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -37580,8 +37801,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "55c3d38b168124ab69c748ade84ea7917101a80d957e3ec9f68ab55e8750a51c",
           "location": {
-            "startLine": 1355,
-            "endLine": 1355
+            "startLine": 1406,
+            "endLine": 1406
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37596,72 +37817,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-139",
+          "sourceAnchor": "unheaded-block-142",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
           "location": {
-            "startLine": 1357,
-            "endLine": 1357
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": true,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-67",
-              "unitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-140",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
-          "location": {
-            "startLine": 1359,
-            "endLine": 1361
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": true,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-68",
-              "unitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-141",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b",
-          "location": {
-            "startLine": 1363,
-            "endLine": 1363
-          },
-          "changedSinceFinalPin": false,
-          "changedSinceInventoryPin": true,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-69",
-              "unitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b"
-            }
-          ],
-          "adaptedBindings": []
-        },
-        {
-          "sourceAnchor": "unheaded-block-142",
-          "unitKind": "unheaded-block",
-          "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
-          "location": {
-            "startLine": 1365,
-            "endLine": 1365
+            "startLine": 1408,
+            "endLine": 1408
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37670,6 +37831,66 @@
             {
               "path": "docs/platform/agent-confinement/spec.md",
               "anchor": "unheaded-block-70",
+              "unitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3"
+            }
+          ],
+          "adaptedBindings": []
+        },
+        {
+          "sourceAnchor": "unheaded-block-143",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
+          "location": {
+            "startLine": 1410,
+            "endLine": 1412
+          },
+          "changedSinceFinalPin": false,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-71",
+              "unitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1"
+            }
+          ],
+          "adaptedBindings": []
+        },
+        {
+          "sourceAnchor": "unheaded-block-144",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b",
+          "location": {
+            "startLine": 1414,
+            "endLine": 1414
+          },
+          "changedSinceFinalPin": false,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-72",
+              "unitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b"
+            }
+          ],
+          "adaptedBindings": []
+        },
+        {
+          "sourceAnchor": "unheaded-block-145",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+          "location": {
+            "startLine": 1416,
+            "endLine": 1416
+          },
+          "changedSinceFinalPin": false,
+          "changedSinceInventoryPin": true,
+          "status": "exact-unit-digest",
+          "exactMatches": [
+            {
+              "path": "docs/platform/agent-confinement/spec.md",
+              "anchor": "unheaded-block-73",
               "unitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d"
             }
           ],
@@ -37680,8 +37901,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "21f2bf3ad52967fc6e5414fed7ade9b084a6c1a76adf93fbcb39447ca3f5da84",
           "location": {
-            "startLine": 1367,
-            "endLine": 1367
+            "startLine": 1418,
+            "endLine": 1418
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37696,12 +37917,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-143",
+          "sourceAnchor": "unheaded-block-146",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
           "location": {
-            "startLine": 1369,
-            "endLine": 1369
+            "startLine": 1420,
+            "endLine": 1420
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37709,19 +37930,19 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-71",
+              "anchor": "unheaded-block-74",
               "unitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae"
             }
           ],
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-144",
+          "sourceAnchor": "unheaded-block-147",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
           "location": {
-            "startLine": 1371,
-            "endLine": 1372
+            "startLine": 1422,
+            "endLine": 1423
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37729,7 +37950,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-72",
+              "anchor": "unheaded-block-75",
               "unitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
             }
           ],
@@ -37740,8 +37961,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "0dfcf749eeb70647271fe1556d86a614a2d58974e87ac020e700e617719f5df9",
           "location": {
-            "startLine": 1374,
-            "endLine": 1374
+            "startLine": 1425,
+            "endLine": 1425
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37756,12 +37977,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-145",
+          "sourceAnchor": "unheaded-block-148",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "26d0809d9d56fa76380750acb999f59113e72ba4cc671bc7d424334679f5c4fd",
           "location": {
-            "startLine": 1376,
-            "endLine": 1376
+            "startLine": 1427,
+            "endLine": 1427
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37776,12 +37997,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-146",
+          "sourceAnchor": "unheaded-block-149",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
           "location": {
-            "startLine": 1378,
-            "endLine": 1378
+            "startLine": 1429,
+            "endLine": 1429
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37796,12 +38017,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-147",
+          "sourceAnchor": "unheaded-block-150",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
           "location": {
-            "startLine": 1380,
-            "endLine": 1380
+            "startLine": 1431,
+            "endLine": 1431
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37816,12 +38037,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-148",
+          "sourceAnchor": "unheaded-block-151",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
           "location": {
-            "startLine": 1382,
-            "endLine": 1382
+            "startLine": 1433,
+            "endLine": 1433
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37840,8 +38061,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f",
           "location": {
-            "startLine": 1384,
-            "endLine": 1384
+            "startLine": 1435,
+            "endLine": 1435
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37856,12 +38077,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-149",
+          "sourceAnchor": "unheaded-block-152",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
           "location": {
-            "startLine": 1386,
-            "endLine": 1389
+            "startLine": 1437,
+            "endLine": 1440
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
@@ -37869,7 +38090,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-73",
+              "anchor": "unheaded-block-76",
               "unitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1"
             }
           ],
@@ -37880,8 +38101,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "61e0baf3fef42f7f150b8ae9fb8e8a7b93afa8f8e6ac6130f4a8246255cd84de",
           "location": {
-            "startLine": 1391,
-            "endLine": 1391
+            "startLine": 1442,
+            "endLine": 1442
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37896,12 +38117,12 @@
           "adaptedBindings": []
         },
         {
-          "sourceAnchor": "unheaded-block-150",
+          "sourceAnchor": "unheaded-block-153",
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "aaace5d56024615612947a17eead7e0798207c8fba429614196666f08b311a00",
           "location": {
-            "startLine": 1393,
-            "endLine": 1401
+            "startLine": 1444,
+            "endLine": 1452
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": true,
@@ -37909,7 +38130,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/agent-confinement/spec.md",
-              "anchor": "unheaded-block-74",
+              "anchor": "unheaded-block-77",
               "unitDigest": "aaace5d56024615612947a17eead7e0798207c8fba429614196666f08b311a00"
             }
           ],
@@ -37918,6 +38139,24 @@
       ],
       "missingCarriage": [],
       "removedOrReplacedInventoryUnits": [
+        {
+          "sourceAnchor": "unheaded-block-1",
+          "unitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "spec-agent-confinement-authority",
+          "unitDigest": "d616d06522982d87caf2b59041a80220005e76ba36608070ce92bfb7644a45a3",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "unheaded-block-2",
+          "unitDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
         {
           "sourceAnchor": "4-threat-model",
           "unitDigest": "1b8a4cbd609c87ffa86c2592a9d4ef8253d472f66676f9c104316725553b2448",
@@ -38021,6 +38260,54 @@
           "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
         },
         {
+          "sourceAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
+          "unitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "unheaded-block-121",
+          "unitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "113-behavior-probes",
+          "unitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "unheaded-block-126",
+          "unitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "12-quyết-định-của-proposal",
+          "unitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "unheaded-block-130",
+          "unitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
+          "unitDigest": "5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
+          "sourceAnchor": "unheaded-block-132",
+          "unitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+          "candidateExactOccurrences": [],
+          "disposition": "review-source-deletion-or-replacement; not automatically a stale claim"
+        },
+        {
           "sourceAnchor": "14-pointers-hiện-tại",
           "unitDigest": "58a8278b0bd9b9c8b17e5df037402fa2de1689f5f8806bbe00f67738a4eff88d",
           "candidateExactOccurrences": [],
@@ -38056,7 +38343,7 @@
         },
         {
           "path": "docs/platform/packaging-distribution/spec.md",
-          "sha256": "421f8ddc5f3859a1d2fbf01bba4500337b745e8bdbb75875aae614b7ee55f1b6",
+          "sha256": "b1b20b788fd8b881ef34b076d2ea8eaf89a070dbc7fdd0465beb48704ddefab1",
           "samePath": false
         }
       ],
@@ -38225,6 +38512,13 @@
               "unitDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa",
               "bindingSha256": "8c2078de517fa7c1c09756503c205871d8f0fad6606e618369fc2ba3f574f2e2",
               "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+            },
+            {
+              "path": "docs/platform/packaging-distribution/spec.md",
+              "anchor": "unheaded-block-89",
+              "unitDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa",
+              "bindingSha256": "8c2078de517fa7c1c09756503c205871d8f0fad6606e618369fc2ba3f574f2e2",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -38244,9 +38538,9 @@
             {
               "path": "docs/platform/packaging-distribution/spec.md",
               "anchor": "data-dictionary",
-              "unitDigest": "438bb4ff71a3e3cbbd3272d44a638cc3bf5e7abe4492455fe229f65b9962a203",
-              "bindingSha256": "fe74779a50168c46bcbbc131bc026a43ef44bbe8230c351d4fef9e3e76e3daac",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json"
+              "unitDigest": "2dc0a292149077bef0543e606ba23bb513348daa7b676f3abc27a99035b995a9",
+              "bindingSha256": "7d87444d1571790837b61299f29d8ad8c02efc847d63adfcc33af7a290c19ec6",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -38266,9 +38560,9 @@
             {
               "path": "docs/platform/packaging-distribution/spec.md",
               "anchor": "unheaded-block-90",
-              "unitDigest": "64ca696b17ff35e6f93b68f54c255204d1064c5745aba29178e6925bad329254",
-              "bindingSha256": "ed05096564d3263119cb1aa7214bac4855177f726c896b35f5bb7120211d300d",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json"
+              "unitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+              "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -38291,6 +38585,13 @@
               "unitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
               "bindingSha256": "3e49d47ef604d65e7765ddaba8789ad16408a60390662546a3b29a1b44467b80",
               "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+            },
+            {
+              "path": "docs/platform/packaging-distribution/spec.md",
+              "anchor": "behaviors-operations",
+              "unitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+              "bindingSha256": "3e49d47ef604d65e7765ddaba8789ad16408a60390662546a3b29a1b44467b80",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -39143,6 +39444,13 @@
               "unitDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
               "bindingSha256": "47e707f626bc0cd473bf16c787da0bebb76d318849a144fc9604f29297ee371a",
               "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+            },
+            {
+              "path": "docs/platform/packaging-distribution/spec.md",
+              "anchor": "unheaded-block-108",
+              "unitDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
+              "bindingSha256": "47e707f626bc0cd473bf16c787da0bebb76d318849a144fc9604f29297ee371a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -39162,9 +39470,9 @@
             {
               "path": "docs/platform/packaging-distribution/spec.md",
               "anchor": "pointers-implementation",
-              "unitDigest": "851884c939509226f78c3caadf8509ec1afffbe99c5067cf97630ae6887b01ab",
-              "bindingSha256": "a14e330d2e9813da7e81d4e5171e0c3c05c28f142c36d2387b2c8582e2e09168",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+              "unitDigest": "69a415f020853dcf82a0db0e5d6f93a3223436771bc39d27c1d9b24d8741d906",
+              "bindingSha256": "40237c29b91ec002a0336fb5efbfc33bd7b1095083f9a283fd4ef26858d10a23",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         },
@@ -39178,21 +39486,15 @@
           },
           "changedSinceFinalPin": false,
           "changedSinceInventoryPin": false,
-          "status": "exact-unit-digest",
-          "exactMatches": [
-            {
-              "path": "docs/platform/packaging-distribution/spec.md",
-              "anchor": "unheaded-block-109",
-              "unitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9"
-            }
-          ],
+          "status": "explicit-adapted-binding",
+          "exactMatches": [],
           "adaptedBindings": [
             {
               "path": "docs/platform/packaging-distribution/spec.md",
               "anchor": "unheaded-block-109",
-              "unitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
-              "bindingSha256": "30676f45fe9bd6407cb09734e51d708506f9516cccd55fcf8464fa2c4c19f6fb",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
+              "unitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+              "bindingSha256": "b614859c5d9ec2c4111a94133eef0f8d37d91c16731af31bedbdf2dd1a8a2972",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json"
             }
           ]
         }
@@ -43730,7 +44032,7 @@
       "status": "modified",
       "postFinalPin": true,
       "postInventoryPin": true,
-      "sourceSha256": "70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b",
+      "sourceSha256": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e",
       "sourceAtFinalPinSha256": "0c899206b1b519f9628941542b8901c21928413618458d90f7c0d2d2a3131133",
       "sourceAtInventoryPinSha256": "04e7c7b51842d440da94a818e7120c34e8ef833c629021c53ec141757384067f",
       "candidateSuccessors": [
@@ -43741,7 +44043,7 @@
         },
         {
           "path": "docs/reading-map.md",
-          "sha256": "45af45bfca6ce4cad5391f746e40eaa581a2b80ba357eb9fb26bc755e81ebd8b",
+          "sha256": "632405906a2b4e1b6671a8ec16e87501e0c14f2b386c0610b8925dc0ff257002",
           "samePath": false
         }
       ],
@@ -43760,7 +44062,7 @@
         {
           "sourceAnchor": "reading-map-sản-phẩm",
           "unitKind": "heading",
-          "sourceUnitDigest": "27c830b14aa03e662057073b1f73ae34bfd2282ca2bac8498001d4f3ac0e17ca",
+          "sourceUnitDigest": "aeff62494cd65c49a3ae6f214402d93b96e511cc7fba10f6365dc19eb73405ab",
           "location": {
             "startLine": 1,
             "endLine": 1
@@ -43772,10 +44074,10 @@
           "adaptedBindings": [
             {
               "path": "docs/reading-map.md",
-              "anchor": "documentation-reading-map",
-              "unitDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e",
-              "bindingSha256": "f095f3dbdab0f46d622a50f553c6c5a08cb262e3524c05fe3943415e8a884cee",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json"
+              "anchor": "5-detailed-product-and-source-map",
+              "unitDigest": "8138321891e5475c175c2159e09be0cd0695fac0de0c533149f98c584c079937",
+              "bindingSha256": "5215dbaa1fa31046d8bcc0874b3c224b934f990bddf8802e51f825d332e8c069",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -43804,7 +44106,7 @@
         {
           "sourceAnchor": "unheaded-block-2",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "aa5ef3b591f7b65841e3f7a389df5ae06c44ff7f6e948e9d0e21fc3e7fcdfc64",
+          "sourceUnitDigest": "1cf4ea2cc73a32773c8ac4435aaa84e9afafd6b230b45eb533575d5a5f7f9217",
           "location": {
             "startLine": 11,
             "endLine": 79
@@ -43817,9 +44119,9 @@
             {
               "path": "docs/reading-map.md",
               "anchor": "unheaded-block-16",
-              "unitDigest": "b07d62f4f1e6d1be975f4d866244196117bf86e3c056100e192cb97175bf37df",
-              "bindingSha256": "291bf8416f995dff7266cd5e202d6a7655d6486cebcc9bb5e9711f9d4d95d5c0",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json"
+              "unitDigest": "1348d23834e11f314424df0a58e5888be52f93bb30e9d7fbf4a74f8c38b4a06f",
+              "bindingSha256": "d38a90c8c2a6ad0fc81fbcce4556e8b0c3364369c5845fd2ea205f32140e445a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         }
@@ -59068,13 +59370,13 @@
       "status": "added",
       "postFinalPin": true,
       "postInventoryPin": true,
-      "sourceSha256": "d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13",
+      "sourceSha256": "be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be",
       "sourceAtFinalPinSha256": "66519171af96b0ae135b92b4e4e113085ebde7faae52d80ead4c636f0d9ebde4",
       "sourceAtInventoryPinSha256": null,
       "candidateSuccessors": [
         {
           "path": "docs/platform/seat-binding/spec.md",
-          "sha256": "5ccd9ec6346ae43f95ba9ad7da67699bb6de388a518648f105dfab3fcbcd22d2",
+          "sha256": "44f46d0c42a343d5dad8e2a97ffb4af2881f1d891d0fb87d961d50ee598ced1c",
           "samePath": false
         }
       ],
@@ -60411,7 +60713,7 @@
         {
           "sourceAnchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
           "unitKind": "heading",
-          "sourceUnitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
+          "sourceUnitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
           "location": {
             "startLine": 241,
             "endLine": 241
@@ -60423,23 +60725,16 @@
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
-              "unitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7"
+              "unitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63"
             }
           ],
           "adaptedBindings": [
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
-              "unitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
-              "bindingSha256": "33a4aaf86066dc1cbad8e8c3353d7633c3edd04602eef8911e83c75394c1d6c5",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
-            },
-            {
-              "path": "docs/platform/seat-binding/spec.md",
-              "anchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
-              "unitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
-              "bindingSha256": "33a4aaf86066dc1cbad8e8c3353d7633c3edd04602eef8911e83c75394c1d6c5",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+              "unitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
+              "bindingSha256": "70b5f688a0cb551c1e13e9949b4a02573e02ee1c54318bca02131fbde002617c",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -60474,7 +60769,7 @@
         {
           "sourceAnchor": "unheaded-block-36",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
+          "sourceUnitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
           "location": {
             "startLine": 245,
             "endLine": 250
@@ -60486,16 +60781,16 @@
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "unheaded-block-38",
-              "unitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b"
+              "unitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678"
             }
           ],
           "adaptedBindings": [
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "unheaded-block-38",
-              "unitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
-              "bindingSha256": "1ddb2018d9c4447dd5323a62fc6ddda0b3e1b9bd5d362b3453056ea963394a20",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+              "unitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
+              "bindingSha256": "06a86eabdd69af7871c66b61804d7ea056fcaa590d35e481325ab77951a0e28a",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -61238,7 +61533,7 @@
         {
           "sourceAnchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
           "unitKind": "heading",
-          "sourceUnitDigest": "0d673b41c2eaae9d13882ccb96bf669948ddcf5b46a4550ec5bab9ccaf1f2151",
+          "sourceUnitDigest": "d938c35389eea356e8a79214c0b42056986291a75315cc4b0bb67c5e8d34cc4f",
           "location": {
             "startLine": 415,
             "endLine": 415
@@ -61251,26 +61546,19 @@
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
-              "unitDigest": "3bcb37dfba85d429a7167b65360b530a6ad1bbadcd5e67060c439504081831ed",
-              "bindingSha256": "385c2e38989a65dc5e90ff6e14080ddf693b0cdfefe1584f8bc3e2e4882a799a",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
-            },
-            {
-              "path": "docs/platform/seat-binding/spec.md",
-              "anchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
-              "unitDigest": "3bcb37dfba85d429a7167b65360b530a6ad1bbadcd5e67060c439504081831ed",
-              "bindingSha256": "385c2e38989a65dc5e90ff6e14080ddf693b0cdfefe1584f8bc3e2e4882a799a",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+              "unitDigest": "6c9dc51206ce3c376b57d629d5e92db9266a4c7c1611e6240d77eb72a7a48e3b",
+              "bindingSha256": "161b52c433620a701736ae612bc2697a08fce2b91102e854ab5c388f7a36ca2c",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
         {
           "sourceAnchor": "unheaded-block-60",
           "unitKind": "unheaded-block",
-          "sourceUnitDigest": "34882abdfde2a615b6d662879789b29d7496af5302912c2323a1c192744eccb4",
+          "sourceUnitDigest": "477e55b22636016eb029dff55ad9e60ea8f2b165446dc5e60425b1ea50e4b352",
           "location": {
             "startLine": 417,
-            "endLine": 439
+            "endLine": 440
           },
           "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
@@ -61280,16 +61568,9 @@
             {
               "path": "docs/platform/seat-binding/spec.md",
               "anchor": "unheaded-block-62",
-              "unitDigest": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
-              "bindingSha256": "7152c74d99cb17c86624dfb86e726f162ddce3ea0b43772f9fe31bda136b0f4b",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
-            },
-            {
-              "path": "docs/platform/seat-binding/spec.md",
-              "anchor": "unheaded-block-62",
-              "unitDigest": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
-              "bindingSha256": "7152c74d99cb17c86624dfb86e726f162ddce3ea0b43772f9fe31bda136b0f4b",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json"
+              "unitDigest": "5a418963fe6553424ca817fd3f5930c8520cf98e15b8bbcb029464f439dc9475",
+              "bindingSha256": "743ee4ba0b23a78ae26911cfed46d0bd0cccd3cd88f01748ec126d4bc1c5b1f1",
+              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json"
             }
           ]
         },
@@ -61298,8 +61579,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "5d4dc6ef953a7737836e187ca189a870d98eea5b34b904ad33a924911e189383",
           "location": {
-            "startLine": 441,
-            "endLine": 441
+            "startLine": 442,
+            "endLine": 442
           },
           "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
@@ -61327,8 +61608,8 @@
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "f12662c506fd4a0f784439aabbd6b42cf9ab0af6b214f6aa4f82e5959ad1abe6",
           "location": {
-            "startLine": 443,
-            "endLine": 453
+            "startLine": 444,
+            "endLine": 454
           },
           "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
@@ -61356,8 +61637,8 @@
           "unitKind": "heading",
           "sourceUnitDigest": "a8bc98f44539a2576807650a8f2ccabfe49fd45f03614fc7c8c6b9000c03bc80",
           "location": {
-            "startLine": 455,
-            "endLine": 455
+            "startLine": 456,
+            "endLine": 456
           },
           "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
@@ -61391,8 +61672,8 @@
           "unitKind": "unheaded-block",
           "sourceUnitDigest": "573a89b3f4334bd5cecbeeeea2231a2280a1e983a1813f93117edd9575174d41",
           "location": {
-            "startLine": 457,
-            "endLine": 462
+            "startLine": 458,
+            "endLine": 463
           },
           "changedSinceFinalPin": true,
           "changedSinceInventoryPin": true,
@@ -62520,7 +62801,7 @@
         },
         {
           "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-          "sha256": "93e2f580c741f1deec19600323137eb1c105eb2cf996b1a31a6877edc9dd6cdb",
+          "sha256": "4774840290718bdb0c05fa885dc778465c05bcbcc9e48c440e1a21787b687b8c",
           "samePath": false
         },
         {
@@ -62754,7 +63035,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-3",
+              "anchor": "unheaded-block-4",
               "unitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000"
             },
             {
@@ -62763,15 +63044,7 @@
               "unitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000"
             }
           ],
-          "adaptedBindings": [
-            {
-              "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-3",
-              "unitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
-              "bindingSha256": "a423be2b985dc171e1b9134bbc15855160668ba3ee334237be5244971493cd39",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
-            }
-          ]
+          "adaptedBindings": []
         },
         {
           "sourceAnchor": "unheaded-block-6",
@@ -62787,7 +63060,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-4",
+              "anchor": "unheaded-block-5",
               "unitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942"
             },
             {
@@ -62796,15 +63069,7 @@
               "unitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942"
             }
           ],
-          "adaptedBindings": [
-            {
-              "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-4",
-              "unitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
-              "bindingSha256": "44688893729a3373fd2677416e8039a9ab39e4794b2ccb1ca74075f34bd1451c",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
-            }
-          ]
+          "adaptedBindings": []
         },
         {
           "sourceAnchor": "unheaded-block-7",
@@ -62820,7 +63085,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-5",
+              "anchor": "unheaded-block-6",
               "unitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae"
             },
             {
@@ -62829,15 +63094,7 @@
               "unitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae"
             }
           ],
-          "adaptedBindings": [
-            {
-              "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-5",
-              "unitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
-              "bindingSha256": "4a15011e0aaa9acb5baa3d347be5026ee2244fd717167a84678ee39866e3973d",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
-            }
-          ]
+          "adaptedBindings": []
         },
         {
           "sourceAnchor": "bản-ghi-friction-kênh-2-của-capture-phase-3-slice-2",
@@ -65567,7 +65824,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-6",
+              "anchor": "unheaded-block-7",
               "unitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406"
             },
             {
@@ -65576,15 +65833,7 @@
               "unitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406"
             }
           ],
-          "adaptedBindings": [
-            {
-              "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-6",
-              "unitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
-              "bindingSha256": "0092ac698cae5aeb5b720925ba537d4bc2423b02d01cfb546b8c870bcf6d5df8",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
-            }
-          ]
+          "adaptedBindings": []
         },
         {
           "sourceAnchor": "đưa-vào-chờ-người-ask",
@@ -65722,7 +65971,7 @@
           "exactMatches": [
             {
               "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-7",
+              "anchor": "unheaded-block-8",
               "unitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93"
             },
             {
@@ -65731,15 +65980,7 @@
               "unitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93"
             }
           ],
-          "adaptedBindings": [
-            {
-              "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
-              "anchor": "unheaded-block-7",
-              "unitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
-              "bindingSha256": "a3a5f60b13e0c8f388bb772b897041deb8679e7238fef37b93d44c4a2d952c81",
-              "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json"
-            }
-          ]
+          "adaptedBindings": []
         },
         {
           "sourceAnchor": "đọc-kết-quả-check",

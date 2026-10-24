@@ -12922,13 +12922,14 @@
       ],
       "targetAnchor": "spec-agent-confinement-authority",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-      "bindingSha256": "3b8b7ab17864992a68bd6d26bf4d7c631076aa77a0605a65f0ab5eeba15b5228",
+      "targetUnitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+      "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/confinement-authority.md",
@@ -12944,8 +12945,8 @@
       ],
       "targetAnchor": "unheaded-block-4",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
-      "bindingSha256": "b2a089f57f993e11173efad9346c86c52a685ef7eaa19811e9e1cb9b0920fe0e",
+      "targetUnitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
+      "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5",
       "disposition": {
         "kind": "retained-truth-correction",
         "reason": "Do not resurrect fixture-only/live-migration-deferred claims. The candidate already records the completed migration and invocation renames with dated evidence; no local config was read or changed.",
@@ -12954,7 +12955,8 @@
           "docs/platform/agent-confinement/spec.md"
         ]
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/confinement-authority.md",
@@ -13027,13 +13029,14 @@
       ],
       "targetAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
-      "bindingSha256": "a8936d7de48d9c7019cec2ed7bfaaa0afe433c11d9a5ef7a82cf69939193c675",
+      "targetUnitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
+      "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/confinement-authority.md",
@@ -13051,8 +13054,8 @@
       ],
       "targetAnchor": "unheaded-block-6",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
-      "bindingSha256": "046ef9fec04afd22aa6c86fb58c346d0db49bef9da6178756844c219bc3b890c",
+      "targetUnitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
+      "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
       "disposition": {
         "kind": "retained-authority-correction",
         "reason": "Keep the existing candidate CTR011 label and A45 qualification. CTR010 belongs to the Gateway REST API; a legacy registration claim does not authorize changing the cross-area register.",
@@ -13061,7 +13064,8 @@
           "docs/platform/agent-confinement/history/rollout-and-settled-facts.md"
         ]
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/herdr-web-dashboard.md",
@@ -13887,13 +13891,14 @@
       ],
       "targetAnchor": "unheaded-block-62",
       "targetOwner": "docs/platform/seat-binding/spec.md",
-      "targetUnitDigest": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
-      "bindingSha256": "7152c74d99cb17c86624dfb86e726f162ddce3ea0b43772f9fe31bda136b0f4b",
+      "targetUnitDigest": "5a418963fe6553424ca817fd3f5930c8520cf98e15b8bbcb029464f439dc9475",
+      "bindingSha256": "743ee4ba0b23a78ae26911cfed46d0bd0cccd3cd88f01748ec126d4bc1c5b1f1",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",
@@ -24849,12 +24854,13 @@
       ],
       "targetAnchor": "9-chuyển-đổi-đã-xong-mã-chuyển-đổi-đã-gỡ",
       "targetOwner": "docs/platform/seat-binding/spec.md",
-      "targetUnitDigest": "d18686125011dd894238082d2848e3dc6202d411ebddc9a5285c14b04af7dec7",
-      "bindingSha256": "33a4aaf86066dc1cbad8e8c3353d7633c3edd04602eef8911e83c75394c1d6c5",
+      "targetUnitDigest": "09c5527e06bd0df62d517581847fd52f653948926dd20a40f3056e7b4a071a63",
+      "bindingSha256": "70b5f688a0cb551c1e13e9949b4a02573e02ee1c54318bca02131fbde002617c",
       "preimageContentSha256": "dd6f69bfd725f4a6c2c2d78d2cfd6c9664e0f3ca9647b71b8d3bdfb68aeadaa1",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -24893,12 +24899,13 @@
       ],
       "targetAnchor": "unheaded-block-38",
       "targetOwner": "docs/platform/seat-binding/spec.md",
-      "targetUnitDigest": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
-      "bindingSha256": "1ddb2018d9c4447dd5323a62fc6ddda0b3e1b9bd5d362b3453056ea963394a20",
+      "targetUnitDigest": "87dc4f8a61b29b0982088a5e680f3b31ff6c669f21cfc1e12c1e7275bdf6b678",
+      "bindingSha256": "06a86eabdd69af7871c66b61804d7ea056fcaa590d35e481325ab77951a0e28a",
       "preimageContentSha256": "933603c9b147b698107517854406665b6c74dfc402c8eea471fef68d59f78b7b",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -24916,12 +24923,13 @@
       ],
       "targetAnchor": "d-adr0072-seat-binding-one-authority-for-agent-seat-choice-một-authority-cho-ghế-agent-project-thắng-tier-khai-trực-tiếp-supersede-phần-chọn-ghế-của-rul80-an-account-is-chosen-first-then-a-cli-rul91-a-person-may-pin-the-provider-account-of-a-unit-run-rul98-workflow-start-passes---timeout-and---account-to-each-unit-rul102-a-tier-cell-names-its-pool-one-family-has-one-executor-rul103-runnermaxtier-caps-every-seat-rul106-a-seat-walks-a-tier-declared-order-and-its-cell-entries",
       "targetOwner": "docs/platform/seat-binding/spec.md",
-      "targetUnitDigest": "3bcb37dfba85d429a7167b65360b530a6ad1bbadcd5e67060c439504081831ed",
-      "bindingSha256": "385c2e38989a65dc5e90ff6e14080ddf693b0cdfefe1584f8bc3e2e4882a799a",
+      "targetUnitDigest": "6c9dc51206ce3c376b57d629d5e92db9266a4c7c1611e6240d77eb72a7a48e3b",
+      "bindingSha256": "161b52c433620a701736ae612bc2697a08fce2b91102e854ab5c388f7a36ca2c",
       "preimageContentSha256": "87144e918baa4b929d4578d33a233451e84ca4c0837ca88fc83d5a905e966d75",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -24939,12 +24947,13 @@
       ],
       "targetAnchor": "unheaded-block-62",
       "targetOwner": "docs/platform/seat-binding/spec.md",
-      "targetUnitDigest": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
-      "bindingSha256": "7152c74d99cb17c86624dfb86e726f162ddce3ea0b43772f9fe31bda136b0f4b",
+      "targetUnitDigest": "5a418963fe6553424ca817fd3f5930c8520cf98e15b8bbcb029464f439dc9475",
+      "bindingSha256": "743ee4ba0b23a78ae26911cfed46d0bd0cccd3cd88f01748ec126d4bc1c5b1f1",
       "preimageContentSha256": "f1f8f5d095e9d109ad521285446d349928add50779c88086a4f4594c4360f4d3",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -34385,18 +34394,20 @@
         "pointer": "/claims/0",
         "targetOwner": "docs/platform/agent-confinement/spec.md",
         "targetAnchor": "unheaded-block-1",
-        "targetUnitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
-        "bindingSha256": null
+        "targetUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
+        "bindingSha256": "be8ef793b3d770a06be3b116d1cbd86b32153877189062635eab3906fe488402",
+        "targetAncestry": []
       },
       "targetAncestry": [],
       "targetAnchor": "unheaded-block-1",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
-      "bindingSha256": "6abf36e35aed698685e7ab9e2d572e24617464648cdc6ac10599219e95d1cfcd",
+      "targetUnitDigest": "5e2c1c17e186370a7de43011e3d156eaeffb3bb0f1d6d7a87aa04b4f6bf9642d",
+      "bindingSha256": "be8ef793b3d770a06be3b116d1cbd86b32153877189062635eab3906fe488402",
       "preimageContentSha256": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -34404,20 +34415,24 @@
         "pointer": "/claims/1",
         "targetOwner": "docs/platform/agent-confinement/spec.md",
         "targetAnchor": "spec-agent-confinement-authority",
-        "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-        "bindingSha256": null
+        "targetUnitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+        "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority"
+        ]
       },
       "targetAncestry": [
         "Spec: Agent Confinement Authority"
       ],
       "targetAnchor": "spec-agent-confinement-authority",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-      "bindingSha256": "3b8b7ab17864992a68bd6d26bf4d7c631076aa77a0605a65f0ab5eeba15b5228",
+      "targetUnitDigest": "726e96be2d33b748dd0cf4738eaccfd71906a2be5cefeb488e0b937092c04aa5",
+      "bindingSha256": "ba1da042c0bb4bfa7aea587e7fcf622455170e4eacb514f7101fd8f01801450a",
       "preimageContentSha256": "aa1151a56ea2ab621eadfb64a460e3a3a6d309887f715c25f64a3b58010c5297",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -34425,20 +34440,24 @@
         "pointer": "/claims/2",
         "targetOwner": "docs/platform/agent-confinement/spec.md",
         "targetAnchor": "unheaded-block-4",
-        "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
-        "bindingSha256": null
+        "targetUnitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
+        "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority"
+        ]
       },
       "targetAncestry": [
         "Spec: Agent Confinement Authority"
       ],
       "targetAnchor": "unheaded-block-4",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
-      "bindingSha256": "b2a089f57f993e11173efad9346c86c52a685ef7eaa19811e9e1cb9b0920fe0e",
+      "targetUnitDigest": "04cb85fc2bb44e915f92034e6579067747003d0dc25bde936e68b99fb1d44f1a",
+      "bindingSha256": "226c8ae4c3840ac81805cd60613c33f7cbbf1d7576b2f2c50cd3bce3a7f22ff5",
       "preimageContentSha256": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -37944,8 +37963,13 @@
         "pointer": "/claims/156",
         "targetOwner": "docs/platform/agent-confinement/spec.md",
         "targetAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
-        "targetUnitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
-        "bindingSha256": null
+        "targetUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
+        "bindingSha256": "f20d1fd5d2951fd2f7eae95620eaf417514e37e0b007da9a85026ebffaa3f2a2",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ]
       },
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
@@ -37954,12 +37978,13 @@
       ],
       "targetAnchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
-      "bindingSha256": "1fdeabd66558b277f5d9e9222e90a872a6c0903e42900981014a4d95e96c9d32",
+      "targetUnitDigest": "2f1e35d9f5c19fad218d2064f227051ef503f8f2e822b9a43fbf79c67c5e8944",
+      "bindingSha256": "f20d1fd5d2951fd2f7eae95620eaf417514e37e0b007da9a85026ebffaa3f2a2",
       "preimageContentSha256": "e43e5a4c2080dd18242d324362904bf5ffaefd9777ef63ce6ee14adf9162deb7",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -37977,12 +38002,13 @@
       ],
       "targetAnchor": "unheaded-block-55",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
-      "bindingSha256": "9214f7bba7d50a0fa8d6ff8498e34bcf663f7c133803fbb18e75f04221f4c6a6",
+      "targetUnitDigest": "ee10167dc010e9d5eb6facd1549b6b5b8b708100045ee3a199ed90fac20c4bfa",
+      "bindingSha256": "59d8546feae2be9672cccd642a63fe9651db98cd7f902d8aa8a9c52d67909afb",
       "preimageContentSha256": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38069,12 +38095,13 @@
       ],
       "targetAnchor": "unheaded-block-59",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
-      "bindingSha256": "47bf361203cb70c39dd6e1ed39fc49b66db4aae351e7c1a4d86b5e780b0cd1f4",
+      "targetUnitDigest": "cd11efe0ec21edf8ecaef32e6b292caf393e9bb779a511c65a5f6445b12e2aa1",
+      "bindingSha256": "6e7965700de00173017308d8a55048e8da6277a41549b552eba89b92bb965230",
       "preimageContentSha256": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38082,8 +38109,12 @@
         "pointer": "/claims/162",
         "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
         "targetAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
-        "targetUnitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
-        "bindingSha256": null
+        "targetUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
+        "bindingSha256": "16a7175ced9e4cf2a4c24b77f290f5e942fbe6110ade59c96a2fab90e9d80e93",
+        "targetAncestry": [
+          "Added in candidate: rollout and settled facts",
+          "10. Lộ trình rollout và trạng thái hoàn thành"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
@@ -38091,12 +38122,13 @@
       ],
       "targetAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
-      "bindingSha256": "2e903dd267b17cfb5fc401b44d45855f5379a54cbf94c0a6ada34420b5e6473e",
+      "targetUnitDigest": "e87c0f147d99bb0c3bf298d3acdedc5e77f5ee231ee1f512dc3eb72d8a5c6ae2",
+      "bindingSha256": "16a7175ced9e4cf2a4c24b77f290f5e942fbe6110ade59c96a2fab90e9d80e93",
       "preimageContentSha256": "bba6f66a5fe7077501716f99153f2ad7f0ba38aa5b8eea10ccd93d3dddd975b4",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38104,8 +38136,12 @@
         "pointer": "/claims/163",
         "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
         "targetAnchor": "unheaded-block-3",
-        "targetUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
-        "bindingSha256": null
+        "targetUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
+        "bindingSha256": "a8a147207f44a978516a101f1d8b0ffb120e4dfc3eac0403b69c742d232e2a4d",
+        "targetAncestry": [
+          "Added in candidate: rollout and settled facts",
+          "10. Lộ trình rollout và trạng thái hoàn thành"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
@@ -38113,12 +38149,13 @@
       ],
       "targetAnchor": "unheaded-block-3",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
-      "bindingSha256": "34b6a58af293ad7a7dd047ef974af1918bb3207bc2655847909d2b32a2ed4f40",
+      "targetUnitDigest": "8269e36bd8c3de225e742f01a5adf28a770ea969e89685acf8d37b16e81d8093",
+      "bindingSha256": "a8a147207f44a978516a101f1d8b0ffb120e4dfc3eac0403b69c742d232e2a4d",
       "preimageContentSha256": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38201,14 +38238,15 @@
         "11. Proof và Definition of Done",
         "11.1 Contract tests"
       ],
-      "targetAnchor": "unheaded-block-60",
+      "targetAnchor": "unheaded-block-63",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
-      "bindingSha256": "75db7d435ac473ddde2c1b95927cfc62b74f4a1d166e0aff14c53af8b5233d83",
+      "bindingSha256": "799851b325632c10f6f1b0d563fde09d6af256eba0879322e265a7ed7227b11f",
       "preimageContentSha256": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38247,14 +38285,15 @@
         "11. Proof và Definition of Done",
         "11.2 One-door tests"
       ],
-      "targetAnchor": "unheaded-block-61",
+      "targetAnchor": "unheaded-block-64",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
-      "bindingSha256": "541817a8eb3c4439df7e23b66cce38657caa15934fd2c0647c869748263fb0d1",
+      "bindingSha256": "7f527cc5843b2a42b07e09276746cf5b60bd2eeef70fe6b6d1c3bb2f75cb030c",
       "preimageContentSha256": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38262,8 +38301,13 @@
         "pointer": "/claims/170",
         "targetOwner": "docs/platform/agent-confinement/spec.md",
         "targetAnchor": "113-behavior-probes",
-        "targetUnitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
-        "bindingSha256": null
+        "targetUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+        "bindingSha256": "42fb71c72a7dc31885ad795345e6890be265ebb7c13109b611377dfc7d570256",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.3 Behavior probes"
+        ]
       },
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
@@ -38272,12 +38316,13 @@
       ],
       "targetAnchor": "113-behavior-probes",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
-      "bindingSha256": "7071abfc8bacdea6b733ea10e45cd630ae9e346c6181c048660e7792f1dac13f",
+      "targetUnitDigest": "3e312aa49c27fc9a15c572e3a702e134ad8dd5885bcf640569b32048cc966978",
+      "bindingSha256": "42fb71c72a7dc31885ad795345e6890be265ebb7c13109b611377dfc7d570256",
       "preimageContentSha256": "a3d76ceaa761e0e32d478b3eb5cce8c83983099d994fa507748cd8be8dc80da3",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38293,14 +38338,15 @@
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "targetAnchor": "unheaded-block-62",
+      "targetAnchor": "unheaded-block-65",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
-      "bindingSha256": "5dcead3e763261c77fece3735b2c86c4391e434dc5b2bc29575cf4290476b1aa",
+      "bindingSha256": "17cbc8a63a586c568a9adc5d1cc103c5b15ef6561424c803a1c2f1c0447f9cca",
       "preimageContentSha256": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38316,14 +38362,15 @@
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "targetAnchor": "unheaded-block-63",
+      "targetAnchor": "unheaded-block-66",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
-      "bindingSha256": "b3d0b6324414d835282124b070681171deb854235061fb12b275e527da481a4a",
+      "targetUnitDigest": "30c0b31ca5bc7e51cd98c6e6db88e0537e53891ee70672b39416da2cb5bce868",
+      "bindingSha256": "5b9e72c944582dc6c65f887da1ad1cf8a1f9c381867c630638eb38f47d40d53c",
       "preimageContentSha256": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38339,14 +38386,15 @@
         "11. Proof và Definition of Done",
         "11.3 Behavior probes"
       ],
-      "targetAnchor": "unheaded-block-64",
+      "targetAnchor": "unheaded-block-67",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
-      "bindingSha256": "91e89358d3623c125b2e35a4da246f9ab2f98002c0fe46636ff19991a6f909ec",
+      "bindingSha256": "9d1ec0a59f63dcf593e6d595e1e2b8e8a2a758be8018eb0ea32dfc2186f8f9ca",
       "preimageContentSha256": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38385,14 +38433,15 @@
         "11. Proof và Definition of Done",
         "11.4 Observability"
       ],
-      "targetAnchor": "unheaded-block-65",
+      "targetAnchor": "unheaded-block-68",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
-      "bindingSha256": "d82f45af084045d9f69d28985569bffa0e26784cc7a7fa9c906487092bdd4e78",
+      "bindingSha256": "c9215d4af0e060fcfceed7a673afba44619b5032ee1d3a78d6f429ef47bf4913",
       "preimageContentSha256": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38431,14 +38480,15 @@
         "11. Proof và Definition of Done",
         "11.5 Doctor/setup"
       ],
-      "targetAnchor": "unheaded-block-66",
+      "targetAnchor": "unheaded-block-69",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
-      "bindingSha256": "f981e0ae7a32a1c907d05b0ba0bf520914b885aa08dec641c2d51e72f20fa565",
+      "bindingSha256": "16d89fead5b97aa6cf3f4b90f9fc87887e0387f49e1118682a4e683cdbeb5738",
       "preimageContentSha256": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38446,8 +38496,12 @@
         "pointer": "/claims/178",
         "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
         "targetAnchor": "12-quyết-định-của-proposal",
-        "targetUnitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
-        "bindingSha256": null
+        "targetUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
+        "bindingSha256": "78879f4952a9081cbf7a0a6270bc1f826876712e5871acd70df2c8b12dc00f22",
+        "targetAncestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: confinement authority decisions",
@@ -38455,12 +38509,13 @@
       ],
       "targetAnchor": "12-quyết-định-của-proposal",
       "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-      "targetUnitDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
-      "bindingSha256": "f3f92203d059b7569eb4219277b36081ab2eedf417f2e2929850d75f5139ccee",
+      "targetUnitDigest": "9694548e317142947d23150625016787563f99b3de0b01f149aa18a2661b0758",
+      "bindingSha256": "78879f4952a9081cbf7a0a6270bc1f826876712e5871acd70df2c8b12dc00f22",
       "preimageContentSha256": "5c3a483c91c74c55acaea3a75ec84de67470e770ef67327096260d537cfb404b",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38468,8 +38523,12 @@
         "pointer": "/claims/179",
         "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
         "targetAnchor": "unheaded-block-3",
-        "targetUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
-        "bindingSha256": null
+        "targetUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
+        "bindingSha256": "ffe781f3cc9b4573afaec6196236559cc01f9f7e3aa1bad9a100b37ea9b3974e",
+        "targetAncestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: confinement authority decisions",
@@ -38477,12 +38536,13 @@
       ],
       "targetAnchor": "unheaded-block-3",
       "targetOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-      "targetUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
-      "bindingSha256": "8d941cc9a4110602389cdf310c74c3f87a917bfb0e158af7d1cb03a727c54fac",
+      "targetUnitDigest": "e1f15975c3d7a246699dd10ffb0a8523d557477daca5940a717cdf1db1f81d33",
+      "bindingSha256": "ffe781f3cc9b4573afaec6196236559cc01f9f7e3aa1bad9a100b37ea9b3974e",
       "preimageContentSha256": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38490,8 +38550,12 @@
         "pointer": "/claims/180",
         "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
         "targetAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
-        "targetUnitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
-        "bindingSha256": null
+        "targetUnitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
+        "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
+        "targetAncestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
@@ -38499,12 +38563,13 @@
       ],
       "targetAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
-      "bindingSha256": "a8936d7de48d9c7019cec2ed7bfaaa0afe433c11d9a5ef7a82cf69939193c675",
+      "targetUnitDigest": "de4a0ccaa8feb8e392fa8bdc243de58c62280e77b6bcb5dd8fedc6a7ec148cdf",
+      "bindingSha256": "5b522f54d88de5ca6b5def13271ad71019318d22f5d4d5fdaf6113b76a52551e",
       "preimageContentSha256": "ef37a8226b61b0ca57fbd005cffce192ce5c707d8b7ef4caa2fa8215c41c8056",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38534,8 +38599,12 @@
         "pointer": "/claims/182",
         "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
         "targetAnchor": "unheaded-block-6",
-        "targetUnitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
-        "bindingSha256": null
+        "targetUnitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
+        "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
+        "targetAncestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+        ]
       },
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
@@ -38543,12 +38612,13 @@
       ],
       "targetAnchor": "unheaded-block-6",
       "targetOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "targetUnitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
-      "bindingSha256": "046ef9fec04afd22aa6c86fb58c346d0db49bef9da6178756844c219bc3b890c",
+      "targetUnitDigest": "f92bc88ce85fc9281e4895511e6313f549412ce11ca58d5d5573df299135da74",
+      "bindingSha256": "ece6fef575f5f7fca148703710aa2ead07389a47045f1e63d727380bfe95e22a",
       "preimageContentSha256": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38587,14 +38657,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "targetAnchor": "unheaded-block-67",
+      "targetAnchor": "unheaded-block-70",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
-      "bindingSha256": "2c56b85fbb1be6eb70a9c72e5146696fe40338ca18fb9ff8d09587b9615a0ca1",
+      "bindingSha256": "bbd93ecebe495a64ff053685c592e1335ba47a24416eb2f20b2dbe12cb5b2893",
       "preimageContentSha256": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38610,14 +38681,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "targetAnchor": "unheaded-block-68",
+      "targetAnchor": "unheaded-block-71",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
-      "bindingSha256": "1a7dfbad64738775ee919f732b4e4ad31ab35c3f9cfa4c1e156bf4202e1c60cc",
+      "bindingSha256": "493b46b961114840912b5f765bea0e7cb99f7cd289d3e399d585804b238907b4",
       "preimageContentSha256": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
       "matchScore": 0.8049281314168378,
       "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38633,14 +38705,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "targetAnchor": "unheaded-block-69",
+      "targetAnchor": "unheaded-block-72",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b",
-      "bindingSha256": "4b9774cf142c7cac67910ffe6ef0baa9dac9abe529e5d13c661dd1d2f0642fac",
+      "bindingSha256": "48e9f04e2b9ba6cd123f5ba639940e7281fe68f51f52b60a21d2be351248c861",
       "preimageContentSha256": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
       "matchScore": 0.9029535864978903,
       "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38656,14 +38729,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "targetAnchor": "unheaded-block-70",
+      "targetAnchor": "unheaded-block-73",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
-      "bindingSha256": "2c18a76a56f38a9623f29d719ad26c28e121b953fb464d48ab6f292fb07f0087",
+      "bindingSha256": "07fd3eca0a14bbd4877d4551eb6ec059f52c09ec563482d8a775f57e9d937e2a",
       "preimageContentSha256": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38702,14 +38776,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "targetAnchor": "unheaded-block-71",
+      "targetAnchor": "unheaded-block-74",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
-      "bindingSha256": "9a02a442da80ac8203d776f03b6fc8f300c18bc3055507cde0f1efcf5f16926d",
+      "bindingSha256": "e29d548d303ddfba74785c3e29e7bb61a5fb0af9c2ea1fb550e637d8cb8282be",
       "preimageContentSha256": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38725,14 +38800,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "targetAnchor": "unheaded-block-72",
+      "targetAnchor": "unheaded-block-75",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
-      "bindingSha256": "001e15f4ba9f0a53ad7fdc9d6e85390deb820eb690f449cba2f2726b6e17d399",
+      "bindingSha256": "d6fe5528fd29476558185d80e5ea4093adb9d2da500e8b14ee496c997b439b41",
       "preimageContentSha256": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38886,14 +38962,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "Tồn đọng mở (Open Deferred Items):"
       ],
-      "targetAnchor": "unheaded-block-73",
+      "targetAnchor": "unheaded-block-76",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
-      "bindingSha256": "d85488773718c9f532cd243b93786b917a1a8bbd94d0b33ac1d57f3bd4641551",
+      "bindingSha256": "88474b80230e9e91c5c594141ab51af1287e782cffd05a1119d5f55788c00172",
       "preimageContentSha256": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
       "matchScore": 3,
       "reason": "Full unit content preserved; refresh current digest, self-inclusive ancestry and placement.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38930,14 +39007,15 @@
         "Spec: Agent Confinement Authority",
         "14. Pointers hiện tại"
       ],
-      "targetAnchor": "unheaded-block-74",
+      "targetAnchor": "unheaded-block-77",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "aaace5d56024615612947a17eead7e0798207c8fba429614196666f08b311a00",
-      "bindingSha256": "69d85eb5eb412c845fed5896554ed1b7506c6c658345b933c73a97ff733faf95",
+      "bindingSha256": "74a23facaa894da50437319f4a66bf20e15ef4266413d2ab7409b3e393758fcb",
       "preimageContentSha256": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
       "matchScore": 0.9401709401709402,
       "reason": "Changed candidate envelope or relocated/adapted clause; explicit before/after witness is retained for review.",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     },
     {
       "supersedesBinding": {
@@ -38952,14 +39030,15 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "targetAnchor": "unheaded-block-68",
+      "targetAnchor": "unheaded-block-71",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
-      "bindingSha256": "1a7dfbad64738775ee919f732b4e4ad31ab35c3f9cfa4c1e156bf4202e1c60cc",
+      "bindingSha256": "493b46b961114840912b5f765bea0e7cb99f7cd289d3e399d585804b238907b4",
       "matchScore": 1,
       "reason": "Previously conditional G0-fix credential-store target is now materialized in live spec §13.1. The complete current invocation/login/trust clause, not the stale ordinal, determines placement.",
       "reviewStatus": "pending",
-      "conditionalTargetMaterialized": true
+      "conditionalTargetMaterialized": true,
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried."
     }
   ],
   "alreadySupersededHistoricalBindings": [

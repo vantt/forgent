@@ -1,0 +1,15 @@
+{
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+  "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
+  "changedPaths": [
+    "docs/specs/confinement-authority.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/seat-binding.md"
+  ],
+  "beforeSha256": "d45170ad321af719433d0a6d54aa884da750fc7c0f1fd44a6fe5e52fcc155108",
+  "afterSha256": "52d2936caa40406912b5e6c932b937f7a3930f40ba0990fe3b562a02da132997",
+  "previousObjectSha256": "90fa080f54336513885dea8d78c53f90e1608282b9b3ce465458656f0d636be4",
+  "originalExceptionMetadataUnchanged": true,
+  "baselineUnchanged": true,
+  "independentReview": "pending"
+}

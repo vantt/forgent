@@ -123,7 +123,7 @@
       "sourceUnitDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-68",
+      "targetAnchor": "unheaded-block-71",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "reviewStatus": "pending",
       "rationale": "Source: docs/specs/confinement-authority.md:1357-1359#unheaded-block-140 (historical witness at c3272bc6fc70015e995921e1c458658b084b0b11); unit SHA256 a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6.\nTarget: docs/specs/confinement-authority.md:1359-1361#unheaded-block-141 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/confinement-authority.md#unheaded-block-140 under docs/specs/confinement-authority.md#unheaded-block-141; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-141 -> unheaded-block-140. The same section 13.1 numbered invocation/login/trust recipe now names credentialStore and preserves resourceBindings compatibility, with explicit RUL105 gloss; its anchor shifts 141 to 140. Login and trust passage continuity identifies the successor, not position. Source identity unchanged; no native identity assignment or approval carry; independent review pending. W2 G0 correction: Bind the carried numbered credentialStore/login/trust recipe under section 13.1 in the after-state of carry:credential-store-setup, after its approved predecessor. This is a conditional composed target, not a presently applied live unit. Full content and immediate neighbours: reports/phase-09/g0fix/binding-repairs.json. Historical prose above is not the current binding. Independent review pending; no approval carry.",
@@ -133,8 +133,8 @@
         "Added in candidate: Current settled facts and deferred items",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
       ],
-      "reviewNote": "W2 G0 current binding/hash or residual authored; independent review pending; no approval carry. Complete before/after record retained in g0fix/record-edits.json.",
-      "bindingSha256": "1a7dfbad64738775ee919f732b4e4ad31ab35c3f9cfa4c1e156bf4202e1c60cc"
+      "reviewNote": "W11 import3: current-byte rebind; independent review required, no prior approval carried.",
+      "bindingSha256": "493b46b961114840912b5f765bea0e7cb99f7cd289d3e399d585804b238907b4"
     },
     {
       "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",

@@ -1,0 +1,46 @@
+{
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+  "method": "Current bounded diagnostic using the unchanged frozen dual extractors. Original source-triage.json retains the 24-unit intake; the live scanner supplies global proof.",
+  "records": [
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceSha256": "f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564",
+      "candidateSuccessors": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "currentUnits": 204,
+      "unprovenUnitCount": 0,
+      "missingCarriage": []
+    },
+    {
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceSha256": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e",
+      "candidateSuccessors": [
+        "docs/platform/README.md",
+        "docs/reading-map.md"
+      ],
+      "currentUnits": 3,
+      "unprovenUnitCount": 0,
+      "missingCarriage": []
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "sourceSha256": "be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be",
+      "candidateSuccessors": [
+        "docs/platform/seat-binding/spec.md"
+      ],
+      "currentUnits": 99,
+      "unprovenUnitCount": 0,
+      "missingCarriage": []
+    }
+  ],
+  "counts": {
+    "sourceFiles": 3,
+    "unprovenUnits": 0
+  },
+  "carriage": "s18-import3-resync.json / binding-refresh.json; independent review pending",
+  "needsWrites": []
+}

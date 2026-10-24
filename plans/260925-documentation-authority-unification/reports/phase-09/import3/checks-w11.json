@@ -1,0 +1,294 @@
+{
+  "inputHEAD": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+  "checks": [
+    {
+      "name": "accounting",
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/account.py"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:41.586125+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"inputHEAD\": \"814c06f3dca5bebcc2521fac4ff31d0248b3660d\",\n  \"commits\": 69,\n  \"changedPaths\": 119,\n  \"changedDocumentation\": 8,\n  \"candidateChecks\": [\n    {\n      \"path\": \"docs/platform/config/spec.md\",\n      \"currentSha256\": \"99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3\",\n      \"completeUnitCount\": 95,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/git/spec.md\",\n      \"currentSha256\": \"63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e\",\n      \"completeUnitCount\": 297,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/holder-lock/spec.md\",\n      \"currentSha256\": \"b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f\",\n      \"completeUnitCount\": 138,\n      \"effectiveDirectBindingsAtInput\": 1,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/secrets/spec.md\",\n      \"currentSha256\": \"652ba5e8797bf2376e61f6bd5a5e76d8de20f5ae89f033ea1a20ae5e2cd38227\",\n      \"completeUnitCount\": 78,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    }\n  ],\n  \"checkedBindings\": 1,\n  \"failingBindings\": 0,\n  \"unprovenUnits\": {\n    \"docs/specs/confinement-authority.md\": 0,\n    \"docs/specs/reading-map.md\": 0,\n    \"docs/specs/seat-binding.md\": 0\n  },\n  \"needsWrites\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "binding-and-conservation",
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/resync.py",
+        "--check"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:43.400632+00:00",
+      "exit": 0,
+      "stdout": "{\"status\": \"pass\", \"effectiveBindings\": 314, \"sourceBindings\": 24, \"refreshedRows\": 63, \"shards\": 5, \"independentReview\": \"pending\"}\n",
+      "stderr": ""
+    },
+    {
+      "name": "scanner-boundary-probes",
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/prove-scanner.py"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:44.259647+00:00",
+      "exit": 0,
+      "stdout": "{\"liveExit\": 0, \"pendingRows\": 134, \"unflaggedMissingExit\": 1, \"composedExit\": 0, \"resolvedOverlayRows\": 134, \"composedMissingChangedUnits\": 2}\n",
+      "stderr": ""
+    },
+    {
+      "name": "legacy-drift-at-head",
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:49.699477+00:00",
+      "exit": 0,
+      "stdout": "{\"postFinalPinFiles\":6,\"postInventoryPinFiles\":33,\"files\":33,\"filesWithUnprovenChange\":0,\"missingChangedUnits\":0}\n",
+      "stderr": ""
+    },
+    {
+      "name": "legacy-drift-replay",
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+        "--check"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:51.276454+00:00",
+      "exit": 0,
+      "stdout": "{\"postFinalPinFiles\":6,\"postInventoryPinFiles\":33,\"files\":33,\"filesWithUnprovenChange\":0,\"missingChangedUnits\":0}\n",
+      "stderr": ""
+    },
+    {
+      "name": "rebind-check",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,sys; from pathlib import Path; m=runpy.run_path(sys.argv[1]); m['main'].__globals__['SCRATCH']=Path('/tmp/fgos-work/w11-import3/rebind'); sys.argv=sys.argv[1:]; raise SystemExit(m['main']())",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:52.809601+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"drift\": 0,\n  \"rows\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ownership-audit",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,tempfile,sys; original=tempfile.mkdtemp; tempfile.mkdtemp=lambda *a,**k: original(*a,**dict(k,dir='/tmp/fgos-work/w11-import3')); runpy.run_path(sys.argv[1],run_name='__main__')",
+        "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:30:54.121643+00:00",
+      "exit": 1,
+      "stdout": "{\n  \"head\": \"814c06f3dca5bebcc2521fac4ff31d0248b3660d\",\n  \"scratch\": \"/tmp/fgos-work/w11-import3/p8-audit-juip9z1o\",\n  \"manifests\": [\n    {\n      \"manifest\": \"plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json\",\n      \"commands\": [\n        {\n          \"script\": \"ownership.mjs\",\n          \"exit\": 0\n        },\n        {\n          \"script\": \"audit-ownership.mjs\",\n          \"exit\": 0\n        },\n        {\n          \"script\": \"checks.mjs\",\n          \"exit\": 1\n        }\n      ],\n      \"failingRows\": [],\n      \"ownership\": {\n        \"noNewDoubleOwnership\": true,\n        \"nativePlatformTargetIdentityDuplicates\": 0,\n        \"newActiveSourcePairCollisions\": []\n      },\n      \"checks\": null\n    },\n    {\n      \"manifest\": \"plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json\",\n      \"commands\": [\n        {\n          \"script\": \"ownership.mjs\",\n          \"exit\": 0\n        },\n        {\n          \"script\": \"audit-ownership.mjs\",\n          \"exit\": 0\n        },\n        {\n          \"script\": \"checks.mjs\",\n          \"exit\": 1\n        }\n      ],\n      \"failingRows\": [],\n      \"ownership\": {\n        \"noNewDoubleOwnership\": true,\n        \"nativePlatformTargetIdentityDuplicates\": 0,\n        \"newActiveSourcePairCollisions\": []\n      },\n      \"checks\": null\n    }\n  ],\n  \"ok\": false\n}\n",
+      "stderr": "",
+      "ownershipSummary": [
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+          "commands": [
+            {
+              "script": "ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "audit-ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "checks.mjs",
+              "exit": 1
+            }
+          ],
+          "failingRowCount": 0,
+          "ownership": {
+            "noNewDoubleOwnership": true,
+            "nativePlatformTargetIdentityDuplicates": 0,
+            "newActiveSourcePairCollisions": []
+          }
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+          "commands": [
+            {
+              "script": "ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "audit-ownership.mjs",
+              "exit": 0
+            },
+            {
+              "script": "checks.mjs",
+              "exit": 1
+            }
+          ],
+          "failingRowCount": 0,
+          "ownership": {
+            "noNewDoubleOwnership": true,
+            "nativePlatformTargetIdentityDuplicates": 0,
+            "newActiveSourcePairCollisions": []
+          }
+        }
+      ],
+      "requiredOwnershipPassed": true,
+      "subcommandOutputs": [
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+          "script": "ownership.mjs",
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+          "stderr": ""
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+          "script": "audit-ownership.mjs",
+          "exit": 0,
+          "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+          "stderr": ""
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+          "script": "checks.mjs",
+          "exit": 1,
+          "stdout": "",
+          "stderr": "file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16\n    facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };\n                                                                 ^\n\nError: {\"cause\":\"git-floor-probe-failed: git-driver-io: Read-only file system (os error 30)\",\"code\":\"refused\",\"detail\":null,\"exitCode\":null,\"operationId\":null,\"receipt\":null,\"retryable\":false,\"signal\":null,\"stderr\":[]}\n    at facade.<computed> [as trackedPaths] (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16:66)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:47\n    at inspectEntries (file:///home/vantt/projects/forgentX-p9-w1-d3/src/util/git-paths.mjs:57:18)\n    at trackedPlatformDocs (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:17)\n    at file:///tmp/fgos-work/w11-import3/p8-audit-juip9z1o/step10-round5/checks.mjs:19:13 {\n  code: 'GenericFailure'\n}\n\nNode.js v24.18.0\n"
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+          "script": "ownership.mjs",
+          "exit": 0,
+          "stdout": "{ all: 272, active: 205, sameSource: 203, drift: 0 }\n",
+          "stderr": ""
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+          "script": "audit-ownership.mjs",
+          "exit": 0,
+          "stdout": "{\n  collisions: 272,\n  newGapGroups: 31,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+          "stderr": ""
+        },
+        {
+          "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+          "script": "checks.mjs",
+          "exit": 1,
+          "stdout": "",
+          "stderr": "file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16\n    facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };\n                                                                 ^\n\nError: {\"cause\":\"git-floor-probe-failed: git-driver-io: Read-only file system (os error 30)\",\"code\":\"refused\",\"detail\":null,\"exitCode\":null,\"operationId\":null,\"receipt\":null,\"retryable\":false,\"signal\":null,\"stderr\":[]}\n    at facade.<computed> [as trackedPaths] (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:16:66)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:47\n    at inspectEntries (file:///home/vantt/projects/forgentX-p9-w1-d3/src/util/git-paths.mjs:57:18)\n    at trackedPlatformDocs (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/check-doc-constitution.mjs:641:17)\n    at file:///tmp/fgos-work/w11-import3/p8-audit-juip9z1o/step10-sync4d/checks.mjs:19:13 {\n  code: 'GenericFailure'\n}\n\nNode.js v24.18.0\n"
+        }
+      ]
+    },
+    {
+      "name": "ratchet",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:31:18.778367+00:00",
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "name": "ratchet-owning-test",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/check-legacy-docs-ratchet.test.mjs"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:31:18.841885+00:00",
+      "exit": 0,
+      "stdout": "✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (1.985002ms)\n✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.135065ms)\n✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.068029ms)\n✔ accounted edit: file modified with valid reviewed exception passes (0.593922ms)\n✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.404257ms)\n✔ unexpected deletion: baselined file missing without exception is refused (0.377653ms)\n✔ malformed baseline: schema validator rejects invalid baseline structures (0.353313ms)\n✔ malformed exception: schema validator rejects invalid exception objects (0.662382ms)\n✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.172307ms)\n✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.46517ms)\n✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (3.13386ms)\n✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.385844ms)\n✔ symlink target: retargeting a symlink to another file of equal bytes is refused (0.404075ms)\n✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.435349ms)\n✔ classification: includes curated generated projections alongside maintained authority (0.068669ms)\n✔ CLI: exits 0 on clean tree and exits 1 on finding (76.752139ms)\n✔ live self-check: repository baseline and ratchet verify cleanly (70.123401ms)\n✔ policy-aware: permits edited and new generated projections without exception (0.946021ms)\n✔ policy-aware: permits new and edited history-evidence payloads without exception (0.45494ms)\n✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.367826ms)\n✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.377581ms)\n✔ safety: detects and refuses class spoofing attempts in baseline (0.299027ms)\n✔ messages: ensure messages do not call non-authority payloads maintained authority (0.260435ms)\n✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.27665ms)\n✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.265488ms)\n✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.282421ms)\n✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.289317ms)\n✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.336803ms)\nℹ tests 28\nℹ suites 0\nℹ pass 28\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 207.25802\n",
+      "stderr": ""
+    },
+    {
+      "name": "diff-whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "environmentOverrides": {
+        "TMPDIR": "/tmp/fgos-work/w11-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:31:19.074780+00:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "requiredChecksPassed": true,
+  "allExitCodesZero": false,
+  "evidenceRelocation": {
+    "status": "not-run",
+    "exit": null,
+    "reason": "The --before checker calls inspectRepo -> ensureScriptAddon. That can load or stage a native addon; W11 explicitly forbids loading one. No attempt made."
+  },
+  "qualification": "Author evidence only. Both ownership readers passed with no failing rows. checks.mjs could not produce a verdict: its native Inspect floor probe refused on the read-only live state root; existing cached-addon loading observed, no Cargo/build output. No pair accounting performed."
+}

@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-10-24T18:37:17.697756+00:00",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/resync.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"status\": \"pass\", \"effectiveBindings\": 314, \"sourceBindings\": 24, \"refreshedRows\": 63, \"shards\": 5, \"independentReview\": \"pending\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/verify.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"pass\",\n  \"inputHEAD\": \"814c06f3dca5bebcc2521fac4ff31d0248b3660d\",\n  \"carriedUnits\": 24,\n  \"exactUnits\": 16,\n  \"adaptedUnits\": 8,\n  \"effectiveRebinds\": 63,\n  \"directOrigins\": 11,\n  \"overlayIdentities\": 11,\n  \"liveMissingCurrent\": 0,\n  \"preparedOverlayRows\": 134,\n  \"composedScannerResidual\": 2,\n  \"ratchetRefreshes\": 3,\n  \"scopePaths\": 31,\n  \"independentReview\": \"pending\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"postFinalPinFiles\":6,\"postInventoryPinFiles\":33,\"files\":33,\"filesWithUnprovenChange\":0,\"missingChangedUnits\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "allPassed": true
+}
