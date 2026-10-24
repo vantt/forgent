@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8ffbcdfca01ac85cb02f175e2fdbf317c80a55fea38f4dc476665cbdb48efbec",
+  "payloadDigest": "4c2e5a5bbf80a1b1521fff82805e109d7d8830517be5e3522fdf19792b7c914f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -541,9 +541,9 @@
     "packages/process/rust/tests/spawn_mapped.rs": "3cdd6810e8a68ffaffa611a03b6d405bb8856ff69d5250c6f5bcaffea3d39104",
     "packages/process/rust/tests/windows_job_domain.rs": "ef43f9d374fb9254ea75dca253c0bd82c8eb3fee5e676d1d14d14da1657b54ba",
     "packages/process/rust/tests/windows_spawn.rs": "5c8eb632a466203a847a2f6f5a57b401ebda7906509bfc62aece0124fee77e54",
-    "packages/run-result/rust/src/lib.rs": "6dd4b5faf19b4efe3d9941cea98bc7bb6d89d375f2fce58f16680fcf37c04ce2",
+    "packages/run-result/rust/src/lib.rs": "c805da16d68a29f1f4dc4d6e53678e3916a609eb70039f6aa2ac07a041c8ee23",
     "packages/run-result/rust/src/unit_summary.rs": "ca14452db4da7f3e840ca4d9df507f3e179b54219a6cee22222fca04fc7a5779",
-    "packages/run-result/rust/tests/layout_fixture.rs": "0569541d1cb7621e18fc0f0784d34167627329e17a311111e20af6a7ad4895cd",
+    "packages/run-result/rust/tests/layout_fixture.rs": "c420c12c768249226adbef896892e080fd35a522a79dcc9d1fae2d755dfcefca",
     "packages/run-result/rust/tests/unit_summary.rs": "7bfada18e9e69ba949dcce9dccf09522380ec42d754ef65aebc21f194199b7b1",
     "packages/run-supervisor/rust/examples/gate_agent.rs": "ef78a263c92889e7f6146ca4fb9f7e61cd0a8ae81f73dba9b4dd30d826f1f84a",
     "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
@@ -853,7 +853,7 @@
     "src/runner/dispatch.mjs": "f73b4e52e2ef668d899cd43487597399d07de71e8bb3b8dfd2c3df9223ae5f86",
     "src/runner/dispatch/adapters.mjs": "dbc83f5033523fdb15aebcb7e0108453c05c1870c179d8453fcc1eaa95e4996a",
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
-    "src/runner/dispatch/assignment-layout.mjs": "afc5f5c4c742892ca2418fbe2f7ec0f0ca801784f6aec1408e4a4aa4de21b791",
+    "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
     "src/runner/dispatch/assignment-runner.mjs": "80ce926f792d2bb2d742603bdd138ec73cf170b8d8e7ec53546867e1bfef2933",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
@@ -996,7 +996,7 @@
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "c6fc99d0a867883296b5f1c0762dbe7c2443b2870e422242362f83dff57f9098",
+    "src/setup/registrations.mjs": "e93ef344bce803c25a09b21dec7c1ca6fd16d5f8e4dd591cd706ca0a8464722d",
     "src/setup/run-supervisor-checks.mjs": "02ac1daf6c996d7dcf974675a1874fbc3a956c519ccea7678220b236c91668e8",
     "src/setup/seat-binding-checks.mjs": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
@@ -3156,14 +3156,14 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6053,
+      "line": 6051,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6123,
+      "line": 6121,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

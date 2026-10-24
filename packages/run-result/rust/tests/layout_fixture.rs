@@ -570,6 +570,73 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
 }
 
 #[test]
+fn settlement_time_admits_only_valid_rfc3339_instants() {
+    let root = FixtureRoot::new();
+    let cases = [
+        ("leap-day", "2028-02-29T23:59:59Z", true),
+        ("offset-fraction", "2026-10-05T12:00:00.250+07:00", true),
+        ("lower-case", "2026-10-05t10:00:00z", true),
+        ("not-leap", "2026-02-29T00:00:00Z", false),
+        ("hour-24", "2026-10-05T24:00:00Z", false),
+        ("bad-offset", "2026-10-05T10:00:00+24:00", false),
+        ("no-zone", "2026-10-05T10:00:00", false),
+        ("empty-fraction", "2026-10-05T10:00:00.Z", false),
+        ("padded", " 2026-10-05T10:00:00Z ", false),
+    ];
+    for (id, time, _) in cases {
+        root.result(id, "01", &json!({"runId": id, "settledAt": time}));
+    }
+    let scan = scan_runs(&root.0).unwrap();
+    for (id, _, admitted) in cases {
+        assert_eq!(
+            scan.runs.iter().any(|o| o.subject.id == id),
+            admitted,
+            "{id}"
+        );
+    }
+    assert_eq!(scan.skipped["invalid-timestamp"], 6);
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn run_scan_keeps_explicit_nulls_and_does_not_reclassify_non_object_results() {
+    let root = FixtureRoot::new();
+    root.result(
+        "null-contract",
+        "01",
+        &json!({"runId": "null-contract", "settledAt": "2026-10-05T10:00:00Z", "contract": null}),
+    );
+    root.result(
+        "null-classification",
+        "01",
+        &json!({
+            "runId": "null-classification", "settledAt": "2026-10-05T10:00:00Z",
+            "status": "done", "classification": null
+        }),
+    );
+    root.result(
+        "null-executor-id",
+        "01",
+        &json!({
+            "runId": "null-executor-id", "settledAt": "2026-10-05T10:00:00Z",
+            "status": "done", "executorId": null, "executor": "claude",
+            "evidence": {"bulky": [1, 2, 3]}
+        }),
+    );
+    root.result("top-level-array", "01", &json!([{"runId": "inside"}]));
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.skipped.get("unparseable"), None);
+    assert_eq!(scan.skipped["no-run-id"], 1);
+    let by_id = |id: &str| scan.runs.iter().find(|o| o.subject.id == id).unwrap();
+    assert_eq!(by_id("null-contract").attrs["outcome"]["reason"], "unsupported-contract");
+    let classification = by_id("null-classification");
+    assert_eq!(classification.attrs["classification"], Value::Null);
+    assert_eq!(classification.attrs["category"], "ok");
+    assert_eq!(by_id("null-executor-id").attrs["executor"], Value::Null);
+    assert_accounting(&root.0);
+}
+
+#[test]
 fn absent_and_malformed_results_have_distinct_accounting() {
     let root = FixtureRoot::new();
     let missing = root.assignments().join("missing/runs/01");
