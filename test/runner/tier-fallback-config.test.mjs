@@ -174,17 +174,19 @@ test('the schema marker is {schema: 1} inside patterns and nothing else', () => 
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
 });
 
-test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; rigorToTier is dropped', () => {
-  const { cfg } = loadRunner(runnerWith(), {
+test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; a rigorToTier there is refused by the global file\'s name', () => {
+  const globalRunner = {
     maxTier: 'flagship',
     tierFallback: { advanced: ['claude'] },
-    // A machine that has not re-run setup still carries it; the loader drops it from the global layer.
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     capabilities: { review: { rigor: 'high', confinement: { mode: 'required', policy: 'host-write-denied' } } },
-  });
-  assert.equal('rigorToTier' in cfg, false);
+  };
+  const { cfg } = loadRunner(runnerWith(), globalRunner);
   assert.equal(cfg.maxTier, 'flagship');
   assert.equal(cfg.capabilities.review.rigor, 'high');
+  refusedLoad(runnerWith(), /~\/\.fgos\/config\.json runner\.rigorToTier no longer exists/, {
+    ...globalRunner,
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  });
 });
 
 test('a $comment key is ignored at every level and never reaches the loaded config', () => {

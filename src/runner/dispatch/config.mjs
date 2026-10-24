@@ -321,26 +321,11 @@ export const FRESH_PROJECT_RUNNER_CONFIG = {
  */
 const warnedGlobalExtendedCells = new Set();
 
-let warnedGlobalRigorToTier = false;
-
-/**
- * `runner.rigorToTier` no longer exists: rigor sets checker count and independence, never a tier. The
- * owner's global file still carries it, so the file is left alone and the key is dropped in memory
- * here, once per process with a note on stderr. A project file that carries it is refused by
- * `validateRunnerConfigShape`. This stays until that global key is removed by hand.
- */
-function dropRetiredGlobalKeys(globalConfig) {
-  if (!globalConfig?.runner || !Object.hasOwn(globalConfig.runner, 'rigorToTier')) return globalConfig;
-  if (!warnedGlobalRigorToTier) {
-    warnedGlobalRigorToTier = true;
-    process.stderr.write('fgos: ignoring ~/.fgos/config.json runner.rigorToTier: rigor no longer chooses a tier (the file is left as it is; older fgOS releases on this machine still read it)\n');
+function sanitizeGlobalLayer(globalConfig) {
+  // Refused here, before the merge, so the error names the global file rather than the project one.
+  if (globalConfig?.runner && Object.hasOwn(globalConfig.runner, 'rigorToTier')) {
+    throw new RunnerConfigError('~/.fgos/config.json runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.');
   }
-  const { rigorToTier: _retired, ...runner } = globalConfig.runner;
-  return { ...globalConfig, runner };
-}
-
-function sanitizeGlobalLayer(rawGlobalConfig) {
-  const globalConfig = dropRetiredGlobalKeys(rawGlobalConfig);
   const modelPolicies = globalConfig?.runner?.modelPolicies;
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
     return globalConfig;

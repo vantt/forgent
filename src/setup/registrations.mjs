@@ -633,9 +633,8 @@ export function checkTierVocabularyDeadKeys(cwd) {
     if ('PLACEMENT_POLICY_SHADOW' in runner) {
       problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
     }
-    // The global file of a machine that has not re-run setup still carries it; it is dropped at load.
-    if (level === 'project' && 'rigorToTier' in runner) {
-      problems.push('project config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, delete the key and declare "tier" per capability, role, persona or seat');
+    if ('rigorToTier' in runner) {
+      problems.push(`${level} config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, delete the key and declare "tier" per capability, role, persona or seat`);
     }
     for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
       if (exec && typeof exec === 'object') {
