@@ -4826,6 +4826,8 @@ function handSealsToChild() {
 function opensEventStore(entry, verb, positional) {
   // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
   if (verb === 'events' && positional[0] === 'migrate') return false;
+  // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
+  if (verb === 'events' && positional[0] === 'seal') return false;
   return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
 }
 
@@ -5119,7 +5121,8 @@ async function main() {
   // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
   let eventStoreLifecycle = null;
   let sweepsLand = false;
-  processSealCoalescer.handOff();
+  // A dispatched worker seals inline: a detached child would leave the attempt's process domain.
+  if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
 

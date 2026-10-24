@@ -105,7 +105,7 @@ test('a seal child that cannot be started never fails the command, and the next 
   await waitFor('the next command to seal both', () => w.receipt() === w.total());
 });
 
-test('a seal child lives on when the CLI process group is interrupted', async (t) => {
+test('a seal child lives on when the CLI process group is interrupted', { skip: process.platform === 'win32' && 'process groups are a unix notion' }, async (t) => {
   const w = workspace();
   const holder = await holdSealFor(t, w);
   const cli = spawn(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: w.env, detached: true, stdio: 'ignore' });
@@ -118,4 +118,13 @@ test('a seal child lives on when the CLI process group is interrupted', async (t
   assert.equal(gone([child]), false, 'the interrupt of the CLI group did not reach the seal child');
   await stopHolder(holder);
   await waitFor('the receipt to cover every event', () => w.receipt() === w.total());
+});
+
+test('a dispatched worker seals inline: the command returns sealed and starts no seal child', async () => {
+  const w = workspace();
+  const moved = spawnSync(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: { ...w.env, FGOS_DISPATCH_DEPTH: '1' }, encoding: 'utf8' });
+  assert.equal(moved.status, 0, moved.stderr);
+  assert.equal(w.receipt(), w.total(), 'the seal was done by the command itself');
+  await sleep(300);
+  assert.deepEqual(w.sealChildren(), []);
 });

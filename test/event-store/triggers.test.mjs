@@ -133,6 +133,10 @@ test('a CLI verb that opens the store runs both triggers on maintenance facts, a
   assert.deepEqual(status.calls.filter((call) => call === 'maintenance'), ['maintenance', 'maintenance'], 'one trigger at each end of the verb');
   // Whatever migrate answers in a fixture with nothing to import, no trigger opened the store around it.
   assert.deepEqual(cli(['events', 'migrate', '--check']).calls, []);
+  // The seal child does one seal and nothing around it: no start or end trigger, hence no sweep and no publish.
+  const seal = cli(['events', 'seal', '--stream', 'project']);
+  assert.equal(seal.status, 0, seal.stderr);
+  assert.deepEqual(seal.calls, []);
   assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|seal\|export\|migrate/);
 });
 
