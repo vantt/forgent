@@ -1,5 +1,7 @@
 # Phase 13: Account readers read the accounts file
 
+> **Moved to Slice C** (owner decision 2026-10-24 10:00, option B). Not built in Slice D; this file is the detailed spec Slice C's plan links to. Slice C's plan says where it lands and which numbers (caps, ownership order) changed. Read "Slice D" below as "the slice that executes this phase".
+
 Depends on 11 and 12 (same shared file). Suggested executor: sonnet; independent sonnet review of the edit list against phase 00's enumeration. Shared files: `src/setup/registrations.mjs`, `bin/fgos.mjs` (two strings), `src/runner/dispatch/config.mjs`; post first.
 
 ## Context

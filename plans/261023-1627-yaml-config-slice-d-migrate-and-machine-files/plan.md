@@ -1,7 +1,7 @@
 ---
-title: "YAML Document + Config foundation, Slice D: confinement mask, machine files, native verbs, migration, doctor, comment renderer"
-description: "G6 through the Confinement Authority, then ~/.fgos/private with accounts.yaml and gateway-token, the account and token moves, the fgos config verbs, project migration with tombstone, the section 11 doctor rows (through a minimal native-door entry) and the comment renderer for existing files."
-status: in-progress
+title: "YAML Document + Config foundation, Slice D: confinement mask, machine files, native verbs, migration, comment renderer"
+description: "G6 through the Confinement Authority, then ~/.fgos/private with accounts.yaml and gateway-token, the account and token moves, the fgos config verbs, project migration with tombstone, the section 11 findings engine and the comment renderer for existing files. The native-door entries, the Node doctor rows and the account and token readers moved to Slice C."
+status: completed (phases 00-10 and 17 landed 2026-10-24; phases 11-14 moved to Slice C, phase 15 split)
 priority: P1
 effort: 85h
 branch: cfg/slice-d (linked worktree; never the shared main checkout)
@@ -17,6 +17,8 @@ Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/conf
 
 > Frame approved by the owner 2026-10-23 20:19 (D first; C landing A in parallel).
 
+> **Closed by the owner 2026-10-24 10:00 (option B).** Slice D lands now at about 3,290 net source lines, inside its 3,300 ceiling. Phases 11 (native door `config` namespace: `check`, `fix`, `accounts`), 12 (Node doctor rows and setup), 13 (account readers) and 14 (gateway token reader) **moved to Slice C**, because C is the reader-cutover slice and opens the door anyway; their phase files stay in this directory as the detailed spec and C's plan links to them. Phase 15 (machine rollout) is split: stage 1 (copy accounts and token into `~/.fgos/private` with `fgos config migrate --global`) is available after D; stage 2 (remove the old keys, `--finish --machine-checked`) waits for Slice C's readers. Phase 16 (live migration of this repository) was already Slice C's first cutover step.
+
 > Ceiling raised by the owner 2026-10-24 09:13 (option A): Slice D source ceiling **3,300 lines** (measured 2,181 added / 97 removed after phases 00-08); per-phase caps stand for the remaining phases, and a phase that would pass its cap stops and reports.
 
 ## Outcome
@@ -29,6 +31,8 @@ Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/conf
 6. **Comment renderer and `refresh-docs`** for existing files (`@fgos:doc` drift and missing lines; idempotent; never touches `@fgos:why` or free notes).
 
 ## Honest ordering of the doctor rows and the door (item 5)
+
+> Superseded 2026-10-24 (owner decision, option B): the minimal door and the Node doctor rows moved to Slice C. The reasoning below is kept as history; the rows' Rust side (`doctor.rs`, `repair.rs`) landed here.
 
 Node reaches Rust only through the native door (owner decision, no spawn), and the door's `config` namespace is spec section 12 / Slice C. Three things force D to open it: (a) the existing doctor row `gateway-token-configured` and every account reader must read `~/.fgos/private/*`, and Node must not parse YAML (`src/util/yaml.mjs` is the tool profile, not a config reader); (b) the rows for permissions, wrong-file keys and `config-secret-outside-private` are the check side of the moves this slice makes; (c) shipping the moves without their rows leaves the machine files unwatched. So **D creates the `config` namespace with the three entries its consumers need: `check` (all section 11 rows, findings only), `fix` (named repairs from `doctor --fix` and setup), `accounts` (the machine inventory, readable without a valid project file)**. Slice C adds `snapshot`, `explain`, `applyPatch` and the facade to the same namespace and moves the remaining readers and writers. Nothing in the door is duplicated later: `accounts` stays the machine-only read, `snapshot` answers the project question. Slice C's scope list below is adjusted to match.
 
@@ -47,13 +51,15 @@ Node reaches Rust only through the native door (owner decision, no spawn), and t
 | [08](phase-08-findings-engine.md) | `doctor.rs` and `contracts/doctor-rows.v1.json`: every section 11 row, per-source, plus the fixes | `tests/golden_doctor.rs` | 04, 05, 06, 07 |
 | [09](phase-09-read-verbs.md) | Host provider and projector: `show`, `explain`, `standard`, `check`; routes, registry entry | projector unit tests + `inspect` golden | 08, 03 |
 | [10](phase-10-write-verbs.md) | `set`, `unset`, `patch`, `migrate`, `refresh-docs` | provider unit tests + one e2e per family | 09, 05, 07 |
-| [11](phase-11-native-door.md) | Addon namespace `config` (`check`, `fix`, `accounts`), `versions()` marker, Node client module | `config_door.test.mjs` (one per entry) | 08, 04, 05 |
-| [12](phase-12-node-doctor-and-setup.md) | `src/setup/config-checks.mjs`, retire the `gateway` default, setup creates the machine files, `gateway-token-configured` on the token file | one wiring test per row family | 11 |
-| [13](phase-13-account-readers.md) | `withMachineAccounts`, every inventory reader, error texts, test fixtures | existing lease/probe/doctor tests moved to the accounts file | 11, 12 |
-| [14](phase-14-gateway-token-reader.md) | `apps/fgos-gateway` reads the token file; message text | gateway unit tests | 04 |
-| [15](phase-15-machine-rollout.md) | Per-machine runbook, copy stage, **owner gate G-D3** per machine for stage 2, evidence | live `fgos config check` + doctor on each machine | 05, 08, 12, 13, 14 landed and activated |
-| [16](phase-16-live-migration-of-this-repo.md) | **Owner gate G-D1**: the live run on this repository's project file | rehearsal golden (phase 07) + live doctor | 07, G-D1 answer |
-| [17](phase-17-docs-closeout.md) | Spec status and decision lines, distribution and runner spec lines, CHANGELOG, board, backlog, final gates, budget count | `cargo test --workspace`, `npm test`, sequential | all except 16 |
+| [11](phase-11-native-door.md) | **Moved to Slice C** (owner decision 2026-10-24 10:00, option B). Addon namespace `config` (`check`, `fix`, `accounts`), `versions()` marker, Node client | `config_door.test.mjs` (one per entry) | Slice C |
+| [12](phase-12-node-doctor-and-setup.md) | **Moved to Slice C** (same decision). `src/setup/config-checks.mjs`, retire the `gateway` default, setup creates the machine files, `gateway-token-configured` on the token file | one wiring test per row family | Slice C |
+| [13](phase-13-account-readers.md) | **Moved to Slice C** (same decision). `withMachineAccounts`, every inventory reader, error texts, test fixtures | existing lease/probe/doctor tests moved to the accounts file | Slice C |
+| [14](phase-14-gateway-token-reader.md) | **Moved to Slice C** (same decision). `apps/fgos-gateway` reads the token file; message text | gateway unit tests | Slice C |
+| [15](phase-15-machine-rollout.md) | **Split.** Stage 1 (copy accounts and token with `fgos config migrate --global`, source kept) is available after D, per machine. Stage 2 (`--finish --machine-checked`, **owner gate G-D3** per machine) waits for Slice C's readers landed and activated | live `fgos config check` on each machine (stage 1); doctor on each machine (stage 2, Slice C) | stage 1: D landed; stage 2: Slice C 07, 12 to 14 landed and activated |
+| [16](phase-16-live-migration-of-this-repo.md) | **Slice C's first cutover step** (owner gate G-D1, answered A); D delivered only the rehearsal (phase 07) | rehearsal golden (phase 07) + live doctor | Slice C |
+| [17](phase-17-docs-closeout.md) | Spec status and decision lines, reading map, confinement spec probe counts, CHANGELOG, backlog; done for what D delivered (distribution and runner spec lines, component-boundary row and board lines go with Slice C) | text re-read against code; `cargo test --workspace`, `npm test`, sequential | all D phases |
+
+**Status (2026-10-24):** 00 to 10 and 17 done and merged on `cfg/slice-d` (verbs at `221bbd58b`); 11 to 14 moved to Slice C; 15 split (stage 1 now, stage 2 with Slice C); 16 is Slice C's. Reports: `plans/reports/phase-2610*-cfg-slice-d-*.md`. The sections below keep the plan as written; where they say "phase 11 to 14 land here", read "Slice C".
 
 Parallelism (file-disjoint, see ownership): after 00, tracks {01 -> 02 -> 03b}, {03 -> 04 -> 05}, {03 -> 06 -> 07}, {14 after 04} run in parallel. 08 joins 04-07; 09 and 10 are sequential (same provider file); 11 joins 08; 12 -> 13 sequential (same Node setup file). A question parked on G-D1 blocks only 16; G-D2 blocks only 03b; G-D3 blocks only stage 2 on one machine.
 
@@ -104,6 +110,7 @@ Shared edits handled in order: `contracts/failure-codes.v1.json` (04, 05, 07 app
 | gateway token read | 14 | 60 | 30 |
 
   Sum of caps: 2,610 lines. **Hard ceiling: 2,900 lines of Rust source** (all of the above, blank lines and comments included), counted by `find packages/config/rust/src packages/git/node-addon/src/config.rs apps/fgos/src packages/host-runtime/rust/src/catalog.rs -name '*.rs' | xargs wc -l` before and after (the delta is the count; the apps/fgos baseline is subtracted), reported in every commit message. Node source cap: confinement 260, `machine-config.mjs` 90, `config-checks.mjs` 140, reader and registration edits 120, command-registry entry 50 (sum 660). If the ceiling or a cap is reached the phase stops and asks; it never trims requested behaviour to fit.
+- **Measured at close (2026-10-24; `git fetch origin`, then `git diff --shortstat $(git merge-base origin/main HEAD) HEAD -- <path>` per path):** `packages/config/rust/src` +2,971/-82, `src/runner/dispatch/confinement` (Node) +224/-35, `apps/fgos/src` +190, `packages/durable-file/rust/src` +25/-3: **net about 3,290 lines**, inside the 3,300 ceiling (raised from 2,900 on 2026-10-24 09:13). Two files outside that path set add to it: `packages/host-runtime/rust/src/catalog.rs` +25/-1 and `src/cli/command-registry.mjs` +18, so counted with them the net is about 3,330. Rust source gross added (config crate, `apps/fgos/src`, durable-file, `catalog.rs`): 3,211 against an estimate of 2,360 for phases 00 to 10 (the 2,450 above minus 90 for the moved phases 11 and 14): **overrun factor about 1.36x** over D's own estimate, which was already base x 1.8. Node confinement came in under its cap (224 against 260). The moved phases keep their caps (config.rs 110, gateway token read 60) and carry the factor in Slice C's budget.
 - Crate size after D: about 4,800 lines of Rust source. That is a signal, not a defect (the crate is the Config component), but see Ideas I1.
 
 ## Constraints
@@ -248,7 +255,9 @@ Slice-level frame approval: the scope, the budget (2,450 estimate, 2,900 ceiling
 
 ## Slice C after D (scope list kept consistent)
 
-C keeps: the native-door entries `snapshot`, `explain`, `applyPatch` in the `config` namespace D created, the Node facade replacing `src/config/*`, moving every remaining reader (seven direct readers of `config.json`, `mergeWithGlobalConfig`, the five `JSON.stringify` writers, the write-on-read) and deleting the old paths, the real `detected` PATH probe and the executor template data, `init` and its setup call, the main-checkout `trusted_root` for the door's `snapshot` (D reuses `trusted_main_root`), the stronger confined fact if wanted, `LOCK_FILES` rows for the two new locks in `src/setup/holder-lock-checks.mjs`, `.githooks/pre-commit` running `fgos config check`, retiring the other 13 `registerConfigDefault` calls and `DEFAULT_RUNNER_CONFIG`, the architecture test "no config read outside the facade", raising `config-format-legacy-json` to a failure, and (if G-D1 = A) **the live migration of this repository as its first step**. C no longer carries: doctor rows, the `fgos config` verbs, `~/.fgos/private` creation, migration, the comment renderer, G6. Slice C's own precondition from D: every machine has run stage 1 (the snapshot refuses a wrong-file key that has no destination).
+**Updated 2026-10-24 (owner decision, option B):** Slice C also takes this plan's phases 11 to 14 (native door `check`, `fix`, `accounts`; Node doctor rows and setup; account readers; gateway token reader) and stage 2 of phase 15; its plan places them. The list below is the original statement; the doctor rows and the door's first three entries are no longer "done by D".
+
+C keeps: the native-door entries `snapshot`, `explain`, `applyPatch` in the `config` namespace D created, the Node facade replacing `src/config/*`, moving every remaining reader (seven direct readers of `config.json`, `mergeWithGlobalConfig`, the five `JSON.stringify` writers, the write-on-read) and deleting the old paths, the real `detected` PATH probe and the executor template data, `init` and its setup call, the main-checkout `trusted_root` for the door's `snapshot` (D reuses `trusted_main_root`), the stronger confined fact if wanted, `LOCK_FILES` rows for the two new locks in `src/setup/holder-lock-checks.mjs`, `.githooks/pre-commit` running `fgos config check`, retiring the other 13 `registerConfigDefault` calls and `DEFAULT_RUNNER_CONFIG`, the architecture test "no config read outside the facade", raising `config-format-legacy-json` to a failure, and (if G-D1 = A) **the live migration of this repository as its first step**. C does not carry: the `fgos config` verbs, migration, the comment renderer, G6 (all landed here). `~/.fgos/private` creation by `fgos setup` and the doctor rows are back in C (phase 12), with the door's `check`, `fix`, `accounts` entries (phase 11). Slice C's own precondition from D: every machine has run stage 1 (the snapshot refuses a wrong-file key that has no destination).
 
 ## Success criteria (observable)
 
