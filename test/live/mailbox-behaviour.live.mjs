@@ -670,10 +670,11 @@ function otherStageRuns() {
   });
 }
 
-/** The 2A mark gate of a stage's sheet: each run must carry a mark its kind allows. */
+/** The 2A mark gate of a stage's sheet, against the stage's runs in the results ledger now. */
 function markGate(sheet, results) {
-  const byId = new Map(results.map((r) => [r.runId, r]));
-  return v7j.markProblem(sheet, (id) => (byId.has(id) ? v7j.marksFor(byId.get(id)) : []));
+  const stage = /-([AB])\.md$/.exec(sheet)?.[1];
+  const cells = MEASURE.cells();
+  return v7j.markProblem(sheet, { required: v7j.markRuns(results, cells, stage), resultsSha: v7j.resultsShaOf(results, cells, stage) });
 }
 
 /** The controller's marks of a 2A addendum's stage sheets that hold, merged. */
@@ -823,15 +824,21 @@ function cmdReportAddendum({ stage, sample, dry, compare, compares }) {
 function writeMarkSheet(base, results, stage) {
   if (!stage) die('a mark sheet is drawn per stage: --stage A or B', 2);
   const file = path.join(base, `${MEASURE.sample}-${stage}.md`);
-  if (fs.existsSync(file)) die(`${file} exists; a sheet is drawn once and marked in place`);
+  const resultsSha = v7j.resultsShaOf(results, MEASURE.cells(), stage);
+  if (fs.existsSync(file)) {
+    // A sheet is drawn once per ledger state: only one drawn from other results lines is set aside and drawn again.
+    if (fs.readFileSync(file, 'utf8').includes(`Results-sha256: ${resultsSha}`)) die(`${file} exists for these results; it is marked in place`);
+    fs.renameSync(file, file.replace(/\.md$/, `.stale-${Date.now()}.md`));
+  }
   const bodies = readData().bodies;
   const list = MEASURE.marked.markRuns(results, stage);
-  const lines = [`# Mark sheet, ${ADDENDUM_NAME}, stage ${stage}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, '',
+  const lines = [`# Mark sheet, ${ADDENDUM_NAME}, stage ${stage}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, `Results-sha256: ${resultsSha}`, '',
     `The controller marks every run below in ${path.basename(v7.controllerMarkFile(file))} beside this file: {"markedBy": …, "markedAt": <after Drawn-at>, "sampleSha256": <this file's sha256>, "marks": {"<runId>": <mark>}}.`,
     `Valid runs: ${Object.entries(v7j.MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`,
-    `Excluded runs: ${Object.entries(v7j.EXCLUDED_MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`, ''];
+    `Excluded or failed runs: ${Object.entries(v7j.EXCLUDED_MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`,
+    'A valid run\'s mark decides where it disagrees with the oracle\'s acted flag; the report lists every disagreement.', ''];
   for (const r of list) {
-    const reason = r.outcome === 'not-reached' || r.outcome === 'channel-mismatch' ? `excluded: ${r.outcome}${r.unclaimed ? ' (unclaimed)' : ''}` : 'valid';
+    const reason = v7j.marksFor(r).includes('acted') ? `valid${r.scoredAs ? ` (acted; scored ${r.scoredAs})` : ''}` : `not valid: ${r.outcome}${r.error ? ` (${r.error})` : ''}${r.unclaimed ? ' (unclaimed)' : ''}`;
     lines.push(`## ${r.runId} (${r.cell}): ${reason}`, '', `Marks allowed: ${v7j.marksFor(r).join(', ')}`, `Oracle acted: ${r.acted}; regex pre-label: ${r.label ?? '-'}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[r.variant].body])}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '');
   }
   fs.writeFileSync(own(file), `${lines.join('\n')}\n`);

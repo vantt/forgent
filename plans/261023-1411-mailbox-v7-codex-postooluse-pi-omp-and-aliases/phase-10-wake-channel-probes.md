@@ -102,4 +102,12 @@ Part B gave Claude Code the bare nudge; its real channel, the session socket, wr
   - **Running order.** The paths run one at a time, harmful cells first in each round.
   - **Freezing.** The live driver is frozen by hash.
   - **`run-cell`** is refused under an addendum.
-- **Module:** `scripts/lib/mailbox-behaviour-v7j.mjs`. 25 mutants of the fixes were all killed. Every dry wiring run gave its outcome.
+- **Third review:**
+  - A path stopped by exclusions above 20 percent cannot start stage B.
+  - Each sheet names every run of its stage from the results ledger and records the ledger's sha256. The gate recomputes both, and the marks must cover exactly those runs.
+  - A run the oracle finds acted counts as acted whatever its outcome, in every cell.
+  - Harmful valid runs are on the sheet; the mark decides any disagreement with the oracle, and the report lists and counts them.
+  - A recovered orphan is excluded as `orphan`.
+  - Trust boundary: the controller commits the mark file to the branch, at a commit later than the sheet's.
+- **Labels:** version 2 is labelled "default (option A)", the owner's receiver rule of 2026-10-24.
+- **Module:** `scripts/lib/mailbox-behaviour-v7j.mjs`. 34 mutants were all killed (one earlier mutant retired with the rule it tested). Every dry wiring run gave its outcome.
