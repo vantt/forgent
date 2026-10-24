@@ -175,13 +175,13 @@ pub(crate) fn accounts_source(global_dir: &Path, max: usize) -> Result<Src, File
     })
 }
 
-/// Whether the token file exists beneath the global directory (a symlink or an error is "no").
-fn token_exists(global_dir: &Path) -> bool {
-    let Ok((parent, dir)) = split_global(global_dir) else {
-        return false;
-    };
+/// Size and revision of the token file beneath the global directory; none when it is absent, a
+/// symlink or unreadable. Its presence decides which global keys are shadowed, so the cache keys on it.
+pub(crate) fn token_revision(global_dir: &Path) -> Option<(usize, String)> {
+    let (parent, dir) = split_global(global_dir).ok()?;
     let path = dir.join("private/gateway-token");
-    matches!(read_beneath(parent, &path, 1024), Ok(Some(_)))
+    let file = read_beneath(parent, &path, 1024).ok()??;
+    Some((file.bytes.len(), file.revision))
 }
 
 /// Opens each source once.
@@ -319,7 +319,7 @@ pub(crate) fn build(
     req: &SnapshotRequest,
     srcs: &[Src],
 ) -> Result<Snapshot, SnapshotError> {
-    let token = req.class == SessionClass::Unconfined && token_exists(&req.global_dir);
+    let token = req.class == SessionClass::Unconfined && token_revision(&req.global_dir).is_some();
     let (docs, errors, notices) = load_sources(ctx, srcs, token);
     fail_if_any(errors)?;
     let json = |role: &str| docs.get(role).map(|(_, json)| json.clone());
