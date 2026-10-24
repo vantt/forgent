@@ -1,4 +1,60 @@
 {
+  "headerBlocks": {
+    "date": "2026-10-24",
+    "inputHead": "f647fc6173d8507594a27c35505221b0b1e0ad81",
+    "status": "headers-complete-verification-blocked",
+    "files": [
+      "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "docs/platform/work-state/contracts/non-transitioning-records.md"
+    ],
+    "driftingRows": 0,
+    "appliedRows": 0,
+    "rebindings": [],
+    "reviewChanges": 0,
+    "textPreservation": "Removing the new header fields/fence and Related links line exactly restores each input-HEAD document; Document type, Owner, Status, Source and all body claims are preserved.",
+    "metadataProof": "Owning headerBlock/headerFields/relatedPaths/relativeLinkTargets helpers on these four explicit files only; required candidate fields, review date and every file link/path resolve. Not H or gate acceptance.",
+    "scratch": "/tmp/fgos-work/w6-header/",
+    "adaptation": "Temporary wrappers relocate only scratch destinations, scratch import/subprocess resolution and the misc verifier report destination into rebind/header-misc-checks.json. Original __file__/ROOT, HEAD pin, historical inputs, extractors and all assertions/comparisons remain unchanged. No verifier report was emitted because its assertion failed.",
+    "commands": [
+      {
+        "command": "python3 -B /tmp/fgos-work/w6-header/run-scoped.py drift header-before",
+        "original": "reports/phase-09/rebind/rebind.py --check",
+        "exit": 0,
+        "result": {"drift": 0, "rows": []}
+      },
+      {
+        "command": "python3 -B /tmp/fgos-work/w6-header/run-scoped.py misc header-misc-rebind",
+        "original": "reports/phase-09/misc-fix/rebind.py --check",
+        "exit": 0,
+        "result": {"effectiveBindingsChecked": 283, "changedRows": 27, "contentChangedRows": 21, "sourceHead": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2"},
+        "note": "Replay of existing historical overlays, not 27 new edits."
+      },
+      {
+        "command": "python3 -B /tmp/fgos-work/w6-header/run-scoped.py verify header-misc-verify",
+        "original": "reports/phase-09/misc-fix/verify.py",
+        "exit": 1,
+        "failure": "AssertionError: proof.json at assert a==b==(ROOT/G6/name).read_bytes() (line 64)",
+        "recordedG6SourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+        "note": "Same failure already documented in the prior receipt. G6 reads tracked source blobs at input HEAD, not these uncommitted headers. No assertion, source pin or delivered artifact was substituted."
+      },
+      {
+        "command": "node /tmp/fgos-work/w6-header/check-headers.mjs",
+        "exit": 0,
+        "result": "Four headers complete; original text preserved; Related paths and relative file links resolve. Not H."
+      },
+      {
+        "command": "python3 -B /tmp/fgos-work/w6-header/run-scoped.py drift header-after",
+        "original": "reports/phase-09/rebind/rebind.py --check",
+        "exit": 0,
+        "result": {"drift": 0, "rows": []}
+      },
+      {"command": "git diff --check", "exit": 0}
+    ],
+    "blocker": "Required misc-fix/verify.py exit 0 remains unmet; final-pin G6 recomposition is outside this write scope and remains Lead custody.",
+    "notRun": ["rebind author mode (zero drift)", "A/B/H and audit-report.py (Lead after merge)", "pair accounting", "fgos CLI or lifecycle verbs", "npm/Cargo suites or tests", "markdown preview (Lead custody; no service/state writes)"]
+  },
   "inputHead": "8cab0204d0c5399390a12121b6e663ec35248a8e",
   "status": "applied",
   "extractors": [

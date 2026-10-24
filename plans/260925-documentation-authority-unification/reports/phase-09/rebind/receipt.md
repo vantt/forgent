@@ -1,5 +1,68 @@
 # Ownership rebind receipt — applied; final verification still deferred
 
+## 2026-10-24 — header blocks
+
+Input HEAD: `f647fc6173d8507594a27c35505221b0b1e0ad81`.
+Authority: the four-document header brief; no authority promotion or gate acceptance.
+
+Added fenced `txt` headers immediately under the H1 in:
+
+- `docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md`
+- `docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md`
+- `docs/platform/runner/contracts/conserved-dispatch-doctrine.md`
+- `docs/platform/work-state/contracts/non-transitioning-records.md`
+
+Each has Document type, Audience, Purpose, Design status, Last reviewed
+`2026-10-24` and Related paths, with clickable Related links immediately after
+the block. Owner, exact Status wording, Source where present, and every body
+claim remain intact. An exact text-preservation assertion restores each
+input-HEAD file by removing only the added fields/fence and Related links line.
+The superseded YAML pointer is not presented as current maintenance guidance;
+STR70a remains proposed; all candidate/authority boundaries are unchanged.
+
+Read the embedded `checks.mjs` and its native checker: H delegates to
+`checkCandidateMetadata`; `headerBlock` requires a fenced `txt` block directly
+under the H1, and `headerFields` reads named fields inside it. Reused those
+owning header/link helpers on the four explicit paths for a bounded static
+check, **not a run or acceptance of H**. All required fields, Related paths and
+relative file-link targets pass.
+
+| Check | Exit | Observed result |
+|---|---:|---|
+| `rebind/rebind.py --check`, after headers and again after static assertions | 0 / 0 | Zero drifting rows both times |
+| `misc-fix/rebind.py --check` | 0 | 283 historical effective bindings; 27 unchanged overlays (21 content) |
+| `misc-fix/verify.py` | **1** | `AssertionError: proof.json`, line 64, unchanged three-way byte comparison |
+| Four-file owning header/link helpers and exact text preservation | 0 | All four pass; not H |
+| `git diff --check` | 0 | Clean whitespace |
+
+No author-mode rebind was needed: **zero rows applied, zero review changes**.
+The original 217-row applied record and rereview list below remain untouched.
+The dated `headerBlocks` section in [rebindings.json](rebindings.json) records
+this run separately, including exact wrapper commands and the failed proof.
+
+All Python runs used scratch-only wrappers under `/tmp/fgos-work/w6-header/`
+to obey this brief's scratch boundary. They retain original `__file__`/ROOT,
+HEAD/source pins, historical inputs, extractors and every assertion/comparison;
+only scratch paths/import/subprocess resolution and the verifier's otherwise
+out-of-scope report destination are relocated. No report was emitted by the
+failed verifier. The literal, unadapted invocations are not claimed as run.
+
+**Unmet requirement:** the misc verifier's requested exit 0 remains blocked by
+the same `proof.json` failure documented in the prior receipt. Its G6 proof
+uses tracked source blobs at input HEAD, not these uncommitted headers; the
+delivered G6 artifact records source commit
+`4178dcc6e3445d5d9b8ffd55963cdd02a418af73`. No source pin, assertion or delivered
+G6 artifact was changed to force green. Final-pin recomposition remains Lead
+custody outside this writable list. This run does not claim A/B/H,
+`audit-report.py`, pair accounting, independent review or final readiness.
+
+No Git write, fgOS CLI/lifecycle verb, product code/test edit, npm/Cargo suite,
+`.fgos/`/secret access or preview service. Impact-analysis capability query was
+not run under the brief's no-CLI rule; no product symbol changed. Markdown
+preview remains Lead custody. No additional write scope is requested.
+
+## Prior ownership rebind — historical receipt
+
 Input HEAD: `8cab0204d0c5399390a12121b6e663ec35248a8e`.
 Authority: L12-137 / the ownership rebind apply brief. No gate acceptance.
 

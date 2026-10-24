@@ -1,8 +1,19 @@
 # Gateway Readiness Contracts
 
+```txt
 Document type: Contract
+Audience: Gateway and packaging-distribution maintainers, implementation agents, conservation reviewers
+Purpose: Preserve machine-token startup refusal and the web client's baseUrl-only reachability interpretation
+Design status: Candidate conservation of existing behavior; no new startup path or authority promotion
+Last reviewed: 2026-10-24
+Related:
+- docs/platform/herdr-web-dashboard/spec.md
+- docs/platform/packaging-distribution/spec.md
+```
+
 Owner: Gateway / packaging-distribution
 Status: Candidate conservation; existing behavior, no new startup path.
+Related links: [Gateway spec](../spec.md), [Packaging-distribution spec](../../packaging-distribution/spec.md).
 
 ## Machine Token And Startup Refusal
 
