@@ -417,6 +417,27 @@ pub fn sync_directory(dir: &Path) -> io::Result<()> {
     file.sync_all()
 }
 
+/// Windows counterpart of the no-follow open: opens `path` with `options` without following a
+/// reparse point (symlink, junction) at the leaf, and refuses a handle that is one or is not a
+/// regular file. Replaces any custom flags already set on `options`. Components above the leaf
+/// are the caller's trusted directory.
+#[cfg(windows)]
+pub fn open_no_reparse(options: &mut OpenOptions, path: &Path) -> io::Result<fs::File> {
+    use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
+    use windows_sys::Win32::Storage::FileSystem::{
+        FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_OPEN_REPARSE_POINT,
+    };
+    let file = options.custom_flags(FILE_FLAG_OPEN_REPARSE_POINT).open(path)?;
+    let metadata = file.metadata()?;
+    if metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 || !metadata.is_file() {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "refused: not a regular file (link or reparse point)",
+        ));
+    }
+    Ok(file)
+}
+
 #[cfg(unix)]
 mod beneath;
 #[cfg(unix)]

@@ -378,6 +378,27 @@
       }
     },
     {
+      "name": "login-wording-inside-agent-text-on-a-blocked-screen-is-needs-human",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "The notes say: not logged in means you should run /login first.\nDo you want to proceed with the edit?",
+            "inspection": {
+              "state": "blocked",
+              "visibleBlocker": true
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "needs-human",
+        "readiness": "needs-human"
+      },
+      "source": "a question the agent asked that quotes login wording mid-sentence; only a line that starts with the wording is the CLI's own error"
+    },
+    {
       "name": "exit-command",
       "step": "exit-command",
       "script": {

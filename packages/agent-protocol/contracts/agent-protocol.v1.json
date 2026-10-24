@@ -2,10 +2,8 @@
   "contract": { "id": "agent-protocol", "version": 1 },
   "description": "Agent protocol (L3, crate fgos-agent-protocol): one pure state machine per CLI x launch mode. It reads what the agent shows and names what happened; it never opens a tab, picks a model, changes a timeout or decides a retry. It does not build argv: argv comes from the executor configuration through resolveExecutorCommand (src/runner/dispatch/transport.mjs) and is written into the envelope (owner decision 2026-10-16).",
   "io": {
-    "description": "Port the supervisor wires to the adapter: a capture file tail (direct) or terminal-control by key (terminal, 6.3).",
+    "description": "Port the supervisor wires to the adapter: terminal-control by key (terminal, 6.3). The direct mode reads no port: its adapter is handed the exit and the capture tail.",
     "send": { "input": { "text": "string or null", "keys": "string[] or null", "submit": "boolean" }, "modes": ["terminal"] },
-    "read": { "output": { "lines": "string[], new lines since the previous read (stdout capture in direct mode, screen in terminal mode)" } },
-    "activity": { "output": "monotonic counter or absent; increments on anything the idle timer counts as activity" },
     "screen": { "output": "string, the whole visible screen right now", "modes": ["terminal"] },
     "inspect": { "output": { "state": "string or null (idle, working, blocked, done)", "visibleBlocker": "boolean", "visibleIdle": "boolean", "visibleWorking": "boolean", "matchedRule": "boolean, a screen rule vouched for the verdict", "promptText": "string, the composer text the rule saw" }, "modes": ["terminal"], "meaning": "the multiplexer's own agent detection for the pane (terminal-control inspect with detail); never a guess of the supervisor" },
     "clock": { "output": "now_ms (monotonic) and pause(ms); every wait of an adapter goes through them so a vector can run on a virtual clock" }
@@ -20,10 +18,9 @@
     "exited": { "code": "integer or null", "meaning": "the agent process exited without a result file" }
   },
   "directAdapter": {
-    "inputs": "envelope.launch (stdinPolicy, briefPath, outboxDir, capture paths), the agent exit reported by gate-exit, and the capture tail",
+    "inputs": "envelope.launch (briefPath, outboxDir, capture paths), the agent exit reported by gate-exit, and the capture tail",
     "decides": [
-      "stdinPolicy for the CLI (codex must use null: it probes piped stdin and blocks; transport.mjs comment at the stdin: 'ignore' spawn)",
-      "activity source for idle: growth of the stdout capture, or JSON events when the executor's liveOutput says the CLI streams events",
+      "activity source for idle: growth of the stdout capture (any new text, a JSON event line included)",
       "completion: agent exited and outbox/result-<N>.json exists -> completed; exited without it -> exited(code) unless a blocked/needs-human pattern was read",
       "named blocked results from known output patterns (login prompt, trust dialog, usage limit)"
     ]
@@ -33,7 +30,7 @@
     "columns": ["direct", "terminal"],
     "cells": {
       "claude": { "direct": "6.2", "terminal": "6.3" },
-      "codex": { "direct": "6.2 (stdinPolicy null)", "terminal": "6.3" },
+      "codex": { "direct": "6.2", "terminal": "6.3" },
       "agy": { "direct": "6.2", "terminal": "6.3" },
       "pi": { "direct": "6.2", "terminal": "6.3" },
       "omp": { "direct": "6.2", "terminal": "6.3" }
