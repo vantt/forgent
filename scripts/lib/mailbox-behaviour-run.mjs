@@ -99,7 +99,10 @@ export function cellOfRunId(runId) {
   const [cli, arm, variant, channel] = parts.length === 5 ? parts : [parts[0], null, ...parts.slice(1)];
   const tail = channel === 'base' ? variant : `${variant}/${channel}`;
   // A scoped cell's run part (`LR-in`) names the cell; its variant is the part before the scope.
-  return { id: `${cli}/${arm ? `${arm}/` : ''}${tail}`, cli, ...(arm ? { arm } : {}), variant: variant.split('-')[0], channel: channel === 'base' ? null : channel };
+  // A part naming an untrusted sender (`LRU-out`) is the variant `LR` when `LRU` is no variant.
+  const head = variant.split('-')[0];
+  const plain = score.VARIANTS[head] || head === score.BASELINE || !head.endsWith('U') ? head : head.slice(0, -1);
+  return { id: `${cli}/${arm ? `${arm}/` : ''}${tail}`, cli, ...(arm ? { arm } : {}), variant: plain, channel: channel === 'base' ? null : channel };
 }
 
 /** A cell's progress from the results: attempts (provider limits excluded), valid runs, and the next attempt number. */
@@ -438,13 +441,16 @@ export const taskFor = (ctx, cell) => ctx.taskOf?.(cell) ?? ctx.data.task;
 /** The valid runs `cell` needs in `stage`: the measurement's own (`ctx.goalOf`), else the baseline count or the stage `target`. */
 export const goalFor = (ctx, cell, stage, target) => ctx.goalOf?.(cell, stage) ?? (cell.variant === score.BASELINE ? score.RULES.BASELINE_RUNS : target);
 
+/** The session id a cell's message is sent from: the cell's own sender, else its variant's. */
+export const senderFor = (cell) => score.SENDERS[cell.sender ?? score.VARIANTS[cell.variant].sender].sessionId;
+
 export async function runOne(ctx, cell, runId) {
   const { base, data } = ctx;
   const paths = confined.runPaths(base, runId);
   const baseline = cell.variant === score.BASELINE;
   const variant = baseline ? null : score.VARIANTS[cell.variant];
   const body = variant ? data.bodies[variant.body] : '';
-  const sender = variant ? score.SENDERS[variant.sender].sessionId : null;
+  const sender = variant ? senderFor(cell) : null;
   const instruction = renderInstruction(data.instruction, [score.SENDERS.trusted.label]);
   const { lastMessage } = paths;
   const ext = EXTENSION_CLIS.includes(cell.cli);

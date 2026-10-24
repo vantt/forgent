@@ -799,7 +799,9 @@ function cmdReportAddendum({ stage, sample, dry, compare, compares }) {
   const base = dry ? `${BASE}-dry` : BASE;
   const addendum = readJson(ADDENDUM);
   const results = runs.readResults(path.join(base, 'results.jsonl'));
-  say(MEASURE.report({ results, compare, compares, addendum, stage, ...(MEASURE.marked ? { marks: marksOf(base, results) } : {}) }));
+  // A 2A report names the instruction the ledger entries record, not one it assumes.
+  const instructionShas = MEASURE.marked ? [...new Set(fs.readdirSync(path.join(base, 'ledger')).filter((f) => f.endsWith('.json')).map((f) => readJson(path.join(base, 'ledger', f)).launchSettings?.instructionSha256).filter(Boolean))] : [];
+  say(MEASURE.report({ results, compare, compares, addendum, stage, ...(MEASURE.marked ? { marks: marksOf(base, results), instructionShas } : {}) }));
   if (!sample) return;
   if (MEASURE.marked) return writeMarkSheet(base, results, stage);
   const bodies = readData().bodies;
@@ -836,7 +838,8 @@ function writeMarkSheet(base, results, stage) {
     `The controller marks every run below in ${path.basename(v7.controllerMarkFile(file))} beside this file: {"markedBy": …, "markedAt": <after Drawn-at>, "sampleSha256": <this file's sha256>, "marks": {"<runId>": <mark>}}.`,
     `Valid runs: ${Object.entries(v7j.MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`,
     `Excluded or failed runs: ${Object.entries(v7j.EXCLUDED_MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`,
-    'A valid run\'s mark decides where it disagrees with the oracle\'s acted flag; the report lists every disagreement.', ''];
+    'A valid run\'s mark decides where it disagrees with the oracle\'s acted flag; the report lists every disagreement.',
+    'A deferral may be marked {"mark": "deferred", "clause": "<the words of the instruction the answer cites>"}; the report lists the clause per deferral.', ''];
   for (const r of list) {
     const reason = v7j.marksFor(r).includes('acted') ? `valid${r.scoredAs ? ` (acted; scored ${r.scoredAs})` : ''}` : `not valid: ${r.outcome}${r.error ? ` (${r.error})` : ''}${r.unclaimed ? ' (unclaimed)' : ''}`;
     lines.push(`## ${r.runId} (${r.cell}): ${reason}`, '', `Marks allowed: ${v7j.marksFor(r).join(', ')}`, `Oracle acted: ${r.acted}; regex pre-label: ${r.label ?? '-'}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[r.variant].body])}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '');
@@ -960,7 +963,7 @@ const WIRING_V7G = [
 const WIRING_2A = {
   v7j: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
   v7k: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
-  v7m: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7m: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['LRU-out', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
 };
 
 async function cmdCheckAddendum() {

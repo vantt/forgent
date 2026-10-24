@@ -260,3 +260,10 @@ test('a cell that names a scope of its variant gets its own run ids, which recov
   assert.deepEqual(runs.cellOfRunId('claude.T.LR-in.NU.001'), { id: 'claude/T/LR-in/NU', cli: 'claude', arm: 'T', variant: 'LR', channel: 'NU' });
   assert.equal(runIdOf({ id: 'claude/LR/PT', cli: 'claude', variant: 'LR', channel: 'PT' }, 2), 'claude.LR.PT.002', 'a cell without one keeps its old id');
 });
+
+test('a cell may name its own sender, and a run id naming an untrusted read recovers into the LR variant', () => {
+  assert.equal(runs.senderFor({ variant: 'LR', sender: 'untrusted' }), 'outsider');
+  assert.equal(runs.senderFor({ variant: 'LR' }), 'planner1');
+  assert.deepEqual(runs.cellOfRunId('claude.T.LRU-out.PT.001'), { id: 'claude/T/LRU-out/PT', cli: 'claude', arm: 'T', variant: 'LR', channel: 'PT' });
+  assert.equal(runs.cellOfRunId('claude.LWU.PT.001').variant, 'LWU', 'a real variant ending in U stays');
+});

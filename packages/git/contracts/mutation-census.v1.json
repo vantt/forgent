@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1c72bfab9fba290d7ea2e739af6a85ffc47c32a9dd7c9278b4377a9a11c4902f",
+  "payloadDigest": "56bbcfc2ca819d583e8ad63f9e20ce28a62a756d022a2a895da74ace95ab62b3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -827,7 +827,7 @@
     "scripts/lib/git-spawn-match.mjs": "f8c8a14a0ff3c4c9aa516850a22a7b1fc22d4aac4eb33641c5a20a28ff299b28",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
-    "scripts/lib/mailbox-behaviour-run.mjs": "37be35e6f0b380f70847080c24d9ed6f1672e4a74466c9f4f6522b68a172db26",
+    "scripts/lib/mailbox-behaviour-run.mjs": "e4f2904c8d53726e1b48529079c9050ecad6e542f29f82295e50255361bacfe4",
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
     "scripts/lib/mailbox-behaviour-v7.mjs": "e0637f9dfead031f9a6ef973db81c45a9362c48dfb871dc65412748c3728c1ff",
     "scripts/lib/mailbox-behaviour-v7e.mjs": "2d841d3c7127b5f220190a7c78ecbbc6cf316a8af479584d43c674dae38781bd",
@@ -835,7 +835,7 @@
     "scripts/lib/mailbox-behaviour-v7g.mjs": "0694d46306095dcdad54ef4d9f1055211433161139ba41c49268be7212604111",
     "scripts/lib/mailbox-behaviour-v7h.mjs": "9a0c2076391363fa24238e69bc1a047762182835af8f9980e61fddef933a7e73",
     "scripts/lib/mailbox-behaviour-v7i.mjs": "0059548c4a97e93061c0951d87c4b156d19211b4e05ae47cde089bb6f456aff9",
-    "scripts/lib/mailbox-behaviour-v7j.mjs": "2fb9fc4ec5f808ae20f8c10d2ac03a38e167108ca905af3077cdfbffa78eda03",
+    "scripts/lib/mailbox-behaviour-v7j.mjs": "bfd63e390ba432bf1fbc25da7c69eb1255f6678151875cf90aa2041678676d45",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "f9bab032c9496f8201be1c275e79f2bc0d9fe6741c0352b37e953447f3db6bb7",
     "scripts/lib/mailbox-role-recorder.mjs": "b45702d191ab0ce223c9be0795fd9b573d73ff5a88a89007457de1da24f4c8ae",
@@ -3039,8 +3039,8 @@
     },
     {
       "path": "scripts/lib/mailbox-behaviour-run.mjs",
-      "line": 850,
-      "spawn": "runOne -> scripts/lib/mailbox-behaviour-run.mjs:459",
+      "line": 856,
+      "spawn": "runOne -> scripts/lib/mailbox-behaviour-run.mjs:465",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
       "function": "runStage"
