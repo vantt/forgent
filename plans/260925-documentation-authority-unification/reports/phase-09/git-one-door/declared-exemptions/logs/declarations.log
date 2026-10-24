@@ -1,0 +1,14 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (15.63901ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (5.187219ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (7.528175ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.86504ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (3.058025ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.387649ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 89.697074

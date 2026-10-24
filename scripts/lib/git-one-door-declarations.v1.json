@@ -1,0 +1,181 @@
+{
+  "schema": "git-one-door-declarations.v1",
+  "declarations": [
+    {
+      "path": ".githooks/pre-commit",
+      "siteId": "leaseGitRead:9255f52f42825e097705fa0572fd14d13f16ee94f2e31eea33034ff36560c590",
+      "class": "hook-read-context",
+      "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
+      "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
+      "verbs": ["cat-file", "ls-tree", "show-ref", "diff", "show", "symbolic-ref read", "rev-parse", "diff-tree", "rev-list"]
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "siteId": "runVerb:53e53c2a74a00e28aa957af1ae7d5248385aa34fe07fbfa04c321c47839b4eec",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "siteId": "runVerb:3a0732fb58eb3197745e010e072f0b5abb60521c8fb25f12eeb1c7d7dcb97fc2",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "validateSourceUnitCoverage:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: ls-tree -l needs size-only blob metadata, mode and OID. Inspect listTree lacks size; reading every body through readObjects exceeds its 32 MiB bound or reads gigabytes just to learn sizes.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "validateCommitBlobIntegrity:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: immutable blob-integrity validation needs size-only ls-tree -l metadata, mode and OID. Inspect listTree has no size and readObjects would read entire large artifacts solely for metadata.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "loadPreviousRegistries:15b3120da8596a3cce1e4f87d4c97fdd8b2cbb220755f3d21e4abdc6e950fed7",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: committed identity-registry JSON permits 1 GiB and can exceed Inspect's 32 MiB path/object ceiling; replacing it would narrow conservation checks.",
+      "retireWhen": "Committed-registry conservation and its proofs/consumers retire, or Git supplies an equivalent large-object reader."
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "siteId": "git:53debf93da60e2b113507b6e7bf34109035481375d31fe905ed98c347a753560",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
+      "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
+    },
+    {
+      "path": "scripts/doc-alias-resolver.mjs",
+      "siteId": "readOldDocument:700c771104fc5ac3f19c796eca2e653e1a38fb9061c9cd33e28e08969f802002",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: the historical Markdown reader permits 64 MiB; Inspect stops at 32 MiB and has no ranged/streamed blob port. Lowering the allowance would narrow the resolver contract.",
+      "retireWhen": "The historical reader and migration/alias consumers retire, or Git supplies an equivalent bounded read."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "readBlobBufferAtCommit:75f7006a6d16ad26688b112f1750fae1106d557ca17ffd74e8c765e575e2a61d",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable binary show is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; changing the generator invalidates phase-06 reproduction check B.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "registryBindsToCommit:f84b879cb0b77f01ec8bf30371ded0096a87c3dbe5b8acd1903029e959d01448",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "listCommitEntries:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized tree enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "listCommitPaths:5cabe3388545e9ecaac628cb5d7c0f72f1446b3583a54a8174033fa3a8845cd9",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "scanInScopeFiles:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized blob enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "readCommitBlobMap:59301094edd07e7f82c4b121accc8d06f6c55c9777c1eca3bd010b8a7b0eb807",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: blob batching is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "carryForwardIdentityRegistry:0a943128baabe04ac45449896e2dd10fc55f15ef9dd5a1ca21237abd27c423d6",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: sized entry lookup is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "resolveCommitSha:67539c0c154f72f4f547c9c5483b8b9e149080c4e5dad0eb434251e200b52bdc",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: explicit commit resolution is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "loadCommitTree:466434e47ec5f655be7a53b2e7c154107d75beb8f6db65c0a279c67323a688de",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: path enumeration is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "readBlobAtCommit:d9f8a50630af644e7b1c746bd04d04c8a47bb7daea80688b6ba5622a928a0821",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-3: immutable text show is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "siteId": "runPhase01Verification:00e89929f3077d6c9f80cb91c920432bdf17441b4abd7e3981315d2d05d3211e",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has commit resolution and entry listings but no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    },
+    {
+      "path": "scripts/verify-phase-01.mjs",
+      "siteId": "runPhase01Verification:eede3be66bbe8d82286b441978c16627c0da6cd08a936ef4d0b019f319100117",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: exact git diff --check includes repository whitespace policy and conflict-marker diagnostics; Inspect diff/diffText does not validate this and a JS approximation would weaken the verifier.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "siteId": "verifyForbiddenPhase02Diff:818919097a7279e97647ea6d9745d9ff9147d36d831f79dbc9c3a6b835490505",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: run('git', ['diff', '--check', ...]) reaches runOrThrow through a callback the scanner cannot resolve. Exact repository whitespace/conflict diagnostics have no equivalent Inspect validation; no check may be dropped.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "siteId": "runPhase02Verification:8b527625bcede9d16cf3d29172fbd2d31a6786f56297e07d33d15708552bf51a",
+      "class": "declared-tooling-exemption",
+      "reason": "Owner L13-6 / L13-2: receipt needs the exact commit tree OID from rev-parse <commit>^{tree}; Inspect has no typed commit-tree identity fact. Parsing commit headers here would duplicate Git parsing.",
+      "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git exposes commit-tree identity."
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "siteId": "landRunnerItem:8165a81879ec9c8a9ca3fccd2770f4503c92b11423008b6e579ed0835598712f",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "siteId": "landRunnerItem:b37bcbdb73dae348262e030c72754506c813c1d517dbc4684454a8adec28b19e",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "siteId": "runWorktreeSetupCommands:bb9514972db619239b027efa0a0bc3c59f089e1562d8335b179861fddae363a2",
+      "class": "configured-binary",
+      "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
+      "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+✖ a declaration classifies exactly one call, retains its rationale, and survives line shifts (5.385934ms)
+✖ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (1.518534ms)
+✖ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (1.337008ms)
+✖ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (7.031098ms)
+✖ an explicitly declared unresolved consumer command uses the existing configured-binary class (2.777475ms)
+✖ the census binds declaration bytes so doctor rejects missing or changed declarations (1.435086ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 77.33621
+
+✖ failing tests:
+
+test at test/scripts/git-one-door-declarations.test.mjs:23:1
+✖ a declaration classifies exactly one call, retains its rationale, and survives line shifts (5.385934ms)
+  AssertionError [ERR_ASSERTION]: The "string" argument must be of type string. Received type undefined (undefined)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:25:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /^readTree:[a-f0-9]{64}$/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:37:1
+✖ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (1.518534ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:42:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /stale or ambiguous Git declaration/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:46:1
+✖ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (1.337008ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:61:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:77:1
+✖ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (7.031098ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   [
+  -     'show-ref'
+  -   ],
+  -   [
+  -     'diff-tree'
+  -   ]
+  - ]
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:80:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ [ 'show-ref' ], [ 'diff-tree' ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:84:1
+✖ an explicitly declared unresolved consumer command uses the existing configured-binary class (2.777475ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   {
+  +     binary: '? unresolvedConfig()',
+  +     family: 'unresolved-binary',
+  +     line: 2,
+  +     path: 'scripts/read.mjs',
+  +     spawn: 'execFileSync'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:88:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { path: 'scripts/read.mjs', line: 2, spawn: 'execFileSync', binary: '? unresolvedConfig()', family: 'unresolved-binary' } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:92:1
+✖ the census binds declaration bytes so doctor rejects missing or changed declarations (1.435086ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'string'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/git-one-door-declarations.test.mjs:96:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'string',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

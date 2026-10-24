@@ -1,0 +1,63 @@
+{
+  "schema": "git-one-door-declaration-receipt.v1",
+  "head": "dac65ad8ba135e8acf33438c8790efc222133e37",
+  "authority": "W3 G4 brief; owner L13-6 (1)",
+  "outcome": "implemented; scanner and doctor pass; Git-owner review and staged existing proofs remain pending",
+  "declarationPath": "scripts/lib/git-one-door-declarations.v1.json",
+  "censusPath": "packages/git/contracts/mutation-census.v1.json",
+  "undeclaredBefore": 25,
+  "undeclaredAfter": 0,
+  "declaredClasses": {
+    "hook-read-context": 1,
+    "configured-binary": 5,
+    "declared-tooling-exemption": 19
+  },
+  "scannedFiles": 1108,
+  "classifiedRows": 287,
+  "payloadDigest": "063f8b56413eb43bf953b695081933b590f6e4a23d1a7219eefb7db34a6ab026",
+  "censusSha256": "5a7af356de55446f6c7efd6673794295ec80ef541d8b0a0952453ed59c96d122",
+  "scannerSha256": "620f5dee521c0cf7644c8ec661d0893e95b4ec1425fd92aedaf071e631eb0e3e",
+  "environment": {
+    "CLAUDE_CODE_SESSION_ID": "unset for every Node test and scan",
+    "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+    "TMPDIR": "/tmp/fgos-work/w3-g4-declare-brief/tmp",
+    "scanStateRoot": "/tmp/fgos-work/w3-g4-declare-brief/state",
+    "scanStateRootMode": "0700",
+    "scanLoader": "production explicit released-addon descriptor; no loader/check patch; actual source worktree"
+  },
+  "testCommandTemplate": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w3-g4-declare-brief/tmp FGOS_HOST_BIN=<environment.FGOS_HOST_BIN> node --test <file>",
+  "testsFirst": {
+    "file": "test/scripts/git-one-door-declarations.test.mjs",
+    "exit": 1,
+    "pass": 0,
+    "total": 6,
+    "log": "logs/tests-first.log"
+  },
+  "tests": [
+    { "file": "test/scripts/git-one-door-declarations.test.mjs", "exit": 0, "pass": 6, "total": 6, "log": "logs/declarations.log" },
+    { "file": "test/setup/git-mutation-census.test.mjs", "exit": 0, "pass": 1, "total": 1, "log": "logs/doctor.log" },
+    { "file": "test/git/one-door.test.mjs", "exit": 1, "pass": 4, "total": 6, "log": "logs/one-door.log", "gap": "Two repository-fixture scans cannot load the payload-local native addon in this worktree; not worked around." }
+  ],
+  "checks": [
+    { "command": "node /tmp/fgos-work/w3-g4-declare-brief/scan-source.mjs --write", "exit": 0, "repeated": true, "api": "createGitInspect with release descriptor -> scan({root,openInspect}) -> writeMutationCensus -> verifyCensus", "logs": ["logs/declared-source-scan.log", "logs/replay.log"], "doctorPassed": true },
+    { "command": "sha256sum -c /tmp/fgos-work/w3-g4-declare-brief/census-before.sha256", "exit": 0, "meaning": "Full census bytes unchanged across replay" },
+    { "command": "python3 -B /tmp/fgos-work/w3-g4-declare-brief/audit.py", "exit": 0, "evidence": "audit.json" },
+    { "api": "listLegacyNodeSourceFiles(root, openInspect)", "exit": 0, "declarationIncluded": true, "evidence": "payload-selection.json" },
+    { "command": "git hash-object scripts/generate-doc-inventory.mjs scripts/generate-shipped-path-inventory.mjs", "exit": 0, "pinnedBlobsUnchanged": true },
+    { "command": "git diff --check", "exit": 0 }
+  ],
+  "notRun": [
+    "test/setup/checks.test.mjs: top-level ensureScriptAddon can stage/build outside the writable list; needs a staged checkout",
+    "plain scanner CLI: automatic addon staging avoided; production scan API used instead",
+    "full suite, npm test, scripts/run-tests.mjs, Cargo: prohibited by the brief",
+    "runtime spawn-spy/full staged-release validation: not claimed",
+    "MDView preview: external registry/database writes are outside the write grant"
+  ],
+  "impactAnalysis": "degraded under no-CLI; source/import/history searches only",
+  "incidents": [
+    "Generic capability query attempted before reading the disk brief; fgos tool query refused at startup with exit 127 (no installation in this worktree). No successful fgOS CLI or lifecycle operation followed.",
+    "First implementation test run passed 5/6 because the new hook fixture lacked a Node shebang; fixture corrected, then 6/6. No production check bypassed."
+  ],
+  "gitOwnerReview": "requested, no verdict claimed",
+  "needsWrites": []
+}

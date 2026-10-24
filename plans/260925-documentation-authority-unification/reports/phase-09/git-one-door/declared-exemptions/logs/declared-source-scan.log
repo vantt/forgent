@@ -1,0 +1,20 @@
+{
+  "sites": [],
+  "classCounts": {
+    "standalone-skill-script": 3,
+    "hook-read-context": 22,
+    "configured-binary": 92,
+    "rust-test": 111,
+    "argv-runner": 13,
+    "production-sandbox-probe": 4,
+    "uncalled-wrapper": 20,
+    "git-driver": 1,
+    "declared-tooling-exemption": 19,
+    "sandbox-door": 2
+  },
+  "files": 1108,
+  "doctor": {
+    "passed": true,
+    "message": "no Git writer outside the fgos-git driver (1108 files scanned, payload digest 063f8b56413e)"
+  }
+}

@@ -26,6 +26,9 @@
 //   - rust-test: Rust code under `tests/` or `#[cfg(test)]`;
 //   - standalone-skill-script: code of a skill whose own SKILL.md declares `metadata.oneDoor: standalone`
 //     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
+// Explicit owner declarations extend these classes by exact path + function/call digest, never by
+// line number. Tooling that cannot use an existing port has its own declared-tooling-exemption class;
+// every declaration carries its reason and retirement condition and must match exactly one raw site.
 //
 // Usage: node scripts/git-one-door-scan.mjs [--json] [--root <dir>] [--write-census]
 // The release build writes the census (packages/git/contracts/mutation-census.v1.json); doctor's
@@ -50,7 +53,7 @@ const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'cmd', 'cmd.exe', 'powershe
 const PASSTHROUGH = new Set(['env', 'nice', 'timeout', 'xargs', 'sudo', 'nohup', 'stdbuf', 'npx']);
 const HOOK_NAMES = new Set(['pre-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit', 'pre-push', 'pre-rebase', 'post-checkout', 'post-merge', 'pre-receive', 'post-receive', 'update', 'reference-transaction', 'pre-merge-commit', 'post-rewrite']);
 // Verbs that only read, keyed by `hookVerb`: `reflog` and `symbolic-ref` count only in their read forms.
-const READ_VERBS = new Set(['reflog show', 'reflog exists', 'config --get', 'config --get-all', 'config --list', 'rev-parse', 'diff', 'show', 'cat-file', 'ls-files', 'ls-tree', 'log', 'merge-base', 'for-each-ref', 'symbolic-ref read', 'rev-list', 'var', 'version', '--version', 'check-attr', 'check-ignore', 'name-rev', 'describe']);
+const READ_VERBS = new Set(['reflog show', 'reflog exists', 'config --get', 'config --get-all', 'config --list', 'rev-parse', 'diff', 'show', 'cat-file', 'ls-files', 'ls-tree', 'show-ref', 'diff-tree', 'log', 'merge-base', 'for-each-ref', 'symbolic-ref read', 'rev-list', 'var', 'version', '--version', 'check-attr', 'check-ignore', 'name-rev', 'describe']);
 const WRITE_VERBS = /\bgit\s+(?:-C\s+\S+\s+)?(add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|restore|rm|mv|stash|tag|cherry-pick|revert|am|apply|clean|init|clone|update-ref|update-index|gc|prune|notes|hook\s+run|worktree\s+(?:add|remove|prune|move|lock|unlock|repair)|branch\s+-[dDfmM]|config\s+(?!--get|-l|--list)[\w.-]+\s+\S)/;
 const PROHIBITION = /\b(never|not|don't|do not|no longer|instead of|refuse[sd]?|forbid|rather than|without)\b/i;
 
@@ -2420,6 +2423,56 @@ function scanSkill(name, source, ctx) {
 
 // ---------- driver ----------
 
+// Shipped with scripts/, so verifyCensus binds this input just like the other Node payload files.
+export const GIT_DECLARATIONS_PATH = 'scripts/lib/git-one-door-declarations.v1.json';
+
+/** A call's identity ignores preceding line shifts, but not edits to its callee, operands or owner. */
+function declaredSiteId(file, site) {
+  let fn = enclosing(file.spans, site.open);
+  while (fn && !fn.name) fn = enclosing(file.spans, fn.from - 1);
+  const callee = /[\w$.]+\s*$/.exec(file.shape.slice(0, site.open))?.[0].trim() ?? '';
+  const call = callee + file.code.slice(site.open, splitArgs(file.shape, site.open).close + 1);
+  return `${fn?.name ?? '<module>'}:${sha256(call)}`;
+}
+
+/** Owner declarations classify raw sites only; stale/ambiguous inputs never yield a green census. */
+function applyDeclarations(root, sites, classes, digests) {
+  let bytes;
+  try { bytes = fs.readFileSync(path.join(root, GIT_DECLARATIONS_PATH), 'utf8'); }
+  catch (err) { if (err.code === 'ENOENT') return sites; throw err; }
+  const invalid = (detail) => { throw new Error(`invalid Git declaration: ${detail}`); };
+  let doc;
+  try { doc = JSON.parse(bytes); } catch { invalid('unreadable JSON'); }
+  if (doc?.schema !== 'git-one-door-declarations.v1' || !Array.isArray(doc.declarations)) invalid('expected git-one-door-declarations.v1');
+  digests[GIT_DECLARATIONS_PATH] = sha256(bytes);
+  const declared = new Set();
+  const matched = new Set();
+  const text = (v) => typeof v === 'string' && v.trim().length > 0;
+  for (const entry of doc.declarations) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)
+      || Object.keys(entry).some(k => !['path', 'siteId', 'class', 'reason', 'retireWhen', 'verbs'].includes(k))
+      || !text(entry.path) || path.posix.normalize(entry.path) !== entry.path
+      || /[\\\\*?\[\]{}:\x00]/.test(entry.path) || path.posix.isAbsolute(entry.path) || entry.path.split('/').some(p => p === '..' || p === '.')
+      || !/^(?:[A-Za-z_$][\w$]*|<module>):[a-f0-9]{64}$/.test(entry.siteId)
+      || !text(entry.reason) || !text(entry.retireWhen)
+      || !['hook-read-context', 'configured-binary', 'declared-tooling-exemption'].includes(entry.class)) invalid('expected exact path, siteId, supported class, reason and retireWhen');
+    const key = `${entry.path}\0${entry.siteId}`;
+    if (declared.has(key)) invalid(`duplicate ${entry.path} ${entry.siteId}`);
+    declared.add(key);
+    const found = sites.filter(s => s.path === entry.path && s.siteId === entry.siteId);
+    if (found.length !== 1) throw new Error(`stale or ambiguous Git declaration: ${entry.path} ${entry.siteId} matched ${found.length} sites`);
+    const [site] = found;
+    if (entry.class === 'hook-read-context') {
+      if (!entry.path.startsWith(`${HOOKS_DIR}/`) || site.binary !== 'git'
+        || !Array.isArray(entry.verbs) || !entry.verbs.length || !entry.verbs.every(v => READ_VERBS.has(v))) invalid(`hook read verbs for ${entry.path}`);
+    } else if (entry.verbs !== undefined) invalid(`verbs on non-hook ${entry.path}`);
+    if (entry.class === 'configured-binary' && site.family !== 'unresolved-binary') invalid(`fixed program is not configured data: ${entry.path}`);
+    classes.push({ ...site, ...entry });
+    matched.add(site);
+  }
+  return sites.filter(s => !matched.has(s));
+}
+
 export function scan({ root = REPO, files, openInspect } = {}) {
   const ctx = { js: new Map(), rust: new Map(), raw: [], wrappers: [], classes: [], markers: [] };
   // Outside the declared product, files are counted per top-level directory, never parsed.
@@ -2486,11 +2539,11 @@ export function scan({ root = REPO, files, openInspect } = {}) {
       });
       if (verbs.every((v) => v && READ_VERBS.has(v))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs }); continue; }
     }
-    sites.push(record);
+    sites.push(file && site ? { ...record, siteId: declaredSiteId(file, site) } : record);
   }
   const key = (s) => `${s.path}:${String(s.line).padStart(6, '0')}:${s.binary}`;
   const unique = (list) => [...new Map(list.map((s) => [key(s), s])).values()].sort((a, b) => key(a).localeCompare(key(b)));
-  const finalSites = unique(sites);
+  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests));
   const classes = unique(ctx.classes);
   const families = {};
   for (const s of finalSites) families[s.family] = (families[s.family] ?? 0) + 1;

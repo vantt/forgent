@@ -1,0 +1,25 @@
+{
+  "head": "dac65ad8ba135e8acf33438c8790efc222133e37",
+  "declarations": 25,
+  "declarationClasses": {
+    "configured-binary": 5,
+    "declared-tooling-exemption": 19,
+    "hook-read-context": 1
+  },
+  "undeclaredBefore": 25,
+  "undeclaredAfter": 0,
+  "exactSetJoin": true,
+  "allPreviouslyScannedSourceDigestsUnchanged": true,
+  "payloadDigest": "063f8b56413eb43bf953b695081933b590f6e4a23d1a7219eefb7db34a6ab026",
+  "scannedFiles": 1108,
+  "classifiedRows": 287,
+  "declarationSha256": "72b122f1ecefb235c3e8cd3e6b897dbc5afcd74250d3f38d6275bfafcd5650d1",
+  "censusSha256": "5a7af356de55446f6c7efd6673794295ec80ef541d8b0a0952453ed59c96d122",
+  "pinnedGeneratorBlobs": {
+    "scripts/generate-doc-inventory.mjs": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+    "scripts/generate-shipped-path-inventory.mjs": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+  },
+  "deterministicReplay": true,
+  "needsWrites": [],
+  "scannerSha256": "620f5dee521c0cf7644c8ec661d0893e95b4ec1425fd92aedaf071e631eb0e3e"
+}
