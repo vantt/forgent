@@ -1,0 +1,1329 @@
+{
+  "scope": "Ownership rebind proposals and apply (217 rows: 93 anchor-only, 124 content) plus the misc-fix preimage change, reviewed at plan HEAD 0d468a225",
+  "commit": [
+    "7bbad6f12",
+    "8e7c6ee93"
+  ],
+  "verdicts": [
+    {
+      "id": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s10-confinement-binding.json/claims/0 -> docs/platform/agent-confinement/spec.md#unheaded-block-45",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_d35eecbfe4319ad1033c7a373bbc4adb",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s2-agent-coordination-truth-judgment.json/claims/29 -> docs/platform/agent-coordination/decisions/README.md#accepted-decisions",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_f7be1d8a794e7f9c867378b67fbc3158",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s2-agent-coordination-truth-judgment.json/claims/261 -> docs/platform/agent-coordination/decisions/README.md#accepted-decisions",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s2-agent-coordination-truth-judgment.json/claims/262 -> docs/platform/agent-coordination/decisions/README.md#accepted-decisions",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_a8914714b51091a9f0a487f739172da2",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s2-agent-coordination-truth-judgment.json/claims/263 -> docs/platform/agent-coordination/decisions/README.md#accepted-decisions",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s3-host-invocation-boundary-gaps.json/registryGaps/0 -> docs/architecture-manifest.json#file-block",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s3-host-invocation-boundary-gaps.json/registryGaps/2 -> docs/platform/component-boundary.md#unheaded-block-11",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause dff50b64c, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_0f4d968b593902731bd334f9ed2af711",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s3-host-invocation-boundary-gaps.json/registryGaps/6 -> docs/specs/distribution.md#unheaded-block-5",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_aa28053a8a4b2ff13690fc6a20044b9f",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-distribution-distribution.json/claims/26 -> docs/platform/packaging-distribution/spec.md#pointers-implementation",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_b5695d38282e111f8ed06656b2efa433",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-distribution-distribution.json/claims/27 -> docs/platform/packaging-distribution/spec.md#unheaded-block-109",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: deliberate misc-fix correction (git rev-parse -> on-disk layout) already recorded by the s17 overlay; legacy still has the old wording."
+    },
+    {
+      "id": "claim_4eeb2f406288458e61bad21531966ab1",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-distribution-distribution.json/claims/28 -> docs/platform/packaging-distribution/spec.md#data-dictionary",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-distribution-distribution.json/registryGaps/0 -> docs/platform/packaging-distribution/spec.md#unheaded-block-90",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-distribution-successors.json/registryGaps/21 -> docs/specs/confinement-authority.md#unheaded-block-147",
+      "reason": "Anchor-only: before digest f0b5e6c1688b at 49ad04648 re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-main-recarry.json/registryGaps/0 -> docs/specs/distribution.md#unheaded-block-5",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-main-recarry.json/registryGaps/1 -> docs/platform/packaging-distribution/spec.md#unheaded-block-90",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s4-packaging-main-recarry.json/registryGaps/2 -> docs/platform/packaging-distribution/spec.md#unheaded-block-90",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-authorities-boundary-gaps.json/registryGaps/0 -> docs/platform/packaging-distribution/spec.md#unheaded-block-90",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_04703f011b22383992b94545055b9e56",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-authorities-boundary-gaps.json/registryGaps/1 -> docs/specs/confinement-authority.md#unheaded-block-147",
+      "reason": "Anchor-only: before digest f0b5e6c1688b at 49ad04648 re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-authorities-boundary-gaps.json/registryGaps/2 -> docs/specs/distribution.md#unheaded-block-5",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_daaf3726036adad15b2529ad43f71d44",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-boundary-sync.json/registryGaps/39 -> docs/platform/packaging-distribution/spec.md#unheaded-block-90",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause ad94156cf, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-main-recarry.json/registryGaps/0 -> docs/architecture-manifest.json#file-block",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s5-root-main-recarry.json/registryGaps/1 -> docs/architecture-manifest.json#file-block",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s6-whole-system-component-component-boundary-advisory.json/claims/27 -> docs/platform/component-boundary.md#5-high-level-component-authority-register",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_ab73231bdd37667748e73f92da406a7b",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s6-whole-system-component-component-boundary-advisory.json/claims/30 -> docs/platform/component-boundary.md#unheaded-block-40",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_3f292fa3beda7ba097f734f4c1dc1860",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s6-whole-system-system-overview.json/claims/3 -> docs/platform/system-overview/spec.md#area-map",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_49dc8dc05b31bcfc5cfd0d7c44c8395e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s6-whole-system-system-overview.json/claims/4 -> docs/platform/system-overview/spec.md#unheaded-block-6",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_0cc5fd490ce0087ed51f38bca9d8c96e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s6-whole-system-system-overview.json/registryGaps/0 -> docs/platform/system-overview/spec.md#unheaded-block-6",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_cac60d0f1164309f87ede7041b9f1895",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/82 -> docs/platform/agent-confinement/contracts/confinement-authority-v1.md#63-confinementrequest",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_401c62c07a0647b8a318471d2de204d5",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/84 -> docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-40",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_f6c28a9097619631e3c748472cb73eac",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/97 -> docs/platform/agent-confinement/contracts/confinement-authority-v1.md#65-backend-port",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_6785a5f3a9f65744e05e4aaa247dd527",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/103 -> docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-57",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_8ee6a4ccd4df0de275866de0f669ae7e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/138 -> docs/platform/agent-confinement/spec.md#85-adapter-mới",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_0117008e3dfef395f044eb1556ad0fca",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/139 -> docs/platform/agent-confinement/spec.md#unheaded-block-42",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_46c173824da77fbf25f59072ae8e1620",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/140 -> docs/platform/agent-confinement/spec.md#86-crash-và-cleanup",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_c0cd54862f6365e2da2856925bef04c1",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/141 -> docs/platform/agent-confinement/spec.md#unheaded-block-43",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_2cfa54b977cf929a5f73250095379bd2",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/142 -> docs/platform/agent-confinement/spec.md#unheaded-block-44",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_26b3a49adef572e1be2ed219e292c8b0",
+      "verdict": "REWORK",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/143 -> docs/platform/agent-confinement/spec.md#unheaded-block-45",
+      "reason": "Second 'move' owner of agent-confinement/spec.md#unheaded-block-45 (a42e5818); claim_d572bb9dc8501362ae23e6d4a71975d2 (s10, move) binds the same unit. Fix: keep claim_d572bb9d as owner (the paragraph declares itself the replacement of the 2026-10-15 binding rule, d572's source); set this row's disposition to merge, state in its rationale that its reaper/herdr-session paragraph was absorbed into block-45, and list the resolution in rebind/receipt.md."
+    },
+    {
+      "id": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/144 -> docs/platform/agent-confinement/spec.md#unheaded-block-46",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_daf2ec0996ad074a68903680fce85adb",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/145 -> docs/platform/agent-confinement/spec.md#unheaded-block-47",
+      "reason": "Anchor-only: before digest f43f3ff53150 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/147 -> docs/platform/agent-confinement/spec.md#unheaded-block-48",
+      "reason": "Anchor-only: before digest 0ef8d6c21069 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_cc0d485b1b93357edb755f4121a26206",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/149 -> docs/platform/agent-confinement/spec.md#unheaded-block-49",
+      "reason": "Anchor-only: before digest f0aa8cea776f at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/150 -> docs/platform/agent-confinement/spec.md#unheaded-block-50",
+      "reason": "Anchor-only: before digest 2fcf6811e81b at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/151 -> docs/platform/agent-confinement/spec.md#unheaded-block-51",
+      "reason": "Anchor-only: before digest 9077d21c4c3f at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_daa730ce31dbd045d14a42c31c57f316",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/152 -> docs/platform/agent-confinement/spec.md#unheaded-block-52",
+      "reason": "Anchor-only: before digest fdcc56c60361 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/154 -> docs/platform/agent-confinement/spec.md#unheaded-block-53",
+      "reason": "Anchor-only: before digest 14f3ee1a5085 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/155 -> docs/platform/agent-confinement/spec.md#unheaded-block-54",
+      "reason": "Anchor-only: before digest 62da6aab4928 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_68dd1d19379c9a16393429b5e2aac34a",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/157 -> docs/platform/agent-confinement/spec.md#unheaded-block-55",
+      "reason": "Anchor-only: before digest cd86d66ba41c at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_b1731956c352b9977eef7ffa07f88991",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/158 -> docs/platform/agent-confinement/spec.md#unheaded-block-56",
+      "reason": "Anchor-only: before digest 7cf71cce1a2b at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_54f630d44a33c5624ebeca834cf25ceb",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/159 -> docs/platform/agent-confinement/spec.md#unheaded-block-57",
+      "reason": "Anchor-only: before digest 8caafcb371d0 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_220b8163566ad8b38cbf1d534c871e42",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/160 -> docs/platform/agent-confinement/spec.md#unheaded-block-58",
+      "reason": "Anchor-only: before digest d0eb5b8c250c at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_9d863e7c1e4c3983292845628b60e041",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/161 -> docs/platform/agent-confinement/spec.md#unheaded-block-59",
+      "reason": "Anchor-only: before digest a42feb4ea36f at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_bb5abf5828264d19c061b9b0920618a3",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/167 -> docs/platform/agent-confinement/spec.md#unheaded-block-60",
+      "reason": "Anchor-only: before digest 7653e11267b2 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/169 -> docs/platform/agent-confinement/spec.md#unheaded-block-61",
+      "reason": "Anchor-only: before digest ef13d34054bf at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_2977601fcac216f335c121ce5a58ec9e",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/171 -> docs/platform/agent-confinement/spec.md#unheaded-block-62",
+      "reason": "Anchor-only: before digest 6dc2d3110bcb at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_d81f120837aab96ba270276e5090e2e0",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/172 -> docs/platform/agent-confinement/spec.md#unheaded-block-63",
+      "reason": "Anchor-only: before digest e3281f44b9de at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_34983077687032d7a49ecc61907a6806",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/173 -> docs/platform/agent-confinement/spec.md#unheaded-block-64",
+      "reason": "Anchor-only: before digest 81541208991d at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/175 -> docs/platform/agent-confinement/spec.md#unheaded-block-65",
+      "reason": "Anchor-only: before digest 0863b0b9257a at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_f82a2cff173a458bb2231203222c10e0",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/177 -> docs/platform/agent-confinement/spec.md#unheaded-block-66",
+      "reason": "Anchor-only: before digest 03aadf655bc3 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_39c40cef341e227d936ea768b12ba435",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/183 -> docs/platform/agent-confinement/spec.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/184 -> docs/platform/agent-confinement/spec.md#unheaded-block-67",
+      "reason": "Anchor-only: before digest 09081a2c1a3e at df3626178 re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/185 -> docs/platform/agent-confinement/spec.md#unheaded-block-68",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/186 -> docs/platform/agent-confinement/spec.md#unheaded-block-69",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_0da9c2a174db070122d3b5c6af25e677",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/187 -> docs/platform/agent-confinement/spec.md#unheaded-block-70",
+      "reason": "Anchor-only: before digest ae79ac51f3a5 at df3626178 re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_022af2ccb616ad85400526fd94408258",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/189 -> docs/platform/agent-confinement/spec.md#unheaded-block-71",
+      "reason": "Anchor-only: before digest 9c24e69b1b4a at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_19c1aba20ad51fafc86dc889996c2063",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/190 -> docs/platform/agent-confinement/spec.md#unheaded-block-72",
+      "reason": "Anchor-only: before digest f0b5e6c1688b at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/191 -> docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#133-pane-codex-chạy---no-daemon-sandbox-riêng-của-codex-phải-tắt-suốt-phiên",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/192 -> docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-4",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_dbbee9d940a2d595936e12ba6781f684",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/197 -> docs/platform/agent-confinement/spec.md#unheaded-block-73",
+      "reason": "Anchor-only: before digest 63bf6e3f79ae at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (reviewed). Method: existing explicit supersession chain, authenticated against current dual extractors."
+    },
+    {
+      "id": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/198 -> docs/platform/agent-confinement/spec.md#14-pointers-hiện-tại",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_c491a724bb730522215633d79a66e5b3",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s8-agent-confinement-01.json/claims/199 -> docs/platform/agent-confinement/spec.md#unheaded-block-74",
+      "reason": "Content: same passage by position/neighbours (existing explicit supersession chain, authenticated against current dual extractors), digest changed at cause d9bedf229, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s9-runner-01.json/registryGaps/26 -> docs/specs/runner.md#unheaded-block-93",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s9-runner-01.json/registryGaps/27 -> docs/specs/runner.md#unheaded-block-93",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause bc5589ed7, pending with stale review fields removed, listed for re-review, hash recomputes; carry: the carried RUL90 lines are byte-identical; only an unrelated terminal line changed."
+    },
+    {
+      "id": "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-behaviors.json/claims/3 -> docs/platform/work-state/spec.md#add-verb",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_320ba6224015cc3877738795b80dabb7",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-behaviors.json/claims/4 -> docs/platform/work-state/spec.md#unheaded-block-65",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_bf41e5090dd12c430e3a55206ea11658",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-behaviors.json/claims/6 -> docs/platform/work-state/spec.md#submit-verb",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-behaviors.json/claims/7 -> docs/platform/work-state/spec.md#unheaded-block-67",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-data-dictionary.json/claims/0 -> docs/platform/work-state/spec.md#3-work-item-data-dictionary",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+      "verdict": "REWORK",
+      "locator": "pilot/decisions/b-data-dictionary.json/claims/1 -> docs/platform/work-state/spec.md#unheaded-block-4",
+      "reason": "Promote row whose rationale says 'Source and target unit digests equal'. Target work-state/spec.md#unheaded-block-4 now says ids come from the Identity mint door (tsk-<10 base32>), while the recorded source and the current legacy docs/specs/work-state.md#unheaded-block-4 still say fixed tsk- prefix + short anti-collision suffix; the rigorToTier clause was also replaced. Fix at re-review: re-decide it as partial-carry or a labelled correction naming both clauses. Do not approve it as identical."
+    },
+    {
+      "id": "claim_ae1f21106b52006a2ff377f9104a1fce",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/0 -> docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/2 -> docs/platform/work-state/decisions/retired-decision-history.md#0002-mô-hình-việc-phẳng",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_0201a1d648765d578fb8fd96673da674",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/3 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-3",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/4 -> docs/platform/work-state/decisions/retired-decision-history.md#0002-mô-hình-việc-phẳng-1",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_faeaa8e46158de47c45810fb0a595dcc",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/5 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/7 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_e8b18c86c4297b05e04a14793817bf6a",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/9 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_0e062808f47ce5c348b6b44a91650ecc",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/12 -> docs/platform/work-state/decisions/retired-decision-history.md#0003-đặt-tên-bố-cục-dữ-liệu",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_75f47ef3fd99abd07c138f106f1ca023",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/13 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-1",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_c6a1314c4583518f5100cc53e78b1979",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/15 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-1",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/17 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-1",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_5908b357cb98d52934398e26e43fcb39",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/20 -> docs/platform/work-state/decisions/retired-decision-history.md#0004-phạm-vi-non-goal",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/21 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-2",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_4063855a9287de7cf5b27cb77d96955f",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/24 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-2",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/26 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-2",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_dbc0da98acd1c90327ebd67850cc8983",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/29 -> docs/platform/work-state/decisions/retired-decision-history.md#0006-trạng-thái-proposed",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_a79114f19bb479ea6b69c50166af8972",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/30 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-3",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_99fa84eefd3c917530ef1a453f08be21",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/33 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-3",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/37 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-3",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/40 -> docs/platform/work-state/decisions/retired-decision-history.md#0007-tiến-hoá-schema-event",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/41 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-4",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_886f9acc902249e303bacc887ffb9882",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/43 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-4",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/46 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-4",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_e375b70390617716823280eb03a82a87",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/49 -> docs/platform/work-state/decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_a93bf40197e2bf32890a9cf931226e15",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/50 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-5",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/51 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-30",
+      "reason": "Anchor-only: before digest 3a9e4da78591 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_33c9953761a4fe99a4072b008cefc634",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/52 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-31",
+      "reason": "Anchor-only: before digest f0eb277249c0 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_ff4510bb2afe125aedac972ed943ce2c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/53 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-5",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/54 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-32",
+      "reason": "Anchor-only: before digest 4746d446f503 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_6346dec77f2dff715949806586e100d3",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/55 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-33",
+      "reason": "Anchor-only: before digest f665548de1ac at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/56 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-5",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_9be26c9507109484cc9b1663ca4ca2d9",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/57 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-34",
+      "reason": "Anchor-only: before digest da125878208e at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_08dc68ef23395b8f3f5b095508348e00",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/58 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-35",
+      "reason": "Anchor-only: before digest 95a357e29712 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: repeated complete digest disambiguated by immediate neighbours."
+    },
+    {
+      "id": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/59 -> docs/platform/work-state/decisions/retired-decision-history.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_386a8c90d7f9d79a52190add7a82f33f",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/60 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-6",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_4806fa4d3041b4b051cddf6a2490730b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/61 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-37",
+      "reason": "Anchor-only: before digest 46ed30006ee6 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_d1d70b955b085baafa10ffcec2702b8d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/62 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-38",
+      "reason": "Anchor-only: before digest e4554b1ed999 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/63 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-39",
+      "reason": "Anchor-only: before digest 1186cfa23b3d at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/64 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-6",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_f44a3645601fbc48b21a8d73b3ac3426",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/65 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-40",
+      "reason": "Anchor-only: before digest 0f8f279453f1 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/66 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-6",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_4da244a64b6f33711d89feb47331b4f0",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/67 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-41",
+      "reason": "Anchor-only: before digest df6252739cff at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_a7c2e1310de5bcd152e86f3833e90033",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/68 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-42",
+      "reason": "Anchor-only: before digest 95a357e29712 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: repeated complete digest disambiguated by immediate neighbours."
+    },
+    {
+      "id": "claim_2d27908b73621a411fcf708b067b6ba2",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/69 -> docs/platform/work-state/decisions/retired-decision-history.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_e68c14be45a430e3676761d7bdc9e6db",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/70 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-7",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_62c3b825e8cc887ad822b8d1b5316769",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/71 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-44",
+      "reason": "Anchor-only: before digest a00c0f5592ff at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_2591914de0c8f3b95488576fb8643dfb",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/72 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-45",
+      "reason": "Anchor-only: before digest ad532d04b4ed at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/73 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-7",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_e2589be21644922e0424a20d39bbd6e3",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/74 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-46",
+      "reason": "Anchor-only: before digest c56d7ec3b4f4 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/75 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-47",
+      "reason": "Anchor-only: before digest f17f548794a7 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_afaa4b9499e137528bcf889ef6ef93f0",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/76 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-48",
+      "reason": "Anchor-only: before digest fe25484d3623 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_185e1f6f4d1ef50fead4ce341980898d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/77 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-49",
+      "reason": "Anchor-only: before digest a25b933f9837 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_fc4d5078de5528578407ea0e3715e723",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/78 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-50",
+      "reason": "Anchor-only: before digest 2bc3f7c954aa at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/79 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-7",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_b8d85d30862c55869062b5418f430f69",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/80 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-51",
+      "reason": "Anchor-only: before digest dd8567cf8f52 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_9f56719f95c81edecfe6dfda00ca0268",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/81 -> docs/platform/work-state/decisions/retired-decision-history.md#ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/82 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-52",
+      "reason": "Anchor-only: before digest 1e83f0bc05ec at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_4e04420f3322b42d6a313faa72216ae9",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/83 -> docs/platform/work-state/decisions/retired-decision-history.md#bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_bd1c7b0191b236990a4740f007de2397",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/84 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-53",
+      "reason": "Anchor-only: before digest 9a5163f68499 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/85 -> docs/platform/work-state/decisions/retired-decision-history.md#phương-án-đã-cân-nhắc-và-bỏ",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/86 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-54",
+      "reason": "Anchor-only: before digest 61cda065233d at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/87 -> docs/platform/work-state/decisions/retired-decision-history.md#0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/88 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-8",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_b87e27dca1c9e551eb4d296c858d0f08",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/89 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-55",
+      "reason": "Anchor-only: before digest 5a365fcd8c5b at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_5770fe5a53057464d4c4795b24abb38a",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/90 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-56",
+      "reason": "Anchor-only: before digest 04c1c4fb64c7 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_86e1127b120054dafe55e52585c2a1d9",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/91 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-8",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/92 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-57",
+      "reason": "Anchor-only: before digest 8dc8ecc4dc88 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_16901b7106220f70f44d600ba4dbb40f",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/93 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-58",
+      "reason": "Anchor-only: before digest 98bb7f4e0465 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_6ce44d19e0f7b99b1c363579bf6eb68e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/94 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-59",
+      "reason": "Anchor-only: before digest 2f6e935eb95f at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/95 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-8",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_38fc27aadc8aecf157c5db30cda1862b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/96 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-60",
+      "reason": "Anchor-only: before digest 03dc0e5f689c at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/97 -> docs/platform/work-state/decisions/retired-decision-history.md#0024-đổi-tên-status-proposed-thành-awaiting-approval",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_aa501f53cee0b7ec6adc656971266a97",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/98 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-9",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-first.json/claims/99 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-61",
+      "reason": "Anchor-only: before digest 7ef891c3b1ad at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_67c5f9d1a031030f5bd1f3ab27320130",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/0 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-62",
+      "reason": "Anchor-only: before digest 4b0aa9f66af4 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_7a2a3390e3beca0100dbfebb57cb6aab",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/1 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-63",
+      "reason": "Anchor-only: before digest bc40e0a51da3 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/2 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-9",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_5fb4a29b7884b27f3d265612f67e4f31",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/3 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-64",
+      "reason": "Anchor-only: before digest f0688f355668 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_5eca88140b6e1a8d5c14095b6cb31045",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/4 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-65",
+      "reason": "Anchor-only: before digest e63e9faed67f at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/5 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-9",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_ec3bfee565512c6d032778295c5838c1",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/6 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-66",
+      "reason": "Anchor-only: before digest 1d55a3e34d5b at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_82f766f5320ab6bbe5174aeda52e710b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/7 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-67",
+      "reason": "Anchor-only: before digest 95a357e29712 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: repeated complete digest disambiguated by immediate neighbours."
+    },
+    {
+      "id": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/8 -> docs/platform/work-state/decisions/retired-decision-history.md#0027-domain-sở-hữu-vocabularytransition-status-đoạn-trước-delivered-supersede-base-workflow-model",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_818a58278988ed797931b14ca91614e2",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/9 -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-10",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_2d89ae63cbc81e492eb80e9a28174b67",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/10 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-68",
+      "reason": "Anchor-only: before digest f4a426a2b867 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_a92d8b1ad203c61b04078fa8b94c9b17",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/11 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-69",
+      "reason": "Anchor-only: before digest 9e779d390baf at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_a3944b679053b61dc2d743795cde3d77",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/12 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-70",
+      "reason": "Anchor-only: before digest 5e566c132da3 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_466331635349f55e32c11e0fcf56d334",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/13 -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-10",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_3f65fc24d3eeb760ecc11ff781159152",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/14 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-71",
+      "reason": "Anchor-only: before digest 1c7ea2fda926 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_a4a77d7c336663f81a9bc8ac697ab518",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/15 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-72",
+      "reason": "Anchor-only: before digest 46ec1457959a at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/16 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-73",
+      "reason": "Anchor-only: before digest 127c7c7a99d0 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/17 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-74",
+      "reason": "Anchor-only: before digest 7b133e87cfdf at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_6c5753df306960b46d20e133a2a36894",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/18 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-75",
+      "reason": "Anchor-only: before digest 6d99060fca9f at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_1d98a4a5c3391d5318f53153b3f5f442",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/19 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-76",
+      "reason": "Anchor-only: before digest 7c211b5505c4 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_546450931dd47024138ce0a32699cd72",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/20 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-77",
+      "reason": "Anchor-only: before digest 31a4c4ddccf1 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_0da8b597cb243173df9f5eb46a34ec76",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/21 -> docs/platform/work-state/decisions/retired-decision-history.md#audit-mọi-consumer-thật-của-status-fsmmjsstatusestransitionsliteral-status-hôm-nay",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/22 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-78",
+      "reason": "Anchor-only: before digest c2f2baeae1bc at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_7889671f1f2783b634ef6d90a251f3e9",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/23 -> docs/platform/work-state/decisions/retired-decision-history.md#1-nguồn-sự-thật-định-nghĩa-statusestransitions",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_fc0f124b5b1368034455207d6378bc00",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/24 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-79",
+      "reason": "Anchor-only: before digest bdee4fb8f864 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/25 -> docs/platform/work-state/decisions/retired-decision-history.md#2-resolved_statuses-tập-giống-category-viết-tay-trộn-cả-2-nhóm",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_d97ba7f5ff310af83839fea58329acdd",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/26 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-80",
+      "reason": "Anchor-only: before digest 827c7ac395f1 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_84950cfff9d75392b847739c4812768a",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/27 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-81",
+      "reason": "Anchor-only: before digest 4e6cda4b133d at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/28 -> docs/platform/work-state/decisions/retired-decision-history.md#3-literal-status-trong-verb-logic-của-binfgosmjs-tầng-clistore-chính-là-bảng-transition-của-domain-coding-hôm-nay",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_72ee6b558f807216affeb2559c6a597d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/29 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-82",
+      "reason": "Anchor-only: before digest 707bfd130965 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/30 -> docs/platform/work-state/decisions/retired-decision-history.md#4-runner-vòng-tự-hành-tiêu-thụ-nặng-nhóm-đầu",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/31 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-83",
+      "reason": "Anchor-only: before digest 78c3de3f1ca2 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_f1507b5008c678f9474202706e018774",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/32 -> docs/platform/work-state/decisions/retired-decision-history.md#5-cơ-chế-domain-agnostic-khác-được-discussionmd-liệt-tường-minh",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_042b85c001dab92b6ae561f89eac6337",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/33 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-84",
+      "reason": "Anchor-only: before digest fa8303943700 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/34 -> docs/platform/work-state/decisions/retired-decision-history.md#6-gap-liên-quan-nhưng-không-phải-phạm-vi-audit-status-literal-ghi-nhận-để-không-lặp-lại-công-sức",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/35 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-85",
+      "reason": "Anchor-only: before digest d398e694ec28 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/36 -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-10",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_8eeec687713e79da23a9339df1179b60",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/37 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-86",
+      "reason": "Anchor-only: before digest e12e5b17bd0a at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/38 -> docs/platform/work-state/decisions/retired-decision-history.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_63db75c2d22d1861c69845d62518ee60",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/39 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-87",
+      "reason": "Anchor-only: before digest 6f54e9c73c49 at f534aeaea re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_7e0016df70b7640b0337c5daf5f80e90",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/42 -> docs/platform/work-state/decisions/retired-decision-history.md#i-kiến-trúc-nền-seq-18029-18031",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_a9be2da803446c73efbfcac40ee82637",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/43 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-89",
+      "reason": "Anchor-only: before digest 2a1722766193 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/44 -> docs/platform/work-state/decisions/retired-decision-history.md#ii-handoff-trái-tim-của-tính-uyển-chuyển-seq-18032-18070-18058",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/45 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-90",
+      "reason": "Anchor-only: before digest dce677680de0 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_45840c035132a9c46aa748567ae37648",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/46 -> docs/platform/work-state/decisions/retired-decision-history.md#iii-cấu-trúc-khai-báo-seq-18059-18060-18110-18189-18232-18242",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_10986602d5cab816cf923616dc6b58f8",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/47 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-91",
+      "reason": "Anchor-only: before digest 7dfb88e6ee48 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/48 -> docs/platform/work-state/decisions/retired-decision-history.md#iv-trình-tự-triển-khai-seq-18030",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_2e0270967476b583f5548c2d0632c6f7",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/49 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-92",
+      "reason": "Anchor-only: before digest 4b806f05cc97 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/50 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-93",
+      "reason": "Anchor-only: before digest d6ebd90319d8 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_fd3c6c93c220012e1e08d65c9276ab24",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/51 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-94",
+      "reason": "Anchor-only: before digest a53db20b6d5f at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_963bf3272df983c42aead0351a429ce4",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/52 -> docs/platform/work-state/decisions/retired-decision-history.md#v-kết-luận-so-sánh-marketing-cockpit-vòng-fable-vẫn-đứng-vững",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_68304d9e3c8f531fd5dcc25392c6d072",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/53 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-95",
+      "reason": "Anchor-only: before digest 6bfb192eaa61 at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_8d8de83dcecd115c8b517cbf12d08795",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/54 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-96",
+      "reason": "Anchor-only: before digest a0a6b146892e at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/55 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-97",
+      "reason": "Anchor-only: before digest b18e4845b71d at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_c696887f984b8248a620d445d341cf0b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/56 -> docs/platform/work-state/decisions/retired-decision-history.md#vi-treo-có-chủ-đích-không-phải-quên",
+      "reason": "Content: same passage by position/neighbours (exact native-source heading digest), digest changed at cause f534aeaea, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target digest equals sourceUnitDigest (verbatim)."
+    },
+    {
+      "id": "claim_092f7d288e8617bb3b8abff586e988f8",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-decisions-second.json/claims/57 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-98",
+      "reason": "Anchor-only: before digest 2431462c129b at aecdc30aa re-extracted; after unit text is byte-equal, the digest is unchanged, the unit is at the bound anchor at HEAD, the binding hash recomputes, and all review fields are kept (pending). Method: unique complete digest."
+    },
+    {
+      "id": "claim_8f6ab9b2c2de71369769d27719a09b8e",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/3 -> docs/platform/work-state/spec.md#2-entry-points-and-triggers",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_a5326477491a9bc30a98744da8e9bfb9",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/4 -> docs/platform/work-state/spec.md#unheaded-block-3",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_477a30f4902261e390c34ab888145dcd",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/7 -> docs/platform/work-state/spec.md#11-business-rules",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_904f21e704c3d43d63ae2a762bf9791c",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/8 -> docs/platform/work-state/spec.md#12-edge-cases-settled",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/9 -> docs/platform/work-state/spec.md#unheaded-block-94",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_d011d26d0e584f25caa838e02c59b613",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/10 -> docs/platform/work-state/spec.md#13-known-gaps-and-deferred-work",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/11 -> docs/platform/work-state/spec.md#unheaded-block-95",
+      "reason": "Content: same passage by position/neighbours (unique full-content correspondence inside bracket), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: target equals the current legacy source unit; recorded sourceUnitDigest is the historical identity."
+    },
+    {
+      "id": "claim_40f7857c31724be3b7ca7a6de1097818",
+      "verdict": "APPROVE",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/15 -> docs/platform/work-state/architecture/implementation-pointers.md#2-implementation-pointers",
+      "reason": "Content: same passage by position/neighbours (replacement bounded by unchanged complete units), digest changed at cause 7be0cbc52, pending with stale review fields removed, listed for re-review, hash recomputes; carry: changed text keeps the claim (link/anchor rewrite, additions, heading-body composite, or supersede successor updated in place)."
+    },
+    {
+      "id": "claim_2e2bc9264b289319dfae5c6487978f99",
+      "verdict": "REWORK",
+      "locator": "pilot/decisions/b-entry-actors-rules-pointers.json/claims/16 -> docs/platform/work-state/architecture/implementation-pointers.md#unheaded-block-3",
+      "reason": "Promote row whose rationale claims an identical carry, but target work-state/architecture/implementation-pointers.md#unheaded-block-3 differs from the recorded source (events.lock, withEventsLock/appendEventLocked, acquireSessionsLock mirror, 2s/10ms, EventLogError('lock-timeout'), hash-suffix generateId) and from the current legacy unit (docs/specs/work-state.md#unheaded-block-111: appendEventLocked vs tx.append). Fix at re-review: do not approve it as identical. Re-decide it as partial-carry or a labelled correction that names the replaced clauses, or resync the legacy clause first."
+    },
+    {
+      "id": "ownership:claim_f8e2b48d6234ca8a73e15cdaad7d9c07-vs-claim_5412ac73c702e4ec33e4b59dd9ad1940",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/work-state/decisions/retired-decision-history.md:28 (H3) and :35 (H1)",
+      "reason": "Two distinct units. The H1 digest a05e96aa equals the H1 in legacy docs/specs/work-state.md:1376, which is f8e2's sourceUnitDigest, so move is right. The H3 differs from legacy :1369 only by the 0012 link retarget and owns the H3. No other row binds either anchor. Note: f8e2's original rationale sentence ('merged into the single ADR 0002 H2, no second H1') is now contradicted by its disposition. Only the appended correction line is current."
+    },
+    {
+      "id": "misc-fix/rebind.py-pin-preimages",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py (8e7c6ee93)",
+      "reason": "All asserts are kept verbatim (shard equality, binding-refresh equality, effective pointer, payload/hash, pending). Only the preimage source moved from the working tree to git show <pin>, which matches the authoring inputs. Current-tree effective resolution still uses documents(). --check exits 0 (283/27/21)."
+    },
+    {
+      "id": "commit-scope",
+      "verdict": "APPROVE",
+      "locator": "git show --stat 7bbad6f12 8e7c6ee93",
+      "reason": "Every path in both commits is inside its brief's writable list. 7bbad6f12 only appends one L12-137 pair (dbf8ad715, w5-rebind-brief.md) to each phase-06 manifest's allowed pairs, which is the pair accounting the first brief asked for. No checker logic changed."
+    }
+  ]
+}

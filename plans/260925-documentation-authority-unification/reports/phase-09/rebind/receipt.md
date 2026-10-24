@@ -191,3 +191,9 @@ before the complete apply brief was loaded, exited **127** (`no .fgos/installati
 found above this worktree`). It was not repeated under the brief's no-CLI rule;
 there is no exposed live GitNexus tool. No product symbol was changed. Scratch
 stays under `/tmp/fgos-work/w5-rebind-apply/`; the runner owns any future commit.
+
+## Review corrections (Lead, 2026-10-24 20:45)
+
+Review `../reviews/w7-rebind-review.{md,json}` checked all 217 rows: 217 APPROVE, 3 REWORK. The Lead applied the three reworks as record corrections. Binding fields are unchanged, and `rebind.py --check` still exits 0.
+- `claim_26b3a49a…` changes from `move` to `merge`. `claim_d572bb9d…` owns `agent-confinement/spec.md#unheaded-block-45`. This was a double move that the "zero new active native pairs" statement missed, because neither claim is in the active registry.
+- `claim_2e2bc926…` and `claim_5ba6768e…` stay `promote` and pending. Their "identical carry" and "equal digest" statements are withdrawn, and the lost or changed clauses are named in each rationale for re-review.
