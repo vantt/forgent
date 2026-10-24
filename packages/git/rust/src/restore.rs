@@ -542,10 +542,8 @@ impl GitDriver {
         .into_iter()
         .collect();
         let mut paths = BTreeMap::new();
-        #[cfg(unix)]
+        #[cfg_attr(not(unix), allow(unused_mut))]
         let mut clean_modes = BTreeMap::new();
-        #[cfg(not(unix))]
-        let clean_modes = BTreeMap::new();
         for p in &preview.paths {
             safe_path(checkout::root(repo)?, p)?;
             let path = checkout::root(repo)?.join(p);

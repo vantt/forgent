@@ -265,7 +265,7 @@ mod os {
     use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
     use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, OpenThread, ResumeThread, TerminateProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION, THREAD_SUSPEND_RESUME};
 
-    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, OrphanWindow, ProcEntry, ORPHAN_SETTLE};
+    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, OrphanWindow, ProcEntry};
     use crate::control::{signal_by_identity, Signal};
     use crate::facts::{Observed, ProcTuple};
     use crate::platform;
