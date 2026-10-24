@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "49282139e03402544c63319eba8fed0ddbe8c3352846ce9aa2d213dfe551643b",
+  "payloadDigest": "5cc8cbc753a28e27efb78e6b280c308bffa58a104bdbfc3e6af4d56d1bdd3e86",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -776,6 +776,7 @@
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
     "src/cli/version.mjs": "ccccc691aa2e9a844d7724cf38da60fe05b7cac96134e01e825ef2392a353146",
+    "src/config/facade.mjs": "7a63214816eee40d58b025878e3a2f3a938c0722592015ae143918631154748d",
     "src/config/global-config.mjs": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
     "src/config/shared-config-file.mjs": "2e246923425c3ad8ecebcb1d9ad529c762ce5c22a2259e3a50aedcae4fc9fe0d",
     "src/convention/convention-client.mjs": "b1b4a89e4f28f0c67a7e62f0b1f5ac760fff238b5a84dd9e01634f7b517b60da",

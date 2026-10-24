@@ -45,3 +45,11 @@ Facade shape and error type: `facade.test.mjs`. Everything below it is B/D/05/06
 ## Rollback
 
 Revert: D's `machine-config.mjs` returns with the import lines; nothing else calls the facade yet.
+
+## Landed (2026-10-24, landing B)
+
+- `src/config/facade.mjs` (kernel row in the manifest; imports only `../native/door.mjs`): `readConfig` (needs `projectRoot`, a `TypeError` otherwise so a forgotten root cannot silently become the machine view), `readMachineConfig`, `projectConfigPresent`, `readMachineAccounts`, `checkConfig`, `fixConfig`, `initConfigFile`, `ConfigDoorError`, `isConfigRefusal`, `CONFINED_MARKER_ENV`. **No `explainConfigPath`, `applyConfigPatch`, `withMachineAccounts`, `machine-config.mjs`** (coordinator answer 1, decision C22); nothing imports the facade yet (landing B moves no reader: `rg "config/facade" src bin scripts` finds none).
+- Defaults per call: `globalDir` from `os.homedir()` and the session class from `FGOS_CONFINED=1` are computed in `call`, never at import; an argument overrides both. `undefined` fields are dropped from the request (the addon refuses a `null` list).
+- `isConfigRefusal(err)`: a `ConfigDoorError` whose code is not one of the door's own ids (`config-request-invalid`, `config-io`, `config-trusted-root-unresolved`, `config-internal-error`). This is the test C7 and C14 use; a missing addon (`git-addon-*`) is not a `ConfigDoorError` and passes through unchanged.
+- `projectConfigPresent` answers from the snapshot's `project` revision, so a migration tombstone counts as absent (it is no source); the two `existsSync` calls it replaces in `dispatch/cli.mjs` asked about a legacy file only, phase 11 settles what they should now mean.
+- Lines: facade 76 (cap 260), `facade.test.mjs` 120 (plan 120). The marker is pinned to the launch driver's export in the facade test (the crate's side is pinned by `dispatch-confinement-machine-private.test.mjs`).
