@@ -6142,7 +6142,7 @@ registerCheck({
 
 registerCheck({
   id: 'observe-run-coverage',
-  description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
+  description: 'Observe run accounting is consistent and its directory totals match the Node layout scan',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
