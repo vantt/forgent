@@ -143,19 +143,16 @@
     {
       "gateId": "retention-L11-23-L11-25",
       "g": "G5",
-      "status": "unmet",
+      "status": "met-local",
       "evidence": [
-        "resync-b/verify-resync.mjs",
-        "resync-b/adjudications.json"
+        "g5/check.py",
+        "g5/check-01e64719d.json"
       ],
-      "commit": null,
+      "commit": "b726d44ed",
       "pin": null,
-      "note": "No evidence found of the retentionReceipts span sha256 check at W0 or at any later commit (no log or receipt). Related only: resync-b/verify-resync.mjs asserts the L11-25 routing/banner prefix in the reading-map entry union, and resync-b/adjudications.json keeps the L11-25 banner; the two compounding-to-knowledge lines have no committed check.",
-      "remaining": "Run the retentionReceipts hash check (holder-lock spec line 8, reading-map banner spans, both compounding-to-knowledge lines) now and again at F, and commit the log.",
-      "blockers": [
-        "No committed hash-check evidence",
-        "Final pin F not recorded"
-      ]
+      "note": "All 10 recorded spans (holder-lock spec line 8; reading-map banner lines 3-9 and lines 34, 37) are found at their recorded lines on the working tree at 01e64719d; the checker verifies the recorded digest recipe first.",
+      "remaining": "Rerun g5/check.py at F (python3 -B g5/check.py --pin F); every span must still be found.",
+      "blockers": []
     },
     {
       "gateId": "step3-step4-preserve-premise-review",

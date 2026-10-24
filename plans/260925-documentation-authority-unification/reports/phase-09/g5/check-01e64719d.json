@@ -1,0 +1,68 @@
+{
+  "pin": "working-tree@b726d44ed90635cdf7d8c6a10a2dbe1848d69ca6",
+  "ok": true,
+  "spans": 10,
+  "missing": [],
+  "rows": [
+    {
+      "file": "docs/platform/holder-lock/spec.md",
+      "recordedLine": 8,
+      "foundLine": 8,
+      "sha256": "d26a554025faad2bbf11dfe26900c1882681572cce2861e57d68dfc92e029a29"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 3,
+      "foundLine": 3,
+      "sha256": "94cdd23d21d400397d6bfd59042d1945b1451f0a70a28b22568d7c16c42ab7cb"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 4,
+      "foundLine": 4,
+      "sha256": "fb5311c374cfee920fe9c6028df70e5bae62361e5ab85d9512a35a4abaaa513b"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 5,
+      "foundLine": 5,
+      "sha256": "36e46e9cf9e5c6b6b0be3ee282c20dcac71cdba9732e8ea407d1661d234db85a"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 6,
+      "foundLine": 6,
+      "sha256": "16368141d63993234fad11e62e3e033f553e89c6b261947da4ed91ca74ae1095"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 7,
+      "foundLine": 7,
+      "sha256": "daf7bc246d780bdbd8723fd344d5b764928e4755caf6862efe1e3408a3a48fe1"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 8,
+      "foundLine": 8,
+      "sha256": "9b75147a99731ae433b63f9d34a29f376184b662b40d78cea174d1d3437ee240"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 9,
+      "foundLine": 9,
+      "sha256": "6a6e9f58c9717087e1ad44290d2e2e6004c6ed750c11d2c1308e63b41a64c710"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 34,
+      "foundLine": 34,
+      "sha256": "96a8f31e5bea9d070112c399c76d29510c6329ed47cdfc34c005ab621bc5c533"
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "recordedLine": 37,
+      "foundLine": 37,
+      "sha256": "3a0a7b4c3c719d32f22b4fd71b1aa76c06a53271ab4ea8bde39ecbc8808f477d"
+    }
+  ]
+}
