@@ -1,0 +1,9 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py",
+  "exit": 1,
+  "stage": "scratch-lifecycle assertion after both acceptance commands exited 0",
+  "cause": "verify.py also had its own import-time mkdir of /tmp/fgos-work/w11-g9; the final no-scratch assertion caught it.",
+  "scopeIncident": "The inherited verify command created an empty historical scratch directory outside the brief's w12-gloss scratch root. It contained no files, was removed with rmdir, and no source, state or secrets were written there.",
+  "correction": "verify.py now reuses recompose.workspace instead of its independent tempfile/root mechanism. Imports create no directories; disposable replay space is confined to w12-gloss.",
+  "claimLimit": "Composition, independent replay, recompose, sweep and verify passed here, but the enclosing reproduction failed its scratch assertion. Subsequent complete reproduction is the acceptance evidence."
+}

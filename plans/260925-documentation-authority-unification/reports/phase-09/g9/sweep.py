@@ -4,7 +4,9 @@
 Inputs are historical record bodies plus the three explicit gate cohorts. A
 record is one physical JSONL row (revisions remain distinct); membership counts
 are not unique-record counts. Source bytes always come from git at --pin, not
-from the checkout. Output is JSON on stdout; this module never writes files.
+from the checkout. Output is JSON on stdout; no persistent files are written.
+Body replay uses disposable tempfile directories, removed on exit. Importing
+this module or recompose creates no directories.
 """
 import argparse
 import collections

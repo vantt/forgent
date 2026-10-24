@@ -6,6 +6,7 @@ not resolved by fuzzy patching: locate exact authored edits first, then create
 and replay a new complete-file-guarded patch with fuzz=0. Ambiguity fails closed.
 """
 import argparse
+from contextlib import contextmanager
 import difflib
 import importlib.util
 import json
@@ -16,8 +17,27 @@ import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w11-g9')
-TMP.mkdir(parents=True, exist_ok=True)
+TMP = Path('/tmp/fgos-work/w12-gloss')
+
+
+@contextmanager
+def workspace(prefix):
+    """Allocate lazily; checks leave neither replay files nor an empty root."""
+    try:
+        TMP.mkdir(parents=True)
+        created = True
+    except FileExistsError:
+        created = False
+    try:
+        with tempfile.TemporaryDirectory(dir=TMP, prefix=prefix) as name:
+            yield name
+    finally:
+        if created:
+            try:
+                TMP.rmdir()
+            except OSError:
+                # Another replay still owns content in the shared root.
+                pass
 
 
 def module(name, path):
@@ -33,7 +53,7 @@ step7 = module('step7_hunks', sweep.P8 / 'step-07-assemble.py')
 
 def relocate(before, spec, commands):
     if sweep.sha(before) == spec['beforeSha256']:
-        with tempfile.TemporaryDirectory(dir=TMP, prefix='historical-') as name:
+        with workspace('historical-') as name:
             target = Path(name) / spec['path']
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(before.encode())
@@ -98,7 +118,7 @@ def relocate(before, spec, commands):
 
 
 def replay(path, before, after, forward, rollback, commands, creation=False):
-    with tempfile.TemporaryDirectory(dir=TMP, prefix='replay-') as name:
+    with workspace('replay-') as name:
         root = Path(name)
         target = root / path
         target.parent.mkdir(parents=True, exist_ok=True)

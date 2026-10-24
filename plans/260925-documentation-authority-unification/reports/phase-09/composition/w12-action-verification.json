@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "actionPointer": "/actions/4",
+  "path": "docs/platform/workflow/spec.md",
+  "effectivePath": "docs/platform/workflow/spec.md",
+  "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+  "expectedAfterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+  "legacyIdentityRetained": "file:docs/specs/workflow.md",
+  "allHolderHashesMatch": true
+}
