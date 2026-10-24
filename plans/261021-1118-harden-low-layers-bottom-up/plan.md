@@ -60,7 +60,7 @@ Also out of scope:
 | 00 | [T0 baseline + one-time whole-suite test investigation](phase-00-baseline-and-test-investigation.md) | — (TEST lane is told, not waited on) | done 10-21 13:40: [T0 baseline](../reports/research-261021-1210-harden-t0-baseline.md), [test investigation](../reports/research-261021-1210-harden-test-suite-investigation.md) |
 | 01 | [T0 Process Facts & Control + leaf crates](phase-01-t0-process-facts-and-leaf-crates.md) | 00 | **landed** 10-21 22:06 on the second machine (main `7d1f1c1b2`, release `613dfa84…`); [closing report](../reports/closing-261021-2213-harden-t0-process-facts-door.md); owner machine by [guide](../reports/guide-261021-2213-harden-t0-owner-machine-landing.md); open: SEAT carry list (sub-plan phase 7), owner ask 2 on net size |
 | 02 | [T1 Holder-lock, Session Identity, Convention](phase-02-t1-holder-lock-identity-convention.md) | 01 closed; **SEAT landed** (T0 carry list and T1 identity/convention edits wait for it) | pending |
-| 03 | [T2 Git, Terminal-control](phase-03-t2-git-terminal-control.md) | 02 closed | pending |
+| 03 | [T2 Git, Terminal-control](phase-03-t2-git-terminal-control.md) | 02 closed | closed 10-24 (decision 28) |
 | 04 | [T3 Agent protocol, Observe, Event Store](phase-04-t3-agent-protocol-observe-event-store.md) | 03 closed; 04b also needs the ES store layer finished | pending |
 | 05 | [T4 Run Supervisor + Launch gate](phase-05-t4-run-supervisor-launch-gate.md) | 04 closed (04a and 04b) | pending |
 | 06 | [T5 Execution Core, Dispatch & Confinement, Seat Binding, Run Result](phase-06-t5-execution-core-dispatch-seat-run-result.md) | 05 closed; SEAT landed | pending |
@@ -224,6 +224,9 @@ Per layer:
     - The owner's own pane: `<short id> · <title> | fg.ssid:<8 chars>`.
     - The short id is the first 8 characters of the minted id, as on the board. Full ids stay in the record.
     - One label builder serves shell and Node.
+
+28. **2026-10-24 10:05, owner: "Q8c".** T2's missed size ceilings are accepted for Rust (the growth is behaviour the owner chose in decisions 20–27); the test overrun folds through TEST's D4 move-down (hand-off H29), not as a T2 block. T2 is closed.
+29. **2026-10-24 10:05, owner: "cho phép kiểm tra census".** The one-door census drift check runs in `.githooks/pre-commit`, only when the staged paths touch files the census covers, so a lane that pushes without the full suite can no longer leave main's census stale (the drift OPC fixed in `f67862e28`). Owner of the change: HARDEN (Git layer, hand-off H31); OPC reviews it as a Git-area diff (decision 14).
 
 ## Hand-off ledger (items HARDEN gave to other lanes)
 
