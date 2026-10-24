@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnitWithPort as runUnit } from './run-unit-with-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
-import { writeGlobalConfig, writeProjectConfig } from './config-fixture.mjs';
+import { writeAccountsFile, writeProjectConfig } from './config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -159,7 +159,12 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     fs.writeFileSync(path.join(accountHome, 'login'), login);
     return [accountId, { credentialStore: { [family]: accountHome } }];
   }))]));
-  writeGlobalConfig(home, { runner: { providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } });
+  // An empty container is not an account entry: the accounts file holds only what has accounts.
+  const accountPools = {
+    ...(Object.keys(globalProviders).length > 0 ? { providers: globalProviders } : {}),
+    ...(globalPools ? { llmAccounts: globalPools } : {}),
+  };
+  if (Object.keys(accountPools).length > 0) writeAccountsFile(path.join(home, '.fgos'), accountPools);
   process.env.HOME = home;
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.

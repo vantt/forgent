@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { writeGlobalConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 function run(args, extra = {}) { return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], { cwd: repo, encoding: 'utf8', ...extra }); }
@@ -25,19 +25,17 @@ test('dispatch inspect projects only its typed selector and rejects zero or mult
   assert.equal(one.status, 0); assert.equal(JSON.parse(one.stdout).data.inspectionStatus, 'not-found');
 });
 
-test('dispatch inspect --provider-capacity reports redacted global account state', () => {
+test('dispatch inspect --provider-capacity reports redacted account state from the accounts file', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-provider-home-'));
   const fgosHome = path.join(home, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  writeGlobalConfig(home, {
-    runner: {
-      providers: {
-        'openai-codex': {
-          accounts: {
-            tetnu: {
-              label: 'Tetnu',
-              credentialSource: { kind: 'codex-home', home: path.join(home, 'codex-tetnu') },
-            },
+  writeAccountsFile(fgosHome, {
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetnu: {
+            label: 'Tetnu',
+            credentialSource: { kind: 'codex-home', home: path.join(home, 'codex-tetnu') },
           },
         },
       },

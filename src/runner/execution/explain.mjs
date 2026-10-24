@@ -24,7 +24,7 @@ function storeOfBinding(executorEntry, invocationId) {
  * The accounts of `pool` in the order the lease takes them, each with whether the CLI `cli` can run on
  * it. A pool no inventory lists runs on the executor's own login.
  */
-function accountsOf(runnerConfig, pool, cli, projectConfig) {
+function accountsOf(runnerConfig, pool, cli) {
   let accounts = {};
   let inventoryProblem = null;
   try {
@@ -33,7 +33,7 @@ function accountsOf(runnerConfig, pool, cli, projectConfig) {
     inventoryProblem = { code: 'inventory-invalid', at: 'runner.providers', detail: err.message };
   }
   const declared = runnerConfig?.llmAccounts?.[pool] !== undefined;
-  const { problems } = readLlmAccounts(runnerConfig, { projectConfig });
+  const { problems } = readLlmAccounts(runnerConfig);
   return {
     pool,
     stateKey: legacyStateKey(pool),
@@ -54,9 +54,8 @@ function accountsOf(runnerConfig, pool, cli, projectConfig) {
  * @param {string} ask.capability
  * @param {string} [ask.rigor]
  * @param {object} ask.session the bind() session (`headless`, `herdrPresent`).
- * @param {object} [ask.projectConfig] the raw project config, to report an account inventory declared there.
  */
-export function explainCapability(runnerConfig, { capability, rigor, session, projectConfig } = {}) {
+export function explainCapability(runnerConfig, { capability, rigor, session } = {}) {
   if (typeof capability !== 'string' || !capability) throw new Error('dispatch explain requires --for <capability>');
   const unit = { id: 'explain', capability, writes: [], ...(rigor ? { rigor } : {}) };
   const { binding, policy, ranked, explain, walk } = explainSeat({ unit, role: 'producer' }, { runnerConfig, session });
@@ -116,7 +115,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
       model: b.model,
       store: storeOf(b.executor, b.invocation)?.use ?? null,
     })),
-    accounts: pools.map(([pool, cli]) => accountsOf(runnerConfig, pool, cli, projectConfig)),
+    accounts: pools.map(([pool, cli]) => accountsOf(runnerConfig, pool, cli)),
     explanation,
   };
 }

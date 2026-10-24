@@ -1,4 +1,4 @@
-// bin-discovery.test.mjs — 3-tier fgos bin resolution + tier-3 config-cache
+// bin-discovery.test.mjs — 3-tier fgos bin resolution + tier-3 bin cache
 // (tsk-2qc-1, D2/D4 of docs/history/install-setup-external-project-
 // reliability/CONTEXT.md).
 import '../helpers/process-tmp-root.mjs';
@@ -16,8 +16,13 @@ import {
   refreshGlobalBinCache,
   resolveFgosBin,
 } from '../../src/setup/bin-discovery.mjs';
-import { loadGlobalConfig } from '../../src/config/global-config.mjs';
-import { globalConfigPath as globalConfigFile, writeGlobalConfig } from '../helpers/config-fixture.mjs';
+
+const cacheFile = (globalDir) => path.join(globalDir, 'runtime', 'bin-cache.json');
+const writeCache = (globalDir, globalFgosPath) => {
+  fs.mkdirSync(path.dirname(cacheFile(globalDir)), { recursive: true });
+  fs.writeFileSync(cacheFile(globalDir), JSON.stringify({ globalFgosPath }));
+};
+const readCache = (globalDir) => JSON.parse(fs.readFileSync(cacheFile(globalDir), 'utf8'));
 
 function mkTempDir(prefix) {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -60,30 +65,27 @@ test('resolveProjectLocalBin returns null when no ancestor has node_modules/.bin
   assert.equal(resolveProjectLocalBin(dir), null);
 });
 
-test('cachedGlobalBin returns null when the global config has no bin.globalFgosPath', () => {
-  const globalConfigPath = path.join(mkTempDir('bin-discovery-cache-'), 'config.json');
-  assert.equal(cachedGlobalBin(globalConfigPath), null);
+test('cachedGlobalBin returns null when there is no bin cache file', () => {
+  const globalDir = mkTempDir('bin-discovery-cache-');
+  assert.equal(cachedGlobalBin({ globalDir }), null);
 });
 
 test('cachedGlobalBin returns the cached path when it still exists on disk', () => {
   const dir = mkTempDir('bin-discovery-cache-hit-');
-  const globalConfigPath = globalConfigFile(dir);
   const binPath = path.join(dir, 'fgos');
   writeStub(binPath);
-  writeGlobalConfig(dir, { bin: { globalFgosPath: binPath } });
-  assert.equal(cachedGlobalBin(globalConfigPath), binPath);
+  writeCache(dir, binPath);
+  assert.equal(cachedGlobalBin({ globalDir: dir }), binPath);
 });
 
 test('cachedGlobalBin self-heals: returns null when the cached path no longer exists on disk', () => {
   const dir = mkTempDir('bin-discovery-cache-stale-');
-  const globalConfigPath = globalConfigFile(dir);
-  writeGlobalConfig(dir, { bin: { globalFgosPath: path.join(dir, 'gone') } });
-  assert.equal(cachedGlobalBin(globalConfigPath), null);
+  writeCache(dir, path.join(dir, 'gone'));
+  assert.equal(cachedGlobalBin({ globalDir: dir }), null);
 });
 
 test('refreshGlobalBinCache writes the resolved PATH bin and reports changed:true on first populate', () => {
   const dir = mkTempDir('bin-discovery-refresh-');
-  const globalConfigPath = path.join(dir, 'config.json');
   const binDir = mkTempDir('bin-discovery-refresh-pathstub-');
   const binPath = path.join(binDir, 'fgos');
   writeStub(binPath);
@@ -91,10 +93,12 @@ test('refreshGlobalBinCache writes the resolved PATH bin and reports changed:tru
   const originalPath = process.env.PATH;
   process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
   try {
-    const { resolved, changed } = refreshGlobalBinCache(globalConfigPath);
+    const { resolved, changed } = refreshGlobalBinCache({ globalDir: dir });
     assert.equal(resolved, binPath);
     assert.equal(changed, true);
-    assert.equal(loadGlobalConfig(globalConfigPath).bin.globalFgosPath, binPath);
+    assert.deepEqual(readCache(dir), { globalFgosPath: binPath });
+    assert.equal(fs.statSync(cacheFile(dir)).mode & 0o777, 0o600);
+    assert.equal(fs.existsSync(path.join(dir, 'config.json')), false, 'the cache never lands in config');
   } finally {
     process.env.PATH = originalPath;
   }
@@ -102,7 +106,6 @@ test('refreshGlobalBinCache writes the resolved PATH bin and reports changed:tru
 
 test('refreshGlobalBinCache is a no-op write when the resolved value already matches the cache (fgos setup idempotency)', () => {
   const dir = mkTempDir('bin-discovery-refresh-idempotent-');
-  const globalConfigPath = path.join(dir, 'config.json');
   const binDir = mkTempDir('bin-discovery-refresh-idempotent-pathstub-');
   const binPath = path.join(binDir, 'fgos');
   writeStub(binPath);
@@ -110,27 +113,26 @@ test('refreshGlobalBinCache is a no-op write when the resolved value already mat
   const originalPath = process.env.PATH;
   process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
   try {
-    refreshGlobalBinCache(globalConfigPath);
-    const mtimeBefore = fs.statSync(globalConfigPath).mtimeMs;
-    const second = refreshGlobalBinCache(globalConfigPath);
+    refreshGlobalBinCache({ globalDir: dir });
+    const mtimeBefore = fs.statSync(cacheFile(dir)).mtimeMs;
+    const second = refreshGlobalBinCache({ globalDir: dir });
     assert.equal(second.changed, false);
-    assert.equal(fs.statSync(globalConfigPath).mtimeMs, mtimeBefore, 'must not rewrite when nothing changed');
+    assert.equal(fs.statSync(cacheFile(dir)).mtimeMs, mtimeBefore, 'must not rewrite when nothing changed');
   } finally {
     process.env.PATH = originalPath;
   }
 });
 
-test('refreshGlobalBinCache clears a stale cached key when nothing resolves on PATH anymore', () => {
+test('refreshGlobalBinCache deletes the cache file when nothing resolves on PATH anymore', () => {
   const dir = mkTempDir('bin-discovery-refresh-clear-');
-  const globalConfigPath = globalConfigFile(dir);
-  writeGlobalConfig(dir, { bin: { globalFgosPath: '/some/stale/path' } });
+  writeCache(dir, '/some/stale/path');
   const originalPath = process.env.PATH;
   process.env.PATH = '';
   try {
-    const { resolved, changed } = refreshGlobalBinCache(globalConfigPath);
+    const { resolved, changed } = refreshGlobalBinCache({ globalDir: dir });
     assert.equal(resolved, null);
     assert.equal(changed, true);
-    assert.equal(loadGlobalConfig(globalConfigPath).bin.globalFgosPath, undefined);
+    assert.equal(fs.existsSync(cacheFile(dir)), false);
   } finally {
     process.env.PATH = originalPath;
   }
@@ -155,11 +157,11 @@ test('resolveFgosBin prefers tier 2 (project-local) over tier 3 when tier 1 is a
 
 test('resolveFgosBin returns null when no tier resolves', () => {
   const dir = mkTempDir('bin-discovery-priority-none-');
-  const globalConfigPath = path.join(mkTempDir('bin-discovery-priority-none-cfg-'), 'config.json');
+  const globalDir = mkTempDir('bin-discovery-priority-none-cfg-');
   const originalPath = process.env.PATH;
   process.env.PATH = '';
   try {
-    assert.equal(resolveFgosBin(dir, { globalConfigPath }), null);
+    assert.equal(resolveFgosBin(dir, { globalDir }), null);
   } finally {
     process.env.PATH = originalPath;
   }

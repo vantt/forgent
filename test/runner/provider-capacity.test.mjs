@@ -29,7 +29,7 @@ import {
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
-import { globalConfigPath as globalConfigFile } from '../helpers/config-fixture.mjs';
+import { globalConfigPath as globalConfigFile, writeAccountsFile } from '../helpers/config-fixture.mjs';
 
 // Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
 // the machine's real ones, and every child process started below inherits it.
@@ -63,6 +63,19 @@ function runnerConfig() {
     },
   };
 }
+
+test('a confined session is refused the lease by name instead of reading as an unmanaged provider', () => {
+  const previous = process.env.FGOS_CONFINED;
+  process.env.FGOS_CONFINED = '1';
+  try {
+    assert.throws(
+      () => acquireNamedAccountLease({ accountId: 'a', runnerConfig: {}, provider: 'openai-codex', runId: 'run_confined_01', runtimeDir: mkTempDir() }),
+      (err) => err.code === 'config-accounts-unavailable-confined',
+    );
+  } finally {
+    if (previous === undefined) delete process.env.FGOS_CONFINED; else process.env.FGOS_CONFINED = previous;
+  }
+});
 
 test('lease acquire/release uses runId and does not reclaim by elapsed time alone', () => {
   const runtimeDir = mkTempDir();
@@ -666,9 +679,7 @@ test('a round that ended on a dead credential quarantines the account as an auth
 test('an owner-set quarantine keeps the account out of selection until its end time', () => {
   const dir = mkTempDir();
   const globalConfigPath = globalConfigFile(dir);
-  // Account pools live in the machine's accounts file, never in the global config file.
-  fs.mkdirSync(path.join(dir, '.fgos', 'private'), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(path.join(dir, '.fgos', 'private', 'accounts.yaml'), JSON.stringify({ runner: { providers: runnerConfig().providers } }), { mode: 0o600 });
+  writeAccountsFile(path.join(dir, '.fgos'), { providers: runnerConfig().providers });
   const until = new Date(Date.now() + 3600_000).toISOString();
 
   const refusedPast = reconcileProviderCapacityQuarantineUseCase({}, {
