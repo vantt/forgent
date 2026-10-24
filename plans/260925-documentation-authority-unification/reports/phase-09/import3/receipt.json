@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "status": "blocked",
+  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
+  "authority": "w10-import3-brief / L12-137 / L13-6",
+  "blocker": "Required retained navigation holder docs/reading-map.md is outside the exact writable list. Global drift scanner separately fails on an absent prepared-only component-boundary history holder.",
+  "needsWrites": [
+    "docs/reading-map.md"
+  ],
+  "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
+  "counts": {
+    "importedCommits": 69,
+    "changedPaths": 119,
+    "changedDocumentation": 8,
+    "incomingPlatformDocuments": 4,
+    "completeIncomingUnits": 608,
+    "effectiveBindingsChecked": 1,
+    "failingIncomingBindings": 0,
+    "carriedUnits": 0,
+    "changedLedgerRows": 0,
+    "ratchetEntriesChanged": 0,
+    "boundedUnprovenUnits": 24
+  },
+  "sourceTriage": [
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unprovenUnits": 18,
+      "details": "source-triage.json#/records/0"
+    },
+    {
+      "sourcePath": "docs/specs/reading-map.md",
+      "unprovenUnits": 2,
+      "details": "source-triage.json#/records/1"
+    },
+    {
+      "sourcePath": "docs/specs/seat-binding.md",
+      "unprovenUnits": 4,
+      "details": "source-triage.json#/records/2"
+    }
+  ],
+  "carriedUnits": [],
+  "successorAnchorsAdded": [],
+  "ratchetEntriesChanged": [],
+  "ratchetMismatchesUnchanged": [
+    "docs/specs/confinement-authority.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/seat-binding.md"
+  ],
+  "globalDrift": {
+    "status": "failed-before-writing",
+    "savedArtifactChanged": false,
+    "savedSourcePin": "5965143b4fd56df6698b2096df1a672d26293c90",
+    "savedZeroMissingIsNotHEADProof": true
+  },
+  "checks": [
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/0",
+      "name": "accounting",
+      "exit": 0
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/1",
+      "name": "legacy-drift-at-head",
+      "exit": 1
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/2",
+      "name": "rebind-check",
+      "exit": 0
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/3",
+      "name": "ownership-audit",
+      "exit": 1
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/4",
+      "name": "ratchet",
+      "exit": 1
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/5",
+      "name": "ratchet-owning-test",
+      "exit": 1
+    },
+    {
+      "record": "checks.json",
+      "commandRef": "checks.json#/checks/6",
+      "name": "evidence-relocation-before",
+      "exit": 2
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/0",
+      "name": "accounting",
+      "exit": 0
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/1",
+      "name": "legacy-drift-at-head",
+      "exit": 1
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/2",
+      "name": "rebind-check",
+      "exit": 0
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/3",
+      "name": "ownership-audit",
+      "exit": 1
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/4",
+      "name": "ratchet",
+      "exit": 1
+    },
+    {
+      "record": "checks-replay.json",
+      "commandRef": "checks-replay.json#/checks/5",
+      "name": "ratchet-owning-test",
+      "exit": 1
+    }
+  ],
+  "additionalCommands": [
+    {
+      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/import3/account.py",
+      "exit": 1,
+      "meaning": "Initial author attempt: overstrict all-docs-equal-main assertion; corrected using exact parent diffs, then rerun with exit 0."
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    {
+      "command": "JSON parse / Python AST parse for import3 artifacts",
+      "exit": 0
+    }
+  ],
+  "evidenceRelocation": {
+    "exit": 2,
+    "verdict": null,
+    "incident": "Explicit release-addon preload did not prevent ensureScriptAddon invoking checkout staging on its next load. Cargo reported an incremental build; the native door refused the second file. Ignored build/.fgos runtime artifacts may have been populated outside scope; not inspected or cleaned afterward.",
+    "repeatDisabledInSafeDriver": true
+  },
+  "artifactEncoding": "Large ownership-audit stdout is stored losslessly in deterministic gzip, authenticated by stdoutSha256 in each command record. Other command outputs are inline.",
+  "scratch": {
+    "path": "/tmp/fgos-work/w10-import3",
+    "removedAtHandback": true
+  },
+  "impactAnalysis": "degraded/unqueried under no-CLI brief; no production symbols changed",
+  "boundaries": {
+    "candidateDocumentsChanged": false,
+    "ledgerChanged": false,
+    "exceptionsChanged": false,
+    "legacyDriftChanged": false,
+    "repositoryGitMutationCommands": false,
+    "fgosCLI": false,
+    "pairAccounting": false,
+    "gateAcceptance": false,
+    "authorityCutover": false
+  },
+  "nextActions": [
+    "Grant docs/reading-map.md for its two imported entry updates while retaining the transition banner, knowledge fixes and later truth/link corrections.",
+    "Have the composition owner resolve prepared-only overlays versus the current scanner before requiring a successful global HEAD scan.",
+    "Resume the 24 bounded unit carries and rebindings, scan globally, then refresh only the three ratchet digests with truthful provenance.",
+    "Retry evidence relocation only in a sanctioned isolated native-payload fixture."
+  ]
+}
