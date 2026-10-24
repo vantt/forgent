@@ -122,11 +122,13 @@ function cliWithNativeSpy(t) {
   };
 }
 
-test('a CLI verb that opens the store runs both triggers on maintenance facts, and `events migrate` opens it through none', (t) => {
+test('a CLI verb that opens the store runs its triggers on maintenance facts, and `events migrate` opens it through none', (t) => {
   const cli = cliWithNativeSpy(t);
   const list = cli(['list']);
   assert.equal(JSON.parse(list.stdout).contract, 'fgos.v1');
   assert.deepEqual(list.calls, ['maintenance', 'maintenance'], 'one fact read at the start and one at the end, no integrity status');
+  // A command that hands its seals to a child skips the start trigger: only the end trigger reads facts and seals what is due.
+  assert.deepEqual(cli(['list'], { dispatched: false }).calls, ['maintenance'], 'a hand-off command runs the end trigger only');
   const status = cli(['events', 'status']);
   assert.equal(status.status, 0, status.stderr);
   assert.equal(JSON.parse(status.stdout).data.remote, 'origin');

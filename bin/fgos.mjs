@@ -5230,8 +5230,10 @@ async function main() {
     if (opensEventStore(entry, verb, positional)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
       sweepsLand = landsWork(verb, positional);
-      // `init` creates the store, so only its end trigger has anything to maintain.
-      if (verb !== 'init') maintainEventStore(path.dirname(dir), eventStoreLifecycle);
+      // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
+      // hands its seals to a child and runs the same seal-if-due policy in its end trigger, so a start trigger would only
+      // repeat that work on the print path; a stale or crashed batch is sealed by that end trigger or the child.
+      if (verb !== 'init' && eventStoreLifecycle.dispatched) maintainEventStore(path.dirname(dir), eventStoreLifecycle);
     }
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
