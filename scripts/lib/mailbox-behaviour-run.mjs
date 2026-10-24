@@ -322,14 +322,15 @@ export const OMP_OFF_CONFIG = 'mcp:\n  enableProjectConfig: false\n';
 
 /**
  * The print-mode argv of a pi or omp run: the JSON event stream, the one `extension` loaded by
- * path, every other source off (`off`; the MCP falsifier drops them), the account's Codex
- * model at the pinned thinking `effort`, the receiver instruction appended to the system
- * prompt, the task. omp names its `profile` and its off overlay file `offConfig`.
+ * path, every other source off (`off`; the MCP falsifier drops them), the account's model under
+ * its `provider` (the Codex login's by default) at the pinned thinking `effort`, the receiver
+ * instruction appended to the system prompt, the task. omp names its `profile` and its off
+ * overlay file `offConfig`.
  */
-export function piOmpArgs(cli, { extension, model, effort, instruction = null, prompt, profile = null, offConfig = null, off = true }) {
+export function piOmpArgs(cli, { extension, model, effort, provider = confined.ACCOUNT_PROVIDER, instruction = null, prompt, profile = null, offConfig = null, off = true }) {
   if (!effort) throw new Error(`a ${cli} run names its thinking effort; it is never inherited`);
   const head = cli === 'pi' ? ['-p', '--mode', 'json', ...(off ? PI_OFF : [])] : [`--profile=${profile}`, '-p', '--mode', 'json', ...OMP_OFF, ...(off ? [`--config=${offConfig}`] : [])];
-  return [...head, '-e', extension, '--model', `openai-codex/${model}`, '--thinking', effort, ...(instruction ? ['--append-system-prompt', instruction] : []), prompt];
+  return [...head, '-e', extension, '--model', `${provider}/${model}`, '--thinking', effort, ...(instruction ? ['--append-system-prompt', instruction] : []), prompt];
 }
 
 /** The CLI argv of a run: print mode, the model (`models`, V6's by default), no MCP server, the hook rows, the instruction, the task. */
@@ -443,7 +444,7 @@ export async function runOne(ctx, cell, runId) {
   // A two-turn cell (V7f's NU) talks to the CLI over its input and output.
   const talking = ctx.conversation?.(cell) ?? null;
   const args = talking ? talking.args({ settings: paths.settings, instruction }) : ext
-    ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, instruction, prompt: data.task, profile: RUN_PROFILE, offConfig: paths.ompOff })
+    ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, ...(ctx.providers?.[cell.cli] ? { provider: ctx.providers[cell.cli] } : {}), instruction, prompt: data.task, profile: RUN_PROFILE, offConfig: paths.ompOff })
     : cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
   const extEnv = ext ? (cell.cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: ctx.natives }) : {};
   const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: { ...cliRunEnv(cell.cli), ...extEnv, ...(ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {}) } });
@@ -525,8 +526,11 @@ export async function runOne(ctx, cell, runId) {
   const end = await confined.endConfinedRun(run, { outcome: timedOut ? 'timeout' : null });
   await provider?.close();
   exit ??= { code: null, signal: 'SIGKILL' };
-  // A talking run's model, effort and instructions travel off the argv; the ledger entry records them.
-  const settled = confined.settleLoginCopy(prepared, talking?.settings ? { launchSettings: talking.settings({ instruction }) } : {});
+  // A talking run's model, effort and instructions travel off the argv, and a pi or omp run's
+  // provider and login are the pair's; the ledger entry records them.
+  const launchSettings = talking?.settings ? talking.settings({ instruction })
+    : ext ? { model: ctx.models[cell.cli], provider: ctx.providers?.[cell.cli] ?? confined.ACCOUNT_PROVIDER, thinking: ctx.effort, instructionSha256: crypto.createHash('sha256').update(instruction).digest('hex') } : null;
+  const settled = confined.settleLoginCopy(prepared, launchSettings ? { launchSettings } : {});
   const output = `${fs.readFileSync(stdoutFile, 'utf8')}\n${fs.readFileSync(stderrFile, 'utf8')}`;
   // pi and omp exit 0 when the provider refuses, and a talking CLI ends its input cleanly; their last turn says so.
   const providerError = talk ? talk.turnError() : ext ? providerErrorOf(stdoutFile) : null;

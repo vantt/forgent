@@ -26,6 +26,7 @@ import {
   piOmpInstall as confinedPiOmpInstall,
   prepareConfinedRun,
   readAccountCredential,
+  readPiAccountCredential,
   settleCopy,
   processesOfRun,
   settleLoginCopy,
@@ -641,4 +642,25 @@ test('the account credential is read from a scratch copy of the profile store, s
   inPlace.prepare('SELECT count(*) FROM auth_credentials').get();
   inPlace.close();
   assert.notDeepEqual(stamp(), before, 'an in-place read-only open creates the owner\'s -wal and -shm');
+});
+
+test('a pi account of another provider is read from pi\'s own account file without changing it, and its copy carries the credential under that provider', () => {
+  const account = makeFixtureDir('mbx-pi-account-');
+  assert.throws(() => readPiAccountCredential(account, 'openrouter'), /never logged in/);
+  const file = path.join(account, 'auth.json');
+  fs.writeFileSync(file, JSON.stringify({ other: { type: 'api_key', key: 'K' } }), { mode: 0o600 });
+  assert.throws(() => readPiAccountCredential(account, 'openrouter'), /holds no openrouter credential/);
+  const credential = { type: 'oauth', access: 'SCRATCH-A', refresh: 'SCRATCH-R', expires: 9007199254740991 };
+  fs.writeFileSync(file, JSON.stringify({ openrouter: credential }), { mode: 0o600 });
+  const before = { sha: sha256(file), mtimeNs: fs.statSync(file, { bigint: true }).mtimeNs };
+  assert.deepEqual(readPiAccountCredential(account, 'openrouter'), credential);
+  assert.deepEqual({ sha: sha256(file), mtimeNs: fs.statSync(file, { bigint: true }).mtimeNs }, before, 'the source keeps its bytes and mtime');
+
+  const home = makeFixtureDir('mbx-pi-login-');
+  const made = materializeAccountLogin({ cli: 'pi', home, credential, provider: 'openrouter' });
+  assert.deepEqual(JSON.parse(fs.readFileSync(made.copy, 'utf8')), { openrouter: credential }, 'no accountId is invented for a provider that has none');
+  assert.equal(fs.statSync(made.copy).mode & 0o777, 0o600);
+  assert.equal(settleCopy(made, path.dirname(home)), null);
+  const codex = materializeAccountLogin({ cli: 'pi', home: makeFixtureDir('mbx-pi-login-'), credential: scratchCredential() });
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(codex.copy, 'utf8'))), ['openai-codex'], 'the Codex account stays the default');
 });

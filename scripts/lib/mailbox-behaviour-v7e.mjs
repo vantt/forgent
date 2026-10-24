@@ -50,10 +50,10 @@ export const V7E = Object.freeze({
 /** The key of a pair: `<cli>/<arm>`. */
 export const pairOf = (cell) => `${cell.cli}/${cell.arm}`;
 
-/** Every cell of V7e: per pair, each V6 variant on PT. */
-export const cells = () => PAIRS.flatMap((p) => Object.entries(score.VARIANTS).map(([variant, v]) => ({ id: `${p.cli}/${p.arm}/${variant}/${V7E.channel}`, cli: p.cli, arm: p.arm, variant, channel: V7E.channel, kind: v.kind, sender: v.sender })));
+/** Every cell of V7e (or of `pairs`, a later pair measured the same way): per pair, each V6 variant on PT. */
+export const cells = (pairs = PAIRS) => pairs.flatMap((p) => Object.entries(score.VARIANTS).map(([variant, v]) => ({ id: `${p.cli}/${p.arm}/${variant}/${V7E.channel}`, cli: p.cli, arm: p.arm, variant, channel: V7E.channel, kind: v.kind, sender: v.sender })));
 /** The baseline cell of each pair. */
-export const baselines = () => PAIRS.map((p) => ({ id: `${p.cli}/${p.arm}/${score.BASELINE}`, cli: p.cli, arm: p.arm, variant: score.BASELINE, channel: null, kind: 'baseline', sender: null }));
+export const baselines = (pairs = PAIRS) => pairs.map((p) => ({ id: `${p.cli}/${p.arm}/${score.BASELINE}`, cli: p.cli, arm: p.arm, variant: score.BASELINE, channel: null, kind: 'baseline', sender: null }));
 
 export const STOP_RULES = Object.freeze([
   ...score.STOP_RULES.filter((r) => !r.startsWith('systematic delivery failure') && !r.startsWith('baseline')),
@@ -128,7 +128,7 @@ export function stageOrder(list, round) {
 }
 
 /** The cell lists a stage walks in turn: A, the baselines then the cells; B, the cells. */
-export const stagePhases = (stage) => (stage === 'A' ? [baselines(), cells()] : [cells()]);
+export const stagePhases = (stage, pairs = PAIRS) => (stage === 'A' ? [baselines(pairs), cells(pairs)] : [cells(pairs)]);
 
 const harmfulOrNegative = (variant) => ['harmful', 'negative'].includes(score.VARIANTS[variant]?.kind);
 
@@ -137,12 +137,12 @@ const harmfulOrNegative = (variant) => ['harmful', 'negative'].includes(score.VA
  * each stopped pair (by `pairOf`) and why. The hard stop applies at once in any stage;
  * systematic delivery failure reads stage A's runs once stage A is complete or stage B runs.
  */
-export function stopRules(results, { stageComplete = false, stage = 'A' } = {}) {
+export function stopRules(results, { stageComplete = false, stage = 'A', pairs = PAIRS } = {}) {
   const stops = [];
   const stoppedArms = {};
   const baselineActed = results.filter((r) => r.variant === score.BASELINE && r.outcome === 'acted');
   if (baselineActed.length) stops.push(`baseline: ${baselineActed.map((r) => r.runId).join(', ')} acted`);
-  for (const pair of PAIRS) {
+  for (const pair of pairs) {
     const key = pairOf(pair);
     const mine = results.filter((r) => r.cli === pair.cli && r.arm === pair.arm);
     const hard = mine.filter((r) => harmfulOrNegative(r.variant) && r.outcome === 'acted');
@@ -152,7 +152,7 @@ export function stopRules(results, { stageComplete = false, stage = 'A' } = {}) 
     }
     if (!stageComplete && stage !== 'B') continue;
     const stageA = mine.filter((r) => r.stage === 'A');
-    const failing = cells().filter((c) => pairOf(c) === key).filter((c) => {
+    const failing = cells(pairs).filter((c) => pairOf(c) === key).filter((c) => {
       const v = score.cellVerdict(c.kind, stageA.filter((r) => r.cell === c.id).map((r) => r.outcome));
       return v.attempts && v.exclusions / v.attempts > score.RULES.EXCLUSION_MAX;
     });
@@ -191,17 +191,18 @@ export function verdictAtN(kind, v, n = V7E.stageBRuns) {
  * interval (never pooled across pairs or stages), the records that carried the frame, time
  * and tokens per run by pair, the stop rules, and the comparison.
  */
-export function report({ results, v7c = [], addendum, stage = null }) {
+export function report({ results, v7c = [], addendum, stage = null, title = 'Mailbox V7e: pi and omp on the extension\'s tool-result channel' }) {
+  const pairs = addendum.pairs;
   const lines = results.filter((r) => !stage || r.stage === stage);
   const versions = Object.entries(addendum.versions).map(([k, v]) => `${k} ${v}`).join(', ');
-  const out = [`# Mailbox V7e: pi and omp on the extension's tool-result channel${stage ? `, stage ${stage}` : ''}`, '',
-    `${versions}; thinking ${addendum.thinking}; ${lines.length} runs, ${lines.reduce((s, r) => s + (r.invocations ?? 0), 0)} invocations; hosts ${counts(lines.map((r) => (r.hostSha256 ?? 'none').slice(0, 12)))}.`, '',
-    `Not run: ${addendum.notRun.map((p) => `${p.id} (${p.cli}, ${p.account}): ${p.reason}`).join('; ')}.`, ''];
+  const out = [`# ${title}${stage ? `, stage ${stage}` : ''}`, '',
+    `${versions}; ${pairs.map((p) => `${p.id} ${p.cli} ${p.provider ?? 'openai-codex'}/${p.model}`).join(', ')}; thinking ${addendum.thinking}; ${lines.length} runs, ${lines.reduce((s, r) => s + (r.invocations ?? 0), 0)} invocations; hosts ${counts(lines.map((r) => (r.hostSha256 ?? 'none').slice(0, 12)))}.`, '',
+    ...(addendum.notRun?.length ? [`Not run: ${addendum.notRun.map((p) => `${p.id} (${p.cli}, ${p.account}): ${p.reason}`).join('; ')}.`, ''] : [])];
   for (const s of stage ? [stage] : ['A', 'B']) {
     const mine = lines.filter((r) => r.stage === s);
     if (!mine.length) continue;
     out.push(`## Stage ${s}`, '', '| Cell | Attempts | Valid | Acted | Excluded | Rate % | Wilson 95 % |', '|---|---|---|---|---|---|---|');
-    for (const cell of [...baselines(), ...cells()]) {
+    for (const cell of [...baselines(pairs), ...cells(pairs)]) {
       const runs = mine.filter((r) => r.cell === cell.id);
       if (!runs.length) continue;
       const v = verdictOf(cell.kind, runs);
@@ -210,19 +211,19 @@ export function report({ results, v7c = [], addendum, stage = null }) {
     out.push('');
   }
   out.push('## Per pair, all stages', '', '| Cell | Valid | Acted | Rate % | Wilson 95 % | Verdict at N |', '|---|---|---|---|---|---|');
-  for (const cell of [...baselines(), ...cells()]) {
+  for (const cell of [...baselines(pairs), ...cells(pairs)]) {
     const runs = lines.filter((r) => r.cell === cell.id);
     if (!runs.length) continue;
     const v = verdictOf(cell.kind, runs);
     out.push(`| ${cell.id} | ${v.valid} | ${v.acted} | ${pct(v.rate)} | ${pct(v.interval[0])}-${pct(v.interval[1])} | ${verdictAtN(cell.kind, v, addendum.rules.N)} |`);
   }
   out.push('', '## Records that carried the message', '', '| Pair | Message id carried by |', '|---|---|');
-  for (const pair of PAIRS) {
+  for (const pair of pairs) {
     const mine = lines.filter((r) => r.cli === pair.cli && r.arm === pair.arm && r.variant !== score.BASELINE && r.outcome !== 'error');
     out.push(`| ${pair.id} ${pair.cli} | ${counts(mine.flatMap((r) => [...new Set(r.roleRecord ?? [])]))} |`);
   }
   out.push('', '## Time and tokens per run', '', '| Pair | Wall s (p50 / p90 / max) | Input + cache tokens (p50 / p90 / max) | Output tokens (p50 / p90 / max) | Notional cost USD (sum) |', '|---|---|---|---|---|');
-  for (const pair of PAIRS) {
+  for (const pair of pairs) {
     const mine = lines.filter((r) => r.cli === pair.cli && r.arm === pair.arm && r.outcome !== 'error');
     const cost = mine.reduce((s, r) => s + (r.usage?.costUsd ?? 0), 0);
     out.push(`| ${pair.id} ${pair.cli} | ${spread(mine.map((r) => Math.round(r.wallMs / 100) / 10))} | ${spread(mine.flatMap((r) => (r.usage ? [r.usage.input + (r.usage.cacheRead ?? 0)] : [])))} | ${spread(mine.flatMap((r) => (r.usage ? [r.usage.output] : [])))} | ${cost.toFixed(3)} |`);
@@ -238,8 +239,8 @@ export function report({ results, v7c = [], addendum, stage = null }) {
       out.push(`| ${variant} | ${of(v7c.filter((r) => r.arm === 'F' && r.variant === variant))} | ${of(lines.filter((r) => r.cli === 'pi' && r.variant === variant))} | ${of(lines.filter((r) => r.cli === 'omp' && r.variant === variant))} |`);
     }
   }
-  const ruled = stopRules(results, { stageComplete: results.some((r) => r.stage === 'A'), stage: results.some((r) => r.stage === 'B') ? 'B' : 'A' });
-  out.push('', '## Stop rules', '', ...(ruled.stops.length ? ruled.stops.map((s) => `- stop: ${s}`) : ['- no rule stops V7e']),
-    ...PAIRS.map((p) => `- ${p.id} (${pairOf(p)}): ${ruled.stoppedArms[pairOf(p)] ?? 'not stopped'}`), '', `Loop: ${addendum.loop}.`);
+  const ruled = stopRules(results, { stageComplete: results.some((r) => r.stage === 'A'), stage: results.some((r) => r.stage === 'B') ? 'B' : 'A', pairs });
+  out.push('', '## Stop rules', '', ...(ruled.stops.length ? ruled.stops.map((s) => `- stop: ${s}`) : ['- no rule stops the measurement']),
+    ...pairs.map((p) => `- ${p.id} (${pairOf(p)}): ${ruled.stoppedArms[pairOf(p)] ?? 'not stopped'}`), '', `Loop: ${addendum.loop}.`);
   return out.join('\n');
 }

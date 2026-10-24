@@ -232,6 +232,19 @@ export function readAccountCredential(profileDir, scratch, provider = ACCOUNT_PR
 }
 
 /**
+ * The account's `provider` credential in pi's own account file (`<account dir>/auth.json`, read
+ * once as a plain file, never written): an account whose login pi itself holds, such as one that
+ * serves a provider no omp profile carries.
+ */
+export function readPiAccountCredential(accountDir, provider) {
+  const file = path.join(accountDir, 'auth.json');
+  if (!exists(file)) throw new ConfinedLaunchError(`no login file at ${file}; the account was never logged in`);
+  const credential = JSON.parse(fs.readFileSync(file, 'utf8'))[provider];
+  if (!credential) throw new ConfinedLaunchError(`the login file at ${file} holds no ${provider} credential`);
+  return credential;
+}
+
+/**
  * The sha256 of the credential rows of an omp `agent.db` (provider, type, data, disabled
  * cause), after folding its WAL into the file, so the rows omp writes on every run (usage,
  * cache, model statistics) never read as a changed login.
@@ -250,21 +263,21 @@ export function credentialRowsDigest(file) {
 const DIGESTS = { bytes: loginDigest, credentials: credentialRowsDigest };
 
 /**
- * Writes the account login of a `cli` (pi or omp) run into its private `home`: pi's `auth.json`
- * (mode 0600), or omp's `agent.db` for `profile` through `<ompBin> auth import -` with the home as
- * `HOME` (the credential on stdin, never in a file). Returns the copy, its snapshot digest and
- * the digest's kind.
+ * Writes the account login of a `cli` (pi or omp) run into its private `home`, under `provider`
+ * (the Codex login's by default): pi's `auth.json` (mode 0600), or omp's `agent.db` for `profile`
+ * through `<ompBin> auth import -` with the home as `HOME` (the credential on stdin, never in a
+ * file). Returns the copy, its snapshot digest and the digest's kind.
  */
-export function materializeAccountLogin({ cli, home, credential, profile = null, ompBin = null, nativesDir = null }) {
+export function materializeAccountLogin({ cli, home, credential, provider = ACCOUNT_PROVIDER, profile = null, ompBin = null, nativesDir = null }) {
   const spec = ACCOUNT_LOGINS[cli];
   if (!spec) throw new ConfinedLaunchError(`no account login rule for ${cli}`);
   const copy = spec.copyPath(home, profile);
   if (cli === 'pi') {
     const { type, access, refresh, expires, accountId } = credential;
-    fs.writeFileSync(copy, `${JSON.stringify({ [ACCOUNT_PROVIDER]: { type, access, refresh, expires, accountId } }, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
+    fs.writeFileSync(copy, `${JSON.stringify({ [provider]: { type, access, refresh, expires, accountId } }, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
   } else {
     const env = { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8', ...(nativesDir ? { PI_NATIVES_DIR: nativesDir } : {}) };
-    const out = spawnSync(ompBin, [`--profile=${profile}`, 'auth', 'import', '-'], { input: JSON.stringify({ version: 1, credentials: [{ provider: ACCOUNT_PROVIDER, credential }] }), env, encoding: 'utf8', timeout: 60_000 });
+    const out = spawnSync(ompBin, [`--profile=${profile}`, 'auth', 'import', '-'], { input: JSON.stringify({ version: 1, credentials: [{ provider, credential }] }), env, encoding: 'utf8', timeout: 60_000 });
     if (out.status !== 0 || !exists(copy)) throw new ConfinedLaunchError(`omp auth import into the private home failed (exit ${out.status}): ${String(out.stderr).trim().split('\n')[0]}`);
   }
   return { copy, snapshot: DIGESTS[spec.digest](copy), digest: spec.digest };

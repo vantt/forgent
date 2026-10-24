@@ -11,7 +11,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { parseSse, rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
+import { parseSse, rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
 
 const post = async (url, body) => {
   const res = await fetch(`${url}/codex/responses`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer SECRET-NEVER-KEPT' }, body: JSON.stringify(body) });
@@ -54,6 +54,32 @@ test('the recording endpoint writes each request body to a 0600 file in the run 
     const zipped = zlib.zstdCompressSync(Buffer.from(JSON.stringify({ input: [{ type: 'message', role: 'user', content: 'MARK-Z' }] })));
     await fetch(`${recorder.url}/codex/responses`, { method: 'POST', headers: { 'content-type': 'application/json', 'content-encoding': 'zstd' }, body: zipped }).then((r) => r.text());
     assert.deepEqual(rolesCarrying([JSON.parse(fs.readFileSync(recorder.requests()[2], 'utf8'))], 'MARK-Z'), [{ request: 1, carriers: ['message:user'] }]);
+  } finally {
+    await recorder.close();
+  }
+});
+
+test('the endpoint also serves the Anthropic Messages stream a pi provider on that API speaks: a bash tool call first, then the final text, and counts the calls of either shape', async () => {
+  const dir = makeFixtureDir('mailbox-role-recorder-messages');
+  const recorder = await startRecorder({ dir, textFor: () => 'the answer' });
+  const send = async (messages) => {
+    const res = await fetch(`${recorder.url}/v1/messages?beta=true`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': 'SECRET-NEVER-KEPT' }, body: JSON.stringify({ model: 'm', stream: true, messages }) });
+    return { status: res.status, events: parseSse(await res.text()) };
+  };
+  try {
+    const first = await send([{ role: 'user', content: 'hello' }]);
+    assert.equal(first.status, 200);
+    assert.deepEqual(first.events.map((e) => e.type), ['message_start', 'content_block_start', 'content_block_delta', 'content_block_stop', 'message_delta', 'message_stop']);
+    const block = first.events[1].content_block;
+    assert.deepEqual([block.type, block.name], ['tool_use', 'bash']);
+    assert.deepEqual(JSON.parse(first.events[2].delta.partial_json), { command: 'ls' });
+    assert.equal(first.events[4].delta.stop_reason, 'tool_use');
+    const history = [{ role: 'user', content: 'hello' }, { role: 'assistant', content: [{ type: 'tool_use', id: block.id, name: 'bash', input: { command: 'ls' } }] }, { role: 'user', content: [{ type: 'tool_result', tool_use_id: block.id, content: 'a' }] }];
+    const second = await send(history);
+    assert.deepEqual([second.events[1].content_block.type, second.events[2].delta.text, second.events[4].delta.stop_reason], ['text', 'the answer', 'end_turn']);
+    assert.ok(!fs.readFileSync(recorder.requests()[0], 'utf8').includes('SECRET-NEVER-KEPT'));
+    assert.equal(toolCallsIn({ messages: history }), 1);
+    assert.equal(toolCallsIn({ input: [{ type: 'function_call' }, { type: 'message' }, { type: 'function_call' }] }), 2);
   } finally {
     await recorder.close();
   }

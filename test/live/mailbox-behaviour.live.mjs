@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -58,8 +58,9 @@ import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
 import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
 import * as v7f from '../../scripts/lib/mailbox-behaviour-v7f.mjs';
 import * as v7g from '../../scripts/lib/mailbox-behaviour-v7g.mjs';
+import * as v7h from '../../scripts/lib/mailbox-behaviour-v7h.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
-import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
+import { rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -175,12 +176,36 @@ const MEASURES = {
     report: ({ results, addendum, stage }) => v7g.report({ results, addendum, stage }),
     sample: 'sample-v7g',
   },
+  v7h: {
+    clis: ['pi'],
+    build: v7h.addendumV7h,
+    cells: v7h.cells,
+    baselines: v7h.baselines,
+    measured: (addendum) => ({
+      models: Object.fromEntries(addendum.pairs.map((p) => [p.cli, p.model])),
+      providers: Object.fromEntries(addendum.pairs.map((p) => [p.cli, p.provider])),
+      effort: addendum.thinking,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: v7h.pairOf,
+      projectConfig: () => ({ mailbox: { enabled: true } }),
+      scoreRun: (evidence) => v7h.scoreRun(evidence),
+      rules: v7h.stopRules,
+      phases: v7h.stagePhases,
+      order: v7h.stageOrder,
+    }),
+    report: ({ results, compare, compareV6, addendum, stage }) => v7h.report({ results, addendum, stage, compare: { piGpt: compare ? runs.readResults(compare) : [], claudeCode: compareV6 ? runs.readResults(compareV6) : [] } }),
+    sample: 'sample-v7h',
+  },
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
 /** Every CLI a pin records: V6's two, and the CLIs of the addendum it runs. */
 const PINNED_CLIS = ['claude', 'codex', ...(MEASURE?.clis ?? []).filter((c) => !['claude', 'codex'].includes(c))];
 /** The omp profile store of the account pi and omp runs carry the login of (owner Q2: openai-tetnu). */
 const ACCOUNT_PROFILE = (account) => path.join(os.homedir(), '.omp', 'profiles', account);
+/** pi's own store of an account it logs in itself. */
+const PI_ACCOUNT = (account) => path.join(os.homedir(), '.pi', 'accounts', account);
 
 const MIN_FREE_GB = 8;
 const MEMORY_WAIT_MS = 30 * 60_000;
@@ -283,19 +308,19 @@ const DRY_TASK_CALLS = ['ls', 'until [ -f go1.txt ]; do sleep 2; done', 'ls | wc
  * and answers its first line (LR acts); `fail` points the CLI at a closed port (a provider error).
  * Writes the provider override into the run's home. Returns `{close}`.
  */
-async function dryProvider(cell, paths, behaviour) {
+async function dryProvider(cell, paths, behaviour, provider = confined.ACCOUNT_PROVIDER) {
   const calls = [...DRY_TASK_CALLS, ...(behaviour === 'act' ? ['head -1 readme.txt'] : [])];
   const recorder = await startRecorder({
     dir: path.join(paths.capture, 'recorder'),
     callFor: (body) => {
-      const done = (body?.input ?? []).filter((i) => i.type === 'function_call').length;
+      const done = toolCallsIn(body);
       return done < calls.length ? { name: 'bash', arguments: JSON.stringify({ command: calls[done] }) } : null;
     },
     textFor: () => (behaviour === 'act' ? `There are 3 files. The first line of readme.txt is ${score.README_TOKEN}.` : 'There are 3 files.'),
   });
   const url = behaviour === 'fail' ? 'http://127.0.0.1:9' : recorder.url;
-  if (cell.cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [confined.ACCOUNT_PROVIDER]: { baseUrl: url } } });
-  else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', runs.RUN_PROFILE, 'agent', 'models.yml'), `providers:\n  ${confined.ACCOUNT_PROVIDER}:\n    baseUrl: ${url}\n`);
+  if (cell.cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [provider]: { baseUrl: url } } });
+  else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', runs.RUN_PROFILE, 'agent', 'models.yml'), `providers:\n  ${provider}:\n    baseUrl: ${url}\n`);
   return recorder;
 }
 
@@ -397,8 +422,15 @@ function context({ dry, stage = null }) {
   const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
   // pi's and omp's login: the account's Codex login, read fresh from its omp profile at every
   // start (a scratch one, and the recording endpoint as the provider, for a dry run).
-  const pairAccount = (cli) => addendum?.pairs?.find((p) => p.cli === cli)?.account;
-  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cli)), path.join(base, 'login-read')), profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
+  const pairOfCli = (cli) => addendum?.pairs?.find((p) => p.cli === cli) ?? null;
+  // A pair's credential: from pi's own account file (`login: pi-account`) or from the account's omp profile store.
+  const pairCredential = (cli) => {
+    const pair = pairOfCli(cli);
+    return pair?.login === 'pi-account'
+      ? confined.readPiAccountCredential(PI_ACCOUNT(pair.account), pair.provider)
+      : confined.readAccountCredential(ACCOUNT_PROFILE(pair?.account), path.join(base, 'login-read'), pair?.provider ?? confined.ACCOUNT_PROVIDER);
+  };
+  const accountLogin = (cli) => ({ cli, credential: dry ? scratchCodexLogin() : pairCredential(cli), provider: pairOfCli(cli)?.provider ?? confined.ACCOUNT_PROVIDER, profile: runs.RUN_PROFILE, ompBin: install.omp, nativesDir: install.natives });
   if (dry) {
     const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
     return {
@@ -411,7 +443,7 @@ function context({ dry, stage = null }) {
       login: { claude: stubLogin(base, 'claude'), codex: stubLogin(base, 'codex') },
       accountLogin,
       // A dry pi or omp run is the real CLI against the recording endpoint, scripted with the stub behaviour.
-      providerFor: async (cell, paths, behaviour) => (runs.EXTENSION_CLIS.includes(cell.cli) ? dryProvider(cell, paths, behaviour) : ADDENDUM_NAME === 'v7f' && cell.cli === 'codex' ? dryCodexProvider(paths, behaviour) : null),
+      providerFor: async (cell, paths, behaviour) => (runs.EXTENSION_CLIS.includes(cell.cli) ? dryProvider(cell, paths, behaviour, pairOfCli(cell.cli)?.provider) : ADDENDUM_NAME === 'v7f' && cell.cli === 'codex' ? dryCodexProvider(paths, behaviour) : null),
       hostSha256: sha256(host),
       beforeRun: async () => live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true }),
       providerPause: async () => {},
@@ -421,6 +453,10 @@ function context({ dry, stage = null }) {
   if (problems.length) die(problems.join('; '));
   const login = { claude: { cli: 'claude', home: os.homedir(), account: 'owner' }, codex: { cli: 'codex', home: live.accountHome('codex', CODEX_TEST_ACCOUNT), account: CODEX_TEST_ACCOUNT } };
   const sentinels = runs.plantSentinels(base, own(HOME_OF.sentinels));
+  // A pair whose login pi itself holds: its account file must keep its bytes through the stage.
+  const loginSources = (addendum?.pairs ?? []).filter((p) => p.login === 'pi-account').map((p) => path.join(PI_ACCOUNT(p.account), 'auth.json'));
+  const sourceDigests = new Map(loginSources.map((f) => [f, sha256(f)]));
+  const sourceChanged = () => loginSources.filter((f) => !fs.existsSync(f) || sha256(f) !== sourceDigests.get(f));
   const ctx = {
     ...common,
     hostSha256: pin.host.sha256,
@@ -440,6 +476,8 @@ function context({ dry, stage = null }) {
     if (stillPinned.length) return `pins: ${stillPinned.join('; ')}`;
     const ceiling = runs.ceilingProblem(base, ctx.addendum ? readJson(ADDENDUM).ceiling : score.CEILING);
     if (ceiling) return `ceiling: ${ceiling}`;
+    const moved = sourceChanged();
+    if (moved.length) return `login source: ${moved.join(', ')} changed since the stage started`;
     const changed = runs.sentinelsChanged(sentinels);
     const tracked = spawnSync('git', ['status', '--porcelain'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
     if (changed.length || tracked) return `safety: ${[...changed, ...(tracked ? ['tracked files of the pinned worktree'] : [])].join(', ')} changed`;
@@ -455,7 +493,7 @@ function context({ dry, stage = null }) {
       for (const waited = Date.now(); ;) {
         let fresh;
         try {
-          fresh = confined.accountLoginFreshness(confined.readAccountCredential(ACCOUNT_PROFILE(pairAccount(cell.cli)), path.join(base, 'login-read')));
+          fresh = confined.accountLoginFreshness(pairCredential(cell.cli));
         } catch (error) {
           return `login: ${error.message}`;
         }
@@ -474,6 +512,7 @@ function context({ dry, stage = null }) {
     }
     return null;
   };
+  ctx.sourceChanged = sourceChanged;
   return ctx;
 }
 
@@ -582,8 +621,11 @@ async function cmdRunStage(stage, { dry, cli }) {
   const { stop, closedSt, stoppedArms } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
   if (closedSt?.length) say(`ST cells closed after stage A for: ${closedSt.join(', ')}`);
   for (const [arm, why] of Object.entries(stoppedArms ?? {})) say(`arm ${arm} stopped: ${why}`);
+  // The login source is checked again once the stage's last run settled.
+  const moved = ctx.sourceChanged?.() ?? [];
+  if (moved.length) die(`stage ${stage}: login source ${moved.join(', ')} changed during the stage`);
   if (stop) die(`stage ${stage} stopped: ${stop}`);
-  say(`stage ${stage}: every cell done`);
+  say(`stage ${stage}: every cell done${ctx.sourceChanged ? '; login source unchanged' : ''}`);
 }
 
 /** A dry loop's stub commands: aa messages bb, by the name it was given or the one the peer file holds; bb works long enough to see it. */
@@ -655,11 +697,11 @@ const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}`);
 const interval = ([lo, hi]) => `${pct(lo)}-${pct(hi)}`;
 const range = (values) => (values.length ? `${Math.min(...values)}-${Math.max(...values)}` : '-');
 
-function cmdReportAddendum({ stage, sample, dry, compare }) {
+function cmdReportAddendum({ stage, sample, dry, compare, compareV6 }) {
   const base = dry ? `${BASE}-dry` : BASE;
   const addendum = readJson(ADDENDUM);
   const results = runs.readResults(path.join(base, 'results.jsonl'));
-  say(MEASURE.report({ results, compare, addendum, stage }));
+  say(MEASURE.report({ results, compare, compareV6, addendum, stage }));
   if (!sample) return;
   const bodies = readData().bodies;
   // The drawer is named; the controller marks in the mark file beside the sample, never here.
@@ -675,8 +717,8 @@ function cmdReportAddendum({ stage, sample, dry, compare }) {
   say(`sample: ${file}`);
 }
 
-function cmdReport({ stage, sample, dry, compare }) {
-  if (ADDENDUM) return cmdReportAddendum({ stage, sample, dry, compare });
+function cmdReport({ stage, sample, dry, compare, compareV6 }) {
+  if (ADDENDUM) return cmdReportAddendum({ stage, sample, dry, compare, compareV6 });
   const base = dry ? `${BASE}-dry` : BASE;
   const results = runs.readResults(path.join(base, 'results.jsonl')).filter((r) => !stage || r.stage === stage);
   const frozen = readJson(PREREGISTRATION);
@@ -752,12 +794,13 @@ const WIRING_V7 = [
  * V7e's wiring runs: per pair, a cell, the dry provider's behaviour and the outcome it must give
  * (the real pi or omp, its real extension and host, the recording endpoint as the model).
  */
-const WIRING_V7E = v7e.PAIRS.flatMap((p) => [
+const wiringOfPairs = (pairs) => pairs.flatMap((p) => [
   [p, 'LR', 'act', 'acted'],
   [p, 'B', 'ignore', 'not-acted'],
   [p, 'M', 'fail', 'error'],
   [p, score.BASELINE, 'ignore', 'not-acted'],
 ]);
+const WIRING_V7E = wiringOfPairs(v7e.PAIRS);
 
 /**
  * V7f's wiring runs: per CLI, a cell, the stand-in model's behaviour and the outcome it must
@@ -804,6 +847,7 @@ async function cmdCheckAddendum() {
   recover(ctx);
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
+    : ADDENDUM_NAME === 'v7h' ? wiringOfPairs(v7h.PAIRS).map(([p, variant, behaviour, want]) => [[...v7h.baselines(), ...v7h.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7g' ? WIRING_V7G.map(([variant, behaviour, want]) => [v7g.cells().find((c) => c.variant === variant), behaviour, want])
     : WIRING_V7.map(([arm, variant, behaviour, want]) => [[...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant), behaviour, want]);
@@ -817,7 +861,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (['v7f', 'v7g'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g', 'v7h'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1469,7 +1513,7 @@ if (process.argv[1] === SCRIPT) {
         cmdRescore();
         break;
       case 'report':
-        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare') });
+        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare'), compareV6: option('--compare-v6') });
         break;
       case 'mcp-probe':
         if (['pi', 'omp'].includes(rest[0])) await cmdMcpProbePiOmp(rest[0], { off: !flag('--without-off') });
@@ -1491,7 +1535,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f|v7g] check | freeze [v7c|v7e|v7f|v7g] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h] check | freeze [v7c|v7e|v7f|v7g|v7h] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-v6 <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

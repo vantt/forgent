@@ -231,3 +231,11 @@ test('a pi or omp run reads the head\'s session records only, and a provider ref
   fs.writeFileSync(stdout, end({ content: [{ type: 'text', text: 'done' }], stopReason: 'stop' }));
   assert.equal(runs.providerErrorOf(stdout), null);
 });
+
+test('a pi or omp run names its model under the pair\'s provider, the Codex login\'s provider by default', () => {
+  const base = { extension: '/x/ext.ts', model: 'gpt-6.1-sol', effort: 'low', prompt: 'P', profile: 'acct', offConfig: '/x/off.yml' };
+  const model = (args) => args[args.indexOf('--model') + 1];
+  assert.equal(model(runs.piOmpArgs('pi', base)), 'openai-codex/gpt-6.1-sol');
+  assert.equal(model(runs.piOmpArgs('pi', { ...base, provider: 'openrouter', model: 'anthropic/claude-haiku-5.5' })), 'openrouter/anthropic/claude-haiku-5.5');
+  assert.equal(model(runs.piOmpArgs('omp', { ...base, provider: 'google-antigravity', model: 'gemini-3.8-flash' })), 'google-antigravity/gemini-3.8-flash');
+});

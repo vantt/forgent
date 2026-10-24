@@ -5,7 +5,8 @@
  * a harness instrument, never a model. A CLI whose provider base URL points here sends its
  * request; the endpoint keeps the request (path, header names, parsed body; never a header
  * value, so no credential is kept) in a 0600 file inside the run directory and answers in the
- * OpenAI Responses stream shape with a scripted exchange: while the input holds no tool call,
+ * OpenAI Responses stream shape (or, for a provider on the Anthropic Messages API, that stream
+ * shape) with a scripted exchange: while the input holds no tool call,
  * one function call running `ls`; after it, the final text `done`. Reading which input item
  * carried an injected marker gives the role each injection method reaches the provider under.
  * Node built-ins only.
@@ -56,6 +57,32 @@ export function scriptedEvents(input, n, forced = null, text = FINAL_TEXT) {
   return events;
 }
 
+/** The tool calls a request's history holds: Responses `function_call` items, or Messages `tool_use` blocks. */
+export function toolCallsIn(body) {
+  if (Array.isArray(body?.input)) return body.input.filter((item) => item?.type === 'function_call').length;
+  return (body?.messages ?? []).filter((m) => m.role === 'assistant' && Array.isArray(m.content)).flatMap((m) => m.content).filter((c) => c?.type === 'tool_use').length;
+}
+
+/**
+ * The events of one scripted Anthropic Messages stream: `forced`, else the bash tool running
+ * `ls` while the history holds no tool call, else the final text.
+ */
+export function scriptedMessagesEvents(body, n, forced = null, text = FINAL_TEXT) {
+  const call = forced ?? (toolCallsIn(body) ? null : SCRIPTED_CALL);
+  const message = { id: `msg_${n}`, type: 'message', role: 'assistant', model: 'recorder', content: [], stop_reason: null, usage: { input_tokens: 10, output_tokens: 0 } };
+  const [start, delta] = call
+    ? [{ type: 'tool_use', id: `toolu_${n}`, name: call.name, input: {} }, { type: 'input_json_delta', partial_json: call.arguments }]
+    : [{ type: 'text', text: '' }, { type: 'text_delta', text }];
+  return [
+    { type: 'message_start', message },
+    { type: 'content_block_start', index: 0, content_block: start },
+    { type: 'content_block_delta', index: 0, delta },
+    { type: 'content_block_stop', index: 0 },
+    { type: 'message_delta', delta: { stop_reason: call ? 'tool_use' : 'end_turn', stop_sequence: null }, usage: { output_tokens: 5 } },
+    { type: 'message_stop' },
+  ];
+}
+
 /** A request body decoded by its content encoding (the Codex providers compress with zstd). */
 function decode(buffer, encoding) {
   switch ((encoding ?? '').toLowerCase()) {
@@ -100,13 +127,17 @@ export async function startRecorder({ dir, callFor = () => null, textFor = () =>
       const file = path.join(dir, `request-${String(n).padStart(3, '0')}.json`);
       fs.writeFileSync(file, `${JSON.stringify({ n, method: req.method, path: req.url, headerNames: Object.keys(req.headers).sort(), contentEncoding: req.headers['content-encoding'] ?? null, body }, null, 2)}\n`, { mode: 0o600 });
       kept.push(file);
-      if (req.method !== 'POST' || !/\/responses$/.test(req.url.split('?')[0])) {
+      const route = req.url.split('?')[0];
+      const events = req.method !== 'POST' ? null
+        : /\/responses$/.test(route) ? scriptedEvents(body?.input, n, callFor(body), textFor(body))
+          : /\/messages$/.test(route) ? scriptedMessagesEvents(body, n, callFor(body), textFor(body)) : null;
+      if (!events) {
         res.writeHead(404, { 'content-type': 'application/json' });
         res.end('{"error":{"message":"not served by the recorder"}}');
         return;
       }
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
-      for (const event of scriptedEvents(body?.input, n, callFor(body), textFor(body))) res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+      for (const event of events) res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
       res.end();
     });
   });
