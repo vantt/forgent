@@ -2,7 +2,7 @@
 # see: fgos config standard
 # @fgos:doc When delivered work items have their worktree and branch reclaimed.
 cleanup:
-  # @fgos:doc Days a delivered root work item waits before the cleanup stage reclaims its worktree and branch. Minimum: 0. Default: 7.
+  # @fgos:doc Days a delivered root work item waits before the cleanup stage reclaims its worktree and branch. Default: 7.
   ttlDays: 7
-  # @fgos:doc Days a delivered child work item waits before cleanup; 0 reclaims at once because its content already lives on the root branch. Minimum: 0. Default: 0.
+  # @fgos:doc Days a delivered child work item waits before cleanup; 0 reclaims at once because its content already lives on the root branch. Default: 0.
   leafTtlDays: 0

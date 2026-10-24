@@ -7,8 +7,6 @@ properties:
   ttlDays:
     description: Days a delivered root work item waits before the cleanup stage reclaims its worktree and branch.
     type: integer
-    minimum: 0
   leafTtlDays:
     description: Days a delivered child work item waits before cleanup; 0 reclaims at once because its content already lives on the root branch.
     type: integer
-    minimum: 0
