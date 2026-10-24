@@ -397,9 +397,11 @@ pub(crate) fn build(
             column: found.map(|(_, span)| span.column),
         }
     };
+    // Only the sections a file wrote are validated; the rest is the bundled standard.
+    let written = |name: &str| docs.values().any(|(_, json)| json.get(name).is_some());
     let violations = ctx
         .schemas
-        .validate(&merged.value)
+        .validate_sections(&merged.value, written)
         .map_err(|refusal| SnapshotError::Refused(vec![refusal]))?;
     let mut errors: Vec<ConfigRefusal> = violations
         .into_iter()
