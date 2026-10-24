@@ -65,9 +65,10 @@ import {
   recordFriction,
   categoryOf,
   EXIT_CODES,
-  resolveWriterLogPath,
 } from '../state/store.mjs';
-import { readClaims } from '../state/runtime-coordination.mjs';
+import { readClaims, withMainState, getMainFgosDir } from '../state/runtime-coordination.mjs';
+import { maintainEventStore } from '../event-store/maintenance.mjs';
+import { processSealCoalescer } from '../event-store/seal-coalescing.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -82,7 +83,6 @@ import {
 import { bind } from './execution/bind.mjs';
 import { workUnitFor } from './work-dispatch.mjs';
 import { spawnWorker, workUnitIdFor } from './work-dispatch.mjs';
-import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { checkoutPathForBranch, compareCommits, branchExists, resolveRefSha, deleteBranchRef, resetDispatchWorktree, createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
@@ -992,16 +992,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       clearResume(dir, item.id);
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
-      // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
-      // stderr/logs, plus one event appended to this writer's own open
-      // file under `.fgos/events/` (`resolveWriterLogPath`, TA-D2/TA-D12)
-      // — never straight to the frozen baseline `events.jsonl`. `replay.mjs`
-      // ignores unknown event types by design, so this audit-only entry
-      // never participates in the FSM view. Queued through the same
-      // `queue.enqueue()` every other write at this call site uses.
+      // Audit through the same Work gate, cursor and staged append as every
+      // mutation; the runner queue serializes this caller's writes.
       log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
-        appendEvent(resolveWriterLogPath(dir), {
+        withMainState(dir, tx => tx.append({
           type: 'executor.dispatch',
           payload: {
             id: item.id,
@@ -1018,7 +1013,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             // The Unit run that carries this dispatch's binding, logs and result.
             unitRunId: worker.unitRunId,
           },
-        }, dir);
+        }));
       });
       // The runner committed the worker's file changes inside the Unit run, so
       // goal-check judges the committed branch.
@@ -1287,7 +1282,12 @@ async function claimAndDispatch(ctx) {
  * failure. An item that trips max-visits is still parked via `todo -> blocked`
  * (per D5) and reported in `parked`; a per-item halt stops further refills.
  */
-export async function runOnce(options = {}) {
+export function runOnce(options = {}) {
+  // The runner is a long-lived writer: its Work seals coalesce until a wave settles, the drain ends or the window closes.
+  return processSealCoalescer.scope(() => drainOnce(options));
+}
+
+async function drainOnce(options) {
   const log = options.log ?? ((...args) => console.log(...args));
   const dryRun = options.dryRun ?? false;
   const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
@@ -1699,6 +1699,7 @@ export async function runOnce(options = {}) {
       const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
       const settled = await Promise.allSettled(admitted.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
+      processSealCoalescer.flush(); // a wave is a finished unit of work
       let progressed = false;
       for (const s of settled) {
         if (s.status === 'rejected') throw s.reason; // uncategorized real bug -> outer catch (exit 1)
@@ -1779,33 +1780,48 @@ export async function runWatch(options = {}) {
   const queue = options.queue ?? createWriteQueue({ onCommit: () => { committed = true; } });
   const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
 
-  while (!options.signal?.aborted) {
-    committed = false;
-    let result;
-    try {
-      result = await runOnce({ ...options, queue, breaker });
-    } catch (err) {
-      // A cycle-level throw must never terminate the watch loop (D8) — report
-      // it via onCycle and keep going, same accepted-risk class as the
-      // hot-loop niche noted below.
-      options.onCycle?.({ outcome: 'error', error: err });
-      result = null;
-    }
-    if (result) options.onCycle?.(result);
-    if (options.signal?.aborted) break;
-    if (!committed) {
-      // Narrow accepted niche: a cycle that commits something and then
-      // throws still sets `committed = true`, so the NEXT cycle starts
-      // immediately with no backoff (a hot loop). This is bounded in
-      // practice by MAX_VISITS/parking moving state toward quiescence, same
-      // accepted-risk class as the doc's W10 note — no throttling added.
+  // Event Store lifecycle (spec §16): a poll seals only what is due, a stop seals everything, and the loop never
+  // publishes (a clone's owner session does, at the end of its commands). Resolved once: it runs git. A directory
+  // that is no checkout resolves to nothing here, and `runOnce` reports that same fault on every cycle.
+  let store = null;
+  try {
+    const dir = options.dir ?? fgosDirFromRoot(options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd()));
+    store = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+  } catch { /* reported by runOnce */ }
+  const maintain = (policy) => { if (store) maintainEventStore(store.cwd, { trustedMain: store.trustedMain, ...policy }); };
+
+  try {
+    while (!options.signal?.aborted) {
+      maintain({});
+      committed = false;
+      let result;
       try {
-        await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
-      } catch {
-        // AbortError from the delay mid-wait — let the while condition exit
-        // the loop naturally on the next check rather than rethrowing.
-        break;
+        result = await runOnce({ ...options, queue, breaker });
+      } catch (err) {
+        // A cycle-level throw must never terminate the watch loop (D8) — report
+        // it via onCycle and keep going, same accepted-risk class as the
+        // hot-loop niche noted below.
+        options.onCycle?.({ outcome: 'error', error: err });
+        result = null;
+      }
+      if (result) options.onCycle?.(result);
+      if (options.signal?.aborted) break;
+      if (!committed) {
+        // Narrow accepted niche: a cycle that commits something and then
+        // throws still sets `committed = true`, so the NEXT cycle starts
+        // immediately with no backoff (a hot loop). This is bounded in
+        // practice by MAX_VISITS/parking moving state toward quiescence, same
+        // accepted-risk class as the doc's W10 note — no throttling added.
+        try {
+          await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
+        } catch {
+          // AbortError from the delay mid-wait — let the while condition exit
+          // the loop naturally on the next check rather than rethrowing.
+          break;
+        }
       }
     }
+  } finally {
+    maintain({ shutdown: true });
   }
 }

@@ -2,8 +2,8 @@
 //
 // A narrow sibling facade to store.mjs, deliberately NOT folded into it: the
 // store's single write door is scoped to the event-sourced FSM truth
-// (`events.jsonl`) and its derived view (`state.json`) — structured, replayable
-// domain events with CAS semantics. Worker dispatch output is unstructured
+// (the Event Store) and its derived view (the Work cache) — structured,
+// replayable domain events with CAS semantics. Worker dispatch output is unstructured
 // operational text, a different concern. This module is the one writer of
 // `.fgos/logs/*`, preserving single-door's spirit (one writer per resource)
 // without touching the FSM contract.

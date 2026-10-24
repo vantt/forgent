@@ -503,13 +503,36 @@
                               "type": "string"
                             },
                             "paths": {
-                              "type": "array",
-                              "items": {
-                                "type": "string",
-                                "minLength": 1,
-                                "pattern": "^(?!/)(?![\\s\\S]*\\u0000)[\\s\\S]+$"
-                              },
-                              "description": "Exact UTF-8 literal repository paths, encoded as JSON strings. JSON escaping round-trips star, tab, newline and other control characters; NUL is refused. Not write-scope declarations."
+                              "oneOf": [
+                                {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "pattern": "^(?!/)(?![\\s\\S]*\\u0000)[\\s\\S]+$"
+                                  },
+                                  "description": "Exact UTF-8 literal repository paths, encoded as JSON strings, as records written before the digest form list them (and an empty list for a no-op commit). JSON escaping round-trips star, tab, newline and other control characters; NUL is refused. Not write-scope declarations."
+                                },
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer",
+                                      "minimum": 1
+                                    },
+                                    "sha256": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "required": [
+                                    "count",
+                                    "sha256"
+                                  ],
+                                  "description": "Digest of the sorted, de-duplicated literal path set, so a record stays bounded however many paths the commit selects."
+                                }
+                              ]
                             },
                             "tree": {
                               "type": "string",
@@ -525,10 +548,32 @@
                                   "additionalProperties": false,
                                   "properties": {
                                     "exactPaths": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
+                                      "oneOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "count": {
+                                              "type": "integer",
+                                              "minimum": 1
+                                            },
+                                            "sha256": {
+                                              "type": "string",
+                                              "pattern": "^[0-9a-f]{64}$"
+                                            }
+                                          },
+                                          "required": [
+                                            "count",
+                                            "sha256"
+                                          ]
+                                        }
+                                      ]
                                     },
                                     "legacyRefOid": {
                                       "type": "string"

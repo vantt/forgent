@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
 import {
   createSession,
   endSession,
@@ -360,6 +361,20 @@ test('sessions lock held by another process that is killed with SIGKILL is free 
     lock.release();
   } finally {
     cleanup(repoRoot);
+  }
+});
+
+test('endSession seals the Work events the session left open, after it released the sessions lock', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    createSession(repoRoot, { sessionId: 'seal-end', sessionsDir });
+    const openAgeSec = leaveOpenWorkEvent(repoRoot);
+    assert.ok(openAgeSec() >= 3599, 'the event is open before the session ends');
+    endSession(repoRoot, 'seal-end');
+    assert.equal(openAgeSec(), 0, 'a clean writer exit leaves nothing unsealed');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
   }
 });
 

@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
 import { initStore, addOutcome } from '../../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,7 +46,7 @@ export function makeDocsIndexStateFixture() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-docs-index-state-fixture-'));
   fs.symlinkSync(path.join(REPO_ROOT, 'docs'), path.join(cwd, 'docs'), 'dir');
 
-  const fgosDir = path.join(cwd, '.fgos');
+  const fgosDir = initializeWorkRepository(cwd);
   initStore(fgosDir);
   addOutcome(fgosDir, { id: REAL_DEMO_OUTCOME_ID, docPath: REAL_DEMO_DOC_PATH, docType: 'how-to' });
 

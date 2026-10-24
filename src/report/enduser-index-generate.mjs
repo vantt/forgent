@@ -107,10 +107,8 @@ export function manifestPathFor(repoRoot) {
  * Compute the current end-user doc index in memory, without writing
  * anything — the read-only half shared by `fgos docs-index`'s write path
  * and the enduser-docs-index-stale doctor check. `fgosDir` is the `.fgos`
- * directory to fold the event log from (tsk-f31: absent `events.jsonl`,
- * e.g. a linked worktree per ADR0020, is "unreachable", not "empty" —
- * an existing on-disk `sourceCaptureId` is preserved rather than
- * regressed to `null` in that case).
+ * directory whose Work history is read through the Event Store facade.
+ * An unavailable or corrupt store throws before any manifest is overwritten.
  */
 export function computeEnduserDocsIndex(repoRoot, fgosDir) {
   const docEntries = enumerateDocEntries(repoRoot);
@@ -121,19 +119,9 @@ export function computeEnduserDocsIndex(repoRoot, fgosDir) {
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;
   }
-  const storeReachable = fs.existsSync(path.join(fgosDir, 'events.jsonl'));
-  const previousById = new Map();
-  if (previousContent) {
-    for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
-  }
+  // listWork opens the facade and propagates unavailable/corrupt history.
   const view = listWork(fgosDir);
-  const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {}, view);
-  const entries = rawEntries.map((e) => {
-    if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
-      return { ...e, sourceCaptureId: previousById.get(e.docPath) };
-    }
-    return e;
-  });
+  const entries = buildEnduserIndex(docEntries, view.outcomes ?? {}, view);
   const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
   return { manifestPath, entries, previousContent, nextContent };
 }

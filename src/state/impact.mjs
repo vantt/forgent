@@ -1,7 +1,7 @@
 // impact.mjs — backlog-triage impact ranking (P21, deep-dive
 // work-item-management.md, "cửa 2 của triage" — separate from P14's
 // intake-triage risk/lane classification). PURE: takes a work-state view (as
-// returned by store.mjs's listWork/rebuildView) and returns items ranked by
+// returned by store.mjs's listWork) and returns items ranked by
 // how many other still-open items they block, highest first. No fs, no
 // Date.now(), no event append, no mutation of any kind — a read never
 // writes, same discipline as src/evolve/candidates.mjs.

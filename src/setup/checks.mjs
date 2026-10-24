@@ -12,6 +12,7 @@ export {
   CONFIG_DEFAULT_REGISTRATIONS,
   FIX_REGISTRATIONS,
   registerCheck,
+  createDoctorRun,
   registerConfigDefault,
   registerFix,
   runFixes,

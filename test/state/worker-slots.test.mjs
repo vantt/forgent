@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -179,6 +180,7 @@ test('hasWorkerSlotRoom falls back to a batch of 1 for a malformed batchSize', a
 
 function initTempRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worker-slots-test-'));
+  initializeWorkRepository(repoRoot);
   execFileSync('git', ['init', '-q'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });

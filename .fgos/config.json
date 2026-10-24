@@ -1552,6 +1552,16 @@
     }
   },
   "eventStore": {
-    "remote": "origin"
+    "remote": "origin",
+    "seal": {
+      "intervalSec": 300,
+      "coalesceSec": 30
+    },
+    "sync": {
+      "intervalSec": 300
+    },
+    "rebuild": {
+      "maxAttempts": 5
+    }
   }
 }

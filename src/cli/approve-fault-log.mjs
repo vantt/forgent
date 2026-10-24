@@ -3,8 +3,8 @@
 // verify is never left with zero trace just because the immediately
 // following status write hits state-lock contention.
 //
-// Deliberately NOT `events.jsonl` — same reasoning as
-// `invocation-fault-log.mjs`: that file is the FSM rebuild source, a pure
+// Deliberately NOT a Work event — same reasoning as
+// `invocation-fault-log.mjs`: the Event Store is the FSM source, a pure
 // diagnostic record has no business in it — and deliberately NOT sharing
 // the state lock (CONTEXT.md D2): a plain `fs.appendFileSync` to its own
 // file, so a record here can still succeed while the state lock stays

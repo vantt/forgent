@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import './process-tmp-root.mjs';
+import { watchSealChildrenOf } from './process-tmp-root.mjs';
 
 // The test runner points this at a per-run directory it removes itself, which also covers a file it
 // had to kill with a signal; run alone, fixtures go straight under /var/tmp and clean up at exit.
@@ -27,6 +27,7 @@ function removeCreated() {
 export function makeFixtureDir(prefix) {
   const dir = fs.mkdtempSync(path.join(FIXTURE_ROOT, prefix));
   created.add(dir);
+  watchSealChildrenOf(dir);
   if (!exitHookInstalled) {
     exitHookInstalled = true;
     process.on('exit', removeCreated);

@@ -2,6 +2,7 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   DOMAINS,
@@ -24,7 +25,7 @@ import {
   legalCallEdges,
 } from '../../src/state/domain-registry.mjs';
 import { resolveTaskSpecPath } from '../../src/runner/paths.mjs';
-import { rebuildView } from '../../src/state/replay.mjs';
+import { foldEvents } from '../../src/state/replay.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = path.join(__dirname, '..', 'fixtures', 'phase1-events.jsonl');
@@ -269,7 +270,7 @@ test('resolveTaskSpecPath resolves task spec paths for domains, core, and custom
 // --- replay ---
 
 test('rebuild-determinism: the fixture log (zero domain events) rebuilds to the exact pre-retrofit view — no item gains a "domain" or step key', () => {
-  const view = rebuildView(FIXTURE_PATH);
+  const view = foldEvents(fs.readFileSync(FIXTURE_PATH, 'utf8').trim().split('\n').map(JSON.parse));
   for (const item of Object.values(view.work)) {
     assert.equal('domain' in item, false);
     assert.equal('workflowStep' in item, false);

@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,6 +19,7 @@ function setupGitRepoWithStore() {
   fs.writeFileSync(readme, '# Test Repo\n', 'utf8');
   execSync('git add README.md && git commit -m "initial commit"', { cwd: tmpDir, stdio: 'ignore' });
 
+  activateGitFixture(tmpDir);
   const fgosDir = path.join(tmpDir, '.fgos');
   initStore(fgosDir);
   return { tmpDir, fgosDir };

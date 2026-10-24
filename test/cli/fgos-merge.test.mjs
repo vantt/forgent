@@ -98,7 +98,7 @@ import {
 test('P06 fixture pilot: in-process initialized cwd preserves the CLI-ready store shape', () => {
   const cwd = tmpCwdFast();
   assert.ok(fs.existsSync(path.join(cwd, '.fgos')), 'fixture must create .fgos/');
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), '', 'fresh fixture event log starts empty');
+  assert.deepEqual(eventLines(cwd), [], 'fresh fixture event store starts empty');
   assert.deepEqual(Object.keys(stateView(cwd).work), [], 'fresh fixture view has no work');
   const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
   assert.equal(manifest.v, 1);

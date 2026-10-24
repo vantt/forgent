@@ -6,6 +6,7 @@
 // wiring (`fgos context-render <id>`) that ties them to a real file.
 
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -20,7 +21,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-context-render-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-context-render-'));
+  initializeWorkRepository(dir);
+  return dir;
 }
 
 function run(cwd, args) {

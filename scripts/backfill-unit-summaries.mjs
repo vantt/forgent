@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { eventsFilePath } from '../src/workflow/store.mjs';
 import {
   buildUnitSummary, readStoredUnitSummary, serializeUnitSummary, unitSummarySkipReason, writeUnitSummary,
 } from '../src/runner/execution/unit-summary.mjs';
@@ -22,7 +23,7 @@ export function readLegacyUnitCompletions(repoRoot) {
   if (!fs.existsSync(root)) return links;
   for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory()) continue;
-    const file = path.join(root, entry.name, 'events.jsonl');
+    const file = eventsFilePath(repoRoot, entry.name);
     try { if (!fs.lstatSync(file).isFile()) continue; } catch { continue; }
     for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
       if (!line.trim()) continue;

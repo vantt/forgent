@@ -7,7 +7,7 @@ import { fixture, append, addon, loaderOptions } from './phase07-fixture.mjs';
 import { trackedLegacy } from './phase08-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { exportUseCase } from '../../src/verbs/events/export.mjs';
-import { listPorting } from '../../src/state/porting-store.mjs';
+import { foldPortingEvents } from '../../src/state/porting-store.mjs';
 import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
 
 test('real import then fixture fence, v4 append and rollback export preserve Work and nested porting parity', t => {
@@ -31,7 +31,7 @@ test('real import then fixture fence, v4 append and rollback export preserve Wor
   assert.deepEqual(fs.readFileSync(path.join(f.temp, 'rollback/events.jsonl')), Buffer.from(files['.fgos/events.jsonl']));
   const restored = fs.readFileSync(path.join(f.temp, 'rollback/porting/docs/distillery/state/porting/events.jsonl'), 'utf8');
   assert.ok(restored.startsWith(files['docs/distillery/state/porting/events.jsonl']));
-  assert.equal(listPorting(path.join(f.temp, 'rollback/porting/docs/distillery/state')).porting.port.status, 'done');
+  assert.equal(foldPortingEvents(restored.trim().split('\n').filter(Boolean).map(JSON.parse)).porting.port.status, 'done');
   assert.equal(fs.existsSync(path.join(f.temp, 'rollback/porting/events.jsonl')), false);
   assert.equal(checkEventStore(f.repo, 'event-store-legacy-layout', f.ctx).passed, true);
   fs.writeFileSync(path.join(f.repo, '.fgos/events.jsonl'), files['.fgos/events.jsonl']);

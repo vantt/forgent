@@ -479,6 +479,7 @@ pub(crate) struct Stat {
 }
 
 impl Stat {
+    #[cfg(target_os = "linux")]
     pub(crate) fn is_gone(&self) -> bool {
         matches!(self.state, 'Z' | 'X')
     }

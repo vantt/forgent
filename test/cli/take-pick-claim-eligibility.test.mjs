@@ -12,6 +12,7 @@
 // an open decomposed child) exactly as before. This file locks that in so
 // the two verbs cannot silently re-diverge.
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
@@ -20,7 +21,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addWork } from '../../src/state/store.mjs';
+import { addWork, readRawEvents } from '../../src/state/store.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,6 +33,7 @@ function run(cwd, args) {
 
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-take-pick-'));
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
   return cwd;
 }
@@ -96,12 +98,12 @@ test('take --id on a discovery-stage item with an unmet dep is still rejected â€
     refs: [],
     verify: 'true',
   });
-  const before = fs.readFileSync(path.join(dir, 'events.jsonl'), 'utf8').split('\n').filter(Boolean).length;
+  const before = readRawEvents(dir).length;
 
   const result = run(cwd, ['take', '--id', 'clarify-with-unmet-dep']);
   assert.equal(result.status, 4, 'an unmet dep must still reject the claim regardless of stage');
   assert.equal(
-    fs.readFileSync(path.join(dir, 'events.jsonl'), 'utf8').split('\n').filter(Boolean).length,
+    readRawEvents(dir).length,
     before,
     'a rejected take never claims and never writes an event',
   );

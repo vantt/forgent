@@ -20,7 +20,7 @@
     "main checkout",
     "active ScopedCommit TargetAttempt without outcome",
     "record-zero dev:ino matches the borrowed description",
-    "exact staged .fgos deletion byte paths: cutoverGrant, or explicit legacyEvents retired layout only (WORK removes at Event Store cutover)",
+    "exact staged .fgos deletion byte paths: cutoverGrant only",
     "cutover only: current refs/fgos/legacy and seal.json SHA-256 digest"
   ],
   "effects": "read-only"

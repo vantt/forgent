@@ -12,6 +12,7 @@ use crate::{
     refs::own_ref,
     walk::{self, git_error},
 };
+use std::path::Path;
 use fgos_git::{
     ExpectedTip, GitDriver, HolderAuthority, Inspect, Oid, Publication, PublicationPort, RefValue,
     RepoHandle,
@@ -43,6 +44,8 @@ pub struct Sealed {
     pub segments: usize,
     pub busy: bool,
     pub last_seq: u64,
+    /// Why the history checkpoint was not extended, when it was asked to be.
+    pub checkpoint_error: Option<String>,
 }
 pub fn seal(driver: &GitDriver, repo: &RepoHandle, req: SealRequest<'_>) -> Result<Sealed, Error> {
     seal_with_fs(driver, repo, req, &OsFileSystem)
@@ -52,6 +55,18 @@ pub fn seal_with_fs(
     repo: &RepoHandle,
     req: SealRequest<'_>,
     fs: &(dyn FileSystem + Sync),
+) -> Result<Sealed, Error> {
+    seal_checkpointed(driver, repo, req, fs, None)
+}
+/// `seal_with_fs` that also moves the history checkpoint file to the commits it
+/// published, so the next read continues from them. The file is a cache: a
+/// failure to extend it is reported in `Sealed::checkpoint_error`, never raised.
+pub fn seal_checkpointed(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    req: SealRequest<'_>,
+    fs: &(dyn FileSystem + Sync),
+    checkpoint: Option<&Path>,
 ) -> Result<Sealed, Error> {
     let Some(mut guard) = acquire_seal(
         req.layout,
@@ -65,7 +80,7 @@ pub fn seal_with_fs(
             ..Default::default()
         });
     };
-    let result = seal_guarded(driver, repo, &req, &mut guard, fs);
+    let result = seal_guarded(driver, repo, &req, &mut guard, fs, checkpoint);
     if let Err(e) = &result {
         if matches!(
             e.code,
@@ -110,6 +125,7 @@ pub(crate) fn seal_guarded(
     req: &SealRequest<'_>,
     guard: &mut crate::locks::SealGuard,
     fs: &(dyn FileSystem + Sync),
+    checkpoint: Option<&Path>,
 ) -> Result<Sealed, Error> {
     guard.validate(req.layout)?;
     if repo.common_dir() != req.layout.common_dir {
@@ -182,7 +198,12 @@ pub(crate) fn seal_guarded(
                 return Err(moved("receipted own ref disappeared"));
             }
             let tips: Vec<_> = tip.iter().cloned().collect();
-            let walked = if let Some(tip) = &tip {
+            // A tip the receipt certified was fully verified by the walk that
+            // wrote it, so walking from it again would find nothing.
+            let walked = if let Some(tip) = tip
+                .as_ref()
+                .filter(|t| !prior.certified.contains(t.as_str()))
+            {
                 let w = walk::walk_verified(
                     &port,
                     repo,
@@ -350,6 +371,20 @@ pub(crate) fn seal_guarded(
             }
             .write_with_fs(&paths.root, fs)?;
             point(fs, Point::AfterSealReceipt)?;
+            if let (Some(path), Some(before)) = (checkpoint, tip.as_ref()) {
+                if *before != current_tip {
+                    if let Err(error) = crate::checkpoint::advance(
+                        path,
+                        &identity.store_id,
+                        reference.as_str(),
+                        before.as_str(),
+                        current_tip.as_str(),
+                        &complete.events,
+                    ) {
+                        result.checkpoint_error = Some(error);
+                    }
+                }
+            }
             std::fs::remove_file(&path).map_err(io)?;
             point(fs, Point::AfterSealDelete)?;
             sync_dir(&paths.closed())?;

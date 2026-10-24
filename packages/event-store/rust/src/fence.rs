@@ -1,5 +1,6 @@
 //! One repository-wide tracked fence authority, shared by read and sync.
 use crate::{
+    commit_memo::CommitMemo,
     errors::{invalid, Error, ErrorCode},
     walk::{self, git_error},
 };
@@ -28,7 +29,10 @@ pub(crate) fn pinned_legacy(port: &dyn Inspect, repo: &RepoHandle) -> Result<Opt
     let head = port.resolve_head(&authority).map_err(git_error)?;
     pinned_at_head(port, &authority, &head)
 }
-/// Reuse a command's already observed authority and HEAD, never a prior command's.
+/// The fence a commit carries never changes: see `commit_memo`.
+static FENCE: CommitMemo<Option<Oid>> = CommitMemo::new();
+
+/// Reuse a command's already observed authority and HEAD.
 pub(crate) fn pinned_at_head(
     port: &dyn Inspect,
     repo: &RepoHandle,
@@ -38,9 +42,18 @@ pub(crate) fn pinned_at_head(
         HeadFact::Attached { commit, .. } | HeadFact::Detached { commit } => commit,
         HeadFact::Unborn { .. } => return Ok(None),
     };
+    FENCE.get_or_compute(repo, head, b"", || read_pin(port, repo, head))
+}
+fn read_pin(port: &dyn Inspect, repo: &RepoHandle, head: &Oid) -> Result<Option<Oid>, Error> {
     let values = port
-        .read_paths_at(repo, head, &[b".fgos/events".to_vec()], 32 * 1024 * 1024)
-        .map_err(git_error)?;
+        .read_paths_at_many(
+            repo,
+            &[(head.clone(), vec![b".fgos/events".to_vec()])],
+            32 * 1024 * 1024,
+        )
+        .map_err(git_error)?
+        .pop()
+        .unwrap_or_default();
     let bytes = match values.into_iter().next().map(|p| p.value) {
         Some(PathValue::Blob(b)) => b,
         Some(PathValue::Absent | PathValue::NotABlob(ObjectType::Tree)) => return Ok(None),
