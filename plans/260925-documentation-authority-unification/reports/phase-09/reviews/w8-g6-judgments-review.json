@@ -1,0 +1,995 @@
+{
+ "scope": "All 163 judgment-preserve-with-dated-note rows of preserve-premise/judgments.json (identical set to history-wrapper-proposals.json) plus every proof.json row whose proposedDisposition is neither preserve nor owned-park (1 row: f07526 repoint-proposal). The 1,259 owned parks are out of scope (reviewed in w8-g6-parks-review).",
+ "commit": "f2162d9ff2d6e863c0068ff8d39f18f8c19fb3a5",
+ "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+ "counts": {
+  "APPROVE": 163,
+  "REWORK": 1
+ },
+ "verdicts": [
+  {
+   "id": "f04521",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md:20",
+   "reason": "'Superseded by' header in a history/** retained-navigation table (L12-26(8) history class); Related line already patched; note true, successor docs/platform/runner/spec.md present and unchanged at HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f04660",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md:20",
+   "reason": "'Superseded by' header in a history/** retained-navigation table (L12-26(8) history class); Related line already patched; note true, successor docs/platform/runner/spec.md present and unchanged at HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f04662",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md:20",
+   "reason": "'Superseded by' header in a history/** retained-navigation table (L12-26(8) history class); Related line already patched; note true, successor docs/platform/runner/spec.md present and unchanged at HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05246",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/README.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05269",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05274",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05275",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05295",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05296",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05305",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05306",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05325",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05326",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05337",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05338",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05352",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05353",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05358",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05359",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05364",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05365",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05372",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05373",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05382",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05383",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05389",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05390",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05399",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05400",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05407",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05408",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05417",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05418",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05425",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05426",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05434",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05435",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05446",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05447",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05472",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05473",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05500",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05501",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05510",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05511",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05514",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05515",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05518",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05519",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05522",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05523",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05526",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05527",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05530",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05531",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05537",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05538",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05547",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05548",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05561",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05562",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05576",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05577",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05591",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05592",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05597",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05598",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05613",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05614",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05619",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05620",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05645",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05646",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05654",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05655",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05660",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05661",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05670",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05671",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05676",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05677",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05692",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05693",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05719",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05720",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05729",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05730",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05741",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05742",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05771",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05772",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05785",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05786",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05792",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05793",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05823",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05824",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05836",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05837",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05854",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05855",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05875",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05876",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05883",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05884",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05902",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05903",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05909",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05910",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05924",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05925",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05937",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05938",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05945",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05946",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05956",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05957",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05963",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05964",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05967",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05968",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05972",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/spec.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05973",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/spec.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05985",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05986",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f05993",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f05994",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06009",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06010",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06015",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vision.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06016",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vision.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06036",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06037",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06057",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06058",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06065",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06066",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06072",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06073",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06079",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06112",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06138",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06152",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06153",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06166",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06167",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06172",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06173",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06198",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06269",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06270",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06280",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06281",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06311",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md:19",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06312",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md:23",
+   "reason": "history-wrapper framing 'see docs/specs/runner.md CoordinationSession', before Literal Snapshot (L12-35(3)); successor h-aabefc85f0c9.md:25 is the exact section; note true"
+  },
+  {
+   "id": "f06316",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06318",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/spec.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06344",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06366",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md:18",
+   "reason": "'Superseded by' header of a History wrapper, before Literal Snapshot (L12-35(3)); runner.md removed at cutover; successor docs/platform/runner/spec.md present, blob equal at pin and HEAD; place after the closing header fence"
+  },
+  {
+   "id": "f06379",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:48",
+   "reason": "dated retirement framing in a retained playbook, outside any snapshot (L12-35(3) form); successor h-aabefc85f0c9.md holds the exact CoordinationSession section (L25); note true"
+  },
+  {
+   "id": "f06381",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md:29",
+   "reason": "dated retirement framing in a retained playbook, outside any snapshot (L12-35(3) form); successor h-aabefc85f0c9.md holds the exact CoordinationSession section (L25); note true"
+  },
+  {
+   "id": "f06383",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:29",
+   "reason": "dated retirement framing in a retained playbook, outside any snapshot (L12-35(3) form); successor h-aabefc85f0c9.md holds the exact CoordinationSession section (L25); note true"
+  },
+  {
+   "id": "f06391",
+   "verdict": "APPROVE",
+   "locator": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md:35",
+   "reason": "dated retirement framing in a retained playbook, outside any snapshot (L12-35(3) form); successor h-aabefc85f0c9.md holds the exact CoordinationSession section (L25); note true; optional: the sentence's present-tense 'records' could become 'recorded' in the same compose"
+  },
+  {
+   "id": "f07526",
+   "verdict": "REWORK",
+   "locator": "docs/platform/proposals/dispatch-control-plane-redesign.md:29",
+   "reason": "Repoint target is right, but alone it makes the same file's line 22 declaration ('The three inline-code legacy paths are retained pending cutover') false, and sibling navigation lines 33 (f07527) and 37 (f07528) under the same declaration stay as dead docs/architect pointers; compose all three repoints and rewrite line 22 in one patch"
+  }
+ ]
+}
