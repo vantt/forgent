@@ -23,8 +23,8 @@ test('temporary Work declaration admits exact legacy events on main only',()=>{
   writeRawProjectConfig(temp,'configkeep');
   const result=checkpointLegacyEventFiles(options,{files,message:'chore(work): checkpoint',operationId:'checkpoint'});
   assert.equal(result.status,'committed');assert.deepEqual(result.files,[...files].sort());
-  assert.equal(git('show','HEAD:.fgos/config.json'),'config');
-  assert.throws(()=>checkpointLegacyEventFiles(options,{files:['.fgos/config.json'],message:'refuse',operationId:'bad'}),/invalid-legacy-event-path/);
+  assert.equal(git('show','HEAD:.fgos/config.yaml'),'config');
+  assert.throws(()=>checkpointLegacyEventFiles(options,{files:['.fgos/config.yaml'],message:'refuse',operationId:'bad'}),/invalid-legacy-event-path/);
   const baseline=createGitScopedCommit(options).preflight();
   const fresh='.fgos/events/new.jsonl';fs.writeFileSync(path.join(temp,fresh),'new\n');
   assert.deepEqual(commitLegacyEventFiles(options,{files:[fresh],baseline,message:'chore(work): new shard',operationId:'new-shard'}).files,[fresh]);
@@ -34,7 +34,7 @@ test('temporary Work declaration admits exact legacy events on main only',()=>{
   const pendingReceipt=commitLegacyEventFiles(options,{files:[pending],baseline:pendingBaseline,message:'chore(work): pending shard',operationId:'pending-shard'});
   assert.equal(pendingReceipt.status,'committed');assert.deepEqual(pendingReceipt.files,[pending]);
   assert.equal(git('show',`HEAD:${pending}`),'already pending');
-  assert.equal(git('show','HEAD:.fgos/config.json'),'config');
+  assert.equal(git('show','HEAD:.fgos/config.yaml'),'config');
   // The real owned hook accepts only the durable declaration under main 50.
   createGitRepositoryConfig(options).ensureHooks({ownedPath:path.resolve('.githooks'),operationId:'event-hook'});
   const moveBaseline=createGitScopedCommit(options).preflight();

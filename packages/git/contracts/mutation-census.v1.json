@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "701fe001d2ce35b15c137385c8b8c8b6f1059f628147016b3ee386389778ba0b",
+  "payloadDigest": "de985de471b7955398c10f85c6de613ca1b6c929e5357621037fc40ed4ba75e2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -986,7 +986,7 @@
     "src/setup/event-store-fixes.mjs": "c02842cf801adb41fb3e338c025bc519159833ee256dca558202f19e97d453b2",
     "src/setup/executor-posture-coverage.mjs": "cab23a4fa399353344a74cd88230b0c72ed267dc02edbbdde725c435e21b89af",
     "src/setup/executor-profile-warnings.mjs": "159ece46c6c50e80b3ba5aae80a14c11387f1a4b3384a0d80e0ad4b969ea7b48",
-    "src/setup/git-checks.mjs": "5512fbd20cb24b00cc52d66c8554802a8a24e06e447d0e5dfd9622dfab4c96a2",
+    "src/setup/git-checks.mjs": "73f12e90471a3b786529b394bbd7efcd170181691cc97ba6815d21ee12603604",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "c00f856125aeba1a7466cd152a7fbf7a187e7c5679fb5281437c6cfa86b9c26d",

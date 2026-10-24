@@ -115,8 +115,9 @@ const attemptFix = (cwd, fix) => {
   try { return fix(cwd); } catch (err) { return { changed: false, message: `warning: Git setup refused: ${err.message}` }; }
 };
 export const fixGitDriverDirectories = (cwd, loaderOptions) => attemptFix(cwd, () => {
-  const { stateRoot, native } = context(cwd, loaderOptions);
-  return { changed: native.prepareGitDriverDirectories(stateRoot), message: 'fgOS Git driver directories are current-user-owned and safely permissioned' };
+  // No config read here: the door refuses while these directories are unsafe, and this is what makes them safe.
+  const native = loadNativeAddon(loaderOptions);
+  return { changed: native.prepareGitDriverDirectories(resolveStateRoot().stateRoot), message: 'fgOS Git driver directories are current-user-owned and safely permissioned' };
 });
 /** A fix that first makes the driver directories safe, then runs its own repair. */
 const afterDriverDirectories = (cwd, loaderOptions, fix) => {

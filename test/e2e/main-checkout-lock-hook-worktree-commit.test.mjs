@@ -419,11 +419,11 @@ test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with
 test('tsk-1i3: a deliberate shrink of a non-log .fgos file such as config.json is not refused; only append-only logs are line-count guarded', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
   writeRawProjectConfig(mainRoot, '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
-  execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
+  execFileSync('git', ['add', '.fgos/config.yaml'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'add multi-line config.json'], { cwd: mainRoot });
 
   writeRawProjectConfig(mainRoot, '{\n  "a": 1\n}\n');
-  execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
+  execFileSync('git', ['add', '.fgos/config.yaml'], { cwd: mainRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'removed config entries'], { cwd: mainRoot, encoding: 'utf8' });
 
