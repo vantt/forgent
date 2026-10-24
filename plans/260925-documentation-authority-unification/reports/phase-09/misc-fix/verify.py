@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Scoped misc replay: current bindings, reused registry census, G6 double run.
+"""Scoped misc replay: pinned authoring, live custody, registry census, G6 double run.
 The combined G2/G6 verifier remains the final-pin owner's proof; this does not
 refresh census outputs, gate projections, or certify uncommitted docs at --pin.
 """
 import sys
 sys.dont_write_bytecode = True
 import hashlib, json, pathlib, re, subprocess, tempfile, textwrap
+from rebind import author_commit, source
 HERE=pathlib.Path(__file__).resolve().parent
 ROOT=HERE.parents[4]
 P=pathlib.Path('plans/260925-documentation-authority-unification')
 G6=P/'reports/phase-09/preserve-premise'
-SCRATCH=pathlib.Path('/tmp/fgos-work/w5-misc-rework')
+SCRATCH=pathlib.Path('/tmp/fgos-work/w11-misc-pin/verify')
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 
@@ -40,26 +41,39 @@ def main():
     assert not set(literal_ids)&set(loop_ids)
     assert len(literal_ids)+len(loop_ids)==registrations['Check']==141
     split=dict(literal=len(literal_ids),loopRegistered=len(loop_ids),loopIds=loop_ids)
-    spec=(ROOT/'docs/platform/packaging-distribution/spec.md').read_text()
-    nav=(ROOT/'docs/reading-map.md').read_text()
+    authored=author_commit()
+    spec=source(authored, 'docs/platform/packaging-distribution/spec.md')
+    nav=source(authored, 'docs/reading-map.md')
     assert 'git rev-parse --path-format=absolute --git-common-dir' not in spec
     assert 'git rev-parse --git-common-dir' not in nav
     clause="from the route's reconcile-scan, each with its pane id"
-    assert clause in spec and clause in (ROOT/'docs/specs/distribution.md').read_text()
+    assert clause in spec and clause in source(authored, 'docs/specs/distribution.md')
     assert 'plans/reports/' not in nav
     for link in ['docs/platform/yaml-document/spec.md','docs/platform/config/spec.md']:
-        assert (ROOT/link).is_file()
-    baseline=run(['git','show',pin+':docs/reading-map.md'])
+        assert run(['git','cat-file','-t',authored+':'+link]).strip()=='blob'
+    preimage=json.loads(source(authored, P/'reports/phase-09/misc-fix/binding-refresh.json'))['sourceHead']
+    baseline=run(['git','show',preimage+':docs/reading-map.md'])
     assert nav.split('## 3. Transitional Note')[1].split('## 4. Related Files')[0]==baseline.split('## 3. Transitional Note')[1].split('## 4. Related Files')[0]
     assert nav.count('fgos-coding-knowledge')==baseline.count('fgos-coding-knowledge')
     comparisons=[]
     outputs=['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json']
     # The G6 artifacts are pinned to the commit they record; replay them there, not at HEAD.
     g6pin=json.loads((ROOT/G6/'proof.json').read_text())['sourceCommit']
+    # The owning proof hardcodes an older scratch root (including its Node
+    # guard). Relocate only plumbing; retain every proof assertion and pin.
+    physical=SCRATCH/'physical-move.mjs'
+    physical.write_text((ROOT/G6/'physical-move.mjs').read_text()
+        .replace('../../../../../src/', (ROOT/'src').as_uri()+'/')
+        .replace('/tmp/fgos-work/w8-g6-fix/', str(SCRATCH)+'/'))
+    replay=SCRATCH/'proof.py'
+    replay.write_text((ROOT/G6/'proof.py').read_text()
+        .replace('HERE = pathlib.Path(__file__).resolve().parent', 'HERE = pathlib.Path('+repr(str(ROOT/G6))+')')
+        .replace('/tmp/fgos-work/w8-g6-fix', str(SCRATCH))
+        .replace("str(HERE/'physical-move.mjs')", repr(str(physical))))
     with tempfile.TemporaryDirectory(prefix='double-',dir=SCRATCH) as tmp:
         base=pathlib.Path(tmp);stdouts=[]
         for n in [1,2]:
-            stdouts.append(run(['python3','-B',str(G6/'proof.py'),'--pin',g6pin,'--out',str(base/str(n))]))
+            stdouts.append(run(['python3','-B',str(replay),'--pin',g6pin,'--out',str(base/str(n))]))
         assert stdouts[0]==stdouts[1]
         for name in outputs:
             a=(base/'1'/name).read_bytes();b=(base/'2'/name).read_bytes()
@@ -82,7 +96,8 @@ def main():
     self_links=['f07697','f08033','f08047']
     run(['git','diff','--check'])
     result=dict(status='scoped-replay-passed-not-gate-acceptance',sourceCommit=pin,g6SourceCommit=g6pin,
-                sourcePinScope='G6 replay and owning assertions at proof.json sourceCommit; registry/nav/rebind checks at HEAD. Binding refresh replays its original W4 preimage pin.',
+                miscAuthoringCommit=authored,
+                sourcePinScope='Misc authoring recipe, ledger and docs at the last commit writing misc-fix/binding-refresh.json, with its recorded sourceHead preimages; live overlay custody and registry census at HEAD. G6 replay and owning assertions at proof.json sourceCommit.',
                 combinedVerifierResult=str(G6/'verification.json'),
                 commands=commands,comparisons=comparisons,counts=proof['counts'],registrations=registrations,doctorCheckSplit=split,
                 changedExampleRows=examples,selfLinkProposalsRemoved=self_links,

@@ -1,5 +1,67 @@
 # Miscellaneous rework receipt
 
+## Authoring pin versus live custody (current check replay)
+
+At input HEAD `335b7faa9e21005478b80ccb5691056201d8c048`, `git log -1
+--format=%H -- <misc-fix/binding-refresh.json>` resolves the authoring commit
+`ad94156cf9c463018060f3ae32ff6a17c4874033`. The owning check now regenerates
+**283 historical bindings / 27 overlays (21 content changes)** against that
+commit's docs, shard and record, using its recorded `23f6eaccf` preimages.
+All previous equality, ancestry, placement, hash, effective-row and pending-review
+assertions remain. The generator recipe is read at that commit too: its old
+133/8 disposition prose predates the later 136/5 correction; it is historical,
+not a current doctor-count claim. The current registry still proves 141/32.
+
+The separate live check accounts for all 27 overlays: **24 unchanged effective
+bindings**, and **three** later bindings (`/bindingRefresh/14`, `/15`, `/18`)
+with exact before-binding preimages in `import3/binding-refresh.json`'s recorded
+changes. It rejects unaccounted rows, rather than checking their live doc
+correctness a second time. Unchanged snapshots alone do not authorize a change.
+The owning live rebind check remains the correctness proof. Its hypothetical-row
+`check(pin, proposed)` caller is preserved. No component-boundary change.
+
+Commands (repository-relative paths below share
+`plans/260925-documentation-authority-unification/reports/phase-09/`):
+
+| Command | Exit |
+|---|---:|
+| `python3 -B <prefix>/misc-fix/rebind.py --check` | 0 |
+| `python3 -B <prefix>/misc-fix/verify.py` | 0 |
+| `python3 -B <prefix>/misc-fix/pin-controls.py` | 0 |
+| Authoring-copy overlay corruption, control subprocess | 1 (expected) |
+| Drop later rebind's `/bindingRefresh/14` before-row, control subprocess | 1 (expected) |
+| Owning `rebind/rebind.py --check`, scratch-only relocation below | 0 (`drift: 0`) |
+| `git diff --check` | 0 |
+
+Owning live-check invocation (no out-of-scope script or assertion edited):
+
+```sh
+python3 -B - <<'PY'
+import pathlib, runpy, sys
+path = pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py')
+m = runpy.run_path(str(path))
+m['main'].__globals__['SCRATCH'] = pathlib.Path('/tmp/fgos-work/w11-misc-pin/live-rebind')
+sys.argv = [str(path), '--check']
+raise SystemExit(m['main']())
+PY
+```
+
+[Checks](checks.json) retains a **real** change, not volatile pin-only churn:
+new `miscAuthoringCommit`/pin-scope evidence, authoring doc reads, the original
+sourceHead navigation baseline, and scratch-relocated G6 commands. Four G6
+artifacts remain byte-identical over two runs and equal delivered bytes; no
+G6 counts or source pin changed. [Negative-control evidence](pin-controls.json)
+records exact subprocess commands, exits and assertion failures; the reusable
+[control driver](pin-controls.py) mutates only scratch copies. Existing owning
+assertions are reused, not replaced by alternate acceptance rules.
+
+All scratch plumbing, including G6's Node path guard and Python launcher, is
+confined to `/tmp/fgos-work/w11-misc-pin/`; that directory was deleted after
+verification. No ledger, doc, other script, Git state, pair accounting, gate
+register or fgOS state was edited. Impact-analysis degraded/unqueried (no exposed
+MCP tool; CLI forbidden). Markdown preview remains deferred to Lead under the
+no-extra-state constraint. No gate acceptance or independent review claimed.
+
 ## Current G6 fixes (supersedes all earlier G6 counts and verifier status)
 
 The L13-10 / `w8-g6-fix-brief.md` replay stays at source pin
