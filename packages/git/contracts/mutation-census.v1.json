@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5cc8cbc753a28e27efb78e6b280c308bffa58a104bdbfc3e6af4d56d1bdd3e86",
+  "payloadDigest": "0c5c84666cd2835b4936993d862898fc1bbe0e72f3edb28cb4fae940d798d585",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -229,7 +229,7 @@
     "packages/config/rust/tests/golden_init.rs": "cf9e5e46541cdf8b69f87923df691bf7e9f2368638e31055e5c52ae25564f108",
     "packages/config/rust/tests/golden_lint.rs": "998d9f358da34dd171e6b24642b04173be773d95ca689973efb8d15fc69ab02b",
     "packages/config/rust/tests/golden_meta.rs": "3ba3eb9dcb44bd5a6be43c32545aca479b6757c40bce4222da428e7f3afc91a7",
-    "packages/config/rust/tests/golden_migrate.rs": "e551820800c081eaa98d1f512c582eb6ef1fc70e7e8b4371a2933823161995dd",
+    "packages/config/rust/tests/golden_migrate.rs": "643c7f5ae823618e8f27c4e7f9b2d6ce8955ea7c42e647393e5429a51632a940",
     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",

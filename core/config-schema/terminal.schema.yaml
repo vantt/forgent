@@ -20,7 +20,7 @@ properties:
       policy:
         description: The placement policy the Rust core registers.
         type: string
-        enum: [measured-split]
+        enum: [even-split, measured-split]
       minCols:
         description: Smallest pane width in columns; the agent CLIs were measured to start at 40.
         type: integer
