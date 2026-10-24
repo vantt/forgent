@@ -107,12 +107,27 @@ test('the global config keeps plain strings but drops list, model@pool and objec
   );
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
-  assert.equal(cfg.modelPolicies.claude.flagship, undefined);
-  assert.equal(cfg.modelPolicies.claude.frontier, undefined);
-  assert.equal(cfg.modelPolicies.deepseek?.standard, undefined);
+  // The dropped cells give way to the layer below (the standard's cell), never to the global value.
+  const below = loadWith({ claude: { standard: 'sonnet' } }).cfg.modelPolicies;
+  assert.deepEqual(cfg.modelPolicies.claude.flagship, below.claude.flagship);
+  assert.deepEqual(cfg.modelPolicies.claude.frontier, below.claude.frontier);
+  assert.deepEqual(cfg.modelPolicies.deepseek?.standard, below.deepseek?.standard);
+  assert.notDeepEqual(cfg.modelPolicies.claude.flagship, ['opus@vertex', 'opus']);
   assert.match(stderr, /runner\.modelPolicies\.claude\.flagship/);
   assert.match(stderr, /runner\.modelPolicies\.claude\.frontier/);
   assert.match(stderr, /runner\.modelPolicies\.deepseek\.standard/);
+});
+
+test('a global extended cell over a standard cell gives the standard cell, and nothing where the standard has none', () => {
+  const standard = loadWith({ claude: { standard: 'sonnet' } }).cfg.modelPolicies.claude;
+  const { cfg } = loadWith(
+    { claude: { standard: 'sonnet' } },
+    { claude: { advanced: ['opus@vertex', 'opus'], frontier: { model: 'opus', effort: 'high' } }, nofamily: { standard: 'x@pool' } },
+  );
+  for (const tier of ['advanced', 'frontier']) {
+    assert.deepEqual(cfg.modelPolicies.claude[tier], standard[tier]);
+  }
+  assert.equal(cfg.modelPolicies.nofamily?.standard, undefined);
 });
 
 function bindConfig(cell) {
