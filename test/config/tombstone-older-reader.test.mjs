@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { readSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { ensureRunnerConfigForDir, loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 
 // What a migrated project's `.fgos/config.json` holds (docs/platform/config/spec.md section 13).
@@ -18,7 +19,7 @@ test('an older release refuses a migrated project and writes no config file', ()
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tombstone-'));
   const fgos = path.join(dir, '.fgos');
   fs.mkdirSync(fgos, { recursive: true });
-  fs.writeFileSync(path.join(fgos, 'config.json'), TOMBSTONE);
+  writeRawProjectConfig(dir, TOMBSTONE);
   fs.writeFileSync(path.join(fgos, 'config.yaml'), '# @fgos:v1\n');
   const before = fs.readdirSync(fgos).sort();
 
