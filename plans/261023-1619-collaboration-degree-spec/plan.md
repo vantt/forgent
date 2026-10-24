@@ -24,14 +24,14 @@ Split decided by the COOK lead (RUL104) after two red-team reviews (20 findings,
 | Item | Where |
 |---|---|
 | Part A, the draft | [spec-draft.md](spec-draft.md) |
-| Part B, outline for a separate backlog item (evidence hardening, assessor, consent, freshness, coding-guide restructure) | [part-b-evidence-hardening.md](part-b-evidence-hardening.md) |
+| Part B, outline for a separate backlog item (evidence hardening, assessor, consent, freshness, coding-workflow restructure) | [part-b-evidence-hardening.md](part-b-evidence-hardening.md) |
 | Red-team reviews | [reports/red-team-contracts.md](reports/red-team-contracts.md), [reports/red-team-assumptions-scope.md](reports/red-team-assumptions-scope.md) |
 | Where the findings went (first panel, r2, second panel) | spec-draft.md section 15 |
 | Design sources | first packet `.fgos/assignments/unit-run-1792741678364-45ec2060/producer/2/runs/01/outbox/report-1.md`; second panel `.fgos/assignments/unit-run-1792758630825-12eb2f56/producer/2/runs/01/outbox/report-1.md` |
-| Glossary (loop, pattern, params, guide, case) | spec-draft.md section 2 |
+| Glossary (workflow, case, unit, pattern, loop, params, seat, run; D-ADR0073) | spec-draft.md section 2 |
 | Spec choices to confirm, and the one owner question (D1) | spec-draft.md section 16 |
 | Area specs Part A merges into | spec-draft.md section 18 (`workflow.md`, `runner.md`, `seat-binding.md`, `docs/platform/config/spec.md`) |
 
-Acceptance of Part A: the owner answers D1 and confirms or amends the spec choices in section 16.2; after approval section 18 is merged into the area specs with a minted D-ADR and implementation is planned separately. The runtime verification engineer's replay of P6 rows 6-7 and the solo-verify crash windows is owed against the draft; the deferred non-coding guide author and downstream operator review it.
+Acceptance of Part A: the owner answers D1 and confirms or amends the spec choices in section 16.2; after approval section 18 is merged into the area specs with a minted D-ADR and implementation is planned separately. The runtime verification engineer's replay of P6 rows 6-7 and the solo-verify crash windows is owed against the draft; the deferred non-coding workflow author and downstream operator review it.
 
 Nothing in the repository other than this directory changed.

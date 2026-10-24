@@ -1,18 +1,18 @@
-# Spec draft, Part A: patterns declared in config, params tuned per run
+# Spec draft, Part A: patterns declared in config, params tuned per unit
 
 Status: draft for owner approval. Nothing here is implemented; no area spec changes until the owner approves it and section 18 is merged.
 Date: 2026-10-24. Code facts verified at main `4065cbd68` and re-checked at `be939a764` where the second panel cites it.
 Language: area specs are Vietnamese; quoted current sentences stay verbatim, all other text is English.
 
-History of this draft: Part A of a split decided under RUL104 (milestone evidence hardening is Part B, `part-b-evidence-hardening.md`); revised after two red-team reviews and one review r2 (`reports/`); revised again on 2026-10-24 after the owner found the params too rigid and asked for config-declared, maximally flexible patterns with easy run-time params, and after a second panel (`wf-run-1792756301921-5ca8b9bb`, final packet `.fgos/assignments/unit-run-1792758630825-12eb2f56/producer/2/runs/01/outbox/report-1.md` and `result-1.json`; explanation `unit-run-1792760475393-fb16f44c/producer/1`). The first advisory packet is `unit-run-1792741678364-45ec2060/producer/2` (rev.3).
+History of this draft: Part A of a split decided under RUL104 (milestone evidence hardening is Part B, `part-b-evidence-hardening.md`); revised after two red-team reviews and one review r2 (`reports/`); revised again on 2026-10-24 after the owner found the params too rigid and asked for config-declared, maximally flexible patterns with easy dispatch-time params, and after a second panel (`wf-run-1792756301921-5ca8b9bb`, final packet `.fgos/assignments/unit-run-1792758630825-12eb2f56/producer/2/runs/01/outbox/report-1.md` and `result-1.json`; explanation `unit-run-1792760475393-fb16f44c/producer/1`). The first advisory packet is `unit-run-1792741678364-45ec2060/producer/2` (rev.3).
 
 Evidence classes: **owner** (decided, binding), **council** (a position in a packet, advice, not approved), **code** (verified), **spec choice** (decided here, needs confirmation, section 16).
 
 ## 1. Problem and evidence
 
-The owner's requirement: light and serious applications of a pattern must stay distinguishable; the mechanism is the degree of applying a pattern; each layer states intent and degree; everything configurable; run-time params easy; the fix is not aimed at the single case `reviewed`. What fails today (**code**):
+The owner's requirement: light and serious applications of a pattern must stay distinguishable; the mechanism is the degree of applying a pattern; each layer states intent and degree; everything configurable; dispatch-time params easy; the fix is not aimed at the single case `reviewed`. What fails today (**code**):
 
-1. A guide activity's declared unit never reaches the door: `chosenPattern` (`src/runner/execution/run.mjs:366`) never sees the guide, so a `--case --activity` dispatch with no selector runs `solo` although `feature.yaml:145` says `unit: { pattern: reviewed }` (P6 notebook row 7; `core/skills/fgos-cook/references/route-table-pending.md` tells the conductor to copy the pattern by hand).
+1. A workflow activity's declared unit never reaches the door: `chosenPattern` (`src/runner/execution/run.mjs:366`) never sees the workflow, so a `--case --activity` dispatch with no selector runs `solo` although `feature.yaml:145` says `unit: { pattern: reviewed }` (P6 notebook row 7; `core/skills/fgos-cook/references/route-table-pending.md` tells the conductor to copy the pattern by hand).
 2. Named presets are a code constant (`PRESETS`, `patterns/presets.mjs`): a project cannot declare one, and a project that wants a lighter `reviewed` has no way to say so.
 3. Solo ignores a supplied verify, and settles as soon as the producer result is recorded (`recordInlineRun`, `run.mjs:1513`, settle block ~1581-1590).
 4. A result whose seat id matches `/^verif(y|ier)$/` counts as the harness's verify (`legacy-seat-read.mjs` `isVerifyResult`; `receiptsFromResults`, `case-projection.mjs:240`); solo accepts any declared seat id (`seat-resolver.mjs:198-201`); `unit.seats` silently beats `params.seats` (`seat-resolver.mjs:159-162`).
@@ -23,20 +23,25 @@ The owner's requirement: light and serious applications of a pattern must stay d
 
 P6 evidence (**council**; `plans/reports/measure-261022-1758-cook-p6-pane-launch.md`): `implement-item` ran solo with `--verify`, passed, left `receipts: []`; `child-verified` never reached in an 11-dispatch, 4.5-hour case. No controlled comparison exists; no speed figure is claimed.
 
-## 2. Glossary (owner decision 1; used in the whole spec)
+## 2. Glossary (owner decision, D-ADR0073; used in the whole spec)
 
 | Term | Meaning | Today's name in code |
 |---|---|---|
-| **loop** | one of the four engines held in code: `solo`, `reviewed`, `panel`, `debate` | CollaborationPattern, dir `src/runner/execution/patterns/` |
+| **workflow** | the versioned definition file; a **playbook** is a workflow whose points are all listed-routes-only (`steps`/`units`); a **conductor-driven workflow** has `activities` with a `unit` (e.g. `coding/feature`) | workflow (`guide-schema.mjs`), Workflow definition |
+| **case** | one instance (run-through) of a workflow, with its own ledger, milestones, frame, consent, worktree binding and close; units dispatched into a case pass its admission | case, `wf-run-` id, `.fgos/workflow-runs/` |
+| **unit** | one piece of work handed to the run door, inside a case or standalone | Unit, `unit-run-` id (`unitRunId`) |
 | **pattern** | a named choice = loop + default params + invariants + one-sentence `promise`; declared in config layered project > global > shipped. Every loop has a shipped pattern of the same name with plain defaults, so `--pattern reviewed` keeps working | "preset" (`code-change`, `consult`, `rfc`, `research-fan-out`); `PRESETS` |
-| **params** | the tuning of one pattern for one run | `params` |
-| **guide** | the versioned definition file. A **playbook** is a guide whose decision points are all listed-routes-only (`steps`/`units`); a **conductor-driven guide** has `activities` with a `unit` (today `domains/coding/workflows/feature.yaml`) | Workflow definition / guide |
-| **case** | one run of a guide | case, `wf-run-` id |
+| **loop** | one of the four engines held in code: `solo`, `reviewed`, `panel`, `debate` | CollaborationPattern, dir `src/runner/execution/patterns/` |
+| **params** | the tuning of one pattern for one unit | `params` |
+| **seat** | a role in a pattern | seat |
+| **run** | one execution of one seat (the noun means only that) | `runs/NN`; the Run Supervisor calls it "attempt" |
 | **Workflow** | names only the component (`src/workflow`) | unchanged |
 | activity unit / step unit | the same shape in both: `unit: { pattern, params }` | step template `pattern` + `params`; activity `unit` |
 | request | `--params` / `--param` values for one dispatch | - |
 | baseline | the selector the precedence chain picks without any request | - |
-| pin | the effective collaboration stored on the Unit-run record | - |
+| pin | the effective collaboration stored on the unit record | `unit.json` |
+
+Commands stay: `fgos run` (the verb: runs a unit, which has one or more runs) and `fgos workflow start|status|answer|resume|close` (`start` opens a case of the named workflow; the others act on a case). Physical renames of ids and directories (`wf-run-` to `case-`, `.fgos/workflow-runs/` to `.fgos/cases/`, `unit-run-` to `unit-`, the Run Supervisor's "attempt" to "run") are **not** in Part A: they belong to backlog item `wf-physical-rename`.
 
 "Light means fewer people or a different topology, never a weaker receipt than the milestone guard" (**owner**).
 
@@ -44,24 +49,24 @@ P6 evidence (**council**; `plans/reports/measure-261022-1758-cook-p6-pane-launch
 
 In scope: patterns as a config catalog over four code-held loops; the activity/step `unit` shape; one precedence chain; two-way replaceable params over unioned floors; validation of every carrier; bounds; the run-time door; the pin; solo verify with a harness receipt; red-team default tunable; the physical rename (section 13) with config conversion, doctor and CHANGELOG.
 
-Not in Part A (Part B or settled): ledger folds, evaluator-kind enforcement, consent payload, freshness, new guard primitive, assessor seat, coding-guide restructure, **any new Workflow admission code** (the guide-MUST and frame floors are a named dependency, 8.3); a fifth loop, `extends` between patterns, expressions or JS in config, a "who may set" ACL, `--without`/`--set`, comma lists, a project/global Workflow loader (separate item), a new evaluator; project overlay of a shipped guide (**owner**); renaming the `fgos workflow` verb, `wf-run` ids and the `workflow-runs` directory (these join the existing backlog item `wf-physical-rename`, `docs/backlog.md`).
+Not in Part A (Part B or settled): ledger folds, evaluator-kind enforcement, consent payload, freshness, new guard primitive, assessor seat, coding-workflow restructure, **any new Workflow admission code** (the workflow-MUST and frame floors are a named dependency, 8.3); a fifth loop, `extends` between patterns, expressions or JS in config, a "who may set" ACL, `--without`/`--set`, comma lists, a project/global Workflow loader (separate item), a new evaluator; project overlay of a shipped workflow (**owner**); renaming the `fgos workflow` verb, `wf-run` ids and the `workflow-runs` directory (these join the existing backlog item `wf-physical-rename`, `docs/backlog.md`).
 
 ## 4. The three messages and who owns each
 
-1. **Activity obligation** (guide): the default `unit: { pattern, params }`, effects, `produces`, MUSTs.
+1. **Activity obligation** (workflow): the default `unit: { pattern, params }`, effects, `produces`, MUSTs.
 2. **Requested collaboration** (agent): activity or route, optionally `--pattern`, `--params`, `--param`, with a reason.
 3. **Effective collaboration** (Execution Core): resolved once, pinned, with provenance.
 
 | Layer | Owns | Must not |
 |---|---|---|
-| Guide / domain author | activity/step `unit`, `produces`, MUSTs, routes | hide a hard obligation in unenforced prose; declare a numeric param cap (D1) |
-| Conductor / skill | which activity fits; an optional request with a reason | keep a private route table; hand-copy the guide's pattern; send a request without a reason |
+| Workflow / domain author | activity/step `unit`, `produces`, MUSTs, routes | hide a hard obligation in unenforced prose; declare a numeric param cap (D1) |
+| Conductor / skill | which activity fits; an optional request with a reason | keep a private route table; hand-copy the workflow's pattern; send a request without a reason |
 | Config (project > global > shipped, Rust Config owns parse, merge, comments, provenance) | the pattern catalog; loop tuning and `bounds`; capability `minCheckers` | change a shipped name's loop or weaken its invariants; cancel a floor |
-| Execution Core | validity of every carrier; the one resolution; the floors it can compute (loop domain, pattern invariants, `checkersByRigor`, capability policy); the pin; every refusal of 8.5 | import Workflow or read the guide; choose acceptance authority; derive tier from degree |
-| Workflow admission | the floors that need the guide or frame (guide MUSTs, `rigor-below-floor`, `seat-launch-ceiling-exceeded`), judged on the proposal the Core hands to `admit()` | recompute a different collaboration; receive params (it never sees a request) |
+| Execution Core | validity of every carrier; the one resolution; the floors it can compute (loop domain, pattern invariants, `checkersByRigor`, capability policy); the pin; every refusal of 8.5 | import Workflow or read the workflow; choose acceptance authority; derive tier from degree |
+| Workflow admission | the floors that need the workflow or frame (workflow MUSTs, `rigor-below-floor`, `seat-launch-ceiling-exceeded`), judged on the proposal the Core hands to `admit()` | recompute a different collaboration; receive params (it never sees a request) |
 | Loops + Seat Binding | the loop exactly; seats | add undocumented seats; downshift silently |
 
-Three hands, three scopes (**owner**): the agent changes the degree per slice; the project sets what the agent may choose from; the guide author sets what nobody changes.
+Three hands, three scopes (**owner**): the agent changes the degree per slice; the project sets what the agent may choose from; the workflow author sets what nobody changes.
 
 ## 5. The pattern catalog in config
 
@@ -114,9 +119,9 @@ Setup never seeds the shipped catalog into a project (files hold only difference
 
 ## 6. The activity and step `unit` shape: reuse
 
-Prior art (**code**): a playbook step declares `pattern` and `params` inline, e.g. `core/workflows/architecture-advisory.yaml:56-70`; `src/workflow/definition.mjs` (~370) normalises them; `unitPatternOf` (`src/workflow/unit-handoff.mjs:163`) emits `pattern` or `{ pattern, params }`, "the same shape the Execution Core accepts from a CLI caller" (`run.mjs:367`); the guide already stores a free `unit` object per activity (`guide-schema.mjs` activity normalisation) and `feature.yaml:145` writes `unit: { pattern: reviewed }`. Decision: activities and steps declare the **same** `unit: { pattern, params }`, where `pattern` is a catalog name. Other keys of a playbook-derived activity (`step`, `units`, `kind: integrate`, `target`) are not collaboration declarations. No new shape, no schema field.
+Prior art (**code**): a playbook step declares `pattern` and `params` inline, e.g. `core/workflows/architecture-advisory.yaml:56-70`; `src/workflow/definition.mjs` (~370) normalises them; `unitPatternOf` (`src/workflow/unit-handoff.mjs:163`) emits `pattern` or `{ pattern, params }`, "the same shape the Execution Core accepts from a CLI caller" (`run.mjs:367`); the workflow already stores a free `unit` object per activity (`guide-schema.mjs` activity normalisation) and `feature.yaml:145` writes `unit: { pattern: reviewed }`. Decision: activities and steps declare the **same** `unit: { pattern, params }`, where `pattern` is a catalog name. Other keys of a playbook-derived activity (`step`, `units`, `kind: integrate`, `target`) are not collaboration declarations. No new shape, no schema field.
 
-`activityUnitOf({ mainRoot, caseId, activity })`, a Workflow export in `src/workflow/case-admission-port.mjs`, returns `{ pattern, params }` from the case's pinned guide snapshot, or `null` when the activity is missing, has no `unit`, has no string `unit.pattern` (`{ kind: integrate }`) or is playbook-derived (`{ step, units }`). One owner: `bin/fgos.mjs` (which already builds `caseRef` and imports `createCaseAdmissionPort`) calls it when `caseRef` is present and passes a plain `options.activityUnit`. The AdmissionPort gains no operation. Execution Core never imports the guide loader (principle 2, `test/architecture.test.mjs`).
+`activityUnitOf({ mainRoot, caseId, activity })`, a Workflow export in `src/workflow/case-admission-port.mjs`, returns `{ pattern, params }` from the case's pinned workflow snapshot, or `null` when the activity is missing, has no `unit`, has no string `unit.pattern` (`{ kind: integrate }`) or is playbook-derived (`{ step, units }`). One owner: `bin/fgos.mjs` (which already builds `caseRef` and imports `createCaseAdmissionPort`) calls it when `caseRef` is present and passes a plain `options.activityUnit`. The AdmissionPort gains no operation. Execution Core never imports the workflow loader (principle 2, `test/architecture.test.mjs`).
 
 ## 7. Selection precedence
 
@@ -130,11 +135,11 @@ Prior art (**code**): a playbook step declares `pattern` and `params` inline, e.
 
 The step-4 insertion changes only calls that today fall to `solo`. The **baseline** is the chain computed without any request; a request never shadows a Unit or step pattern and carries no pattern of its own.
 
-**Explicit swap in a case.** When a case dispatch's explicit selector (steps 1-3) names a pattern different from a non-null `activityUnit.pattern`: `--reason` is required (`request-reason-required`; outside a case no reason is needed); the pin records it (`requested.pattern`, `baseline.source`); and the **activity pattern's invariants are floors on the effective result**: `atLeast` lists are unioned in, a `fixed` param must equal, and a loop that does not read an invariant's param refuses `pattern-invariant-weakened` naming the activity pattern. A swap therefore cannot weaken what the activity's pattern locked. Plain `reviewed` locks nothing, so `--pattern solo` on an activity declaring `reviewed` stays an allowed, reasoned, recorded choice. Gating a swap as a route deviation is not in Part A (B9); until B6/B9 the owner rule "never a weaker receipt than the milestone guard" is **not enforced by Part A** for such a swap or for a solo run with no verify command (stated, RR-P6).
+**Explicit swap in a case.** When a case dispatch's explicit selector (steps 1-3) names a pattern different from a non-null `activityUnit.pattern`: `--reason` is required (`request-reason-required`; outside a case no reason is needed); the pin records it (`requested.pattern`, `baseline.source`); and the **activity pattern's invariants are floors on the effective result**: `atLeast` lists are unioned in, a `fixed` param must equal, and a loop that does not read an invariant's param refuses `pattern-invariant-weakened` naming the activity pattern. A swap therefore cannot weaken what the activity's pattern locked. Plain `reviewed` locks nothing, so `--pattern solo` on an activity declaring `reviewed` stays an allowed, reasoned, recorded choice. Gating a swap as a route deviation is not in Part A (B9); until B6/B9 the owner rule "never a weaker receipt than the milestone guard" is **not enforced by Part A** for such a swap or for a solo unit with no verify command (stated, RR-P6).
 
 ### 7.2 `selector-conflict` (Q-C, council default; owner decision 3)
 
-When two **explicit** selectors (steps 1-3) name different patterns, the run refuses `selector-conflict` before admission, reserving nothing. "Different" means different catalog names after resolving each; the same name is not a conflict; a single explicit selector never conflicts with the inherited activity unit (explicit beats it). Today the Unit silently wins over a caller string; the census (9.2) proves no shipped caller passes two different names, and the refusal replaces a silent shadow with a visible one. Timing argument: the proposal is built inside `run` after `chosenPattern` and before any seat runs (`run.mjs:700-733`), so the check belongs before admission (council position, parent `:75`; the critique reviewer's R5 was a citation fix and is not counted as a vote).
+When two **explicit** selectors (steps 1-3) name different patterns, the dispatch refuses `selector-conflict` before admission, reserving nothing. "Different" means different catalog names after resolving each; the same name is not a conflict; a single explicit selector never conflicts with the inherited activity unit (explicit beats it). Today the Unit silently wins over a caller string; the census (9.2) proves no shipped caller passes two different names, and the refusal replaces a silent shadow with a visible one. Timing argument: the proposal is built inside `run` after `chosenPattern` and before any seat runs (`run.mjs:700-733`), so the check belongs before admission (council position, parent `:75`; the critique reviewer's R5 was a citation fix and is not counted as a vote).
 
 ## 8. Params
 
@@ -162,7 +167,7 @@ request > selector params (caller object / step template) > `unit.seats` (the `s
 
 - **Execution Core** unions what it can compute from the Unit and the config snapshot: the loop's domain and cardinality; the chosen pattern's invariants (and, on an explicit swap in a case, the activity pattern's, 7.1); `checkersByRigor[effective rigor]`; and the capability's `minCheckers` (exact key, then `<prefix>:*`, or the `code` default, section 12). A `minCheckers` **request adds, never removes**: a request below any of these floors, including a pattern invariant or a capability `minCheckers`, is a **minimum** (Q-B): the floors are unioned on top and the result shows, per checker, the contribution that keeps it (`rigor:<level>`, `pattern-invariant:<name>`, `capability:<key>`, `code:default-red-team`, `request`). It is never reported as lighter when the roster did not shrink, and it is not a refusal. A smaller roster comes from replacing a pattern **default** or, in config, a capability's `minCheckers` (which replaces another config layer's value for that capability, project > global, but never lowers `checkersByRigor` or an invariant).
 - **Which code for a bad roster.** If the violated requirement is a named pattern invariant and the roster was set by a caller (`unit.seats`, a request `seats`, a step or activity default) against it: `pattern-invariant-weakened`. If no invariant is named, e.g. a reviewed roster missing a role the loop itself requires (`seat-resolver.mjs:205-223`, "exactly"): `seat-multiplicity` (existing). Heavier on reviewed goes through `minCheckers`, not `seats`; the exact match is not retired.
-- **Workflow admission** owns the floors that need the guide or frame: `rigor-below-floor` and `seat-launch-ceiling-exceeded` (existing, `case-admission.mjs` ~209-236, computed from the proposal's `rigor` and `seatLaunches`, which the Core derives from the effective params, so a heavy request beyond the frame already refuses there). The guide-MUST checks and the proposal fields they need are Part B's dependency (B6, B9). Part A adds no admission code and no proposal field; the Core never reads the guide.
+- **Workflow admission** owns the floors that need the workflow or frame: `rigor-below-floor` and `seat-launch-ceiling-exceeded` (existing, `case-admission.mjs` ~209-236, computed from the proposal's `rigor` and `seatLaunches`, which the Core derives from the effective params, so a heavy request beyond the frame already refuses there). The workflow-MUST checks and the proposal fields they need are Part B's dependency (B6, B9). Part A adds no admission code and no proposal field; the Core never reads the workflow.
 
 ### 8.4 Loop tuning and bounds (Q-A = (b), owner decision 4)
 
@@ -187,10 +192,10 @@ request > selector params (caller object / step template) > `unit.seats` (the `s
 | `request-reason-required` | a request, or an explicit selector differing from the activity's pattern (7.1), on a dispatch that names a case, with no `--reason` | `--case c --activity x --param maxRounds=1` |
 | `selector-conflict` | two explicit selectors name different patterns | `--pattern rfc` with `unit.pattern: reviewed` |
 | `unknown-pattern` (existing) | the name is not in the catalog | `research-fan-out-gated` after retirement |
-| `verify-command-unsupported` | a Unit-explicit `verify` (Unit file or `--verify`) on a loop with no verify checkpoint (`panel`, `debate`); a capability-level `verify` is not refused: the run reports `verify: { ran: false, reason }` as today | `--pattern panel --verify "npm test"` |
+| `verify-command-unsupported` | a Unit-explicit `verify` (Unit file or `--verify`) on a loop with no verify checkpoint (`panel`, `debate`); a capability-level `verify` is not refused: the unit reports `verify: { ran: false, reason }` as today | `--pattern panel --verify "npm test"` |
 | `collaboration-pin-unusable` | a resume finds a pin that cannot be read or names an unregistered pattern or loop | resume after a pattern was removed |
 
-Mapping from the council's earlier names: its `param-out-of-bounds` is the bounds case only; the floor cases are `seat-multiplicity` and `pattern-invariant-weakened`; `param-below-floor` is **dropped**; `param-request-invalid` became `param-invalid`; `param-reason-required` became `request-reason-required` (it now also covers a swap); `preset-invariant-weakened` became `pattern-invariant-weakened`. A request on a standalone run needs no reason; with a case the reason is the existing `--reason`, which already travels `caseRef.reason` to `proposal.reason` to the `route` event (`case-admission.mjs`).
+Mapping from the council's earlier names: its `param-out-of-bounds` is the bounds case only; the floor cases are `seat-multiplicity` and `pattern-invariant-weakened`; `param-below-floor` is **dropped**; `param-request-invalid` became `param-invalid`; `param-reason-required` became `request-reason-required` (it now also covers a swap); `preset-invariant-weakened` became `pattern-invariant-weakened`. A request on a standalone unit needs no reason; with a case the reason is the existing `--reason`, which already travels `caseRef.reason` to `proposal.reason` to the `route` event (`case-admission.mjs`).
 
 ## 9. The request door and the caller census
 
@@ -219,7 +224,7 @@ Forms 3 and 4 are collected in `bin/fgos.mjs` into one `options.request` (never 
 
 ## 10. The pin and resume
 
-On the Unit-run record, one new field, written once on a fresh run **before** admission depends on it:
+On the unit record, one new field, written once on a fresh unit **before** admission depends on it:
 
 ```
 collaboration: {
@@ -245,17 +250,17 @@ collaboration: {
 | `unit-summary.mjs:72,146` | pin: shows effective params and both provenance dimensions |
 | `legacy-seat-read.mjs` (pre-seat records) | untouched |
 
-Resume: a record with **no** `collaboration` field (every in-flight run at upgrade, schema 1) resumes **through the translation of 13.2**, not through deleted code: its config snapshot's `patterns.reviewed.*` is read as loop tuning, and its stored selector goes through the historical decoder (`legacy-seat-read.mjs`) to a catalog name (`consult`, `rfc`, `code-change`, `research-fan-out` keep their names; `research-fan-out-gated` maps to `research-fan-out`, its `gated` key was never read). A pinned record resumes on the pin regardless of later catalog or config edits (the config snapshot already pins runner config). An unreadable pin, or one naming an unregistered pattern or loop, refuses `collaboration-pin-unusable`. Resume takes no new params.
+Resume: a record with **no** `collaboration` field (every in-flight unit at upgrade, schema 1) resumes **through the translation of 13.2**, not through deleted code: its config snapshot's `patterns.reviewed.*` is read as loop tuning, and its stored selector goes through the historical decoder (`legacy-seat-read.mjs`) to a catalog name (`consult`, `rfc`, `code-change`, `research-fan-out` keep their names; `research-fan-out-gated` maps to `research-fan-out`, its `gated` key was never read). A pinned record resumes on the pin regardless of later catalog or config edits (the config snapshot already pins runner config). An unreadable pin, or one naming an unregistered pattern or loop, refuses `collaboration-pin-unusable`. Resume takes no new params.
 
 ## 11. Minimum evidence for a light degree to be real
 
-1. **Solo runs a supplied verify once** after a passing producer, **only when `verifyCommandOf(unit, runnerConfig)` returns a command** (Unit `verify`, else the exact capability's). The run-level `verify` hook returns `{ pass: true }` when no command exists (`run.mjs` ~1415), so solo never calls it unconditionally: a run with no command writes **no** `verify` result and mints **no** harness-verify receipt. The result is `{ seat: 'verify', round: 1, outcome, findings }` as `reviewed` writes (~302), through the same bounded runner (`runner.timeoutMs`); a failed verify returns findings with no repair loop; resume reuses a prior passing result; a crash before the result is durable is not a verified pass.
+1. **Solo runs a supplied verify once** after a passing producer, **only when `verifyCommandOf(unit, runnerConfig)` returns a command** (Unit `verify`, else the exact capability's). The run-level `verify` hook returns `{ pass: true }` when no command exists (`run.mjs` ~1415), so solo never calls it unconditionally: a unit with no command writes **no** `verify` result and mints **no** harness-verify receipt. The result is `{ seat: 'verify', round: 1, outcome, findings }` as `reviewed` writes (~302), through the same bounded runner (`runner.timeoutMs`); a failed verify returns findings with no repair loop; resume reuses a prior passing result; a crash before the result is durable is not a verified pass.
 2. **Solo does not settle before its verify.** `recordInlineRun` applies the same `verifyCommandOf` test with the Unit and snapshot config read from `unit.json`; with a command it sets `execution: pending`, leaves `settlement` unset, and a resume runs the verify through the loop.
 3. **The receipt is tied to the harness having executed the verify, never to a seat id a worker can choose.** `verify` and `verifier` are reserved seat ids: `checkDeclaredSeats` refuses them in every declaration (`unit.seats`, `params.seats`, a config pattern's seats), so only the runner's verify checkpoint can produce a result with that seat key; `unit.seats` is the `seats` param at its slot in 8.2 and falls under the invariants.
 4. Candidate-commit ordering is unchanged (commit before verify); a committed candidate in a linked worktree is reported separately from verified delivery.
 5. Panel and debate: capability-level `verify` behaves as today (not run, not refused); a Unit-explicit `verify` refuses `verify-command-unsupported` (8.5).
 
-Not claimed: the receipt's digest is still computed at settle from the tested paths as today (Part B, B3). A case activity whose guide requires a verify receipt, run solo with **no** command, still passes without a receipt; preventing it is Part B (B6).
+Not claimed: the receipt's digest is still computed at settle from the tested paths as today (Part B, B3). A case activity whose workflow requires a verify receipt, run as a solo unit with **no** command, still passes without a receipt; preventing it is Part B (B6).
 
 ## 12. Red-team: a shipped default in the resolver, tunable by config
 
@@ -300,11 +305,11 @@ Consumers to move in the same change (L10; nothing keeps the old path): `pattern
 
 ## 14. Acceptance scenarios
 
-One owning proof per scenario at the lowest layer that can see it; at most one wiring proof above (principle 8). None exists yet unless noted. Fixtures include a non-coding domain (capability `business:*`/`docs:*`; a guide fixture local to the test, since the only shipped guide is the coding one).
+One owning proof per scenario at the lowest layer that can see it; at most one wiring proof above (principle 8). None exists yet unless noted. Fixtures include a non-coding domain (capability `business:*`/`docs:*`; a workflow fixture local to the test, since the only shipped workflow is the coding one).
 
 | # | Scenario | Owning proof | Wiring |
 |---|---|---|---|
-| S1 | A `--case --activity` dispatch with no selector runs the activity's `unit`; the pin shows `baseline.source: 'activity'` and provenance (non-coding guide fixture) | `test/runner/execution/run-case-admission.test.mjs` | none |
+| S1 | A `--case --activity` dispatch with no selector runs the activity's `unit`; the pin shows `baseline.source: 'activity'` and provenance (non-coding workflow fixture) | `test/runner/execution/run-case-admission.test.mjs` | none |
 | S2 | `activityUnitOf` is null for a missing activity, no `unit`, `{ kind: integrate }`, playbook-derived units; the chain falls to `solo` | `test/workflow/case-admission-port.test.mjs` | none |
 | S3 | Two explicit selectors naming different patterns refuse `selector-conflict` before admission, reserving nothing; the same name, or one explicit selector, runs | `test/runner/execution/run.test.mjs` | none |
 | S4 | A project-declared non-coding pattern (config only, no JS change) runs through resolver and dry-bind; shipped `reviewed` with plain defaults still works for `--pattern reviewed` | `test/runner/execution/patterns/catalog.test.mjs` | `test/setup/seat-binding-dry-bind.test.mjs` (existing, extended) |
@@ -314,7 +319,7 @@ One owning proof per scenario at the lowest layer that can see it; at most one w
 | S8 | Validity: unknown key refuses `param-unknown` on a request, Unit, step template, activity unit and config pattern; `maxRounds: 0`/`1.5`/`"abc"` refuses `param-invalid` and never runs an empty loop; `roleTasks` in a request refuses `param-not-requestable` | `test/runner/execution/patterns/catalog.test.mjs` | none |
 | S9 | Bounds: a request outside `bounds.maxRounds` refuses `param-out-of-bounds`; a shipped pattern or activity default outside the bounds runs unclamped; absent bounds never refuse; doctor warns on a default beyond a bound | `test/runner/execution/patterns/catalog.test.mjs` | `test/runner/dispatch-config-patterns.test.mjs` (schema) |
 | S10 | Door: `--param` and `--params` normalise to one request; `--param` splits on the first `=`, types by the param table, and refuses an empty value, `1.5`, `abc` and a list-typed key with `param-invalid`; a repeated key, or the same key through both forms, refuses `param-request-conflict`; a request in a case with no `--reason` refuses `request-reason-required`; both flags refused beside `--resume`; a standalone request runs without a reason | `test/cli/run-verb.test.mjs` | `test/runner/execution/run-case-admission.test.mjs` (reason reaches the `route` event) |
-| S11 | Pin and resume: a pinned run keeps its effective meaning after a catalog and config edit; an unreadable pin refuses `collaboration-pin-unusable`; a schema-1 host refuses a schema-2 record; an unpinned schema-1 record resumes through the translation (snapshot `patterns.reviewed.*` as loop tuning; a stored `research-fan-out-gated` runs as `research-fan-out`) | `test/runner/execution/run.test.mjs` (extend the existing fence proof) | none |
+| S11 | Pin and resume: a pinned unit keeps its effective meaning after a catalog and config edit; an unreadable pin refuses `collaboration-pin-unusable`; a schema-1 host refuses a schema-2 record; an unpinned schema-1 record resumes through the translation (snapshot `patterns.reviewed.*` as loop tuning; a stored `research-fan-out-gated` runs as `research-fan-out`) | `test/runner/execution/run.test.mjs` (extend the existing fence proof) | none |
 | S12 | Light implement: solo with a verify command runs it once after a passing producer; pass gives a harness verify result and receipt; fail gives findings and no repair; a crash before the result is durable is not a verified pass; **no command means no `verify` result and no receipt**; an inline solo record with a command ends `execution: pending` | `test/runner/execution/patterns/solo.test.mjs` (moves to `loops/`) | `test/runner/execution/run.test.mjs` (`recordInlineRun`) |
 | S13 | Seat ids `verify` and `verifier` are refused in `unit.seats`, `params.seats` and config pattern seats; a solo Unit declaring one cannot produce a harness-verify receipt | `test/runner/execution/seat-resolver.test.mjs` | none |
 | S14 | Red-team default: `code:implement` reviewed includes red-team with no config; a `code:*` `minCheckers: [reviewer]` (prefix) replaces the default; an exact-key entry wins over the prefix; `[]` clears the default; a request below the capability `minCheckers` is unioned, never removing red-team; `business:advise` never gets it | `test/runner/execution/seat-resolver.test.mjs` | none |
@@ -402,7 +407,7 @@ The second panel's other elements are adopted as owner decision 3: catalog over 
 
 ### 16.3 Decision question D1 (the one remaining owner question; unchanged)
 
-**What is happening.** The owner's rule says an agent may request params "within the bounds the pattern and the guide allow". The model now has pattern invariants and config `bounds`, but a guide activity carries only a default `unit` and its MUST rows; reviewers found the guide bound has no field. **Cause.** Checked in `guide-schema.mjs` (activity: `unit` and `must` only) and `case-admission.mjs` (MUST rows and routes, no param caps). **Options.** (a) the guide's bound is its MUST rows (enforced by Part B's admission checks); numeric caps live in config `bounds` or a pattern invariant. Gain: no new field, no rule language (RUL-WF-25); harm: a guide author cannot write "never above N rounds"; cost: 0. (b) a guide `bounds` row per activity: gain, the guide states a cap; harm, a fourth place beside config bounds, invariants and defaults that can disagree, and the Core would need a port read; cost, schema, port read, resolver, doctor, proofs. **Recommendation.** (a); the wording "the guide allows" leaves normative text; reverse if a real guide needs a cap that is not a promise (RT-10). **Scope of the answer.** A yes confirms (a) for Part A only; it decides no choice in 16.2 and nothing in Part B.
+**What is happening.** The owner's rule says an agent may request params "within the bounds the pattern and the workflow allow". The model now has pattern invariants and config `bounds`, but a workflow activity carries only a default `unit` and its MUST rows; reviewers found the workflow bound has no field. **Cause.** Checked in `guide-schema.mjs` (activity: `unit` and `must` only) and `case-admission.mjs` (MUST rows and routes, no param caps). **Options.** (a) the workflow's bound is its MUST rows (enforced by Part B's admission checks); numeric caps live in config `bounds` or a pattern invariant. Gain: no new field, no rule language (RUL-WF-25); harm: a workflow author cannot write "never above N rounds"; cost: 0. (b) a workflow `bounds` row per activity: gain, the workflow states a cap; harm, a fourth place beside config bounds, invariants and defaults that can disagree, and the Core would need a port read; cost, schema, port read, resolver, doctor, proofs. **Recommendation.** (a); the wording "the workflow allows" leaves normative text; reverse if a real workflow needs a cap that is not a promise (RT-10). **Scope of the answer.** A yes confirms (a) for Part A only; it decides no choice in 16.2 and nothing in Part B.
 
 ## 17. Dissent, risks, expertise
 
@@ -423,9 +428,9 @@ The second panel's other elements are adopted as owner decision 3: catalog over 
 | RR-P3 | a catalog or `runner.loops` key in the global file breaks older activated releases (they refuse the file, which is the fence) | doctor warns while one is installed; setup leaves the global file (13.2); RT-P4 |
 | RR-P4 | Config door not wired at implementation tempts a JS merger | catalog waits for the Config door; no second semantics |
 | RR-P5 | `selector-conflict` refuses a caller | census 9.2; RT-P6 |
-| RR-P6 | Part A read as proving milestone safety: it does not enforce the guard for a solo run with no verify command or for an explicit swap to a lighter loop (the swap is reasoned and recorded) | stated in 7.1 and 11; B6, B9 |
+| RR-P6 | Part A read as proving milestone safety: it does not enforce the guard for a solo unit with no verify command or for an explicit swap to a lighter loop (the swap is reasoned and recorded) | stated in 7.1 and 11; B6, B9 |
 | RR-P7 | the pinned digest diverges from loop code after a release | `collaboration-pin-unusable`; RT-4 |
-| RR-P8 | Part B's checks need proposal fields the proposal lacks | pointer to B6/B9 (8.3); the Core must not read the guide |
+| RR-P8 | Part B's checks need proposal fields the proposal lacks | pointer to B6/B9 (8.3); the Core must not read the workflow |
 | RR-P9 | per-entry deep merge lets a stray key from one layer's entry survive | the resolver validates the merged entry against the final loop (5.2); no entry-level replace |
 | RR-P10 | the rename touches many consumers, skills and renders | one L10 step, S19, S18 |
 | RR10/RR11 | red-team default costs one checker at standard rigor; at high/critical a round needs three or four families. A round halts only when the fallback walk, which re-binds under current independence, finds no eligible replacement | tunable by `minCheckers`; named failure; RT-8, RT-9 |
@@ -433,9 +438,9 @@ The second panel's other elements are adopted as owner decision 3: catalog over 
 | RT-P1 | a project needs a cap `bounds` cannot express | reopen the bounds shape |
 | RT-P2 | agents re-copy whole rosters to drop one seat | consider a subtraction adapter over the same request |
 | RT-P3 | a project needs its own multi-Unit composition | open the Workflow loader to a project/global source: separate item |
-| RT-10 | a guide needs a cap that is not a promise | reopen D1 (b) |
+| RT-10 | a workflow needs a cap that is not a promise | reopen D1 (b) |
 
-Expertise still owed: runtime verification engineer (proofs of pin, solo-verify crash windows, receipt on a real release); Config component owner (entry-level replace, snapshot provenance naming a catalog entry); distribution/activation owner (which installed releases have the `seatSchema` fence; global-file coexistence); admission-port owner (proposal fields, for Part B); non-coding guide author (first non-coding pattern fixture, default task wording); **downstream operator** of a project running a shipped guide (deferred by the owner until a draft exists: this is that draft).
+Expertise still owed: runtime verification engineer (proofs of pin, solo-verify crash windows, receipt on a real release); Config component owner (entry-level replace, snapshot provenance naming a catalog entry); distribution/activation owner (which installed releases have the `seatSchema` fence; global-file coexistence); admission-port owner (proposal fields, for Part B); non-coding workflow author (first non-coding pattern fixture, default task wording); **downstream operator** of a project running a shipped workflow (deferred by the owner until a draft exists: this is that draft).
 
 ## 18. Amendments to area specs
 
@@ -456,4 +461,4 @@ When approved, merge with a minted D-ADR (`fgos identity mint d-adr` at merge; n
 | `docs/specs/seat-binding.md` marker sentence (~245) | "Marker `runner.patterns.seatBinding.schema` vẫn do config project mới ghi và validator vẫn đọc giá trị của nó; thiếu marker không bị từ chối." | the marker is a reserved name, `schema: 2` after conversion; older releases refuse it; the new release reads schema 1 and 2 |
 | decision history | - | the D-ADR for the owner's 2026-10-23 and 2026-10-24 decisions |
 
-Not amended by Part A: `docs/specs/distribution.md` (no new doctor check name), `docs/platform-foundations.md` L1-L10 (L10 is applied: the door, step handoff, conductor skills, renders, config conversion and the rename move in one cutover and the old path is deleted), the guide schema, `feature.yaml`, RUL-WF-7, RUL-WF-14, RUL-WF-19 (Part B).
+Not amended by Part A: `docs/specs/distribution.md` (no new doctor check name), `docs/platform-foundations.md` L1-L10 (L10 is applied: the door, step handoff, conductor skills, renders, config conversion and the rename move in one cutover and the old path is deleted), the workflow schema (`guide-schema.mjs`), `feature.yaml`, RUL-WF-7, RUL-WF-14, RUL-WF-19 (Part B).
