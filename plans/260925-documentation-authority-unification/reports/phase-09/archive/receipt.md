@@ -39,3 +39,17 @@ After direct retention, **123 kept files / 1,025 relative link occurrences / 628
 `/var/tmp` is on ext4, but sandbox `mkdir /var/tmp/fgos-work` fails with **errno 30, Read-only file system**. `/tmp` is tmpfs (7.7 GiB); it is not a real-disk cold-timing substitute, and the existing rehearsal free-space guard requires more than 20 GiB. No bypass, in-tree fallback, lowered guard, fake residency or old timing substitution was used. No scratch was created, so no cleanup remains. To finish, rerun in a permission frame with writable external real-disk scratch, at least the existing space guard, and the same scoped archive output; then run both variants and the full verifier. No additional repository write scope is required (`needsWrites=[]`).
 
 `audit/attempt-1/rehearsal.bundle` stays deleted; the other attempt-1 records and current historical bundle are unchanged. No pair accounting, product/test edit, source Git write, fgOS CLI, `.fgos`/secret read, lifecycle verb, publication or landing. The runner owns committing. Impact-analysis is degraded/unqueried under the no-fgOS-CLI brief; direct source/history review only. npm test and `scripts/run-tests.mjs` are prohibited; Cargo and browser/service preview were not run for this records task.
+
+## Lead run outside the sandbox (2026-10-24 15:10)
+
+The Doer's blocker above was environmental: the sandbox could not create scratch on real disk. The Lead ran the same command unconfined on design-lap, where `/tmp` is ext4 on the root disk with 26 GB free and SEAT agreed to the heavy IO:
+`env -u CLAUDE_CODE_SESSION_ID python3 -B <archive>/rehearse.py --scratch /tmp/fgos-work/w5-d5e-cold --release-path <activated release>`. It exited **0** (log `/tmp/fgos-work/w5-d5e-rehearse.log`), and the script removed its scratch.
+
+| Variant | Eviction (resident bytes before → after) | Cold run 1 (residency before = 0) | Warm runs 2/3 | Median |
+|---|---|---:|---:|---:|
+| After final pin, without gates (reduced tip) | 704,667,648 → 0 | **2.93 s** | 2.71 / 2.90 s | 2.90 s |
+| Before final pin, with gates | 704,667,648 → 0 | **41.70 s** | 10.55 / 12.44 s | 12.44 s |
+
+Every cold run is labelled from measured residency, not from its position, and `ownerDropCachesColdRunRequired` is false. Both variants stay under the Git driver's 120 s deadline. Accounting after the run: A, B and I are ok for both manifests.
+
+`verify-design.py` asserts HEAD equals the source pin. The Lead therefore ran it in a detached worktree at `d3efc70c5`, with this `archive/` directory copied in. It exited **0** with `status: verified`, `checkARevalidated: true`, 6,918 partition files (6,026 moving, 892 retained), 4 direct-link files / 783,918 B added, and the rejected-closure digest verified. `retainedToArchivedLinks` reports 123 reader files and 1,025 links. The refreshed `verification.json` is copied here, and the worktree was removed. The BLOCKED status at the top of this receipt is superseded by this section.
