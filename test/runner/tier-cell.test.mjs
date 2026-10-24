@@ -99,17 +99,20 @@ test('a project config with a malformed cell fails to load and names the cell', 
   assert.throws(() => loadWith({ claude: { standard: 'sonnet@' } }), /runner\.modelPolicies\.claude\.standard \(oneOf\)/);
 });
 
-test('the global config\'s list, model@pool and object cells are read as written, one cell form for both layers', () => {
+test('the global config keeps plain strings but drops list, model@pool and object cells, naming each once', () => {
+  // Every fgOS release on the machine reads the global config; an older one fails on a list.
   const { cfg, stderr } = loadWith(
     { claude: { standard: 'sonnet' } },
     { claude: { advanced: 'opus', flagship: ['opus@vertex', 'opus'], frontier: { model: 'opus', effort: 'high' } }, deepseek: { standard: 'deepseek-v4@openrouter' } },
   );
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
-  assert.deepEqual(cfg.modelPolicies.claude.flagship, ['opus@vertex', 'opus']);
-  assert.deepEqual(cfg.modelPolicies.claude.frontier, { model: 'opus', effort: 'high' });
-  assert.equal(cfg.modelPolicies.deepseek.standard, 'deepseek-v4@openrouter');
-  assert.equal(stderr, '', 'nothing is filtered, so nothing is reported');
+  assert.equal(cfg.modelPolicies.claude.flagship, undefined);
+  assert.equal(cfg.modelPolicies.claude.frontier, undefined);
+  assert.equal(cfg.modelPolicies.deepseek?.standard, undefined);
+  assert.match(stderr, /runner\.modelPolicies\.claude\.flagship/);
+  assert.match(stderr, /runner\.modelPolicies\.claude\.frontier/);
+  assert.match(stderr, /runner\.modelPolicies\.deepseek\.standard/);
 });
 
 function bindConfig(cell) {
