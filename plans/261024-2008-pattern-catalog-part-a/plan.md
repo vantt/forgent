@@ -119,7 +119,7 @@ Accepted as stated risks (not blockers): F-1 the landing fence (risk 1); A-3 the
 - **U5:** decided at slice time; a small fixture of its own is allowed only if no existing CLI conductor-case fixture fits.
 - **U6:** asked of CFG with U1; Branch A only.
 - **U7:** the slice first checks for an existing host verb that lists releases and uses it; only if none exists does the warning stay unconditional, worded as advice.
-- **U8:** owner question, asked with the plan.
+- **U8:** owner answered (b) at 2026-10-24 20:37: the lead stops and asks before landing phase 12.
 
 ## Unresolved questions
 
