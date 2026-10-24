@@ -7,17 +7,23 @@ only scratch/output locations and the current correction metadata are adapted.
 No live docs, product code, generated skills or baselines are written.
 """
 import argparse
+import atexit
 import difflib
 import importlib.util
 import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[5]
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w10-g9-rework')
+TMP = Path('/tmp/fgos-work')
+TMP.mkdir(parents=True, exist_ok=True)
+_workspace = tempfile.TemporaryDirectory(prefix='composition-rework-', dir=TMP)
+atexit.register(_workspace.cleanup)
+TMP = Path(_workspace.name)
 OLD_TMP = '/tmp/fgos-work/w9-comp-rework'
 
 

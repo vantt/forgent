@@ -12,10 +12,11 @@ from pathlib import Path
 import runpy
 import subprocess
 import sys
+import tempfile
 sys.dont_write_bytecode = True
 P = Path('plans/260925-documentation-authority-unification')
 O = P/'reports/phase-09/import3'
-S = Path('/tmp/fgos-work/w11-import3')
+S = Path('/tmp/fgos-work')
 sys.path.insert(0, str(P/'reports/phase-09/ledgerfix'))
 from bindings import documents, rows, supersessions, effective, at, payload, digest, sha, KEYS
 locate = runpy.run_path(str(P/'reports/phase-09/rebind/rebind.py'))['locate']
@@ -221,5 +222,8 @@ def author(write):
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--write',action='store_true');ap.add_argument('--check',action='store_true');args=ap.parse_args()
-    if args.check:check()
-    else:author(args.write)
+    S.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='import3-resync-', dir=S) as name:
+        S = Path(name)
+        if args.check:check()
+        else:author(args.write)

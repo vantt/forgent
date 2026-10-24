@@ -2,6 +2,7 @@
 """Independent, hash-guarded replay of effective records, not author claims.
 Reuses GNU patch at fuzz=0, never applies a source-worktree edit. No fgOS CLI.
 """
+import atexit
 import collections
 import hashlib
 import json
@@ -11,8 +12,11 @@ import tempfile
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[4]
 P8=HERE.parent.parent/'phase-08'
-TMP=Path('/tmp/fgos-work/w2-d2b-brief/independent-verifier')
+TMP=Path('/tmp/fgos-work')
 TMP.mkdir(parents=True,exist_ok=True)
+_workspace=tempfile.TemporaryDirectory(prefix='composition-verify-',dir=TMP)
+atexit.register(_workspace.cleanup)
+TMP=Path(_workspace.name)
 sha=lambda s:hashlib.sha256(s.encode()).hexdigest()
 def load(p):return json.loads(p.read_text())
 packet=load(HERE/'patch-specs.json')

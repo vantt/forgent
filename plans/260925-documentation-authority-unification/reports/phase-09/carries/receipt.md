@@ -1,5 +1,11 @@
 # Conserved Claims And Packaging Refresh — Doer Receipt
 
+## Current checker qualification
+
+The [source-parity rework receipt](../g0rework/receipt.md#current-source-parity-rework) supersedes the current-freshness claims below, not their historical evidence. The same `node …/carries/verify-carries.mjs` command now separates author-pin placement/heading/patch witnesses from current source parity and 1,208 current ledger successor assertions. All 345 rows survive; [current-binding-refresh.json](current-binding-refresh.json) records the extra target-ordinal and candidate-binding repairs. Explicit split/adapted units are checked, never called equal. Final-pin completeness, patch recomposition, native-dependent audit and independent approval remain outside this result.
+
+## Original authoring receipt
+
 Author: `fgos-run_unit-run-1792750955a733`  
 Source pin: `3e2d05af89313dbfbf0d26cd0de34f6b660d194b`  
 Status: **Authored and locally verified; independent review pending. No gate accepted.**

@@ -5,8 +5,9 @@ Run from the repo root with python3 -B. Prints JSON, writes no repository file.
 Owning proof assertions/extractors are unchanged. The misc verifier's sole
 repository report sink is redirected before the write, since its path is not in
 this assignment's writable list. The original checks.json is never rewritten.
-The audit's checks.mjs is refused before execution: trackedPlatformDocs reaches
-native Git and stages the addon. This is an explicit not-run (126), never a pass.
+Only the embedded ownership recipes run, never phase-08/audit-report.py.
+checks.mjs reaches native Git and stages the addon: it is explicitly not run.
+Exit 0 certifies the scoped record proofs; audit status remains partial, ok false.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -48,15 +49,13 @@ def main():
             commands.append(item)
             return proc
 
-        # Original --check main; relocate only the extractor's fixed scratch root.
-        wrapper = tmp / 'rebind-check.py'
-        owner = root / P / 'reports/phase-09/rebind/rebind.py'
-        wrapper.write_text("import runpy,sys,pathlib\n"
-            + "sys.argv=[" + repr(str(owner)) + ",'--check']\n"
-            + "m=runpy.run_path(" + repr(str(owner)) + ")\n"
-            + "m['extract'].__globals__['SCRATCH']=pathlib.Path(" + repr(str(tmp / 'rebind')) + ")\n"
-            + "raise SystemExit(m['main']())\n")
-        run('rebind/rebind.py --check (only scratch relocated)', ['python3', '-B', str(wrapper)])
+        # Invoke the real door: it must own and remove its extractor workspace.
+        scratch_before = sorted(str(p.relative_to(scratch)) for p in scratch.rglob('*'))
+        run('rebind/rebind.py --check', ['python3', '-B', str(P / 'reports/phase-09/rebind/rebind.py'), '--check'])
+        assert scratch_before == sorted(str(p.relative_to(scratch)) for p in scratch.rglob('*'))
+        report['assertions']['rebindLeavesNoScratch'] = True
+        run('carries accounting deterministic replay', ['python3', '-B', str(HERE / 'refresh-carries.py'), '--check'])
+        run('carries/verify-carries.mjs', ['node', str(P / 'reports/phase-09/carries/verify-carries.mjs')])
 
         checks = root / P / 'reports/phase-09/misc-fix/checks.json'
         checks_before = checks.read_bytes()
@@ -78,39 +77,32 @@ def main():
             misc = json.loads((tmp / 'misc-checks.json').read_text())
             report['miscReplay'] = misc
 
-        # Original ownership/audit-ownership scripts run unchanged. Preflight
-        # refuses only checks.mjs, whose trackedPlatformDocs reaches native Git,
-        # BEFORE it can stage an addon/cache outside the writable scope.
-        wrapper = tmp / 'audit-report.py'
-        owner = root / P / 'reports/phase-08/audit-report.py'
-        wrapper.write_text("import runpy,tempfile,pathlib,subprocess\n"
-            + "original_run=subprocess.run\n"
-            + "def run(argv,*a,**kw):\n"
-            + " if argv[0]=='node' and pathlib.Path(argv[1]).name=='checks.mjs':\n"
-            + "  return subprocess.CompletedProcess(argv,126,'','Not run: checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.\\n')\n"
-            + " return original_run(argv,*a,**kw)\n"
-            + "subprocess.run=run\n"
-            + "original=tempfile.mkdtemp\n"
-            + "def mkdtemp(*a,**kw):\n"
-            + " if str(kw.get('dir',''))=='/tmp/fgos-work': kw['dir']=" + repr(str(tmp)) + "\n"
-            + " return original(*a,**kw)\n"
-            + "tempfile.mkdtemp=mkdtemp\n"
-            + "runpy.run_path(" + repr(str(owner)) + ",run_name='__main__')\n")
-        proc = run('phase-08/audit-report.py (tempfile relocated; native-dependent checks.mjs refused before execution)', ['python3', '-B', str(wrapper)])
-        try:
-            audit = json.loads(proc.stdout)
-            report['ownershipAudits'] = [dict(manifest=m['manifest'], commands=m['commands'],
-                failingRows=m['failingRows'], ownership=m['ownership'],
-                checksOk=m['checks'].get('ok') if m['checks'] else None,
-                checksStderr=(Path(audit['scratch']) / Path(m['manifest']).name.replace('-reproduction.json', '') / 'checks.mjs.stderr').read_text())
-                for m in audit['manifests']]
-            report['fullAuditPassed'] = audit['ok']
-            # The brief's owning requirement is zero failing ownership rows.
-            assert all(m['failingRows'] == [] and all(c['exit'] == 0 for c in m['commands']
-                if c['script'] in ['ownership.mjs', 'audit-ownership.mjs']) for m in audit['manifests'])
-            report['assertions']['ownershipPassed'] = True
-        except (ValueError, AssertionError):
-            report['assertions']['ownershipPassed'] = False
+        # Reuse the frozen ownership recipes verbatim, without invoking the
+        # prohibited audit driver or even materializing native-dependent checks.
+        report['ownershipAudits'] = []
+        for stem, key in [('step10-round5', 'scripts'), ('step10-sync4d', 'readOnlyScripts')]:
+            manifest = P / 'reports/phase-06' / (stem + '-reproduction.json')
+            dest = tmp / stem
+            dest.mkdir()
+            scripts = json.loads(manifest.read_text())[key]
+            for name, source in scripts.items():
+                assert Path(name).name == name
+                if name != 'checks.mjs':
+                    (dest / name).write_text(source)
+            outcomes = []
+            for name in ['ownership.mjs', 'audit-ownership.mjs']:
+                proc = run(stem + '/' + name, ['node', str(dest / name), '--output-dir', str(dest)])
+                outcomes.append(dict(script=name, exit=proc.returncode))
+            own = json.loads((dest / (stem + '-target-ownership.json')).read_text())
+            assert own['targetDigestDrift'] == []
+            report['ownershipAudits'].append(dict(manifest=str(manifest), commands=outcomes,
+                failingRows=own['targetDigestDrift'], ownership={k: own.get(k) for k in [
+                    'noNewDoubleOwnership', 'nativePlatformTargetIdentityDuplicates', 'newActiveSourcePairCollisions']},
+                checksOk=None, checksStatus='not-run',
+                checksReason='checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment.'))
+        report['assertions']['ownershipPassed'] = all(c['exit'] == 0
+            for m in report['ownershipAudits'] for c in m['commands'])
+        report['fullAuditPassed'] = False
 
         run('legacy docs ratchet', ['node', 'scripts/check-legacy-docs-ratchet.mjs'])
         run('whitespace', ['git', 'diff', '--check'])
@@ -119,6 +111,14 @@ def main():
         links = supersessions(docs)
         overlay = docs[str(SHARD)]['bindingRefresh']
         assert len(overlay) == 127
+        dictionary = next(r for r in overlay if r['claimId'].startswith('claim_5ba6768e'))
+        assert [c['changeSources'] for c in dictionary['changedClauses']] == [
+            ['docs/platform/identity/spec.md#4a-minting-ids-for-every-owner-settled-2026-10-22',
+             '63b777873c44e8977d16857e80246b043240ed0b', '11733af3782423e8b2ce70f11417dba67353ee05'],
+            ['docs/platform/seat-binding/spec.md#52-rigor-tách-khỏi-tier', 'e0e52312a', 'bd8d64fdd']]
+        add = next(r for r in overlay if r['claimId'].startswith('claim_320ba622'))
+        assert '(9 file)' in add['rationale'] and 'trong nhiều file (ví dụ …)' in add['rationale']
+        report['assertions'].update(clauseSpecificSourceLists=2, addVerbFileCountRationale=True)
         review = json.loads((P / 'reports/phase-09/reviews/w14-g0-content-rereview.json').read_text())['rows']
         touched = list(rows(docs[str(SHARD)]))
         assert len(touched) == 127
@@ -154,19 +154,33 @@ def main():
         # the direct claims visited by the historical ownership auditor.
         import runpy
         rebind = runpy.run_path(str(root / P / 'reports/phase-09/rebind/rebind.py'))
-        rebind['extract'].__globals__['SCRATCH'] = tmp / 'extract'
         extract = rebind['extract']
         paths = {r['targetOwner'] for _, r in touched}
         parity = json.loads((P / 'reports/phase-09/carries/source-parity.json').read_text())
-        # Compare with the version before the commit that appended these rows, so the
-        # check holds after the authoring is committed (HEAD already contains them).
+        # Stable authenticated pre-append pin, unaffected by later parity edits.
         parity_path = str(P / 'reports/phase-09/carries/source-parity.json')
-        if subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--', parity_path]).returncode:
-            parity_base = 'HEAD'  # uncommitted authoring: HEAD is still the base
-        else:
-            parity_base = subprocess.check_output(['git', 'log', '-1', '--format=%H', '--', parity_path], text=True).strip() + '^'
+        parity_base = json.loads((HERE / 'receipt.json').read_text())['sourceHead']
         parity_old = json.loads(subprocess.check_output(['git', 'show', parity_base + ':' + parity_path], text=True))
-        assert parity[:len(parity_old)] == parity_old
+        assert len(parity_old) == 324
+        refreshed = {301, 305, *range(312, 324)}
+        target_only = set(json.loads((P / 'reports/phase-09/carries/current-binding-refresh.json').read_text())['targetOnlyParityRows'])
+        assert not (target_only & refreshed)
+        for i, before in enumerate(parity_old):
+            if i not in refreshed | target_only:
+                assert parity[i] == before, ('unexpected prior parity edit', i)
+            else:
+                current = parity[i]
+                assert current['accounting']['previousParityRow'] == before
+                assert current['accounting']['oldLegacyAnchor'] == before['sourceAnchor']
+                assert current['accounting']['oldLegacyDigest'] == before['sourceUnitDigest']
+                assert current['sourcePath'] == before['sourcePath']
+                if i in refreshed:
+                    assert current['sourcePath'] == 'docs/specs/distribution.md'
+                else:
+                    for k in ['sourceAnchor', 'sourceUnitDigest', 'comparisonRecipe']:
+                        assert current[k] == before[k], (i, k)
+                    assert current['status'] == ('accounted-current-source-adaptation' if i == 249 else before['status'])
+        report['assertions']['parityBase'] = parity_base
         appended = parity[len(parity_old):]
         assert len(appended) == 21
         assert collections.Counter(r['sourcePath'] for r in appended) == {
@@ -205,7 +219,9 @@ def main():
             current = next(u for u in cat[p['sourcePath']]['units'] if u['anchor'] == a['currentSourceAnchor'])
             target = p['targets'][0]
             assert current['textDigest'] == a['newLegacyDigest'] == target['targetUnitDigest']
-            assert overlay[next(i for i, r in enumerate(overlay) if r['claimId'] == a['claimId'])]['sourceUnitDigest'] == p['sourceUnitDigest']
+            assert p['sourceAnchor'] == a['currentSourceAnchor']
+            assert p['sourceUnitDigest'] == a['newLegacyDigest']
+            assert overlay[next(i for i, r in enumerate(overlay) if r['claimId'] == a['claimId'])]['sourceUnitDigest'] == a['historicalSourceUnitDigest']
         for row in overlay[:124]:
             if 'legacyWordingWitness' not in row:
                 continue
@@ -221,19 +237,17 @@ def main():
         ref = residual['residualRef']
         assert hashlib.sha256(Path(ref['path']).read_bytes()).hexdigest() == ref['fileSha256']
         report['assertions'].update(currentTargetsAndAncestries=127, exactChangedLineDiffs=3,
-            legacyRewriteDigests=21, parityPriorEntriesUnchanged=len(parity_old),
+            legacyRewriteDigests=21, parityPriorEntriesUnchanged=len(parity_old)-len(refreshed)-len(target_only),
+            parityPriorSourceEntriesRefreshed=len(refreshed), parityPriorTargetOnlyRefreshed=len(target_only),
             residualFileHashUnchanged=True)
-        # The assignment permits checks.mjs to remain not run when it requires
-        # a native addon; report that boundary separately, never call it green.
-        report['nativeDependentChecksNotRun'] = [m['manifest'] for m in report.get('ownershipAudits', [])
-            if m['checksStderr'].startswith('Not run: checks.mjs calls trackedPlatformDocs -> native Git addon;')]
-        report['ok'] = (all(c['exit'] == 0 for c in commands
-            if not c['label'].startswith('phase-08/audit-report.py'))
-            and report['assertions'].get('ownershipPassed', False)
-            and (report.get('fullAuditPassed', False)
-                 or len(report['nativeDependentChecksNotRun']) == 2))
+        report['nativeDependentChecksNotRun'] = [dict(manifest=m['manifest'],
+            script='checks.mjs', reason=m['checksReason']) for m in report['ownershipAudits']]
+        report['recordProofsPassed'] = (all(c['exit'] == 0 for c in commands)
+            and report['assertions']['ownershipPassed'])
+        report['status'] = 'partial' if report['recordProofsPassed'] else 'failed'
+        report['ok'] = False  # The full audit did not run; exit 0 is scoped only.
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    return 0 if report['ok'] else 1
+    return 0 if report['recordProofsPassed'] else 1
 
 
 if __name__ == '__main__':

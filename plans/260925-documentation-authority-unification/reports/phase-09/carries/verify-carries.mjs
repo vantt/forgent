@@ -4,11 +4,18 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
 import {extractMarkdownConservationUnits} from '../../../../../scripts/generate-doc-inventory.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../../../..');
 const plan='plans/260925-documentation-authority-unification';
 const out=path.join(root,plan,'reports/phase-09/carries');
-const read=p=>fs.readFileSync(path.resolve(root,p),'utf8');
+// Placements and unapplied patch packets are historical authoring witnesses.
+// Replay them at their immutable authoring commit, then authenticate their
+// current ledger successors separately; never confuse the two byte domains.
+const witnessPin=execFileSync('git',['log','--diff-filter=A','--format=%H','--',`${plan}/reports/phase-09/carries/binding-refresh.json`],{cwd:root,encoding:'utf8'}).trim();
+assert.match(witnessPin,/^[a-f0-9]{40}$/);
+let historical=true;
+const read=p=>historical ? execFileSync('git',['show',`${witnessPin}:${p}`],{cwd:root,encoding:'utf8',maxBuffer:50*1024*1024}) : fs.readFileSync(path.resolve(root,p),'utf8');
 const json=p=>JSON.parse(read(p));
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const shard=json(`${plan}/ledger/decisions/s11-preflip-carries.json`);
@@ -80,24 +87,80 @@ for(const p of packet.patches){
  const after=applyDiff(before,p.forwardDiff);assert.equal(hash(after),p.expectedAfterSha256);assert.equal(applyDiff(after,p.rollbackDiff),before);assert.equal(p.applied,false);
 }
 assert.ok(!fs.existsSync(path.join(root,'src/runner/dispatch/assignment-policy.mjs')),'removed consumer not resurrected');
+// Check live successors using the canonical supersession traversal and existing
+// dual extractors, not an alternate JS approximation of ledger identity.
+const currentBindings=JSON.parse(execFileSync('python3',['-B','-c',`
+import json,runpy,sys
+from pathlib import Path
+P=Path('${plan}')
+sys.path.insert(0,str(P/'reports/phase-09/ledgerfix'))
+from bindings import documents,rows,supersessions,effective,at,digest
+D=documents(); L=supersessions(D)
+origins=[(str(P/'ledger/decisions/s11-preflip-carries.json'),p,r) for p,r in rows(D[str(P/'ledger/decisions/s11-preflip-carries.json')])]
+refresh=json.loads((P/'reports/phase-09/carries/binding-refresh.json').read_text())
+for r in refresh['rows']:
+ f=r['shard'];p='/'+r['collection']+'/'+str(r['index']);origins.append((f,p,at(D[f],p)))
+current=[effective(f,p,r,D,L) for f,p,r in origins]
+extract=runpy.run_path(str(P/'reports/phase-09/rebind/rebind.py'))['extract']
+cat=extract(dict(paths=sorted({r['targetOwner'] for f,p,r in current})))['catalog']
+for f,p,r in current:
+ us=[u for u in cat[r['targetOwner']]['units'] if u['anchor']==r['targetAnchor'] and u['textDigest']==r['targetUnitDigest']]
+ assert len(us)==1,(f,p)
+ u=us[0];assert r['targetAncestry']==u['ancestry']+([u['title']] if u['unitKind']=='heading' else []),(f,p,'ancestry')
+ assert r['bindingSha256']==digest(r),(f,p,'hash')
+print(json.dumps(dict(status='pass',origins=len(origins),currentBindings=len(current))))
+`],{cwd:root,encoding:'utf8',maxBuffer:50*1024*1024}));
+assert.equal(currentBindings.status,'pass');
+historical=false;cache.clear();
+const liveDropped=json(`${plan}/dropped-claims-register.json`);
+assert.equal(liveDropped.entries.length,17);
+for(const e of liveDropped.entries){assert.equal(e.preflipDisposition.reviewStatus,'pending');const u=checkBinding(e.preflipDisposition.binding);assert.equal(u.text,e.preflipDisposition.placement.content,'unchanged restored passage at current binding');assert.ok(!e.status.startsWith('dropped-needs-'));}
 // Source parity strips Markdown heading depth, link destinations and whitespace only.
 const normalize=t=>t.replace(/^#{1,6} /,'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
 const parity=json(`${plan}/reports/phase-09/carries/source-parity.json`);
 for(const r of parity){
  const s=units(r.sourcePath).find(u=>u.anchor===r.sourceAnchor&&u.textDigest===r.sourceUnitDigest);assert.ok(s,'fresh current source');
- if(r.status==='current-complete-unit-present')assert.ok(r.targets.some(t=>{const u=units(t.path).find(v=>v.anchor===t.anchor);return u&&normalize(u.text).includes(normalize(s.text));}));
- else {assert.equal(r.status,'accounted-selected-design-not-implementation');assert.equal(r.sourceAnchor,'unheaded-block-7');assert.ok(r.accounting?.rationale);const b=r.accounting.binding;checkBinding(b);assert.ok(units(b.targetOwner).find(u=>u.anchor===b.targetAnchor).text.includes('Source checkouts support explicit `dev:<rev>` activation'));}
+ if(r.status==='current-complete-unit-present')assert.ok(r.targets.some(t=>{const u=units(t.path).find(v=>v.anchor===t.anchor);return u&&normalize(u.text).includes(normalize(s.text));}),r.sourcePath+'#'+r.sourceAnchor);
+ else if(r.status==='current-complete-unit-split-present'){
+  const texts=r.targets.map(t=>{const u=units(t.path).find(v=>v.anchor===t.anchor&&v.textDigest===t.targetUnitDigest);assert.ok(u);return u.text;});
+  assert.equal(normalize(texts.join('\n')),normalize(s.text),'complete split unit, no omitted text');
+ }
+ else if(r.status==='accounted-current-source-adaptation'){
+  const a=r.accounting;assert.ok(a.rationale);const u=checkBinding(a.binding);
+  assert.equal(r.targets.length,1);assert.deepEqual(r.targets[0],{path:a.binding.targetOwner,anchor:a.binding.targetAnchor,targetUnitDigest:a.binding.targetUnitDigest});
+  assert.equal(hash(a.forwardDiff),a.forwardSha256);assert.equal(hash(a.rollbackDiff),a.rollbackSha256);
+  assert.equal(applyDiff(s.text+'\n',a.forwardDiff),u.text+'\n','exact authored adaptation, not equality');
+  assert.equal(applyDiff(u.text+'\n',a.rollbackDiff),s.text+'\n','complete source recovered');
+  assert.equal(a.reviewStatus,'pending');
+ }
+ else {
+  assert.equal(r.status,'accounted-selected-design-not-implementation');assert.equal(r.sourceAnchor,'unheaded-block-7');assert.ok(r.accounting?.rationale);
+  const b=r.accounting.binding;
+  historical=true;cache.clear();checkBinding(b);
+  historical=false;cache.clear();
+  // An ordinal moved, but this whole compound table is byte-identical. Require
+  // a unique full digest AND ancestry, not a guessed current ordinal.
+  const matches=units(b.targetOwner).filter(u=>u.textDigest===b.targetUnitDigest);
+  assert.equal(matches.length,1);assert.deepEqual(matches[0].ancestry,b.targetAncestry);
+  assert.ok(matches[0].text.includes('Source checkouts support explicit `dev:<rev>` activation'));
+ }
 }
+// The 91 heading/direct-block lineage witnesses are the original census, not
+// a claim that later source additions have passed final-pin conservation.
+const currentParity=parity;
+historical=true;cache.clear();
+const originalParity=json(`${plan}/reports/phase-09/carries/source-parity.json`);
 const sourceHeadings=json(`${plan}/reports/phase-09/carries/source-heading-parity.json`);
 for(const h of sourceHeadings){
  const us=units(h.sourcePath),s=us.find(u=>u.anchor===h.sourceAnchor&&u.textDigest===h.sourceUnitDigest);assert.ok(s,'current source heading');assert.equal(s.title,h.title);
  const members=[];for(const u of us.slice(us.indexOf(s)+1)){if(u.unitKind==='heading')break;members.push(u.anchor);}assert.deepEqual(members,h.directSourceBlocks);
  assert.ok(h.targets.length);for(const t of h.targets){const u=units(t.path).find(u=>u.anchor===t.anchor&&u.textDigest===t.targetUnitDigest);assert.ok(u);assert.equal(u.title,h.title);assert.equal(u.level,t.level);}
- for(const anchor of members)assert.ok(parity.some(p=>p.sourcePath===h.sourcePath&&p.sourceAnchor===anchor),'direct section block accounted');
+ for(const anchor of members)assert.ok(originalParity.some(p=>p.sourcePath===h.sourcePath&&p.sourceAnchor===anchor),'direct section block accounted at authoring pin');
 }
+historical=false;cache.clear();
 const foundation=read('docs/platform/platform-foundations.md');
 const expectedLaw=read('test/docs/rul104-law.txt').trim();assert.equal(foundation.match(/^- \*\*RUL104 \(tốt hơn, không to hơn\)\.\*\* (.+)$/m)?.[1],expectedLaw);
 for(const id of ['0035','0054','0062'])assert.match(foundation,new RegExp('^### '+id+' —','m'));
 assert.match(read('docs/platform/work-state/decisions/retired-decision-history.md'),/^### 0032 — Multi-role Team Harness/m);
 for(const p of ['docs/platform/platform-foundations.md','docs/platform/work-state/decisions/retired-decision-history.md'])assert.equal((read(p).match(/^## Lịch sử quyết định retired từ docs\/decisions\/ \(tsk-1lv-4\)$/gm)??[]).length,1);
-console.log(JSON.stringify({status:'pass',claims:44,candidateUnits:shard.unitCarries.length,refreshedDecisions:refresh.rows.length,droppedClaims:17,pointerFiles:packet.patches.length,currentSourceUnits:parity.length+sourceHeadings.length,sourceParityQualification:'link destinations/heading depth not certified by normalized text; the sole textual delta is dev-source implementation-status qualification; see source-parity.json',reviewStatus:'pending; no gate accepted'},null,2));
+console.log(JSON.stringify({status:'pass',claims:44,candidateUnits:shard.unitCarries.length,refreshedDecisions:refresh.rows.length,droppedClaims:17,pointerFiles:packet.patches.length,currentSourceUnits:currentParity.length,historicalHeadingWitnesses:sourceHeadings.length,witnessPin,currentLedgerSuccessors:currentBindings,sourceParityQualification:'Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Heading census, placement and unapplied patch witnesses replay at witnessPin; final-pin coverage/patch recomposition is not certified.',reviewStatus:'pending; no gate accepted'},null,2));

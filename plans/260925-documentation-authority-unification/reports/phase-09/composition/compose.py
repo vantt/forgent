@@ -2,6 +2,7 @@
 """Records-only composition. Source checkout is read-only; executable bytes go to scratch.
 Reuse Step 7's authored hunk parser and exact locator, never invoke its assembly door.
 """
+import atexit
 import collections
 import difflib
 import hashlib
@@ -18,8 +19,11 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[5]
 HERE = Path(__file__).resolve().parent
 P8 = HERE.parent.parent / 'phase-08'
-SCRATCH = Path('/tmp/fgos-work/w1-d2-brief')
+SCRATCH = Path('/tmp/fgos-work')
 SCRATCH.mkdir(parents=True, exist_ok=True)
+_workspace = tempfile.TemporaryDirectory(prefix='composition-', dir=SCRATCH)
+atexit.register(_workspace.cleanup)
+SCRATCH = Path(_workspace.name)
 spec = importlib.util.spec_from_file_location('step7', P8 / 'step-07-assemble.py')
 step7 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(step7)

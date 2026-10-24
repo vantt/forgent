@@ -1,0 +1,173 @@
+{
+  "status": "scoped-proofs-passed-full-audit-partial",
+  "sourceHead": "9c8d2ce063813bcf9df2d5cbe552da2655da17bc",
+  "commands": [
+    {
+      "command": "rebind/rebind.py --check",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "c01fbb55bedbe9f15319c6a1c8b2e0e67a3995a56aa1ca85f07b97cdb00f81c4",
+      "stderr": ""
+    },
+    {
+      "command": "g0rework/verify.py",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g0rework/verify.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "536576c13ad81dbb4dd41db913ab9a3f4d768c783c1fa1416f3695ff4846ed93",
+      "stderr": ""
+    },
+    {
+      "command": "carries/verify-carries.mjs",
+      "argv": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs"
+      ],
+      "exit": 0,
+      "stdoutSha256": "a57caa3b857784333a7ebdf98b4cffd6fd0bb319d2609a04bfeeacb662efaa70",
+      "stderr": "",
+      "result": {
+        "status": "pass",
+        "claims": 44,
+        "candidateUnits": 1009,
+        "refreshedDecisions": 121,
+        "droppedClaims": 17,
+        "pointerFiles": 24,
+        "currentSourceUnits": 345,
+        "historicalHeadingWitnesses": 91,
+        "witnessPin": "f534aeaea59ebdc39613aab02c109dbd30fd36b8",
+        "currentLedgerSuccessors": {
+          "status": "pass",
+          "origins": 1208,
+          "currentBindings": 1208
+        },
+        "sourceParityQualification": "Current rows require exact source anchor/digest and normalized full-source inclusion at a named current target. Split/adapted rows also check target digests; explicit zero-fuzz adaptations are not false equality. Heading census, placement and unapplied patch witnesses replay at witnessPin; final-pin coverage/patch recomposition is not certified.",
+        "reviewStatus": "pending; no gate accepted"
+      }
+    },
+    {
+      "command": "misc-fix/verify.py (only checks.json sink redirected)",
+      "argv": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/parity-required-n_drghcd/misc-verify.py"
+      ],
+      "exit": 0,
+      "stdoutSha256": "ce0b56db3637fe154f9ee2aebf106faf50095d9c0cc5bcad916eee3dc953360a",
+      "stderr": "",
+      "result": {
+        "byteIdenticalArtifacts": 4,
+        "counts": {
+          "byResult": {
+            "judgment-preserve-with-dated-note": 163,
+            "park-current-passage-unbound": 137,
+            "park-source-absent": 2,
+            "park-source-removed-by-cutover": 162,
+            "park-unconfirmed-preserve-premise": 623,
+            "preserve-operand-reachability-unchanged": 1394,
+            "preserve-source-confirmed-history": 2926,
+            "repoint-proposal": 6
+          },
+          "byStage": {
+            "step-03": 4804,
+            "step-04": 609
+          },
+          "excludedRetireWithTree": 38,
+          "finalBatchPopulation": {
+            "step-03": 130,
+            "step-04": 33
+          },
+          "recordBatches": 136,
+          "total": 5413
+        },
+        "doctorCheckSplit": {
+          "literal": 136,
+          "loopIds": [
+            "git-worktree-recovery",
+            "git-component-compatible",
+            "git-repository-config",
+            "git-operation-journal",
+            "git-native-locks"
+          ],
+          "loopRegistered": 5
+        },
+        "registrations": {
+          "Check": 141,
+          "Fix": 32
+        },
+        "status": "scoped-replay-passed-not-gate-acceptance"
+      }
+    },
+    {
+      "command": "g9/sweep.py --check --pin HEAD",
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdoutSha256": "32d0323e64668d11ffee8e35bd5737bbbd633247739ea31b06f9ba2592dfd7af",
+      "stderr": "",
+      "result": {
+        "pin": "9c8d2ce063813bcf9df2d5cbe552da2655da17bc",
+        "uniqueRecords": 574,
+        "judgmentErrors": [],
+        "bodies": 546,
+        "drift": 0,
+        "chainMismatches": 0,
+        "replayMismatches": 0,
+        "recompositionErrors": 0
+      }
+    },
+    {
+      "command": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "negativeScratchChecks": [
+    {
+      "command": "import3 malformed request",
+      "exit": 1,
+      "cleanupPassed": true
+    },
+    {
+      "command": "rebind missing-file extractor",
+      "exit": 1,
+      "cleanupPassed": true
+    }
+  ],
+  "scratchBefore": [],
+  "scratchAfter": [],
+  "miscChecksUnchangedSha256": "faa095f14d65005355089b65d4896ba06e96776413a8ec4d33b138d4fb939fe4",
+  "notRun": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "checks.mjs",
+      "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "checks.mjs",
+      "reason": "checks.mjs calls trackedPlatformDocs -> native Git addon; staging/loading forbidden by assignment."
+    }
+  ],
+  "notes": "No audit-report.py or native-dependent checks.mjs executed. Every required command exited 0; full audit remains partial. No repository file outside the exact writable list was written."
+}

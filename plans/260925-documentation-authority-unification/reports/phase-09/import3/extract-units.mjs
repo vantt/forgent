@@ -4,8 +4,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 const P='plans/260925-documentation-authority-unification';
-const scratch='/tmp/fgos-work/w11-import3/extractors';
+fs.mkdirSync('/tmp/fgos-work', {recursive:true});
+const scratch=fs.mkdtempSync('/tmp/fgos-work/import3-extract-');
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
+try {
 const input=JSON.parse(fs.readFileSync(0,'utf8')),libs=[],proofs=[];
 for(const [i,[name,key,lib]] of [
  ['step10-round5-reproduction.json','scripts','step10-sync287-lib.mjs'],
@@ -30,3 +32,6 @@ for(const [i,v] of (input.virtual||[]).entries()){
 for(const entry of Object.values(catalog))for(const u of entry.units)
  if(u.unitKind==='heading')u.ancestry.push(u.title);
 console.log(JSON.stringify({extractors:proofs,catalog}));
+} finally {
+ fs.rmSync(scratch, {recursive:true,force:true});
+}

@@ -3,6 +3,7 @@
 No fgOS CLI, no source application, no Git writes outside the disposable fixture.
 Run with python3 -B. Historical entries are retained, effective IDs are explicit.
 """
+import atexit
 import collections
 import difflib
 import hashlib
@@ -19,8 +20,11 @@ sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 P8 = HERE.parent.parent / 'phase-08'
-SCRATCH = Path('/tmp/fgos-work/w2-d2b-brief')
+SCRATCH = Path('/tmp/fgos-work')
 SCRATCH.mkdir(parents=True, exist_ok=True)
+_workspace = tempfile.TemporaryDirectory(prefix='complete-parks-', dir=SCRATCH)
+atexit.register(_workspace.cleanup)
+SCRATCH = Path(_workspace.name)
 spec = importlib.util.spec_from_file_location('step7', P8 / 'step-07-assemble.py')
 step7 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(step7)

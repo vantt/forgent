@@ -1,0 +1,1587 @@
+{
+  "version": 1,
+  "authority": "Records-only current carry rebind; independent review pending, no gate accepted",
+  "bindingRefresh": [
+    {
+      "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "targetAnchor": "vendored-yaml-parser-maintenance",
+      "targetUnitDigest": "b2e31d29c23e67a301f9f3ccec56f16299b7f68248be45832b1f92c2b4a67dd3",
+      "targetAncestry": [
+        "Vendored YAML Parser Maintenance"
+      ],
+      "bindingSha256": "22f327c76a0b872ef63fc81c49944a3a74cb68f06845544dfcfa424ca7632bd6",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "vendored-yaml-parser-maintenance",
+          "unitKind": "heading",
+          "title": "Vendored YAML Parser Maintenance",
+          "textDigest": "b2e31d29c23e67a301f9f3ccec56f16299b7f68248be45832b1f92c2b4a67dd3",
+          "startLine": 1,
+          "endLine": 1,
+          "ancestry": [
+            "Vendored YAML Parser Maintenance"
+          ]
+        },
+        "previous": null,
+        "next": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "918e1767134f11bc813f72127144710fec12fc1a71f0329d243d9cf00b9d9902",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Vendored YAML Parser Maintenance"
+          ]
+        },
+        "content": "# Vendored YAML Parser Maintenance"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/877",
+        "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+        "targetAnchor": "vendored-yaml-parser-maintenance",
+        "targetUnitDigest": "7e4089e8cbea3b88544a76dcc68590a5b3e2a1e9454ef3e42e760512210ca538",
+        "targetAncestry": [
+          "Vendored YAML Parser Maintenance"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "c5c8e32a5e8d9e49ffbb6455615d99653681d4799adef2a4511a7943b3ec43e4",
+      "targetAncestry": [
+        "Vendored YAML Parser Maintenance"
+      ],
+      "bindingSha256": "df7df6221b40e7fe80cc137d13b4a42da7e1d12e64b660f77665b34a6c8712d1",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "c5c8e32a5e8d9e49ffbb6455615d99653681d4799adef2a4511a7943b3ec43e4",
+          "startLine": 14,
+          "endLine": 17,
+          "ancestry": [
+            "Vendored YAML Parser Maintenance"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "918e1767134f11bc813f72127144710fec12fc1a71f0329d243d9cf00b9d9902",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Vendored YAML Parser Maintenance"
+          ]
+        },
+        "next": {
+          "anchor": "upgrade-and-advisory-procedure",
+          "unitKind": "heading",
+          "title": "Upgrade And Advisory Procedure",
+          "textDigest": "a7a749093db6a108f6abb494fb53b492e6a2c77c1729ce915f3f287964b3c6c8",
+          "startLine": 19,
+          "endLine": 19,
+          "ancestry": [
+            "Vendored YAML Parser Maintenance",
+            "Upgrade And Advisory Procedure"
+          ]
+        },
+        "content": "Owner: Packaging-distribution\nStatus: Superseded by RUL108 on 2026-10-23; candidate authority follows the transitional switchboard.\nSource: `docs/specs/distribution.md`, 2026-10-16 decision and 2026-10-23 supersession.\nRelated links: [Distribution decision history](../spec.md#lịch-sử-quyết-định), [YAML Document contract](../../yaml-document/spec.md)."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/878",
+        "targetOwner": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+        "targetAnchor": "unheaded-block-1",
+        "targetUnitDigest": "c61d833da20d838fd7755b1eeb42352eeb7432c9867959001514ae24c6906b37",
+        "targetAncestry": [
+          "Vendored YAML Parser Maintenance"
+        ]
+      }
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "non-transitioning-decision-and-outcome-records",
+      "targetUnitDigest": "8b13a3bd0514d32a4c742cf32f08220b50db158a624d8f5ed47136f34dd92d8f",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records"
+      ],
+      "bindingSha256": "0eed7c800f16df83716de35df8a11ea70ea3cda899830de0a75b660611d0d226",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "non-transitioning-decision-and-outcome-records",
+          "unitKind": "heading",
+          "title": "Non-Transitioning Decision And Outcome Records",
+          "textDigest": "8b13a3bd0514d32a4c742cf32f08220b50db158a624d8f5ed47136f34dd92d8f",
+          "startLine": 1,
+          "endLine": 1,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "previous": null,
+        "next": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "6f40984f1a7db3b14918fe2865264fc9d317d0da9df214ff54f42e0f10d1b5a5",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "content": "# Non-Transitioning Decision And Outcome Records"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/977",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "non-transitioning-decision-and-outcome-records",
+        "targetUnitDigest": "a18153ce3e950bc923962eb4f2fe0af48aee9b6c5fa21c80e0c8cc2c56a93100",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "700e03cb70029395a068aa3f7cdbc56d652a76018cc8ccb13e0c1f0f50883cb2",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records"
+      ],
+      "bindingSha256": "98d2032a33b086c118a211ffc606273923f6574335cec0371051c969996409a4",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "700e03cb70029395a068aa3f7cdbc56d652a76018cc8ccb13e0c1f0f50883cb2",
+          "startLine": 14,
+          "endLine": 16,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "6f40984f1a7db3b14918fe2865264fc9d317d0da9df214ff54f42e0f10d1b5a5",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "c91cff3604952f4bbc173116cffb123fe44c8d03e74a3684f25eaba000df8c99",
+          "startLine": 18,
+          "endLine": 18,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "content": "Owner: Work-state\nStatus: Candidate conservation of existing two-verb precedent, not implementation of STR70a.\nRelated links: [Work-state spec](../spec.md), [Runner spec](../../runner/spec.md)."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/978",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-1",
+        "targetUnitDigest": "e2643dbc4d7a79f24dd9b10598aad63a50eada20fd423b419e30a984dced68ff",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "c91cff3604952f4bbc173116cffb123fe44c8d03e74a3684f25eaba000df8c99",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records"
+      ],
+      "bindingSha256": "2e01b25659d00d2bec186ddfa7715e358a1338c582931e16931264e225744ed1",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "c91cff3604952f4bbc173116cffb123fe44c8d03e74a3684f25eaba000df8c99",
+          "startLine": 18,
+          "endLine": 18,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "700e03cb70029395a068aa3f7cdbc56d652a76018cc8ccb13e0c1f0f50883cb2",
+          "startLine": 14,
+          "endLine": 16,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records"
+          ]
+        },
+        "next": {
+          "anchor": "bản-ghi-kết-quả-outcome-dự-đoán-thực-tế",
+          "unitKind": "heading",
+          "title": "Bản ghi kết quả (outcome) — dự đoán / thực tế",
+          "textDigest": "602d948e76f9796ce23c9449b93b83321230de4dff8b8e58d84438647fb91e51",
+          "startLine": 20,
+          "endLine": 20,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "content": "`decision` and `outcome` append durable records through the existing store without changing the work item status or workflow step. Engine bookkeeping is not the same as a design decision. This is the precedent the STR70a proposal cites; the proposal remains proposed and gains no new distillate/gate mechanism here."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/979",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-2",
+        "targetUnitDigest": "c91cff3604952f4bbc173116cffb123fe44c8d03e74a3684f25eaba000df8c99",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records",
+        "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+      ],
+      "bindingSha256": "c0a240d31a58683dcddbc9a23d47263f8839d1e3143edacba336fa75b2aeb26e",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "sourceAnchor": "unheaded-block-5",
+          "sourceUnitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+          "claimIds": [
+            "claim_a9bc0a5c1e4d634958dce841f0e8c44e"
+          ]
+        }
+      ],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+          "startLine": 22,
+          "endLine": 24,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "previous": {
+          "anchor": "bản-ghi-kết-quả-outcome-dự-đoán-thực-tế",
+          "unitKind": "heading",
+          "title": "Bản ghi kết quả (outcome) — dự đoán / thực tế",
+          "textDigest": "602d948e76f9796ce23c9449b93b83321230de4dff8b8e58d84438647fb91e51",
+          "startLine": 20,
+          "endLine": 20,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+          "startLine": 26,
+          "endLine": 38,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "content": "Ngoài bảng trường của work item, một item có thể mang thêm một **bản ghi outcome**: hai nửa\nđến ở hai thời điểm khác nhau trong đời của một lần chạy, gộp theo id — nửa đến sau CỘNG\nTHÊM vào bản ghi, không bao giờ đè mất nửa đã có."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/981",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records",
+          "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records",
+        "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+      ],
+      "bindingSha256": "3d580c614044a15f0babf08a27cb6cc89795777da96b3bd8a5e3ec3a9b3f0eca",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "sourceAnchor": "unheaded-block-6",
+          "sourceUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+          "claimIds": [
+            "claim_ef20fa89f544c95d36bedd6842407afc"
+          ]
+        }
+      ],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+          "startLine": 26,
+          "endLine": 38,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+          "startLine": 22,
+          "endLine": 24,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+          "startLine": 40,
+          "endLine": 42,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "content": "| # | Nửa | Element | Meaning | Values | Ghi khi nào |\n|---|-----|---------|---------|--------|-------------|\n| O1 | dự đoán | tier dự kiến | Hạng nặng-nhẹ dự kiến của việc tại thời điểm nhận việc | `light` / `standard` / `heavy` | lúc nhận việc (claim) |\n| O2 | dự đoán | số dep | Số lượng việc phụ thuộc của item tại thời điểm nhận việc | số nguyên ≥ 0 | lúc nhận việc |\n| O3 | dự đoán | số lần nhận trước đó | Item này đã từng được nhận (chuyển sang \"đang làm\") bao nhiêu lần trước lần này | số nguyên ≥ 0 | lúc nhận việc |\n| O4 | thực tế | kết cục (disposition) | Kết cục cuối của lần chạy | `awaiting-approval` — goal-check đạt, thành đề xuất chờ duyệt · `parked` — dừng lại theo lẽ thường (hết trần thử lại, hoặc lỗi không thử lại được), item bị đỗ · `halted` — cầu dao chấm-trượt-liên-tiếp cắt cả vòng chạy, item bị đỗ trước khi vòng dừng hẳn | lúc item tới trạng thái cuối |\n| O5 | thực tế | đạt goal-check | Phép đo goal-check của chính vòng tự hành có đạt hay không | boolean | lúc item tới trạng thái cuối |\n| O6 | thực tế | số lần thử | Số lần thử trong đúng lần chạy này | số nguyên ≥ 1 | lúc item tới trạng thái cuối |\n| O7 | thực tế | lớp lỗi | Lớp lỗi (theo bảng phục hồi của spec Runner) nếu thất bại; rỗng nếu thành công | free text hoặc rỗng | lúc item tới trạng thái cuối |\n| O8 | thực tế | số commit | Số commit mà item để lại trên nhánh đề xuất | số nguyên ≥ 0 | lúc item tới trạng thái cuối |\n| O9 | thực tế | số lần nhận (đến giờ) | Item này đã từng được nhận bao nhiêu lần tính đến hết lần chạy này | số nguyên ≥ 0 | lúc item tới trạng thái cuối |\n| O10 | — (trực giao) | phân loại tài liệu (docType) | Nhãn Diataxis TÙY CHỌN gắn trên bản ghi — chiều AUDIENCE/loại-tài-liệu, TRỰC GIAO với chiều type-axis kỹ sư (pattern/decision/failure), một chiều CỘNG THÊM chứ không thay thế. Kiểm hình dạng khi CÓ MẶT (phải là đúng một trong bốn quadrant); vắng mặt/`null` = chưa gắn nhãn, luôn hợp lệ, không bao giờ bắt buộc — cùng khuôn optional-additive với `docsRef` (Data Dictionary #23). Đi ké payload thô của sự kiện capture nên sống sót replay qua chính spread-fold sẵn có, không đổi cơ chế | `tutorial` / `how-to` / `reference` / `explanation` (bốn quadrant Diataxis; giá trị khác khi có mặt bị từ chối `validation`) | tùy — bên sản xuất `compound --doc-type` (RUL51 (verb compound — nay là cửa gắn nhãn, không còn là cửa chuyển stage)/52) hoặc bất kỳ bên ghi capture nào cung cấp |\n| O11 | — (trực giao) | con trỏ tài liệu (docPath) | Con trỏ TÙY CHỌN tới tài liệu người-dùng-cuối mà bản ghi outcome này sinh ra — chiều LINKAGE nguồn↔tài-liệu, đứng CẠNH `docType` (O10) chứ không thay thế: `docType` nói \"loại tài liệu\", `docPath` nói \"đúng tài liệu nào\". Ghi lúc `compound --doc-path <path>` (RUL53 (con trỏ tài liệu docPath — trường linkage cộng-thêm trên outcome)); không kiểm hình dạng (đường dẫn tự do), vắng mặt/`null` = chưa gắn linkage, luôn hợp lệ, không bao giờ bắt buộc — cùng khuôn optional-additive với `docType`/`docsRef`. Đi ké payload thô của sự kiện capture nên sống sót replay/rebuild qua chính spread-fold sẵn có, tầng lưu không đổi một byte. Là móc để chỉ mục đọc-theo-tag truy ngược tài liệu về capture (area `enduser-docs-index`), đảm bảo dựng lại tài liệu không mất chi tiết/cấu trúc (per bước-3 compound-learn-enduser-docs) | chuỗi đường dẫn tài liệu (vd `docs/how-to/x.md`); vắng/`null` khi chưa gắn | tùy — bên sản xuất `compound --doc-path` (RUL53 (con trỏ tài liệu docPath — trường linkage cộng-thêm trên outcome)) |"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/982",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records",
+          "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records",
+        "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+      ],
+      "bindingSha256": "30d7e0e8faed437398898d0c4a4c6f51d53fe5ff53e81ad55f6cda9646a66455",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "sourceAnchor": "unheaded-block-7",
+          "sourceUnitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+          "claimIds": [
+            "claim_5eb3738c1994942ff2c0127bd0c5144a"
+          ]
+        }
+      ],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+          "startLine": 40,
+          "endLine": 42,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+          "startLine": 26,
+          "endLine": 38,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+          ]
+        },
+        "next": {
+          "anchor": "ghi-quyết-định-decision",
+          "unitKind": "heading",
+          "title": "Ghi quyết định (decision)",
+          "textDigest": "7785259f39c2b11639e0d28f24b2f0df776f3bc6e93d8a3bf145cb6a06c19502",
+          "startLine": 44,
+          "endLine": 44,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi quyết định (decision)"
+          ]
+        },
+        "content": "Item chưa từng chạy không mang bản ghi outcome nào — vắng mặt hoàn toàn, không phải bản ghi\nrỗng. Nhật ký ghi trước khi bản ghi này tồn tại replay lại nguyên vẹn, không sinh ra outcome\nnào cho item nào (tương thích ngược, theo luật tiến hóa schema RUL11 (tiến hóa schema))."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/983",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records",
+          "Bản ghi kết quả (outcome) — dự đoán / thực tế"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records",
+        "Ghi quyết định (decision)"
+      ],
+      "bindingSha256": "44f002b3955c9155d6c650f707aed12f9cfb12749a35ced78670872ab3d82145",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "sourceAnchor": "unheaded-block-86",
+          "sourceUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+          "claimIds": [
+            "claim_b96048ae94d1c4ef2735793bd5243751"
+          ]
+        }
+      ],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+          "startLine": 46,
+          "endLine": 47,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi quyết định (decision)"
+          ]
+        },
+        "previous": {
+          "anchor": "ghi-quyết-định-decision",
+          "unitKind": "heading",
+          "title": "Ghi quyết định (decision)",
+          "textDigest": "7785259f39c2b11639e0d28f24b2f0df776f3bc6e93d8a3bf145cb6a06c19502",
+          "startLine": 44,
+          "endLine": 44,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi quyết định (decision)"
+          ]
+        },
+        "next": {
+          "anchor": "ghi-kết-quả-dự-đoánthực-tế-outcome",
+          "unitKind": "heading",
+          "title": "Ghi kết quả dự đoán/thực tế (outcome)",
+          "textDigest": "32d6edcfca2c33fd1e09a7845cc4fd3f8a73fe50f0dc9ada5093cc59ec67a85b",
+          "startLine": 49,
+          "endLine": 49,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi kết quả dự đoán/thực tế (outcome)"
+          ]
+        },
+        "content": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/985",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records",
+          "Ghi quyết định (decision)"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+      "targetAncestry": [
+        "Non-Transitioning Decision And Outcome Records",
+        "Ghi kết quả dự đoán/thực tế (outcome)"
+      ],
+      "bindingSha256": "0f70ba518b4cfaa3612efd80d4ea664cfdb7a7d49e1ef7c6eac96d0d4736f794",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [
+        {
+          "sourcePath": "docs/specs/work-state.md",
+          "sourceAnchor": "unheaded-block-89",
+          "sourceUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+          "claimIds": [
+            "claim_80498f2c23623a2165e2fe2bf39af2d8"
+          ]
+        }
+      ],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 8",
+          "textDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+          "startLine": 51,
+          "endLine": 55,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi kết quả dự đoán/thực tế (outcome)"
+          ]
+        },
+        "previous": {
+          "anchor": "ghi-kết-quả-dự-đoánthực-tế-outcome",
+          "unitKind": "heading",
+          "title": "Ghi kết quả dự đoán/thực tế (outcome)",
+          "textDigest": "32d6edcfca2c33fd1e09a7845cc4fd3f8a73fe50f0dc9ada5093cc59ec67a85b",
+          "startLine": 49,
+          "endLine": 49,
+          "ancestry": [
+            "Non-Transitioning Decision And Outcome Records",
+            "Ghi kết quả dự đoán/thực tế (outcome)"
+          ]
+        },
+        "next": null,
+        "content": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ khi thành công lẫn khi thất bại.\n- **Blocked when:** thiếu id — `validation`.\n- **What changes:** một sự kiện outcome vào nhật ký cho MỖI nửa (hai sự kiện riêng biệt, cùng id, đến ở hai thời điểm khác nhau); bản chiếu gộp hai nửa theo id — nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất.\n- **Side effects:** không.\n- **Afterwards:** `fgos check` đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/987",
+        "targetOwner": "docs/platform/work-state/contracts/non-transitioning-records.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+        "targetAncestry": [
+          "Non-Transitioning Decision And Outcome Records",
+          "Ghi kết quả dự đoán/thực tế (outcome)"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "conserved-dispatch-and-session-contracts",
+      "targetUnitDigest": "7a8774626c9683ebdc4fdd48b8516e748a2881ddbe5837941e9480eda9c820b3",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts"
+      ],
+      "bindingSha256": "970f0e204b14ff8064a5fe0d938e5de6a338dd36c41e0a9d1dc6382c26f14257",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "conserved-dispatch-and-session-contracts",
+          "unitKind": "heading",
+          "title": "Conserved Dispatch And Session Contracts",
+          "textDigest": "7a8774626c9683ebdc4fdd48b8516e748a2881ddbe5837941e9480eda9c820b3",
+          "startLine": 1,
+          "endLine": 1,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts"
+          ]
+        },
+        "previous": null,
+        "next": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "6bcfb4c21cd3a7a5b7c365adac3c8d5e3a77b2f866102f4c08733d287f61f146",
+          "startLine": 3,
+          "endLine": 13,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts"
+          ]
+        },
+        "content": "# Conserved Dispatch And Session Contracts"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/988",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "conserved-dispatch-and-session-contracts",
+        "targetUnitDigest": "2937f744e8aae279044a43443a41532003fa8b48876b481df386b397f4ea2995",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "cca6d29f1fff9eed188497377555ddb93238208b5e296c2e960eaaee38c1e65d",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts"
+      ],
+      "bindingSha256": "405aca59d13ad84af9bc676b5b44033ead8e33a373589b24e1d6389025757791",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "cca6d29f1fff9eed188497377555ddb93238208b5e296c2e960eaaee38c1e65d",
+          "startLine": 15,
+          "endLine": 17,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "6bcfb4c21cd3a7a5b7c365adac3c8d5e3a77b2f866102f4c08733d287f61f146",
+          "startLine": 3,
+          "endLine": 13,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts"
+          ]
+        },
+        "next": {
+          "anchor": "native-first-reasoning",
+          "unitKind": "heading",
+          "title": "Native-First Reasoning",
+          "textDigest": "8cc8ac4d464cfcb6b617af2aa98867b131b9a4c137623cead43cd607b9323fd1",
+          "startLine": 19,
+          "endLine": 19,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Native-First Reasoning"
+          ]
+        },
+        "content": "Owner: Runner\nStatus: Candidate conservation; no new mechanism. The transitional authority route remains unchanged.\nRelated links: [Runner spec](../spec.md), [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#0026--native-first-dispatch-doctrine-launcherroottaskcapacity), [Seat Binding](../../seat-binding/spec.md)."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/989",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-1",
+        "targetUnitDigest": "2ac8c848f18798893c92856c18d1163c29622c34fb455f086234fc2c96987fb3",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "cd083fe29bad64021e91c9ce38fd1405152d62cc18eb6573de3a98b67aef123a",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Native-First Reasoning"
+      ],
+      "bindingSha256": "3cad6476e6fd6b3ec35b825247050fa3317863b7eed0f65338199cb242be7db5",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "cd083fe29bad64021e91c9ce38fd1405152d62cc18eb6573de3a98b67aef123a",
+          "startLine": 21,
+          "endLine": 21,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Native-First Reasoning"
+          ]
+        },
+        "previous": {
+          "anchor": "native-first-reasoning",
+          "unitKind": "heading",
+          "title": "Native-First Reasoning",
+          "textDigest": "8cc8ac4d464cfcb6b617af2aa98867b131b9a4c137623cead43cd607b9323fd1",
+          "startLine": 19,
+          "endLine": 19,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Native-First Reasoning"
+          ]
+        },
+        "next": {
+          "anchor": "session-participation-and-merge-isolation",
+          "unitKind": "heading",
+          "title": "Session Participation And Merge Isolation",
+          "textDigest": "8a6c3d122b0881edce075786e1d7c07d2f7be472121f0669a41f8b0b65ae9c45",
+          "startLine": 23,
+          "endLine": 23,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "content": "The complete verbatim Native-First rules, their 0033 narrowing, the no-extra-judge rationale and live caller self-declaration are held in [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#0026--native-first-dispatch-doctrine-launcherroottaskcapacity). This is the governing passage, not the missing filename `executor-native-vs-cli-spawn`. Inline reasoning does not need a second judge to re-derive the live session's judgment with less context. Pure mechanical targets, different providers and explicitly CLI-shaped executors still follow the existing decide/bind door; the live caller never guesses the mechanism."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/991",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-2",
+        "targetUnitDigest": "cd083fe29bad64021e91c9ce38fd1405152d62cc18eb6573de3a98b67aef123a",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Native-First Reasoning"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "e1eb1987bf7b58fd47e0f9300cda902b245083a9020b3ed408d2460a42f42b19",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Session Participation And Merge Isolation"
+      ],
+      "bindingSha256": "225a3b06fdb91b906ac51c922f255eda0c5219918d052699d83fc753ba08744f",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "e1eb1987bf7b58fd47e0f9300cda902b245083a9020b3ed408d2460a42f42b19",
+          "startLine": 25,
+          "endLine": 25,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "previous": {
+          "anchor": "session-participation-and-merge-isolation",
+          "unitKind": "heading",
+          "title": "Session Participation And Merge Isolation",
+          "textDigest": "8a6c3d122b0881edce075786e1d7c07d2f7be472121f0669a41f8b0b65ae9c45",
+          "startLine": 23,
+          "endLine": 23,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "f2b05b1f2f5ea97aab3dca336e5d3ffc624e2ede47f1ed0a6d2aa8fc39ca0c81",
+          "startLine": 27,
+          "endLine": 27,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "content": "“A session worktree is structurally the wrong place for a merge-into-main to happen.” This exact quoted rule survives in `bin/fgos.mjs`'s return guard; the supposedly quoted full sentence was not present in `docs/specs/runner.md` at this pin and no removal from that document was found by `git log -S`. Its current behavior is conserved here rather than pretending an old paragraph was found."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/993",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "e1eb1987bf7b58fd47e0f9300cda902b245083a9020b3ed408d2460a42f42b19",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Session Participation And Merge Isolation"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "f2b05b1f2f5ea97aab3dca336e5d3ffc624e2ede47f1ed0a6d2aa8fc39ca0c81",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Session Participation And Merge Isolation"
+      ],
+      "bindingSha256": "a136a5069509ffd2e4932ad430ec96e144f0e73c37102627ef60b6e66844b961",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "f2b05b1f2f5ea97aab3dca336e5d3ffc624e2ede47f1ed0a6d2aa8fc39ca0c81",
+          "startLine": 27,
+          "endLine": 27,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "e1eb1987bf7b58fd47e0f9300cda902b245083a9020b3ed408d2460a42f42b19",
+          "startLine": 25,
+          "endLine": 25,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Session Participation And Merge Isolation"
+          ]
+        },
+        "next": {
+          "anchor": "operation-prompt-templates",
+          "unitKind": "heading",
+          "title": "Operation Prompt Templates",
+          "textDigest": "011351e114a49f82a2d3624749c45733af9dd8bcfe6876c3d8a226b9d2f3b325",
+          "startLine": 29,
+          "endLine": 29,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "content": "`approve` refuses every linked worktree, registered session included. `return` is different: a registered `fgos session start` worktree may perform its own progress check (`aheadCount` and verify); its `.fgos` is a symlink to the shared store. An unregistered worktree cannot return a main-source item. A session can therefore participate in work without becoming the merge-into-main checkout. See `bin/fgos.mjs` return, `src/verbs/merge/approve.mjs` and `src/runner/session.mjs`. The quoted sentence's recorded origin is [the return-guard research](../../../history/tsk-ikd-return-main-worktree-guard/RESEARCH.md), line 26; it is not the name of a test file."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/994",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "f2b05b1f2f5ea97aab3dca336e5d3ffc624e2ede47f1ed0a6d2aa8fc39ca0c81",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Session Participation And Merge Isolation"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "1e41299557a4659c966db84a70c60681359f8daa2d31ac30e47516b08d729977",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Operation Prompt Templates"
+      ],
+      "bindingSha256": "cc6cd8a1ce28e11a26555e0d9d670a0164e1e5656e2087500012584eedab0bab",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "1e41299557a4659c966db84a70c60681359f8daa2d31ac30e47516b08d729977",
+          "startLine": 31,
+          "endLine": 31,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "previous": {
+          "anchor": "operation-prompt-templates",
+          "unitKind": "heading",
+          "title": "Operation Prompt Templates",
+          "textDigest": "011351e114a49f82a2d3624749c45733af9dd8bcfe6876c3d8a226b9d2f3b325",
+          "startLine": 29,
+          "endLine": 29,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+          "startLine": 33,
+          "endLine": 58,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "content": "The still-maintained operation-template contract is not the retired FlowDefinition engine. The exact maintained source declaration is:"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/996",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "1e41299557a4659c966db84a70c60681359f8daa2d31ac30e47516b08d729977",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Operation Prompt Templates"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Operation Prompt Templates"
+      ],
+      "bindingSha256": "6d7c96dc4f8147cf64720867f5772b408e475a47a0ea1fe08568728291fe1a7c",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+          "startLine": 33,
+          "endLine": 58,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "1e41299557a4659c966db84a70c60681359f8daa2d31ac30e47516b08d729977",
+          "startLine": 31,
+          "endLine": 31,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 8",
+          "textDigest": "3125540fb867e93d8341f8f66c5d236e5eac658a5f3bf3a61219151712008a3a",
+          "startLine": 60,
+          "endLine": 60,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "content": "```text\n// dispatch/operation-prompt-templates.mjs — operation prompt-template registry,\n// deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3),\n// per docs/architect/agent-coordination/contracts/flow-definition.md and\n// plans/260919-coordination-skill-harness-simplification/plan.md.\n//\n// Layer: infra (same layer as src/runner/dispatch/assignment.mjs).\n// Reads only from filesystem during template discovery. Never performs mutations,\n// never writes to session event log or store, never grants or widens authority.\n//\n// Discovery tiers (fixed precedence: project overrides domain, domain overrides core):\n//   1. project: `<cwd>/.fgos/prompt-templates/<templateId>.{md,txt}`\n//   2. domain:  `<packageRoot>/domains/<domain>/prompt-templates/<templateId>.{md,txt}`\n//   3. core:    `<packageRoot>/core/prompt-templates/<templateId>.{md,txt}`\n//\n// Bounded variables:\n// Only variables derived from validated semantic action / ExecutionContract / Assignment\n// are permitted in templates:\n//   - {objective}\n//   - {contextRefs} (and alias {artifactRefs})\n//   - {expectedOutputs}\n//   - {role}\n//   - {constraints} (filtered to strip internal engine stamps such as protocol-operation:*)\n//   - {evidenceContract}\n// Any placeholder outside this bounded set fails loudly with 'template-invalid'.\n```"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/997",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Operation Prompt Templates"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "3125540fb867e93d8341f8f66c5d236e5eac658a5f3bf3a61219151712008a3a",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Operation Prompt Templates"
+      ],
+      "bindingSha256": "d50a7778032822abcffdbf066e309b8e8a48d3b80c3474acde7f30571648a15a",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 8",
+          "textDigest": "3125540fb867e93d8341f8f66c5d236e5eac658a5f3bf3a61219151712008a3a",
+          "startLine": 60,
+          "endLine": 60,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 7",
+          "textDigest": "f95837610cf2b87c9bb61f9ec1541161e1cf099247704ea5f48fe8c04dce199d",
+          "startLine": 33,
+          "endLine": 58,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Operation Prompt Templates"
+          ]
+        },
+        "next": {
+          "anchor": "retired-provider-policy-pointer",
+          "unitKind": "heading",
+          "title": "Retired Provider-Policy Pointer",
+          "textDigest": "8097ff8131977bbff7206fe4f456922644e76907a94890283bef0354f09f9605",
+          "startLine": 62,
+          "endLine": 62,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Retired Provider-Policy Pointer"
+          ]
+        },
+        "content": "Discovery and rendering remain owned by `src/runner/dispatch/operation-prompt-templates.mjs`: fixed project > domain > core precedence, deterministic selection, bounded substitution from validated Assignment/ExecutionContract inputs only, no widening of authority, and template id/source/content digest recorded as provenance. Unknown variables, ambiguity and path escape fail by name. The historical FlowDefinition operation primitive supplies design provenance only; this contract does not revive FlowDefinition/CoordinationProtocol or the retired coordination engine."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/998",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "3125540fb867e93d8341f8f66c5d236e5eac658a5f3bf3a61219151712008a3a",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Operation Prompt Templates"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "917149c12d7ccc0fbd59bd8fd7dc6b9b1d509f79521789a2cdebafb1474c7b0d",
+      "targetAncestry": [
+        "Conserved Dispatch And Session Contracts",
+        "Retired Provider-Policy Pointer"
+      ],
+      "bindingSha256": "c3b6a26e76c40d055795ab26312b6cb73af497dde8dc1d4ca3a2feae790067ec",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 9",
+          "textDigest": "917149c12d7ccc0fbd59bd8fd7dc6b9b1d509f79521789a2cdebafb1474c7b0d",
+          "startLine": 64,
+          "endLine": 64,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Retired Provider-Policy Pointer"
+          ]
+        },
+        "previous": {
+          "anchor": "retired-provider-policy-pointer",
+          "unitKind": "heading",
+          "title": "Retired Provider-Policy Pointer",
+          "textDigest": "8097ff8131977bbff7206fe4f456922644e76907a94890283bef0354f09f9605",
+          "startLine": 62,
+          "endLine": 62,
+          "ancestry": [
+            "Conserved Dispatch And Session Contracts",
+            "Retired Provider-Policy Pointer"
+          ]
+        },
+        "next": null,
+        "content": "The former `src/runner/dispatch/assignment-policy.mjs` citation to `docs/history/executor-policy-dispatch-seams/` never had that directory as a live authority. That module is now absent. H2a/H2b/RT1/F1 historical evidence remains evidence, not a new live policy owner. Current seat choice belongs to [Seat Binding](../../seat-binding/spec.md); no pointer patch to a deleted module is applied or invented."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1000",
+        "targetOwner": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+        "targetAnchor": "unheaded-block-8",
+        "targetUnitDigest": "917149c12d7ccc0fbd59bd8fd7dc6b9b1d509f79521789a2cdebafb1474c7b0d",
+        "targetAncestry": [
+          "Conserved Dispatch And Session Contracts",
+          "Retired Provider-Policy Pointer"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "gateway-readiness-contracts",
+      "targetUnitDigest": "b0d35bd4967d4fc3aff19a546ad74616d9398640e7af86927f2a6b55d11b10f8",
+      "targetAncestry": [
+        "Gateway Readiness Contracts"
+      ],
+      "bindingSha256": "501c31c254cf759500216b517ab3dace68177b20ee6321584aa66d487b2957e3",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "gateway-readiness-contracts",
+          "unitKind": "heading",
+          "title": "Gateway Readiness Contracts",
+          "textDigest": "b0d35bd4967d4fc3aff19a546ad74616d9398640e7af86927f2a6b55d11b10f8",
+          "startLine": 1,
+          "endLine": 1,
+          "ancestry": [
+            "Gateway Readiness Contracts"
+          ]
+        },
+        "previous": null,
+        "next": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "2b986dac1518c70db63ac60454f1a4d04c9035637f1b071f92966b21feee7698",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Gateway Readiness Contracts"
+          ]
+        },
+        "content": "# Gateway Readiness Contracts"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1001",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "gateway-readiness-contracts",
+        "targetUnitDigest": "b9b3e484070f004cdff02599b217d02d2db1590390a640efbb98fbe2a1c3ffb2",
+        "targetAncestry": [
+          "Gateway Readiness Contracts"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "8a285a1e0bebe84289e83f52d7b23cc083c555a9535034212c1ef2f621107cc9",
+      "targetAncestry": [
+        "Gateway Readiness Contracts"
+      ],
+      "bindingSha256": "9299540e640a78444530c4b792dc8471f848e16387f7721ddee5fbaa59a8e358",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 2",
+          "textDigest": "8a285a1e0bebe84289e83f52d7b23cc083c555a9535034212c1ef2f621107cc9",
+          "startLine": 14,
+          "endLine": 16,
+          "ancestry": [
+            "Gateway Readiness Contracts"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 1",
+          "textDigest": "2b986dac1518c70db63ac60454f1a4d04c9035637f1b071f92966b21feee7698",
+          "startLine": 3,
+          "endLine": 12,
+          "ancestry": [
+            "Gateway Readiness Contracts"
+          ]
+        },
+        "next": {
+          "anchor": "machine-token-and-startup-refusal",
+          "unitKind": "heading",
+          "title": "Machine Token And Startup Refusal",
+          "textDigest": "e0a3d59b49a02de7b414eb9cac0ba7801a259b74ff5d84cd230e6ef88e676ece",
+          "startLine": 18,
+          "endLine": 18,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "content": "Owner: Gateway / packaging-distribution\nStatus: Candidate conservation; existing behavior, no new startup path.\nRelated links: [Gateway spec](../spec.md), [Packaging-distribution spec](../../packaging-distribution/spec.md)."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1002",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "unheaded-block-1",
+        "targetUnitDigest": "272e62ab8ae75ac97bd938fab0f15f580cbfed72c8e6af498e3d6484b4f9542a",
+        "targetAncestry": [
+          "Gateway Readiness Contracts"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "dd1876bae7e9c18d49a4dcc61252129cd8e382c8956c73a6b7c26be0a0c98a5c",
+      "targetAncestry": [
+        "Gateway Readiness Contracts",
+        "Machine Token And Startup Refusal"
+      ],
+      "bindingSha256": "41be588eedba23317bb659757d74276536e27891d810c977335aaf9657cc447f",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "dd1876bae7e9c18d49a4dcc61252129cd8e382c8956c73a6b7c26be0a0c98a5c",
+          "startLine": 20,
+          "endLine": 20,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "previous": {
+          "anchor": "machine-token-and-startup-refusal",
+          "unitKind": "heading",
+          "title": "Machine Token And Startup Refusal",
+          "textDigest": "e0a3d59b49a02de7b414eb9cac0ba7801a259b74ff5d84cd230e6ef88e676ece",
+          "startLine": 18,
+          "endLine": 18,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+          "startLine": 22,
+          "endLine": 22,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "content": "The gateway reads `~/.fgos/config.json` and its `gateway.token`; it never creates the global file or self-provisions a token. A missing file, missing token or blank token refuses startup. The original distribution row 5b is conserved verbatim:"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1004",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "unheaded-block-2",
+        "targetUnitDigest": "dd1876bae7e9c18d49a4dcc61252129cd8e382c8956c73a6b7c26be0a0c98a5c",
+        "targetAncestry": [
+          "Gateway Readiness Contracts",
+          "Machine Token And Startup Refusal"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+      "targetAncestry": [
+        "Gateway Readiness Contracts",
+        "Machine Token And Startup Refusal"
+      ],
+      "bindingSha256": "5dd3094ac9fe68e344281618bfc29711c53c1c1d32f755844fbda941c33b9b59",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+          "startLine": 22,
+          "endLine": 22,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 3",
+          "textDigest": "dd1876bae7e9c18d49a4dcc61252129cd8e382c8956c73a6b7c26be0a0c98a5c",
+          "startLine": 20,
+          "endLine": 20,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "next": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "891032424c968d3a03f35d4a9ee12004f71ae32b11f7c1df9bead4856d8c47da",
+          "startLine": 24,
+          "endLine": 24,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "content": "| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |"
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1005",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+        "targetAncestry": [
+          "Gateway Readiness Contracts",
+          "Machine Token And Startup Refusal"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "891032424c968d3a03f35d4a9ee12004f71ae32b11f7c1df9bead4856d8c47da",
+      "targetAncestry": [
+        "Gateway Readiness Contracts",
+        "Machine Token And Startup Refusal"
+      ],
+      "bindingSha256": "2e2ce4d6922b6b539969509ca34e80b919a43f404f76da90a07f6d2aadc76708",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 5",
+          "textDigest": "891032424c968d3a03f35d4a9ee12004f71ae32b11f7c1df9bead4856d8c47da",
+          "startLine": 24,
+          "endLine": 24,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "previous": {
+          "anchor": "unheaded-block-4",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 4",
+          "textDigest": "27bd0d1d7bd193d8e07443d1387cb677b14fe694dc4fadd28d42f6a07dee4ea8",
+          "startLine": 22,
+          "endLine": 22,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Machine Token And Startup Refusal"
+          ]
+        },
+        "next": {
+          "anchor": "reachable-on-network",
+          "unitKind": "heading",
+          "title": "Reachable On Network",
+          "textDigest": "0b2f9077a3a9ff2186f2735ceb529bd4e7e884bf37f40d518c4d28c5b4a32701",
+          "startLine": 26,
+          "endLine": 26,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Reachable On Network"
+          ]
+        },
+        "content": "The exclusive-creator sentence is the historical setup contract, not a restriction on the subsequently registered token fix: `fgos setup` creates/fills the global config, and the `gateway-token-configured` fix also creates it when absent and writes a real token (`fixGatewayTokenConfigured` in `src/setup/registrations.mjs`). Both setup and `doctor --fix` run this same registered fix. The gateway itself remains read-only. This explicitly supersedes the old “only setup” creator claim to the extent it would exclude the fix; it does not authorize gateway startup to write."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1006",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "891032424c968d3a03f35d4a9ee12004f71ae32b11f7c1df9bead4856d8c47da",
+        "targetAncestry": [
+          "Gateway Readiness Contracts",
+          "Machine Token And Startup Refusal"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    },
+    {
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "d9a285554f632bb1921a4fc1cd96a8448846c76a945b1ff3ee1ae65501ea162f",
+      "targetAncestry": [
+        "Gateway Readiness Contracts",
+        "Reachable On Network"
+      ],
+      "bindingSha256": "d5da5721adae71dc711f6128c3135d6f54d66cb284aa3afffaf6fb91950bc370",
+      "reviewStatus": "pending",
+      "authoredBy": "fgos-run_unit-run-1792750955a733",
+      "kind": "new-or-changed-candidate-unit",
+      "sourceOrigins": [],
+      "placement": {
+        "selected": {
+          "anchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "title": "Unheaded block 6",
+          "textDigest": "d9a285554f632bb1921a4fc1cd96a8448846c76a945b1ff3ee1ae65501ea162f",
+          "startLine": 28,
+          "endLine": 28,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Reachable On Network"
+          ]
+        },
+        "previous": {
+          "anchor": "reachable-on-network",
+          "unitKind": "heading",
+          "title": "Reachable On Network",
+          "textDigest": "0b2f9077a3a9ff2186f2735ceb529bd4e7e884bf37f40d518c4d28c5b4a32701",
+          "startLine": 26,
+          "endLine": 26,
+          "ancestry": [
+            "Gateway Readiness Contracts",
+            "Reachable On Network"
+          ]
+        },
+        "next": null,
+        "content": "The old R5 client contract is independent of static-serving and lifecycle/bind defaults: “reachable on network” has no dedicated contract field. The web client derives that observation only from its configured gateway `baseUrl`, not by probing reachability or reading a server-owned reachability flag. `apps/fgos-gateway/web/src/lib/network.ts` owns that interpretation for Taskboard and TaskDetail; the current static-serving R5 does not remove it."
+      },
+      "rationale": "Complete candidate unit bound by full content and neighboring named placement. Native claim identities are referenced only when the immutable identity registry has the same source digest; no IDs minted, no identity registry write and no independent review inferred.",
+      "supersedesBinding": {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+        "pointer": "/unitCarries/1008",
+        "targetOwner": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "d9a285554f632bb1921a4fc1cd96a8448846c76a945b1ff3ee1ae65501ea162f",
+        "targetAncestry": [
+          "Gateway Readiness Contracts",
+          "Reachable On Network"
+        ]
+      },
+      "rebindReason": "Current-byte carry repair through the existing supersession mechanism; complete preimage/current witnesses in carries/current-binding-refresh.json. No approval carried."
+    }
+  ]
+}

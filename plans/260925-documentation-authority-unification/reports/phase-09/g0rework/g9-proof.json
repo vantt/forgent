@@ -1,0 +1,19 @@
+{
+  "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py", "--check", "--pin", "HEAD"],
+  "exit": 0,
+  "pin": "9c8d2ce063813bcf9df2d5cbe552da2655da17bc",
+  "stdoutSha256": "32d0323e64668d11ffee8e35bd5737bbbd633247739ea31b06f9ba2592dfd7af",
+  "uniqueRecords": 574,
+  "judgmentErrors": [],
+  "specSweep": {
+    "files": 546,
+    "drifted": [],
+    "predecessorChainMismatches": [],
+    "bodyReplayMismatches": [],
+    "bodyReplayCommands": 1018,
+    "unrecognizedEffectivePaths": [],
+    "uncomposedHistoricalParkCount": 4,
+    "recompositionErrors": []
+  },
+  "scope": "Bounded receipt of the unchanged owning sweep, not a duplicate of its full output or a gate-acceptance claim. Re-run the argv to reproduce; stdoutSha256 authenticates the captured full output at this pin."
+}

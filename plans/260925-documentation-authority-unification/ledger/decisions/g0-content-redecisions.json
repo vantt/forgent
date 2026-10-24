@@ -1526,7 +1526,7 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "specification",
       "disposition": "supersede",
-      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the rationale names the corrected clauses. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
+      "rationale": "Current rationale at 568a11f21f442190ef86e25cf5d2303df7fc0f3d: Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the implementation-pointer wording also changes from \"(9 file)\" to \"trong nhiều file (ví dụ …)\", avoiding a fixed file-count claim. Source identity is historical and unchanged. Independent review pending; no truth, authority-transition or cutover approval.",
       "authoredBy": "fgos-run_unit-run-17928787018826",
       "targetUnitDigest": "d6004980f8bdb50003e28eaa386059d97c51d1b635823d8af58aee6acc0caa2f",
       "targetAncestry": [
@@ -1654,10 +1654,7 @@
           "changeSources": [
             "docs/platform/identity/spec.md#4a-minting-ids-for-every-owner-settled-2026-10-22",
             "63b777873c44e8977d16857e80246b043240ed0b",
-            "11733af3782423e8b2ce70f11417dba67353ee05",
-            "docs/platform/seat-binding/spec.md#52-rigor-tách-khỏi-tier",
-            "e0e52312a",
-            "bd8d64fdd"
+            "11733af3782423e8b2ce70f11417dba67353ee05"
           ]
         },
         {
@@ -1665,9 +1662,6 @@
           "oldWording": "| 10b | rigor | Độ nghiêm của việc (cùng thang với step và unit), dẫn tới model qua runner.rigorToTier; discovery phán từ bằng chứng thật | `low` · `standard` · `high` · `critical` | no | vắng mặt (dispatch dùng mặc định `standard`, trừ `risk: heavy` dùng `high`) |",
           "newWording": "| 10b | rigor | Độ nghiêm của việc (cùng thang với step và unit), chỉ quyết số checker và độ độc lập giữa các ghế, không quyết tier ([Seat Binding](../seat-binding/spec.md) mục 5.2); discovery phán từ bằng chứng thật | `low` · `standard` · `high` · `critical` | no | vắng mặt (dispatch dùng mặc định `standard`, trừ `risk: heavy` dùng `high`) |",
           "changeSources": [
-            "docs/platform/identity/spec.md#4a-minting-ids-for-every-owner-settled-2026-10-22",
-            "63b777873c44e8977d16857e80246b043240ed0b",
-            "11733af3782423e8b2ce70f11417dba67353ee05",
             "docs/platform/seat-binding/spec.md#52-rigor-tách-khỏi-tier",
             "e0e52312a",
             "bd8d64fdd"

@@ -1,0 +1,37 @@
+{
+  "status": "pass",
+  "root": "/tmp/fgos-work",
+  "before": [],
+  "after": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"drift\": 0,\n  \"rows\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/resync.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "{\"status\": \"pass\", \"effectiveBindings\": 314, \"sourceBindings\": 24, \"refreshedRows\": 63, \"shards\": 5, \"independentReview\": \"pending\"}\n",
+      "stderr": ""
+    }
+  ],
+  "compositionSyntaxOnly": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/complete-parks.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/verify-effective.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-rework.py"
+  ],
+  "scope": "Rebind/import3 real check paths leave no entries; composition changes are plumbing-only and syntax-checked, not authoring/native replays."
+}

@@ -16,11 +16,12 @@ from pathlib import Path
 import re
 import runpy
 import subprocess
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 P = Path('plans/260925-documentation-authority-unification')
-SCRATCH = Path('/tmp/fgos-work/w5-rebind-apply/rebind')
+SCRATCH = Path('/tmp/fgos-work')
 sys.path.insert(0, str(ROOT / P / 'reports/phase-09/ledgerfix'))
 from bindings import documents, supersessions, effective, at, payload, digest, sha
 
@@ -33,13 +34,15 @@ def extract(request):
     # Reuse the existing adapter and both embedded extractors byte-for-byte.
     # Only the adapter's scratch destination changes; no extractor is edited.
     source = (ROOT / P / 'reports/phase-09/g0fix/extract-units.mjs').read_text()
-    source = source.replace('/tmp/fgos-work/w3-ledger-fix-brief/extractors',
-                            str(SCRATCH / 'extractors'))
     SCRATCH.mkdir(parents=True, exist_ok=True)
-    script = SCRATCH / 'extract.mjs'
-    script.write_text(source)
-    return json.loads(subprocess.check_output(['node', str(script)], cwd=ROOT,
-                      input=json.dumps(request).encode()))
+    with tempfile.TemporaryDirectory(prefix='rebind-extract-', dir=SCRATCH) as name:
+        scratch = Path(name)
+        source = source.replace('/tmp/fgos-work/w3-ledger-fix-brief/extractors',
+                                str(scratch / 'extractors'))
+        script = scratch / 'extract.mjs'
+        script.write_text(source)
+        return json.loads(subprocess.check_output(['node', str(script)], cwd=ROOT,
+                          input=json.dumps(request).encode()))
 
 
 def direct_rows(docs):
