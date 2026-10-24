@@ -20,6 +20,12 @@ const SEAL_CHILD_WAIT_MS = 20000;
 let processDoor = null;
 import('../../src/runner/dispatch/process-identity.mjs').then((door) => { processDoor = door; }, () => {});
 
+// Directories outside the private root that a test made and drove CLI Work commands in (fixture-dir.mjs): a seal child
+// naming one of them must also end before this process's root, which holds the child's state root, goes away.
+const watchedRoots = new Set();
+/** Also wait, at exit, for the seal children that name `dir`. */
+export function watchSealChildrenOf(dir) { watchedRoots.add(dir); }
+
 function sealChildrenOf(root) {
   const views = processDoor.scan({});
   if (views === 'unsupported') return [];
@@ -32,8 +38,9 @@ function sealChildrenOf(root) {
 function waitForSealChildren(root) {
   if (!processDoor) return;
   const deadline = Date.now() + SEAL_CHILD_WAIT_MS;
+  const pendingSealChildren = () => [root, ...watchedRoots].flatMap((dir) => sealChildrenOf(dir));
   try {
-    for (let running = sealChildrenOf(root); running.length && Date.now() < deadline; running = sealChildrenOf(root)) {
+    for (let running = pendingSealChildren(); running.length && Date.now() < deadline; running = pendingSealChildren()) {
       const alive = running.filter((view) => view.tuple !== null && processDoor.judge(view.tuple) !== 'dead');
       if (!alive.length) return;
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
