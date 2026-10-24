@@ -5947,7 +5947,7 @@
     {
       "id": "file:docs/specs/workflow.md",
       "kind": "composed-current-hunks",
-      "path": "docs/specs/workflow.md",
+      "path": "docs/platform/workflow/spec.md",
       "rowIds": [
         "f08330",
         "f08334"
@@ -5956,7 +5956,9 @@
       "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
       "expectedAfterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
       "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
-      "currentSourceSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "currentSourceSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+      "legacySourcePath": "docs/specs/workflow.md",
+      "legacySourceSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
       "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
       "successor": "docs/platform/workflow/spec.md",
       "effectivePath": "docs/platform/workflow/spec.md",

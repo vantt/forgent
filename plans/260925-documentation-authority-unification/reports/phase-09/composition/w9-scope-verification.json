@@ -1,0 +1,94 @@
+{
+  "exit": 0,
+  "allowedPathsOnly": true,
+  "filesVerified": 16,
+  "changedGlossSpecs": [
+    "w8:gloss:docs/platform/agent-protocol/spec.md",
+    "w8:gloss:docs/platform/event-store/spec.md",
+    "w8:gloss:docs/platform/git/spec.md",
+    "w8:gloss:docs/platform/process/spec.md",
+    "w8:gloss:docs/platform/terminal-control/spec.md"
+  ],
+  "correctedWitnessIndices": [
+    3,
+    9,
+    15,
+    33,
+    86,
+    87,
+    96
+  ],
+  "all88HeadingRecordsPreserved": true,
+  "changedActionIndices": [
+    4
+  ],
+  "gitDiffCheckExit": 0,
+  "needsWrites": [],
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json",
+      "sha256": "f5b22edcf27215c602363c4bf7d2d1d1d641718e9db3d07b3c8780846b8d17a3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/w9-component-carriage-body-overlays.json",
+      "sha256": "ca6b27cceb744afcb6ee4edba1c0bb9d8ce0e0dc50cb8c5f2d146e592c412e0b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json",
+      "sha256": "3734ea79e37551ee4cadc4dc74656f5d226594c6a044835f54611f3f8c77cab5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+      "sha256": "c2bf4db089ae2fd3f119ef42b1eae88e3b016b1e6931c1456c9b3df529d08857"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.json",
+      "sha256": "5854d2e965de1c9fefb3f01eeb0c76bbfb288650a0165dbedb2b32c805b8c9bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md",
+      "sha256": "4a448d7f77ca29fcac10c94819e0dbef957ef830df5cb6e948cfaad97afeabde"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json",
+      "sha256": "9e551ffd7c347081e122b3edd4a5300f6df3479d5e072844d682237852bd1e2d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-action-verification.json",
+      "sha256": "f9b4fa2d97e4080da29806059b42bfbea529b72ee572c2000244fb4b5745e73b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-chain-verification.json",
+      "sha256": "321a9e5fadc19fb42a4044a1e1b487d42052290016fa46e253665bdcf25dc55a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-citation-before-f.json",
+      "sha256": "88f1c8cfd0cc0c0890b351da2995922514e4f7198d723968cdf80ccbad1cc4b5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-citation-verification.json",
+      "sha256": "13457613cf17518823e97137c0200b44206938e7a8292921770e5d173af0d918"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-commands.json",
+      "sha256": "b99e2baf085a4672d1b8225c062d3fd3854b03c87d0f23bade1a38c0c075501d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-gap05-verification.json",
+      "sha256": "58e8898f294c3921bb434137c9ef69860f66b2771c56421177f014d4ad066d63"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-independent-verification.json",
+      "sha256": "f7753cb7d5c0607eeea66dd30bd9cc643e424535ae7917dbb9f8cf214eabc35d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-replay-recipes.json",
+      "sha256": "1cdd5eec1e9e38a28ef8758044d991f4905d6ede1174084b7d64d3cb4709bcb6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w9-unresolved-bindings.json",
+      "sha256": "2dfe892a7d3d69df3f54d3002fc79eda21138a486f80c8c4edd582eae20cd41f"
+    }
+  ],
+  "limitations": "This is records-only local verification, not independent G0 acceptance or final cutover parity. This scope artifact excludes its own hash."
+}
