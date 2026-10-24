@@ -36,3 +36,10 @@ Docs: CHANGELOG [Unreleased], docs/platform/git/spec.md section 12 dated sentenc
 ## Notes
 Tests that copy the hook (main-checkout fixtures) are unaffected: no census there, and copy without scripts/ skips.
 Plain cargo used CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/harden-census-target (left in place).
+
+## Follow-up commit (OPC review: merge, three Lows)
+- Bytes vs text: the scan hashes `sha256(readFileSync(file,'utf8'))`, a decoded utf8 string, not raw bytes. The hook already decodes the staged blob as utf8, the identical input; switching to a buffer would diverge on invalid sequences. Comment added in the hook saying so.
+- Refusal text now ends "(a merge needs a regenerated census, not either side's)".
+- Spec sentence added: hook judges with the scanner of the checkout whose hook runs (via core.hooksPath), so a branch changing kindOf/declaredProduct is judged by main's rules until it lands; same trust choice as `../src`.
+- Not done, possible later: batch the per-file `git cat-file blob` child into one `cat-file --batch`.
+- Census regenerated (hook changed); focused tests census-drift, event-layout, root-file-guard, one-door: 32 pass, 0 fail.
