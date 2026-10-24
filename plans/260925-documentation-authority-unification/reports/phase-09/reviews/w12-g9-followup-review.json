@@ -1,0 +1,19 @@
+{
+  "verdict": "pass-with-findings",
+  "reviewedCommit": "4c9e1f31e",
+  "mergeCommit": "c4133d86a",
+  "checkedAt": "335b7faa9",
+  "judgedPin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "findings": [
+    {"id": "C1-scope", "severity": "info", "verdict": "pass", "summary": "Commit touches only g9/** (26) and composition/** (15); no ledger change.", "evidence": "git show --name-only 4c9e1f31e"},
+    {"id": "C2-sweep-and-rejudge", "severity": "info", "verdict": "pass", "summary": "sweep --check exits 0 at HEAD, 4c9e1f31e and d786e305e. Joining the 90 paths changed from d14d89865 to the pin against all row/passage path fields gives exactly one row (citation-ratchet-roots.jsonl:7), still absent/owned-park. 0 disposition changes.", "evidence": "own runs of python3 -B g9/sweep.py --check --pin {HEAD,4c9e1f31e,d786e305e}; join script over judgments.json and passages.json"},
+    {"id": "C4-body-vs-chain", "severity": "info", "verdict": "pass", "summary": "Scratch mutations all exit 1: old body, forged after-hash, stale preimage, self-consistent edited body. The real copy exits 0. Four bodies replay with patch --fuzz=0 forward+rollback byte-exact.", "evidence": "/tmp/fgos-work/w12-g9-review (deleted); holder-lock, reading-map, agent-confinement rollout, git spec"},
+    {"id": "C5-trailing-lf", "severity": "info", "verdict": "pass", "summary": "All 274 moved passages whose text differs from the bound text differ only by a final LF; 274 changed->moved in 26 rows; one record class change; no disposition change; receipt counts match judgments.json.", "evidence": "passages.json scan; old judgments.json at d786e305e vs new"},
+    {"id": "M1", "severity": "medium", "verdict": "open", "summary": "git spec lines 1075-1079 (#35-#39) was a D1-D9 list. All labels are lost, #35/#36/#39 still start lowercase while #37/#38 were capitalized, and the gloss repeats the old subtitle ('order (order)'). The audit's list-label rule misses lists with one label per line.", "evidence": "w10-gloss-audit.json witnesses 35,36,39 labelReview='no local list'"},
+    {"id": "M2", "severity": "medium", "verdict": "open", "summary": "Restored labels 'Mục n:' collide with the holder-lock spec's use of 'mục N' for section numbers; #62 has 'Mục 8: ... xem mục 16 ... Spec: mục 14, 16-18'.", "evidence": "docs/platform/holder-lock/spec.md:420,425,428 after replay"},
+    {"id": "M3", "severity": "medium", "verdict": "open", "summary": "#65 glosses 'D8' as 'the declared repo-lease and worktree-admin scope decision': it mixes the hardening-lane D8 with the main-door D8 and puts English inside a Vietnamese sentence; it should point to the restored Mục 8 of the main-door entry.", "evidence": "holder-lock/spec.md:430 witness 65"},
+    {"id": "L1", "severity": "low", "verdict": "open", "summary": "sweep.py now imports recompose.py, which creates /tmp/fgos-work/w11-g9 at import and writes temporary directories during --check; the 'never writes files' docstring is false and the scratch the receipt says was deleted comes back on every run.", "evidence": "recompose.py TMP.mkdir at module level; sweep.py importlib of recompose"},
+    {"id": "L2", "severity": "low", "verdict": "open", "summary": "The receipt's 'Passages' column counts per-row evidence (21,194), not unique passages (20,621); label it.", "evidence": "g9/receipt.md table; passages.json"},
+    {"id": "L3", "severity": "low", "verdict": "open", "summary": "Pre-existing gloss style faults: Vietnamese glosses inside English sentences (#47, #50, #59), nested parentheses (#94), garbled join in #2.", "evidence": "w10-gloss-audit.json"}
+  ]
+}
