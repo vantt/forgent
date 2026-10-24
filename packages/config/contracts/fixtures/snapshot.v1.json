@@ -3863,6 +3863,360 @@
      }
     }
    }
+  },
+  {
+   "id": "snapshot-wrong-file-key-held-by-an-equal-destination-passes",
+   "why": "spec 13: a copy the accounts file holds already is no refusal; the value comes from the accounts file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"s\": {",
+      "    \"pool\": {",
+      "      \"a\": \"tok\"",
+      "    }",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "s:",
+      "  pool:",
+      "    a: tok"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.pool.a": "tok"
+    },
+    "prov": [
+     [
+      "s.pool.a",
+      "accounts",
+      "accounts",
+      "accounts:accounts.yaml",
+      3,
+      5
+     ]
+    ],
+    "accounts": "present"
+   }
+  },
+  {
+   "id": "snapshot-wrong-file-key-held-by-a-different-destination-lets-the-destination-win",
+   "why": "spec 13: after an interrupted move the destination wins, whatever the global file still holds",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"s\": {",
+      "    \"pool\": {",
+      "      \"a\": \"old\"",
+      "    }",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "s:",
+      "  pool:",
+      "    a: new"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "s.pool.a": "new"
+    },
+    "prov": [
+     [
+      "s.pool.a",
+      "accounts",
+      "accounts",
+      "accounts:accounts.yaml",
+      3,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-wrong-file-key-with-no-destination-is-still-refused",
+   "why": "spec 3: a key whose destination does not hold it stays config-key-in-wrong-file",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer}",
+      "  b: {type: string}",
+      "  note: {type: [string, 'null']}",
+      "  list: {type: array, items: {type: string}}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      properties:",
+      "        x: {type: integer}",
+      "        y: {type: integer}",
+      "  rep:",
+      "    type: object",
+      "    x-fgos-merge: replace",
+      "    additionalProperties: {type: integer}",
+      "  cat:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: [object, 'null']",
+      "      properties: {k: {type: string}}",
+      "  executor: {type: string, x-fgos-absent: detected}",
+      "  dm: {x-fgos-merge: deep}",
+      "  stdDetected: {type: string, x-fgos-absent: detected}",
+      "  pool: {type: object, x-fgos-file: accounts, additionalProperties: {type: string}}",
+      "  cmd:",
+      "    type: object",
+      "    additionalProperties:",
+      "      type: object",
+      "      x-fgos-sensitivity: command",
+      "      x-fgos-scope: both"
+     ],
+     "gateway": [
+      "x-fgos-scope: global-only",
+      "type: object",
+      "properties:",
+      "  port: {type: integer}"
+     ],
+     "w": [
+      "type: object",
+      "additionalProperties:",
+      "  type: object",
+      "  properties:",
+      "    literal: {type: object, x-fgos-merge: replace}",
+      "  additionalProperties:",
+      "    type: object",
+      "    additionalProperties:",
+      "      x-fgos-merge: replace"
+     ]
+    },
+    "standard": {
+     "s": [
+      "s:",
+      "  a: 1",
+      "  b: std",
+      "  note: x",
+      "  list: [std1, std2]",
+      "  m:",
+      "    one: {x: 1, y: 2}",
+      "    two: {x: 3, y: 4}",
+      "  rep: {p: 1, q: 2}",
+      "  cat:",
+      "    alpha: {k: v}",
+      "    beta: {k: w}",
+      "  cmd:",
+      "    run: {exe: /std}",
+      "  stdDetected: fromstd",
+      "  dm: {a: 1}"
+     ],
+     "w": [
+      "w:",
+      "  p:",
+      "    literal: {a: 1, b: 2}",
+      "    other: {a: 1, b: 2}",
+      "    q:",
+      "      r: {k1: 1, k2: 2}"
+     ]
+    },
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"s\": {",
+      "    \"pool\": {",
+      "      \"a\": \"tok\"",
+      "    }",
+      "  }",
+      "}"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-key-in-wrong-file",
+      "s.pool",
+      "global:config.json",
+      null,
+      null,
+      "",
+      ""
+     ]
+    ]
+   }
   }
  ]
 }

@@ -22,6 +22,11 @@ import { ensureRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.m
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
+// Set to `1` in every confined worker; `fgos-config`'s session class reads it (`CONFINED_MARKER` in
+// packages/config/rust/src/session.rs, pinned equal by a test). Information for the session, not a
+// security boundary: the sandbox is the boundary, and a worker that unsets it only loses the doors'
+// politeness refusal.
+export const CONFINED_MARKER_ENV = 'FGOS_CONFINED';
 
 function credentialError(message) {
   const err = new Error(message);
@@ -166,27 +171,38 @@ function realPathOrResolved(p) {
 }
 
 /**
+ * One refusal per candidate directory that lies inside a masked root: the mask would hide it from
+ * the worker that was given it.
+ */
+function hiddenWorkspaceRefusals(candidates, roots, code, describe) {
+  const mismatches = [];
+  for (const [name, dir] of candidates) {
+    if (typeof dir !== 'string' || !dir) continue;
+    const real = realPathOrResolved(dir);
+    const root = roots.find((hidden) => isInsideRoot(real, hidden));
+    if (root) mismatches.push({ code, detail: describe(name, real, root) });
+  }
+  return mismatches;
+}
+
+const hiddenRootTargets = (resolvedResources, machinePrivate) =>
+  resolvedResources.filter((r) => r.resource === 'hidden-root' && Boolean(r.machinePrivate) === machinePrivate).map((r) => r.hostTarget);
+
+/**
  * Refusals specific to `hostRead: blind`, read off the resolved resources: a workspace that
  * sits inside a hidden root would be masked away from its own worker, and a context ref that
  * points into a hidden root outside the dispatch's own directory could never be read.
  */
 function blindRefusals(request, resolvedResources) {
-  const hiddenRoots = resolvedResources.filter((r) => r.resource === 'hidden-root').map((r) => r.hostTarget);
+  const hiddenRoots = hiddenRootTargets(resolvedResources, false);
   const own = resolvedResources.find((r) => r.resource === 'own-assignment')?.hostTarget;
-  const mismatches = [];
   const context = request.context || {};
-
-  for (const [name, dir] of [['cwd', context.cwd], ['repoRoot', context.repoRoot]]) {
-    if (typeof dir !== 'string' || !dir) continue;
-    const real = realPathOrResolved(dir);
-    const root = hiddenRoots.find((hidden) => isInsideRoot(real, hidden));
-    if (root) {
-      mismatches.push({
-        code: 'blind-hides-workspace',
-        detail: `hostRead: blind would hide the ${name} "${real}" from its own worker: it lies inside the hidden root "${root}".`,
-      });
-    }
-  }
+  const mismatches = hiddenWorkspaceRefusals(
+    [['cwd', context.cwd], ['repoRoot', context.repoRoot]],
+    hiddenRoots,
+    'blind-hides-workspace',
+    (name, real, root) => `hostRead: blind would hide the ${name} "${real}" from its own worker: it lies inside the hidden root "${root}".`,
+  );
 
   const base = context.cwd || context.repoRoot || process.cwd();
   for (const ref of Array.isArray(context.contextRefs) ? context.contextRefs : []) {
@@ -201,6 +217,29 @@ function blindRefusals(request, resolvedResources) {
     }
   }
   return mismatches;
+}
+
+/**
+ * Refusal specific to machine-private roots (spec section 9.3), for every confined request: the
+ * workspace, cwd, repo root or a granted mount that lies inside one would be masked away from the
+ * worker that was given it.
+ */
+function machinePrivateRefusals(request, resolvedResources) {
+  const roots = hiddenRootTargets(resolvedResources, true);
+  if (roots.length === 0) return [];
+  const context = request.context || {};
+  return hiddenWorkspaceRefusals(
+    [
+      ['cwd', context.cwd],
+      ['repoRoot', context.repoRoot],
+      ...resolvedResources
+        .filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment')
+        .map((r) => [`${r.resource} mount`, r.hostTarget]),
+    ],
+    roots,
+    'machine-private-hides-workspace',
+    (name, real, root) => `the ${name} "${real}" lies inside the machine-private root "${root}", which is hidden from every confined dispatch.`,
+  );
 }
 
 /**
@@ -397,6 +436,7 @@ export function assessBwrap(request, backend) {
       providerSources: {},
       blind: requestIsBlind(request),
     });
+    mismatches.push(...machinePrivateRefusals(request, resolvedResources));
     if (requestIsBlind(request)) mismatches.push(...blindRefusals(request, resolvedResources));
   } catch (err) {
     mismatches.push({
@@ -504,6 +544,7 @@ export function prepareBwrapSync(plan, request, backend) {
       // Every launch gets its own pid namespace with the launched command as pid 1, so the
       // namespace is empty exactly when that command's tree is gone.
       '--unshare-pid', '--as-pid-1',
+      '--setenv', CONFINED_MARKER_ENV, '1',
     ];
     // Only a terminal-mode launch is tied to its launcher's lifetime. A direct attempt must
     // outlive a dead supervisor, so it never gets --die-with-parent.
@@ -526,7 +567,7 @@ export function prepareBwrapSync(plan, request, backend) {
 
     const resources = plan.resources || [];
     const blind = requestIsBlind(request);
-    const hidden = blind ? resources.filter((r) => r.resource === 'hidden-root' && r.executionTarget?.path) : [];
+    const hidden = resources.filter((r) => r.resource === 'hidden-root' && r.executionTarget?.path);
     const own = blind ? resources.find((r) => r.resource === 'own-assignment') : null;
     if (blind && !own) {
       throw new Error('hostRead: blind plan has no own-assignment resource to bind back.');
@@ -572,8 +613,12 @@ export function prepareBwrapSync(plan, request, backend) {
       for (const file of request.attemptBinds ?? []) bwrapArgs.push('--bind', file, file);
     };
     if (!blind) {
+      // Only machine-private roots are hidden here (spec section 9.3); with none on the host this
+      // is the mounts and the attempt binds, byte for byte.
       mounts.forEach(materialize);
+      for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
       bindAttemptFiles();
+      for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
     } else {
       // A later mount over a parent hides an earlier one beneath it, so the order is the
       // contract: mounts that do not sit inside a hidden root (a workspace may contain one),

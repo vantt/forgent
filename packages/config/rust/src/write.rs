@@ -6,28 +6,32 @@ use std::path::{Path, PathBuf};
 
 use fgos_durable_file::{ensure_dir_beneath, install_once_with_mode, replace_durably_with_mode};
 use fgos_durable_file::{BeneathError, DirIdentity, Installed};
-use fgos_holder_lock::{Acquire, LockScope, ScopeError, Wait};
 use fgos_identity::WriterIdentity;
 use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment, Value as Doc};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
+use crate::docs;
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
 use crate::grammar::{block_for_changed_key, block_for_new_key, doc_lines, header_lines};
 use crate::grammar::{Actor, Reason};
-use crate::locks::{scope_params, GLOBAL_CONFIG, PROJECT_CONFIG};
+use crate::locks::{hold, GLOBAL_CONFIG, PROJECT_CONFIG};
 use crate::schema::{json_at, json_put};
 use crate::scope::{judge, SourceKind};
-use crate::snapshot::{build, read_sources, Context, SessionClass, SnapshotError, SnapshotRequest};
+use crate::snapshot::{build, read_sources, Context, SessionClass, Snapshot};
+use crate::snapshot::{SnapshotError, SnapshotRequest};
 use crate::ConfigRefusal;
 
 const REASON_REQUIRED: &str = "config-comment-reason-required";
 
+/// `Docs` rewrites the `@fgos:doc` lines that differ from the render in every key of the file; it
+/// writes no value, needs no reason and is never part of another write (`docs-edit-alone`).
 pub enum Edit {
     Set { path: Vec<Segment>, value: Value },
     Unset { path: Vec<Segment> },
+    Docs,
 }
 
 pub struct WriteRequest {
@@ -66,28 +70,31 @@ pub struct WriteResult {
     pub notices: Vec<(&'static str, String)>,
 }
 
-fn conflict(reason: &str) -> SnapshotError {
+pub(crate) fn conflict(reason: &str) -> SnapshotError {
     let mut refusal = ConfigRefusal::new("config-write-conflict");
     refusal.detail_mut().keyword = Some(reason.to_string());
     refusal.into()
 }
 
-fn sha(bytes: &[u8]) -> String {
+pub(crate) fn sha(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
 
-fn io_error(error: impl ToString) -> SnapshotError {
+pub(crate) fn io_error(error: impl ToString) -> SnapshotError {
     io::Error::other(error.to_string()).into()
 }
 
 /// Where the target lives: the root it is opened beneath, its directory and its file name.
-fn place(req: &WriteRequest) -> Result<(PathBuf, PathBuf, &'static str), SnapshotError> {
-    let global = &req.roots.global_dir;
+fn place(
+    roots: &SnapshotRequest,
+    target: SourceKind,
+) -> Result<(PathBuf, PathBuf, &'static str), SnapshotError> {
+    let global = &roots.global_dir;
     let (Some(parent), Some(dir)) = (global.parent(), global.file_name()) else {
         return Err(ConfigRefusal::new("config-path-symlink").into());
     };
-    Ok(match req.target {
-        SourceKind::Project => (req.roots.project_root.clone(), ".fgos".into(), YAML_NAME),
+    Ok(match target {
+        SourceKind::Project => (roots.project_root.clone(), ".fgos".into(), YAML_NAME),
         SourceKind::Global => (parent.into(), dir.into(), YAML_NAME),
         SourceKind::Accounts => (
             parent.into(),
@@ -97,23 +104,40 @@ fn place(req: &WriteRequest) -> Result<(PathBuf, PathBuf, &'static str), Snapsho
     })
 }
 
-/// The file now, from one open descriptor, compared with the revision the edits were made against.
-fn current(
-    req: &WriteRequest,
+/// The target file from one open descriptor; none when it does not exist. A legacy JSON file is
+/// `config-format-legacy-json`: it is migrated, never edited.
+fn read_target(
+    target: SourceKind,
     (root, dir, name): &(PathBuf, PathBuf, &str),
-    compare: bool,
 ) -> Result<Option<LoadedFile>, SnapshotError> {
     let max = Profile::StrictConfig.limits().input_bytes;
-    let file = match req.target {
-        SourceKind::Accounts => read_beneath(root, &dir.join(name), max)?,
+    match target {
+        SourceKind::Accounts => Ok(read_beneath(root, &dir.join(name), max)?),
         _ => match select_source(root, dir, max)? {
-            Source::Absent => None,
-            Source::Yaml(file) => Some(file),
-            Source::LegacyJson(_) => {
-                return Err(ConfigRefusal::new("config-format-legacy-json").into())
-            }
+            Source::Absent => Ok(None),
+            Source::Yaml(file) => Ok(Some(file)),
+            Source::LegacyJson(_) => Err(ConfigRefusal::new("config-format-legacy-json").into()),
         },
-    };
+    }
+}
+
+/// The revision of the file a write to `target` is computed against, to pass back as
+/// [`WriteRequest::expected`]; none when the file does not exist.
+pub fn target_revision(
+    roots: &SnapshotRequest,
+    target: SourceKind,
+) -> Result<Option<String>, SnapshotError> {
+    let file = read_target(target, &place(roots, target)?)?;
+    Ok(file.map(|f| f.revision))
+}
+
+/// The file now, compared with the revision the edits were made against when `compare`.
+fn current(
+    req: &WriteRequest,
+    at: &(PathBuf, PathBuf, &str),
+    compare: bool,
+) -> Result<Option<LoadedFile>, SnapshotError> {
+    let file = read_target(req.target, at)?;
     match compare && file.as_ref().map(|f| &f.revision) != req.expected.as_ref() {
         true => Err(conflict("revision-changed")),
         false => Ok(file),
@@ -121,7 +145,11 @@ fn current(
 }
 
 /// The directory of the target (created when missing, never through a symlink) and who it is now.
-fn dir_identity(root: &Path, dir: &Path, mode: u32) -> Result<DirIdentity, SnapshotError> {
+pub(crate) fn dir_identity(
+    root: &Path,
+    dir: &Path,
+    mode: u32,
+) -> Result<DirIdentity, SnapshotError> {
     match ensure_dir_beneath(root, dir, mode).and_then(|d| d.identity()) {
         Err(BeneathError::Refused(_)) => Err(ConfigRefusal::new("config-path-symlink").into()),
         Err(BeneathError::Io(error)) => Err(error.into()),
@@ -149,8 +177,23 @@ pub fn commit_observed(
         return Err(ConfigRefusal::new("config-write-confined").into());
     }
     let actor = Actor::from_writer(writer);
-    let at = place(req)?;
+    let at = place(&req.roots, req.target)?;
     let seen = current(req, &at, false)?;
+    let refreshing = req.edits.iter().any(|edit| matches!(edit, Edit::Docs));
+    if refreshing && req.edits.len() > 1 {
+        let mut refusal = ConfigRefusal::new("config-key-out-of-scope");
+        refusal.detail_mut().keyword = Some("docs-edit-alone".into());
+        return Err(refusal.into());
+    }
+    // A file that is not there has no doc lines to refresh, and refreshing must not create it.
+    if refreshing && seen.is_none() {
+        return Ok(WriteResult {
+            writer_id: writer.id.to_string(),
+            new_revision: "absent".into(),
+            applied: Vec::new(),
+            notices: Vec::new(),
+        });
+    }
     // A write that changes nothing needs no reason: every edit sets what the key inherits already.
     let reason = match all_redundant(ctx, req, seen.as_ref(), at.2) {
         true => Reason::parse(&req.reason).ok(),
@@ -163,6 +206,7 @@ pub fn commit_observed(
                 json_put(&mut proposed, path, Some(value.clone()))
             }
             Edit::Unset { path } if !path.is_empty() => {}
+            Edit::Docs => {}
             // The document itself is no key.
             _ => return Err(ConfigRefusal::new("config-key-out-of-scope").into()),
         }
@@ -180,24 +224,19 @@ pub fn commit_observed(
     } else {
         (GLOBAL_CONFIG, PathBuf::new())
     };
-    let mut scope = LockScope::seeded(Vec::new()).map_err(io_error)?;
-    match scope.acquire(
-        lock,
-        &scope_params(&fgos_dir, &req.lock_root),
-        Wait::Ms(req.lock_wait_ms),
-    ) {
-        Ok(_) => {}
-        Err(ScopeError::Acquire(why))
-            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
-        {
-            return Err(conflict("lock-held"))
-        }
-        Err(other) => return Err(io_error(other)),
-    }
+    let _scope = hold(lock, &fgos_dir, &req.lock_root, req.lock_wait_ms)?;
     observe(Step::LockHeld)?;
     observe(Step::FirstCheck)?;
     let base = current(req, &at, true)?;
-    let (bytes, applied, notices) = edit(ctx, req, &actor, reason.as_ref(), base.as_ref(), name)?;
+    let (bytes, applied, notices) = produce(
+        ctx,
+        &req.edits,
+        req.acknowledge_comment_loss,
+        &actor,
+        reason.as_ref(),
+        base.as_ref(),
+        name,
+    )?;
     observe(Step::Edited)?;
     let mut result = WriteResult {
         writer_id: writer.id.to_string(),
@@ -240,8 +279,9 @@ pub fn commit_observed(
 
 type Edited = (Vec<u8>, Vec<(String, bool)>, Vec<(&'static str, String)>);
 
-/// Whether every edit sets a value equal to the standard on a key the file does not hold. A file
-/// that cannot be read here is not redundant; the transaction refuses it after the lock.
+/// Whether the edits write no value: each sets what the key inherits already on a key the file does
+/// not hold, or is the docs refresh. A file that cannot be read here is not redundant; the
+/// transaction refuses it after the lock.
 fn all_redundant(ctx: &Context, req: &WriteRequest, base: Option<&LoadedFile>, name: &str) -> bool {
     let held = match base {
         None => Ok(Value::Null),
@@ -254,14 +294,17 @@ fn all_redundant(ctx: &Context, req: &WriteRequest, base: Option<&LoadedFile>, n
                 ctx.standard.value_at(path) == Some(value) && json_at(&held, path).is_none()
             }
             Edit::Unset { .. } => false,
+            Edit::Docs => true,
         })
 }
 
 /// The produced bytes: every edit applied to one in-memory document, each key given its comment
-/// block. Nothing is written; any error discards the document.
-fn edit(
+/// block. Nothing is written; any error discards the document. The one producer of a file's bytes:
+/// the transaction and the migration both call it.
+pub(crate) fn produce(
     ctx: &Context,
-    req: &WriteRequest,
+    edits: &[Edit],
+    acknowledge: bool,
     actor: &Actor,
     reason: Option<&Reason>,
     base: Option<&LoadedFile>,
@@ -277,15 +320,21 @@ fn edit(
         Profile::StrictConfig,
         name,
     )?;
-    let loss = if req.acknowledge_comment_loss {
+    let loss = if acknowledge {
         CommentLoss::Acknowledge
     } else {
         CommentLoss::Refuse
     };
     let (mut applied, mut notices) = (Vec::new(), Vec::new());
     let node = |path: &[Segment]| Some(ctx.schemas.resolve(path)?.node.clone());
-    for edit in &req.edits {
-        let (Edit::Set { path, .. } | Edit::Unset { path }) = edit;
+    for edit in edits {
+        let (Edit::Set { path, .. } | Edit::Unset { path }) = edit else {
+            for change in docs::plan(ctx, &doc)? {
+                applied.push((format_path(&change.finding.path), false));
+                doc.set_comment_block(&change.finding.path, &change.block)?;
+            }
+            continue;
+        };
         let before = doc.to_json()?;
         let held = json_at(&before, path).is_some();
         // A value equal to the standard is no value: a no-op on a missing key, an unset on a present one.
@@ -329,7 +378,18 @@ fn edit(
 /// The effective value the produced file would give, against scope, placement and the schemas.
 fn validate(ctx: &Context, req: &WriteRequest, bytes: &[u8]) -> Result<(), SnapshotError> {
     let role = ["project", "global", "accounts"][req.target as usize];
-    let mut sources = read_sources(&req.roots)?;
+    snapshot_with(ctx, &req.roots, role, bytes).map(drop)
+}
+
+/// The snapshot with the source of `role` replaced by `bytes` (not yet on disk): the other sources
+/// are read as they are.
+pub(crate) fn snapshot_with(
+    ctx: &Context,
+    roots: &SnapshotRequest,
+    role: &str,
+    bytes: &[u8],
+) -> Result<Snapshot, SnapshotError> {
+    let mut sources = read_sources(roots)?;
     if let Some(source) = sources.iter_mut().find(|s| s.role == role) {
         let (revision, mode, parent) = (sha(bytes), 0, (0, 0));
         source.file = Some(LoadedFile {
@@ -339,5 +399,34 @@ fn validate(ctx: &Context, req: &WriteRequest, bytes: &[u8]) -> Result<(), Snaps
             parent,
         });
     }
-    build(ctx, &req.roots, &sources).map(drop)
+    build(ctx, roots, &sources)
+}
+
+/// `roots` without the project layer, so a source replaced in `snapshot_with` is read over the machine
+/// files alone even while both files of a project exist. A linked worktree keeps the main checkout's
+/// commands.
+pub(crate) fn without_project(roots: &SnapshotRequest) -> SnapshotRequest {
+    let absent = roots.project_root.join(".fgos-absent");
+    let linked = roots.trusted_root != roots.project_root;
+    SnapshotRequest {
+        trusted_root: if linked {
+            roots.trusted_root.clone()
+        } else {
+            absent.clone()
+        },
+        project_root: absent,
+        ..roots.clone()
+    }
+}
+
+/// Rewrite the `@fgos:doc` lines of `req.target` that differ from the render: [`commit_observed`]
+/// with the one docs edit. The reason and any edits of the request are not used.
+pub fn refresh(
+    ctx: &Context,
+    mut req: WriteRequest,
+    writer: &WriterIdentity,
+    observe: impl FnMut(Step) -> io::Result<()>,
+) -> Result<WriteResult, SnapshotError> {
+    req.edits = vec![Edit::Docs];
+    commit_observed(ctx, &req, writer, observe)
 }

@@ -111,6 +111,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_identity::IDENTITY_DESCRIPTOR,
     fgos_identity::IDENTITY_READ_DESCRIPTOR,
     fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
+    fgos_config::provider::CONFIG_READ_DESCRIPTOR,
+    fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
 ];
 
 static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
@@ -120,6 +122,7 @@ static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
         fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS,
     ),
     ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
+    ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
 ];
 
 fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
@@ -247,6 +250,14 @@ fn main() {
         fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
     ] {
         service.register_provider(Arc::new(fgos_identity::IdentityProvider::for_descriptor(
+            descriptor,
+        )));
+    }
+    for descriptor in [
+        fgos_config::provider::CONFIG_READ_DESCRIPTOR,
+        fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(fgos_config::provider::ConfigProvider::for_descriptor(
             descriptor,
         )));
     }

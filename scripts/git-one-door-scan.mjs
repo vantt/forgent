@@ -2576,6 +2576,24 @@ export function writeMutationCensus(root, result = scan({ root })) {
   return target;
 }
 
+/**
+ * The scan-free drift check for commit time: the staged paths whose census digest a regenerated census
+ * would change. `changes` maps a staged path to its staged source (null when deleted). It judges the same
+ * files the scan digests (declared product, scannable kind), so a clean answer means the census still
+ * matches every staged file; a change to the product declaration itself is left to the full scan.
+ */
+export function censusDrift(doc, root, changes) {
+  if (!censusDigestMatches(doc)) return [MUTATION_CENSUS_PATH];
+  const product = declaredProduct(root);
+  const drift = [];
+  for (const [name, source] of changes) {
+    if (name === 'scripts/git-one-door-scan.mjs' || (product && !product(name))) continue;
+    const digest = source !== null && kindOf(name, source) ? sha256(source) : undefined;
+    if (doc.files[name] !== digest) drift.push(name);
+  }
+  return drift;
+}
+
 // The Node payload a release ships whole; Rust sources are compiled in, so they are not on disk there.
 const NODE_PAYLOAD = /^(src|bin|scripts|core)\//;
 

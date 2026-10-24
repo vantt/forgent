@@ -1,0 +1,1173 @@
+{
+ "version": 1,
+ "about": "Owning cases of the findings engine (docs/platform/config/spec.md sections 7, 11, 13) and of the repairs. Shared `schemas` and `standard`. Input: files (as the snapshot fixture), machine (`bare`: no private directory or token; every other case gets a healthy machine), modes (file under the global directory to the mode set before the check), class, stale and fresh (files whose mtime is set 40 and 1 days before `now`), fix (fix ids to apply) and ack. Expect for a check: rows ([row, file, path] triples, compared as sets), details (`row path` to detail, the last word of it), fixes (row to fix id), severity (row to [doctor, check]), absent (text no finding may contain). Expect for a fix: applied ([fix id, path]), files (after), absent (paths that must be gone), modes (path to mode after), code (a refusal's rule or id); the repair is run twice and the second run must apply nothing.",
+ "schemas": {
+  "gateBypass": [
+   "type: object",
+   "description: Gate bypass settings.",
+   "properties:",
+   "  level: {type: string, enum: [off, light, standard, heavy], description: Gate bypass level for agent work.}"
+  ],
+  "limits": [
+   "type: object",
+   "properties:",
+   "  count: {type: integer, minimum: 1, description: Parallel runs.}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  port: {type: integer}"
+  ],
+  "accounts": [
+   "type: object",
+   "x-fgos-file: accounts",
+   "additionalProperties:",
+   "  type: object",
+   "  properties:",
+   "    login: {type: string}"
+  ],
+  "labels": [
+   "type: object",
+   "additionalProperties: {type: [string, 'null']}"
+  ],
+  "mixed": [
+   "type: object",
+   "x-fgos-merge: deep",
+   "additionalProperties: {}"
+  ]
+ },
+ "standard": {
+  "gateBypass": [
+   "gateBypass:",
+   "  level: off"
+  ],
+  "limits": [
+   "limits:",
+   "  count: 4"
+  ],
+  "gateway": [
+   "gateway:",
+   "  port: 4170"
+  ]
+ },
+ "cases": [
+  {
+   "id": "clean-file-has-no-finding",
+   "why": "a rendered file with a reason on its value",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": []
+   }
+  },
+  {
+   "id": "unparseable-file-is-config-parse",
+   "why": "spec 11: strict-config refuses it, with its position",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass: [unclosed"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-parse",
+      "project:config.yaml",
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "schema-violation-is-config-schema",
+   "why": "spec 11: the value breaks the section schema",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: bogus"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-schema",
+      "project:config.yaml",
+      "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "both-files-is-legacy-shadowed",
+   "why": "spec 5/11: config.yaml and config.json together",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ],
+     "project/.fgos/config.json": [
+      "{\"gateBypass\": {\"level\": \"light\"}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-legacy-shadowed",
+      ".fgos/config.json",
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "legacy-json-reports-only-its-format",
+   "why": "D19: a JSON file has no comments, so it has no doc, reason or note rows",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"gateBypass\": {\"level\": \"light\"}, \"extra\": 1}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-format-legacy-json",
+      "project:config.json",
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "missing-doc-and-drifted-doc",
+   "why": "spec 7/11: both rows offer refresh-docs; doctor warns, check fails on drift",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc Old wording.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-comment-missing-doc",
+      "project:config.yaml",
+      "gateBypass"
+     ],
+     [
+      "config-doc-drift",
+      "project:config.yaml",
+      "gateBypass.level"
+     ]
+    ],
+    "severity": {
+     "config-doc-drift": [
+      "warn",
+      "fail"
+     ],
+     "config-comment-missing-doc": [
+      "warn",
+      "warn"
+     ],
+     "config-schema": [
+      "fail",
+      "fail"
+     ]
+    }
+   }
+  },
+  {
+   "id": "value-without-a-reason-and-migrated-reason",
+   "why": "spec 7/13: a value with no why warns; a [migrate] why is listed until replaced",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  level: light",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "gateBypass.level"
+     ],
+     [
+      "config-comment-migrated-why",
+      "project:config.yaml",
+      "limits.count"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unknown-key-is-a-warning",
+   "why": "spec 11: a section no schema describes is kept and reported",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "extra:",
+      "  # @fgos:why [vantt] mine",
+      "  flag: true"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "extra"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "redundant-value-says-whether-a-note-would-go",
+   "why": "spec 11: equal to the standard; a note on it needs the acknowledgement",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  level: off",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  count: 4"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "gateBypass.level"
+     ],
+     [
+      "config-redundant-value",
+      "project:config.yaml",
+      "gateBypass.level"
+     ],
+     [
+      "config-redundant-value",
+      "project:config.yaml",
+      "limits.count"
+     ]
+    ],
+    "details": {
+     "config-redundant-value gateBypass.level": "plain",
+     "config-redundant-value limits.count": "needs-acknowledgement"
+    }
+   }
+  },
+  {
+   "id": "a-broken-project-does-not-hide-the-global-file",
+   "why": "D20: each source is judged on its own",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass: [unclosed"
+     ],
+     "home/.fgos/config.yaml": [
+      "gateBypass:",
+      "  level: heavy"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-parse",
+      "project:config.yaml",
+      null
+     ],
+     [
+      "config-comment-missing-doc",
+      "global:config.yaml",
+      "gateBypass"
+     ],
+     [
+      "config-comment-missing-doc",
+      "global:config.yaml",
+      "gateBypass.level"
+     ],
+     [
+      "config-comment-missing-why",
+      "global:config.yaml",
+      "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "layers-that-disagree-about-a-shape-are-a-schema-row-once-each-is-sound",
+   "why": "spec 5: a scalar in one file and a mapping in the other is reported after each file passes alone",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "mixed:",
+      "  # @fgos:why [vantt] r",
+      "  a: 1"
+     ],
+     "home/.fgos/config.yaml": [
+      "mixed:",
+      "  a:",
+      "    # @fgos:why [vantt] r",
+      "    b: 1"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-schema",
+      "merged",
+      "mixed.a"
+     ],
+     [
+      "config-unknown-key",
+      "global:config.yaml",
+      "mixed.a.b"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "global-only-key-in-the-project-file-is-a-schema-row",
+   "why": "spec 3: refused by name, naming the file it belongs in",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateway:",
+      "  # @fgos:why [vantt] r",
+      "  port: 9999"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-schema",
+      "project:config.yaml",
+      "gateway.port"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "a-pool-in-the-global-file-is-a-wrong-file-row-with-a-copy-fix",
+   "why": "spec 11/13: the legacy global JSON still holds the pool and the destination lacks it, so it fails and offers the copy",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
+      "config-key-in-wrong-file",
+      "global:config.json",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": "copy-to-destination"
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-absent"
+    }
+   }
+  },
+  {
+   "id": "a-pool-already-in-its-destination-is-a-warning-with-no-fix",
+   "why": "spec 13: the state after the copy stage",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
+      "config-key-in-wrong-file",
+      "global:config.json",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-equal"
+    },
+    "severity": {
+     "config-key-in-wrong-file": [
+      "warn",
+      "warn"
+     ]
+    }
+   }
+  },
+  {
+   "id": "a-pool-whose-destination-differs-fails-with-no-fix",
+   "why": "spec 13: the destination holds another value for the key; the copy would refuse, so none is offered",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: y"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-format-legacy-json",
+      "global:config.json",
+      null
+     ],
+     [
+      "config-key-in-wrong-file",
+      "global:config.json",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-different"
+    },
+    "severity": {
+     "config-key-in-wrong-file": [
+      "fail",
+      "fail"
+     ]
+    }
+   }
+  },
+  {
+   "id": "a-pool-in-the-global-yaml-file-has-no-copy-fix",
+   "why": "the relocation reads the legacy JSON only, so a hand-written YAML global file gets the row and no repair",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-key-in-wrong-file",
+      "global:config.yaml",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    },
+    "details": {
+     "config-key-in-wrong-file accounts": "destination-absent"
+    }
+   }
+  },
+  {
+   "id": "a-pool-in-the-project-file-has-no-fix",
+   "why": "D14: the project file is untrusted for machine keys",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-key-in-wrong-file",
+      "project:config.yaml",
+      "accounts"
+     ]
+    ],
+    "fixes": {
+     "config-key-in-wrong-file": null
+    }
+   }
+  },
+  {
+   "id": "permissions-and-machine-files-are-observed-on-disk",
+   "why": "spec 9/11: a config file wider than 0600 and a machine without a private directory or token",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "machine": "bare",
+    "modes": {
+     "config.yaml": 420
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-global-permissions",
+      "config.yaml",
+      null
+     ],
+     [
+      "config-machine-files",
+      null,
+      null
+     ]
+    ],
+    "details": {
+     "config-machine-files ": "private-missing"
+    }
+   }
+  },
+  {
+   "id": "a-private-directory-without-a-token-is-a-machine-files-row",
+   "why": "spec 9/11: the token file is missing",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "machine": "bare"
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-machine-files",
+      null,
+      null
+     ]
+    ],
+    "details": {
+     "config-machine-files ": "token-missing"
+    },
+    "fixes": {
+     "config-machine-files": "create-machine-files"
+    }
+   }
+  },
+  {
+   "id": "a-token-file-wider-than-0600-is-a-permission-row-and-an-invalid-token",
+   "why": "spec 9: the token mode is reported by both, never its value",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "modes": {
+     "private/gateway-token": 420
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-global-permissions",
+      "private/gateway-token",
+      null
+     ],
+     [
+      "config-machine-files",
+      null,
+      null
+     ]
+    ],
+    "absent": [
+     "tok-1"
+    ]
+   }
+  },
+  {
+   "id": "a-loose-file-under-the-global-directory-holding-a-pool",
+   "why": "spec 11: config.json.bak-* style files",
+   "input": {
+    "files": {
+     "home/.fgos/config.json.bak-20261021": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/notes.json": [
+      "{\"foo\": 1}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-secret-outside-private",
+      "config.json.bak-20261021",
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "a-backup-older-than-the-stale-age-is-listed",
+   "why": "spec 13: 30 days by mtime",
+   "input": {
+    "files": {
+     "project/.fgos/runtime/config-migrate/old-config.json": [
+      "{}"
+     ],
+     "home/.fgos/private/config-migrate/new-config.json": [
+      "{}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "stale": [
+     "project/.fgos/runtime/config-migrate/old-config.json"
+    ],
+    "fresh": [
+     "home/.fgos/private/config-migrate/new-config.json"
+    ]
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-migrate-backup-stale",
+      "old-config.json",
+      null
+     ]
+    ]
+   }
+  },
+  {
+   "id": "no-finding-or-fix-report-holds-a-value",
+   "why": "spec 9/15: findings name paths, never values",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "labels:",
+      "  # @fgos:why [vantt] r",
+      "  token: hunter2-secret",
+      "extra:",
+      "  secret: hunter2-secret"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "extra.secret"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "extra"
+     ]
+    ],
+    "absent": [
+     "hunter2-secret"
+    ]
+   }
+  },
+  {
+   "id": "fix-refresh-docs-rewrites-drift-and-is-idempotent",
+   "why": "spec 7: refresh-docs on both YAML files; a second run changes nothing",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc stale",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "refresh-docs"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "refresh-docs",
+      "gateBypass"
+     ],
+     [
+      "refresh-docs",
+      "gateBypass.level"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-remove-redundant-drops-a-plain-value",
+   "why": "spec 11: the value equal to the standard goes",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 4",
+      "gateBypass:",
+      "  # @fgos:doc stale?",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-redundant"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "remove-redundant",
+      "limits"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc stale?",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-remove-redundant-with-a-note-needs-the-acknowledgement",
+   "why": "spec 7/11: comment-would-be-lost unless acknowledged",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  count: 4"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-redundant"
+    ]
+   },
+   "expect": {
+    "applied": [],
+    "code": "comment-would-be-lost"
+   }
+  },
+  {
+   "id": "fix-remove-redundant-acknowledged-drops-value-and-note",
+   "why": "spec 7/11: the caller decided the note goes",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  count: 4",
+      "gateBypass:",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-redundant"
+    ],
+    "ack": true
+   },
+   "expect": {
+    "applied": [
+     [
+      "remove-redundant",
+      "limits"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-chmod-sets-the-expected-modes-and-is-idempotent",
+   "why": "spec 9: a wide config file and token go to 0600",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "modes": {
+     "config.yaml": 420,
+     "private/gateway-token": 416
+    },
+    "fix": [
+     "chmod"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "chmod",
+      "config.yaml"
+     ],
+     [
+      "chmod",
+      "private/gateway-token"
+     ]
+    ],
+    "modes": {
+     "home/.fgos/config.yaml": 384,
+     "home/.fgos/private/gateway-token": 384
+    }
+   }
+  },
+  {
+   "id": "fix-create-machine-files-makes-the-private-directory-and-token-once",
+   "why": "spec 8/9: created 0600 inside a 0700 directory; a second run keeps the token",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "machine": "bare",
+    "fix": [
+     "create-machine-files"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "create-machine-files",
+      "private/gateway-token"
+     ]
+    ],
+    "modes": {
+     "home/.fgos/private": 448,
+     "home/.fgos/private/gateway-token": 384
+    }
+   }
+  },
+  {
+   "id": "fix-copy-to-destination-writes-the-accounts-file-and-keeps-the-source",
+   "why": "spec 13 stage 1: the pool is copied; the source still holds it, so the second run copies nothing",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "copy-to-destination"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "copy-to-destination",
+      "accounts"
+     ]
+    ],
+    "files": {
+     "home/.fgos/config.json": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "accounts:",
+      "  a:",
+      "    # @fgos:why [vantt] [migrate] carried over from ~/.fgos/config.json, reason never recorded",
+      "    login: x"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-under-private-installs-then-removes-the-loose-file",
+   "why": "spec 11: a backup holding a pool moves into private/ and the source goes",
+   "input": {
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-under-private"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-under-private",
+      "config.json.bak-1"
+     ]
+    ],
+    "files": {
+     "home/.fgos/private/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    },
+    "absent": [
+     "home/.fgos/config.json.bak-1"
+    ],
+    "modes": {
+     "home/.fgos/private/config.json.bak-1": 384
+    }
+   }
+  },
+  {
+   "id": "fix-move-under-private-refuses-when-private-holds-another-file-by-that-name",
+   "why": "nothing is lost: the source stays",
+   "input": {
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ],
+     "home/.fgos/private/config.json.bak-1": [
+      "{}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-under-private"
+    ]
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "files": {
+     "home/.fgos/config.json.bak-1": [
+      "{\"accounts\": {\"a\": {\"login\": \"x\"}}}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-is-refused-in-a-confined-session",
+   "why": "spec 9: repairs write machine files, which a confined session may not",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "class": "confined",
+    "fix": [
+     "chmod"
+    ]
+   },
+   "expect": {
+    "code": "config-write-confined"
+   }
+  },
+  {
+   "id": "fix-leaves-an-unknown-id-as-skipped",
+   "why": "an id this build does not know is reported, not applied",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "no-such-fix"
+    ]
+   },
+   "expect": {
+    "applied": []
+   }
+  },
+  {
+   "id": "fix-skips-a-legacy-json-file",
+   "why": "a JSON file has no comments to repair; it is not rewritten",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"limits\": {\"count\": 4}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "refresh-docs",
+     "remove-redundant"
+    ]
+   },
+   "expect": {
+    "applied": []
+   }
+  }
+ ]
+}
