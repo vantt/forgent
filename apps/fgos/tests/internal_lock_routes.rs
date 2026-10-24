@@ -9,6 +9,7 @@
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::os::unix::process::CommandExt;
 use std::time::Duration;
 
 use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Release, Resource, Wait};
@@ -193,7 +194,11 @@ fn protocol_and_usage_errors_fail_closed() {
 fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     let _serial = serial();
     let dir = temp_dir("quiesce");
-    let mut sleeper = Command::new("sleep").arg("30").current_dir(&dir).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+    // A cwd in the workspace counts only for a process that could be fgOS (the
+    // scan reads argv[0]'s basename): a shell named `fgos` that does not exec away.
+    let mut sleeper = Command::new("bash").arg0("fgos").args(["-c", "sleep 30; :"]).current_dir(&dir).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+    // The argv the scan reads is the exec'd one, so let the child finish its exec first.
+    std::thread::sleep(Duration::from_millis(50));
     let root = dir.to_string_lossy().into_owned();
     let out = route(&["quiesce-scan", "--protocol", "1", "--root", &root]);
     assert_eq!(out.status.code(), Some(10));
