@@ -370,7 +370,7 @@
       }
     },
     {
-      "name": "usage-limit-on-an-idle-screen-is-needs-human",
+      "name": "usage-limit-on-an-idle-screen-is-blocked-usage-limit",
       "step": "detect-completed",
       "script": {
         "frames": [
@@ -384,7 +384,8 @@
         ]
       },
       "expect": {
-        "outcome": "needs-human"
+        "outcome": "blocked",
+        "reason": "usage-limit"
       }
     },
     {

@@ -465,6 +465,61 @@ fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits()
     fs::remove_dir_all(dir).unwrap();
 }
 
+/// Runs one outbox read on its own thread and reports whether it finished within
+/// `limit`; a read stuck on a FIFO is released afterwards by opening the FIFO's
+/// writer side, so a red run fails fast and leaves no blocked thread behind.
+#[cfg(unix)]
+fn outbox_read_finishes_within<T: Send + 'static>(
+    fifo: &Path,
+    limit: std::time::Duration,
+    read: impl FnOnce() -> T + Send + 'static,
+) -> Option<T> {
+    let (done, finished) = std::sync::mpsc::channel();
+    let reader = std::thread::spawn(move || {
+        let _ = done.send(read());
+    });
+    let answer = finished.recv_timeout(limit).ok();
+    if answer.is_none() {
+        drop(fs::OpenOptions::new().write(true).open(fifo));
+    }
+    let _ = reader.join();
+    answer
+}
+
+#[cfg(unix)]
+#[test]
+fn a_fifo_named_like_a_result_is_never_read_and_both_outbox_reads_return_none_promptly() {
+    let dir = scratch_dir("fifo-result");
+    let fifo = dir.join("result-1.json");
+    let made = std::process::Command::new("mkfifo").arg(&fifo).status().unwrap();
+    assert!(made.success(), "mkfifo failed");
+    let limit = std::time::Duration::from_secs(2);
+
+    let complete_dir = dir.clone();
+    let complete = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(complete_dir).newest_complete());
+    let unreadable_dir = dir.clone();
+    let unreadable = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(unreadable_dir).newest_unreadable());
+    assert_eq!(
+        (complete, unreadable.map(|found| found.is_some())),
+        (Some(None), Some(false)),
+        "(newest_complete, newest_unreadable found) on a FIFO result; None = still blocked after 2 s"
+    );
+    fs::remove_dir_all(dir).unwrap();
+}
+
+/// Larger than any result claim an agent writes; the outbox's result size cap
+/// (`MAX_RESULT_BYTES` once defined) sits below it.
+const OVERSIZED_RESULT_BYTES: usize = 16 * 1024 * 1024 + 1;
+
+#[test]
+fn an_oversized_result_file_is_not_taken_as_complete() {
+    let dir = scratch_dir("oversized-result");
+    let padding = "a".repeat(OVERSIZED_RESULT_BYTES);
+    fs::write(dir.join("result-1.json"), format!("{{\"status\":\"done\",\"pad\":\"{padding}\"}}")).unwrap();
+    assert_eq!(FsOutbox::new(&dir).newest_complete(), None, "an oversized result was read whole and accepted");
+    fs::remove_dir_all(dir).unwrap();
+}
+
 /// A pane whose attempt starts ending at the first pause after the brief went in:
 /// from then on every call is refused, as the supervisor's pane access does.
 struct EndingPane {
