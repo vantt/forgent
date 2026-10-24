@@ -1,0 +1,9 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py",
+  "exit": 1,
+  "stage": "composition recipe materialization, after gloss preparation and audit",
+  "error": "FileNotFoundError: /tmp/fgos-work/w12-gloss/rework.py; cleanup also found the root absent",
+  "cause": "The temporary workspace helper removed an empty scratch root owned by its caller.",
+  "correction": "Remove the parent only when this invocation created it; preserve caller-owned roots. Preparation now reads the committed input packet/witnesses for repeatability after partial preparation.",
+  "claimLimit": "This attempt did not run the composition or G9 acceptance checks; later command artifacts record actual successful runs."
+}

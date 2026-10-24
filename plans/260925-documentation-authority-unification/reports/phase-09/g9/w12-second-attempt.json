@@ -1,0 +1,10 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/g9/w12-gloss-polish.py",
+  "exit": 1,
+  "stage": "before-F citation negative control",
+  "error": "Expected 130 findings, scanner reported 131, including runner/subcomponents/h-02842f76ffd2/spec.md:45 ADR0072 with no gloss.",
+  "cause": "The first flattening of witness 94 removed parentheses immediately after the id, breaking the scanner's self-contained citation format.",
+  "correction": "Remove the outer parentheses instead; keep D-ADR0072 (gloss) intact. Neither the expected count nor scanner/baseline was changed.",
+  "scratchRemoved": true,
+  "claimLimit": "This failed attempt was not an acceptance run; subsequent artifacts record actual checks."
+}

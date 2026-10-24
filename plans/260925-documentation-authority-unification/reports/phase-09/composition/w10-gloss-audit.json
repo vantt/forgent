@@ -1,5 +1,5 @@
 {
-  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
   "witnessesRead": [
     0,
     1,
@@ -118,7 +118,10 @@
       "originalLocalLabels": [
         "2"
       ],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
@@ -132,7 +135,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -142,11 +148,14 @@
       "file": "docs/platform/agent-mailbox/spec.md",
       "line": 692,
       "before": "| 2026-10-20 | Independent architecture panel: five claims of the draft did not stand (an unlocked rename called a transaction; `delivered` called \"in context\"; a cycle proof by pair counts; a shell guard as a cost model; unauthenticated identity granting human exemptions). Applied here: snapshot record under a mutex, `offered`, attempt token plus generation, emit-then-conditional-finish, depth proof struck, lifetime cap, native hook selector, empty-composer predicate in agent-protocol (since moved to section 15.8), body escaping, refusal counters bounded, interactive-session scope. The workflow ended `failed` before its final report was closed, so this is a read of its summary, not a finished verdict | panel, applied by the controller | applied; two forks left open (section 16, D2 and record layout); `plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md` |",
-      "after": "| 2026-10-20 | Independent architecture panel: five claims of the draft did not stand (an unlocked rename called a transaction; `delivered` called \"in context\"; a cycle proof by pair counts; a shell guard as a cost model; unauthenticated identity granting human exemptions). Applied here: snapshot record under a mutex, `offered`, attempt token plus generation, emit-then-conditional-finish, depth proof struck, lifetime cap, native hook selector, empty-composer predicate in agent-protocol (since moved to section 15.8), body escaping, refusal counters bounded, interactive-session scope. The workflow ended `failed` before its final report was closed, so this is a read of its summary, not a finished verdict | panel, applied by the controller | applied; two forks left open (section 16, the Stop-drain decision: only wake-enabled mail starts an idle turn and record layout); `plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md` |",
+      "after": "| 2026-10-20 | Independent architecture panel: five claims of the draft did not stand (an unlocked rename called a transaction; `delivered` called \"in context\"; a cycle proof by pair counts; a shell guard as a cost model; unauthenticated identity granting human exemptions). Applied here: snapshot record under a mutex, `offered`, attempt token plus generation, emit-then-conditional-finish, depth proof struck, lifetime cap, native hook selector, empty-composer predicate in agent-protocol (since moved to section 15.8), body escaping, refusal counters bounded, interactive-session scope. The workflow ended `failed` before its final report was closed, so this is a read of its summary, not a finished verdict | panel, applied by the controller | applied; two forks left open (section 16: the Stop-drain decision and the record layout; Stop-drain permits only wake-enabled mail to start an idle turn); `plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md` |",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -160,7 +169,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -176,7 +188,10 @@
       "originalLocalLabels": [
         "4"
       ],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
@@ -190,7 +205,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -204,7 +222,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -218,7 +239,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -232,7 +256,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -246,7 +273,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -260,7 +290,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -273,9 +306,16 @@
       "after": "15. Decision placeholder rewritten to supersede L3 clauses 1 and 4 and D-ADR0003 (bố cục dữ liệu events.jsonl tracked) explicitly (section 26).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "15"
+      ],
+      "retainedListLabels": [
+        "15"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -288,7 +328,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -301,9 +344,16 @@
       "after": "3. **Unchanged.** No protocol step, lock row, lock rank or decision of D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy) changes. The dissent \"Git component as a precondition\" is answered in placement only: publication runs through the Git port, and the Event Store cutover follows the order of Git spec section 12.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "3"
+      ],
+      "retainedListLabels": [
+        "3"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -316,7 +366,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -330,7 +383,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -343,9 +399,14 @@
       "after": "- Section 5 names `project:<name>` consumer streams (in the plan, porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -358,7 +419,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -372,7 +436,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -386,7 +453,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -400,7 +470,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -414,7 +487,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -428,7 +504,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -442,7 +521,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -456,7 +538,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -470,7 +555,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -484,7 +572,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -498,7 +589,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -512,7 +606,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -526,7 +623,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -540,7 +640,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -554,7 +657,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -568,7 +674,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -582,7 +691,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -596,7 +708,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -606,12 +721,21 @@
       "file": "docs/platform/git/spec.md",
       "line": 1075,
       "before": "  - **D1 (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
-      "after": "  - **the red-tests-first order (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "after": "  - **(1) Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "1"
+      ],
+      "retainedListLabels": [
+        "1"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        36
+      ],
+      "labelReview": "vertical local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -620,12 +744,24 @@
       "file": "docs/platform/git/spec.md",
       "line": 1076,
       "before": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
-      "after": "  - **the CAS-only sequence counter, the scp remote form (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "after": "  - **(2), (3) Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "2",
+        "3"
+      ],
+      "retainedListLabels": [
+        "2",
+        "3"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        35,
+        37
+      ],
+      "labelReview": "vertical local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -634,12 +770,26 @@
       "file": "docs/platform/git/spec.md",
       "line": 1077,
       "before": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
-      "after": "  - **The worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **(5), (6) Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "retainedListLabels": [
+        "4",
+        "5",
+        "6"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        36,
+        38
+      ],
+      "labelReview": "vertical local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -648,12 +798,24 @@
       "file": "docs/platform/git/spec.md",
       "line": 1078,
       "before": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
-      "after": "  - **The WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **(8) Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "7",
+        "8"
+      ],
+      "retainedListLabels": [
+        "7",
+        "8"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        37,
+        39
+      ],
+      "labelReview": "vertical local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -662,12 +824,21 @@
       "file": "docs/platform/git/spec.md",
       "line": 1079,
       "before": "  - **D9 (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
-      "after": "  - **the deferred repository-handle cache (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "after": "  - **(9) Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [
+        "9"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        38
+      ],
+      "labelReview": "vertical local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -680,7 +851,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -694,7 +868,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -708,7 +885,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -722,7 +902,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -736,7 +919,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -750,7 +936,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -764,7 +953,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -774,11 +966,14 @@
       "file": "docs/platform/git/spec.md",
       "line": 1209,
       "before": "| G-118 | Retire event-file mechanism under D-ADR0055; §4/16 publication replaces it | V-EVENT/V-PARITY | Checkpoint là một giao dịch add, commit, reset-khi-lỗi chạy trong một writer: `heldMainCheckoutWriter` chạy dưới lần giữ có sẵn của người gọi chỉ đặt env holder pid; `acquiringMainCheckoutWriter` lấy mutex chỉ trong giao dịch (releaseOnExit, không tự-nhận-diện), bỏ qua khi đang bị giữ, nhả ngay sau; rollback staging một phần. |",
-      "after": "| G-118 | Retire event-file mechanism under D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); §4/16 publication replaces it | V-EVENT/V-PARITY | Checkpoint là một giao dịch add, commit, reset-khi-lỗi chạy trong một writer: `heldMainCheckoutWriter` chạy dưới lần giữ có sẵn của người gọi chỉ đặt env holder pid; `acquiringMainCheckoutWriter` lấy mutex chỉ trong giao dịch (releaseOnExit, không tự-nhận-diện), bỏ qua khi đang bị giữ, nhả ngay sau; rollback staging một phần. |",
+      "after": "| G-118 | Retire event-file mechanism under D-ADR0055 (event log as sealed changesets on per-machine refs); §4/16 publication replaces it | V-EVENT/V-PARITY | Checkpoint là một giao dịch add, commit, reset-khi-lỗi chạy trong một writer: `heldMainCheckoutWriter` chạy dưới lần giữ có sẵn của người gọi chỉ đặt env holder pid; `acquiringMainCheckoutWriter` lấy mutex chỉ trong giao dịch (releaseOnExit, không tự-nhận-diện), bỏ qua khi đang bị giữ, nhả ngay sau; rollback staging một phần. |",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -792,7 +987,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -806,7 +1004,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -816,11 +1017,14 @@
       "file": "docs/platform/git/spec.md",
       "line": 1261,
       "before": "| G-170 | Retire event-file mechanism under D-ADR0055; §4/16 publication replaces it | V-TRUST/V-BORROW/V-ORDER | Trên branch không phải `fgw`, từ chối `.fgos/**/*.jsonl` đã sửa mà số dòng staged ít hơn HEAD; các file `.fgos` khác co lại hợp lệ được; đọc blob bằng buffer 200 MB; blob không đọc được thì từ chối; tính đơn điệu chỉ áp cho dữ liệu có hợp đồng chỉ-thêm thật. |",
-      "after": "| G-170 | Retire event-file mechanism under D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); §4/16 publication replaces it | V-TRUST/V-BORROW/V-ORDER | Trên branch không phải `fgw`, từ chối `.fgos/**/*.jsonl` đã sửa mà số dòng staged ít hơn HEAD; các file `.fgos` khác co lại hợp lệ được; đọc blob bằng buffer 200 MB; blob không đọc được thì từ chối; tính đơn điệu chỉ áp cho dữ liệu có hợp đồng chỉ-thêm thật. |",
+      "after": "| G-170 | Retire event-file mechanism under D-ADR0055 (event log as sealed changesets on per-machine refs); §4/16 publication replaces it | V-TRUST/V-BORROW/V-ORDER | Trên branch không phải `fgw`, từ chối `.fgos/**/*.jsonl` đã sửa mà số dòng staged ít hơn HEAD; các file `.fgos` khác co lại hợp lệ được; đọc blob bằng buffer 200 MB; blob không đọc được thì từ chối; tính đơn điệu chỉ áp cho dữ liệu có hợp đồng chỉ-thêm thật. |",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -834,7 +1038,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -848,7 +1055,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -862,7 +1072,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -876,7 +1089,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -890,7 +1106,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -904,7 +1123,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -918,7 +1140,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -932,7 +1157,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -942,11 +1170,14 @@
       "file": "docs/platform/holder-lock/spec.md",
       "line": 161,
       "before": "The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055; implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.",
-      "after": "The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.",
+      "after": "The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -960,7 +1191,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -970,7 +1204,7 @@
       "file": "docs/platform/holder-lock/spec.md",
       "line": 420,
       "before": "- **2026-10-16 — Lead tự quyết (plan 4.2).** D1: spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. D2: registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. D3: primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. D4: `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. D5: route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. D6: account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. D7: bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). D8: luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
-      "after": "- **2026-10-16 — Lead tự quyết (plan 4.2).** Mục 1: Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. Mục 2: Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. Mục 3: Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. Mục 4: `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. Mục 5: Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. Mục 6: Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. Mục 7: Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). Mục 8: Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.2).** (1) Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. (2) Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. (3) Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. (4) `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. (5) Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. (6) Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. (7) Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). (8) Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [
@@ -983,8 +1217,20 @@
         "7",
         "8"
       ],
+      "retainedListLabels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
       "lostListLabels": [],
-      "labelReview": "ordered local list restored as Mục n",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "inline local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -993,7 +1239,7 @@
       "file": "docs/platform/holder-lock/spec.md",
       "line": 425,
       "before": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** D1: cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. D4: hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. D5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. D6: hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. D7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. D8: `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
-      "after": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** Mục 1: Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. Mục 4: Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. Mục 5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. Mục 6: Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. Mục 7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. Mục 8: `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** (1) Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. (4) Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. (5) `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. (6) Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. (7) `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. (8) `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [
@@ -1004,8 +1250,18 @@
         "7",
         "8"
       ],
+      "retainedListLabels": [
+        "1",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
       "lostListLabels": [],
-      "labelReview": "ordered local list restored as Mục n",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "inline local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1018,7 +1274,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1028,7 +1287,7 @@
       "file": "docs/platform/holder-lock/spec.md",
       "line": 428,
       "before": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. D1: ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. D2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. D3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. D4: ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). D5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. D6: giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
-      "after": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. Mục 1: Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. Mục 2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Mục 3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. Mục 4: Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Mục 5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. Mục 6: Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. (1) Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. (2) `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. (3) Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. (4) Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). (5) Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. (6) Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [
@@ -1039,8 +1298,18 @@
         "5",
         "6"
       ],
+      "retainedListLabels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
       "lostListLabels": [],
-      "labelReview": "ordered local list restored as Mục n",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "inline local list; all labels required",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1049,11 +1318,14 @@
       "file": "docs/platform/holder-lock/spec.md",
       "line": 430,
       "before": "- **2026-10-17 — Quyết định của anh (Git G0 Q6): `worktree-admin` bọc add, remove, move, prune.** Bài học G-042 và G-155 của component Git đòi kiểm bẩn tới lúc huỷ nằm dưới một quyền sở hữu; D8 chỉ bọc `git worktree add` nên remove/relocate/prune là khe hở có tên. Mở rộng tập bọc của chính lock hạng 40, không thêm lock admin thứ hai, không đổi rank, đường dẫn hay hàng registry. Cài đặt đi cùng component Git. Spec: mục 16; [Git spec](../git/spec.md) §5, §18.",
-      "after": "- **2026-10-17 — Quyết định của anh (Git G0 Q6): `worktree-admin` bọc add, remove, move, prune.** Bài học G-042 và G-155 của component Git đòi kiểm bẩn tới lúc huỷ nằm dưới một quyền sở hữu; the declared repo-lease and worktree-admin scope decision chỉ bọc `git worktree add` nên remove/relocate/prune là khe hở có tên. Mở rộng tập bọc của chính lock hạng 40, không thêm lock admin thứ hai, không đổi rank, đường dẫn hay hàng registry. Cài đặt đi cùng component Git. Spec: mục 16; [Git spec](../git/spec.md) §5, §18.",
+      "after": "- **2026-10-17 — Quyết định của anh (Git G0 Q6): `worktree-admin` bọc add, remove, move, prune.** Bài học G-042 và G-155 của thành phần Git đòi việc kiểm tra cây làm việc bẩn kéo dài tới lúc huỷ phải nằm dưới một quyền sở hữu; ý (8) của đoạn main-door chỉ bọc `git worktree add` nên các thao tác xoá, di chuyển và dọn dẹp là những khe hở đã được chỉ ra. Mở rộng tập bọc của chính lock hạng 40, không thêm lock admin thứ hai, không đổi rank, đường dẫn hay hàng registry. Cài đặt đi cùng component Git. Spec: mục 16; [Git spec](../git/spec.md) §5, §18.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1072,7 +1344,10 @@
         }
       ],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [
         "False positive from replacing two distinct adjacent inline code spans with CODE; original text has no doubled word."
@@ -1088,7 +1363,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1102,7 +1380,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1116,7 +1397,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1130,7 +1414,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1144,7 +1431,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1158,7 +1448,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1172,7 +1465,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1186,7 +1482,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1200,7 +1499,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1214,7 +1516,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1228,7 +1533,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1242,7 +1550,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1256,7 +1567,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1270,7 +1584,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1284,7 +1601,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1298,7 +1618,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1312,7 +1635,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1326,7 +1652,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1340,7 +1669,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1354,7 +1686,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1368,7 +1703,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1384,7 +1722,10 @@
       "originalLocalLabels": [
         "4"
       ],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
@@ -1400,7 +1741,10 @@
       "originalLocalLabels": [
         "6"
       ],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
@@ -1413,9 +1757,14 @@
       "after": "- **2026-10-18 — `dispatch.gateKillGraceMs`, mặc định 10000, tối thiểu 1000.** Doctor `gate-kill-grace`; setup không ghi khoá vào config global.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1428,7 +1777,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1442,7 +1794,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1456,7 +1811,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1466,11 +1824,14 @@
       "file": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
       "line": 45,
       "before": "Workflow/Unit và operation phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp với `capabilities.<cap>.rigor`; nó chỉ quyết số checker của một unit `reviewed` và mức độc lập giữa các ghế, **không** quyết tier và không đặt mức effort. Tier của một ghế agent được khai trực tiếp trong config và giải theo thứ tự ưu tiên của [Seat Binding](../../../seat-binding/spec.md) mục 6.3; model chọn tại `runner.modelPolicies[family][tier]`. Việc chọn tier, model, effort, thứ tự executor, thứ tự account và bước fallback cho ghế agent do Seat Binding làm authority (D-ADR0072); `bind()` trong Execution Core là facade mỏng của nó. Trần `runner.maxTier` hạ tier một cách hiển thị (`max-tier-cap`); `--tier` và các cửa chọn khác nâng tier bị từ chối theo mục 5.5 của spec đó.",
-      "after": "Workflow/Unit và operation phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp với `capabilities.<cap>.rigor`; nó chỉ quyết số checker của một unit `reviewed` và mức độc lập giữa các ghế, **không** quyết tier và không đặt mức effort. Tier của một ghế agent được khai trực tiếp trong config và giải theo thứ tự ưu tiên của [Seat Binding](../../../seat-binding/spec.md) mục 6.3; model chọn tại `runner.modelPolicies[family][tier]`. Việc chọn tier, model, effort, thứ tự executor, thứ tự account và bước fallback cho ghế agent do Seat Binding làm authority (D-ADR0072 (Seat Binding owns executor, model, effort, tier and account choice)); `bind()` trong Execution Core là facade mỏng của nó. Trần `runner.maxTier` hạ tier một cách hiển thị (`max-tier-cap`); `--tier` và các cửa chọn khác nâng tier bị từ chối theo mục 5.5 của spec đó.",
+      "after": "Workflow/Unit và operation phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp với `capabilities.<cap>.rigor`; nó chỉ quyết số checker của một unit `reviewed` và mức độc lập giữa các ghế, **không** quyết tier và không đặt mức effort. Tier của một ghế agent được khai trực tiếp trong config và giải theo thứ tự ưu tiên của [Seat Binding](../../../seat-binding/spec.md) mục 6.3; model chọn tại `runner.modelPolicies[family][tier]`. Việc chọn tier, model, effort, thứ tự executor, thứ tự account và bước fallback cho ghế agent do Seat Binding làm authority — D-ADR0072 (Seat Binding quyết định executor, model, effort, tier và account); `bind()` trong Execution Core là facade mỏng của nó. Trần `runner.maxTier` hạ tier một cách hiển thị (`max-tier-cap`); `--tier` và các cửa chọn khác nâng tier bị từ chối theo mục 5.5 của spec đó.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1484,7 +1845,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1498,7 +1862,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1517,7 +1884,10 @@
         }
       ],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [
         "Vietnamese song song means concurrently; valid reduplication already present in the before-line, not a removal-induced doubled word."
@@ -1533,7 +1903,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1547,7 +1920,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1560,9 +1936,16 @@
       "after": "3. Addon namespace and the `src/util/yaml.mjs` re-point; js-yaml and its hash test deleted; RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) supersession recorded (RUL108 (every YAML parse goes through the native door)); the Node test becomes one wiring proof. Done 2026-10-23.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "3"
+      ],
+      "retainedListLabels": [
+        "3"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1574,9 +1957,16 @@
       "after": "3. **What contract does it touch?** The `parseYaml` facade signature (kept), the addon ABI marker (extended), RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) (superseded).",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "3"
+      ],
+      "retainedListLabels": [
+        "3"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1588,9 +1978,16 @@
       "after": "6. **What learning is left?** The parser choice and its evidence in the upgrade record; the RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) supersession in `distribution.md`.",
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
-      "originalLocalLabels": [],
+      "originalLocalLabels": [
+        "6"
+      ],
+      "retainedListLabels": [
+        "6"
+      ],
       "lostListLabels": [],
-      "labelReview": "no local list",
+      "verticalList": false,
+      "adjacentListWitnesses": [],
+      "labelReview": "single citation prefix is not an ordered list",
       "matchReviews": [],
       "status": "pass"
     },
@@ -1603,7 +2000,10 @@
       "lowercaseAfterFullStop": [],
       "doubledWords": [],
       "originalLocalLabels": [],
+      "retainedListLabels": [],
       "lostListLabels": [],
+      "verticalList": false,
+      "adjacentListWitnesses": [],
       "labelReview": "no local list",
       "matchReviews": [],
       "status": "pass"
@@ -1612,79 +2012,120 @@
   "rules": {
     "sentenceStarts": "Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations",
     "doubledWords": "case-insensitive adjacent Unicode words",
-    "listLabels": "multi-label D1:…D8: lists retain each original number as Mục n:"
+    "listLabels": "Inline multi-label lists and adjacent numbered/lettered vertical items retain every original label (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels."
   },
   "fixes": [
     {
-      "index": 0,
+      "index": 2,
       "path": "docs/platform/agent-mailbox/spec.md",
-      "line": 653,
-      "before": "10. **what does a Stop drain?** Answered 2026-10-20 (the owner asked for advice and the controller decided, with reasons): only `wake:true` messages. `wake` is the sender's permission to start a turn on an idle recipient, so letting a `wake:false` message start one at Stop would empty the flag of meaning and let ordinary mail make an agent work while nobody asked; it keeps a person as the brake. The cost: an idle agent sees a `wake:false` message late, at its next tool call or next prompt, and the delivery report says so; a sender who needs it read now sets `wake`. The panel recommended the other option (drain everything at Stop, bounded) for an honest delivery report; the delivery report here is just worded to say what really happens.",
-      "after": "10. **What does a Stop drain?** Answered 2026-10-20 (the owner asked for advice and the controller decided, with reasons): only `wake:true` messages. `wake` is the sender's permission to start a turn on an idle recipient, so letting a `wake:false` message start one at Stop would empty the flag of meaning and let ordinary mail make an agent work while nobody asked; it keeps a person as the brake. The cost: an idle agent sees a `wake:false` message late, at its next tool call or next prompt, and the delivery report says so; a sender who needs it read now sets `wake`. The panel recommended the other option (drain everything at Stop, bounded) for an honest delivery report; the delivery report here is just worded to say what really happens.",
-      "labelMap": {}
+      "line": 692,
+      "before": "| 2026-10-20 | Independent architecture panel: five claims of the draft did not stand (an unlocked rename called a transaction; `delivered` called \"in context\"; a cycle proof by pair counts; a shell guard as a cost model; unauthenticated identity granting human exemptions). Applied here: snapshot record under a mutex, `offered`, attempt token plus generation, emit-then-conditional-finish, depth proof struck, lifetime cap, native hook selector, empty-composer predicate in agent-protocol (since moved to section 15.8), body escaping, refusal counters bounded, interactive-session scope. The workflow ended `failed` before its final report was closed, so this is a read of its summary, not a finished verdict | panel, applied by the controller | applied; two forks left open (section 16, the Stop-drain decision: only wake-enabled mail starts an idle turn and record layout); `plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md` |",
+      "after": "| 2026-10-20 | Independent architecture panel: five claims of the draft did not stand (an unlocked rename called a transaction; `delivered` called \"in context\"; a cycle proof by pair counts; a shell guard as a cost model; unauthenticated identity granting human exemptions). Applied here: snapshot record under a mutex, `offered`, attempt token plus generation, emit-then-conditional-finish, depth proof struck, lifetime cap, native hook selector, empty-composer predicate in agent-protocol (since moved to section 15.8), body escaping, refusal counters bounded, interactive-session scope. The workflow ended `failed` before its final report was closed, so this is a read of its summary, not a finished verdict | panel, applied by the controller | applied; two forks left open (section 16: the Stop-drain decision and the record layout; Stop-drain permits only wake-enabled mail to start an idle turn); `plans/reports/research-261020-1327-mailbox-spec-architecture-panel.md` |"
+    },
+    {
+      "index": 35,
+      "path": "docs/platform/git/spec.md",
+      "line": 1075,
+      "before": "  - **the red-tests-first order (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "after": "  - **(1) Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read)."
+    },
+    {
+      "index": 36,
+      "path": "docs/platform/git/spec.md",
+      "line": 1076,
+      "before": "  - **the CAS-only sequence counter, the scp remote form (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "after": "  - **(2), (3) Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease."
     },
     {
       "index": 37,
       "path": "docs/platform/git/spec.md",
       "line": 1077,
-      "before": "  - **the worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **the test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
-      "after": "  - **The worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
-      "labelMap": {}
+      "before": "  - **The worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar."
+    },
+    {
+      "index": 37,
+      "path": "docs/platform/git/spec.md",
+      "line": 1077,
+      "before": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **(4) Worktree-add fsync count** went to the owner as a question and is not part of this entry. **(5), (6) Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar."
     },
     {
       "index": 38,
       "path": "docs/platform/git/spec.md",
       "line": 1078,
-      "before": "  - **the WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **the census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
-      "after": "  - **The WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
-      "labelMap": {}
+      "before": "  - **The WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields)."
+    },
+    {
+      "index": 38,
+      "path": "docs/platform/git/spec.md",
+      "line": 1078,
+      "before": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **(7) WAL digest**: kept by evidence, no byte-equality run (§10). **(8) Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields)."
+    },
+    {
+      "index": 39,
+      "path": "docs/platform/git/spec.md",
+      "line": 1079,
+      "before": "  - **the deferred repository-handle cache (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "after": "  - **(9) Parked**: a per-process repository handle cache, `PATH` out of the floor key."
+    },
+    {
+      "index": 47,
+      "path": "docs/platform/git/spec.md",
+      "line": 1209,
+      "before": "| G-118 | Retire event-file mechanism under D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); §4/16 publication replaces it | V-EVENT/V-PARITY | Checkpoint là một giao dịch add, commit, reset-khi-lỗi chạy trong một writer: `heldMainCheckoutWriter` chạy dưới lần giữ có sẵn của người gọi chỉ đặt env holder pid; `acquiringMainCheckoutWriter` lấy mutex chỉ trong giao dịch (releaseOnExit, không tự-nhận-diện), bỏ qua khi đang bị giữ, nhả ngay sau; rollback staging một phần. |",
+      "after": "| G-118 | Retire event-file mechanism under D-ADR0055 (event log as sealed changesets on per-machine refs); §4/16 publication replaces it | V-EVENT/V-PARITY | Checkpoint là một giao dịch add, commit, reset-khi-lỗi chạy trong một writer: `heldMainCheckoutWriter` chạy dưới lần giữ có sẵn của người gọi chỉ đặt env holder pid; `acquiringMainCheckoutWriter` lấy mutex chỉ trong giao dịch (releaseOnExit, không tự-nhận-diện), bỏ qua khi đang bị giữ, nhả ngay sau; rollback staging một phần. |"
+    },
+    {
+      "index": 50,
+      "path": "docs/platform/git/spec.md",
+      "line": 1261,
+      "before": "| G-170 | Retire event-file mechanism under D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); §4/16 publication replaces it | V-TRUST/V-BORROW/V-ORDER | Trên branch không phải `fgw`, từ chối `.fgos/**/*.jsonl` đã sửa mà số dòng staged ít hơn HEAD; các file `.fgos` khác co lại hợp lệ được; đọc blob bằng buffer 200 MB; blob không đọc được thì từ chối; tính đơn điệu chỉ áp cho dữ liệu có hợp đồng chỉ-thêm thật. |",
+      "after": "| G-170 | Retire event-file mechanism under D-ADR0055 (event log as sealed changesets on per-machine refs); §4/16 publication replaces it | V-TRUST/V-BORROW/V-ORDER | Trên branch không phải `fgw`, từ chối `.fgos/**/*.jsonl` đã sửa mà số dòng staged ít hơn HEAD; các file `.fgos` khác co lại hợp lệ được; đọc blob bằng buffer 200 MB; blob không đọc được thì từ chối; tính đơn điệu chỉ áp cho dữ liệu có hợp đồng chỉ-thêm thật. |"
+    },
+    {
+      "index": 59,
+      "path": "docs/platform/holder-lock/spec.md",
+      "line": 161,
+      "before": "The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.",
+      "after": "The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates."
     },
     {
       "index": 61,
       "path": "docs/platform/holder-lock/spec.md",
       "line": 420,
-      "before": "- **2026-10-16 — Lead tự quyết (plan 4.2).** spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
-      "after": "- **2026-10-16 — Lead tự quyết (plan 4.2).** Mục 1: Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. Mục 2: Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. Mục 3: Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. Mục 4: `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. Mục 5: Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. Mục 6: Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. Mục 7: Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). Mục 8: Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
-      "labelMap": {
-        "D1:": "Mục 1:",
-        "D2:": "Mục 2:",
-        "D3:": "Mục 3:",
-        "D4:": "Mục 4:",
-        "D5:": "Mục 5:",
-        "D6:": "Mục 6:",
-        "D7:": "Mục 7:",
-        "D8:": "Mục 8:"
-      }
+      "before": "- **2026-10-16 — Lead tự quyết (plan 4.2).** Mục 1: Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. Mục 2: Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. Mục 3: Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. Mục 4: `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. Mục 5: Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. Mục 6: Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. Mục 7: Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). Mục 8: Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.2).** (1) Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. (2) Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. (3) Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. (4) `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. (5) Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. (6) Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. (7) Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). (8) Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con."
     },
     {
       "index": 62,
       "path": "docs/platform/holder-lock/spec.md",
       "line": 425,
-      "before": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
-      "after": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** Mục 1: Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. Mục 4: Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. Mục 5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. Mục 6: Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. Mục 7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. Mục 8: `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
-      "labelMap": {
-        "D1:": "Mục 1:",
-        "D4:": "Mục 4:",
-        "D5:": "Mục 5:",
-        "D6:": "Mục 6:",
-        "D7:": "Mục 7:",
-        "D8:": "Mục 8:"
-      }
+      "before": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** Mục 1: Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. Mục 4: Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. Mục 5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. Mục 6: Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. Mục 7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. Mục 8: `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** (1) Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. (4) Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. (5) `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. (6) Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. (7) `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. (8) `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`."
     },
     {
       "index": 64,
       "path": "docs/platform/holder-lock/spec.md",
       "line": 428,
-      "before": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
-      "after": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. Mục 1: Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. Mục 2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Mục 3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. Mục 4: Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Mục 5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. Mục 6: Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
-      "labelMap": {
-        "D1:": "Mục 1:",
-        "D2:": "Mục 2:",
-        "D3:": "Mục 3:",
-        "D4:": "Mục 4:",
-        "D5:": "Mục 5:",
-        "D6:": "Mục 6:"
-      }
+      "before": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. Mục 1: Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. Mục 2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Mục 3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. Mục 4: Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Mục 5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. Mục 6: Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. (1) Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. (2) `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. (3) Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. (4) Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). (5) Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. (6) Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md)."
+    },
+    {
+      "index": 65,
+      "path": "docs/platform/holder-lock/spec.md",
+      "line": 430,
+      "before": "- **2026-10-17 — Quyết định của anh (Git G0 Q6): `worktree-admin` bọc add, remove, move, prune.** Bài học G-042 và G-155 của component Git đòi kiểm bẩn tới lúc huỷ nằm dưới một quyền sở hữu; the declared repo-lease and worktree-admin scope decision chỉ bọc `git worktree add` nên remove/relocate/prune là khe hở có tên. Mở rộng tập bọc của chính lock hạng 40, không thêm lock admin thứ hai, không đổi rank, đường dẫn hay hàng registry. Cài đặt đi cùng component Git. Spec: mục 16; [Git spec](../git/spec.md) §5, §18.",
+      "after": "- **2026-10-17 — Quyết định của anh (Git G0 Q6): `worktree-admin` bọc add, remove, move, prune.** Bài học G-042 và G-155 của thành phần Git đòi việc kiểm tra cây làm việc bẩn kéo dài tới lúc huỷ phải nằm dưới một quyền sở hữu; ý (8) của đoạn main-door chỉ bọc `git worktree add` nên các thao tác xoá, di chuyển và dọn dẹp là những khe hở đã được chỉ ra. Mở rộng tập bọc của chính lock hạng 40, không thêm lock admin thứ hai, không đổi rank, đường dẫn hay hàng registry. Cài đặt đi cùng component Git. Spec: mục 16; [Git spec](../git/spec.md) §5, §18."
+    },
+    {
+      "index": 94,
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "line": 45,
+      "before": "Workflow/Unit và operation phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp với `capabilities.<cap>.rigor`; nó chỉ quyết số checker của một unit `reviewed` và mức độc lập giữa các ghế, **không** quyết tier và không đặt mức effort. Tier của một ghế agent được khai trực tiếp trong config và giải theo thứ tự ưu tiên của [Seat Binding](../../../seat-binding/spec.md) mục 6.3; model chọn tại `runner.modelPolicies[family][tier]`. Việc chọn tier, model, effort, thứ tự executor, thứ tự account và bước fallback cho ghế agent do Seat Binding làm authority (D-ADR0072 (Seat Binding owns executor, model, effort, tier and account choice)); `bind()` trong Execution Core là facade mỏng của nó. Trần `runner.maxTier` hạ tier một cách hiển thị (`max-tier-cap`); `--tier` và các cửa chọn khác nâng tier bị từ chối theo mục 5.5 của spec đó.",
+      "after": "Workflow/Unit và operation phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp với `capabilities.<cap>.rigor`; nó chỉ quyết số checker của một unit `reviewed` và mức độc lập giữa các ghế, **không** quyết tier và không đặt mức effort. Tier của một ghế agent được khai trực tiếp trong config và giải theo thứ tự ưu tiên của [Seat Binding](../../../seat-binding/spec.md) mục 6.3; model chọn tại `runner.modelPolicies[family][tier]`. Việc chọn tier, model, effort, thứ tự executor, thứ tự account và bước fallback cho ghế agent do Seat Binding làm authority — D-ADR0072 (Seat Binding quyết định executor, model, effort, tier và account); `bind()` trong Execution Core là facade mỏng của nó. Trần `runner.maxTier` hạ tier một cách hiển thị (`max-tier-cap`); `--tier` và các cửa chọn khác nâng tier bị từ chối theo mục 5.5 của spec đó."
     }
   ],
   "reviewRequired": [],

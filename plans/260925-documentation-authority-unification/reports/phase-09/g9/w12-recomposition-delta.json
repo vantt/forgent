@@ -1,0 +1,31 @@
+{
+  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
+  "changedBodies": [
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "oldAfterSha256": "4ab5e5f2c0412541a7578db6b7683436797f7e943bb964b20f62e35fb2b48e0f",
+      "afterSha256": "19e4186c8ef1843e888563de63e280ab8dffb3715367980395c6bdf004c3759d",
+      "preimageUnchanged": true
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "oldAfterSha256": "3ab8874e1e5aec335444ab1a893afc09df22b0d6a23bd5579ea1ae8861a4897c",
+      "afterSha256": "1217581e7cf00e9db85957f1ebd4747c2a3345a0a8d68515661e1ca207c324be",
+      "preimageUnchanged": true
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "oldAfterSha256": "dc33b1d948941867dd40723bd9087f9f0f6c28278bc75772fff99ac30385e7cb",
+      "afterSha256": "08fd6d8b64a17a384fef0e7a76606335972ad6ed3f283431e24cb235aabb0ac0",
+      "preimageUnchanged": true
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "oldAfterSha256": "0de10bf53ae6557889da063d6aaa845828a987cee81579962aef1554f51c2aac",
+      "afterSha256": "c6f3eb6e0ef208d2721fe88d37bcdca04a574cac50f2133c559b8dd24202c2f1",
+      "preimageUnchanged": true
+    }
+  ],
+  "unchangedBodyDiffs": 541,
+  "totalBodies": 545
+}

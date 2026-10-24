@@ -1,69 +1,56 @@
-# Source-context follow-up receipt
+# Gloss polish and sweep hygiene receipt
 
-Judged source pin: **`d786e305eb20dfdda8d1634b227bd9f8a9328541`**, containing the third import/resync; **not final pin F**. `sweep.py --check --pin HEAD` and `verify.py --pin HEAD` both exit **0** at this pin. This receipt supersedes the previous current-count/completion claims; older artifacts remain historical evidence at their own pins. No semantic approval, authority promotion, parity or gate closure is claimed.
+Replay/check pin: **`8fd37e3590d3654729cf2d177c90bb0fbb17dff9`** (`HEAD` during this run), **not final pin F**. The complete reproduction, `sweep.py --check --pin HEAD` and `verify.py --pin HEAD` exit **0**. This receipt supersedes current completion claims in the previous receipt; W11 artifacts remain historical evidence at their own pins. No authority promotion, semantic acceptance, parity or gate closure is claimed.
 
-## Evidence refresh and counts
+## Bounded repairs
 
-Joined `git diff --name-only d14d89865 HEAD` to **both original and current evidence paths** for all 574 physical records. The sole matching record is `phase-08/step-05-records/citation-ratchet-roots.jsonl:7`, bound to `scripts/check-legacy-docs-ratchet.exceptions.json`; its current digests/locators were rejudged and it remains **owned-park**. The entire 574-row judge/evidence packet was regenerated at the named pin, not merely this row.
+Repaired **14 distinct gloss witnesses** (#2, #35–#39, #47, #50, #59, #61, #62, #64, #65, #94); the four composition gloss specs have regenerated diffs, inverse diffs and expected-after hashes. See [composition receipt](../composition/receipt.md) and [w12-preparation.json](../composition/w12-preparation.json).
 
-The join also accounts explicitly for every changed source path in [w11-delta.json](w11-delta.json). Four changed documentation paths have selected G9 bodies and were recomposed. `docs/platform/seat-binding/spec.md` has **neither a bound passage in these cohorts nor a selected body**; no new record or patch was invented for it. None of the changed documentation paths is evidence for one of the 574 historical rows. This is distinct from their whole-file recomposition guards.
+- Git's local list retains every number 1–9 as `(n)`, including grouped labels, capitals and no duplicated subtitles.
+- Holder-lock uses `(n)` for list items, keeping `mục` for sections. The corrected Vietnamese cross-reference points to **ý (8) của đoạn main-door**, not the unrelated repo-lease decision.
+- The mixed-language sentences, garbled join and nested parentheses are repaired. The flattened citation still uses the scanner's required `ID (gloss)` form.
+- All **104** witness lines are checked against real replayed before/after bytes. The extended existing audit covers vertical numbered/lettered lists as well as inline lists: **102 pass + 2 explained matches**, no unresolved matches. Missing-label controls reject all five git rows and generic numbered/lettered examples.
 
-**684 cohort memberships / 574 physical records**, with revision rows kept distinct:
+## Recomposition and unchanged judgments
 
-| Classification | Records | Passages |
+All **545 bodies** were recomposed at the check pin. Exactly **four body diffs/hashes changed**: agent-mailbox spec, git spec, holder-lock spec and runner subcomponent `h-02842f76ffd2/spec.md`; their preimages are unchanged. The other **541 body diffs/hashes are unchanged**. [w12-recomposition-delta.json](w12-recomposition-delta.json) records the old/new hashes. Fifteen historical chain inputs required the existing exact authored-edit relocation; the resulting packet has no unresolved problems or current preimage drift.
+
+Every body passes whole-file-guarded forward/rollback replay with `patch --batch --fuzz=0 --reject-file=- -p1`. Sweep independently compares each body replay with its current chain replay and ordered predecessor metadata: **zero drift, zero chain mismatches, zero body mismatches, zero judgment errors**. Verify also passes its 545 body roundtrips, evidence joins, four existing negative controls, 10 pure-pin fields and 12 patch-id equivalences.
+
+No judge/ledger changes were needed. Source-judgment records retain their original pin provenance (`d786e305e`); content-bound evidence checks authenticate them at this run's HEAD. Counts remain **684 cohort memberships / 574 physical records**; revisions remain distinct:
+
+| Classification | Records | Evidence passages per row |
 |---|---:|---:|
 | unchanged | 55 | 3,576 |
 | moved | 89 | 13,040 |
 | changed | 352 | 3,583 |
 | absent | 78 | 995 |
+| **Total** | **574** | **21,194** |
 
-Dispositions remain **229 still-valid-as-recorded / 7 needs-recomposition / 338 owned-park**. **No disposition changed.** Parks retain the named Documentation source-binding reviewer / Lead (G9), evidence, and row-specific next actions. The five previously identified dependency parks remain parks, and the seven pending recompositions do not become approvals.
+The **21,194 per-row evidence occurrences** reference **20,621 unique passages** in `passages.json`; they are not the same count. Dispositions remain **229 still-valid-as-recorded / 7 needs-recomposition / 338 owned-park**. The LF-only classification rule and all remaining parks are unchanged.
 
-The mapped-interval rule now ignores **one added/removed final LF only**, not other whitespace or CRLF. Comparing the actual old classifier to the new one at the **same current source pin** proves exactly **274 changed→moved passages in 26 records**. Only `tests-judgment-batch6.jsonl:16` changes its record classification, changed→moved; it was already still-valid. Current passage hashes still include the actual LF. Complete locators/digests and whitespace counterexamples: [w11-newline-proof.json](w11-newline-proof.json).
+## Temporary workspace hygiene
 
-## Recomposition and body authentication
+`recompose.py` no longer creates a directory at import. Its workspace context creates a `tempfile.TemporaryDirectory` lazily under `/tmp/fgos-work/w12-gloss`, removes it on exit, and removes the parent only if it created that parent and it is empty. Caller-owned scratch roots are preserved. `verify.py` now reuses this workspace rather than maintaining another import-time root. Sweep's docstring distinguishes disposable replay writes from persistent output.
 
-The packet contains **545 bodies**: 536 existing paths and nine absence-guarded creations; 46 no-byte-change bodies, 79 generator-evidence-only bodies, 14 final-pin-conditional bodies. **Seven body diffs/hashes changed** relative to the committed pre-follow-up packet:
-
-- `docs/platform/agent-confinement/decisions/confinement-authority-decisions.md`
-- `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`
-- `docs/platform/agent-confinement/spec.md`
-- `docs/reading-map.md`
-- `docs/platform/holder-lock/spec.md`
-- `docs/platform/agent-mailbox/spec.md`
-- `docs/platform/git/spec.md`
-
-The first four have drifted preimages; the last three carry the repaired glosses. The other **538 body diffs/hashes are unchanged**. Composition's confinement base and its credential-store successor were rebound together. The existing explicit reading-map resolution was extended by one authored-hunk mapping: retain import-3's probe-count/private-home facts and apply only the original navigation path substitutions. No fuzzy relocation or restoration of obsolete facts.
-
-Every body replays forward and rollback byte-exact with whole-file guards and `patch --batch --fuzz=0 --reject-file=- -p1`. `sweep.py --check` now additionally **replays each current composition chain and compares its resulting bytes to the recomposed body's replay**, including its expected-after hash. Ordered metadata equality is still checked separately. The existing exact authored-hunk locator/replay is reused, not copied into a new patch engine. `verify.py` invokes this owning check in addition to its own roundtrips.
-
-[w11-stale-body-control.json](w11-stale-body-control.json) proves rejection in a scratch copy: an old event-store body **with current predecessorChain metadata** still self-roundtrips byte-exact, but sweep exits **1**, naming only its body/chain byte mismatch. Judgment errors, source drift and metadata mismatches are zero. The real tree has **zero body mismatches, zero chain mismatches, zero drift, zero judgment errors and zero unresolved recompositions**, exit **0**.
-
-The historical pure-pin check also encountered an actual import-3 report regeneration: `late-areas/legacy-drift.json.head` advanced to `814c06f3dca5bebcc2521fac4ff31d0248b3660d`. `sha-map.json` records that exact committed refresh. Verification checks the current whole-file bytes against `d786e305e`, its parent against the original mapped pin, and all relevant ancestry; it does not accept an arbitrary new ancestor or edit the report. All **10 pin fields / 12 patch-id equivalences** still verify.
+Actual sweep/verify runs started with scratch absent and left it absent. Import-only and normal/exception cleanup controls are recorded in [w12-final-audit.json](w12-final-audit.json); the enclosing reproduction's checks are in [w12-tempfile-proof.json](w12-tempfile-proof.json).
 
 ## Commands and exits
 
-Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9`, `C=../composition` relative to G, and `T=/tmp/fgos-work/w11-g9`. All Python commands use **`python3 -B`**, and every G9 command below passes its pin explicitly.
+Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9`, `C` be its sibling `composition`, and `T=/tmp/fgos-work/w12-gloss`. Every Python invocation uses **`python3 -B`**.
 
-| Command | Final exit / result |
+| Command | Exit / result |
 |---|---|
-| `python3 -B "$G/w11-followup.py"` | **0**; complete reproduction, including the expected failing stale-body control |
-| `python3 -B "$G/recompose.py" --pin HEAD` | **0**; 545 bodies, no problems; **1,515 patch calls, all 0** |
-| `python3 -B "$G/judge.py" --pin HEAD` | **0**; all 574 rows, final 229 / 7 / 338 |
-| `python3 -B "$G/sweep.py" --check --pin HEAD` | **0**; named pin above; **1,016 chain/body patch calls, all 0** |
-| `python3 -B "$G/verify.py" --pin HEAD` | **0**; 545 roundtrips plus chain/body proof; **2,014 patch calls, all 0** |
-| Scratch-copy `sweep.py --check --pin d786e305eb20dfdda8d1634b227bd9f8a9328541` with stale body/current metadata | **1**, expected; only event-store body mismatch |
-| Old/new classifier comparison at the same pin, inside reproduction | **0**; 274 LF-only cases, one record classification change, no disposition changes |
-| `python3 -B "$T/verify.py"` (composition) | **0**; full-chain, witness, citation, shared resolver/action checks |
-| `python3 -B "$T/independent-replay.py"` | **0**; 74 files; 221 patch calls, all 0 |
-| Scratch skill generator / citation scanner, before F and full chain | **0 / 1**, then **0 / 0**; 130 findings→0, baseline unchanged |
-| Read-only Git history, pin/blob/patch-id/ancestry/diff/status inspections | **0**; missing-source `git show` exits **128** are explicit absence evidence |
-| `git diff --check`; final scope/index audit; scratch deletion | **0**; see `w11-final-audit.json` |
+| `python3 -B "$G/w12-gloss-polish.py"` | **0**, complete reproduction; scratch removed |
+| `python3 -B "$G/recompose.py" --pin HEAD` | **0**, 545 bodies; 1,515 patch calls, all 0 |
+| `python3 -B "$G/sweep.py" --check --pin HEAD` | **0**, 1,016 chain/body patch calls, all 0 |
+| `python3 -B "$G/verify.py" --pin HEAD` | **0**, 2,014 patch calls, all 0 |
+| Reused `python3 -B "$T/verify.py"` (composition) | **0**, complete chain, witnesses, citation and binding/action checks |
+| Reused `python3 -B "$T/independent-replay.py"` | **0**, 74 files; 221 patch calls, all 0 |
+| Scratch skill generator; citation scan, before F / full chain | **0; 1 / 0**, intentional 130 findings → zero |
+| Import-only, workspace normal/exception cleanup and scope/index controls | **0**, `w12-final-audit.json` |
+| `git diff --check`; read-only scope/index audit | **0** |
 
-Exact argv/exits/output digests are in `w11-commands.json`, `patch-commands.json`, `source-read-commands.json`, `verification-commands.json`, `sweep-check.json.commands`, `sweep-check.json.specSweep.bodyReplayCommands`, and composition's `w11-*` artifacts. Reproduction recipes are persisted, not dependent on surviving scratch. The final verification command log has 35 expected missing-source reads (exit 128), not hidden successes.
+Exact commands/exits are in [w12-commands.json](w12-commands.json), `patch-commands.json`, `sweep-check.json`, `verification-commands.json` and composition's W12 artifacts. The verification command log retains 35 expected `git show` exit-128 absence reads; these are not successful commands. Three initial enclosing attempts exited 1 and are retained as `w12-first-attempt.json`, `w12-second-attempt.json`, `w12-third-attempt.json`: caller-owned scratch cleanup, citation-parenthesis format, then verify's inherited scratch mkdir. The third attempt created an empty historical scratch directory outside the allowed scratch root; it was removed and the independent mkdir mechanism retired. The final complete run has no such residue.
 
-Two initial reproduction attempts exited **1**, retained in `w11-first-attempt.json` and `w11-second-attempt.json`: the first failed closed on the changed reading-map hunk; the second exposed the regenerated late-area report's obsolete historical pin assertion. Both were corrected by explicit byte-bound records, not by bypassing checks. Later full reproductions pass. Audit also found removal-induced capitalization at witnesses #0/#37/#38 after stripping Markdown emphasis; these were repaired alongside #61/#62/#64, with full per-witness results in composition's `w10-gloss-audit.json`.
-
-Reused prior art: G9 exact hunk relocation/evidence joins, Step 7 parser, GNU patch, the W10 full/independent composition replay, shared ledger resolver and immutable extractors. Read-only `git log -S` traced the chain guard to `bc2a6a014` and original mechanisms to `4f08d504d`. **impact-analysis: degraded** under this explicit no-fgOS-CLI grant; caller inspection limits changes to records tooling, not product runtime.
-
-Only `g9/**` and `composition/**` changed. No ledger change was needed. No live docs/scripts/product code/tests, checker baseline, pair accounting, Git write, fgOS CLI, state/secrets, suites or preview service. The previous assignment's ratchet blocker is historical, **not this follow-up's blocker**; this brief neither requests nor reruns that ratchet. Scratch is removed at handoff. `needsWrites=[]`. Final-pin F, independent semantic review, remaining parks/binding drift and actual cutover remain Lead-owned.
+Prior art reused: G9 exact authored-hunk relocation, Step 7 parser, GNU patch, W11 audit generator and persisted full/independent composition recipes, unchanged shared resolver/extractors. **impact-analysis: degraded** under the explicit no-fgOS-CLI grant; records tooling only, no runtime changes. Only `g9/**` and `composition/**` changed; no live docs, ledgers, pair accounting, product code/tests, baseline, Git write, fgOS CLI, state/secrets or suites. No preview service was launched under the exact write grant. `needsWrites=[]`. Final-pin F, independent acceptance, cutover and residual binding drift remain Lead-owned.

@@ -162,7 +162,26 @@ def prepare(pin):
     save(COMP / 'w8-citation-glosses.json', witnesses)
     save(COMP / 'w11-preparation.json', {'pin': pin, 'changes': changes, 'glossFixes': fixes,
                                        'commands': commands, 'independentAcceptance': False})
-    # Mechanical audit of every witness, retaining each match and its resolution.
+    audit_glosses(witnesses, fixes, pin)
+
+
+def audit_glosses(witnesses, fixes, pin):
+    """Audit all witnesses, including adjacent one-item-per-line local lists."""
+    def labels(text):
+        found = re.findall(r'\bD(\d+):', text)
+        for bold in re.findall(r'\*\*([^*]+)\*\*', text):
+            if re.match(r'D\d+\b', bold):
+                found.extend(re.findall(r'\bD(\d+)\b', bold))
+        if not found:
+            match = vertical_label(text)
+            if match:
+                found.append(match[1].removeprefix('D'))
+        return list(dict.fromkeys(found))
+
+    def vertical_label(text):
+        return re.match(r'^\s*(?:[-+*]\s+)?(?:\*\*)?(D\d+|\d+|[A-Za-z])(?:[.),:]|\s+\()', text)
+
+    rows = witnesses['witnesses']
     audit = []
     for index, witness in enumerate(witnesses['witnesses']):
         text = witness['after']
@@ -174,10 +193,20 @@ def prepare(pin):
                      re.finditer(r'\.\s+([^\W\d_])', prose) if m[1].islower()]
         doubled = [{'offset': m.start(), 'text': m[0]} for m in
                    re.finditer(r'\b([^\W\d_]+)\s+\1\b', prose, re.IGNORECASE)]
-        labels = re.findall(r'\bD([1-8]):', witness['before'])
-        # A single decision prefix is not an ordered list. Lists must retain all
-        # numbers, including gaps in the original local numbering.
-        missing = [label for label in labels if len(labels) > 1 and 'Mục ' + label + ':' not in text]
+        original_labels = labels(witness['before'])
+        neighbors = [j for j in [index - 1, index + 1] if 0 <= j < len(rows)
+                     and rows[j]['file'] == witness['file']
+                     and abs(rows[j]['line'] - witness['line']) == 1
+                     and vertical_label(rows[j]['before'])]
+        vertical = bool(vertical_label(witness['before']) and neighbors)
+        ordered = len(original_labels) > 1 or vertical
+        # Preserve every number/letter, including gaps and labels grouped on
+        # one physical line. Parenthesized labels do not look like decision ids.
+        retained = [label for label in original_labels if
+                    re.search(r'\(' + re.escape(label) + r'\)|\bÝ ' + re.escape(label) + r':', text)
+                    or (not re.search(r'\bD\d+\b', witness['before']) and
+                        re.search(r'(?:^|\s|\*\*)' + re.escape(label) + r'[.):]', text))]
+        missing = [label for label in original_labels if ordered and label not in retained]
         reviews = []
         if index == 66 and doubled:
             assert [m['text'] for m in doubled] == ['CODE CODE']
@@ -190,9 +219,12 @@ def prepare(pin):
         audit.append({'index': index, 'file': witness['file'], 'line': witness['line'],
                       'before': witness['before'], 'after': text,
                       'lowercaseAfterFullStop': lowercase, 'doubledWords': doubled,
-                      'originalLocalLabels': labels, 'lostListLabels': missing,
-                      'labelReview': 'ordered local list restored as Mục n' if len(labels) > 1 else
-                                     'single citation prefix is not an ordered list' if labels else 'no local list',
+                      'originalLocalLabels': original_labels, 'retainedListLabels': retained,
+                      'lostListLabels': missing, 'verticalList': vertical,
+                      'adjacentListWitnesses': neighbors if vertical else [],
+                      'labelReview': 'vertical local list; all labels required' if vertical else
+                                     'inline local list; all labels required' if ordered else
+                                     'single citation prefix is not an ordered list' if original_labels else 'no local list',
                       'matchReviews': reviews,
                       'status': 'review-required' if lowercase or missing or (doubled and not reviews) else
                                 'pass-reviewed-match' if reviews else 'pass'})
@@ -200,7 +232,7 @@ def prepare(pin):
         'pin': pin, 'witnessesRead': list(range(len(audit))), 'witnesses': audit,
         'rules': {'sentenceStarts': 'Unicode lowercase letter after full stop + whitespace; strip emphasis and exclude inline code/link destinations',
                   'doubledWords': 'case-insensitive adjacent Unicode words',
-                  'listLabels': 'multi-label D1:…D8: lists retain each original number as Mục n:'},
+                  'listLabels': 'Inline multi-label lists and adjacent numbered/lettered vertical items retain every original label (including gaps and grouped labels); decision labels become (n) or Ý n:, not section labels.'},
         'fixes': fixes, 'reviewRequired': [row['index'] for row in audit if row['status'] == 'review-required'],
         'claimLimit': 'Mechanical prose audit; real replay separately authenticates all 104 witness lines.'})
 

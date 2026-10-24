@@ -1,5 +1,5 @@
 {
-  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
@@ -2192,7 +2192,7 @@
     {
       "path": "docs/platform/agent-mailbox/spec.md",
       "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
-      "expectedAfterSha256": "4ab5e5f2c0412541a7578db6b7683436797f7e943bb964b20f62e35fb2b48e0f",
+      "expectedAfterSha256": "19e4186c8ef1843e888563de63e280ab8dffb3715367980395c6bdf004c3759d",
       "roundtripExact": true
     },
     {
@@ -2270,7 +2270,7 @@
     {
       "path": "docs/platform/git/spec.md",
       "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
-      "expectedAfterSha256": "3ab8874e1e5aec335444ab1a893afc09df22b0d6a23bd5579ea1ae8861a4897c",
+      "expectedAfterSha256": "1217581e7cf00e9db85957f1ebd4747c2a3345a0a8d68515661e1ca207c324be",
       "roundtripExact": true
     },
     {
@@ -2306,7 +2306,7 @@
     {
       "path": "docs/platform/holder-lock/spec.md",
       "beforeSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
-      "expectedAfterSha256": "dc33b1d948941867dd40723bd9087f9f0f6c28278bc75772fff99ac30385e7cb",
+      "expectedAfterSha256": "08fd6d8b64a17a384fef0e7a76606335972ad6ed3f283431e24cb235aabb0ac0",
       "roundtripExact": true
     },
     {
@@ -2468,7 +2468,7 @@
     {
       "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
       "beforeSha256": "b7f4e590dbb6b10579466a589e26c5dd161c43c0841a4cefe39bdf20a9caf501",
-      "expectedAfterSha256": "0de10bf53ae6557889da063d6aaa845828a987cee81579962aef1554f51c2aac",
+      "expectedAfterSha256": "c6f3eb6e0ef208d2721fe88d37bcdca04a574cac50f2133c559b8dd24202c2f1",
       "roundtripExact": true
     },
     {

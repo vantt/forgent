@@ -1,0 +1,108 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdoutSha256": "fc36e1e590620615439b950f2706dc59dd03bc7941f5b909ff7575bf72b928cc",
+    "stdoutBytes": 41,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "8fd37e3590d3654729cf2d177c90bb0fbb17dff9:plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json"
+    ],
+    "exit": 0,
+    "stdoutSha256": "724e49fb4ee46e1d9f7c087f32b776fdbc45c30d27176740972ed0bee5108f10",
+    "stdoutBytes": 3311943,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "8fd37e3590d3654729cf2d177c90bb0fbb17dff9:plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json"
+    ],
+    "exit": 0,
+    "stdoutSha256": "4cd8f432063a5398ed7c3baf947f4e2974bed32c116256ccf02f95cbf88bdec1",
+    "stdoutBytes": 129696,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "8fd37e3590d3654729cf2d177c90bb0fbb17dff9:plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json"
+    ],
+    "exit": 0,
+    "stdoutSha256": "ab8c781729e5dbc39ce01fefe77cab59e72858bee9023e73d60070a39b6cfe51",
+    "stdoutBytes": 1622142,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/tmp/fgos-work/w12-gloss/verify.py"
+    ],
+    "exit": 0,
+    "stdoutSha256": "a1b7b6e63c421c0976e6f9e3377721c0da8ce299feb2dcb4f5395638d73520e4",
+    "stdoutBytes": 1596,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/tmp/fgos-work/w12-gloss/independent-replay.py"
+    ],
+    "exit": 0,
+    "stdoutSha256": "697d347e9406db464695cd860f406f6bf29acfbdef128d11302b81d55230e68a",
+    "stdoutBytes": 105352,
+    "stderr": "patch apps/fgos-gateway/Cargo.toml\npatch apps/fgos-gateway/Cargo.toml\npatch apps/fgos-gateway/src/mcp.rs\npatch apps/fgos-gateway/src/mcp.rs\npatch docs/platform/component-boundary.md\npatch docs/platform/component-boundary.md\npatch docs/platform/component-boundary.md\npatch docs/platform/component-boundary.md\npatch docs/platform/git/spec.md\npatch docs/platform/git/spec.md\npatch docs/platform/git/spec.md\npatch docs/platform/git/spec.md\npatch docs/platform/herdr-web-dashboard/README.md\npatch docs/platform/herdr-web-dashboard/README.md\npatch docs/platform/holder-lock/spec.md\npatch docs/platform/holder-lock/spec.md\npatch docs/platform/holder-lock/spec.md\npatch docs/platform/holder-lock/spec.md\npatch docs/platform/runner/README.md\npatch docs/platform/runner/README.md\npatch src/cli/command-registry.mjs\npatch src/cli/command-registry.mjs\npatch src/cli/command-registry.mjs\npatch src/cli/command-registry.mjs\npatch src/runner/worktree.mjs\npatch src/runner/worktree.mjs\npatch src/setup/registrations.mjs\npatch src/setup/registrations.mjs\npatch test/runner/dispatch-executor-profile.test.mjs\npatch test/runner/dispatch-executor-profile.test.mjs\npatch test/runner/worktree.test.mjs\npatch test/runner/worktree.test.mjs\npatch test/cli/fgos-merge.test.mjs\npatch test/cli/fgos-merge.test.mjs\npatch docs/how-to/fix-bare-citation-findings.md\npatch docs/how-to/fix-bare-citation-findings.md\npatch docs/platform/agent-confinement/spec.md\npatch docs/platform/agent-confinement/spec.md\npatch docs/platform/agent-confinement/spec.md\npatch docs/platform/agent-confinement/spec.md\npatch core/skills/_shared/citation-format.md\npatch core/skills/_shared/citation-format.md\npatch core/skills/_shared/citation-format.md\npatch core/skills/_shared/citation-format.md\npatch scripts/check-decision-citation-drift.mjs\npatch scripts/check-decision-citation-drift.mjs\npatch scripts/check-decision-citation-drift.mjs\npatch scripts/check-decision-citation-drift.mjs\npatch test/scripts/check-decision-citation-drift.test.mjs\npatch test/scripts/check-decision-citation-drift.test.mjs\npatch test/scripts/check-decision-citation-drift.test.mjs\npatch test/scripts/check-decision-citation-drift.test.mjs\npatch bin/fgos.mjs\npatch bin/fgos.mjs\npatch bin/fgos.mjs\npatch bin/fgos.mjs\npatch src/state/store.mjs\npatch src/state/store.mjs\npatch AGENTS.md\npatch AGENTS.md\npatch AGENTS.md\npatch AGENTS.md\npatch docs/platform/process/spec.md\npatch docs/platform/process/spec.md\npatch docs/platform/process/spec.md\npatch docs/platform/process/spec.md\npatch docs/platform/identity/spec.md\npatch docs/platform/identity/spec.md\npatch docs/platform/identity/spec.md\npatch docs/platform/identity/spec.md\npatch packages/herdr-fgos-common/rust/src/fgos.rs\npatch packages/herdr-fgos-common/rust/src/fgos.rs\npatch src/runner/merge.mjs\npatch src/runner/merge.mjs\npatch test/runner/merge.test.mjs\npatch test/runner/merge.test.mjs\npatch docs/platform/agent-coordination/contracts/assignment-run-runresult.md\npatch docs/platform/agent-coordination/contracts/assignment-run-runresult.md\npatch docs/platform/agent-coordination/contracts/assignment-run-runresult.md\npatch docs/platform/agent-coordination/contracts/assignment-run-runresult.md\npatch docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\npatch docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\npatch docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\npatch docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\npatch docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\npatch docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\npatch docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\npatch docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\npatch docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\npatch docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\npatch docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\npatch docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\npatch test/runner/dead-vocabulary-guard.test.mjs\npatch test/runner/dead-vocabulary-guard.test.mjs\npatch test/runner/dead-vocabulary-guard.test.mjs\npatch test/runner/dead-vocabulary-guard.test.mjs\npatch scripts/test-proof-inventory.mjs\npatch scripts/test-proof-inventory.mjs\npatch docs/doc-governance.md\npatch docs/doc-governance.md\npatch docs/README.md\npatch docs/README.md\npatch docs/platform/documentation/operations/portals/docs-portal.md\npatch docs/platform/documentation/operations/portals/docs-portal.md\npatch docs/platform/host-invocation-routing/README.md\npatch docs/platform/host-invocation-routing/README.md\npatch docs/user/README.md\npatch docs/user/README.md\npatch docs/platform/migration-authoring-rules.md\npatch docs/platform/migration-authoring-rules.md\npatch docs/platform/host-invocation-routing/verification/source-preservation-audit.md\npatch docs/platform/host-invocation-routing/verification/source-preservation-audit.md\npatch docs/platform/proposals/documentation-system-unification.md\npatch docs/platform/proposals/documentation-system-unification.md\npatch docs/platform/vision.md\npatch docs/platform/vision.md\npatch docs/platform/system-architecture/architecture/roadmap.md\npatch docs/platform/system-architecture/architecture/roadmap.md\npatch docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md\npatch docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md\npatch docs/platform/system-architecture/architecture/workspace-topology-audit.md\npatch docs/platform/system-architecture/architecture/workspace-topology-audit.md\npatch docs/platform/system-architecture/architecture/workspace-topology-roadmap.md\npatch docs/platform/system-architecture/architecture/workspace-topology-roadmap.md\npatch docs/platform/system-architecture/architecture/workspace-topology.md\npatch docs/platform/system-architecture/architecture/workspace-topology.md\npatch docs/platform/platform-foundations.md\npatch docs/platform/platform-foundations.md\npatch docs/platform/platform-foundations.md\npatch docs/platform/platform-foundations.md\npatch docs/platform/packaging-distribution/README.md\npatch docs/platform/packaging-distribution/README.md\npatch docs/platform/work-state/README.md\npatch docs/platform/work-state/README.md\npatch docs/platform/README.md\npatch docs/platform/README.md\npatch docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\npatch docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\npatch docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\npatch docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-overview/spec.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/system-architecture/architecture/architecture-intent.md\npatch docs/platform/agent-coordination/spec.md\npatch docs/platform/agent-coordination/spec.md\npatch docs/platform/agent-coordination/spec.md\npatch docs/platform/agent-coordination/spec.md\npatch docs/platform/workflow/spec.md\npatch docs/platform/workflow/spec.md\npatch docs/platform/governance.md\npatch docs/platform/governance.md\npatch docs/platform/governance.md\npatch docs/platform/governance.md\npatch docs/transitional-switchboard.md\npatch docs/transitional-switchboard.md\npatch docs/platform/documentation/switchboard.md\npatch docs/platform/documentation/switchboard.md\npatch docs/platform/system-architecture/history/component-boundary-source-carriage.md\npatch docs/platform/system-architecture/history/component-boundary-source-carriage.md\npatch docs/platform/runner/decisions/h-36d872fbb0e5.md\npatch docs/platform/runner/decisions/h-36d872fbb0e5.md\npatch docs/platform/runner/decisions/h-36d872fbb0e5.md\npatch docs/platform/runner/decisions/h-36d872fbb0e5.md\npatch docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\npatch docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\npatch docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\npatch docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\npatch docs/platform/terminal-control/spec.md\npatch docs/platform/terminal-control/spec.md\npatch docs/platform/terminal-control/spec.md\npatch docs/platform/terminal-control/spec.md\npatch docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md\npatch docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md\npatch docs/platform/runner/spec.md\npatch docs/platform/runner/spec.md\npatch docs/platform/work-state/spec.md\npatch docs/platform/work-state/spec.md\npatch core/skills/fgos-researching/SKILL.md\npatch core/skills/fgos-researching/SKILL.md\npatch core/skills/fgos-researching/SKILL.md\npatch core/skills/fgos-researching/SKILL.md\npatch docs/platform/agent-mailbox/spec.md\npatch docs/platform/agent-mailbox/spec.md\npatch docs/platform/agent-protocol/spec.md\npatch docs/platform/agent-protocol/spec.md\npatch docs/platform/agent-protocol/spec.md\npatch docs/platform/agent-protocol/spec.md\npatch docs/platform/coexistence/spec.md\npatch docs/platform/coexistence/spec.md\npatch docs/platform/coexistence/spec.md\npatch docs/platform/coexistence/spec.md\npatch docs/platform/config/spec.md\npatch docs/platform/config/spec.md\npatch docs/platform/event-store/spec.md\npatch docs/platform/event-store/spec.md\npatch docs/platform/packaging-distribution/spec.md\npatch docs/platform/packaging-distribution/spec.md\npatch docs/platform/run-supervisor/spec.md\npatch docs/platform/run-supervisor/spec.md\npatch docs/platform/run-supervisor/spec.md\npatch docs/platform/run-supervisor/spec.md\npatch docs/platform/yaml-document/spec.md\npatch docs/platform/yaml-document/spec.md\npatch docs/ui-spec/generated/wireframe-v2.html\npatch docs/ui-spec/generated/wireframe-v2.html\npatch docs/ui-spec/generated/wireframe-v2.html\npatch docs/ui-spec/generated/wireframe-v2.html\npatch docs/ui-spec/generated/wireframe-v2.html\npatch .agents/skills/fgos-researching/SKILL.md\npatch .agents/skills/fgos-researching/SKILL.md\npatch plugins/fgOS/skills/fgos-researching/SKILL.md\npatch plugins/fgOS/skills/fgos-researching/SKILL.md\n"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+      "--pin",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdoutSha256": "6718a04bbe2880ff79806b9bf4d82af225ddd45b908a48db05ee5bcfdc82b3da",
+    "stdoutBytes": 93,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+      "--check",
+      "--pin",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdoutSha256": "218c8ec253925cab3ede0eee0fc4439654d4074f3417dee46ca8e435808e2677",
+    "stdoutBytes": 2147945,
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+      "--pin",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdoutSha256": "af88322bcfb66c19065b72b05d4bb8981a0a7714128da09835d0dc9a417d1cc8",
+    "stdoutBytes": 606,
+    "stderr": ""
+  }
+]

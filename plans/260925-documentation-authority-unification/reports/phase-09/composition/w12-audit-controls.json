@@ -1,0 +1,162 @@
+{
+  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
+  "exit": 0,
+  "historicalReviewRequired": [
+    35,
+    36,
+    37,
+    38,
+    39,
+    61,
+    62,
+    64
+  ],
+  "verticalMissingLabelRows": [
+    {
+      "index": 35,
+      "file": "docs/platform/git/spec.md",
+      "line": 1075,
+      "before": "  - **D1 (order)**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "after": "  - **Order**: red tests first, then the remote door, then correctness fixes, cost changes, one-port-file consolidation, doctor, contracts and spec. A finding whose red test was green closed as not reproduced (CF07: `redact` reads through a lossy conversion, so a non-UTF-8 URL cannot fail the read).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "1"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "1"
+      ],
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        36
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 36,
+      "file": "docs/platform/git/spec.md",
+      "line": 1076,
+      "before": "  - **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "after": "  - **Sequence counter and the scp form**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "2",
+        "3"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "2",
+        "3"
+      ],
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        35,
+        37
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 37,
+      "file": "docs/platform/git/spec.md",
+      "line": 1077,
+      "before": "  - **D4 (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **D5, D6**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **Worktree-add fsync count** went to the owner as a question and is not part of this entry. **Test move-down and per-operation herdr command counts**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "4",
+        "5",
+        "6"
+      ],
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        36,
+        38
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 38,
+      "file": "docs/platform/git/spec.md",
+      "line": 1078,
+      "before": "  - **D7 (WAL digest)**: kept by evidence, no byte-equality run (§10). **D8 (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **WAL digest**: kept by evidence, no byte-equality run (§10). **Drains**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "7",
+        "8"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "7",
+        "8"
+      ],
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        37,
+        39
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    },
+    {
+      "index": 39,
+      "file": "docs/platform/git/spec.md",
+      "line": 1079,
+      "before": "  - **D9 (parked)**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "after": "  - **Parked**: a per-process repository handle cache, `PATH` out of the floor key.",
+      "lowercaseAfterFullStop": [],
+      "doubledWords": [],
+      "originalLocalLabels": [
+        "9"
+      ],
+      "retainedListLabels": [],
+      "lostListLabels": [
+        "9"
+      ],
+      "verticalList": true,
+      "adjacentListWitnesses": [
+        38
+      ],
+      "labelReview": "vertical local list; all labels required",
+      "matchReviews": [],
+      "status": "review-required"
+    }
+  ],
+  "genericListControls": [
+    {
+      "kind": "numbered",
+      "lostLabelsRejected": [
+        "1",
+        "2"
+      ],
+      "restoredLabelsPass": true
+    },
+    {
+      "kind": "lettered",
+      "lostLabelsRejected": [
+        "A",
+        "B"
+      ],
+      "restoredLabelsPass": true
+    }
+  ],
+  "allWitnesses": 104,
+  "currentReviewRequired": []
+}

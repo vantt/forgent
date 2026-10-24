@@ -1,0 +1,10 @@
+{
+  "pin": "8fd37e3590d3654729cf2d177c90bb0fbb17dff9",
+  "exit": 0,
+  "scratchAbsentBeforeChecks": true,
+  "scratchAbsentAfterSweep": true,
+  "scratchAbsentAfterVerify": true,
+  "historicalScratchExistsUnchanged": false,
+  "importCreatesDirectory": false,
+  "scope": "Actual check/verify runs after scratch deletion; import-only proof is also recorded in final-audit."
+}

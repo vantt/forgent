@@ -7,15 +7,13 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w11-g9')
-TMP.mkdir(parents=True, exist_ok=True)
-sp = importlib.util.spec_from_file_location('g9_sweep', HERE / 'sweep.py')
-sweep = importlib.util.module_from_spec(sp)
-sp.loader.exec_module(sweep)
+sp = importlib.util.spec_from_file_location('g9_recompose', HERE / 'recompose.py')
+recompose = importlib.util.module_from_spec(sp)
+sp.loader.exec_module(recompose)
+sweep = recompose.sweep
 
 
 def main():
@@ -41,7 +39,7 @@ def main():
         expected = sweep.chain_identity(selected[path])
         assert [{k: edge.get(k) for k in expected[0]}
                 for edge in spec['predecessorChain']] == expected, path
-        with tempfile.TemporaryDirectory(dir=TMP, prefix='verification-') as name:
+        with recompose.workspace('verification-') as name:
             target = Path(name) / path
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(before)
