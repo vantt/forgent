@@ -33,7 +33,7 @@ for(const mode of ['added','renamed','copied','type-changed','fence','legacy-sha
 
 // A branch cut before the cutover merges main: the shard deletions and the fence come from main, the
 // merge parent, so the real hook lets the merge commit through; a deletion main never made still stops it.
-for (const own of [false, true]) test(`retired layout hook: merging main into a branch cut before the cutover${own ? ' with a deletion of its own' : ''}`, t => {
+for (const own of ['', 'tracked', 'branch-only']) test(`retired layout hook: merging main into a branch cut before the cutover${own ? ` with a deletion of its own (${own})` : ''}`, t => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'es-hook-merge-'));
   t.after(() => fs.rmSync(repo, { recursive: true, force: true }));
   const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' }).trim();
@@ -44,7 +44,8 @@ for (const own of [false, true]) test(`retired layout hook: merging main into a 
   git('add', '.fgos'); git('commit', '-qm', 'legacy main');
   git('checkout', '-qb', 'feature');
   fs.writeFileSync(path.join(repo, 'work.txt'), 'work\n');
-  git('add', 'work.txt'); git('commit', '-qm', 'feature work');
+  fs.writeFileSync(path.join(repo, '.fgos/branch-only.json'), '{}\n');
+  git('add', 'work.txt', '.fgos/branch-only.json'); git('commit', '-qm', 'feature work');
   git('checkout', '-q', 'main');
   git('rm', '-rq', '.fgos/events');
   fs.mkdirSync(path.join(repo, '.fgos'), { recursive: true });
@@ -52,8 +53,9 @@ for (const own of [false, true]) test(`retired layout hook: merging main into a 
   git('add', '.fgos/events'); git('commit', '-qm', 'cutover');
   git('checkout', '-q', 'feature');
   git('merge', '--no-commit', '--no-ff', '-q', 'main');
-  if (own) git('rm', '-q', '--cached', '.fgos/keep.json');
+  const deleted = own === 'tracked' ? '.fgos/keep.json' : '.fgos/branch-only.json';
+  if (own) git('rm', '-q', '--cached', deleted);
   const result = spawnSync(process.execPath, [path.resolve('.githooks/pre-commit')], { cwd: repo, encoding: 'utf8' });
-  if (own) { assert.equal(result.status, 1, result.stderr); assert.match(result.stderr, /stages a deletion under "\.fgos\/" \(\.fgos\/keep\.json\)/); }
+  if (own) { assert.equal(result.status, 1, result.stderr); assert.match(result.stderr, new RegExp(`stages a deletion under "\\.fgos/" \\(${deleted.replaceAll('.', '\\.')}\\)`)); }
   else assert.equal(result.status, 0, result.stderr);
 });

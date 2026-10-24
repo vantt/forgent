@@ -251,7 +251,7 @@ function stagedFgosDeletions(committingToplevel) {
 }
 
 // During a merge, a staged `.fgos` path whose index entry equals the incoming side's (absent on both,
-// or the same blob) is that side's own change carried in, not a write by this checkout: a branch cut
+// or the same blob), where that side changed it since the merge base, is that side's own change carried in, not a write by this checkout: a branch cut
 // before the Event Store cutover that merges main takes main's retired shards and its fence this way.
 function fgosPathsOwnedByMergeHead(committingToplevel, paths) {
   if (paths.length === 0) return new Set();
@@ -263,9 +263,12 @@ function fgosPathsOwnedByMergeHead(committingToplevel, paths) {
     return [row.slice(tab + 1), row.slice(0, tab).split(' ')[field]];
   }));
   const index = entries(git(['ls-files', '-s', '-z', '--', '.fgos']), 1);
+  // The incoming side must have changed the path itself since the merge base: a path absent on
+  // both sides that this branch alone had and deleted by hand is not the incoming side's change.
+  const tree = (oid) => entries(git(['ls-tree', '-r', '-z', oid, '--', '.fgos']), 2);
   const heads = fs.readFileSync(mergeHeadFile, 'utf8').split('\n').filter(Boolean)
-    .map((oid) => entries(git(['ls-tree', '-r', '-z', oid, '--', '.fgos']), 2));
-  return new Set(paths.filter((p) => heads.some((head) => head.get(p) === index.get(p))));
+    .map((oid) => ({ head: tree(oid), base: tree(git(['merge-base', 'HEAD', oid]).trim()) }));
+  return new Set(paths.filter((p) => heads.some(({ head, base }) => head.get(p) === index.get(p) && head.get(p) !== base.get(p))));
 }
 
 // tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
