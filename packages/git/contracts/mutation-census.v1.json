@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5e6e64beedd85421d3776adfe0bb74d4a6e2b902394f26675c0a77db965e5cb7",
+  "payloadDigest": "626f35ed1ef87ae2165dacb5c2261f5d73874e013bdbe9131126ba9c596c13eb",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -284,7 +284,7 @@
     "packages/event-store/rust/src/identity.rs": "b4bf24086e864acbd3a10c4839277ef1a8109c2e0d600abe4dd66ad8ae767398",
     "packages/event-store/rust/src/layout.rs": "5d5b80442d2ee1bb353613bbe91bb8fe78fb0961bd8f3b4343c342aacc939337",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
-    "packages/event-store/rust/src/legacy_import.rs": "9f3fc31bd2551fb813d243d4d26364286c0799f6211893514be6684d4add09c6",
+    "packages/event-store/rust/src/legacy_import.rs": "c21dd2728a6c079ea3dc47349c18395e0d01c6c0c9f435192ac1727e6c89ac45",
     "packages/event-store/rust/src/lib.rs": "3a4c4ce636c3dd857a70461c974a0571a98fa3f795fb39b01d32b4dca2b0f86f",
     "packages/event-store/rust/src/locks.rs": "ef5bb97e8af4ef96867885657aa5c3e06d4de99e8d4406944fcdb9d0123917e3",
     "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
@@ -315,7 +315,7 @@
     "packages/event-store/rust/tests/offline_sync.rs": "d0cac51d4e8402051c5d9c8785bc0ebd3ba1e3c1e8169f52d6f4d339bb91b459",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
     "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
-    "packages/event-store/rust/tests/read_head_children.rs": "f2fa0e07e729edfa296723cf772ca9bb847ab5dd57f78143f26abba5229c1148",
+    "packages/event-store/rust/tests/read_head_children.rs": "ee7a7ca38ff6c062dc49a27fbda88a784eb409943dd8bbea9223301518be93e0",
     "packages/event-store/rust/tests/read_memo.rs": "d0134060cbc0ad3d6de4b4f4dfe65e70e6ce6235bdb1dcd84595a4459273507f",
     "packages/event-store/rust/tests/reader_review_regressions.rs": "efbd1fd2f7fb6b5456979b81544b1c7b6aa73ac2a22356a638fccc649587a5ea",
     "packages/event-store/rust/tests/reader_seal_stress.rs": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",

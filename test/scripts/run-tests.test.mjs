@@ -182,7 +182,9 @@ test('chosen test files run alone in the staged environment, and a path that is 
   const f = write(root, 'x.test.mjs');
   let captured = null;
   const ran = runChosenTests(['x.test.mjs'], {
-    cwd: root, forwardedArgs: ['--test-reporter=tap'], env: { PATH: process.env.PATH },
+    // The suite's own staged door, so this run never restages (and rebuilds) the checkout's addon mid-suite.
+    cwd: root, forwardedArgs: ['--test-reporter=tap'],
+    env: { PATH: process.env.PATH, FGOS_HOST_BIN: process.env.FGOS_HOST_BIN, FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH },
     spawn: (execPath, argv, opts) => { captured = { argv, env: opts.env }; return { status: 0 }; },
   });
   assert.equal(ran.status, 0);

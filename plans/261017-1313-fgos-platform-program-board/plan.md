@@ -47,7 +47,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | **Landed:** Slice A (crate `fgos-yaml-doc`, bỏ `serde_yaml`), Slice B (crate `fgos-config`, schema `core/config-schema/` + bộ chuẩn `core/config-standard/`, lock), Slice C landing A (YAML qua Rust, xoá js-yaml, RUL108), **Slice D 10-24** (verb `fgos config`, migrate có `--dry-run`/tombstone/backup, doctor findings + repair, `~/.fgos/private` bị che với mọi worker confine, `FGOS_CONFINED=1`). **Tiếp:** Slice C landing B (cửa `config` trên native door, facade) rồi landing C (cutover một merge: migrate file repo, chuyển mọi reader Node/gateway/account/token, xoá `src/config/`). fgOS vẫn đọc `.fgos/config.json` cách cũ tới landing C
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
-| RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:12; owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên. phiên này còn giữ thêm vai `lead:PROSE`; từ main `3cee85c9a` nhả được bằng `fgos identity session --drop-role lead:PROSE`) | `fg-server` |
+| RULE | `lead:RULE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:12; owner 11:30 xác nhận PROSE = RULE và phiên được đổi tên; vai thừa `lead:PROSE` đã nhả 10-24 21:55 bằng `--drop-role`) | `fg-server` |
 | DOC | `lead:DOC` | `claude-4c3b@design-lap` (đã nhận vai 10-23 11:30) | `design-lap` |
 
 ## Các luồng

@@ -37,6 +37,11 @@ Doctor rows: observe — `observe-dir-writable` :6586, `observe-friction-migrate
 
 Filled by the T3 sub-plan with Create / Modify / **Delete** / **Tests to retire** (event-store Node tests TEST phase 2 has not already retired).
 
+## 04b council inputs (recorded 2026-10-24)
+
+- `fgos-event-store` does not build its test targets for `x86_64-pc-windows-msvc` (`--all-targets`): test files such as `append_recovery` and `sync_review` import `std::os::unix` unguarded; the lib has an unused `mut` at `export.rs:45` on Windows. The crate is not in the msvc/darwin land-gate list yet. Found by H31-A's lead; WORK left it to 04b.
+- Test gap WORK named (WORK follow-up unless 04b takes it): no test drives the migrated admission with a `refs/fgos/remotes/<r>/legacy` mirror whose oid differs from the pin (should refuse `event-store-refspec-missing`); the owner would sit next to `reader_review_regressions.rs:233`.
+
 ## Net size
 
 Estimate before council (HARDEN commits only): Node −100 to −400 (legacy event adapter, duplicated outcome naming), Rust −300 to +100, tests −100 to −400. Layer total ≤ 0.
