@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "626f35ed1ef87ae2165dacb5c2261f5d73874e013bdbe9131126ba9c596c13eb",
+  "payloadDigest": "b20de5be65a01acc2042f4d875c973ee0a9b1c3bd7e23b1dfcd42a1a57edc21c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -284,7 +284,7 @@
     "packages/event-store/rust/src/identity.rs": "b4bf24086e864acbd3a10c4839277ef1a8109c2e0d600abe4dd66ad8ae767398",
     "packages/event-store/rust/src/layout.rs": "5d5b80442d2ee1bb353613bbe91bb8fe78fb0961bd8f3b4343c342aacc939337",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
-    "packages/event-store/rust/src/legacy_import.rs": "c21dd2728a6c079ea3dc47349c18395e0d01c6c0c9f435192ac1727e6c89ac45",
+    "packages/event-store/rust/src/legacy_import.rs": "9e7f614a5e7a4d69f286a585f0dee9a3366dcb235a9466f9c9906803fb125eb1",
     "packages/event-store/rust/src/lib.rs": "3a4c4ce636c3dd857a70461c974a0571a98fa3f795fb39b01d32b4dca2b0f86f",
     "packages/event-store/rust/src/locks.rs": "ef5bb97e8af4ef96867885657aa5c3e06d4de99e8d4406944fcdb9d0123917e3",
     "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
@@ -310,7 +310,7 @@
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
     "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
     "packages/event-store/rust/tests/kill_append.rs": "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58",
-    "packages/event-store/rust/tests/legacy_import.rs": "298bb3892c05bff4aa04ff679763354f5480cc4765037b73d612c2696433c79a",
+    "packages/event-store/rust/tests/legacy_import.rs": "485cf643e9845caec7055401ae2029e8fdd20ce61b7a1f8d9a5a2c19dab67b05",
     "packages/event-store/rust/tests/legacy_reader.rs": "1d359ca1cac64604fcdeaeac42cb502bc1f2325694b978062b11c61c53c9f385",
     "packages/event-store/rust/tests/offline_sync.rs": "d0cac51d4e8402051c5d9c8785bc0ebd3ba1e3c1e8169f52d6f4d339bb91b459",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
@@ -1917,6 +1917,13 @@
     {
       "path": "packages/event-store/rust/tests/legacy_import.rs",
       "line": 13,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/legacy_import.rs",
+      "line": 164,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

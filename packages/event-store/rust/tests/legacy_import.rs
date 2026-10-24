@@ -128,6 +128,51 @@ fn legacy_import_real_publication_reuses_exact_commit_and_reads_nested_porting()
     drop(f.handle());
 }
 #[test]
+fn a_clone_without_the_import_data_tree_object_still_verifies_the_published_legacy_commit() {
+    let f = Fixture::new();
+    legacy(&f, true);
+    let before = inventory(&f.driver, &f.repo).unwrap();
+    let pin = import_legacy(
+        &f.driver,
+        &f.repo,
+        &f.layout,
+        before.from_commit.as_str(),
+        &[],
+        0,
+    )
+    .unwrap();
+    let oid = Oid::parse(
+        pin["legacyRefOid"].as_str().unwrap(),
+        f.repo.object_format(),
+    )
+    .unwrap();
+    let seal: serde_json::Value = serde_json::from_slice(
+        &fgos_event_store::walk::blob(&f.driver, &f.repo, &oid, b"seal.json")
+            .unwrap()
+            .unwrap(),
+    )
+    .unwrap();
+    let data_tree = seal["treeOfFgosEvents"].as_str().unwrap().to_string();
+    // No ref reaches the data tree, so a clone that fetched the legacy ref never has its object.
+    let objects = std::path::PathBuf::from(git(
+        &f,
+        &["rev-parse", "--path-format=absolute", "--git-common-dir"],
+    ))
+    .join("objects");
+    fs::remove_file(objects.join(&data_tree[..2]).join(&data_tree[2..])).unwrap();
+    assert!(
+        Command::new("git")
+            .arg("-C")
+            .arg(f.repo.trusted_main_root())
+            .args(["cat-file", "-e", &data_tree])
+            .status()
+            .unwrap()
+            .code()
+            != Some(0)
+    );
+    verify_legacy_tree(&f.driver, &f.repo, &oid).unwrap();
+}
+#[test]
 fn legacy_import_dirty_multiple_porting_and_moved_head_refuse() {
     let f = Fixture::new();
     legacy(&f, false);
@@ -187,7 +232,7 @@ fn legacy_import_sealed_tree_refuses_missing_data_and_invalid_events_before_publ
     let mut handle = f.handle();
     let port = f.port(&mut handle, "refs/fgos/events/test-aa");
     let damaged = reader_support::commit(&port, &f.repo, vec![], vec![(b"seal.json", seal)]);
-    assert!(verify_legacy_tree(&port, &f.repo, &damaged)
+    assert!(verify_legacy_tree(&f.driver, &f.repo, &damaged)
         .unwrap_err()
         .detail
         .contains("differs"));
@@ -235,9 +280,7 @@ fn a_cutover_operation_directory_without_an_intent_does_not_block_the_next_attem
     let f = Fixture::new();
     legacy(&f, false);
     let head = inventory(&f.driver, &f.repo).unwrap().from_commit;
-    let import = || {
-        import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0)
-    };
+    let import = || import_legacy(&f.driver, &f.repo, &f.layout, head.as_str(), &[], 0);
     let first = import().unwrap();
     let id = format!("event-store-cutover-{}-1", &head.as_str()[..32]);
     assert_eq!(first["operationId"], id);
