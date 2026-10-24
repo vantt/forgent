@@ -88,6 +88,16 @@
    "reason": "EVENT_STORE_DEFAULTS in src/event-store/config.mjs, what the reader assumes; the registration seeds only remote"
   },
   {
+   "path": "eventStore.seal.coalesceSec",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 30
+   },
+   "reason": "EVENT_STORE_DEFAULTS in src/event-store/config.mjs; the registration seeds only remote"
+  },
+  {
    "path": "eventStore.sync.intervalSec",
    "registry": {
     "absent": true
