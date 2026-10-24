@@ -1,29 +1,286 @@
 {
   "status": "blocked-combined-g2-g6-not-accepted",
   "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "checkoutHead": "77bdddccbdb42fa9193088095bdeb9a143eec671",
   "command": {
     "argv": [
       "python3",
       "-B",
-      "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py",
+      "/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py",
       "--pin",
       "HEAD"
     ],
     "exit": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 186, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 26, in main\n    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'\nAssertionError: G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 200, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 26, in main\n    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'\nAssertionError: G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification\n"
   },
-  "blocker": "Combined verifier requires G2 census artifacts at the G6 pin; delivered G2 is pinned to 3d0169f390e21c67bc3fc69081fd1bc07186599f outside this write scope. Its join.py also restricts scratch outputs to the previous brief directory, so the G2 owner must adapt that plumbing before replay under this brief.",
-  "needsWrites": [
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-dynamics.json"
-  ],
+  "blocker": "G2 remains pinned to 3d0169f390e21c67bc3fc69081fd1bc07186599f; the final-pin owner must refresh its census and Rust test locators. No combined pass is claimed.",
+  "noReadinessClaim": true,
+  "miscVerifier": {
+    "exit": 0,
+    "evidence": "misc-checks.json",
+    "adapterSource": "import pathlib\nroot=pathlib.Path('/home/vantt/projects/forgentX-p9-w1-d1')\nbase=pathlib.Path('/tmp/fgos-work/w6-misc-sentence')\narea=root/'plans/260925-documentation-authority-unification/reports/phase-09'\n# Preserve original __file__ so all repository reads and owning G6 assertions\n# resolve exactly as before. Only scratch, explicit source pin and output move.\nrebind=area/'misc-fix/rebind.py'\nadapter=base/'rebind-adapter.py'\nadapter.write_text('exec(compile('+repr(rebind.read_text().replace('/tmp/fgos-work/w5-misc-rework','/tmp/fgos-work/w6-misc-sentence'))+','+repr(str(rebind))+',\"exec\"), {\"__file__\":'+repr(str(rebind))+',\"__name__\":\"__main__\"})\\n')\nowner=area/'misc-fix/verify.py'\ncode=owner.read_text().replace('/tmp/fgos-work/w5-misc-rework','/tmp/fgos-work/w6-misc-sentence')\ncode=code.replace(\"pin=run(['git','rev-parse','HEAD']).strip()\", \"pin=run(['git','rev-parse','4178dcc6e^{commit}']).strip()\")\ncode=code.replace(\"str(P/'reports/phase-09/misc-fix/rebind.py')\",repr(str(adapter)))\ncode=code.replace(\"(HERE/'checks.json').write_text\", \"(ROOT/G6/'misc-checks.json').write_text\")\n(base/'misc-verify-adapted.py').write_text(code)\nexec(compile(code,str(owner),'exec'),{'__file__':str(owner),'__name__':'__main__'})\n",
+    "scopeChanges": [
+      "Scratch redirected exclusively to /tmp/fgos-work/w6-misc-sentence/.",
+      "Explicit G6 source pin 4178dcc6e instead of moving HEAD.",
+      "Read-only rebind --check uses the same scratch relocation.",
+      "Only checks.json output redirected into preserve-premise/misc-checks.json. All assertions retained."
+    ]
+  },
+  "historicalPinDiagnostic": {
+    "evidence": "historical-pin-diagnostic.json",
+    "g2pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+    "g6pin": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+    "patch": "--- preserve-premise/verify.py\n+++ scratch/historical-pin-diagnostic.py\n@@ -23,32 +23,14 @@\n     # Fail closed before replay: this combined verifier also owns G2, whose\n     # delivered artifacts must be refreshed by their owner, not silently skipped\n     # when a records-only G6 turn has a newer source pin.\n-    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'\n+    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==g2pin and g2pin!=pin\n     scratch = pathlib.Path('/tmp/fgos-work/w6-misc-sentence');scratch.mkdir(parents=True,exist_ok=True)\n     commands, comparisons = [], []\n     with tempfile.TemporaryDirectory(prefix='double-replay-',dir=scratch) as name:\n         base = pathlib.Path(name)\n-        for label, script, extra, owning, outputs in [\n-            ('census','join.py',['--rescan'],CENSUS,['join.json','residue.json','post-pin-literals.json','post-pin-dynamics.json']),\n-            ('preserve','proof.py',[],HERE,['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json']),\n-        ]:\n-            stdouts = []\n-            for round in (1,2):\n-                out = base/(label+'-'+str(round))\n-                argv = ['python3','-B',str((owning/script).relative_to(ROOT)),*extra,'--pin',pin,'--out',str(out)]\n-                run = subprocess.run(argv,cwd=ROOT,capture_output=True)\n-                commands.append(dict(label=label,round=round,argv=argv,exit=run.returncode,stdout=run.stdout.decode(),stderr=run.stderr.decode()))\n-                assert run.returncode == 0, run.stderr.decode()\n-                stdouts.append(run.stdout)\n-            assert stdouts[0] == stdouts[1], label+' stdout drift'\n-            for output in outputs:\n-                a,b = [(base/(label+'-'+str(round))/output).read_bytes() for round in (1,2)]\n-                actual = (owning/output).read_bytes()\n-                assert a == b == actual, label+'/'+output+' byte drift'\n-                comparisons.append(dict(path=str((owning/output).relative_to(ROOT)),sha256=sha(a),bytes=len(a),runsByteIdentical=True,checkedInWorkingArtifactEqual=True))\n         join = json.loads((CENSUS/'join.json').read_text())\n         proof = json.loads((HERE/'proof.json').read_text())\n-        assert join['sourceCommit'] == proof['sourceCommit'] == pin\n+        assert join['sourceCommit']==g2pin and proof['sourceCommit']==g6pin\n         assert len(join['rows']) == len({r['id'] for r in join['rows']}) == 1126\n         register = json.loads((HERE.parent.parent/'phase-08/step-08-preflip-gates.json').read_text())\n         assert {r['id'] for r in join['rows']}=={r['id'] for r in register['nonBehavioralCensusSites']}\n@@ -61,6 +43,7 @@\n         for id in ('pc-d-0185','pc-d-0186'):\n             row, = [r for r in join['rows'] if r['id']==id]\n             assert row['owningProofs'][0]['testTitle']=='recovery_matrix_all_payload_kinds'\n+        pin = g2pin\n         blobs = {}\n         def source(file):\n             if file not in blobs: blobs[file] = subprocess.check_output(['git','show',pin+':'+file],cwd=ROOT,text=True)\n@@ -86,6 +69,8 @@\n         assert all(r['status']=='judged-non-document-REJECT' and r['gradeRecord']['nonDocumentUse'] for r in reader_rows)\n         assert all(r.get('reason') and r.get('owner') for r in dynamics['rows'])\n         assert all(r['owningProofs'] for r in dynamics['rows'] if r['status']=='joined-owning-test')\n+        pin = g6pin\n+        blobs.clear()\n         assert collections.Counter(r['stage'] for r in proof['rows']) == {'step-03':4804,'step-04':609}\n         assert len({r['rowId'] for r in proof['rows']}) == 5413\n         assert len(proof['negativeDecisionProbes']) == 10 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])\n@@ -184,7 +169,7 @@\n     assert check.returncode == 0, check.stderr\n     commands.append(dict(label='diff-check',argv=command,exit=check.returncode,stdout=check.stdout,stderr=check.stderr))\n     scripts = [CENSUS/'join.py',CENSUS/'test-locators.mjs',HERE/'proof.py',HERE/'physical-move.mjs',HERE/'verify.py']\n-    result = dict(sourceCommit=pin,status='records-replay-passed-not-gate-acceptance',commands=commands,comparisons=comparisons,\n+    result = dict(sourceCommit=pin,status='historical-pin-diagnostic-only-not-combined-verification',commands=commands,comparisons=comparisons,\n                   scriptDigests={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in scripts},\n                   counts={'G2':join['counts'],'G6':proof['counts']},wrapperReviewBatchCoverage=wrapper_coverage,\n                   negativeProbes=dict(sourceBindingAndHistoricalEvidence=10,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=5),\n@@ -193,7 +178,7 @@\n                   manualDynamicJudgmentsSourceCommit=dynamics['judgmentSourceCommit'],\n                   noReadinessClaim=True,independentApproval=False,\n                   notRun=['npm test','scripts/run-tests.mjs','cargo test --workspace','owning product tests (records-only custody task; no product behavior changed, temporary fixture Git writes are allowed)','fgos CLI / impact capability query (forbidden by brief)','pair accounting (Lead A1 custody)','final-pin F census and independent G2/G6 review','markdown preview (Lead custody)'])\n-    (HERE/'verification.json').write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+'\\n')\n+    (HERE/'historical-pin-diagnostic.json').write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+'\\n')\n     print(json.dumps({'byteIdenticalArtifacts':len(comparisons),'G2':join['counts'],'G6':proof['counts'],'wrapperCoverage':wrapper_coverage},sort_keys=True))\n \n \n",
+    "executedScriptSha256": "7364be78dd3c93a138aa6bcfe2a7c91a1fa67622e6ace0193aedd0096b9b9399",
+    "caveat": "Diagnostic only: G2 replay and common-pin equality are not certified. G2 source assertions use the delivered G2 pin, G6 source assertions use 4178dcc6e. All remaining assertions are unchanged; production verifier remains fail-closed.",
+    "exit": 0,
+    "G2LocatorDriftAtG6Pin": {
+      "count": 33,
+      "files": [
+        "packages/git/rust/tests/inspect.rs",
+        "packages/git/rust/tests/recovery_matrix.rs",
+        "packages/git/rust/tests/scoped_commit_sync.rs"
+      ],
+      "rows": [
+        {
+          "rowId": "pc-l-0015",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-l-0016",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-l-0017",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0174",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0175",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0176",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0177",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0178",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0179",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0180",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0181",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0182",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0183",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0184",
+          "file": "packages/git/rust/tests/inspect.rs",
+          "line": 322,
+          "textAtG6Pin": "            .snapshot_writes(&repo, &[b\"escape/outside\".to_vec()], 4096)",
+          "testTitle": "inspect_merge_facts_for_land_consumers"
+        },
+        {
+          "rowId": "pc-d-0185",
+          "file": "packages/git/rust/tests/recovery_matrix.rs",
+          "line": 511,
+          "textAtG6Pin": "                .success()),",
+          "testTitle": "recovery_matrix_all_payload_kinds"
+        },
+        {
+          "rowId": "pc-d-0186",
+          "file": "packages/git/rust/tests/recovery_matrix.rs",
+          "line": 511,
+          "textAtG6Pin": "                .success()),",
+          "testTitle": "recovery_matrix_all_payload_kinds"
+        },
+        {
+          "rowId": "pc-d-0192",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 304,
+          "textAtG6Pin": "    let prepared = f",
+          "testTitle": "noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files"
+        },
+        {
+          "rowId": "pc-d-0193",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 304,
+          "textAtG6Pin": "    let prepared = f",
+          "testTitle": "noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files"
+        },
+        {
+          "rowId": "pc-d-0194",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 304,
+          "textAtG6Pin": "    let prepared = f",
+          "testTitle": "noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files"
+        },
+        {
+          "rowId": "pc-d-0195",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 304,
+          "textAtG6Pin": "    let prepared = f",
+          "testTitle": "noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files"
+        },
+        {
+          "rowId": "pc-d-0196",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0197",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0198",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0199",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0200",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0201",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0202",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 368,
+          "textAtG6Pin": "            &main,",
+          "testTitle": "baseline_only_cutover_commits_the_event_fence"
+        },
+        {
+          "rowId": "pc-d-0206",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 544,
+          "textAtG6Pin": "    fs::write(f.tree.join(\"fresh\"), id).unwrap();",
+          "testTitle": "admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids"
+        },
+        {
+          "rowId": "pc-d-0207",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 544,
+          "textAtG6Pin": "    fs::write(f.tree.join(\"fresh\"), id).unwrap();",
+          "testTitle": "admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids"
+        },
+        {
+          "rowId": "pc-d-0208",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 642,
+          "textAtG6Pin": "    assert!(error.cause.contains(\"retained index.lock runbook\"));",
+          "testTitle": "terminal_commit_history_is_bounded_and_compacted_receipts_replay"
+        },
+        {
+          "rowId": "pc-d-0209",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 780,
+          "textAtG6Pin": "        .driver",
+          "testTitle": "pre_attempt_recovery_does_not_unstage_a_changed_index"
+        },
+        {
+          "rowId": "pc-d-0211",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 1027,
+          "textAtG6Pin": "                        \"lifecycle\",",
+          "testTitle": "lifecycle_attempts_exclude_commit_and_sync"
+        },
+        {
+          "rowId": "pc-d-0212",
+          "file": "packages/git/rust/tests/scoped_commit_sync.rs",
+          "line": 1027,
+          "textAtG6Pin": "                        \"lifecycle\",",
+          "testTitle": "lifecycle_attempts_exclude_commit_and_sync"
+        }
+      ]
+    }
+  },
   "owningG6Assertions": {
-    "evidence": "../misc-fix/checks.json",
-    "exit": 0
+    "exit": 0,
+    "evidence": "misc-checks.json"
   },
-  "noReadinessClaim": true
+  "doubleReplay": "sentence-replay.json",
+  "noOtherDiagnosticAssertionFailures": true
 }

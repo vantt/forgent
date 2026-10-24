@@ -1,0 +1,91 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "label": "diff-check",
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "comparisons": [],
+  "counts": {
+    "G2": {
+      "files": 140,
+      "sites": 1126,
+      "statuses": {
+        "confirmed-grade-record-REJECT": 293,
+        "joined-owning-test": 646,
+        "judgment-required": 187
+      }
+    },
+    "G6": {
+      "byResult": {
+        "judgment-preserve-with-dated-note": 163,
+        "park-current-passage-unbound": 137,
+        "park-source-absent": 2,
+        "park-source-removed-by-cutover": 162,
+        "park-unconfirmed-preserve-premise": 959,
+        "preserve-operand-reachability-unchanged": 1416,
+        "preserve-source-confirmed-history": 2574
+      },
+      "byStage": {
+        "step-03": 4804,
+        "step-04": 609
+      },
+      "excludedRetireWithTree": 38,
+      "finalBatchPopulation": {
+        "step-03": 130,
+        "step-04": 33
+      },
+      "recordBatches": 136,
+      "total": 5413
+    }
+  },
+  "followupChecks": {
+    "additionalDynamicSites": 11,
+    "allEnumeratedWrapperLines": 163,
+    "deletedCensusSources": 28,
+    "deletedSourcePreservesParked": 5,
+    "individuallyJudgedReaderHints": 13,
+    "livePointersParked": 29,
+    "missedWrappersNowNoted": 11,
+    "reviewedDynamicSites": 132
+  },
+  "independentApproval": false,
+  "manualDynamicJudgmentsSourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
+  "negativeProbes": {
+    "copiedL12_121HistoricalPredicate": 3,
+    "positiveEvidenceControls": 5,
+    "sourceBindingAndHistoricalEvidence": 10
+  },
+  "noReadinessClaim": true,
+  "notRun": [
+    "npm test",
+    "scripts/run-tests.mjs",
+    "cargo test --workspace",
+    "owning product tests (records-only custody task; no product behavior changed, temporary fixture Git writes are allowed)",
+    "fgos CLI / impact capability query (forbidden by brief)",
+    "pair accounting (Lead A1 custody)",
+    "final-pin F census and independent G2/G6 review",
+    "markdown preview (Lead custody)"
+  ],
+  "scriptDigests": {
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py": "4d9a428ceaf41f3854c1c812e48d1af3e972393ed1879d813aaf3a8289c4a802",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs": "7e3c81518493f842dde5508a35fb65ad8c96d21facec23ea5bbf483ea697e5ac",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs": "93ba67feff7f2bce8b6f4427e612cbed78117af54a6df9ce1170502c685d1fb7",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py": "479e9c4c6264b31a551c20e70e680d85144b84b38bb71577501d5b285462cce8",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py": "6bc0a46c69e1c0bf3a38e446f42bb74b7555db5d3cdb3180410e3dd64ab09118"
+  },
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "status": "historical-pin-diagnostic-only-not-combined-verification",
+  "wrapperReviewBatchCoverage": {
+    "coveredByProposals": 73,
+    "missing": [],
+    "reviewBatchPaths": 73
+  }
+}
