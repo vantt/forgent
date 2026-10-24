@@ -141,10 +141,12 @@ Added by the run supervisor ([run-supervisor spec](../run-supervisor/spec.md)); 
 | Operation | Meaning |
 |---|---|
 | `create(attemptId) -> domain` | A domain with no process yet |
-| `spawn_in(domain, spec) -> root tuple` | Start the gate inside the domain with an explicit fd map (`spawn_with_fds`, every other fd from 3 up is closed) and an exact environment; the domain id is complete afterwards. The id is identical to the `domainId` of the holder-lock predecessor record, so it can be declared as is |
+| `spawn_in(domain, spec) -> root tuple` | Start the gate inside the domain with an explicit fd map (`spawn_mapped`, every other fd from 3 up is closed) and an exact environment; the domain id is complete afterwards. The id is identical to the `domainId` of the holder-lock predecessor record, so it can be declared as is |
 | `is_empty(domain) -> empty \| not-empty \| unknown` | The OS's real state; a caller never treats `unknown` as empty |
 | `kill_all(domain, graceMs) -> ok \| refused` | SIGTERM (or job terminate), then SIGKILL after `graceMs` (0 means at once), then wait for empty; `refused` when the driver cannot act (identity mismatch, unsupported) |
 | `guarantee() -> {driver, level, escapes}` | `kernel`, `best-effort` or `unsupported`, with the named escape routes the doctor prints |
+
+2026-10-24: contained children start without forking the caller: every driver's `spawn_in` on unix goes through `mapped::spawn_mapped` (`posix_spawn` on Linux with glibc, the bwrap `--info-fd` slot and the caller's stdio files as its file actions, `POSIX_SPAWN_SETSID` for the session the `linux-pgroup` gate leads), so its cost no longer grows with the caller's memory; macOS and other non-glibc unix take the same door's `Command` fallback, which still forks.
 
 Driver selection: Linux uses `bwrap-pidns` when bwrap with user and PID namespaces works (probed once per process and path), else `linux-pgroup`; Windows `windows-job`; macOS `macos-tree`; anything else `unsupported-platform`. Port errors have stable names: `unsupported-platform`, `driver-unavailable`, `spawn-failed`, `namespace-unavailable`, `invalid-bwrap-prefix`, `io`.
 
