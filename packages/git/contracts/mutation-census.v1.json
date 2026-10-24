@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5d249ff50f83ebd74fc7cca32f150d3c9c46e735cc0a4d948ee222603cc1657d",
+  "payloadDigest": "8d85aba92dd695fd080cb4bc618072e2286949c49e28ef4954c058a988fd91a7",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -270,7 +270,7 @@
     "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
     "packages/distribution/rust/src/lock.rs": "e79b03663013f69e83f509bfa2745825ee3a796f979746e419241b54823094b0",
     "packages/distribution/rust/src/manifest.rs": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
-    "packages/distribution/rust/src/shim.rs": "10a10737fd453a5a6f1916b35d25dda75fff26e82e42905cc31e2aacaa2fed26",
+    "packages/distribution/rust/src/shim.rs": "aace8fce5eb2ff090b690a8b48a2bbc99584b6faaa7873976139dfa37a0b0b0d",
     "packages/distribution/rust/src/store.rs": "7bd1e141a72e4db792ef9c2346872b3a79fb72e0978b47cbbad124a65217f2c6",
     "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
     "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
@@ -2027,16 +2027,37 @@
     },
     {
       "path": "packages/distribution/rust/src/shim.rs",
-      "line": 409,
+      "line": 416,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
     },
     {
       "path": "packages/distribution/rust/src/shim.rs",
-      "line": 427,
+      "line": 434,
       "spawn": "Command::new",
       "binary": "? shim of run_shim",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/shim.rs",
+      "line": 543,
+      "spawn": "Command::new",
+      "binary": "? shim of run_shim_within",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/shim.rs",
+      "line": 582,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/shim.rs",
+      "line": 628,
+      "spawn": "Command::new",
+      "binary": "sh",
       "class": "rust-test"
     },
     {

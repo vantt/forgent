@@ -20,51 +20,56 @@ const ENTRY_FGOS_RUNNER: &str = "fgos-runner";
 /// line of the form `"<key>": "<value>"` (spaces around the colon, trailing
 /// commas and a trailing carriage return allowed) gives the value; carriage
 /// returns inside it are dropped, and in `releasePath` every backslash becomes
-/// a slash and repeated slashes collapse.
+/// a slash and repeated slashes collapse. Reading stops once both keys are
+/// found. Every name the shim sets starts with `_fgos_`, so a caller's
+/// exported variables reach the entry unchanged; a lost carriage-return byte
+/// (a tool that strips a lone CR) only stops the CR handling, never the loop.
 fn sh_body(entry: &str) -> String {
     let body = format!(
         r#"#!/bin/sh
 # fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
 # `fgctl repair` to regenerate it.
 set -eu
-case $0 in */*) self_dir=${{0%/*}} ;; *) self_dir=. ;; esac
-activation="$self_dir/../activation.json"
-[ -f "$activation" ] || {{ echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }}
-cr='CR'
-# value KEY LINE: sets $value from a line `"KEY": "VALUE"`; false otherwise.
-value() {{
-  v=${{2%"$cr"}}
-  v=${{v#"${{v%%[![:space:]]*}}"}}
-  case $v in "\"$1\""*) v=${{v#"\"$1\""}} ;; *) return 1 ;; esac
-  v=${{v#"${{v%%[![:space:]]*}}"}}
-  case $v in :*) v=${{v#:}} ;; *) return 1 ;; esac
-  v=${{v#"${{v%%[![:space:]]*}}"}}
-  case $v in \"*) v=${{v#\"}} ;; *) return 1 ;; esac
-  while :; do case $v in *,) v=${{v%,}} ;; *) break ;; esac; done
-  case $v in *\") v=${{v%\"}} ;; *) return 1 ;; esac
-  while :; do case $v in *"$cr"*) v=${{v%%"$cr"*}}${{v#*"$cr"}} ;; *) break ;; esac; done
-  value=$v
+case $0 in */*) _fgos_self_dir=${{0%/*}} ;; *) _fgos_self_dir=. ;; esac
+_fgos_activation="$_fgos_self_dir/../activation.json"
+[ -f "$_fgos_activation" ] || {{ echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }}
+[ -r "$_fgos_activation" ] || {{ echo "fgos: activation.json is not readable -- run fgctl repair" >&2; exit 3; }}
+_fgos_cr='CR'
+# _fgos_value KEY LINE: sets $_fgos_value from a line `"KEY": "VALUE"`; false otherwise.
+_fgos_value() {{
+  _fgos_v=${{2%"$_fgos_cr"}}
+  _fgos_v=${{_fgos_v#"${{_fgos_v%%[![:space:]]*}}"}}
+  case $_fgos_v in "\"$1\""*) _fgos_v=${{_fgos_v#"\"$1\""}} ;; *) return 1 ;; esac
+  _fgos_v=${{_fgos_v#"${{_fgos_v%%[![:space:]]*}}"}}
+  case $_fgos_v in :*) _fgos_v=${{_fgos_v#:}} ;; *) return 1 ;; esac
+  _fgos_v=${{_fgos_v#"${{_fgos_v%%[![:space:]]*}}"}}
+  case $_fgos_v in \"*) _fgos_v=${{_fgos_v#\"}} ;; *) return 1 ;; esac
+  while :; do case $_fgos_v in *,) _fgos_v=${{_fgos_v%,}} ;; *) break ;; esac; done
+  case $_fgos_v in *\") _fgos_v=${{_fgos_v%\"}} ;; *) return 1 ;; esac
+  [ -z "$_fgos_cr" ] || while :; do case $_fgos_v in *"$_fgos_cr"*) _fgos_v=${{_fgos_v%%"$_fgos_cr"*}}${{_fgos_v#*"$_fgos_cr"}} ;; *) break ;; esac; done
+  _fgos_value=$_fgos_v
 }}
-status= release_path= found_status= found_path=
-while IFS= read -r line || [ -n "$line" ]; do
-  if [ -z "$found_status" ] && value status "$line"; then status=$value; found_status=1; fi
-  if [ -z "$found_path" ] && value releasePath "$line"; then release_path=$value; found_path=1; fi
-done < "$activation"
-[ "$status" = "ready" ] || {{ echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }}
-while :; do case $release_path in *\\*) release_path=${{release_path%%\\*}}/${{release_path#*\\}} ;; *) break ;; esac; done
-while :; do case $release_path in *//*) release_path=${{release_path%%//*}}/${{release_path#*//}} ;; *) break ;; esac; done
-[ -n "$release_path" ] || {{ echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }}
-entry="$release_path/bin/{entry}"
-if [ ! -x "$entry" ] && [ -x "${{entry}}.exe" ]; then
-  entry="${{entry}}.exe"
+_fgos_status= _fgos_release_path= _fgos_found_status= _fgos_found_path=
+while IFS= read -r _fgos_line || [ -n "$_fgos_line" ]; do
+  if [ -z "$_fgos_found_status" ] && _fgos_value status "$_fgos_line"; then _fgos_status=$_fgos_value; _fgos_found_status=1; fi
+  if [ -z "$_fgos_found_path" ] && _fgos_value releasePath "$_fgos_line"; then _fgos_release_path=$_fgos_value; _fgos_found_path=1; fi
+  [ -z "$_fgos_found_status" ] || [ -z "$_fgos_found_path" ] || break
+done < "$_fgos_activation"
+[ "$_fgos_status" = "ready" ] || {{ echo "fgos: active runtime is not ready ($_fgos_status) -- run fgctl repair" >&2; exit 3; }}
+while :; do case $_fgos_release_path in *\\*) _fgos_release_path=${{_fgos_release_path%%\\*}}/${{_fgos_release_path#*\\}} ;; *) break ;; esac; done
+while :; do case $_fgos_release_path in *//*) _fgos_release_path=${{_fgos_release_path%%//*}}/${{_fgos_release_path#*//}} ;; *) break ;; esac; done
+[ -n "$_fgos_release_path" ] || {{ echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }}
+_fgos_entry="$_fgos_release_path/bin/{entry}"
+if [ ! -x "$_fgos_entry" ] && [ -x "${{_fgos_entry}}.exe" ]; then
+  _fgos_entry="${{_fgos_entry}}.exe"
 fi
-[ -x "$entry" ] || {{ echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }}
-exec "$entry" "$@"
+[ -x "$_fgos_entry" ] || {{ echo "fgos: active release entry not found: $_fgos_entry -- run fgctl repair" >&2; exit 3; }}
+exec "$_fgos_entry" "$@"
 "#
     );
     // A literal carriage return: the only way a POSIX shell names one
     // without running a program.
-    body.replacen("cr='CR'", "cr='\r'", 1)
+    body.replacen("_fgos_cr='CR'", "_fgos_cr='\r'", 1)
 }
 
 /// The `.cmd` launcher. `target` is the release-relative Windows file it runs
@@ -259,12 +264,14 @@ mod tests {
         let shims = workspace_shims();
         let fgos = shims.iter().find(|s| s.name == "fgos").unwrap();
         assert!(fgos.body.starts_with("#!/bin/sh\n"));
-        assert!(fgos.body.contains(r#"entry="$release_path/bin/fgos""#));
-        assert!(fgos.body.contains(r#"exec "$entry" "$@""#));
+        assert!(fgos
+            .body
+            .contains(r#"_fgos_entry="$_fgos_release_path/bin/fgos""#));
+        assert!(fgos.body.contains(r#"exec "$_fgos_entry" "$@""#));
         let runner = shims.iter().find(|s| s.name == "fgos-runner").unwrap();
         assert!(runner
             .body
-            .contains(r#"entry="$release_path/bin/fgos-runner""#));
+            .contains(r#"_fgos_entry="$_fgos_release_path/bin/fgos-runner""#));
     }
 
     #[test]
@@ -521,6 +528,159 @@ mod tests {
         let out = run_shim(&shim, &path);
         assert_eq!(out.status.code(), Some(3));
         assert!(String::from_utf8_lossy(&out.stderr).contains("no active runtime"));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// Runs `shim` with `env` only, ending it after `limit`; `None` when it had not returned.
+    #[cfg(unix)]
+    fn run_shim_within(
+        shim: &Path,
+        env: &[(&str, &str)],
+        limit: std::time::Duration,
+    ) -> Option<std::process::Output> {
+        let path = std::env::var("PATH").unwrap_or_default();
+        for _ in 0..50 {
+            let spawned = std::process::Command::new(shim)
+                .args(["hook", "mailbox"])
+                .env_clear()
+                .env("PATH", &path)
+                .envs(env.iter().copied())
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::piped())
+                .spawn();
+            let mut child = match spawned {
+                Err(e) if e.kind() == std::io::ErrorKind::ExecutableFileBusy => {
+                    std::thread::sleep(std::time::Duration::from_millis(20));
+                    continue;
+                }
+                other => other.unwrap(),
+            };
+            let start = std::time::Instant::now();
+            while start.elapsed() < limit {
+                if child.try_wait().unwrap().is_some() {
+                    return Some(child.wait_with_output().unwrap());
+                }
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+            let _ = child.kill();
+            let _ = child.wait();
+            return None;
+        }
+        panic!("{} stayed busy", shim.display())
+    }
+
+    const PRETTY: &str = "{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\",\n  \"shimVersion\": \"1\"\n}\n";
+
+    #[cfg(unix)]
+    #[test]
+    fn a_sh_shim_whose_carriage_return_byte_was_lost_still_returns_and_runs_the_entry() {
+        let (root, shim) = shim_scene("no-cr", PRETTY);
+        // A tool that strips a lone carriage return leaves `cr=''`.
+        let body = std::fs::read_to_string(&shim).unwrap();
+        assert!(body.contains("_fgos_cr='\r'"));
+        std::fs::remove_file(&shim).unwrap();
+        let written = std::process::Command::new("sh")
+            .arg("-c")
+            .arg("printf '%s' \"$2\" > \"$1\" && chmod 755 \"$1\"")
+            .arg("sh")
+            .arg(&shim)
+            .arg(body.replace("_fgos_cr='\r'", "_fgos_cr=''"))
+            .status()
+            .unwrap();
+        assert!(written.success());
+        let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(5))
+            .expect("the shim returned");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        assert!(String::from_utf8_lossy(&out.stdout)
+            .trim_end()
+            .ends_with("/release/bin/fgos hook mailbox"));
+        // Without the byte a CRLF activation is no longer understood, but the shim still returns.
+        let activation = root.join("installation").join("activation.json");
+        let crlf = std::fs::read_to_string(&activation)
+            .unwrap()
+            .replace('\n', "\r\n");
+        std::fs::write(&activation, crlf).unwrap();
+        let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(5))
+            .expect("the shim returned on a CRLF activation");
+        assert_eq!(out.status.code(), Some(3), "{out:?}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_sh_shim_leaves_the_callers_exported_variables_to_the_entry_untouched() {
+        let (root, shim) = shim_scene("caller-env", PRETTY);
+        let entry = root.join("release").join("bin").join("fgos");
+        let names = [
+            "v",
+            "value",
+            "line",
+            "cr",
+            "status",
+            "release_path",
+            "found_status",
+            "found_path",
+            "entry",
+            "activation",
+            "self_dir",
+        ];
+        let script = format!("#!/bin/sh\nfor n in {}; do eval \"printf '%s=%s;' \\\"$n\\\" \\\"\\${{$n-unset}}\\\"\"; done\n", names.join(" "));
+        let written = std::process::Command::new("sh")
+            .arg("-c")
+            .arg("rm -f \"$1\" && printf '%s' \"$2\" > \"$1\" && chmod 755 \"$1\"")
+            .arg("sh")
+            .arg(&entry)
+            .arg(&script)
+            .status()
+            .unwrap();
+        assert!(written.success());
+        let env: Vec<(&str, String)> = names.iter().map(|n| (*n, format!("caller-{n}"))).collect();
+        let env: Vec<(&str, &str)> = env.iter().map(|(n, v)| (*n, v.as_str())).collect();
+        let out = run_shim_within(&shim, &env, std::time::Duration::from_secs(5))
+            .expect("the shim returned");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        let expected: String = names.iter().map(|n| format!("{n}=caller-{n};")).collect();
+        assert_eq!(String::from_utf8_lossy(&out.stdout), expected);
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn an_unreadable_activation_refuses_with_exit_3_and_the_repair_hint() {
+        use std::os::unix::fs::PermissionsExt;
+        let (root, shim) = shim_scene("unreadable", PRETTY);
+        let activation = root.join("installation").join("activation.json");
+        std::fs::set_permissions(&activation, std::fs::Permissions::from_mode(0o000)).unwrap();
+        // Root reads a mode-000 file anyway; the refusal is then not reachable.
+        if std::fs::read(&activation).is_err() {
+            let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(5))
+                .expect("the shim returned");
+            assert_eq!(out.status.code(), Some(3), "{out:?}");
+            assert!(
+                String::from_utf8_lossy(&out.stderr).contains("-- run fgctl repair"),
+                "{out:?}"
+            );
+        }
+        std::fs::set_permissions(&activation, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_sh_shim_stops_reading_once_it_has_both_keys() {
+        // Both keys first, then a tail of about 33 MB, which sh takes some 5 s to read
+        // line by line: the shim returns long before, without reading it.
+        let pad = "x".repeat(200);
+        let tail: String = (0..150_000)
+            .map(|i| format!("  \"pad{i}\": \"{pad}\",\n"))
+            .collect();
+        let (root, shim) = shim_scene(
+            "long-tail",
+            &format!("{{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\",\n{tail}}}\n"),
+        );
+        let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(2))
+            .expect("the shim returned within 2 s");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
         let _ = std::fs::remove_dir_all(&root);
     }
 
