@@ -42,7 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree, deleteBranchRef, gitWorktrees, realpathOrSelf } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
-import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
@@ -57,6 +57,13 @@ import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
+
+/**
+ * The invariant-check commands of the project at `repoRoot` (`invariantChecks.commands`). The door reads
+ * `command` values from the main checkout whatever root is passed, so a worker's edit to its own
+ * worktree's config never changes what the merge gate executes; a refused config file throws.
+ */
+export const readInvariantCheckCommands = (repoRoot) => readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands ?? [];
 
 /** Raised only for a genuinely unexpected failure (a held lock, a target
  * checked out elsewhere, an unreadable merge) — never for a conflict or a

@@ -7,17 +7,18 @@
 // `src/setup/registrations.mjs`, itself use-case tier — an infra file
 // importing a use-case file would invert the layer this whole boundary
 // refactor exists to keep one-directional (docs/architecture-manifest.json).
-import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
+import { readConfig } from '../../config/facade.mjs';
 import { IRON_LAW_LEVELS, DEFAULT_IRON_LAW_LEVEL } from '../../setup/registrations.mjs';
 import { addDecision } from '../../state/store.mjs';
 
 // Anything that is not exactly the opt-in literal reads as `ask` — a missing
-// key, a malformed file, a typo'd value. That is the same fail-closed shape
+// key or a value outside the levels. A config file the door refuses is not
+// swallowed here: the read throws its named refusal and the verb stops. That is the same fail-closed shape
 // `--acknowledge-iron-law` already uses for its own bare-boolean check
 // (review-20260718-self-improve-loop f02), and it matters more here: the
 // permissive level is the one that lets a self-modifying diff land unreviewed.
 export function readIronLawLevel(repoRoot) {
-  const level = readSharedConfigOrEmpty(repoRoot)?.ironLaw?.level;
+  const level = readConfig({ projectRoot: repoRoot, sections: ['ironLaw'] }).value.ironLaw?.level;
   return IRON_LAW_LEVELS.includes(level) ? level : DEFAULT_IRON_LAW_LEVEL;
 }
 

@@ -23,7 +23,7 @@ import {
 } from '../../src/terminal-control/config.mjs';
 import { READY_TIMEOUT_MS } from '../../src/runner/dispatch/herdr-deadlines.mjs';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, ensureSharedConfigDefaults } from '../../src/setup/registrations.mjs';
-import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { globalConfigPath as globalConfigFile, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -79,8 +79,9 @@ test('terminal-control passes on defaults and prints every value with its source
 });
 
 test('terminal-control names the source of an override: project over global over default', () => {
-  const globalPath = path.join(scratch, 'global-with-terminal.json');
-  fs.writeFileSync(globalPath, JSON.stringify({ terminal: { allocationGraceMs: 90000, layout: { minCols: 100 } } }));
+  const home = path.join(scratch, 'global-with-terminal');
+  writeGlobalConfig(home, { terminal: { allocationGraceMs: 90000, layout: { minCols: 100 } } });
+  const globalPath = globalConfigFile(home);
   const root = workspace('override', { layout: { minCols: 120 } });
   const r = configCheck(root, globalPath);
   assert.equal(r.passed, true);
@@ -108,20 +109,20 @@ test('terminal-control fails a retainFailedPaneMs that is neither null nor a pos
   assert.match(ok.message, /retainFailedPaneMs=3600000 \(project\)/);
 });
 
-test('terminal-control prints the refusal the core names for a limit below the measured floor, and passes the floor itself', () => {
-  for (const [key, value, named] of [['minCols', 39, 'layout.minCols=39 < 40'], ['minRows', 7, 'layout.minRows=7 < 8']]) {
+test('terminal-control names the refusal of the config door for a limit below the measured floor, and passes the floor itself', () => {
+  for (const [key, value] of [['minCols', 39], ['minRows', 7]]) {
     const r = configCheck(workspace(`floor-${key}`, { layout: { [key]: value } }));
     assert.equal(r.passed, false, `${key}=${value}`);
-    assert.ok(r.message.includes(named) && r.message.includes('terminal-config-below-floor'), r.message);
+    assert.match(r.message, new RegExp(`config-schema .*terminal\\.layout\\.${key} \\(minimum\\)`), r.message);
   }
   assert.equal(configCheck(workspace('floor-ok', { layout: { minCols: 40, minRows: 8 } })).passed, true);
 });
 
-test('terminal-control reports the Node rules and the core refusal in one message', () => {
+test('terminal-control reports a config the door refuses before it judges the Node rules', () => {
   const r = configCheck(workspace('many', { allocationGraceMs: 10, layout: { minCols: 1 } }));
   assert.equal(r.passed, false);
-  assert.match(r.message, /terminal\.allocationGraceMs/);
-  assert.match(r.message, /layout\.minCols=1 < 40/);
+  assert.match(r.message, /^terminal\.\* unreadable: config-schema .*terminal\.layout\.minCols \(minimum\)/);
+  assert.doesNotMatch(r.message, /allocationGraceMs/, 'the Node rules judge values the door accepted');
 });
 
 test('terminal-control warns, without failing, when the route cannot be reached', () => {
@@ -236,7 +237,7 @@ test('terminal-allocations warns about a slot that was allocated and never launc
   const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { title: 'stuck', role: 'worker' } });
   assert.equal(slot.result, 'slot');
   const before = fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '';
-  const root = workspace('alloc-stuck', { allocationGraceMs: 0 });
+  const root = workspace('alloc-stuck', { allocationGraceMs: 1 });
   const r = checkTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: tc });
   assert.equal(r.passed, true);
   assert.match(r.message, /^warning: 1 slot\(s\) need a person; nothing was closed: doctor-stuck-slot \(pane \S+\): a slot was allocated but never launched/);

@@ -17,6 +17,9 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
+// The config facade layers the machine's own global file under the project file; a test never reads the real one.
+process.env.HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worker-slots-home-'));
+
 const FGOS_BIN = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
 /** A view is just `{work: {id: item}}` — worker-slots.mjs is pure, so these
@@ -324,22 +327,18 @@ test('fgos report supplies its own rationale when no stop reason is given, since
   assert.ok(report.rationale.trim().length > 0);
 });
 
-// The shared config is an edit-the-file-by-hand surface, so a half-typed edit
-// is an ordinary state. Before the ceiling existed, take/pick never read that
-// file at all; reading it bare made a broken one throw an UNCATEGORIZED error
-// straight through claimWork — exit 1 with a raw stack instead of the
-// validation code, and a whole runner drain-run dying with it.
-test('a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash', async () => {
+// The project config is an edit-the-file-by-hand surface, so a half-typed edit is an ordinary state. A claim never
+// reads a broken one as "no ceiling" (that would widen what may run at once): the read throws the door's named
+// refusal, categorised as a config refusal rather than a raw parse stack, and the item stays at todo.
+test('a project config that does not parse refuses the claim by name and leaves the item at todo', async () => {
   const { repoRoot, dir } = setup();
   writeRawProjectConfig(repoRoot, '{ not json');
 
-  await claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
-
-  assert.equal(
-    listWork(dir).work.target.status,
-    'doing',
-    'an unreadable config must read as "no ceiling", exactly like an absent one',
+  await assert.rejects(
+    claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot }),
+    (err) => err.name === 'ConfigDoorError' && err.code === 'config-parse',
   );
+  assert.equal(listWork(dir).work.target.status, 'todo', 'a refused config claims nothing');
 });
 
 // --- the registered config default ------------------------------------------

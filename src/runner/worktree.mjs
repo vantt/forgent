@@ -66,7 +66,7 @@ function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta =
 }
 export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
 
-import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { statusPaths, inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
@@ -140,7 +140,8 @@ const WORKTREE_SETUP_TIMEOUT_MS = 30 * 60 * 1000;
  * Throws WorktreeError (with the command's output) on the first failure.
  */
 export function runWorktreeSetupCommands(worktreePath, repoRoot) {
-  const commands = readWorktreeSetupCommands(repoRoot);
+  // `command` values: the door reads them from the main checkout whatever root is passed, so a worker's edit to its own worktree's config never changes what runs.
+  const commands = readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] }).value.worktreeSetup?.commands ?? [];
   for (const command of commands) {
     try {
       execFileSync(command, {

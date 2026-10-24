@@ -90,9 +90,8 @@ import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
 import { cleanupMergedBranch } from './merge.mjs';
-import { claimWork, ClaimError } from './claim-port.mjs';
+import { claimWork, ClaimError, readWorkerSlotCeiling } from './claim-port.mjs';
 import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
-import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
@@ -1379,7 +1378,7 @@ export async function runOnce(options = {}) {
         const discoverEntry = stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind);
         if (discoverEntry === undefined || item.workflowStep !== discoverEntry || item.status !== 'todo') continue;
         const researchRoom = hasWorkerSlotRoom(listWork(dir), {
-          ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
+          ceiling: readWorkerSlotCeiling(dir),
           excludeId: item.id,
         });
         if (!researchRoom.allowed) {
@@ -1626,11 +1625,11 @@ export async function runOnce(options = {}) {
     // is CONFIGURATION, while the occupancy it is compared against is STATE
     // — and the state half is already re-read every poll, through `view`
     // below. `dir` is the `.fgos` directory, so its parent is the project
-    // root readSharedConfig expects — resolved the same way claimWork's own
+    // root the config facade expects — resolved the same way claimWork's own
     // gate does (claim-port.mjs), rather than from `repoRoot`, which callers
     // set independently. An absent `workerSlots.ceiling` means no ceiling at
     // all, so this whole gate stays inert until a project configures one.
-    const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
+    const ceiling = readWorkerSlotCeiling(dir);
     const dispatched = [];
     let haltExitCode = null;
     // Set whenever the worker-slot gate refused or trimmed a wave, so the

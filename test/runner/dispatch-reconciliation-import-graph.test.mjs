@@ -196,9 +196,8 @@ const EXPECTED_CLOSURE = [
   'src/runner/dispatch/llm-accounts.mjs',
   // The effort levels provider-adapter.mjs reports as renderable (a leaf: no imports).
   'src/runner/dispatch/tier-cell.mjs',
-  'src/config/global-config.mjs',
-  'src/config/shared-config-file.mjs',
-  'src/setup/config-merge.mjs',
+  // The config facade reconcile.mjs reads the machine's runner through (one native door call; reconcile reaches `readMachineConfig` only).
+  'src/config/facade.mjs',
   // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
   // names for the planner's and visibility-session's write-then-rename.
   'src/util/unique-tmp-tag.mjs',

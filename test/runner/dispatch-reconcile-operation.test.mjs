@@ -98,9 +98,9 @@ test('invokeDispatchReconcileOperation ignores a forged now/ttlMs in payload for
   assert.equal(applied.outcome, 'applied');
 });
 
-test('dispatch reconcile provider-capacity clear-quarantine validates global inventory and writes audit', () => {
+test('dispatch reconcile provider-capacity clear-quarantine validates the machine account inventory and writes audit', () => {
   const dir = root();
-  const globalConfigPath = path.join(dir, 'global-config.json');
+  const globalConfigPath = path.join(dir, 'global', 'config.json');
   const runtimeDir = path.join(dir, 'runtime');
   const runnerConfig = {
     runner: {
@@ -116,7 +116,9 @@ test('dispatch reconcile provider-capacity clear-quarantine validates global inv
       },
     },
   };
-  fs.writeFileSync(globalConfigPath, `${JSON.stringify(runnerConfig, null, 2)}\n`);
+  // Account pools live in the machine's accounts file, never in the global config file.
+  fs.mkdirSync(path.join(dir, 'global', 'private'), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(dir, 'global', 'private', 'accounts.yaml'), `${JSON.stringify(runnerConfig, null, 2)}\n`, { mode: 0o600 });
 
   const ctx = { repoRoot: dir, actor: 'test-operator' };
   const unknown = invokeDispatchReconcileOperation({
