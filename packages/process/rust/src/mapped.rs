@@ -7,11 +7,13 @@
 //! [`spawn_mapped`] takes the whole request instead, so on Linux with glibc
 //! it starts the child with `posix_spawn` (a `vfork`-style clone that shares
 //! the caller's memory until exec) and applies the same map as file
-//! actions: each slot is a `dup2` of a close-on-exec duplicate, every other
-//! descriptor that would survive exec is closed, the child gets its own
-//! process group when asked, an empty signal mask and default `SIGPIPE`
-//! (what `Command` gives a child). Elsewhere it runs the `Command` path.
-//! A program that cannot be executed is an error of the call.
+//! actions: each slot and each given stdio file is a `dup2` of a
+//! close-on-exec duplicate, every other descriptor that would survive exec
+//! is closed, the child leads its own process group or session when asked,
+//! and it gets an empty signal mask and default `SIGPIPE` (what `Command`
+//! gives a child). Elsewhere it runs the `Command` path. A program that
+//! cannot be executed is an error of the call. Every contained child (the
+//! containment drivers' `spawn_in`) starts through this door.
 
 use std::ffi::OsString;
 use std::fs::File;
@@ -22,19 +24,32 @@ use std::process::ExitStatus;
 use crate::FdSlot;
 
 /// One standard stream of a mapped child.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MappedStdio {
+#[derive(Debug, Clone, Copy)]
+pub enum MappedStdio<'a> {
     /// The caller's own stream.
     Inherit,
     /// `/dev/null`.
     Null,
     /// A pipe; the parent end is returned on [`MappedChild`].
     Piped,
+    /// A duplicate of a file the caller keeps.
+    File(&'a File),
+}
+
+/// Which process group and session a mapped child is in.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MappedLead {
+    /// The caller's.
+    Caller,
+    /// A new process group the child leads.
+    Group,
+    /// A new session (and its process group) the child leads.
+    Session,
 }
 
 /// Everything about a child [`spawn_mapped`] starts.
 #[derive(Debug, Clone)]
-pub struct MappedSpawn {
+pub struct MappedSpawn<'a> {
     /// Program and arguments. A program without `/` is looked up in the
     /// child's `PATH` (from `env`, else the caller's).
     pub argv: Vec<OsString>,
@@ -45,10 +60,10 @@ pub struct MappedSpawn {
     pub clear_env: bool,
     /// Working directory of the child.
     pub cwd: Option<PathBuf>,
-    /// Put the child in a new process group it leads.
-    pub process_group: bool,
+    /// The process group and session of the child.
+    pub lead: MappedLead,
     /// Standard input, output and error.
-    pub stdio: [MappedStdio; 3],
+    pub stdio: [MappedStdio<'a>; 3],
 }
 
 /// A child started by [`spawn_mapped`]. Like `std::process::Child` it is not
@@ -102,21 +117,39 @@ impl MappedChild {
     pub fn wait(&mut self) -> io::Result<ExitStatus> {
         match &mut self.inner {
             Inner::Std(child) => child.wait(),
-            Inner::Spawned { status: Some(status), .. } => Ok(*status),
-            Inner::Spawned { pid, status } => {
-                use std::os::unix::process::ExitStatusExt;
-                let mut raw = 0;
-                loop {
-                    // SAFETY: waitpid on our own child into a local.
-                    if unsafe { libc::waitpid(*pid as libc::pid_t, &mut raw, 0) } >= 0 {
-                        let exited = ExitStatus::from_raw(raw);
-                        *status = Some(exited);
-                        return Ok(exited);
-                    }
-                    let err = io::Error::last_os_error();
-                    if err.raw_os_error() != Some(libc::EINTR) {
-                        return Err(err);
-                    }
+            Inner::Spawned { pid, status } => reap(*pid, status, 0).map(|s| s.expect("a blocking waitpid returns a status")),
+        }
+    }
+
+    /// The exit status if the child has exited (reaping it), else `None`.
+    pub fn try_wait(&mut self) -> io::Result<Option<ExitStatus>> {
+        match &mut self.inner {
+            Inner::Std(child) => child.try_wait(),
+            Inner::Spawned { pid, status } => reap(*pid, status, libc::WNOHANG),
+        }
+    }
+}
+
+/// `waitpid` once (retrying on `EINTR`) unless already reaped; `None` only
+/// under `WNOHANG` while the child runs.
+fn reap(pid: u32, status: &mut Option<ExitStatus>, flags: libc::c_int) -> io::Result<Option<ExitStatus>> {
+    use std::os::unix::process::ExitStatusExt;
+    if status.is_some() {
+        return Ok(*status);
+    }
+    let mut raw = 0;
+    loop {
+        // SAFETY: waitpid on our own child into a local.
+        match unsafe { libc::waitpid(pid as libc::pid_t, &mut raw, flags) } {
+            0 => return Ok(None),
+            done if done > 0 => {
+                *status = Some(ExitStatus::from_raw(raw));
+                return Ok(*status);
+            }
+            _ => {
+                let err = io::Error::last_os_error();
+                if err.raw_os_error() != Some(libc::EINTR) {
+                    return Err(err);
                 }
             }
         }
@@ -152,17 +185,24 @@ fn with_command(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Result
     if let Some(cwd) = &request.cwd {
         cmd.current_dir(cwd);
     }
-    #[cfg(unix)]
-    if request.process_group {
-        use std::os::unix::process::CommandExt;
-        cmd.process_group(0);
+    use std::os::unix::process::CommandExt;
+    match request.lead {
+        MappedLead::Caller => {}
+        MappedLead::Group => _ = cmd.process_group(0),
+        // SAFETY: setsid is async-signal-safe and touches no memory of the parent.
+        MappedLead::Session => unsafe {
+            cmd.pre_exec(|| if libc::setsid() < 0 { Err(io::Error::last_os_error()) } else { Ok(()) });
+        },
     }
-    let stdio = |s: MappedStdio| match s {
-        MappedStdio::Inherit => Stdio::inherit(),
-        MappedStdio::Null => Stdio::null(),
-        MappedStdio::Piped => Stdio::piped(),
+    let stdio = |s: MappedStdio| -> io::Result<Stdio> {
+        Ok(match s {
+            MappedStdio::Inherit => Stdio::inherit(),
+            MappedStdio::Null => Stdio::null(),
+            MappedStdio::Piped => Stdio::piped(),
+            MappedStdio::File(file) => Stdio::from(file.try_clone()?),
+        })
     };
-    cmd.stdin(stdio(request.stdio[0])).stdout(stdio(request.stdio[1])).stderr(stdio(request.stdio[2]));
+    cmd.stdin(stdio(request.stdio[0])?).stdout(stdio(request.stdio[1])?).stderr(stdio(request.stdio[2])?);
     let mut child = crate::control::spawn_with_fds(cmd, fd_map)?;
     let stdin = child.stdin.take().map(owned_file);
     let stdout = child.stdout.take().map(owned_file);
@@ -269,18 +309,18 @@ mod posix {
             slots.push(slot);
         }
         let above = slots.iter().max().map_or(3, |last| last + 1);
-        // Close-on-exec duplicates numbered above every slot, so no dup2 in
-        // the child overwrites a source it still needs.
-        let mut sources: Vec<OwnedFd> = Vec::with_capacity(fd_map.len());
-        for (_, file) in fd_map {
+        // Close-on-exec duplicates numbered above every slot and stdio, so no
+        // dup2 in the child overwrites a source it still needs.
+        let duplicate = |file: &File| -> io::Result<OwnedFd> {
             // SAFETY: F_DUPFD_CLOEXEC duplicates a descriptor we borrow.
             let dup = unsafe { libc::fcntl(file.as_raw_fd(), libc::F_DUPFD_CLOEXEC, above) };
             if dup < 0 {
                 return Err(io::Error::last_os_error());
             }
             // SAFETY: just created.
-            sources.push(unsafe { OwnedFd::from_raw_fd(dup) });
-        }
+            Ok(unsafe { OwnedFd::from_raw_fd(dup) })
+        };
+        let sources: Vec<OwnedFd> = fd_map.iter().map(|(_, file)| duplicate(file)).collect::<io::Result<_>>()?;
         let program = program(request)?;
         let argv: Vec<CString> = request.argv.iter().map(|a| cstring(a.clone().into_vec())).collect::<io::Result<_>>()?;
         let mut env: Vec<(OsString, OsString)> = if request.clear_env { Vec::new() } else { std::env::vars_os().collect() };
@@ -329,6 +369,12 @@ mod posix {
                     parent_ends[target as usize] = Some(parent);
                     child_ends.push(child);
                 }
+                MappedStdio::File(file) => {
+                    let child = duplicate(file)?;
+                    // SAFETY: the duplicate stays open until posix_spawn returns.
+                    check(unsafe { libc::posix_spawn_file_actions_adddup2(&mut actions.0, child.as_raw_fd(), target) })?;
+                    child_ends.push(child);
+                }
             }
         }
         for (slot, source) in slots.iter().zip(&sources) {
@@ -347,10 +393,15 @@ mod posix {
             check(unsafe { libc::posix_spawn_file_actions_addchdir_np(&mut actions.0, cwd.as_ptr()) })?;
         }
         let mut flags = libc::POSIX_SPAWN_SETSIGMASK | libc::POSIX_SPAWN_SETSIGDEF;
-        if request.process_group {
-            flags |= libc::POSIX_SPAWN_SETPGROUP;
-            // SAFETY: attr is initialised.
-            check(unsafe { libc::posix_spawnattr_setpgroup(&mut attr.0, 0) })?;
+        match request.lead {
+            MappedLead::Caller => {}
+            MappedLead::Group => {
+                flags |= libc::POSIX_SPAWN_SETPGROUP;
+                // SAFETY: attr is initialised.
+                check(unsafe { libc::posix_spawnattr_setpgroup(&mut attr.0, 0) })?;
+            }
+            // glibc 2.26 and later; setsid also makes the child its group's leader.
+            MappedLead::Session => flags |= libc::c_int::from(libc::POSIX_SPAWN_SETSID),
         }
         // SAFETY: signal sets are plain values filled by libc.
         unsafe {

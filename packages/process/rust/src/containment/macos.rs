@@ -3,16 +3,12 @@
 //! descendant tree scanned from the gate. A descendant that calls `setsid` and
 //! double-forks to launchd leaves both.
 
-use std::fs::File;
-use std::io;
-use std::process::Command;
 use std::time::Duration;
 
-use super::pgroup::{self, apply_stdio, wait_until, ListFn, Members, Unlistable, POLL};
+use super::pgroup::{self, wait_until, ListFn, Members, Unlistable};
 use super::{ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SpawnSpec, Spawned};
-use crate::control::{self, Signal};
 use crate::facts::{self, Observed, ProcTuple, Verdict};
-use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
+use crate::{Domain, DomainState, KillOutcome, ProcId};
 
 /// `proc_listpids` selector: processes of one process group.
 const PROC_PGRP_ONLY: u32 = 2;
@@ -37,29 +33,7 @@ impl ContainmentDriver for MacosTree {
     }
 
     fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError> {
-        use std::os::unix::process::CommandExt;
-        let Some((program, args)) = spec.argv.split_first() else {
-            return Err(ContainmentError::SpawnFailed("empty gate command".into()));
-        };
-        let mut cmd = Command::new(program);
-        cmd.args(args);
-        apply_stdio(&mut cmd, &spec);
-        // SAFETY: setsid is async-signal-safe and touches no memory of the parent.
-        unsafe {
-            cmd.pre_exec(|| {
-                if libc::setsid() < 0 {
-                    return Err(io::Error::last_os_error());
-                }
-                Ok(())
-            });
-        }
-        let mapped: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
-        let mut child = control::spawn_with_fds(cmd, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
-        let Some(root) = crate::platform::macos::child_identity(ProcId(child.id())) else {
-            let _ = child.kill();
-            let _ = child.wait();
-            return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
-        };
+        let (child, root) = pgroup::spawn_leader(&spec, crate::platform::macos::child_identity)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::MacosTree(root.clone()));
         Ok(Spawned { child, root })
@@ -202,6 +176,7 @@ pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait:
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::process::Command;
 
     /// A dead root and a member of the tree that this observer cannot judge (another host's record) is not
     /// an empty domain: nothing proves that member is gone.
