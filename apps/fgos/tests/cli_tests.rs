@@ -1655,3 +1655,79 @@ fn host_pins_the_state_root_for_the_node_payload() {
     assert_eq!(run(Some("/already/pinned")), "/already/pinned");
     let _ = fs::remove_dir_all(&dir);
 }
+
+// ---- `fgos config`: one wiring case per verb family; the behaviours are owned by the
+// `fgos-config` crate tests, these prove the verbs are routed, projected and exit as documented.
+
+/// A fresh project, home and state root; the state root is left for fgos to create (mode 0700).
+fn config_sandbox(name: &str) -> PathBuf {
+    let dir = std::env::temp_dir().join(format!("fgos_test_config_{name}_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(dir.join("project/.fgos")).unwrap();
+    fs::create_dir_all(dir.join("home")).unwrap();
+    dir
+}
+
+fn config_run(sandbox: &std::path::Path, args: &[&str], confined: bool) -> std::process::Output {
+    let mut cmd = Command::new(fgos_bin());
+    cmd.arg("config").args(args).arg("--dir").arg(sandbox.join("project"));
+    cmd.current_dir(sandbox.join("project"));
+    cmd.env("HOME", sandbox.join("home")).env("FGOS_STATE_ROOT", sandbox.join("state"));
+    cmd.env("FGOS_SESSION_ID", "config-test-writer");
+    cmd.env_remove("FGOS_CONFINED");
+    if confined {
+        cmd.env("FGOS_CONFINED", "1");
+    }
+    cmd.output().unwrap()
+}
+
+fn config_data(output: &std::process::Output) -> serde_json::Value {
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "config must exit 0, stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).expect("a JSON envelope");
+    assert_eq!(parsed["contract"], "fgos.v1");
+    parsed["data"].clone()
+}
+
+fn config_refusal(output: &std::process::Output) -> String {
+    assert_eq!(output.status.code(), Some(65), "stderr={}", String::from_utf8_lossy(&output.stderr));
+    String::from_utf8_lossy(&output.stderr).into_owned()
+}
+
+#[test]
+fn config_show_prints_the_value_with_where_it_came_from() {
+    let sandbox = config_sandbox("show");
+    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateBypass:\n  level: light\n").unwrap();
+    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level", "--json"], false));
+    assert_eq!(shown["value"], "light");
+    assert_eq!(shown["provenance"][0]["layer"], "project");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_explain_and_standard_describe_a_key_without_a_secret_value() {
+    let sandbox = config_sandbox("explain");
+    let explained = config_data(&config_run(&sandbox, &["explain", "gateway.token"], false));
+    assert_eq!(explained["scope"], "global-only");
+    assert_eq!(explained["sensitivity"], "secret-value");
+    let fragment = config_data(&config_run(&sandbox, &["standard", "--path", "gateway.port"], false));
+    assert!(fragment["fragment"].as_str().unwrap().contains("port: 4170"));
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+#[test]
+fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
+    let sandbox = config_sandbox("check");
+    assert_eq!(config_data(&config_run(&sandbox, &["check"], false))["ok"], true);
+    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateway:\n  port: 49999\n").unwrap();
+    let output = config_run(&sandbox, &["check", "--json"], false);
+    assert_eq!(output.status.code(), Some(65));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("config-schema"), "{stdout}");
+    assert!(!stdout.contains("49999"), "a finding never carries a value: {stdout}");
+    let _ = fs::remove_dir_all(&sandbox);
+}
