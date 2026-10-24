@@ -25,12 +25,22 @@ Behaviour unchanged on every platform: unix/linux code is textually the same log
 ## Delta
 Rust: 60 insertions, 32 deletions in 9 src files (net +28, all cfg lines / block braces). Tests: none added or removed (only two test helper types gated).
 
-## Not fixed (other crates, out of scope for fgos-git)
-fgos-process: `ORPHAN_SETTLE` unused import (windows_job.rs:268), `Stat::is_gone` unused (facts.rs:482, windows and darwin); fgos-holder-lock: 12 dead items in driver/flock.rs on darwin. They appear only in dependency crates, not in fgos-git output.
+## Second pass: fgos-process and fgos-holder-lock (same branch, new commit)
+Before (--all-targets): windows fgos-process 2 lib + 2 conformance-test warnings; darwin fgos-process 1, fgos-holder-lock 12 lib + 2 multiprocess-test. After: 0 on both targets for fgos-process, fgos-holder-lock, fgos-git.
+- facts.rs: `Stat::is_gone` gated `cfg(target_os = "linux")` (only linux modules call it).
+- windows_job.rs: unused `ORPHAN_SETTLE` dropped from the `os` module import (the tests reach it through `super::*`).
+- flock.rs: `Reach`, `Tree`, `Cleanup`, `cleanup_loop`, `drain_description`, `parent_and_group`, `in_borrow_domain`, `in_domain` and the HashMap/HashSet import gated `cfg(target_os = "linux")` (their only users are linux functions). The non-linux `has_borrowed_copy` returning false was dead on macOS too (all callers are linux-only), so it is deleted.
+- tests/multiprocess.rs: `declare`, `observe`, `Observed` imports gated linux like their tests.
+- tests/containment_conformance.rs: `Props.double_fork_escapee_survives` exists only on unix (read only there; windows initializer removed); windows `TermProbe` arm reads `handler`.
+- Refinement: the three `cfg(unix)`/`cfg(not(unix))` binding pairs (objects.rs `files`, restore.rs and sync.rs `clean_modes`) are now one binding each with `#[cfg_attr(not(unix), allow(unused_mut))]`. No other allow anywhere.
+- Census regenerated again (10 lines).
+
+Δ (second commit): 9 package files, +36/-31 lines (Rust and tests +26/-21, census +10/-10); net -5 Rust lines. No tests added or removed.
 
 ## Commands
 - `cargo check -p fgos-git --all-targets --target x86_64-pc-windows-msvc`: 0 fgos-git warnings
 - `cargo check -p fgos-git --all-targets --target aarch64-apple-darwin`: 0 fgos-git warnings
-- `cargo clippy -p fgos-git --all-targets -- -D warnings`: pass
+- `cargo clippy -p fgos-git --all-targets -- -D warnings`: pass (second pass: `-p fgos-process -p fgos-holder-lock -p fgos-git`, pass)
+- second pass: windows and darwin `cargo check` of all three crates `--all-targets`: 0 warnings; `cargo test -p fgos-process -p fgos-holder-lock --lib`: 20 + 40 passed; fgos-git lib 73 passed
 - `cargo test -p fgos-git --lib`: 73 passed, 0 failed (22 s)
 - `node scripts/git-one-door-scan.mjs --root .`: 5 undeclared (unchanged); census regenerated with `--write-census`

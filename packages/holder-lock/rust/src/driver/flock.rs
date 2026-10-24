@@ -3,6 +3,7 @@
 //! never touched with `LOCK_UN`, except a probe description private to one
 //! call (see `LockDriver::unlock_private`).
 
+#[cfg(target_os = "linux")]
 use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 use std::fs::File;
@@ -250,6 +251,7 @@ pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<Cr
 }
 
 /// Which processes a drain reads descriptor tables of.
+#[cfg(target_os = "linux")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Reach {
     /// Lagged per-spawn floor, assuming fork inheritance and ordinary PID
@@ -262,6 +264,7 @@ pub(crate) enum Reach {
     Since(CreationMark),
 }
 
+#[cfg(target_os = "linux")]
 impl Reach {
     fn of(since: Option<CreationMark>) -> Result<Self, Leftovers> {
         // Missing reach facts refuse instead of reintroducing a host scan
@@ -271,8 +274,10 @@ impl Reach {
 }
 
 /// One pass over the process table: parent, group and start of each pid.
+#[cfg(target_os = "linux")]
 struct Tree(HashMap<u32, (u32, u32, u64)>);
 
+#[cfg(target_os = "linux")]
 impl Tree {
     fn read() -> Option<Self> {
         fgos_process::facts::relations().map(Self::of)
@@ -293,12 +298,14 @@ impl Tree {
 }
 
 /// Shared pinned signalling and bounded poll loop for borrow and release.
+#[cfg(target_os = "linux")]
 #[derive(Default)]
 struct Cleanup {
     signaled: HashSet<(u32, String)>,
     killed: u32,
 }
 
+#[cfg(target_os = "linux")]
 impl Cleanup {
     fn signal(&mut self, pid: u32) -> bool {
         let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) else { return false; };
@@ -314,6 +321,7 @@ impl Cleanup {
     }
 }
 
+#[cfg(target_os = "linux")]
 fn cleanup_loop(kill_wait: Duration, mut pass: impl FnMut(&mut Cleanup, Instant) -> Result<bool, Leftovers>) -> Result<u32, Leftovers> {
     let deadline = Instant::now() + kill_wait;
     let mut cleanup = Cleanup::default();
@@ -336,13 +344,6 @@ fn has_borrowed_copy(dev: u64, ino: u64, pid: u32) -> bool {
             .and_then(|flags| u32::from_str_radix(flags.trim(), 8).ok()))
             .is_some_and(|flags| flags & libc::O_CLOEXEC as u32 == 0)
     }))
-}
-
-/// Without the Linux fd tables nothing proves a direct child is an adopted borrower. At every call
-/// `true` means "kill or release it", so `false` is the answer that keeps the child protected.
-#[cfg(not(target_os = "linux"))]
-fn has_borrowed_copy(_dev: u64, _ino: u64, _pid: u32) -> bool {
-    false
 }
 
 /// Close first; the kernel's locker stamp distinguishes our escaped copies
@@ -425,6 +426,7 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
     }
 }
 
+#[cfg(target_os = "linux")]
 pub(crate) fn drain_description(
     file: &File,
     child_pid: Option<u32>,
@@ -558,16 +560,19 @@ pub(crate) fn drain_description(
 }
 
 /// Read-only local Linux domain facts; no process-control policy lives here.
+#[cfg(target_os = "linux")]
 fn parent_and_group(pid: u32) -> Option<(u32, u32)> {
     let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
     let relation = fgos_process::facts::parse_relation(fgos_process::ProcId(pid), &stat)?;
     Some((relation.parent, relation.group))
 }
 
+#[cfg(target_os = "linux")]
 fn in_borrow_domain(pid: u32, root: u32) -> bool {
     in_domain(pid, root, parent_and_group)
 }
 
+#[cfg(target_os = "linux")]
 fn in_domain(mut pid: u32, root: u32, relation: impl Fn(u32) -> Option<(u32, u32)>) -> bool {
     let mut seen = HashSet::new();
     while pid > 1 && seen.insert(pid) {
