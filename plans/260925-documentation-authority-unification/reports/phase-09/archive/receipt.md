@@ -1,62 +1,41 @@
-# Archive retained-set correction receipt
+# Direct-link archive rework receipt
 
-**Local task completed; G8 is not accepted or closed.** Authority: D5c brief, L12-129/L12-137. Source pin: `23f6eaccf5eb195a8f50e5788d38f386a901b6d2`. Only `archive/**` changed. No source Git write, lifecycle/fgOS CLI, real lease, publication, landing, source pair accounting, product/test edit or baseline change.
+**BLOCKED on external real-disk scratch permission, not on retention budget.** A42 (`../w5-d5e-brief.md`) replaces the rejected transitive rule. Source pin: `d3efc70c5879d6b3a599cd9998615a46a73a82bd`. The direct-link partition and custody checks pass structurally; no new rehearsal, Check A/link-finding parity, cold timing, cutover or G8/F acceptance is claimed.
 
-Read `design.md`, `manifest.json`, `verification.json`, `rehearsal.json`. The one-step final-pin rebuild command is in `design.md` and uses the existing builder/rehearsal/verifier, not another archive mechanism.
+## Exact retention result
 
-## Retained set and complete link enumeration
+The general one-hop rule in `build-design.py` adds exactly **4 files / 783,918 B**, below the 50,000,000 B guard. It recognizes already-kept ruling document types and existing navigation roots; it never follows target links or uses a filename hand list. `audit/direct-links.json.gz` carries the exact additions, roots, locators and before/after sets.
 
-- Partition: **6,899 files / 2,897,413,094 B**; archive **6,016 / 2,265,926,393 B**; retain **883 / 631,486,701 B**. No threshold. Every kept row has an exact input contract, source/field/line read witness, or navigation link locator.
-- Removed outside-plan basename fan-out. Run receipts, fixture outputs, comments, help and mismatching constructed filenames no longer masquerade as plan reads. Direct output/provenance-only names in retained plan programs are not input reads either.
-- All **22 reviewed false reasons / 23,297,481 original B** are addressed. **20 files / 23,083,394 original B move**. Two stay under the brief's explicit navigation rule: `pilot/README.md` is really linked from the Phase 06 contract at line 25; `review-6-checkpoint.md` from phase-06 progress at line 1306. Their old prose/help reasons are removed. `audit/retained-set-corrections.json.gz` binds each old row to its new disposition and locator; this is an explicit, evidence-based qualification of the brief's shorthand “22 files”, not an unreported exception.
-- Scanned **every tracked outside-plan non-symlink file** except `.fgos/`, not just code. `audit/external-references.json.gz` contains **164 raw full-path lines / 184 normalized path/link joins**, plus **619 plan-navigation link joins**. Directory mentions are containers, not blanket reads of descendants. Every existing exact target in these joins is retained. The historical review's 21-reference count is not used as a completeness boundary.
+| Target under the plan root | Bytes | Ruling locator (reason prefix: `ruling link: `) |
+|---|---:|---|
+| `alias-table-and-resolver-contract.md` | 3,951 | `minimum-constitution.md:235` |
+| `cutover-write-lease-design.md` | 27,057 | `minimum-constitution.md:244`; `evidence-payload-relocation-policy.md:15` |
+| `reports/phase-06/same-path-binding-blocker.json` | 59,528 | `minimum-constitution.md:332` |
+| `reports/doc-inventory.md` | 693,382 | `evidence-payload-relocation-policy.md:96` |
+| **Added total** | **783,918** | **4 files** |
 
-All **45 current outside-plan joins to previously archived files** are enumerated individually in the correction audit, grouped here for review (`P` is the plan root):
+| Disposition at the same source pin | Before files | Before bytes | After files | After bytes |
+|---|---:|---:|---:|---:|
+| Retained | 888 | 632,057,359 | 892 | 632,841,277 |
+| Proposed archive | 6,030 | 2,266,895,891 | 6,026 | 2,266,111,973 |
+| Full plan partition (excluding archive records) | 6,918 | 2,898,953,250 | 6,918 | 2,898,953,250 |
 
-| Kept target under P | Outside-plan reader locator(s) | Joins |
-|---|---|---:|
-| `minimum-constitution.md` | `docs/platform/intent-preservation-ledger.md:81-91`; retired-engine inbound copy `:102-112` | 22 |
-| `current-authority-map-2026-09-25.md` | `docs/platform/documentation/switchboard.md:117,130`; `docs/reading-map.md:99,118`; `docs/specs/reading-map.md:7`; `docs/transitional-switchboard.md:9,118` | 7 |
-| `reports/phase-06/step-08-report.md` | platform READMEs: agent-confinement `:34`, claude-plugin `:32`, decision-citation-drift `:32`, distillery `:32`, herdr-web-dashboard `:34`, observe `:32`, ui-spec `:52` | 7 |
-| `reports/phase-06/step-10-report.md`, `holds.md` | `docs/platform/history/documentation-authority-unification/README.md:29,32` respectively | 2 |
-| `reports/phase-06/step-09-report.md` | `docs/platform/runner/README.md:49` | 1 |
-| `reports/phase-07/phase-07-scorecard.md` | board log `:710` (matched line only, not whole-log reading) | 1 |
-| `reports/harness-readiness-2026-09-29.md` | `plans/reports/advice-260930-1002-harness-flexibility-plan-agnostic-routing.md:52,201` | 2 |
-| three `independent-frontier-*.md` prompt/review/rereview files | `plans/reports/research-261021-1054-rules-instruction-optimization-references.md:523-525` | 3 |
+`link-closure.json` remains byte-identical (SHA256 `93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893`): the historical 637-file / 281,770,653 B closure explains why transitivity was rejected. The current direct-link audit binds it by digest; the old closure is not current policy. The previous 22 false basename reasons remain removed: 19 files archive, two retain for real navigation links, and `reports/doc-inventory.md` now retains for its direct ruling link.
 
-The phase-08 gate register is separately kept at the execution plan's exact register citation and navigation links. All six restored source witnesses, 2,918 historical scriptRef occurrences, 47 historical reader files / 135 joins and 279 reachable prior-prune recovery blobs are verified. The old review-checkpoint template and the liveness test's generated scratch output are explicitly rejected as committed-tip reads, with unchanged source locators.
+After direct retention, **123 kept files / 1,025 relative link occurrences / 628 archived targets** remain, independently recomputed in `audit/retained-archive-links.json.gz` and the verifier. `design.md` explains normalization, approved archive-ref recovery and digest checks with an example `git show` command. These historical evidence links are not newly failing product candidate links; no fresh production link-parity result is available because rehearsal did not start.
 
-**359 standalone retirement specs** state “behaviour retired with the plan”. The reviewed ten and all **43 current Phase 09 programs** remain retire-at-final-pin. Temporary closure: **3,283 files / 1,299,055,408 B**, retained until gate proofs and independent reviews freeze. Two historical programs linked by navigation remain source text; their execution context is the archive checkout, not a false claim that all old inputs stay at tip.
+## Implementation and proof actually executed
 
-## Real-disk rehearsal
+- Builder: **exit 0**, refreshed `manifest.json` and compressed partition/reader/link audits at the current source pin. `audit/rebuild-d5e.log` records the run. No source Git write.
+- Verifier: **exit 2**, explicitly `blocked-rehearsal-not-current`, with `structuralCustodyVerified: true`. It checks the complete blob/size/SHA partition, exact one-hop additions/reasons, rejected-closure digest, all remaining link occurrences, 184 outside-plan joins, 619 navigation joins, six restored inputs, 279 reachable recovery blobs, 361 retirement specifications, 47 historical readers / 135 joins, and four rejection probes. It does **not** convert an old rehearsal bundle into a new pass. See `verification.json` and `audit/verify-d5e.log`.
+- Python syntax: all three modified scripts parse using `ast.parse`, without bytecode files.
+- Rehearsal: **exit 1 before clone/scratch creation**, recorded in `audit/rehearse-d5e.log`. Command: `TMPDIR=/var/tmp python3 -B <archive>/rehearse.py --scratch /tmp/fgos-work/w5-d5e-cold --release-path /home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8`.
+- No new Check A, B/H/I, test parity, worktree timing or cache residency observation was produced. The historical `rehearsal.json` evidence remains bound to `23f6eaccf5eb195a8f50e5788d38f386a901b6d2`, clearly marked historical with the new attempt/blocker metadata. Its previously reviewed A pass and old warm timings do not prove this pin.
 
-Filesystem: `stat -f` reports `ext2/ext3 ef53`, `findmnt` reports **NVMe ext4**. Source refs/index are untouched; all clone Git mutations lived in scoped `.scratch`, addressed through `/tmp/fgos-work/w4-d5c-final-inputs`, then cleaned.
+## Cold-run code and environmental blocker
 
-| Candidate | Exact measured tip bytes | Detached worktree adds, seconds | Median |
-|---|---:|---|---:|
-| After final-pin acceptance, gates retired | **818,290,357** | **2.415 cold fallback**, 6.091, 6.012 | **6.012 s** |
-| Before acceptance, gate programs/inputs retained | **2,117,345,765** | **49.515 cold fallback**, 27.737, 13.365 | **27.737 s** |
+`rehearse.py` now places physical scratch outside the tree at `$TMPDIR/fgos-work/<fresh-name>` (default `/tmp/fgos-work`), with any logical `/tmp` alias also external. It removes its scratch on normal/error exit after creation, runs timing variants sequentially, and never recreates `archive/.scratch`. Before each variant's first add it enumerates every timing-clone `.git/objects` file, records per-file `fincore` pages/bytes, flushes and evicts each with `os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)`, then records residency again. It records residency before/after all three adds and labels by measured state, not ordinal position. Unproven eviction labels run 1 `first run, warm page cache` and requires owner `drop_caches` cold evidence at F. The verifier checks the recorded arithmetic and labels if a current rehearsal exists. **These new runtime paths are not exercised by this blocked attempt.**
 
-`drop_caches` is not writable/permitted. Per the brief, the first run in a fresh `--no-hardlinks --no-checkout` clone is the cold fallback for each variant. This is **not physical cache eviction** or final-F acceptance. Both medians are below 60 s; only the post-freeze median meets the 20 s target. Navigation retention increases tip size relative to D5b intentionally; the ~0.2 GB aspiration is not claimed.
+`/var/tmp` is on ext4, but sandbox `mkdir /var/tmp/fgos-work` fails with **errno 30, Read-only file system**. `/tmp` is tmpfs (7.7 GiB); it is not a real-disk cold-timing substitute, and the existing rehearsal free-space guard requires more than 20 GiB. No bypass, in-tree fallback, lowered guard, fake residency or old timing substitution was used. No scratch was created, so no cleanup remains. To finish, rerun in a permission frame with writable external real-disk scratch, at least the existing space guard, and the same scoped archive output; then run both variants and the full verifier. No additional repository write scope is required (`needsWrites=[]`).
 
-LOCAL archive snapshot: `b9ce940e293d27fb03751063b5f5e2db304fdf83`, ref `refs/heads/archive/260925-records`. Accounted reduced candidate: `98a121070744e334bb2333bfcd2f10ec672e7ec4`; pre-freeze: `dd78c6b18fca66243a624dae1d8c165e1e9fe23c`. `audit/rehearsal.bundle` preserves and verifies these refs with the source pin as prerequisite. No ref was installed in the real repository. The augmented archive contains the source tree and all 11 descriptor-bound audit assets (**1,709,754 compressed B**). Main manifest: **7,253 B template**; measured main-side artifacts: **50,093 B**. Receipt/verification/rehearsal outputs follow measurement; `audit/final-artifact-delta.json.gz` reports their final delta, not an unmeasured final-tree timing claim.
-
-## Full checks, A after accounting, and link parity
-
-Both frozen **complete `checks.mjs` programs** ran before and after clone-only exact exception accounting; no A-only slice this time. Removal commit: `b4fd9a7d6b5b7c795b1a034f9a9f56134c10cc64`. Per recipe: **3,384 removal pairs + 48 preexisting pending pairs = 3,432 unaccounted before**; after accounting, **A green, 0 unaccounted / 0 working violations**. Pending source pairs are labelled fixture-only simulation, not source approval. B pins and I checks are green; recipe logic, allowlist and baselines are unchanged.
-
-The complete recipe still exits **1**, honestly: H has the same **four preexisting missing-header findings** on both sides, **zero new findings** and **zero unresolved links/Related paths**. The four documents are gateway-readiness, vendored-yaml-parser decision, conserved-dispatch-doctrine and non-transitioning-records. The previous new switchboard → authority-map failure is gone. Full before/after outputs are in `audit/before-*.json.gz` / `after-*.json.gz`; exact rows in `audit/pair-accounting.json.gz`.
-
-The actual candidate-status CLI reports identical full findings/counts at pin and candidate. The actual retirement CLI was attempted on both sides and cannot load the saved inventory because its uncommitted `doc-inventory.parts/part-0001.jsonl` is absent on both. This remains a **full-retirement-CLI gap**, not green. Its existing production `links-resolve` evaluator was also run with real tracked platform files, constitution, switchboard and metadata: **pass / zero links on both sides**. Unrelated evaluator inputs are explicitly fixture data; this proves the link result, not inventory/cutover acceptance. Its unchanged owning test passes **36/36**; candidate-status owning test **11/11**.
-
-## Owning tests and exposed fixture corrections
-
-Eleven unchanged test files per side: **314 cases / 312 pass / 2 fail / 0 skip / 0 cancelled**, identical failing titles. The two existing reproduction fresh-reviewer ownership cases fail at `current.noNewDoubleOwnership`; no archive-induced failure remains. All other ten files pass, including liveness, constitution and both link-check owners. The real activated host/addon was used: release `sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8`. This does not establish working-tree Rust freshness.
-
-`audit/attempt-1/` preserves the first rehearsal, command/test logs and bundle: the structural verifier caught two navigation-linked historical programs incorrectly classified for removal; they are now retained. Ten verifier cleanup cases initially failed equally because the physically scoped temp directory inherited this repository's ESM package type, unlike normal `/tmp`. A **scratch-only CommonJS package boundary** restores the unchanged extensionless npm fixture's ordinary execution environment; no test, assertion, flag or production check was changed/skipped. Final `verify-phase-02.test.mjs`: **16/16 per side**. An early builder assertion also exposed that the review-row selector included two genuinely read identity registries; the selector now names only the reviewed 22, preserving both registries. None of these failed attempts is counted as completion.
-
-`python3 -B .../archive/verify-design.py`: **exit 0**, complete partition/digests, exact external/navigation locators, 22 review dispositions, four negative probes, bundle refs/digest, raw-log hashes, failure parity, A/B/H/I evidence and cold-fallback timings. `git diff --check`: exit 0. Final source diff scope is exclusively `archive/**`.
-
-## Handoff
-
-Rebuild and independently review at F; use the one-step command in `design.md`. Source accounting, F metadata/ownership gaps, retirement inventory materialization/full CLI, G10/G11, origin publish and main landing remain Lead/owner work. No new tool, config default or runtime dependency is introduced. Full npm suite and `scripts/run-tests.mjs` were prohibited; Cargo workspace suite and browser/service preview were not run for this constrained record correction. Impact-analysis: degraded/unqueried under the explicit no-fgOS-CLI rule. **needsWrites=[]**; no out-of-scope repair was needed or attempted for this assignment.
+`audit/attempt-1/rehearsal.bundle` stays deleted; the other attempt-1 records and current historical bundle are unchanged. No pair accounting, product/test edit, source Git write, fgOS CLI, `.fgos`/secret read, lifecycle verb, publication or landing. The runner owns committing. Impact-analysis is degraded/unqueried under the no-fgOS-CLI brief; direct source/history review only. npm test and `scripts/run-tests.mjs` are prohibited; Cargo and browser/service preview were not run for this records task.

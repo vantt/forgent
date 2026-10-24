@@ -1,11 +1,15 @@
 {
-  "inputCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
-  "exit": 0,
-  "partitionFiles": 6899,
-  "movingFiles": 6016,
-  "retainedFiles": 883,
-  "retirementSpecs": 359,
-  "gatePrograms": 43,
+  "inputCommit": "d3efc70c5879d6b3a599cd9998615a46a73a82bd",
+  "exit": 2,
+  "status": "blocked-rehearsal-not-current",
+  "structuralCustodyVerified": true,
+  "checkARevalidated": false,
+  "rehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "partitionFiles": 6918,
+  "movingFiles": 6026,
+  "retainedFiles": 892,
+  "retirementSpecs": 361,
+  "gatePrograms": 45,
   "reviewedTen": 10,
   "historicalReaderFiles": 47,
   "historicalJoins": 135,
@@ -13,8 +17,16 @@
   "externalReferenceJoinsVerified": 184,
   "navigationReferenceJoinsVerified": 619,
   "falseBasenameRowsReviewed": 22,
-  "falseBasenameRowsArchived": 20,
-  "falseBasenameRowsNowRequiredByNavigation": 2,
+  "falseBasenameRowsArchived": 19,
+  "falseBasenameRowsNowRequiredByLinks": 3,
+  "directLinkAddedFiles": 4,
+  "directLinkAddedBytes": 783918,
+  "rejectedTransitiveClosureDigestVerified": true,
+  "retainedToArchivedLinks": {
+    "readerFiles": 123,
+    "links": 1025,
+    "targetFiles": 628
+  },
   "sixRestoredInputsRetained": true,
   "alreadyPrunedRecoveryBlobsVerified": 279,
   "negativeProbes": [
@@ -35,18 +47,8 @@
       "rejected": true
     }
   ],
-  "mainManifestBytes": 7253,
-  "auditCompressedBytes": 1709754,
-  "rehearsalCustody": {
-    "bundleHeadsAndDigestVerified": true,
-    "testsPerSide": 11,
-    "baselineFailureParity": true,
-    "accountingRecipesGreen": 2,
-    "realDisk": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
-    "variantTipBytes": [
-      818290357,
-      2117345765
-    ]
-  },
+  "mainManifestBytes": 7924,
+  "auditCompressedBytes": 1738177,
+  "rehearsalCustody": null,
   "limits": "Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass."
 }

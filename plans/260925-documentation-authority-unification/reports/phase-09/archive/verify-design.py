@@ -74,13 +74,58 @@ def main():
     for r in references['references'] + references['navigationReferences']:
         assert r['targetPath'] in kept, r
         assert r['text'] == (ROOT / r['readerPath']).read_text(errors='replace').splitlines()[r['line'] - 1]
+    # Independently recompute ONE hop from the recorded pre-addition roots.
+    # The rejected historical closure remains digest-bound evidence, not policy.
+    direct = load('direct-links.json')
+    assert direct['inputCommit'] == pin and direct['status'] == 'within-budget'
+    rejected = direct['rejectedTransitiveClosure']
+    rejected_bytes = (ROOT / rejected['path']).read_bytes()
+    assert hashlib.sha256(rejected_bytes).hexdigest() == rejected['sha256']
+    assert json.loads(rejected_bytes)['status'] == 'blocked-budget-exceeded'
+    before = set(direct['beforeRetainedPaths'])
+    roots = set(direct['rulingRoots'] + direct['navigationRoots'])
+    assert roots <= before <= set(kept)
+    import posixpath
+    def links(paths, targets):
+        result = []
+        for path in sorted(paths):
+            text = (ROOT / path).read_bytes().decode('utf8', errors='replace')
+            if '\0' in text: continue
+            for number, line in enumerate(text.splitlines(), 1):
+                for match in re.finditer(r'\[[^\]]*\]\(\s*<?([^\s)>]+)', line):
+                    value = match[1].split('#')[0].split('?')[0]
+                    if not value or re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I): continue
+                    target = posixpath.normpath(posixpath.join(posixpath.dirname(path), value))
+                    if target in targets:
+                        result.append({'readerPath': path, 'line': number, 'targetPath': target})
+        return result
+    direct_refs = links(roots, entries)
+    direct_targets = {r['targetPath'] for r in direct_refs}
+    assert direct_targets <= set(kept)
+    added = {r['path']: r for r in direct['added']}
+    assert set(added) == direct_targets - before == set(kept) - before
+    assert len(added) == len(direct['added']) == direct['addedFiles']
+    assert sum(r['size'] for r in added.values()) == direct['addedBytes'] <= direct['budgetBytes'] == 50000000
+    for r in added.values():
+        check_row(r)
+        expected = {'ruling link: ' + x['readerPath'] + ':' + str(x['line']) for x in direct_refs
+            if x['targetPath'] == r['path'] and x['readerPath'] in direct['rulingRoots']}
+        assert expected and expected <= set(kept[r['path']]['reasons'])
+    for label, paths in [('before', before), ('proposedAfter', set(kept))]:
+        assert direct[label] == {'retainFiles': len(paths), 'retainBytes': sum(entries[p][1] for p in paths)}
+    remaining = load('retained-archive-links.json')
+    remaining_refs = links(kept, moving)
+    assert remaining['references'] == remaining_refs
+    assert remaining['links'] == len(remaining_refs)
+    assert remaining['readerFiles'] == len({r['readerPath'] for r in remaining_refs})
+    assert remaining['targetFiles'] == len({r['targetPath'] for r in remaining_refs})
     corrections = load('retained-set-corrections.json')
     assert len(corrections['rows']) == 22 and sum(r['previousSize'] for r in corrections['rows']) == 23297481
     for r in corrections['rows']:
         if r['disposition'] == 'archive': assert r['path'] in moving
         else:
             assert r['path'] in kept and all('retained reader closure:' not in s for s in r['currentReasons'])
-            assert any(x['targetPath'] == r['path'] for x in references['navigationReferences'])
+            assert any(x['targetPath'] == r['path'] for x in references['navigationReferences'] + direct_refs)
     for name in ['minimum-constitution.md', 'current-authority-map-2026-09-25.md', 'reports/phase-08/step-08-preflip-gates.json', 'reports/phase-06/step-08-report.md']:
         assert P + name in kept
     restored = {r['path'] for r in old['directoryReaderCorrection']['restoredFiles']}
@@ -105,8 +150,7 @@ def main():
     else: raise AssertionError('self-owning retirement accepted')
     rehearsal = json.loads((HERE / 'rehearsal.json').read_text()) if (HERE / 'rehearsal.json').exists() else {}
     observed = None
-    if 'bundle' in rehearsal:
-        assert rehearsal['sourceCommit'] == pin
+    if 'bundle' in rehearsal and rehearsal.get('sourceCommit') == pin:
         bundle = rehearsal['bundle']; data = (ROOT / bundle['path']).read_bytes()
         assert len(data) == bundle['size'] and hashlib.sha256(data).hexdigest() == bundle['sha256']
         heads = {line.split()[1]: line.split()[0] for line in git('bundle', 'list-heads', str(ROOT / bundle['path'])).decode().splitlines()}
@@ -146,21 +190,51 @@ def main():
                 assert full['H']['findings'] == next(r['result']['findings'] for r in checks if r['check'] == 'check-doc-candidate-status' and r['phase'] == 'baseline')
         for variant in rehearsal['variants']:
             assert len(variant['runs']) == 3 and all(r['exit'] == 0 for r in variant['runs'])
-            assert variant['runs'][0]['cache'].startswith('cold fallback:')
+            eviction = variant['eviction']
+            def check_residency(snapshot):
+                rows = snapshot['fileResidency']
+                assert len(rows) == snapshot['files'] > 0
+                assert sum(int(r['size']) for r in rows) == snapshot['bytes']
+                assert sum(int(r['pages']) for r in rows) == snapshot['residentPages']
+                assert sum(int(r['res']) for r in rows) == snapshot['residentBytes']
+                return {r['file'] for r in rows}
+            files = check_residency(eviction['residencyBefore'])
+            assert check_residency(eviction['residencyAfter']) == files
+            proven = (eviction['residencyBefore']['residentPages'] > 0
+                and eviction['residencyAfter']['residentPages'] == 0 and not eviction['errors'])
+            assert eviction['proven'] == proven
+            for run in variant['runs']:
+                assert check_residency(run['residencyBefore']) == check_residency(run['residencyAfter']) == files
+                expected = 'cold' if proven and run['residencyBefore']['residentPages'] == 0 else 'warm'
+                if run['run'] == 1 and expected != 'cold': expected = 'first run, warm page cache'
+                assert run['cache'] == expected
+            assert variant['ownerDropCachesColdRunRequired'] == (not proven or variant['runs'][0]['cache'] != 'cold')
             assert variant['medianSeconds'] < 60
-        observed = {'bundleHeadsAndDigestVerified': True, 'testsPerSide': 11, 'baselineFailureParity': True,
+        assert rehearsal['ownerDropCachesColdRunRequired'] == any(v['ownerDropCachesColdRunRequired'] for v in rehearsal['variants'])
+        observed = {'bundleHeadsAndDigestVerified': True, 'measuredResidencyVerified': True,
+            'ownerDropCachesColdRunRequired': rehearsal['ownerDropCachesColdRunRequired'],
+            'testsPerSide': 11, 'baselineFailureParity': True,
             'accountingRecipesGreen': len(pairs), 'realDisk': rehearsal['findmnt'], 'variantTipBytes': [r['tipBytes'] for r in rehearsal['variants']]}
-    result = {'inputCommit': pin, 'exit': 0, 'partitionFiles': len(entries), 'movingFiles': len(moving),
+    result = {'inputCommit': pin, 'exit': 0 if observed else 2,
+        'status': 'verified' if observed else 'blocked-rehearsal-not-current',
+        'structuralCustodyVerified': True, 'checkARevalidated': observed is not None,
+        'rehearsalSourceCommit': rehearsal.get('sourceCommit'),
+        'partitionFiles': len(entries), 'movingFiles': len(moving),
         'retainedFiles': len(kept), 'retirementSpecs': len(specs), 'gatePrograms': len(gates['programs']), 'reviewedTen': 10,
         'historicalReaderFiles': 47, 'historicalJoins': 135, 'priorScriptRefOccurrences': len(prior),
         'externalReferenceJoinsVerified': len(references['references']), 'navigationReferenceJoinsVerified': len(references['navigationReferences']),
         'falseBasenameRowsReviewed': 22, 'falseBasenameRowsArchived': sum(r['disposition'] == 'archive' for r in corrections['rows']),
-        'falseBasenameRowsNowRequiredByNavigation': sum(r['disposition'] != 'archive' for r in corrections['rows']),
+        'falseBasenameRowsNowRequiredByLinks': sum(r['disposition'] != 'archive' for r in corrections['rows']),
+        'directLinkAddedFiles': len(added), 'directLinkAddedBytes': direct['addedBytes'],
+        'rejectedTransitiveClosureDigestVerified': True,
+        'retainedToArchivedLinks': {k: remaining[k] for k in ('readerFiles', 'links', 'targetFiles')},
         'sixRestoredInputsRetained': True, 'alreadyPrunedRecoveryBlobsVerified': len(recovery),
         'negativeProbes': negative, 'mainManifestBytes': (HERE / 'manifest.json').stat().st_size,
         'auditCompressedBytes': sum(r['size'] for r in m['auditAssets']), 'rehearsalCustody': observed,
         'limits': 'Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass.'}
     (HERE / 'verification.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result))
+    if not observed:
+        raise SystemExit(2)
 
 if __name__ == '__main__': main()

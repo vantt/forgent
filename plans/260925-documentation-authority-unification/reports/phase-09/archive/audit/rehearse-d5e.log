@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/pathlib.py", line 1175, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/fgos-work/w5-d5e-cold'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py", line 353, in <module>
+    if __name__ == '__main__': main()
+  File "/home/vantt/projects/forgentX-p9-w1-d2/plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearse.py", line 44, in main
+    physical.mkdir(parents=True)
+  File "/usr/lib/python3.10/pathlib.py", line 1179, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+  File "/usr/lib/python3.10/pathlib.py", line 1175, in mkdir
+    self._accessor.mkdir(self, mode)
+OSError: [Errno 30] Read-only file system: '/var/tmp/fgos-work'
