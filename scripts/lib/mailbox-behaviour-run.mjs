@@ -92,13 +92,14 @@ export const appendResult = (file, line) => {
  * A run id names its cell and its attempt number: `<cli>.<variant>.<channel|base>.<nnn>`, or,
  * for a cell of an addendum's arm, `<cli>.<arm>.<variant>.<channel|base>.<nnn>`.
  */
-export const runIdOf = (cell, attempt) => `${cell.cli}${cell.arm ? `.${cell.arm}` : ''}.${cell.variant}.${cell.channel ?? 'base'}.${String(attempt).padStart(3, '0')}`;
-export const RUN_ID = /^[a-z]+(\.[A-Z])?\.[A-Z0-9]+\.[A-Za-z]+\.\d+$/;
+export const runIdOf = (cell, attempt) => `${cell.cli}${cell.arm ? `.${cell.arm}` : ''}.${cell.runPart ?? cell.variant}.${cell.channel ?? 'base'}.${String(attempt).padStart(3, '0')}`;
+export const RUN_ID = /^[a-z]+(\.[A-Z])?\.[A-Z0-9]+(-[a-z]+)?\.[A-Za-z]+\.\d+$/;
 export function cellOfRunId(runId) {
   const parts = runId.split('.');
   const [cli, arm, variant, channel] = parts.length === 5 ? parts : [parts[0], null, ...parts.slice(1)];
   const tail = channel === 'base' ? variant : `${variant}/${channel}`;
-  return { id: `${cli}/${arm ? `${arm}/` : ''}${tail}`, cli, ...(arm ? { arm } : {}), variant, channel: channel === 'base' ? null : channel };
+  // A scoped cell's run part (`LR-in`) names the cell; its variant is the part before the scope.
+  return { id: `${cli}/${arm ? `${arm}/` : ''}${tail}`, cli, ...(arm ? { arm } : {}), variant: variant.split('-')[0], channel: channel === 'base' ? null : channel };
 }
 
 /** A cell's progress from the results: attempts (provider limits excluded), valid runs, and the next attempt number. */
@@ -431,6 +432,12 @@ function usageOf(cli, stdoutFile) {
  * ends it at the timeout), settles the login copy, scores the run and appends one results
  * line. Returns the line, and `stop` when the login guard stopped the batch.
  */
+/** The task a run of `cell` gets: the measurement's own for that cell (`ctx.taskOf`), else the frozen task. */
+export const taskFor = (ctx, cell) => ctx.taskOf?.(cell) ?? ctx.data.task;
+
+/** The valid runs `cell` needs in `stage`: the measurement's own (`ctx.goalOf`), else the baseline count or the stage `target`. */
+export const goalFor = (ctx, cell, stage, target) => ctx.goalOf?.(cell, stage) ?? (cell.variant === score.BASELINE ? score.RULES.BASELINE_RUNS : target);
+
 export async function runOne(ctx, cell, runId) {
   const { base, data } = ctx;
   const paths = confined.runPaths(base, runId);
@@ -444,8 +451,8 @@ export async function runOne(ctx, cell, runId) {
   // A two-turn cell (V7f's NU) talks to the CLI over its input and output.
   const talking = ctx.conversation?.(cell) ?? null;
   const args = talking ? talking.args({ settings: paths.settings, instruction }) : ext
-    ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, ...(ctx.providers?.[cell.cli] ? { provider: ctx.providers[cell.cli] } : {}), instruction, prompt: data.task, profile: RUN_PROFILE, offConfig: paths.ompOff })
-    : cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
+    ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, ...(ctx.providers?.[cell.cli] ? { provider: ctx.providers[cell.cli] } : {}), instruction, prompt: taskFor(ctx, cell), profile: RUN_PROFILE, offConfig: paths.ompOff })
+    : cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: taskFor(ctx, cell), models: ctx.models });
   const extEnv = ext ? (cell.cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: ctx.natives }) : {};
   const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: { ...cliRunEnv(cell.cli), ...extEnv, ...(ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {}) } });
   const readOnly = [paths.installation, ...(ext ? [paths.extension, ...(cell.cli === 'omp' ? [paths.ompOff] : [])] : [])];
@@ -492,7 +499,7 @@ export async function runOne(ctx, cell, runId) {
       sent = harnessSend(paths.ws, binding.name, body, { wake: wakes(cell.channel), sender });
       o.sent = true;
     } else if (next.action === 'turn1') {
-      talk.say(data.task);
+      talk.say(taskFor(ctx, cell));
       o.started = true;
     } else if (next.action === 'nudge') {
       talk.say(talking.nudge);
@@ -817,6 +824,8 @@ export const stagePhases = (stage, clis = null) => (stage === 'A' ? [score.basel
 export async function runStage(ctx, stage) {
   const target = stage === 'A' ? (ctx.stageARuns ?? score.STAGE_A_RUNS) : (ctx.stageBRuns ?? score.RULES.N);
   const cap = ctx.cap ?? score.RULES.CAP;
+  // A measurement may cap a cell's attempts on its own (`ctx.capOf`), else the one cap applies.
+  const capFor = (c) => ctx.capOf?.(c) ?? cap;
   // The group a stop rule takes out: V7c's arm, or V7e's pair (`ctx.groupOf`).
   const groupOf = ctx.groupOf ?? ((c) => c.arm);
   const closedSt = new Set(ctx.closedSt ?? []);
@@ -825,18 +834,17 @@ export async function runStage(ctx, stage) {
   const phases = ctx.phases ? ctx.phases(stage) : stagePhases(stage, ctx.clis);
   const stopped = (ruled) => ruled.stoppedArms ?? {};
   for (const cells of phases) {
-    const goal = cells[0].variant === score.BASELINE ? score.RULES.BASELINE_RUNS : target;
     for (let round = 0; ; round += 1) {
       const results = readResults(ctx.resultsFile);
       const arms = stopped(rules(results, { stageComplete: false, stage }));
-      const open = order(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && !(c.arm && arms[groupOf(c)]) && cellOpen(cellProgress(results, c.id), goal, cap));
+      const open = order(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && !(c.arm && arms[groupOf(c)]) && cellOpen(cellProgress(results, c.id), goalFor(ctx, c, stage, target), capFor(c)));
       if (!open.length) break;
       for (const cell of open) {
         const now = readResults(ctx.resultsFile);
         const progress = cellProgress(now, cell.id);
         const ruled = rules(now, { stageComplete: false, stage });
         if (ruled.stops.length) return { stop: ruled.stops.join('; ') };
-        if (!cellOpen(progress, goal, cap) || (cell.arm && stopped(ruled)[groupOf(cell)])) continue;
+        if (!cellOpen(progress, goalFor(ctx, cell, stage, target), capFor(cell)) || (cell.arm && stopped(ruled)[groupOf(cell)])) continue;
         const problem = await ctx.beforeRun(cell);
         if (problem) return { stop: problem };
         const { line, stop } = await runOne(ctx, cell, runIdOf(cell, progress.next));

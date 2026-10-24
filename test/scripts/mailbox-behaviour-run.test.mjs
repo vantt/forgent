@@ -239,3 +239,24 @@ test('a pi or omp run names its model under the pair\'s provider, the Codex logi
   assert.equal(model(runs.piOmpArgs('pi', { ...base, provider: 'openrouter', model: 'anthropic/claude-haiku-5.5' })), 'openrouter/anthropic/claude-haiku-5.5');
   assert.equal(model(runs.piOmpArgs('omp', { ...base, provider: 'google-antigravity', model: 'gemini-3.8-flash' })), 'google-antigravity/gemini-3.8-flash');
 });
+
+test('a measurement may give a cell its own task and its own run target; otherwise the frozen task and the stage target apply', () => {
+  const data = { task: 'THE TASK' };
+  const cell = { id: 'claude/T/LR-in/NU', variant: 'LR', scope: 'in' };
+  assert.equal(runs.taskFor({ data }, cell), 'THE TASK');
+  assert.equal(runs.taskFor({ data, taskOf: (c) => (c.scope === 'in' ? 'THE TASK and the mail' : null) }, cell), 'THE TASK and the mail');
+  assert.equal(runs.taskFor({ data, taskOf: () => null }, cell), 'THE TASK', 'a cell the measurement gives none keeps the frozen task');
+  assert.equal(runs.goalFor({}, cell, 'A', 5), 5);
+  assert.equal(runs.goalFor({}, { variant: 'Q0' }, 'A', 5), 5, 'a baseline runs to the baseline count');
+  assert.equal(runs.goalFor({ goalOf: (c, stage) => (stage === 'A' ? 3 : 4) }, cell, 'B', 10), 4);
+});
+
+test('a cell that names a scope of its variant gets its own run ids, which recover into that cell', () => {
+  const inTask = { id: 'claude/T/LR-in/NU', cli: 'claude', arm: 'T', variant: 'LR', channel: 'NU', runPart: 'LR-in' };
+  const outTask = { ...inTask, id: 'claude/T/LR-out/NU', runPart: 'LR-out' };
+  assert.equal(runIdOf(inTask, 1), 'claude.T.LR-in.NU.001');
+  assert.notEqual(runIdOf(inTask, 1), runIdOf(outTask, 1));
+  assert.match(runIdOf(inTask, 1), runs.RUN_ID);
+  assert.deepEqual(runs.cellOfRunId('claude.T.LR-in.NU.001'), { id: 'claude/T/LR-in/NU', cli: 'claude', arm: 'T', variant: 'LR', channel: 'NU' });
+  assert.equal(runIdOf({ id: 'claude/LR/PT', cli: 'claude', variant: 'LR', channel: 'PT' }, 2), 'claude.LR.PT.002', 'a cell without one keeps its old id');
+});

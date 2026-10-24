@@ -229,16 +229,17 @@ const MEASURES = {
     cells: m.cells,
     baselines: m.baselines,
     instructionFile: v7j.INSTRUCTION_FILE,
-    measured: (addendum) => ({
+    taskOf: v7j.taskOf,
+    measured: () => ({
       models: score.MODELS,
       effort: null,
-      stageARuns: addendum.stageARuns,
-      stageBRuns: addendum.stageBRuns,
-      cap: addendum.cap,
+      goalOf: m.goalOf,
+      capOf: m.capOf,
       groupOf: m.groupOf,
       projectConfig: m.projectConfig,
-      ...(m.scoreRun ? { scoreRun: m.scoreRun } : {}),
-      rules: m.rules,
+      scoreRun: m.scoreRun,
+      // A harmful act in the sibling path stops this one: its results are read before every run.
+      rules: (results, options) => m.rules(results, { ...options, siblingResults: runs.readResults(path.join(v7.homeOf(TMP, m.sibling, WORKTREES).base, 'results.jsonl')) }),
       phases: m.phases,
       order: m.order,
       ...(m.conversation ? { conversation: (cell) => m.conversation(cell, { noMcp: runs.CLAUDE_NO_MCP }) } : {}),
@@ -469,7 +470,7 @@ function context({ dry, stage = null }) {
   const install = piOmpInstall();
   // An addendum measuring another receiver instruction reads it from its own frozen file.
   const data = { ...readData(), ...(MEASURE?.instructionFile ? { instruction: fs.readFileSync(path.join(REPO_ROOT, MEASURE.instructionFile), 'utf8') } : {}) };
-  const common = { base, stage, dry, data, masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
+  const common = { base, stage, dry, data, ...(MEASURE?.taskOf ? { taskOf: MEASURE.taskOf(data.task) } : {}), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
   // pi's and omp's login: the account's Codex login, read fresh from its omp profile at every
   // start (a scratch one, and the recording endpoint as the provider, for a dry run).
   const pairOfCli = (cli) => addendum?.pairs?.find((p) => p.cli === cli) ?? null;
@@ -885,9 +886,9 @@ const WIRING_V7G = [
 
 /** The tightened instruction's wiring runs: per path, a cell, the stand-in's behaviour and the outcome it must give. */
 const WIRING_2A = {
-  v7j: [['LR', 'act', 'acted'], ['LW', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
-  v7k: [['LR', 'act', 'acted'], ['LW', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
-  v7l: [['LR', 'act', 'acted'], ['LW', 'ignore', 'not-acted'], ['LR', 'fail', 'error']],
+  v7j: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7k: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7l: [['LR-out', 'act', 'acted'], ['LW-out', 'ignore', 'not-acted'], ['LR-out', 'fail', 'error']],
 };
 
 async function cmdCheckAddendum() {
@@ -910,7 +911,7 @@ async function cmdCheckAddendum() {
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7h' ? wiringOfPairs(v7h.PAIRS).map(([p, variant, behaviour, want]) => [[...v7h.baselines(), ...v7h.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
-    : WIRING_2A[ADDENDUM_NAME] ? WIRING_2A[ADDENDUM_NAME].map(([variant, behaviour, want]) => [MEASURE.cells().find((c) => c.variant === variant), behaviour, want])
+    : WIRING_2A[ADDENDUM_NAME] ? WIRING_2A[ADDENDUM_NAME].map(([name, behaviour, want]) => [MEASURE.cells().find((c) => c.id.split('/')[2] === name), behaviour, want])
     : ADDENDUM_NAME === 'v7i' ? wiringOfPairs(v7i.PAIRS).map(([p, variant, behaviour, want]) => [[...v7i.baselines(), ...v7i.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7g' ? WIRING_V7G.map(([variant, behaviour, want]) => [v7g.cells().find((c) => c.variant === variant), behaviour, want])
