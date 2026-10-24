@@ -1,0 +1,732 @@
+{
+  "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "archiveRef": "refs/heads/archive/260925-records",
+  "archiveCommit": "e767e56ee0587655d752ed30f3ce39681f626eea",
+  "removalCommit": "fe9b2780651a79da8190586df56e659f0a707b39",
+  "accountedCandidate": "9a32c086a8aef423aa75fff2cc35ce6e785de7fe",
+  "preFreezeCandidate": "0ed877f5dd4a3d91155c5c1c6e383b4d67ae7ae6",
+  "filesystemStat": "ext2/ext3 ef53 4096 122654446 8416791",
+  "findmnt": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
+  "physicalScratch": "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-brief",
+  "logicalScratch": "/tmp/fgos-work/w4-d5c-brief",
+  "warmCache": false,
+  "coldMethod": "drop_caches not writable/permitted; first add in a fresh --no-hardlinks --no-checkout clone per variant (brief-authorized fallback, not physical cache eviction)",
+  "variants": [
+    {
+      "variant": "after-final-pin-without-gates",
+      "commit": "9a32c086a8aef423aa75fff2cc35ce6e785de7fe",
+      "files": 11158,
+      "tipBytes": 819887766,
+      "planFiles": 892,
+      "planBytes": 634649089,
+      "archiveTipBytes": 49763,
+      "runs": [
+        {
+          "run": 1,
+          "seconds": 2.508836050052196,
+          "exit": 0,
+          "cache": "cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/after-final-pin-without-gates-fresh-clone"
+        },
+        {
+          "run": 2,
+          "seconds": 2.4589934539981186,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/after-final-pin-without-gates-fresh-clone"
+        },
+        {
+          "run": 3,
+          "seconds": 2.4774028821848333,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/after-final-pin-without-gates-fresh-clone"
+        }
+      ],
+      "medianSeconds": 2.4774028821848333
+    },
+    {
+      "variant": "before-final-pin-with-gates",
+      "commit": "0ed877f5dd4a3d91155c5c1c6e383b4d67ae7ae6",
+      "files": 14443,
+      "tipBytes": 2122494592,
+      "planFiles": 4177,
+      "planBytes": 1937255915,
+      "archiveTipBytes": 49763,
+      "runs": [
+        {
+          "run": 1,
+          "seconds": 50.956445917952806,
+          "exit": 0,
+          "cache": "cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/before-final-pin-with-gates-fresh-clone"
+        },
+        {
+          "run": 2,
+          "seconds": 30.86826197290793,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/before-final-pin-with-gates-fresh-clone"
+        },
+        {
+          "run": 3,
+          "seconds": 9.165387474931777,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-brief/before-final-pin-with-gates-fresh-clone"
+        }
+      ],
+      "medianSeconds": 30.86826197290793
+    }
+  ],
+  "bundle": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/rehearsal.bundle",
+    "size": 1788526,
+    "sha256": "4064fdc4d7a82184134df2aebe01322f94db934dff79a0d5cfe49784b1796fd0",
+    "prerequisiteCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+    "verifyExit": 0
+  },
+  "gatePrograms": 43,
+  "reviewedTen": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/replay-focused-proofs.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/finalize.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/replay-scans.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"
+  ],
+  "temporaryGateFiles": 3285,
+  "retainedFilesVerified": 885,
+  "tests": [
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-rationale-reproduction.test.mjs.log.gz",
+      "sha256": "fa0c3b916dfb78e26d45124a106dab9177c5a643ae1a974d6bca146f13ae1ba0",
+      "summary": [
+        "ℹ tests 8",
+        "ℹ pass 6",
+        "ℹ fail 2",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (68560.099534ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (16833.858688ms)",
+        "✖ failing tests:",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (68560.099534ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (16833.858688ms)"
+      ]
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-runner-liveness.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-runner-liveness.test.mjs.log.gz",
+      "sha256": "548c5349c8413aad17af69ef31375259fd53d688a76de626dcc7a8d4a429435d",
+      "summary": [
+        "ℹ tests 1",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-doc-inventory.test.mjs.log.gz",
+      "sha256": "c58cfb3a1c14cfa436e430d63e92702e3d1ff9294aa97bfac0a731b6b9abaa0c",
+      "summary": [
+        "ℹ tests 96",
+        "ℹ pass 96",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/verify-phase-02.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-verify-phase-02.test.mjs.log.gz",
+      "sha256": "bf8eac698b0db9368b19c1bb350e319055258ccd368aa73daae4d24c70e6e2c2",
+      "summary": [
+        "ℹ tests 16",
+        "ℹ pass 6",
+        "ℹ fail 10",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ verifier 01 cleans its setup after check failure without forcing removal (436.545901ms)",
+        "✖ verifier 01 cleans its setup after partial install without forcing removal (449.30788ms)",
+        "✖ verifier 01 cleans its setup after keep worktree without forcing removal (294.026238ms)",
+        "✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (457.389587ms)",
+        "✖ verifier 01 cleans its setup after committed dependencies without forcing removal (459.23198ms)",
+        "✖ verifier 02 cleans its setup after check failure without forcing removal (558.327611ms)",
+        "✖ verifier 02 cleans its setup after partial install without forcing removal (529.195083ms)",
+        "✖ verifier 02 cleans its setup after keep worktree without forcing removal (362.213397ms)",
+        "✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (501.222637ms)",
+        "✖ verifier 02 cleans its setup after committed dependencies without forcing removal (581.449892ms)",
+        "✖ failing tests:",
+        "✖ verifier 01 cleans its setup after check failure without forcing removal (436.545901ms)",
+        "✖ verifier 01 cleans its setup after partial install without forcing removal (449.30788ms)",
+        "✖ verifier 01 cleans its setup after keep worktree without forcing removal (294.026238ms)",
+        "✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (457.389587ms)",
+        "✖ verifier 01 cleans its setup after committed dependencies without forcing removal (459.23198ms)",
+        "✖ verifier 02 cleans its setup after check failure without forcing removal (558.327611ms)",
+        "✖ verifier 02 cleans its setup after partial install without forcing removal (529.195083ms)",
+        "✖ verifier 02 cleans its setup after keep worktree without forcing removal (362.213397ms)",
+        "✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (501.222637ms)",
+        "✖ verifier 02 cleans its setup after committed dependencies without forcing removal (581.449892ms)"
+      ]
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-doc-retirement.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-retirement.test.mjs.log.gz",
+      "sha256": "d7f0a0db0f4a339ef6e2988b6fbe370a69ab7012bae505e27e1bc4705bb01344",
+      "summary": [
+        "ℹ tests 36",
+        "ℹ pass 36",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-candidate-status.test.mjs.log.gz",
+      "sha256": "5da646d5aa0c0009b3dfcb370854bef2c8a52ddec3d80d6c0d3df0eb06b4451b",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-evidence-relocation.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-evidence-relocation.test.mjs.log.gz",
+      "sha256": "6b035214cff23646dc0f3fd4fb1157ca5efee116fb99695424da03e49ff5dba2",
+      "summary": [
+        "ℹ tests 41",
+        "ℹ pass 41",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-review-format.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-review-format.test.mjs.log.gz",
+      "sha256": "80c30f2c3e199b3e70dd5cb0b1bc436998e8474aef56f5f66ee0dae3506a0b51",
+      "summary": [
+        "ℹ tests 25",
+        "ℹ pass 25",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/doc-restoration-proofs.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-restoration-proofs.test.mjs.log.gz",
+      "sha256": "83f6548ab1fa1e05d29b8d2637bbdca9ff58b977dfc5b031db847958b15d5099",
+      "summary": [
+        "ℹ tests 5",
+        "ℹ pass 5",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-constitution.test.mjs.log.gz",
+      "sha256": "0a2e49d0df6632d027fb6a4174f64403a9c4a8478d6082ce5668bc6643963cec",
+      "summary": [
+        "ℹ tests 65",
+        "ℹ pass 65",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
+      "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-shipped-path-inventory.test.mjs.log.gz",
+      "sha256": "33628f57d4bf4e71bbf7ae1808dd6d4d79738e384d9884da5cfacaef3d00aff3",
+      "summary": [
+        "ℹ tests 10",
+        "ℹ pass 10",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-rationale-reproduction.test.mjs.log.gz",
+      "sha256": "8e59cf5c6b3e7819485c9df290e1420d3991bea78f1ece721d324fbda953d5ee",
+      "summary": [
+        "ℹ tests 8",
+        "ℹ pass 6",
+        "ℹ fail 2",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10202.693414ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10254.668851ms)",
+        "✖ failing tests:",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10202.693414ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10254.668851ms)"
+      ]
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-runner-liveness.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-runner-liveness.test.mjs.log.gz",
+      "sha256": "0e703578ab1a982f22b8c560a4b49d8ebba08e89d65162572afafb25217bce86",
+      "summary": [
+        "ℹ tests 1",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-doc-inventory.test.mjs.log.gz",
+      "sha256": "44b74f08d88fb7fdbe3e8181b181bb15e8bba18f7de9734c33af651b260137bd",
+      "summary": [
+        "ℹ tests 96",
+        "ℹ pass 96",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/verify-phase-02.test.mjs",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-verify-phase-02.test.mjs.log.gz",
+      "sha256": "1049a2b8cc63414da19acafc8d0e632608ebaba170fed1221ff9b6c9fceeed4a",
+      "summary": [
+        "ℹ tests 16",
+        "ℹ pass 6",
+        "ℹ fail 10",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": [
+        "✖ verifier 01 cleans its setup after check failure without forcing removal (483.807909ms)",
+        "✖ verifier 01 cleans its setup after partial install without forcing removal (535.393071ms)",
+        "✖ verifier 01 cleans its setup after keep worktree without forcing removal (275.238073ms)",
+        "✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (477.594021ms)",
+        "✖ verifier 01 cleans its setup after committed dependencies without forcing removal (510.125985ms)",
+        "✖ verifier 02 cleans its setup after check failure without forcing removal (546.608503ms)",
+        "✖ verifier 02 cleans its setup after partial install without forcing removal (428.544696ms)",
+        "✖ verifier 02 cleans its setup after keep worktree without forcing removal (232.145085ms)",
+        "✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (477.458543ms)",
+        "✖ verifier 02 cleans its setup after committed dependencies without forcing removal (476.73979ms)",
+        "✖ failing tests:",
+        "✖ verifier 01 cleans its setup after check failure without forcing removal (483.807909ms)",
+        "✖ verifier 01 cleans its setup after partial install without forcing removal (535.393071ms)",
+        "✖ verifier 01 cleans its setup after keep worktree without forcing removal (275.238073ms)",
+        "✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (477.594021ms)",
+        "✖ verifier 01 cleans its setup after committed dependencies without forcing removal (510.125985ms)",
+        "✖ verifier 02 cleans its setup after check failure without forcing removal (546.608503ms)",
+        "✖ verifier 02 cleans its setup after partial install without forcing removal (428.544696ms)",
+        "✖ verifier 02 cleans its setup after keep worktree without forcing removal (232.145085ms)",
+        "✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (477.458543ms)",
+        "✖ verifier 02 cleans its setup after committed dependencies without forcing removal (476.73979ms)"
+      ]
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-doc-retirement.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-retirement.test.mjs.log.gz",
+      "sha256": "84ca6fa1852524a20690ed7f179c0b6356b19a919b88753576b6993e2ec9d4e4",
+      "summary": [
+        "ℹ tests 36",
+        "ℹ pass 36",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-candidate-status.test.mjs.log.gz",
+      "sha256": "fdf63cc3003b1aa242704386df3f7c0666c29291e1e343a86870a8efcf919f0e",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-evidence-relocation.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-evidence-relocation.test.mjs.log.gz",
+      "sha256": "6e32c7eb8f511df88be7e840025561772c1ebbcacb798a3c66073dd7551a5b55",
+      "summary": [
+        "ℹ tests 41",
+        "ℹ pass 41",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-review-format.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-review-format.test.mjs.log.gz",
+      "sha256": "bef5b4d3c23ad8a5ad12c0dd0a3015457453d363a8bd6df5eec52ac1f76588d0",
+      "summary": [
+        "ℹ tests 25",
+        "ℹ pass 25",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/doc-restoration-proofs.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-restoration-proofs.test.mjs.log.gz",
+      "sha256": "037c377ef12411d39575304b29dfa94d9852847795de30660f38e4c7bd5e1d80",
+      "summary": [
+        "ℹ tests 5",
+        "ℹ pass 5",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-constitution.test.mjs.log.gz",
+      "sha256": "06098a8a572f4f568d36ad37e8d9cc8e7486a7c7413e2cb022cad113eb527a6a",
+      "summary": [
+        "ℹ tests 65",
+        "ℹ pass 65",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
+      "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-shipped-path-inventory.test.mjs.log.gz",
+      "sha256": "604017bf94781d7846e63a74dd192b0fcaaaf6b57a6e40af7f980e4c026d9f5c",
+      "summary": [
+        "ℹ tests 10",
+        "ℹ pass 10",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    }
+  ],
+  "linkChecks": [
+    {
+      "phase": "baseline",
+      "check": "check-doc-candidate-status",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-candidate-status.json.gz",
+      "sha256": "801d84f5b40809941ef7b3dcb69a2878a600a52739dcd8cf91c978e1a72da033",
+      "result": {
+        "counts": {
+          "files": 627,
+          "byStatus": {
+            "promoted": 3,
+            "candidate": 221,
+            "legacy-current": 0,
+            "non-authority": 1,
+            "unrouted": 402
+          },
+          "exemptUnrouted": 302,
+          "checked": 224,
+          "findings": 4,
+          "byType": {
+            "missing-candidate-fields": 4
+          }
+        },
+        "findings": [
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "phase": "baseline",
+      "check": "check-doc-retirement",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-retirement.json.gz",
+      "sha256": "34ed087c8fcfb0b56341a4c7ca3dd718a5feeae3f3d53f79bdb59964af220d68",
+      "result": null,
+      "error": "check-doc-retirement error loading input: inventory shards unreadable (/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-brief/repo/plans/260925-documentation-authority-unification/reports/doc-inventory.json: missing shard doc-inventory.parts/part-0001.jsonl). The shards are not committed; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit 23f6eaccf5eb195a8f50e5788d38f386a901b6d2 --identity-registry plans/260925-documentation-authority-unification/reports/identity-registry.json --json-out plans/260925-documentation-authority-unification/reports/doc-inventory.json --md-out plans/260925-documentation-authority-unification/reports/doc-inventory.md\n"
+    },
+    {
+      "phase": "baseline",
+      "check": "retirement-links-resolve",
+      "exit": 0,
+      "result": {
+        "scope": "production links-resolve evaluator only; unrelated inventory fixture inputs",
+        "findings": [],
+        "results": [
+          {
+            "gate": "promotionGate",
+            "id": "links-resolve",
+            "rule": "Every relative link and Related path resolves.",
+            "enforcedBy": "script",
+            "status": "pass",
+            "measure": "none: unresolved relative links or Related paths in candidate and promoted documents"
+          }
+        ]
+      }
+    },
+    {
+      "phase": "reduced",
+      "check": "check-doc-candidate-status",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-candidate-status.json.gz",
+      "sha256": "801d84f5b40809941ef7b3dcb69a2878a600a52739dcd8cf91c978e1a72da033",
+      "result": {
+        "counts": {
+          "files": 627,
+          "byStatus": {
+            "promoted": 3,
+            "candidate": 221,
+            "legacy-current": 0,
+            "non-authority": 1,
+            "unrouted": 402
+          },
+          "exemptUnrouted": 302,
+          "checked": 224,
+          "findings": 4,
+          "byType": {
+            "missing-candidate-fields": 4
+          }
+        },
+        "findings": [
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "phase": "reduced",
+      "check": "check-doc-retirement",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-retirement.json.gz",
+      "sha256": "50b6d6340280af713d9f45e9b721ff5d8e4805142dce1905b7007d7af6c11fd0",
+      "result": null,
+      "error": "check-doc-retirement error loading input: inventory shards unreadable (/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-brief/repo/plans/260925-documentation-authority-unification/reports/doc-inventory.json: missing shard doc-inventory.parts/part-0001.jsonl). The shards are not committed; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit 9a32c086a8aef423aa75fff2cc35ce6e785de7fe --identity-registry plans/260925-documentation-authority-unification/reports/identity-registry.json --json-out plans/260925-documentation-authority-unification/reports/doc-inventory.json --md-out plans/260925-documentation-authority-unification/reports/doc-inventory.md\n"
+    },
+    {
+      "phase": "reduced",
+      "check": "retirement-links-resolve",
+      "exit": 0,
+      "result": {
+        "scope": "production links-resolve evaluator only; unrelated inventory fixture inputs",
+        "findings": [],
+        "results": [
+          {
+            "gate": "promotionGate",
+            "id": "links-resolve",
+            "rule": "Every relative link and Related path resolves.",
+            "enforcedBy": "script",
+            "status": "pass",
+            "measure": "none: unresolved relative links or Related paths in candidate and promoted documents"
+          }
+        ]
+      }
+    }
+  ],
+  "accounting": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "embeddedKey": "scripts",
+      "recipeSha256": "f5591bc62b5a914b3d40307732282bc6fb2f2c31df42b0a1613b337ecc045013",
+      "recipeScope": "Entire unchanged checks.mjs; only exact exception-array rows appended in clone",
+      "afterBOk": true,
+      "afterHFindings": 4,
+      "afterHNewFindings": 0,
+      "afterIOk": true,
+      "afterRecipeExit": 1,
+      "beforeExit": 1,
+      "beforeUnaccountedPairs": 3429,
+      "removalCommit": "fe9b2780651a79da8190586df56e659f0a707b39",
+      "removalPairs": 3381,
+      "preexistingPendingPairs": 48,
+      "afterExit": 0,
+      "afterAOk": true,
+      "afterUnaccountedPairs": 0,
+      "afterWorkingViolations": 0,
+      "noBPinOrAllowlistChange": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "embeddedKey": "readOnlyScripts",
+      "recipeSha256": "29f161963a3927a6848613e8319e24877034c5455357b3e63f355d5faac35d3c",
+      "recipeScope": "Entire unchanged checks.mjs; only exact exception-array rows appended in clone",
+      "afterBOk": true,
+      "afterHFindings": 4,
+      "afterHNewFindings": 0,
+      "afterIOk": true,
+      "afterRecipeExit": 1,
+      "beforeExit": 1,
+      "beforeUnaccountedPairs": 3429,
+      "removalCommit": "fe9b2780651a79da8190586df56e659f0a707b39",
+      "removalPairs": 3381,
+      "preexistingPendingPairs": 48,
+      "afterExit": 0,
+      "afterAOk": true,
+      "afterUnaccountedPairs": 0,
+      "afterWorkingViolations": 0,
+      "noBPinOrAllowlistChange": true
+    }
+  ],
+  "measuredMainArtifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
+      "size": 7291,
+      "sha256": "538a20c566e3cee6b61304bcefa5a7a40292fce5625b2fd1a7e0e4f50cc8b820"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
+      "size": 9132,
+      "sha256": "17355d5f8c28607ec4a65acc0b8839427844f49252a2a2a24f458659577eead4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
+      "size": 6598,
+      "sha256": "64276d8335688cba9a965d3096f30c180e6529d694988a5a8e2d92e01f304404"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.json",
+      "size": 4463,
+      "sha256": "b045723467bc91d38486765a7fdf4907c0d9978942e835772288c7feb69671df"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
+      "size": 18519,
+      "sha256": "baa962f74d43b822773a02e474e86edc03d0d24fc05fff2b5741ece36a1c2639"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
+      "size": 1275,
+      "sha256": "68ce1b6cf98b26b0f20829413493437a0cf7102cf99ff0b4ca49a3da261737c1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
+      "size": 2485,
+      "sha256": "624a19e01f663b3206418e998c9fce7e047f70953f968448bbe193e53ed9baa0"
+    }
+  ],
+  "postMeasurementNote": "Receipt and rehearsal outputs are written after measured commits. Their exact delta must be added at F; no final-tree claim.",
+  "releaseId": "sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8",
+  "rustFreshness": "activated addon only; working-tree Rust freshness not established",
+  "noSourceGitWrites": true,
+  "noProductOrTestSourceChange": true
+}

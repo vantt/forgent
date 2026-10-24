@@ -1,15 +1,20 @@
 {
-  "inputCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
+  "inputCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "exit": 0,
-  "partitionFiles": 6761,
-  "movingFiles": 6362,
-  "retainedFiles": 399,
-  "retirementSpecs": 336,
-  "gatePrograms": 18,
+  "partitionFiles": 6899,
+  "movingFiles": 6016,
+  "retainedFiles": 883,
+  "retirementSpecs": 359,
+  "gatePrograms": 43,
   "reviewedTen": 10,
   "historicalReaderFiles": 47,
   "historicalJoins": 135,
   "priorScriptRefOccurrences": 2918,
+  "externalReferenceJoinsVerified": 184,
+  "navigationReferenceJoinsVerified": 619,
+  "falseBasenameRowsReviewed": 22,
+  "falseBasenameRowsArchived": 20,
+  "falseBasenameRowsNowRequiredByNavigation": 2,
   "sixRestoredInputsRetained": true,
   "alreadyPrunedRecoveryBlobsVerified": 279,
   "negativeProbes": [
@@ -30,17 +35,17 @@
       "rejected": true
     }
   ],
-  "mainManifestBytes": 6573,
-  "auditCompressedBytes": 1657100,
+  "mainManifestBytes": 7253,
+  "auditCompressedBytes": 1709754,
   "rehearsalCustody": {
     "bundleHeadsAndDigestVerified": true,
-    "testsPerSide": 10,
+    "testsPerSide": 11,
     "baselineFailureParity": true,
     "accountingRecipesGreen": 2,
     "realDisk": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
     "variantTipBytes": [
-      679257054,
-      1970867003
+      818290357,
+      2117345765
     ]
   },
   "limits": "Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass."
