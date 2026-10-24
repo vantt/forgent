@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1e8caea6c9f810f51e0971b085c04fb37d485e412baa065828a20bd6368e7661",
+  "payloadDigest": "87003d48b48d8a67293a28e0c898969df4f4cb27041264d35df8298ec8c759d3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "aef175bb268f97a90602656684578d008891ad20a35f5e43ebc9e237e333bc20",
+    "bin/fgos.mjs": "9872a7bd0e924b266fd469a8ebe090b0476070087a13975baa0de42a01d63fd7",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -784,7 +784,7 @@
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
-    "src/event-store/config.mjs": "200e2649df5dc241e0f585d3a0e077f2d38901f602c7ef36a20a953bb5b7b39c",
+    "src/event-store/config.mjs": "c8c67bdae03ce24f4e70f6a74bba877811aa049f9d9c46007841dc8c40d28d6c",
     "src/event-store/consumers.mjs": "211dee946e024e09b138f938293d641f2be1fff624e14e2f505d5bcd3344bd74",
     "src/event-store/index.mjs": "0454cb1a43357b8be24f0d4a67e00a2cf5812ca2d4e71975d5e6eb897cf5a42d",
     "src/event-store/maintenance.mjs": "60489fa9e3d898d83feb6219ec8780022e77c6c7750e8ecac0508f64d6fb7379",
@@ -852,7 +852,7 @@
     "src/runner/anti-loop.mjs": "feab88887c5951617d6f551d26ad27e07470a020100f9ac5cfd61399cad8d4b8",
     "src/runner/attestation-guard.mjs": "a7fcde36b4580892f22f160fb4331bcdddfa483554c726b6d606f8e8707b35b4",
     "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
-    "src/runner/claim-port.mjs": "55f4c782e9d1304655b33afebc8fefa1f34db29829757993e74098f08ce6ff91",
+    "src/runner/claim-port.mjs": "382c3b5b87dfa392c0dbaa2173bae8ec7eeed558a678e374cd1448dc28ba5ec1",
     "src/runner/dispatch.mjs": "2372515e1257a68ef852fa26b56846228e418043d39244a27e9da87eb26fe108",
     "src/runner/dispatch/adapters.mjs": "dbc83f5033523fdb15aebcb7e0108453c05c1870c179d8453fcc1eaa95e4996a",
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
@@ -1115,42 +1115,42 @@
   "sites": [
     {
       "path": "bin/fgos.mjs",
-      "line": 3465,
+      "line": 3463,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? -Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3465,
+      "line": 3463,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3465,
+      "line": 3463,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? NaN",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3609,
+      "line": 3607,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? -Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3609,
+      "line": 3607,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3609,
+      "line": 3607,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? NaN",
       "family": "unresolved-binary"
@@ -1867,14 +1867,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3465,
+      "line": 3463,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3609,
+      "line": 3607,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"

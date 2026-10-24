@@ -20,13 +20,14 @@ import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { DEFAULTS } from '../state/work.mjs';
 
-/** `workerSlots.ceiling` of the project that owns the `.fgos` directory `dir` (null: no ceiling armed); a refused config file throws. */
+/** `workerSlots.ceiling` of the project that owns the `.fgos` directory `dir` (null: no ceiling armed), following a linked worktree's `.fgos` symlink to the main checkout that holds the store; a refused config file throws. */
 export function readWorkerSlotCeiling(dir) {
-  return readConfig({ projectRoot: path.dirname(dir), sections: ['workerSlots'] }).value.workerSlots?.ceiling;
+  return readConfig({ projectRoot: path.dirname(fs.realpathSync(dir)), sections: ['workerSlots'] }).value.workerSlots?.ceiling;
 }
 
 /**

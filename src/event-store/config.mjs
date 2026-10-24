@@ -28,12 +28,12 @@ export function eventStoreConfig(config = {}) {
  * The Event Store config of the project at `root`, read through the config door; `globalConfigPath` names a global config
  * file whose directory replaces `~/.fgos`.
  *
- * Config files are hand edited, so a half-typed edit is an ordinary state. A file that does not parse never yields the
- * defaults for a publish decision: a caller that reports on or acts for the user (`strict`: the `events` verbs, doctor)
- * gets the `event-store-config` error with the door's message; any other caller (the write path and the lifecycle
- * triggers) gets a config that never pushes (`sync.intervalSec` 0), so a trigger still seals and never publishes against
- * the user's real setting. Any other refusal of the door (a value that breaks the schema, a file the door cannot read)
- * throws for every caller.
+ * Config files are hand edited, so a half-typed edit is an ordinary state, and the door refuses a file as a whole. A
+ * refused file never yields the defaults for a publish decision: a caller that reports on or acts for the user (`strict`:
+ * the `events` verbs, doctor) gets the `event-store-config` error with the door's message; any other caller (the write
+ * path and the lifecycle triggers) gets a config that never pushes (`sync.intervalSec` 0) when the refusal is not about
+ * the `eventStore` section, so a trigger still seals and never publishes against the user's real setting. A refusal that
+ * names an `eventStore` value throws for every caller.
  */
 export function readEventStoreConfig(root, globalConfigPath, { strict = false } = {}) {
   const globalDir = globalConfigPath ? path.dirname(globalConfigPath) : undefined;
@@ -41,7 +41,8 @@ export function readEventStoreConfig(root, globalConfigPath, { strict = false } 
     return eventStoreConfig(readConfig({ projectRoot: root, globalDir, sections: ['eventStore'] }).value);
   } catch (error) {
     if (!isConfigRefusal(error)) throw error;
-    if (strict || error.code !== 'config-parse') throw Object.assign(new Error(`event-store-config: ${error.message}`), { code: 'event-store-config' });
+    const aboutEventStore = error.refusals.some(({ path: at }) => typeof at === 'string' && (at === 'eventStore' || at.startsWith('eventStore.')));
+    if (strict || aboutEventStore) throw Object.assign(new Error(`event-store-config: ${error.message}`), { code: 'event-store-config' });
     return { ...eventStoreConfig({}), sync: { intervalSec: 0 } };
   }
 }
