@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { globalConfigPath, projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { DEFAULT_RUNNER_CONFIG, loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 
@@ -32,9 +32,9 @@ function withMachine({ globalRunner = GLOBAL_RUNNER(), project }, fn) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-layers-home-'));
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-layers-repo-'));
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  const globalFile = path.join(home, '.fgos', 'config.json');
+  const globalFile = globalConfigPath(home);
   if (globalRunner) writeGlobalConfig(home, { runner: globalRunner });
-  const projectFile = path.join(repo, '.fgos', 'config.json');
+  const projectFile = projectConfigPath(repo);
   if (project) {
     fs.mkdirSync(path.dirname(projectFile), { recursive: true });
     writeProjectConfig(repo, project);

@@ -2,13 +2,13 @@
 //
 // A loop worker runs confined: it can write only its own worktree, never git, never the main
 // checkout's `.fgos/`, never a file elsewhere on disk. `runUnit` reads the runner config from the
-// main checkout's `.fgos/config.json`, never from the caller's memory. So a test that hands the
+// main checkout's project config, never from the caller's memory. So a test that hands the
 // loop a runner config also has to put it on disk, with executors the Unit can bind: each one
 // with a bwrap-confined cli invocation, and a capability pool for each step the loop dispatches.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CONFINED_INVOCATION_ID = 'cli';
 
@@ -53,18 +53,19 @@ export function confinedRunnerConfig(config = {}) {
   for (const [id, entry] of Object.entries(executors)) executors[id] = confinedEntry(entry);
   const capabilities = { ...(config.capabilities ?? {}) };
   for (const [capability, executorId] of Object.entries(LOOP_STEP_EXECUTORS)) {
-    if (!capabilities[capability] && executors[executorId]) capabilities[capability] = { prefer: [{ executor: executorId }] };
+    if (!capabilities[capability] && executors[executorId]) capabilities[capability] = capabilityServedBy(executorId, capability, { tier: config.defaults?.tier });
   }
+  // The walk after a failure follows the families `tierFallback` lists, so the fixture lists the families its executors serve.
+  const families = [...new Set(Object.values(executors).filter((entry) => entry?.kind !== 'tool' && entry?.providerModel).map((entry) => entry.providerModel))];
+  const tierFallback = config.tierFallback ?? Object.fromEntries(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, families]));
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
-  return { ...config, executors, capabilities, patterns: { ...(config.patterns ?? {}), seatBinding: { schema: 1 } } };
+  return { ...config, executors, capabilities, ...(families.length > 0 ? { tierFallback } : {}), patterns: { ...(config.patterns ?? {}), seatBinding: { schema: 1 } } };
 }
 
-/** Write `config` as the runner block of `<repoRoot>/.fgos/config.json`, keeping other blocks. */
+/** Write `config` as the runner block of the project config of `repoRoot`, keeping other blocks. */
 export function persistRunnerConfig(repoRoot, config) {
-  const file = path.join(repoRoot, '.fgos', 'config.json');
   let existing = {};
   try { existing = readProjectConfig(repoRoot); } catch { /* none yet */ }
-  fs.mkdirSync(path.dirname(file), { recursive: true });
   writeProjectConfig(repoRoot, { ...existing, runner: config });
 }
 

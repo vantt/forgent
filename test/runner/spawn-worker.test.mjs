@@ -22,7 +22,7 @@ import { confinedRunnerConfig, persistRunnerConfig, unitRuns, countWorkerRuns } 
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -80,7 +80,7 @@ const scriptDir = () => fs.realpathSync(makeFixtureDir('fgos-spawn-worker-exec-'
 function baseConfig(executorArgs, extra = {}) {
   return {
     // bind picks the model from the executor's declared provider.
-    executor: { command: process.execPath, args: executorArgs, providerModel: 'node' },
+    executor: { command: process.execPath, args: executorArgs, providerModel: 'node', allowCrossProvider: true },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
@@ -367,20 +367,21 @@ test('spawnWorker passes an executor\'s own resolved env to the worker, never in
   try {
     const env = { ANTHROPIC_BASE_URL: 'https://openrouter.ai/api', ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}', ANTHROPIC_API_KEY: '' };
     const fx = fixture({
+      // An id of its own: one named after a standard executor would replace that one's invocations, which the standard's capabilities name.
       executors: {
-        glm: {
+        'glm-env': {
           kind: 'agent', command: process.execPath, args: [envEcho], providerModel: 'node', allowCrossProvider: true, env,
           invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [envEcho], env }],
         },
       },
-      capabilities: { 'code:implement': { prefer: [{ executor: 'glm' }] } },
+      capabilities: { 'code:implement': capabilityServedBy('glm-env', 'code:implement') },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 20000,
     });
 
     const result = await fx.run();
 
-    assert.equal(result.executorId, 'glm');
+    assert.equal(result.executorId, 'glm-env');
     const output = echoed(result.stdout);
     assert.equal(output.BASE_URL, 'https://openrouter.ai/api');
     assert.equal(output.AUTH_TOKEN, 'secret-test-key-12345');

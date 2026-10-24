@@ -183,7 +183,7 @@ test('the global layer keeps the keys it has always carried: maxTier, tierFallba
   const { cfg } = loadRunner(runnerWith(), globalRunner);
   assert.equal(cfg.maxTier, 'flagship');
   assert.equal(cfg.capabilities.review.rigor, 'high');
-  refusedLoad(runnerWith(), /declares retired "rigorToTier"/, {
+  refusedLoad(runnerWith(), /runner\.rigorToTier no longer exists/, {
     ...globalRunner,
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   });

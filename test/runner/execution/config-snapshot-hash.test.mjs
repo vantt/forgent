@@ -40,12 +40,10 @@ test('the hash changes when any part of seat choice changes: the default tier, t
   }
 });
 
-test('a comment, anywhere, never changes the hash, and neither does a key the hash does not cover', () => {
+// A comment in a config file is a YAML comment: the reader drops it before any value exists, so it never reaches the hash.
+test('a key the hash does not cover never changes the hash', () => {
   const base = hashOf(runner());
   const noted = runner();
-  noted.$comment = ['nano: mechanical'];
-  noted.modelPolicies.$comment = 'cells';
-  noted.capabilities['code:*'].$comment = 'taste';
   noted.timeoutMs = 1;
   assert.equal(hashOf(noted), base);
 });

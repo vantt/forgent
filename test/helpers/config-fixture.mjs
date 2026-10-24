@@ -98,14 +98,14 @@ function standardCapabilityCatalog() {
 }
 
 /**
- * A capability entry of a fixture project that only `executor` serves, at one tier. The bundled standard also
+ * A capability entry of a fixture project that only `executors` (one id or a pool, in order) serve, at one tier. The bundled standard also
  * carries seat, role and persona scopes (and `<family>:*` wildcard scopes) with pools of their own, and a scope
  * wins over the capability's pool; the entry restates every scope the standard has for `name` so the fixture's
  * executor serves each seat, never a real CLI the standard names.
  */
-export function capabilityServedBy(executor, name, { tier = 'standard', rigor = 'standard' } = {}) {
+export function capabilityServedBy(executors, name, { tier = 'standard', rigor = 'standard' } = {}) {
   const catalog = standardCapabilityCatalog();
-  const prefer = [{ executor }];
+  const prefer = [executors].flat().map((executor) => ({ executor }));
   const entry = { prefer, rigor, tier };
   const scopes = [catalog[name], ...Object.entries(catalog).filter(([key]) => key.endsWith(':*') && name.startsWith(key.slice(0, -1))).map(([, value]) => value)];
   for (const group of ['seats', 'roles', 'personas']) {

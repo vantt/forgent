@@ -143,16 +143,16 @@ test('h. .fgos is never committed, even under a bare ** scope', () => withRepo(u
   assert.deepEqual(committed(dir), ['a.txt']);
 }));
 
-test('tracked modified .fgos files stay out of a broad scoped commit', () => withRepo({ '.fgos/config.json': 'base\n' }, (dir) => {
+test('tracked modified .fgos files stay out of a broad scoped commit', () => withRepo({ '.fgos/config.yaml': 'base\n' }, (dir) => {
   writeRawProjectConfig(dir, 'modified\n');
   write(dir, 'a.txt');
-  const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'], changedFiles: ['.fgos/config.json', 'a.txt'] });
+  const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'], changedFiles: ['.fgos/config.yaml', 'a.txt'] });
   assert.equal(r.status, 'committed', r.error);
   assert.deepEqual(r.files, ['a.txt']);
   assert.deepEqual(r.outOfScope, []);
   assert.deepEqual(committed(dir), ['a.txt']);
-  assert.equal(git(dir, 'show', 'HEAD:.fgos/config.json'), 'base\n');
-  assert.equal(fs.readFileSync(path.join(dir, '.fgos/config.json'), 'utf8'), 'modified\n');
+  assert.equal(git(dir, 'show', 'HEAD:.fgos/config.yaml'), 'base\n');
+  assert.equal(fs.readFileSync(path.join(dir, '.fgos/config.yaml'), 'utf8'), 'modified\n');
 }));
 
 test('i. a pre-commit hook that adds a file is caught after the commit', () => withRepo(undefined, (dir) => {
