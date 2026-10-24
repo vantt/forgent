@@ -18,3 +18,10 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 herdr-fgos-common = { path = "../packages/herdr-fgos-common/rust" }
 fgos-git = { path = "../packages/git/rust" }
+
+# fgos-yaml-doc (under fgos-config, which herdr-fgos-common reads settings through) pins its parser to
+# the vendored copies under packages/yaml-doc/third-party; this crate is outside the root workspace
+# and has its own lock, so it repeats the root [patch.crates-io].
+[patch.crates-io]
+saphyr-parser = { path = "../packages/yaml-doc/third-party/saphyr-parser-0.2.2" }
+arraydeque = { path = "../packages/yaml-doc/third-party/arraydeque-0.5.1" }
