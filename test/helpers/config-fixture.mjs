@@ -65,6 +65,16 @@ export function writeRawProjectConfig(dir, text) {
   writeRaw(projectConfigPath(dir), text);
 }
 
+/** Path of the retired JSON project config under `dir`, for the tests of what the product does with a legacy file. */
+export function legacyProjectConfigPath(dir) {
+  return path.join(dir, '.fgos', 'config.json');
+}
+
+/** Write exactly `text` as the retired JSON project config. */
+export function writeRawLegacyProjectConfig(dir, text) {
+  writeRaw(legacyProjectConfigPath(dir), text);
+}
+
 /** Write exactly `text` as the global config. */
 export function writeRawGlobalConfig(home, text) {
   writeRaw(globalConfigPath(home), text);

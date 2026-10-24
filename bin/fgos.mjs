@@ -485,7 +485,8 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     }
     return timeoutMs;
   }
-  return loadRunnerConfigForDir(repoRoot).timeoutMs;
+  // The config is the main checkout's; a session worktree reaches it only through a `.fgos` link, which the door refuses.
+  return loadRunnerConfigForDir(resolveMainCheckoutRoot(repoRoot) ?? repoRoot).timeoutMs;
 }
 
 /**
@@ -1267,7 +1268,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // worktree-resident session, since `.fgos/config.json` is
       // unconditionally wiped from every freshly-created worktree
       // (ADR0020) and a bare cwd would silently resolve to nothing there.
-      const cfg = loadRunnerConfigForDir(path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -1302,7 +1303,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id>');
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
-      const cfg = loadRunnerConfigForDir(path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -3302,7 +3303,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // never `process.cwd()`: a session returning from inside a worktree
       // would otherwise read that branch's own possibly-stale copy of
       // config.json instead of the project's real one.
-      const invariantCheckCommands = readInvariantCheckCommands(path.dirname(dir));
+      const invariantCheckCommands = readInvariantCheckCommands(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
 
       const view = listWork(dir);
       const item = view.work[id];

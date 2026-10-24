@@ -31,8 +31,7 @@ import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawPr
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
 // other executor, never through a `fgos tool register` event.
 function declareExecutor(cwd, id, fields) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? readProjectConfig(cwd) : {};
+  const cfg = readProjectConfig(cwd);
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;

@@ -66,8 +66,7 @@ function eventLines(cwd) {
 // — the real, config-edited way a tool provider is declared post-D1, same
 // as this project's own `.fgos/config.json` declares `gitnexus`/`herdr`.
 function declareExecutor(cwd, id, fields) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? readProjectConfig(cwd) : {};
+  const cfg = readProjectConfig(cwd);
   cfg.runner ??= {};
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
   cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };

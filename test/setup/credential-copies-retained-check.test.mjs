@@ -541,7 +541,7 @@ test('the registered check reads the global inventory even from a directory with
 
 test('the registered check fails with the reason when the global config cannot be read, and never echoes what the file says', () => {
   for (const [label, content, location, named, wantReason] of [
-    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', 'config.json', 'config.json', /machine config unreadable \(config-parse /],
+    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', 'config.yaml', 'config.yaml', /machine config unreadable \(config-parse /],
     ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), 'accounts.yaml', null, /machine config refused by the provider inventory validator/],
   ]) {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));

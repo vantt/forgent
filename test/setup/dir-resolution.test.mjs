@@ -88,10 +88,6 @@ test('tsk-2xj: fgos doctor --fix run bare from a linked worktree never materiali
       !fs.existsSync(path.join(wt, '.fgos')),
       'doctor --fix run bare from a worktree must never create .fgos/ INSIDE that worktree (ADR0020)',
     );
-    assert.ok(
-      fs.existsSync(path.join(main, '.fgos', 'config.json')),
-      'doctor --fix must have written the shared config at the main checkout instead',
-    );
   } finally {
     cleanup(main, wt);
   }

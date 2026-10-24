@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c309eaeda36adda82ae999af53223265b9b14c45053f17cc727154ad35fed966",
+  "payloadDigest": "701fe001d2ce35b15c137385c8b8c8b6f1059f628147016b3ee386389778ba0b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "3685d48a5774adddfe5573f091720d0ee2e22a435058543d7ab0664fdd9dbb1f",
+    "bin/fgos.mjs": "637791fc71df5fc7fbeaef0838d64be393cca48b78cb0e7e3d65174cbc4808c3",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1113,42 +1113,42 @@
   "sites": [
     {
       "path": "bin/fgos.mjs",
-      "line": 3453,
+      "line": 3454,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? -Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3453,
+      "line": 3454,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3453,
+      "line": 3454,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? NaN",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3597,
+      "line": 3598,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? -Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3597,
+      "line": 3598,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? Infinity",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3597,
+      "line": 3598,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? NaN",
       "family": "unresolved-binary"
@@ -1841,14 +1841,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3453,
+      "line": 3454,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3597,
+      "line": 3598,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"

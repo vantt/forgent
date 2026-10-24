@@ -9,7 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { EXIT_CODES, OUTCOME_EXIT_CODES, exitCodeForOutcome } from '../../src/state/store.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -63,7 +63,7 @@ if (match) {
         },
       },
       capabilities: {
-        'docs:write': { prefer: ['mock-pass'] },
+        'docs:write': capabilityServedBy('mock-pass', 'docs:write'),
       },
     },
   });
@@ -192,7 +192,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
         },
       },
       capabilities: {
-        'docs:write': { prefer: ['fail-exec'] },
+        'docs:write': capabilityServedBy('fail-exec', 'docs:write'),
       },
     };
     writeProjectConfig(repoDir, { runner });

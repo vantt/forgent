@@ -41,8 +41,7 @@ import {
 const GATED_MODULE = 'src/runner/iron-law-gate-probe.mjs';
 
 function writeIronLawLevel(cwd, level) {
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const existing = fs.existsSync(configPath) ? readProjectConfig(cwd) : {};
+  const existing = readProjectConfig(cwd);
   writeProjectConfig(cwd, { ...existing, ironLaw: { level } });
   commitPending(cwd, `config: ironLaw.level = ${level}`);
 }
@@ -211,7 +210,8 @@ test('an unrecognized ironLaw.level is refused by name and the approve never pro
   writeIronLawLevel(cwd, 'whatever');
 
   const result = run(cwd, ['approve', 'gate-level-bogus']);
-  assert.equal(result.status, 1, `an unknown level is never the permissive one: ${result.stdout}${result.stderr}`);
+  // A refused config file is a validation refusal (exit 4), never the permissive level.
+  assert.equal(result.status, 4, `an unknown level is never the permissive one: ${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /config-schema .*ironLaw\.level/, 'the refusal names the config file path that holds the bad level');
   assert.notEqual(stateView(cwd).work['gate-level-bogus'].status, 'delivered', 'the approve did not go through');
 });

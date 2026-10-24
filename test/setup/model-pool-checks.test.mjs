@@ -42,29 +42,23 @@ function runCheck(id, runner, globalRunner, setup) {
 }
 
 test('executor-family-unique passes with one executor per family and names both executors of a shared family', () => {
-  const one = runCheck('executor-family-unique', { executors: { claude: agent('claude'), openai: agent('openai', 'codex') } });
+  // The standard alone has one executor per family.
+  const one = runCheck('executor-family-unique', {});
   assert.equal(one.passed, true, one.message);
 
-  const two = runCheck('executor-family-unique', { executors: { claude: agent('claude'), 'claude-herdr': agent('claude') } });
+  // A project executor of the family the standard's `claude` already serves is named beside it.
+  const two = runCheck('executor-family-unique', { executors: { 'claude-herdr': agent('claude') } });
   assert.equal(two.passed, false, two.message);
-  assert.match(two.message, /claude \(claude, claude-herdr\)/);
+  assert.match(two.message, /claude \(claude-herdr, claude\)/);
 });
 
 test('executor-skills-installed passes when the declared skill is installed and fails naming the missing path', () => {
-  const executors = { claude: { ...agent('claude'), supports: { skills: ['ak:cook'] } }, openai: agent('openai', 'codex') };
-  const missing = runCheck('executor-skills-installed', { executors });
+  // The standard's executors declare the skill, one skill directory per CLI they run through.
+  const install = (...dirs) => (dir) => { for (const d of dirs) { fs.mkdirSync(path.join(dir, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(dir, d, 'ak-cook', 'SKILL.md'), '# ak:cook\n'); } };
+  const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills'];
+  const missing = runCheck('executor-skills-installed', {});
   assert.equal(missing.passed, false);
   assert.match(missing.message, /claude declares ak:cook but \.claude\/skills\/ak-cook\/SKILL\.md is missing/);
-
-  const installed = runCheck('executor-skills-installed', { executors }, undefined, (dir) => {
-    fs.mkdirSync(path.join(dir, '.claude', 'skills', 'ak-cook'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.claude', 'skills', 'ak-cook', 'SKILL.md'), '# ak:cook\n');
-  });
-  assert.equal(installed.passed, true, installed.message);
-  assert.match(installed.message, /1 declared executor skill/);
-
-  const none = runCheck('executor-skills-installed', { executors: { claude: agent('claude') } });
-  assert.equal(none.passed, true);
 
   // The directory follows each invocation's CLI: every invocation of the executor must have the skill.
   const twoClis = { multi: { ...agent('openai', 'codex'), supports: { skills: ['ak:cook'] }, invocations: [
@@ -72,27 +66,28 @@ test('executor-skills-installed passes when the declared skill is installed and 
     { id: 'omp-cli', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['{prompt}'] },
     { id: 'odd-cli', via: 'cli', adapter: 'cli-spawn', command: 'odd', args: ['{prompt}'] },
   ] } };
-  const install = (...dirs) => (dir) => { for (const d of dirs) { fs.mkdirSync(path.join(dir, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(dir, d, 'ak-cook', 'SKILL.md'), '# ak:cook\n'); } };
-  const partial = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install('.agents/skills'));
+  const partial = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install(...standardDirs));
   assert.equal(partial.passed, false);
   assert.match(partial.message, /\.omp\/skills\/ak-cook\/SKILL\.md is missing/);
   assert.doesNotMatch(partial.message, /\.agents\/skills/);
-  const both = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install('.agents/skills', '.omp/skills'));
+  const both = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install(...standardDirs, '.omp/skills'));
   assert.equal(both.passed, true, both.message);
   assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
 });
 
 test('model-policy-pools is quiet without a named pool and warns about a pool runner.llmAccounts lacks', () => {
-  const plain = runCheck('model-policy-pools', {});
+  // The standard's cells name the thehive and openrouter pools: with both declared nothing is left to warn about.
+  const pools = { thehive: { shared: { credentialStore: { pi: '/srv/pi-thehive' } } }, openrouter: { shared: { credentialStore: { pi: '/srv/pi-openrouter' } } } };
+  const plain = runCheck('model-policy-pools', {}, { llmAccounts: pools });
   assert.equal(plain.passed, true);
-  assert.match(plain.message, /no tier cell names a pool/);
+  assert.doesNotMatch(plain.message, /warning/);
 
   const policies = { claude: { standard: 'sonnet' }, deepseek: { standard: ['deepseek-v4@openrouter', 'deepseek-v4'] } };
   const missing = runCheck('model-policy-pools', { modelPolicies: policies });
   assert.equal(missing.passed, true);
   assert.match(missing.message, /^warning: .*deepseek\.standard@openrouter/);
 
-  const declared = runCheck('model-policy-pools', { modelPolicies: policies }, { llmAccounts: { openrouter: { shared: { credentialStore: { pi: '/srv/pi-openrouter' } } } } });
+  const declared = runCheck('model-policy-pools', { modelPolicies: policies }, { llmAccounts: pools });
   assert.equal(declared.passed, true);
   assert.doesNotMatch(declared.message, /warning/);
 });
@@ -107,7 +102,7 @@ test('llm-accounts-shape passes on a valid global inventory and fails on one in 
   // The config door refuses the inventory in a project file by name before this row reads it; the row reports no refusal of its own.
   assert.match(inProject.message, /config-key-in-wrong-file .*runner\.llmAccounts/);
 
-  const alias = runCheck('llm-accounts-shape', { executors: { openai: agent('openai', 'codex') } }, { llmAccounts: { codex: { a: { credentialStore: { codex: '/x' } } } } });
+  const alias = runCheck('llm-accounts-shape', { executors: { 'fx-openai': agent('openai', 'codex') } }, { llmAccounts: { codex: { a: { credentialStore: { codex: '/x' } } } } });
   assert.equal(alias.passed, false);
   assert.match(alias.message, /family "openai"/);
 });
@@ -136,12 +131,13 @@ test('global-model-policies-portable fails on a list, model@pool or object cell 
   assert.match(extended.message, /claude\.advanced, deepseek\.standard, gemini\.flagship/);
 });
 
-test('tier-fallback is quiet without a list, passes a served list of all six tiers, and warns about a missing tier or a family the walk would skip', () => {
+test('tier-fallback passes the list of the standard, passes a served list of all six tiers, and warns about a family the walk would skip', () => {
+  // The standard declares the walk order of every tier.
   const none = runCheck('tier-fallback', {});
   assert.equal(none.passed, true);
-  assert.match(none.message, /not declared/);
+  assert.match(none.message, /declares the walk order of 6 tier\(s\)/);
 
-  const executors = { claude: agent('claude'), gemini: agent('gemini', 'agy') };
+  const executors = { 'fx-claude': agent('claude'), 'fx-gemini': agent('gemini', 'agy') };
   const tiers = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
   const cells = Object.fromEntries(tiers.map((tier) => [tier, 'm']));
   const modelPolicies = { claude: cells, gemini: cells };
@@ -149,16 +145,11 @@ test('tier-fallback is quiet without a list, passes a served list of all six tie
   assert.equal(served.passed, true);
   assert.match(served.message, /declares the walk order of 6 tier\(s\): nano, mini, standard, advanced, flagship, frontier/);
 
-  const partial = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'claude'] } });
-  assert.equal(partial.passed, true);
-  assert.match(partial.message, /^warning: .*mini: no list, so a seat at mini has no walk after a failure/);
-  assert.doesNotMatch(partial.message, /advanced: no list/);
-
-  const skipped = runCheck('tier-fallback', { executors, modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } }, tierFallback: { advanced: ['gemini', 'z-ai', 'claude'], flagship: ['claude'] } });
+  const skipped = runCheck('tier-fallback', { executors, modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } }, tierFallback: { advanced: ['gemini', 'nofamily', 'claude'], flagship: ['nofamily'] } });
   assert.equal(skipped.passed, true);
-  assert.match(skipped.message, /advanced: z-ai has no modelPolicies cell at advanced/);
-  assert.match(skipped.message, /flagship: claude has no modelPolicies cell at flagship/);
+  assert.match(skipped.message, /advanced: nofamily has no modelPolicies cell at advanced/);
+  assert.match(skipped.message, /flagship: nofamily has no modelPolicies cell at flagship/);
 
-  const unserved = runCheck('tier-fallback', { executors: { claude: agent('claude') }, modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } }, tierFallback: { advanced: ['gemini'] } });
-  assert.match(unserved.message, /advanced: no agent executor serves gemini/);
+  const unserved = runCheck('tier-fallback', { modelPolicies: { orphan: { advanced: 'orphan-model' } }, tierFallback: { advanced: ['orphan'] } });
+  assert.match(unserved.message, /advanced: no agent executor serves orphan/);
 });

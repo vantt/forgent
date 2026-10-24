@@ -4,7 +4,7 @@
 // trong 120s của file gốc, nên gom theo chủ đề sẽ đẻ ra nhóm vượt ngưỡng 30s.
 import '../helpers/process-tmp-root.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { legacyProjectConfigPath, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 import { test } from 'node:test';
 import {
   DEFAULT_LEVEL,
@@ -76,11 +76,11 @@ test('fgos setup leaves an existing legacy config.json alone and creates no conf
   const cwd = mkTemp('setup-cli-legacy-config-');
   const homeDir = mkTemp('setup-cli-legacy-config-home-');
   initFixtureRepo(cwd);
-  writeRawProjectConfig(cwd, '{}\n');
+  writeRawLegacyProjectConfig(cwd, '{}\n');
   const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const { data } = JSON.parse(result.stdout);
-  assert.equal(data.configPath, path.join(cwd, '.fgos', 'config.json'));
+  assert.equal(data.configPath, legacyProjectConfigPath(cwd));
   assert.equal(data.configCreated, false);
   assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'config.yaml')), false);
   fs.rmSync(cwd, { recursive: true, force: true });

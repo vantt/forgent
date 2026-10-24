@@ -13,7 +13,7 @@ seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -72,7 +72,7 @@ function setupTestRepo() {
         },
       },
       capabilities: {
-        'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
+        'docs:write': capabilityServedBy('test-node', 'docs:write'),
       },
       patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
