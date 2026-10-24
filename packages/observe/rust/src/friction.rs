@@ -790,4 +790,210 @@ mod tests {
 
         let _ = fs::remove_dir_all(&tmp);
     }
+
+    fn temp_root(tag: &str) -> std::path::PathBuf {
+        let tmp = std::env::temp_dir().join(format!("fgos-fric-{tag}-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&tmp);
+        fs::create_dir_all(tmp.join(".fgos/observe/friction")).unwrap();
+        tmp
+    }
+
+    fn friction_dir(root: &Path) -> std::path::PathBuf {
+        root.join(".fgos/observe/friction")
+    }
+
+    fn recorded_line(id: &str, ts: &str) -> String {
+        json!({
+            "v": 1, "type": "friction-recorded", "ts": ts,
+            "subject": { "kind": "work", "id": id },
+            "layer": "verification", "errorClass": "verify-miss", "disposition": "blocked",
+            "detail": "d", "attempts": 1, "docType": null, "producer": "test",
+            "caller": { "pid": 1 }
+        })
+        .to_string()
+    }
+
+    fn resolved_line(id: &str, ts: &str) -> String {
+        json!({
+            "v": 1, "type": "friction-resolved", "ts": ts,
+            "subject": { "kind": "work", "id": id },
+            "reason": "done", "by": "test", "caller": { "pid": 1 }
+        })
+        .to_string()
+    }
+
+    fn fresh_input(id: &str) -> FrictionInput {
+        FrictionInput {
+            subject: Subject::parse(&format!("work:{id}")).unwrap(),
+            layer: "verification".to_string(),
+            error_class: "verify-miss".to_string(),
+            disposition: "advisory".to_string(),
+            detail: "fresh".to_string(),
+            producer: "test".to_string(),
+            attempts: None,
+            doc_type: None,
+        }
+    }
+
+    fn one_legacy_source() -> Vec<Box<dyn LegacyFrictionSource>> {
+        vec![Box::new(MockLegacySource {
+            records: vec![LegacyFrictionRecord {
+                src: "events.jsonl".to_string(),
+                seq: 10,
+                ts: "2026-07-01T10:00:00Z".to_string(),
+                subject_id: "tsk-legacy".to_string(),
+                layer: "verification".to_string(),
+                error_class: "verify-miss".to_string(),
+                disposition: "blocked".to_string(),
+                detail: "legacy".to_string(),
+                attempts: Some(1),
+                doc_type: None,
+                producer: Some("runner.loop".to_string()),
+                resolved: false,
+                resolve_reason: None,
+            }],
+        })]
+    }
+
+    /// The already-migrated copy of `one_legacy_source`'s record, as a migration wrote it.
+    fn migrated_legacy_line() -> String {
+        let mut value: Value = serde_json::from_str(&recorded_line("tsk-legacy", "2026-07-01T10:00:00Z")).unwrap();
+        value["legacy"] = json!({ "src": "events.jsonl", "seq": 10 });
+        value.to_string()
+    }
+
+    /// How many shard lines carry the migrated copy of legacy record `seq`, read
+    /// byte-wise so an invalid line cannot hide them.
+    fn migrated_copies(root: &Path, seq: u64) -> usize {
+        let needle = format!("\"legacy\":{{\"src\":\"events.jsonl\",\"seq\":{seq}}}");
+        let mut count = 0;
+        for entry in fs::read_dir(friction_dir(root)).unwrap() {
+            let bytes = fs::read(entry.unwrap().path()).unwrap();
+            count += String::from_utf8_lossy(&bytes)
+                .lines()
+                .filter(|line| line.contains("\"friction-recorded\"") && line.contains(&needle))
+                .count();
+        }
+        count
+    }
+
+    fn listed_ids(root: &Path) -> Vec<String> {
+        list(root, None, None, None)
+            .expect("friction list must succeed")
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| item["subject"]["id"].as_str().unwrap().to_string())
+            .collect()
+    }
+
+    fn migrate_request(root: &Path) -> crate::contract::ObserveRequest {
+        crate::contract::ObserveRequest {
+            operation: "observe.friction".into(),
+            sub: "migrate".into(),
+            args: Vec::new(),
+            root: root.to_path_buf(),
+            stdin: None,
+        }
+    }
+
+    #[test]
+    fn an_invalid_utf8_line_is_skipped_and_the_good_records_of_its_shard_still_list() {
+        let tmp = temp_root("bad-utf8-list");
+        let mut bytes = format!("{}\n", recorded_line("tsk-before", "2026-10-01T10:00:00.000Z")).into_bytes();
+        bytes.extend_from_slice(b"{\"detail\":\"c\xe1\xbb\n");
+        bytes.extend_from_slice(format!("{}\n", recorded_line("tsk-after", "2026-10-01T10:01:00.000Z")).as_bytes());
+        fs::write(friction_dir(&tmp).join("other-writer.jsonl"), bytes).unwrap();
+
+        let ids = listed_ids(&tmp);
+        assert_eq!(ids, vec!["tsk-before".to_string(), "tsk-after".to_string()]);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn an_invalid_line_never_makes_a_write_or_migrate_append_migrated_legacy_records_again() {
+        let tmp = temp_root("bad-utf8-remigrate");
+        let mut bytes = format!("{}\n", migrated_legacy_line()).into_bytes();
+        bytes.extend_from_slice(b"{\"detail\":\"c\xe1\xbb\n");
+        fs::write(friction_dir(&tmp).join("migrated-writer.jsonl"), bytes).unwrap();
+        assert_eq!(migrated_copies(&tmp, 10), 1);
+        let sources = one_legacy_source();
+
+        let _ = record(&tmp, fresh_input("tsk-new"), &sources);
+        assert_eq!(migrated_copies(&tmp, 10), 1, "record appended the migrated legacy record again");
+        let _ = resolve(&tmp, Subject::parse("work:tsk-new").unwrap(), "done", "test", &sources);
+        assert_eq!(migrated_copies(&tmp, 10), 1, "resolve appended the migrated legacy record again");
+        let _ = crate::friction_cli::dispatch(&migrate_request(&tmp), &sources);
+        assert_eq!(migrated_copies(&tmp, 10), 1, "migrate appended the migrated legacy record again");
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_record_after_a_torn_last_line_lists_with_the_earlier_good_record() {
+        let tmp = temp_root("torn");
+        let shard = shard_path(&tmp, "friction").unwrap();
+        let torn = r#"{"v":1,"type":"friction-recorded","ts":"2026-10-01T10:01:00.000Z","subject":{"kind":"work","id":"tsk-torn""#;
+        fs::write(&shard, format!("{}\n{torn}", recorded_line("tsk-good", "2026-10-01T10:00:00.000Z"))).unwrap();
+
+        record(&tmp, fresh_input("tsk-new"), &[]).unwrap();
+        let ids = listed_ids(&tmp);
+        assert!(ids.contains(&"tsk-good".to_string()), "earlier record lost: {ids:?}");
+        assert!(ids.contains(&"tsk-new".to_string()), "record appended onto the torn line was swallowed: {ids:?}");
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn migrate_appends_nothing_while_another_holder_has_the_store_lock() {
+        let tmp = temp_root("migrate-lock");
+        let held = acquire_store_lock(&tmp).expect("test takes the store lock");
+        let root = tmp.clone();
+        let migration = std::thread::spawn(move || {
+            crate::friction_cli::dispatch(&migrate_request(&root), &one_legacy_source())
+        });
+        std::thread::sleep(std::time::Duration::from_millis(300));
+        let while_held = migrated_copies(&tmp, 10);
+        held.release();
+        let answer = migration.join().unwrap();
+        assert_eq!(while_held, 0, "migrate appended while another holder had the store lock");
+        answer.expect("migrate succeeds once the lock is free");
+        assert_eq!(migrated_copies(&tmp, 10), 1);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_resolve_at_the_same_instant_or_later_settles_the_record_whatever_the_stamp_precision() {
+        let tmp = temp_root("instants");
+        let lines = [
+            recorded_line("tsk-equal", "2026-10-01T10:00:00.000Z"),
+            resolved_line("tsk-equal", "2026-10-01T10:00:00.000Z"),
+            recorded_line("tsk-legacy-stamp", "2026-07-01T10:00:00Z"),
+            resolved_line("tsk-legacy-stamp", "2026-07-01T10:00:00.500Z"),
+        ];
+        fs::write(friction_dir(&tmp).join("one-writer.jsonl"), format!("{}\n", lines.join("\n"))).unwrap();
+
+        for subject in ["work:tsk-equal", "work:tsk-legacy-stamp"] {
+            assert_eq!(show(&tmp, subject).unwrap()["unsettled"], 0, "{subject} stays unsettled");
+        }
+        assert_eq!(rank(&tmp, None).unwrap(), json!([]), "rank still lists settled records");
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_symlinked_writer_shard_is_refused_and_its_target_never_changes() {
+        let tmp = temp_root("symlink");
+        let external = temp_root("symlink-external");
+        let target = external.join("outside.jsonl");
+        let original = format!("{}\n", recorded_line("tsk-outside", "2026-10-01T10:00:00.000Z"));
+        fs::write(&target, &original).unwrap();
+        std::os::unix::fs::symlink(&target, shard_path(&tmp, "friction").unwrap()).unwrap();
+
+        assert!(record(&tmp, fresh_input("tsk-new"), &[]).is_err(), "record wrote through a symlinked shard");
+        assert_eq!(fs::read_to_string(&target).unwrap(), original);
+        if let Ok(listed) = list(&tmp, None, None, None) {
+            assert!(!listed.to_string().contains("tsk-outside"), "list read records through a symlinked shard");
+        }
+        let _ = fs::remove_dir_all(&tmp);
+        let _ = fs::remove_dir_all(&external);
+    }
 }

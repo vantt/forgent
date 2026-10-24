@@ -89,3 +89,46 @@ pub fn dispatch_snapshot(
 fn chrono_now_iso() -> String {
     format_system_time_utc(std::time::SystemTime::now())
 }
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    use crate::contract::{SourceError, WorkEntropySignalsRecord, WorkOutcomesRecord};
+    use std::fs;
+    use std::path::Path;
+
+    struct EmptyWork;
+
+    impl WorkObservationSource for EmptyWork {
+        fn read_outcomes_report(&self, _root: &Path, _filter_id: Option<&str>) -> Result<WorkOutcomesRecord, SourceError> {
+            Ok(WorkOutcomesRecord { outcomes: Vec::new(), settlement: None, learning: None, missing_outcome_nag: None })
+        }
+
+        fn read_entropy_signals(&self, _root: &Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+            Ok(WorkEntropySignalsRecord::default())
+        }
+    }
+
+    #[test]
+    fn a_symlinked_snapshot_shard_is_refused_and_its_target_never_changes() {
+        let base = std::env::temp_dir().join(format!("fgos-snapshot-symlink-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&base);
+        let (root, external) = (base.join("root"), base.join("external"));
+        fs::create_dir_all(&root).unwrap();
+        fs::create_dir_all(&external).unwrap();
+        let target = external.join("outside.jsonl");
+        fs::write(&target, "original external bytes\n").unwrap();
+        std::os::unix::fs::symlink(&target, shard::shard_path(&root, "snapshots").unwrap()).unwrap();
+        let req = ObserveRequest {
+            operation: "observe.metrics".into(),
+            sub: "snapshot".into(),
+            args: Vec::new(),
+            root: root.clone(),
+            stdin: None,
+        };
+
+        assert!(dispatch_snapshot(&req, Some(&EmptyWork)).is_err(), "snapshot wrote through a symlinked shard");
+        assert_eq!(fs::read_to_string(&target).unwrap(), "original external bytes\n");
+        let _ = fs::remove_dir_all(&base);
+    }
+}
