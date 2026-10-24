@@ -2,10 +2,10 @@
   "version": 1,
   "authority": "L12-137",
   "asOf": {
-    "commit": "01e64719d",
-    "date": "2026-10-24",
+    "commit": "a0c7d0af9",
+    "date": "2026-10-25",
     "finalPinF": null,
-    "basis": "Committed evidence only: preflip-execution-plan.md section 2, owner-answers.md L13-1..L13-9, reviews/*, receipts, review-batches.json, w2-review-notes.md. A review of a delta is not counted as approval of a whole gate; pending re-review rows and Lead fixes without an independent review count as not approved."
+    "basis": "Committed evidence only: preflip-execution-plan.md section 2, owner-answers.md L13-1..L13-12, reviews/*, receipts, review-batches.json, w2-review-notes.md. A review of a delta is not counted as approval of a whole gate; pending re-review rows and Lead fixes without an independent review count as not approved."
   },
   "gates": [
     {
@@ -63,10 +63,10 @@
         "reviews/w5-misc-fix-review.json",
         "reviews/w6-misc-rework-review.json"
       ],
-      "commit": "d22072da2",
+      "commit": "daa87810b",
       "pin": null,
-      "note": "D1 carries f534aeaea (44 claims; w2-g1-carries 69/5 at cffe725b9). D1b/D7 re-sync 7be0cbc52, d9bedf229 (reviews 61/6, 21/3), fixed in fd161a8c2/dff50b64c (w4-ledger-d7b approves the LF-*/D7b doc items), shell-helper and doctor-split follow-ups approved in w5/w6. Late-area holders e5af4c501 (seat-binding, workflow, end-user contracts; w2-late-areas 20/2). D2/D2b composed family 8/13/17 records (member-joins 48/16/8) in 5fe778624 and d22072da2. No independent review of the composition records was found. GAP-05 placement still awaits the Lead; dead-vocabulary guard 9/1 and citation-drift test 31/1 (124 new findings) in composition/receipt.md.",
-      "remaining": "Get an independent per-member review of the D2 family 8/13/17 records, have the Lead place GAP-05 dynamic-023895, and close the citation-drift and dead-vocabulary owning guards on the post-move scratch replay.",
+      "note": "D1 carries f534aeaea (44 claims; w2-g1-carries 69/5 at cffe725b9). D1b/D7 re-sync 7be0cbc52, d9bedf229 (reviews 61/6, 21/3), fixed in fd161a8c2/dff50b64c (w4-ledger-d7b approves the LF-*/D7b doc items), shell-helper and doctor-split follow-ups approved in w5/w6. Late-area holders e5af4c501 (seat-binding, workflow, end-user contracts; w2-late-areas 20/2). D2/D2b composed family 8/13/17 records (member-joins 48/16/8) in 5fe778624 and d22072da2. Composition review chain: w8-composition 164/19 at f2162d9ff; w9-composition-fix 17 resolved / 2 REWORK (63c3db9c6); w10-composition-rework all five checks APPROVE plus gloss #16 (928f5cc14: GAP-05 90 overlays for 171 body bindings, 0 moved units unresolved, 7 glosses, actions/4 path); gloss fixes bc2a6a014, 4c9e1f31e, 0fe6c4381, daa87810b reviewed in w11-g9-rework, w12-g9-followup, w13-misc-pin-and-gloss and w14-check-hardening (104 witnesses audited mechanically, citation scan 130 to 0 with glosses applied, chains replay fuzz=0 byte-exact). Third main import 571a996f5 accounted and re-synced in 7693ae514/d786e305e (w11-import3-review: 46/47 imported lines carried verbatim, 1 declared adaptation; 98 ledger rows recompute; 24 new bindings pending).",
+      "remaining": "Independent per-unit review of the 24 import-3 bindings and the 8 adapted rows (s18-import3-resync.json); at F re-run the owning guards (dead-vocabulary, citation drift) on the post-apply tree.",
       "blockers": [
         "No independent review found for composition/** (family 8 successor scan sets, family 13 convention/citation-drift scan, family 17 area-holder table)",
         "GAP-05 placement proposal (composition/gap05-placement-proposal.json) awaits Lead approval; test/runner/dead-vocabulary-guard.test.mjs red (L13-7 D class)",
@@ -202,10 +202,10 @@
         "w2-review-notes.md",
         "rebind/rereview-claim-ids.json"
       ],
-      "commit": "d22072da2",
+      "commit": "daa87810b",
       "pin": null,
-      "note": "Of 423 specs, 387 reviewed at 8a9385eca: 385 APPROVE, 2 REWORK (c5 test/cli/fgos-merge.test.mjs stray blank line; c7 docs/how-to/fix-bare-citation-findings.md RUL home); 36 deferred to G9. D2 recomposed both REWORK specs and composed park actions (5fe778624, d22072da2): 11 of 15 unfinished parks completed, 4 park actions blocked on missing holders. 62 effective specs pass fuzz=0 round trips (bytes only, not semantic approval). No independent review of the recomposed REWORK specs or of the 101 park actions was found. The 4 blocked actions predate the D6 holders (e5af4c501) and no recomposition after D6 was found. Many target files changed after 8a9385eca, so digest-bound approvals reopen per id at F.",
-      "remaining": "Recompose the 4 blocked park actions against the D6 holders, then get an independent review of the 2 recomposed REWORK specs and all 101 park actions, and re-check every approved spec digest at F.",
+      "note": "Of 423 specs, 387 reviewed at 8a9385eca: 385 APPROVE, 2 REWORK (c5 test/cli/fgos-merge.test.mjs stray blank line; c7 docs/how-to/fix-bare-citation-findings.md RUL home); 36 deferred to G9. D2 recomposed both REWORK specs and composed park actions (5fe778624, d22072da2): 11 of 15 unfinished parks completed, 4 park actions blocked on missing holders. 62 effective specs pass fuzz=0 round trips (bytes only, not semantic approval). Composition review chain: w8-composition 164/19 at f2162d9ff; w9-composition-fix 17 resolved / 2 REWORK (63c3db9c6); w10-composition-rework all five checks APPROVE plus gloss #16 (928f5cc14: GAP-05 90 overlays for 171 body bindings, 0 moved units unresolved, 7 glosses, actions/4 path); gloss fixes bc2a6a014, 4c9e1f31e, 0fe6c4381, daa87810b reviewed in w11-g9-rework, w12-g9-followup, w13-misc-pin-and-gloss and w14-check-hardening (104 witnesses audited mechanically, citation scan 130 to 0 with glosses applied, chains replay fuzz=0 byte-exact).",
+      "remaining": "Re-check every approved spec digest at F and get delta reviews; the 4 blocked park actions were resolved in the w8/w9 composition rework.",
       "blockers": [
         "2 REWORK specs recomposed but not re-reviewed",
         "101 park actions without independent review",
@@ -256,10 +256,10 @@
         "composition/w2-predecessor-recomposition.json",
         "reviews/w4-import2-review.json"
       ],
-      "commit": "4b62385cb",
+      "commit": "daa87810b",
       "pin": null,
-      "note": "Done so far: legacy drift re-syncs (7be0cbc52, d9bedf229, 4b62385cb); scan-legacy-drift at 77db6ed2b shows 33 files, 3,066 units, 0 missing (w4-import2 legacy-drift-rerun APPROVE). Pin F not recorded. No evidence found of the planned interim re-judgment of the 518 records plus 10/9/125 overlaps, of the W0 deferred 11/4/7 records, or of a G9 review. 36 G7 specs deferred here; 19 predecessors recomposed mechanically in D2b need a G9 delta review. w4-import2 REWORK source-pin-provenance is open: records pin pre-rebase Doer SHAs (92260972c) reachable only from plan/260925-w1-d1.",
-      "remaining": "Record F, re-judge the 518 records, overlaps and every spec whose file changed since 5e03159 at F, recompose drifted specs, run the all-spec hash sweep to 0 drift and get a source review.",
+      "note": "Interim G9 done at HEAD (not F): 4f08d504d judged 574 records / 684 memberships (518 changed, 10/9/125 overlaps, W0 deferred 11/4/7); reworks bc2a6a014, 4c9e1f31e (re-judged at d786e305e), 0fe6c4381, daa87810b. Final counts 55/89/352/78 records, dispositions 229 still valid / 7 recompose / 338 owned parks; 545 recomposed bodies replay fuzz=0; sweep.py --check compares preimage hash, predecessor chain and body bytes against the current chain (proven to fail on stale bodies). Doer-SHA provenance: sha-map by equal patch-id, records re-pinned; ratchet previousMainMergeAccounting re-pinned 92260972c to 5965143b4 (byte-equal file); keep/doer-pin-92260972c and keep/doer-pin-a27d85d0a hold the old commits. Reviews w10-g9-interim, w11-g9-rework, w12-g9-followup, w13, w14: all checks pass; open items are low.",
+      "remaining": "At F: rerun sweep.py --check --pin F and judge every row whose evidence changed since d786e305e; recompose drifted specs; the 338 owned parks are mechanical (5 fixed rules, generic next action) and need the Lead re-judgment or an owner before F; source review of the F delta.",
       "blockers": [
         "Final pin F not recorded",
         "Interim and final re-judgment of 518 + 144 records not done",
@@ -299,16 +299,14 @@
     }
   ],
   "cutoverReadiness": {
-    "summary": "No gate is met-local. Every gate needs work before or at final pin F, or an external owner. The cutover approval packet cannot be sent yet.",
+    "summary": "No gate is met-local. G1/G7/G9 interim work is reviewed; remaining items are listed per phase. The cutover approval packet cannot be sent yet.",
     "beforeFinalPin": [
       "Re-review the 124 pending content rebind rows in rebind/rereview-claim-ids.json and the 3 rows corrected in 6f5b9419d (G0, G7)",
       "Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8)",
-      "Recompose the 4 blocked park actions against the D6 holders (system-overview f07928/f07929, architecture-intent rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751) (G7)",
-      "Get an independent review of composition/**: the 2 recomposed REWORK specs, the 101 park actions and the family 8/13/17 records (G1, G7)",
-      "Lead places GAP-05 dynamic-023895 so the dead-vocabulary guard is green, and closes the citation-drift 124-finding gap (G1)",
       "Get an exhaustive APPROVE of every G6 overturn/judgment row, including the 1,423 open judgment/note rows (G6)",
       "Run and commit the G5 retention hash check (G5)",
-      "Do the interim G9 re-judgment of the 518 records, the 10/9/125 overlaps and the W0 deferred 11/4/7 records (G9)"
+      "Re-judge or assign owners for the 338 mechanical G9 parks (G9)",
+      "Independent per-unit review of the 24 import-3 bindings and 8 adapted rows in s18-import3-resync.json (G0, G1)"
     ],
     "atFinalPinUnderLease": [
       "Import main (M2) with merge accounting and record F; no further main import after it",
@@ -324,10 +322,12 @@
       "Run the full suite in an isolated clone at F with main-vs-branch attribution",
       "G8: rebuild the partition at F, re-enumerate readers and time a cold checkout (after G10 per W4)",
       "Write the final status ledger and get an independent review of it",
-      "At F, after applying every composed patch, rerun the ownership/ledger binding resolution and rebind: review w9-composition-fix found 661 bindings unresolved after the full patch chain (2 at HEAD), e.g. 339 in platform-foundations.md from block-position shifts. The final-pin rebind must cover composed patches, not only GAP-05."
+      "At F, after applying every composed patch, rerun the ownership/ledger binding resolution and rebind: review w9-composition-fix found 661 bindings unresolved after the full patch chain (2 at HEAD), e.g. 339 in platform-foundations.md from block-position shifts. The final-pin rebind must cover composed patches, not only GAP-05.",
+      "Size the post-apply rebind as two groups: 361 bindings broken by the composed patch chain and 46 already unresolved at the pin (w10-composition-rework); the 661 figure from w9 counts assertions across the full chain",
+      "Legacy drift scan after applying the prepared w8/w9 shards reports 2 gaps (README, repo-layout-vision) because its source join does not follow supersession; fix the join or carry them before the scan gate at F (w11-import3 F3)",
+      "Every check that reads committed bytes takes an explicit --pin; run them at F, not at a moving HEAD"
     ],
     "external": [
-      "WORK posts \"cutover xong\"; until then DOC launches no fgos run, pull or push (L13-9)",
       "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",
       "Git owner gives section 7 consent (G10)",
       "SEAT stages the docs-lease release from the F code commit; the Lead proves the four routes in a disposable clone (G11)",
