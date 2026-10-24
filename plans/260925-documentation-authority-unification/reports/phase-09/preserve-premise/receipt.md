@@ -1,59 +1,49 @@
-# Preserve-premise follow-up receipt
+# Preserve-premise rework receipt
 
-> Historical W2 receipt below. W4 supersedes the bare-span example predicate,
-> source pin, counts and self-successor proposals: see
-> [misc-fix/receipt.md](../misc-fix/receipt.md) and [checks.json](../misc-fix/checks.json).
-> The former combined `verification.json` remains historical; the scoped W4
-> replay runs the owning G6 assertions without claiming a G2 refresh.
+Status: **G6 scoped replay passes; assignment blocked, combined G2/G6 verification fails.** No gate accepted or independent approval claimed.
+Current source pin: `4178dcc6e3445d5d9b8ffd55963cdd02a418af73`.
+This replaces the W2/W4 receipt's predicate, counts and verification claim.
+Read first: [current brief](../w5-misc-rework-brief.md), [full receipt](../misc-fix/receipt.md), [G6 double replay](../misc-fix/checks.json), [combined failure](verification.json), [row delta](../misc-fix/rejudgment.json).
 
-Pin: `3d0169f390e21c67bc3fc69081fd1bc07186599f` (HEAD at execution). Authority: W2 D4b, L12-137, L12-121, L12-35(3). Supersedes the W1 receipt at `bade6b6b3`. **Records task complete; G6 remains unmet.** No source patch, authority flip or independent acceptance is implied.
+## Predicate and controls
 
-## Predicate fixes and replay
+Example markers are searched only on the physical `currentLines` of the bound spans, not the expanded `currentUnit`. A new negative control puts an `e.g.` on a different line **within the same unit**: it parks with no evidence. All three existing negative controls and both existing positive controls remain; a third positive control checks citation of the bound placeholder. Physical-move controls remain unchanged.
 
-`proof.py --pin <commit>` now resolves the tracked-source pin explicitly. Physical scratch moves still reuse L12-121's non-overwriting destinations and owning generators. The physical adapter refuses a pin whose `src/` bytes differ from its imported owning generators instead of silently proving historical inputs with HEAD code. Scratch is confined to `/tmp/fgos-work/w2-d4b/`.
+For already line-framed rows, a placeholder in the path is cited preferentially. f07822 now cites `docs/history/<id>/iron-law-evidence.md` / `<id>`, not the unrelated `ví dụ` about `evolve --submit`. This citation refinement does not add marker-free confirmations.
 
-The external/example branch searches **the actual bound source span**, never a distant heading or another paragraph. A Purpose declaration above an explicit `Literal Snapshot` cannot turn its live wrapper into literal carriage. A `Canonical architecture moved to:` assertion remains navigation. The effective premise predicate now also checks that the **consumer source survives the physical cutover**: an unchanged operand alone cannot prove text survives in a deleted consumer.
+## Before and after
 
-Three real negative probes pass through span binding and `historical_evidence()` where binding succeeds:
+Before: delivered W4 proof at `23f6eaccf5eb195a8f50e5788d38f386a901b6d2`. After: current source pin above.
+All **5,413** final preserve identities (4,804 + 609), **38** separate retire-with-tree exclusions, **136** catalog batches and **27** zero-edge batches remain conserved.
 
-1. Live pointer with unrelated `e.g.` forty lines away → park, no evidence.
-2. Navigation table row under an H1 containing `Bee` → park, no evidence.
-3. Historical-looking reason with a mismatched source passage → unbound park.
+| Result | Before | After |
+|---|---:|---:|
+| Source-confirmed history/provenance/carriage | 2,549 | 2,524 |
+| Stable operand reachability | 1,399 | 1,415 |
+| Park: unconfirmed premise | 1,001 | 1,010 |
+| Park: unbound passage | 137 | 137 |
+| Park: absent source | 2 | 2 |
+| Park: source removed by physical cutover | 162 | 162 |
+| Proposed dated wrapper note | 163 | 163 |
+| Example-framed evidence, including placeholder citations | 31 | 6 |
 
-Two positive controls retain genuine in-passage example framing and text after an explicit snapshot boundary. The three unchanged L12-121 control probes remain separately labelled; they are not substitutes for these new probes.
+Nine rows return to parked with no evidence: **f00166, f03953, f07667, f08643, f08645, f08668, f08681, f08748, f08817**.
 
-## Coverage at this pin
+**Qualification requiring Lead adjudication:** f00445, f08621, f08646 and f08700 also lose the false framing evidence, but become `preserve-operand-reachability-unchanged`, not parks. Their exact named operands survive before/after the physical move; the existing stable-operand branch remains intact. Twelve other rows behave likewise. No historical/external semantics or runtime parity is claimed for these 16. The brief's literal “do the same” parking expectation is therefore not claimed satisfied for those four rows.
 
-All **4,804 Step 3 + 609 Step 4 = 5,413** final preserve identities remain exactly conserved, including Step 4 slot hashes. The **38 retire-with-tree rows**, 136 catalog batches and 27 zero-edge batches remain separately accounted.
+The five previous named rows still confirm by the line rule: f00167 (`e.g.` / `<feature>` on line 840), f08807 (`e.g.` on line 852), f07822 (`<id>` on framed line 67), and f08072/f08073 (`ví dụ` / path convention on docsRef line 85). f07697/f08033/f08047 remain parked with self-successor exclusions and no candidate self-links.
 
-| Result | Rows |
-|---|---:|
-| Source-confirmed history/provenance/carriage | 2,526 |
-| Operand reachability unchanged, consumer survives | 1,426 |
-| Park: premise unconfirmed | 1,019 |
-| Park: current passage unbound | 115 |
-| Park: source absent at pin | 2 |
-| Park: source removed by physical cutover | 162 |
-| Proposed preserve with dated successor note | 163 |
+The result is **3,939 bounded confirmations + 1,311 parks + 163 dated-note proposals = 5,413**, not a green G6 gate. `judgments.json` indexes **1,474** open rows. Owning assertions still cover all earlier live-pointer counterexamples, five deleted consumers, 163 wrapper positions and 73/73 named review-batch files.
 
-Thus **3,952 bounded confirmations + 1,298 parks + 163 note proposals**, not 5,413 approvals. `judgments.json` indexes all **1,461 open rows**, with owning evidence in `proof.json`. Conservative source-removal custody applies to all affected rows, not just the five reviewer examples. The physical index result remains **492 → 490**, with 1,039 recorded legacy paths removed in scratch.
+## Replay and blocker
 
-## Named findings
+`proof.py --pin HEAD` exits **0**. `misc-fix/verify.py` exits **0** and runs the proof twice in isolated scratch directories: stdout and all **four G6 artifacts** are byte-identical and equal to delivered bytes. It runs the owning G6 assertion section from `verify.py` verbatim rather than duplicating the cases. Commands and hashes: [checks.json](../misc-fix/checks.json). `git diff --check` exits **0**.
 
-- **29 live pointers:** every row cited by the reviewer now parks with no history evidence and a reachable, digest-bound candidate successor. This includes AGENTS, gateway runtime/build schema paths, UI citations, routing/I/O/coexistence/foundation pointers and the runbook. They need their owning consumer/co-cut composition; candidates are not auto-promoted. Self-successor/provenance cases remain parked rather than creating self-links.
-- **Deleted consumers f00515/f00521/f00525/f01225/f08411:** all are `park-source-removed-by-cutover`, with the actual source successors recorded. A non-identical existing destination does not inherit the old relative link or preserve verdict.
-- **f07526:** owned **repoint proposal** to `docs/platform/agent-coordination/architecture/dispatch-control-plane.md`, with successor digest. It is a live canonical-navigation assertion, not carriage. Lead must compose and review the pointer replacement; no product edit here.
-- **Uniform wrapper notes:** **163 proposals across 90 files**, up from 152. All nine named f05646–f05742 rows, f06391 and **f06167** now receive the same dated-note treatment. f06167 is before `Literal Snapshot`; its old carriage reason is rejected. Independent source-position enumeration confirms all 163 wrapper lines are covered, including all **73/73** named G7 files.
+`preserve-premise/verify.py --pin HEAD` exits **1**: it is the combined G2/G6 verifier, and the delivered G2 census remains pinned to `3d0169f390e21c67bc3fc69081fd1bc07186599f`. Its pre-existing pin-equality condition now fails early. The G2 checks were **not removed or skipped** to get green. [verification.json](verification.json) records the actual stderr, failed command and out-of-scope `needsWrites`. The G2 owner must refresh its four artifacts and its old scratch-path restriction in `census-join/join.py`, then rerun the combined proof. Neither a G2 refresh nor the brief's both-exit-0 requirement is claimed complete.
 
-Each wrapper proposal keeps historical wording and supplies a reachable successor **outside the literal snapshot**. The dated note explicitly becomes effective only after the authority flip and says **Prepared successor**, not current authority. Lead chooses this existing L12-35(3) treatment or repoint, then co-composes/reviews the note with the owning patch. Inner snapshot citations are not rewritten.
+## Handoff boundaries
 
-## Verification and handoff
-
-```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f
-```
-
-Both exit 0. `verification.json` records two isolated runs per generator: identical stdout, **eight byte-identical artifacts**, equality to delivered bytes, conserved ids, all reviewer counterexamples/named rows and full wrapper-position coverage. `git diff --check` exits 0. During verifier development, its independent wrapper scan attempted an already-absent session-identity source; fixed by enumerating only sources actually present at the pin, while the absent premise rows remain explicitly parked.
-
-Reuse: W1 source binding, reason/operand digests, physical move, Step 4 identity and existing generators; prior-art `bade6b6b3` and L12-121 were read before changing the predicate. No original frozen record, test, baseline, product source, owner answer or progress ledger was edited. No Git mutation, fgOS CLI/lifecycle, `.fgos`/secret read, full npm/Cargo suite, product test, pair accounting, service or preview. Impact-analysis: **degraded/unqueried under no-CLI**. Independent G6 review, source refresh at final F, all parks, note/repoint composition and accounting remain Lead custody. Markdown preview deferred to Lead to avoid out-of-scope service state. `needsWrites: []`.
+- Doctor correction is **136 literal plus 5 loop-registered Git ids**, total 141 checks / 32 fixes; all nine reason copies and the generator agree. Historical `resync-a/adjudications.json` still says 143 outside scope.
+- Lead residuals, untouched: `docs/distribution-vision.md:87` and `docs/explanation/iron-law-classification-recipe-path.md:45` still describe `git rev-parse --git-common-dir`.
+- No pair accounting, manifest/gate-register edit, Git mutation, fgOS CLI/lifecycle, secrets, product source change, full npm/Cargo suite, service or preview. Scratch is only `/tmp/fgos-work/w5-misc-rework/`. Impact-analysis: degraded/unqueried under no-CLI/no exposed GitNexus tool; preview deferred to Lead. No component-boundary or product behavior change.
+- Independent review, final-pin replay, park/note/repoint co-composition and post-merge accounting remain Lead custody. See the full receipt for prior art and unchanged binding witnesses.

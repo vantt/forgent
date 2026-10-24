@@ -20,7 +20,11 @@ def main():
     args = ap.parse_args()
     pin = subprocess.check_output(['git','rev-parse','--verify',args.pin+'^{commit}'],cwd=ROOT,text=True).strip()
     assert not subprocess.check_output(['git','diff','--name-only',pin,'--','docs','src','scripts','test','packages','apps'],cwd=ROOT).strip(), 'source drift outside records / source modules differ from pin'
-    scratch = pathlib.Path('/tmp/fgos-work/w2-d4b');scratch.mkdir(parents=True,exist_ok=True)
+    # Fail closed before replay: this combined verifier also owns G2, whose
+    # delivered artifacts must be refreshed by their owner, not silently skipped
+    # when a records-only G6 turn has a newer source pin.
+    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'
+    scratch = pathlib.Path('/tmp/fgos-work/w5-misc-rework');scratch.mkdir(parents=True,exist_ok=True)
     commands, comparisons = [], []
     with tempfile.TemporaryDirectory(prefix='double-replay-',dir=scratch) as name:
         base = pathlib.Path(name)
@@ -84,9 +88,9 @@ def main():
         assert all(r['owningProofs'] for r in dynamics['rows'] if r['status']=='joined-owning-test')
         assert collections.Counter(r['stage'] for r in proof['rows']) == {'step-03':4804,'step-04':609}
         assert len({r['rowId'] for r in proof['rows']}) == 5413
-        assert len(proof['negativeDecisionProbes']) == 3 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
+        assert len(proof['negativeDecisionProbes']) == 4 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
         assert all('source' in r and 'spans' in r for r in proof['negativeDecisionProbes'])
-        assert len(proof['positiveEvidenceControls'])==2 and all(r['evidence'] for r in proof['positiveEvidenceControls'])
+        assert len(proof['positiveEvidenceControls'])==3 and all(r['evidence'] for r in proof['positiveEvidenceControls'])
         rows = {r['rowId']:r for r in proof['rows']}
         review = json.loads((HERE.parent/'reviews/w2-g6-preserve-review.json').read_text())
         live_pointers = [v['id'] for v in review['verdicts'] if v['verdict']=='REWORK' and v['reason'].startswith('live pointer to')]
@@ -107,11 +111,25 @@ def main():
         assert rows['f07526']['result']=='park-unconfirmed-preserve-premise' and rows['f07526']['proposedDisposition']=='repoint-proposal'
         assert rows['f07526']['successor']['path']=='docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
         assert not any(r['result'].startswith('preserve-') for r in rows.values() if not r['sourcePresentAfterCutover'])
-        assert all(r['evidence']['text'] in r['currentUnit'] for r in rows.values() if (r['evidence'] or {}).get('kind')=='explicit-external-or-example-framing')
+        same_unit, = [p for p in proof['negativeDecisionProbes'] if p['case']=='marker elsewhere in the same bound unit']
+        assert 'e.g.' in same_unit['currentUnit'] and same_unit['bound']==[1]
+        assert 'e.g.' not in same_unit['source'].splitlines()[0]
+        assert same_unit['actual']=='park-unconfirmed-preserve-premise' and same_unit['evidence'] is None
+        for row in rows.values():
+            if (row['evidence'] or {}).get('kind') in {'explicit-external-or-example-framing','explicit-path-placeholder'}:
+                bound_text='\n'.join(source(row['file']).splitlines()[n-1] for n in row['currentLines'])
+                assert row['evidence']['text'] in bound_text
+                assert re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)',bound_text)
         assert proof['positiveEvidenceControls'][0]['span']['text']=='docs/specs/x.md'
         for id in ['f00167','f08807','f07822','f08072','f08073']:
             assert rows[id]['result']=='preserve-source-confirmed-history'
-            assert rows[id]['evidence']['kind']=='explicit-external-or-example-framing'
+            assert rows[id]['evidence']['kind'] in {'explicit-external-or-example-framing','explicit-path-placeholder'}
+        assert rows['f07822']['evidence']==dict(kind='explicit-path-placeholder',text='docs/history/<id>/iron-law-evidence.md',placeholder='<id>')
+        for id in ['f00166','f03953','f07667','f08643','f08645','f08668','f08681','f08748','f08817']:
+            assert rows[id]['result']=='park-unconfirmed-preserve-premise' and rows[id]['evidence'] is None
+        for id in ['f00445','f08621','f08646','f08700']:
+            assert rows[id]['result']=='preserve-operand-reachability-unchanged' and rows[id]['evidence'] is None
+            assert all(r['beforePresent'] and r['afterPresent'] and not r['wildcard'] for r in rows[id]['normalizedOperands'])
         for id in ['f07697','f08033','f08047']:
             assert rows[id]['candidateSuccessors']==[]
             assert rows[id]['excludedSelfSuccessor']==rows[id]['file']
@@ -155,7 +173,7 @@ def main():
     result = dict(sourceCommit=pin,status='records-replay-passed-not-gate-acceptance',commands=commands,comparisons=comparisons,
                   scriptDigests={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in scripts},
                   counts={'G2':join['counts'],'G6':proof['counts']},wrapperReviewBatchCoverage=wrapper_coverage,
-                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=3,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=2),
+                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=4,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=3),
                   followupChecks=dict(reviewedDynamicSites=132,individuallyJudgedReaderHints=13,additionalDynamicSites=len(dynamics['rows'])-132,
                                       deletedCensusSources=len(deleted),livePointersParked=29,deletedSourcePreservesParked=5,missedWrappersNowNoted=11,allEnumeratedWrapperLines=len(wrapper_lines)),
                   manualDynamicJudgmentsSourceCommit=dynamics['judgmentSourceCommit'],

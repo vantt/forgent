@@ -1,214 +1,29 @@
 {
-  "commands": [
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-        "--rescan",
-        "--pin",
-        "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-        "--out",
-        "/tmp/fgos-work/w2-d4b/double-replay-xjmlvq4e/census-1"
-      ],
-      "exit": 0,
-      "label": "census",
-      "round": 1,
-      "stderr": "",
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n"
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
-        "--rescan",
-        "--pin",
-        "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-        "--out",
-        "/tmp/fgos-work/w2-d4b/double-replay-xjmlvq4e/census-2"
-      ],
-      "exit": 0,
-      "label": "census",
-      "round": 2,
-      "stderr": "",
-      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n"
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
-        "--pin",
-        "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-        "--out",
-        "/tmp/fgos-work/w2-d4b/double-replay-xjmlvq4e/preserve-1"
-      ],
-      "exit": 0,
-      "label": "preserve",
-      "round": 1,
-      "stderr": "",
-      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 115, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 1019, \"preserve-operand-reachability-unchanged\": 1426, \"preserve-source-confirmed-history\": 2526}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n"
-    },
-    {
-      "argv": [
-        "python3",
-        "-B",
-        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
-        "--pin",
-        "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-        "--out",
-        "/tmp/fgos-work/w2-d4b/double-replay-xjmlvq4e/preserve-2"
-      ],
-      "exit": 0,
-      "label": "preserve",
-      "round": 2,
-      "stderr": "",
-      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 115, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 1019, \"preserve-operand-reachability-unchanged\": 1426, \"preserve-source-confirmed-history\": 2526}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n"
-    },
-    {
-      "argv": [
-        "git",
-        "diff",
-        "--check"
-      ],
-      "exit": 0,
-      "label": "diff-check",
-      "stderr": "",
-      "stdout": ""
-    }
+  "status": "blocked-combined-g2-g6-not-accepted",
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "command": {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py",
+      "--pin",
+      "HEAD"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 186, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 26, in main\n    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'\nAssertionError: G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification\n"
+  },
+  "blocker": "Combined verifier requires G2 census artifacts at the G6 pin; delivered G2 is pinned to 3d0169f390e21c67bc3fc69081fd1bc07186599f outside this write scope. Its join.py also restricts scratch outputs to the previous brief directory, so the G2 owner must adapt that plumbing before replay under this brief.",
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-dynamics.json"
   ],
-  "comparisons": [
-    {
-      "bytes": 2147295,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
-      "runsByteIdentical": true,
-      "sha256": "d9db05e7e785c2147bddcc0f0b4c2fe8accd094bf5496be353f7a9214f572534"
-    },
-    {
-      "bytes": 306031,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
-      "runsByteIdentical": true,
-      "sha256": "d1cc0974109c7361bd5d766ccdd23b144cfd45e06e9af5be144576d23605c6ad"
-    },
-    {
-      "bytes": 20922,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
-      "runsByteIdentical": true,
-      "sha256": "3e5d0903e448a58999423e60984476968f170acc4796d37fac0b66d7e8861653"
-    },
-    {
-      "bytes": 322603,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-dynamics.json",
-      "runsByteIdentical": true,
-      "sha256": "43046e0a9b276ca1fa10f493c3ad9ab07b651a35d95d9a78095234cdb93aff67"
-    },
-    {
-      "bytes": 16216088,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
-      "runsByteIdentical": true,
-      "sha256": "05facf9174fb8727d1f259552561e8c8b1332bca13c0a5037f8ac2f968043d45"
-    },
-    {
-      "bytes": 18404,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
-      "runsByteIdentical": true,
-      "sha256": "9c09d5e75003b173aa5537a63d6808e2b826c48a8f8fc68c89787657a4c4810f"
-    },
-    {
-      "bytes": 1693391,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
-      "runsByteIdentical": true,
-      "sha256": "e370c934acfa339293e60da195703adf22ab3bd8b5844cf1f32cd24ae2479fa4"
-    },
-    {
-      "bytes": 254302,
-      "checkedInWorkingArtifactEqual": true,
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
-      "runsByteIdentical": true,
-      "sha256": "8d9647a9e9f29f6ba23fb8af0e96530e03b0aa07832cfbbc08bf4f3d5f96040e"
-    }
-  ],
-  "counts": {
-    "G2": {
-      "files": 140,
-      "sites": 1126,
-      "statuses": {
-        "confirmed-grade-record-REJECT": 293,
-        "joined-owning-test": 646,
-        "judgment-required": 187
-      }
-    },
-    "G6": {
-      "byResult": {
-        "judgment-preserve-with-dated-note": 163,
-        "park-current-passage-unbound": 115,
-        "park-source-absent": 2,
-        "park-source-removed-by-cutover": 162,
-        "park-unconfirmed-preserve-premise": 1019,
-        "preserve-operand-reachability-unchanged": 1426,
-        "preserve-source-confirmed-history": 2526
-      },
-      "byStage": {
-        "step-03": 4804,
-        "step-04": 609
-      },
-      "excludedRetireWithTree": 38,
-      "finalBatchPopulation": {
-        "step-03": 130,
-        "step-04": 33
-      },
-      "recordBatches": 136,
-      "total": 5413
-    }
+  "owningG6Assertions": {
+    "evidence": "../misc-fix/checks.json",
+    "exit": 0
   },
-  "followupChecks": {
-    "additionalDynamicSites": 11,
-    "allEnumeratedWrapperLines": 163,
-    "deletedCensusSources": 28,
-    "deletedSourcePreservesParked": 5,
-    "individuallyJudgedReaderHints": 13,
-    "livePointersParked": 29,
-    "missedWrappersNowNoted": 11,
-    "reviewedDynamicSites": 132
-  },
-  "independentApproval": false,
-  "manualDynamicJudgmentsSourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-  "negativeProbes": {
-    "copiedL12_121HistoricalPredicate": 3,
-    "positiveEvidenceControls": 2,
-    "sourceBindingAndHistoricalEvidence": 3
-  },
-  "noReadinessClaim": true,
-  "notRun": [
-    "npm test",
-    "scripts/run-tests.mjs",
-    "cargo test --workspace",
-    "owning product tests (records-only custody task; no product behavior changed, temporary fixture Git writes are allowed)",
-    "fgos CLI / impact capability query (forbidden by brief)",
-    "pair accounting (Lead A1 custody)",
-    "final-pin F census and independent G2/G6 review",
-    "markdown preview (Lead custody)"
-  ],
-  "scriptDigests": {
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py": "4d9a428ceaf41f3854c1c812e48d1af3e972393ed1879d813aaf3a8289c4a802",
-    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs": "7e3c81518493f842dde5508a35fb65ad8c96d21facec23ea5bbf483ea697e5ac",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs": "2f841b1f50f630ed136cc63dcc9c301378f77f41c963ecdb30669145d1e52c27",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py": "23c98aad6311b9d53b700b9fb672f68404bb51dcfc35959dab6846a33d4ab64f",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py": "87fee5006d2b1a38425d4875c82e43d906dbd7a8c8c736333551c7ea3e4a7836"
-  },
-  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-  "status": "records-replay-passed-not-gate-acceptance",
-  "wrapperReviewBatchCoverage": {
-    "coveredByProposals": 73,
-    "missing": [],
-    "reviewBatchPaths": 73
-  }
+  "noReadinessClaim": true
 }
