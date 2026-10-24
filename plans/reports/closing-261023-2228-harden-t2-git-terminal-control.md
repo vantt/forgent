@@ -114,6 +114,8 @@ The measured figures are the big lead's run of the phase 17 command; I have not 
 - *Recommendation (draft; the big lead confirms before it goes out).* (a) for Rust, because the growth is behaviour the owner chose; (c) for tests, as a TEST follow-up, not a T2 block.
 - *Scope of the answer.* T2's ceilings only.
 
+**Owner answer, 2026-10-24 10:05: "Q8c".** Rust growth accepted; the test overrun folds through TEST's D4 move-down (H29). T2 is closed (parent plan decision 28).
+
 Node budgets named in the plan's "Done when": met: `src/git` (216 lines in 12 files at phase 9), `terminal-control-checks.mjs` (120, the Q2 target). Missed: `git-checks.mjs` (169 against 150), `client.mjs` (235 against 200, the second spawn path was not paid), `config.mjs` (111 against 100).
 
 ## 4. Arbitration items
@@ -217,6 +219,6 @@ The independent verifies caught what the leads' own runs had missed: for example
 
 ## Unresolved questions
 
-1. **Q8:** accept the missed size ceilings, fold a slice, or fold the tests through TEST's move-down? (Section 3.)
-2. **Censuses.** Do `fg-server` and `design-lap` both read zero, with no workspace on a release built before `869e789d7`? Until then slices A and C of phase 8 stay unmerged.
-3. **R9** lands next, as HARDEN's first item after this close.
+1. ~~**Q8**~~ answered 10-24 10:05: (c).
+2. **Censuses.** `design-lap` read zero (board 10-23 18:25) and landed T2 on 10-24 09:40. Does `fg-server` read zero, with no workspace on a release built before `869e789d7`? Until then slices A and C of phase 8 stay unmerged.
+3. ~~**R9**~~ fixed in `8a9e3fb79`, active on fg-server2 since 10-24 09:37.

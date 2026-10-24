@@ -136,6 +136,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::mailbox_verbs::INBOX_CLAIM_DESCRIPTOR,
     wiring::mailbox_verbs::LIST_DESCRIPTOR,
     wiring::mailbox_verbs::STATUS_DESCRIPTOR,
+    fgos_config::provider::CONFIG_READ_DESCRIPTOR,
+    fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
 ];
 
 static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
@@ -146,6 +148,7 @@ static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ),
     ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
     ("mailbox", wiring::mailbox_verbs::AVAILABLE_SUBCOMMANDS),
+    ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
 ];
 
 fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
@@ -294,6 +297,14 @@ fn main() {
         service.register_provider(Arc::new(
             wiring::mailbox_verbs::MailboxProvider::for_descriptor(descriptor),
         ));
+    }
+    for descriptor in [
+        fgos_config::provider::CONFIG_READ_DESCRIPTOR,
+        fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(fgos_config::provider::ConfigProvider::for_descriptor(
+            descriptor,
+        )));
     }
     let tracker = service.tracker();
 

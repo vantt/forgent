@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use fgos_yaml_doc::merge::{merge, MergeRule};
+use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{Document, Profile, Segment, Value as Doc};
 use serde_json::Value;
 
@@ -12,7 +13,7 @@ use crate::detect::{self, Detectors};
 use crate::files::{
     read_beneath, select_source, FileError, LoadedFile, Source, JSON_NAME, YAML_NAME,
 };
-use crate::schema::{json_at, json_put, key_span, load, Schemas};
+use crate::schema::{descend, json_at, json_put, key_span, load, Schemas};
 use crate::scope::{judge, trusted_project, SourceKind};
 use crate::standard::Standard;
 use crate::ConfigRefusal;
@@ -74,6 +75,9 @@ pub struct Snapshot {
     /// Revision of the bytes read per source role, `absent` for a missing source.
     pub revisions: BTreeMap<&'static str, String>,
     pub accounts: AccountsState,
+    /// `(id, path)`: `shadowed-by-destination` for a key the global file still holds that the
+    /// accounts file or the token file holds already (a move interrupted or in its copy stage).
+    pub notices: Vec<(&'static str, String)>,
 }
 
 impl Snapshot {
@@ -151,17 +155,39 @@ fn open_source(role: &'static str, root: &Path, dir: &Path, max: usize) -> Resul
     })
 }
 
+/// The directory that holds the global directory and the global directory's own name; the global
+/// directory must be named (never the root).
+pub(crate) fn split_global(global_dir: &Path) -> Result<(&Path, &Path), ConfigRefusal> {
+    match (global_dir.parent(), global_dir.file_name()) {
+        (Some(parent), Some(dir)) => Ok((parent, Path::new(dir))),
+        _ => Err(ConfigRefusal::new("config-path-symlink")),
+    }
+}
+
+/// The accounts file beneath the global directory, read once and never followed through a symlink.
+pub(crate) fn accounts_source(global_dir: &Path, max: usize) -> Result<Src, FileError> {
+    let (parent, dir) = split_global(global_dir).map_err(|r| FileError::Refused(Box::new(r)))?;
+    let file = read_beneath(parent, &dir.join("private/accounts.yaml"), max)?;
+    Ok(Src {
+        role: "accounts",
+        name: "accounts:accounts.yaml".into(),
+        file,
+    })
+}
+
+/// Size and revision of the token file beneath the global directory; none when it is absent, a
+/// symlink or unreadable. Its presence decides which global keys are shadowed, so the cache keys on it.
+pub(crate) fn token_revision(global_dir: &Path) -> Option<(usize, String)> {
+    let (parent, dir) = split_global(global_dir).ok()?;
+    let path = dir.join("private/gateway-token");
+    let file = read_beneath(parent, &path, 1024).ok()??;
+    Some((file.bytes.len(), file.revision))
+}
+
 /// Opens each source once.
 pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotError> {
     let max = Profile::StrictConfig.limits().input_bytes;
-    let (Some(parent), Some(dir)) = (
-        req.global_dir.parent(),
-        req.global_dir.file_name().map(Path::new),
-    ) else {
-        return Err(SnapshotError::Refused(vec![ConfigRefusal::new(
-            "config-path-symlink",
-        )]));
-    };
+    let (parent, dir) = split_global(&req.global_dir)?;
     let project = |role, root| open_source(role, root, Path::new(".fgos"), max);
     let mut reads = vec![project("project", &req.project_root)];
     if req.trusted_root != req.project_root {
@@ -169,13 +195,7 @@ pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotEr
     }
     reads.push(open_source("global", parent, dir, max));
     if req.class == SessionClass::Unconfined {
-        reads.push(
-            read_beneath(parent, &dir.join("private/accounts.yaml"), max).map(|file| Src {
-                role: "accounts",
-                name: "accounts:accounts.yaml".into(),
-                file,
-            }),
-        );
+        reads.push(accounts_source(&req.global_dir, max));
     }
     let (mut out, mut refused) = (Vec::new(), Vec::new());
     for read in reads {
@@ -204,23 +224,69 @@ fn layer(layer: &'static str, json: Value) -> Option<Layer> {
     })
 }
 
-/// Parses every source and judges it against its scope; each refusal is listed.
-fn load_sources(
+/// Whether a value in the wrong file has anything to carry: null, `{}` and `[]` hold nothing.
+pub(crate) fn carries(value: &Value) -> bool {
+    match value {
+        Value::Null => false,
+        Value::Object(map) => !map.is_empty(),
+        Value::Array(items) => !items.is_empty(),
+        _ => true,
+    }
+}
+
+/// The global file without the keys its destination holds already, or that hold nothing: the
+/// destination wins (spec section 13), so such a key is no refusal and no layer.
+fn without_held(
     ctx: &Context,
-    srcs: &[Src],
-) -> (
+    global: Value,
+    accounts: Option<&Value>,
+    token: bool,
+    notices: &mut Vec<(&'static str, String)>,
+) -> Value {
+    let (mut kept, mut held) = (global.clone(), Vec::new());
+    descend(&global, &mut Vec::new(), &mut |path, value| {
+        let file = ctx.schemas.resolve(path).map_or("config", |r| r.file);
+        let shadowed = match file {
+            "accounts" => accounts.is_some_and(|a| json_at(a, path).is_some()),
+            "token" => token,
+            _ => return true,
+        } || !carries(value);
+        if shadowed {
+            held.push(path.to_vec());
+        }
+        false
+    });
+    for path in held {
+        json_put(&mut kept, &path, None);
+        notices.push(("shadowed-by-destination", format_path(&path)));
+    }
+    kept
+}
+
+/// The parsed sources by role, the refusals found and the notices.
+type Loaded = (
     BTreeMap<&'static str, (Document, Value)>,
     Vec<ConfigRefusal>,
-) {
-    let (mut docs, mut errors) = (BTreeMap::new(), Vec::new());
+    Vec<(&'static str, String)>,
+);
+
+/// Parses every source and judges it against its scope; each refusal is listed.
+fn load_sources(ctx: &Context, srcs: &[Src], token: bool) -> Loaded {
+    let (mut docs, mut errors, mut notices) = (BTreeMap::new(), Vec::new(), Vec::new());
+    let accounts = srcs.iter().find(|s| s.role == "accounts");
+    let accounts = accounts.and_then(|s| load(&s.name, &s.file.as_ref()?.bytes).ok());
     for (src, file) in srcs.iter().filter_map(|s| Some((s, s.file.as_ref()?))) {
-        let (doc, json) = match load(&src.name, &file.bytes) {
+        let (doc, mut json) = match load(&src.name, &file.bytes) {
             Ok(parsed) => parsed,
             Err(refusal) => {
                 errors.push(refusal);
                 continue;
             }
         };
+        if src.role == "global" {
+            let held = accounts.as_ref().map(|(_, json)| json);
+            json = without_held(ctx, json, held, token, &mut notices);
+        }
         let kind = match src.role {
             "project" => Some(SourceKind::Project),
             "global" => Some(SourceKind::Global),
@@ -232,7 +298,7 @@ fn load_sources(
         }
         docs.insert(src.role, (doc, json));
     }
-    (docs, errors)
+    (docs, errors, notices)
 }
 
 /// A merge that cannot combine two layers: `config-schema` naming the layers that hold the path.
@@ -253,7 +319,8 @@ pub(crate) fn build(
     req: &SnapshotRequest,
     srcs: &[Src],
 ) -> Result<Snapshot, SnapshotError> {
-    let (docs, errors) = load_sources(ctx, srcs);
+    let token = req.class == SessionClass::Unconfined && token_revision(&req.global_dir).is_some();
+    let (docs, errors, notices) = load_sources(ctx, srcs, token);
     fail_if_any(errors)?;
     let json = |role: &str| docs.get(role).map(|(_, json)| json.clone());
     let project = json("project").unwrap_or(Value::Null);
@@ -362,6 +429,7 @@ pub(crate) fn build(
             SessionClass::Confined => AccountsState::UnavailableConfined,
             SessionClass::Unconfined => AccountsState::Present,
         },
+        notices,
     })
 }
 

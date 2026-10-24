@@ -1048,7 +1048,7 @@ test('tier-vocabulary-dead-keys check fails when retired keys are present', () =
   }
 });
 
-test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leaves the global one to the loader', () => {
+test('tier-vocabulary-dead-keys names a rigorToTier as retired at the level that carries it', () => {
   const dir = mkTemp('checks-tier-dead-rigor-');
   const fakeHome = mkTemp('fake-home-');
   try {
@@ -1058,7 +1058,10 @@ test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leav
     writeGlobalConfig(fakeHome, { runner: { rigorToTier } });
     withHome(fakeHome, () => {
       writeProjectConfig(dir, { runner: { defaults: { tier: 'standard' } } });
-      assert.equal(checkById('tier-vocabulary-dead-keys').check(dir).passed, true, 'a global file that has not re-run setup is not an error');
+      const global = checkById('tier-vocabulary-dead-keys').check(dir);
+      assert.equal(global.passed, false);
+      assert.match(global.message, /global config contains retired key "runner\.rigorToTier".*delete the key/);
+      writeGlobalConfig(fakeHome, { runner: {} });
       writeProjectConfig(dir, { runner: { rigorToTier } });
       const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
       assert.equal(passed, false);

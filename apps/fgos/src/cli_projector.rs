@@ -114,6 +114,13 @@ pub fn project_cli_invocation(
             ContractRef::from_static("mailbox.status.request", "1.0.0"),
             Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
         ),
+        "config.read" | "config.write" => (
+            ContractRef::from_static(
+                if operation.as_str() == "config.read" { "config.read.request" } else { "config.write.request" },
+                "1.0.0",
+            ),
+            Box::new(project_config_request(args, root)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -142,7 +149,107 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
             .operation_id()
             .to_string());
     }
+    if route_operation == fgos_config::provider::CONFIG_READ_OPERATION_ID {
+        let request = project_config_request(args, std::path::PathBuf::new())?;
+        return Ok(request.operation_id().to_string());
+    }
     Ok(route_operation.to_string())
+}
+
+/// `fgos config show|standard [--path <p>]`, `explain <path>`, `check`, `set <path> <value>
+/// [--reason <text>] [--global]`, `unset <path> [--reason <text>] [--global]
+/// [--acknowledge-comment-loss]`, `patch <file> [--reason <text>] [--global]`, `migrate [--dry-run]
+/// [--accept-machine-overrides]` or `migrate --global [--finish [--machine-checked]] [--dry-run]`,
+/// `refresh-docs [--global]`. A path is in the text form of YAML Document. `--dir` and `--json`
+/// are accepted on every verb; the reason is optional here because a write that changes nothing
+/// needs none (the crate refuses a missing one when it is needed).
+fn project_config_request(
+    args: &[OsString],
+    root: std::path::PathBuf,
+) -> Result<fgos_config::provider::ConfigRequest, String> {
+    use fgos_config::provider::Verb;
+    let sub = args
+        .get(1)
+        .and_then(|value| value.to_str())
+        .ok_or_else(|| "config requires a subcommand".to_string())?;
+    let (valued, switches, arguments): (&[&str], &[&str], usize) = match sub {
+        "show" | "standard" => (&["--path"], &[], 0),
+        "check" => (&[], &[], 0),
+        "explain" => (&[], &[], 1),
+        "set" => (&["--reason"], &["--global"], 2),
+        "unset" => (&["--reason"], &["--global", "--acknowledge-comment-loss"], 1),
+        "patch" => (&["--reason"], &["--global"], 1),
+        "migrate" => {
+            (&[], &["--dry-run", "--global", "--finish", "--machine-checked", "--accept-machine-overrides"], 0)
+        }
+        "refresh-docs" => (&[], &["--global"], 0),
+        other => {
+            return Err(format!(
+                "unknown config subcommand '{other}'. Available: {}",
+                fgos_config::provider::AVAILABLE_SUBCOMMANDS.join(", ")
+            ))
+        }
+    };
+    let (mut values, mut on, mut positional) = (std::collections::HashMap::new(), Vec::new(), Vec::new());
+    let mut rest = args[2..].iter().map(|a| a.to_string_lossy().into_owned());
+    while let Some(token) = rest.next() {
+        if !token.starts_with("--") {
+            positional.push(token);
+            continue;
+        }
+        let (flag, inline) = token
+            .split_once('=')
+            .map_or((token.as_str(), None), |(flag, value)| (flag, Some(value.to_owned())));
+        if flag == "--json" {
+            continue;
+        }
+        if switches.contains(&flag) {
+            on.push(flag.to_owned());
+        } else if valued.contains(&flag) || flag == "--dir" {
+            let value = inline
+                .or_else(|| rest.next())
+                .ok_or_else(|| format!("{flag} requires a value"))?;
+            values.insert(flag.to_owned(), value);
+        } else {
+            return Err(format!("unknown config option '{token}'"));
+        }
+    }
+    if positional.len() != arguments {
+        return Err(format!("config {sub} takes {arguments} argument(s), got {}", positional.len()));
+    }
+    let has = |flag: &str| on.iter().any(|f| f == flag);
+    let reason = values.remove("--reason").unwrap_or_default();
+    let (global, mut arg) = (has("--global"), positional.into_iter());
+    let mut next = || arg.next().unwrap_or_default();
+    let verb = match sub {
+        "show" => Verb::Show { path: values.remove("--path") },
+        "standard" => Verb::Standard { path: values.remove("--path") },
+        "check" => Verb::Check,
+        "explain" => Verb::Explain { path: next() },
+        "set" => Verb::Set { path: next(), value: next(), reason, global },
+        "unset" => Verb::Unset { path: next(), reason, global, acknowledge: has("--acknowledge-comment-loss") },
+        "patch" => Verb::Patch { file: next().into(), reason, global },
+        "refresh-docs" => Verb::RefreshDocs { global },
+        _ => {
+            if has("--finish") && !global {
+                return Err("--finish needs --global".into());
+            }
+            if has("--machine-checked") && !has("--finish") {
+                return Err("--machine-checked needs --finish".into());
+            }
+            if has("--accept-machine-overrides") && global {
+                return Err("--accept-machine-overrides is for the project migration, not --global".into());
+            }
+            Verb::Migrate {
+                global,
+                finish: has("--finish"),
+                machine_checked: has("--machine-checked"),
+                accept_machine_overrides: has("--accept-machine-overrides"),
+                dry_run: has("--dry-run"),
+            }
+        }
+    };
+    Ok(fgos_config::provider::ConfigRequest { root, verb })
 }
 
 /// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
@@ -732,5 +839,62 @@ mod tests {
             None,
         )
         .is_err());
+    }
+
+    fn config(args: &[&str]) -> Result<fgos_config::provider::ConfigRequest, String> {
+        let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+        project_config_request(&args, std::path::PathBuf::from("/repo"))
+    }
+
+    #[test]
+    fn config_read_verbs_map_their_arguments_and_run_as_a_read() {
+        use fgos_config::provider::Verb;
+        assert_eq!(
+            config(&["config", "show", "--json", "--dir", "/x", "--path", "a.b[0]"]).unwrap().verb,
+            Verb::Show { path: Some("a.b[0]".into()) }
+        );
+        assert_eq!(config(&["config", "standard", "--path=a"]).unwrap().verb, Verb::Standard { path: Some("a".into()) });
+        assert_eq!(config(&["config", "explain", "gateBypass.level"]).unwrap().verb, Verb::Explain { path: "gateBypass.level".into() });
+        assert_eq!(config(&["config", "check"]).unwrap().verb, Verb::Check);
+        for args in [&["config", "show"][..], &["config", "explain", "a"], &["config", "check"], &["config", "migrate", "--dry-run"]] {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            assert_eq!(native_operation_id("config.read", &args).unwrap(), "config.read");
+        }
+        let write: Vec<OsString> = ["config", "migrate"].iter().map(OsString::from).collect();
+        assert_eq!(native_operation_id("config.read", &write).unwrap(), "config.write");
+        assert!(config(&["config", "show", "extra"]).is_err());
+        assert!(config(&["config", "explain"]).is_err());
+        assert!(config(&["config", "show", "--bogus"]).is_err());
+        assert!(config(&["config", "frobnicate"]).is_err());
+    }
+
+    #[test]
+    fn config_write_verbs_map_their_arguments_and_refuse_incompatible_flags() {
+        use fgos_config::provider::Verb;
+        assert_eq!(
+            config(&["config", "set", "a.b", "[x, y]", "--reason", "why not", "--global"]).unwrap().verb,
+            Verb::Set { path: "a.b".into(), value: "[x, y]".into(), reason: "why not".into(), global: true }
+        );
+        assert_eq!(
+            config(&["config", "unset", "a.b", "--acknowledge-comment-loss"]).unwrap().verb,
+            Verb::Unset { path: "a.b".into(), reason: String::new(), global: false, acknowledge: true }
+        );
+        assert_eq!(
+            config(&["config", "patch", "p.yaml", "--reason=r"]).unwrap().verb,
+            Verb::Patch { file: "p.yaml".into(), reason: "r".into(), global: false }
+        );
+        assert_eq!(config(&["config", "refresh-docs", "--global"]).unwrap().verb, Verb::RefreshDocs { global: true });
+        assert_eq!(
+            config(&["config", "migrate", "--global", "--finish", "--machine-checked"]).unwrap().verb,
+            Verb::Migrate { global: true, finish: true, machine_checked: true, accept_machine_overrides: false, dry_run: false }
+        );
+        // A negative number is a value, not a flag.
+        assert!(matches!(config(&["config", "set", "a", "-1"]).unwrap().verb, Verb::Set { value, .. } if value == "-1"));
+        assert!(config(&["config", "migrate", "--finish"]).is_err());
+        assert!(config(&["config", "migrate", "--global", "--machine-checked"]).is_err());
+        assert!(config(&["config", "migrate", "--global", "--accept-machine-overrides"]).is_err());
+        assert!(config(&["config", "set", "only-a-path"]).is_err());
+        assert!(config(&["config", "set", "a", "b", "--reason"]).is_err());
+        assert!(config(&["config", "unset", "a", "--global", "--finish"]).is_err());
     }
 }

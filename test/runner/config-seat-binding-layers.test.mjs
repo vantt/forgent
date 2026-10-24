@@ -1,6 +1,5 @@
-// The two config layers after rigorToTier is retired. The global file of a machine that has not re-run setup
-// still carries `rigorToTier` and the bare-verb capabilities, and every older release on it still requires
-// them: it must keep loading, untouched.
+// The two config layers after rigorToTier is retired. The global file still carries the bare-verb
+// capabilities, and every release on the machine reads them: it must keep loading, untouched.
 // These tests run with a real global file on disk (a temp HOME), not with the layer mocked.
 
 import '../helpers/process-tmp-root.mjs';
@@ -19,7 +18,6 @@ import {
 } from '../../src/runner/dispatch/config.mjs';
 
 const GLOBAL_RUNNER = () => ({
-  rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   capabilities: {
     advise: { description: 'bare verb', serves: { outputKind: 'advice' } },
     execute: { description: 'bare verb', serves: { outputKind: 'execution' } },
@@ -46,15 +44,12 @@ function withMachine({ globalRunner = GLOBAL_RUNNER(), project }, fn) {
     fs.mkdirSync(path.dirname(projectFile), { recursive: true });
     writeProjectConfig(repo, project);
   }
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE, write: process.stderr.write };
-  const stderr = [];
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
   process.env.HOME = home;
   process.env.USERPROFILE = home;
-  process.stderr.write = (chunk) => { stderr.push(String(chunk)); return true; };
   try {
-    return fn({ repo, home, globalFile, projectFile, stderr });
+    return fn({ repo, home, globalFile, projectFile });
   } finally {
-    process.stderr.write = saved.write;
     process.env.HOME = saved.HOME;
     if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
     else delete process.env.USERPROFILE;
@@ -64,17 +59,15 @@ function withMachine({ globalRunner = GLOBAL_RUNNER(), project }, fn) {
 }
 const bytes = (file) => fs.readFileSync(file, 'utf8');
 
-test('a global file that still carries rigorToTier and the bare verbs loads under a project, untouched', () => {
-  withMachine({ project: { runner: CONVERTED_PROJECT() } }, ({ repo, globalFile, stderr }) => {
+test('a global file that carries the bare verbs loads under a project, untouched', () => {
+  withMachine({ project: { runner: CONVERTED_PROJECT() } }, ({ repo, globalFile }) => {
     const before = bytes(globalFile);
     for (const load of [loadRunnerConfigFromDir, ensureRunnerConfigForDir]) {
       const merged = load(repo);
-      assert.equal('rigorToTier' in merged, false, 'the retired key is dropped from the global layer before the merge');
       assert.deepEqual(Object.keys(merged.capabilities).sort(), ['advise', 'execute', 'review'], 'the global bare-verb entries stay, as exact keys');
       assert.equal(merged.defaults.tier, 'standard');
     }
     assert.equal(bytes(globalFile), before, 'setup is the only writer of the global file');
-    assert.ok(stderr.join('').includes('runner.rigorToTier'), 'the drop is said once on stderr');
   });
 });
 

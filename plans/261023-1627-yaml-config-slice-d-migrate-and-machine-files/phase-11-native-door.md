@@ -1,5 +1,7 @@
 # Phase 11: The native door, namespace `config` (`check`, `fix`, `accounts`)
 
+> **Moved to Slice C** (owner decision 2026-10-24 10:00, option B). Not built in Slice D; this file is the detailed spec Slice C's plan links to. Slice C's plan says where it lands and which numbers (caps, ownership order) changed. Read "Slice D" below as "the slice that executes this phase".
+
 Depends on 08 (check, fix), 04 (accounts), 05 (the copy fix), 03 (class). Suggested executor: sonnet. Cap: `config.rs` 110 lines. Impact analysis on `versions()` and the ABI check in `loadNativeAddon` first.
 
 ## Context

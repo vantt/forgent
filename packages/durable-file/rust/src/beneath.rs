@@ -4,7 +4,7 @@
 //! directory before it. The caller-supplied root is opened once, no-follow, so a symlinked root is
 //! refused as well. The bytes and the revision come from the one descriptor returned here.
 use rustix::fs::{
-    fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, CWD,
+    fchmod, fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, CWD,
 };
 use rustix::io::Errno;
 use sha2::{Digest, Sha256};
@@ -80,6 +80,14 @@ impl Dir {
     pub fn identity(&self) -> Result<DirIdentity, BeneathError> {
         identity_of(self.0.as_fd())
     }
+    /// The permission bits (`0o777` mask) of the open directory.
+    pub fn mode(&self) -> Result<u32, BeneathError> {
+        Ok(fstat(&self.0)?.st_mode as u32 & 0o777)
+    }
+    /// Change the permission bits through the descriptor, never through a path.
+    pub fn set_mode(&self, mode: u32) -> Result<(), BeneathError> {
+        Ok(fchmod(&self.0, Mode::from_raw_mode(mode as _))?)
+    }
 }
 
 /// The bytes read from an [`OpenedFile`] and their revision (sha256, lowercase hex).
@@ -102,6 +110,10 @@ impl OpenedFile {
     /// The permission bits (`0o777` mask) of the open file.
     pub fn mode(&self) -> Result<u32, BeneathError> {
         Ok(fstat(&self.file)?.st_mode as u32 & 0o777)
+    }
+    /// Change the permission bits through the descriptor, never through a path.
+    pub fn set_mode(&self, mode: u32) -> Result<(), BeneathError> {
+        Ok(fchmod(&self.file, Mode::from_raw_mode(mode as _))?)
     }
     /// Read to the end from this descriptor, refusing a file longer than `max` bytes. The revision
     /// is of exactly the bytes returned, whatever the path names by now.
@@ -249,6 +261,16 @@ pub fn open_beneath(root: &Path, relative: &Path) -> Result<Option<OpenedFile>, 
         outcome => return outcome,
     }
     open_beneath_with(Strategy::Walk, root, relative)
+}
+
+/// Open the directory `relative` (a plain downward path) beneath `root` without creating anything.
+/// A missing root or directory is `Ok(None)`; a symlink anywhere or a non-directory is a refusal.
+pub fn open_dir_beneath(root: &Path, relative: &Path) -> Result<Option<Dir>, BeneathError> {
+    let names = names(relative)?;
+    let Some(root_fd) = open_root(root)? else {
+        return Ok(None);
+    };
+    Ok(resolve_dir(Strategy::Walk, root_fd.as_fd(), &names)?.map(Dir))
 }
 
 /// Create the directories of `relative` beneath `root` that are missing (`mode`, filtered by the

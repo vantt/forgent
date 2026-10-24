@@ -222,6 +222,21 @@ pub fn present_outcome(outcome: &ProviderOutcome, json: bool) -> i32 {
                     } else {
                         wrap_envelope(show, None)
                     }
+                } else if let Some(config) =
+                    output.downcast_ref::<fgos_config::provider::ConfigOutcome>()
+                {
+                    // `config check` prints its findings and carries its own exit code.
+                    let code = config.exit;
+                    match wrap_envelope(&config.data, None) {
+                        Ok(text) => {
+                            let _ = std::io::stdout().write_all(text.as_bytes());
+                            return code;
+                        }
+                        Err(err) => {
+                            eprintln!("fgos: error: {}", err);
+                            return 1;
+                        }
+                    }
                 } else if let Some(show) =
                     output.downcast_ref::<fgos_work_state::GateBypassShowOutcome>()
                 {
