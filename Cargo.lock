@@ -218,6 +218,8 @@ dependencies = [
  "fgos-config",
  "fgos-convention",
  "fgos-distribution",
+ "fgos-event-store",
+ "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
