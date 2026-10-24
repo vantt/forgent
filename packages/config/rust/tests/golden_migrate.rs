@@ -164,9 +164,9 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let opts = common::migrate_options(&dir, false, false);
     let writer = common::writer(&json!({"session": "vantt"}));
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
-    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 16 values stay.
-    assert_eq!(report.kept.len(), 16);
-    assert_eq!(report.dropped_redundant.len(), 256);
+    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 23 values stay (seven of them are this repository's pools that never fall back to Codex).
+    assert_eq!(report.kept.len(), 23);
+    assert_eq!(report.dropped_redundant.len(), 249);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
     assert_eq!(
         report.dropped_out_of_scope,
