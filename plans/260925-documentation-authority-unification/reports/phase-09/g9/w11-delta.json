@@ -1,0 +1,417 @@
+{
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "comparisonPin": "d14d89865",
+  "changedSourcePathAccounting": [
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "recordEvidenceRows": [],
+      "selectedForRecomposition": true,
+      "recompositionPreimageDrifted": true,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "recordEvidenceRows": [],
+      "selectedForRecomposition": true,
+      "recompositionPreimageDrifted": true,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "recordEvidenceRows": [],
+      "selectedForRecomposition": true,
+      "recompositionPreimageDrifted": true,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    },
+    {
+      "path": "docs/platform/seat-binding/spec.md",
+      "recordEvidenceRows": [],
+      "selectedForRecomposition": false,
+      "recompositionPreimageDrifted": false,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    },
+    {
+      "path": "docs/reading-map.md",
+      "recordEvidenceRows": [],
+      "selectedForRecomposition": true,
+      "recompositionPreimageDrifted": true,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "recordEvidenceRows": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl:7"
+      ],
+      "selectedForRecomposition": false,
+      "recompositionPreimageDrifted": false,
+      "note": "Rejudged/recomposed where selected; no new record/body invented for a path outside the G9 cohorts/chains."
+    }
+  ],
+  "changedPaths": [
+    "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+    "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+    "docs/platform/agent-confinement/spec.md",
+    "docs/platform/seat-binding/spec.md",
+    "docs/reading-map.md",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s18-import3-resync.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-action-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-chain-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-citation-before-f.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-citation-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-first-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-first-verify-command.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-gap05-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-gloss-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-independent-command.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-independent-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-prepare-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-replay-recipes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-rework.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-unresolved-bindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-verify-command.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-before-recompose-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-chain-control.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-judge-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-judgment-delta.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-ratchet-after.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-ratchet-before.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-ratchet-repin.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-ratchet.log",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-recompose-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-recomposition-delta.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w10-verify-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/account.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/binding-refresh.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/checks-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/checks-w11.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/current-source-triage.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/extract-units.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/final-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/finish.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/merge-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/ownership-audit-original.stdout.json.gz",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/ownership-audit-replay.stdout.json.gz",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/prove-scanner.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/ratchet-refresh.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/receipt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/refresh-ratchet.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/resync.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/run-checks.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/scanner-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/source-triage.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/import3/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/reviews/w11-g9-rework-review.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/w10-import3-brief.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/w11-g9-followup-brief.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/w11-import3-resume-brief.md",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "evidencePathJoin": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl:7",
+      "changedEvidencePaths": [
+        "scripts/check-legacy-docs-ratchet.exceptions.json"
+      ],
+      "evidenceDigestChanged": true,
+      "disposition": "owned-park"
+    }
+  ],
+  "recordChanges": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl:7",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": [
+        "scripts/check-legacy-docs-ratchet.exceptions.json"
+      ]
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "still-valid-as-recorded",
+      "disposition": "still-valid-as-recorded",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:3",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "oldClassification": "changed",
+      "classification": "moved",
+      "oldDisposition": "still-valid-as-recorded",
+      "disposition": "still-valid-as-recorded",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:38",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:57",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "still-valid-as-recorded",
+      "disposition": "still-valid-as-recorded",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "still-valid-as-recorded",
+      "disposition": "still-valid-as-recorded",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:133",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "still-valid-as-recorded",
+      "disposition": "still-valid-as-recorded",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:183",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:225",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "oldClassification": "absent",
+      "classification": "absent",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "owned-park",
+      "disposition": "owned-park",
+      "changedEvidencePaths": []
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:20",
+      "oldClassification": "changed",
+      "classification": "changed",
+      "oldDisposition": "needs-recomposition",
+      "disposition": "needs-recomposition",
+      "changedEvidencePaths": []
+    }
+  ],
+  "bodyChanges": [
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "preimageDrifted": true,
+      "beforeSha256": "8a9fb141177b482648240bbcc30385c68a43d86737e3004b85b299b2309b6677",
+      "afterSha256": "694b9ed080264efcec56180f2155bf9e40c5b838948384ad6d1e3ac5c924a010"
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "preimageDrifted": true,
+      "beforeSha256": "07c52fe3fa4533cb6c07414b639cf8e7eb4ea8d888c912d2e557cc6231a6279f",
+      "afterSha256": "7de0b75c90f6564d28b3c8c81ac05f216899392d55b29c634814e60fb6fbf49f"
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "preimageDrifted": true,
+      "beforeSha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10",
+      "afterSha256": "a8d54d134cc0329a2be3227560d0b63131e25d2032492b585f8cf56a99c4e112"
+    },
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "preimageDrifted": false,
+      "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
+      "afterSha256": "4ab5e5f2c0412541a7578db6b7683436797f7e943bb964b20f62e35fb2b48e0f"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "preimageDrifted": false,
+      "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+      "afterSha256": "3ab8874e1e5aec335444ab1a893afc09df22b0d6a23bd5579ea1ae8861a4897c"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "preimageDrifted": false,
+      "beforeSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
+      "afterSha256": "dc33b1d948941867dd40723bd9087f9f0f6c28278bc75772fff99ac30385e7cb"
+    },
+    {
+      "path": "docs/reading-map.md",
+      "preimageDrifted": true,
+      "beforeSha256": "632405906a2b4e1b6671a8ec16e87501e0c14f2b386c0610b8925dc0ff257002",
+      "afterSha256": "787546838c40e89ab1f4a08b403556b53a33a21422e7436784497809984e5bf5"
+    }
+  ],
+  "dispositionChanges": []
+}

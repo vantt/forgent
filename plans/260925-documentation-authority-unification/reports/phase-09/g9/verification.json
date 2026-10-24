@@ -1,5 +1,5 @@
 {
-  "pin": "d14d89865b44018db48d12fa8b3f5279a2dbc905",
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
@@ -1489,20 +1489,20 @@
     },
     {
       "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-      "beforeSha256": "5feffde597de5d2bd666fbaf06096f3e1bf0e1f3059f07144f560a33cf644290",
-      "expectedAfterSha256": "ed3796eb63f3410c7d9078bafb4eea76e35cbb8e5575682d5aaf3e5c44502125",
+      "beforeSha256": "8a9fb141177b482648240bbcc30385c68a43d86737e3004b85b299b2309b6677",
+      "expectedAfterSha256": "694b9ed080264efcec56180f2155bf9e40c5b838948384ad6d1e3ac5c924a010",
       "roundtripExact": true
     },
     {
       "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "beforeSha256": "bd26ff8474267ab4e565b56141bb25267f0d246a9b9207b60b5e22f2a1360580",
-      "expectedAfterSha256": "a0461fdd013283546e08313e7ab026f2c0a57ef324093fb7f7e3d7757e524801",
+      "beforeSha256": "07c52fe3fa4533cb6c07414b639cf8e7eb4ea8d888c912d2e557cc6231a6279f",
+      "expectedAfterSha256": "7de0b75c90f6564d28b3c8c81ac05f216899392d55b29c634814e60fb6fbf49f",
       "roundtripExact": true
     },
     {
       "path": "docs/platform/agent-confinement/spec.md",
-      "beforeSha256": "51dc306ed3d1e37df50b86102fcef8e5deeb1ac7545f72e99747cd616ce5ac4d",
-      "expectedAfterSha256": "f8f583cd7673e030bf1b3ed10ba88a3fc3a5449f6714188e62ed949e876bb7bb",
+      "beforeSha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10",
+      "expectedAfterSha256": "a8d54d134cc0329a2be3227560d0b63131e25d2032492b585f8cf56a99c4e112",
       "roundtripExact": true
     },
     {
@@ -2192,7 +2192,7 @@
     {
       "path": "docs/platform/agent-mailbox/spec.md",
       "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
-      "expectedAfterSha256": "57ab8fd4b1a1872ec11fa03b69c82bcc17c5f8dd94cb115cdca6f6c1eb755c1a",
+      "expectedAfterSha256": "4ab5e5f2c0412541a7578db6b7683436797f7e943bb964b20f62e35fb2b48e0f",
       "roundtripExact": true
     },
     {
@@ -2270,7 +2270,7 @@
     {
       "path": "docs/platform/git/spec.md",
       "beforeSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
-      "expectedAfterSha256": "f9c14f9d06a5fff19ec346ab78d78b581ac683023f64bbd7fdad9e4131308e9f",
+      "expectedAfterSha256": "3ab8874e1e5aec335444ab1a893afc09df22b0d6a23bd5579ea1ae8861a4897c",
       "roundtripExact": true
     },
     {
@@ -2306,7 +2306,7 @@
     {
       "path": "docs/platform/holder-lock/spec.md",
       "beforeSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
-      "expectedAfterSha256": "6957b104f41bdb789a5208f0c2d8d6138a2e60bc1521476090ef6e02fe782446",
+      "expectedAfterSha256": "dc33b1d948941867dd40723bd9087f9f0f6c28278bc75772fff99ac30385e7cb",
       "roundtripExact": true
     },
     {
@@ -2683,8 +2683,8 @@
     },
     {
       "path": "docs/reading-map.md",
-      "beforeSha256": "6ba3c16e40a1d109eb242dbd2ab35ffc2138ca1e1882c4cdbda6a2a733c41bcb",
-      "expectedAfterSha256": "528c7a3e80706cb017f265d13039d08a671f25d5ec257a68dec489737d33ca13",
+      "beforeSha256": "632405906a2b4e1b6671a8ec16e87501e0c14f2b386c0610b8925dc0ff257002",
+      "expectedAfterSha256": "787546838c40e89ab1f4a08b403556b53a33a21422e7436784497809984e5bf5",
       "roundtripExact": true
     },
     {

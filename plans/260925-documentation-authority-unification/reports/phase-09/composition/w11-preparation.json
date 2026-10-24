@@ -1,0 +1,1711 @@
+{
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "changes": [
+    {
+      "specId": "w8:base:docs/platform/agent-confinement/spec.md",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "oldBeforeSha256": "51dc306ed3d1e37df50b86102fcef8e5deeb1ac7545f72e99747cd616ce5ac4d",
+      "beforeSha256": "20a3161a93d9c99555b852058e0c139d27f58b9aa4d8b22f22513e8c32272f10",
+      "oldAfterSha256": "44907dc5d8500251140f42332e1939be828287c81f61a1589b56613b605c2936",
+      "afterSha256": "2cd909636034ff69fe8f5976a1e6bdbe144422b1d74e95e8eb649ab1be0d8f07"
+    },
+    {
+      "specId": "w8:repin:carry:credential-store-setup",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "oldBeforeSha256": "44907dc5d8500251140f42332e1939be828287c81f61a1589b56613b605c2936",
+      "beforeSha256": "2cd909636034ff69fe8f5976a1e6bdbe144422b1d74e95e8eb649ab1be0d8f07",
+      "oldAfterSha256": "f8f583cd7673e030bf1b3ed10ba88a3fc3a5449f6714188e62ed949e876bb7bb",
+      "afterSha256": "a8d54d134cc0329a2be3227560d0b63131e25d2032492b585f8cf56a99c4e112"
+    },
+    {
+      "specId": "w8:gloss:docs/platform/agent-mailbox/spec.md",
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "oldBeforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
+      "beforeSha256": "2b16fd4743bcaa63eaece85cf951a03ce18accca7527cbe9273a8195f389606a",
+      "oldAfterSha256": "57ab8fd4b1a1872ec11fa03b69c82bcc17c5f8dd94cb115cdca6f6c1eb755c1a",
+      "afterSha256": "4ab5e5f2c0412541a7578db6b7683436797f7e943bb964b20f62e35fb2b48e0f"
+    },
+    {
+      "specId": "w8:gloss:docs/platform/git/spec.md",
+      "path": "docs/platform/git/spec.md",
+      "oldBeforeSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+      "beforeSha256": "fc3f666950a4b9c70fa90904ced2897b1edf0cdd219ff44313317e67dc511b41",
+      "oldAfterSha256": "f9c14f9d06a5fff19ec346ab78d78b581ac683023f64bbd7fdad9e4131308e9f",
+      "afterSha256": "3ab8874e1e5aec335444ab1a893afc09df22b0d6a23bd5579ea1ae8861a4897c"
+    },
+    {
+      "specId": "w8:gloss:docs/platform/holder-lock/spec.md",
+      "path": "docs/platform/holder-lock/spec.md",
+      "oldBeforeSha256": "e91d4f844ed0e4bdd6d3ecfefa3fe4c66552f284d11faff4658d0e55160032c6",
+      "beforeSha256": "e91d4f844ed0e4bdd6d3ecfefa3fe4c66552f284d11faff4658d0e55160032c6",
+      "oldAfterSha256": "6957b104f41bdb789a5208f0c2d8d6138a2e60bc1521476090ef6e02fe782446",
+      "afterSha256": "dc33b1d948941867dd40723bd9087f9f0f6c28278bc75772fff99ac30385e7cb"
+    }
+  ],
+  "glossFixes": [
+    {
+      "index": 0,
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "line": 653,
+      "before": "10. **what does a Stop drain?** Answered 2026-10-20 (the owner asked for advice and the controller decided, with reasons): only `wake:true` messages. `wake` is the sender's permission to start a turn on an idle recipient, so letting a `wake:false` message start one at Stop would empty the flag of meaning and let ordinary mail make an agent work while nobody asked; it keeps a person as the brake. The cost: an idle agent sees a `wake:false` message late, at its next tool call or next prompt, and the delivery report says so; a sender who needs it read now sets `wake`. The panel recommended the other option (drain everything at Stop, bounded) for an honest delivery report; the delivery report here is just worded to say what really happens.",
+      "after": "10. **What does a Stop drain?** Answered 2026-10-20 (the owner asked for advice and the controller decided, with reasons): only `wake:true` messages. `wake` is the sender's permission to start a turn on an idle recipient, so letting a `wake:false` message start one at Stop would empty the flag of meaning and let ordinary mail make an agent work while nobody asked; it keeps a person as the brake. The cost: an idle agent sees a `wake:false` message late, at its next tool call or next prompt, and the delivery report says so; a sender who needs it read now sets `wake`. The panel recommended the other option (drain everything at Stop, bounded) for an honest delivery report; the delivery report here is just worded to say what really happens.",
+      "labelMap": {}
+    },
+    {
+      "index": 37,
+      "path": "docs/platform/git/spec.md",
+      "line": 1077,
+      "before": "  - **the worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **the test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "after": "  - **The worktree-add fsync question (fsync count of a worktree add)** went to the owner as a question and is not part of this entry. **The test-lane move-down boundary, the per-operation herdr command-count bar**: test move-down is the test lane's; a herdr command count per operation replaces a timing bar.",
+      "labelMap": {}
+    },
+    {
+      "index": 38,
+      "path": "docs/platform/git/spec.md",
+      "line": 1078,
+      "before": "  - **the WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **the census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "after": "  - **The WAL digest evidence decision (WAL digest)**: kept by evidence, no byte-equality run (§10). **The census-gated legacy-drain decision (drains)**: the six legacy `worktree:{root}` acceptances and the v1 compact-receipt branch go only after a clean census of every repository and activated release; the census-gated deletions are separate commits, so a dirty census leaves the drains in place and this spec describes them as retained. Outcome kinds `abandonedBeforeAttempt` and `configApproved` are stated in §2 and add no `ResultCode`. The Node arms nothing called were deleted (§3); the Rust functions Recovery, Land and Event Store call stayed. The Land `CheckoutProof.old_index` field and the SafeRestore snapshot defaults stayed, because retained chains and snapshots carry them (Land records deny unknown fields).",
+      "labelMap": {}
+    },
+    {
+      "index": 61,
+      "path": "docs/platform/holder-lock/spec.md",
+      "line": 420,
+      "before": "- **2026-10-16 — Lead tự quyết (plan 4.2).** spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.2).** Mục 1: Spec ở `docs/platform/holder-lock/spec.md` và `docs/platform/process/spec.md`, theo tiền lệ Session Identity. Mục 2: Registry lock là file dữ liệu `lock-registry.v1.json`, chốt ở phase đầu, Rust và Node cùng đọc. Mục 3: Primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) để run supervisor làm, 4.2 không có consumer. Mục 4: `fgctl` chạy vector mượn và probe ngữ nghĩa bằng crate nó tự link, trước publish. Mục 5: Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch`. Mục 6: Account lock giữ bất biến \"con probe còn sống thì không giành\" bằng `runBorrowed`. Mục 7: Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest (hàng rào đã làm binary cũ fail to tiếng). Mục 8: Luật 6.0.1 cài một lần trong lõi cổng và route; ở 4.2 chỉ miền `linux-gate` có cài đặt; luật nhả trên Linux: `run_borrowed` không khai miền, phần còn sót là process khác còn giữ description; macOS: process group của con.",
+      "labelMap": {
+        "D1:": "Mục 1:",
+        "D2:": "Mục 2:",
+        "D3:": "Mục 3:",
+        "D4:": "Mục 4:",
+        "D5:": "Mục 5:",
+        "D6:": "Mục 6:",
+        "D7:": "Mục 7:",
+        "D8:": "Mục 8:"
+      }
+    },
+    {
+      "index": 62,
+      "path": "docs/platform/holder-lock/spec.md",
+      "line": 425,
+      "before": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
+      "after": "- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** Mục 1: Cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. Mục 4: Hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. Mục 5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. Mục 6: Hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. Mục 7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. Mục 8: `worktree-admin` chỉ bọc `git worktree add` (Amended 2026-10-17 by owner decision (Git G0 Q6); implementation lands with the Git component: nay bọc add, remove, move và prune, xem mục 16). Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.",
+      "labelMap": {
+        "D1:": "Mục 1:",
+        "D4:": "Mục 4:",
+        "D5:": "Mục 5:",
+        "D6:": "Mục 6:",
+        "D7:": "Mục 7:",
+        "D8:": "Mục 8:"
+      }
+    },
+    {
+      "index": 64,
+      "path": "docs/platform/holder-lock/spec.md",
+      "line": 428,
+      "before": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
+      "after": "- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là \"đã chuyển\". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. Mục 1: Ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. Mục 2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. Mục 3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. Mục 4: Ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). Mục 5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. Mục 6: Giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).",
+      "labelMap": {
+        "D1:": "Mục 1:",
+        "D2:": "Mục 2:",
+        "D3:": "Mục 3:",
+        "D4:": "Mục 4:",
+        "D5:": "Mục 5:",
+        "D6:": "Mục 6:"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "apps/fgos-gateway/Cargo.toml",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file apps/fgos-gateway/Cargo.toml\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file apps/fgos-gateway/src/mcp.rs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/component-boundary.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/component-boundary.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/git/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/git/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/herdr-web-dashboard/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/holder-lock/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/holder-lock/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/cli/command-registry.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/cli/command-registry.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/runner/worktree.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/runner/worktree.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/setup/registrations.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/setup/registrations.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/runner/dispatch-executor-profile.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/runner/worktree.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/runner/worktree.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/cli/fgos-merge.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/cli/fgos-merge.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/how-to/fix-bare-citation-findings.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/how-to/fix-bare-citation-findings.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-confinement/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-confinement/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "core/skills/_shared/citation-format.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file core/skills/_shared/citation-format.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "core/skills/_shared/citation-format.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file core/skills/_shared/citation-format.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file scripts/check-decision-citation-drift.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/scripts/check-decision-citation-drift.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "bin/fgos.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file bin/fgos.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/state/store.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/state/store.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/cli/command-registry.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/cli/command-registry.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "AGENTS.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file AGENTS.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "AGENTS.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file AGENTS.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "bin/fgos.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file bin/fgos.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/process/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/process/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/identity/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/identity/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file packages/herdr-fgos-common/rust/src/fgos.rs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "src/runner/merge.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file src/runner/merge.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/runner/merge.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/runner/merge.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/contracts/assignment-run-runresult.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/contracts/assignment-run-runresult.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/runner/dead-vocabulary-guard.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "scripts/test-proof-inventory.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file scripts/test-proof-inventory.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/doc-governance.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/doc-governance.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/documentation/operations/portals/docs-portal.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/host-invocation-routing/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/user/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/user/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/migration-authoring-rules.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/migration-authoring-rules.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/host-invocation-routing/verification/source-preservation-audit.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/proposals/documentation-system-unification.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/proposals/documentation-system-unification.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/vision.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/vision.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/roadmap.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/workspace-topology-audit.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/workspace-topology-roadmap.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/workspace-topology.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/platform-foundations.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/platform-foundations.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/packaging-distribution/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/packaging-distribution/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/work-state/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/work-state/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/README.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/README.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-overview/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-overview/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-overview/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-overview/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/architecture-intent.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/architecture-intent.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/runner/dead-vocabulary-guard.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-coordination/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/workflow/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/workflow/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/governance.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/governance.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/governance.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/governance.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-overview/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-overview/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/architecture/architecture-intent.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/transitional-switchboard.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/transitional-switchboard.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/documentation/switchboard.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/documentation/switchboard.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/component-boundary.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/component-boundary.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/system-architecture/history/component-boundary-source-carriage.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/system-architecture/history/component-boundary-source-carriage.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file scripts/check-decision-citation-drift.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file test/scripts/check-decision-citation-drift.test.mjs\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/decisions/h-36d872fbb0e5.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/terminal-control/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/terminal-control/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/decisions/h-36d872fbb0e5.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/work-state/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/work-state/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file core/skills/fgos-researching/SKILL.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "core/skills/fgos-researching/SKILL.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file core/skills/fgos-researching/SKILL.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-mailbox/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-protocol/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-protocol/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/agent-protocol/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/agent-protocol/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/coexistence/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/coexistence/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/coexistence/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/coexistence/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/config/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/config/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/event-store/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/event-store/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/git/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/git/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/holder-lock/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/holder-lock/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/identity/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/identity/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/packaging-distribution/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/platform-foundations.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/platform-foundations.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/process/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/process/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/run-supervisor/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/run-supervisor/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/run-supervisor/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/run-supervisor/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/terminal-control/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/terminal-control/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/yaml-document/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/yaml-document/spec.md\n",
+      "stderr": ""
+    }
+  ],
+  "independentAcceptance": false
+}

@@ -1,0 +1,112 @@
+{
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "status": "pass",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "d786e305eb20dfdda8d1634b227bd9f8a9328541\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": " M plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json\n M plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md\n M plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-gloss-audit.json\n M plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/reading-map-resolution.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/sha-map.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-action-verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-chain-verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-citation-before-f.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-citation-verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-gap05-verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-independent-verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-preparation.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-replay-recipes.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-unresolved-bindings.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-verify-summary.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-delta.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-first-attempt.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-followup.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-judge-summary.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-newline-proof.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-recompose-summary.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-second-attempt.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-stale-body-control.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-verify-summary.json\n",
+      "stderr": ""
+    }
+  ],
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w10-gloss-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/reading-map-resolution.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sha-map.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-action-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-chain-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-citation-before-f.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-citation-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-gap05-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-independent-verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-preparation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-replay-recipes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-unresolved-bindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w11-verify-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-delta.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-first-attempt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-followup.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-judge-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-newline-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-recompose-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-second-attempt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-stale-body-control.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/w11-verify-summary.json"
+  ],
+  "writeScopeOnly": true,
+  "indexEmpty": true,
+  "allChangedJsonParsed": true,
+  "effectiveBodiesChecked": 545,
+  "bodyChanges": 7,
+  "glossWitnessesAudited": 104,
+  "dispositionChanges": [],
+  "scratchCleanup": {
+    "operation": "shutil.rmtree",
+    "path": "/tmp/fgos-work/w11-g9",
+    "exit": 0,
+    "absentAfter": true
+  },
+  "owningProofs": {
+    "sweepExit": 0,
+    "g9VerifyExit": 0,
+    "compositionVerifyExit": 0,
+    "independentReplayExit": 0,
+    "citationFindings": 0,
+    "staleBodyNegativeExit": 1
+  },
+  "scope": "Records-only replay; no independent semantic acceptance, final-pin F or gate closure."
+}

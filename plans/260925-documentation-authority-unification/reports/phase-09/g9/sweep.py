@@ -11,6 +11,7 @@ import collections
 import difflib
 import functools
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -208,7 +209,7 @@ def classify_passage(passage, pin):
     start, end = passage['oldStartLine'], passage['oldEndLine']
     at_old = ''.join(lines[start - 1:end]) if start and end else None
     if passage.get('wholeFileContext'):
-        kind, value, newstart = ('unchanged' if now == text else 'changed'), now, 1
+        kind, value, newstart = ('unchanged' if same_passage(now, text) else 'changed'), now, 1
     elif at_old == text or (at_old is not None and at_old.rstrip('\r\n') == text):
         kind, value, newstart = 'unchanged', text, start
     elif now.count(text) == 1:
@@ -237,7 +238,7 @@ def classify_passage(passage, pin):
             value, newstart = ''.join(lines[lo:hi]), lo + 1
             # Repeated equal text has no unique global locator, but the edit
             # mapping can still identify its exact moved interval.
-            kind = 'moved' if value == text else 'changed'
+            kind = 'moved' if same_passage(value, text) else 'changed'
         else:
             # Keep a current neighbouring passage as absence evidence, never
             # pretend that it is the vanished passage.
@@ -251,6 +252,11 @@ def classify_passage(passage, pin):
                currentReadCommand=['git', 'show', pin + ':' + current_path],
                locator='neighbour-only; bound passage absent' if kind == 'absent' else 'current passage')
     return out
+
+
+def same_passage(current, bound):
+    """Ignore only one added/removed final LF, never other whitespace."""
+    return current == bound or current == bound + '\n' or bound == current + '\n'
 
 
 @functools.lru_cache(None)
@@ -345,6 +351,12 @@ def spec_sweep(pin):
     chain_mismatches = []
     rows = []
     chains = spec_chains()
+    # Reuse the owning exact authored-hunk locator and fuzz=0 patch replay.
+    # Import lazily: recompose loads this module for its shared input contract.
+    sp = importlib.util.spec_from_file_location('g9_body_replay', HERE / 'recompose.py')
+    replay = importlib.util.module_from_spec(sp)
+    sp.loader.exec_module(replay)
+    body_mismatches, replay_commands = [], []
     for path, chain in sorted(chains.items()):
         data = blob(pin, path)
         requires_absent = chain[0].get('requiresAbsent', False)
@@ -358,12 +370,30 @@ def spec_sweep(pin):
             chain_mismatches.append({'path': path, 'recordedChain': recorded_chain,
                                      'currentCompositionChain': expected_chain,
                                      'error': 'recomposed body missing or stale; recompose before G9 can pass'})
+        body_matches = False
+        try:
+            if not chosen:
+                raise ValueError('missing recomposed body')
+            if data is None and not requires_absent:
+                raise ValueError('missing source preimage')
+            preimage = (data or b'').decode()
+            current = preimage
+            for spec in chain:
+                current, _ = replay.relocate(current, spec, replay_commands)
+            # A self-roundtripping old body with refreshed metadata is not proof.
+            body, _ = replay.relocate(preimage, chosen, replay_commands)
+            if body.encode() != current.encode() or sha(body) != chosen['expectedAfterSha256']:
+                raise ValueError('recomposed body bytes differ from current chain replay')
+            body_matches = True
+        except ValueError as error:
+            body_mismatches.append({'path': path, 'error': str(error)})
         before = chosen['beforeSha256'] if chosen else chain[0]['beforeSha256']
         row = {'path': path, 'currentFileSha256': sha(data) if data is not None else None,
                'guardedPreimageSha256': actual, 'beforeSha256': before,
                'specId': chosen['id'] if chosen else chain[0].get('id', chain[0].get('patchSpecId')),
                'historicalSpecIds': [s.get('id', s.get('patchSpecId')) for s in chain],
                'predecessorChainMatchesCurrentComposition': chain_matches,
+               'bodyBytesMatchCurrentChainReplay': body_matches,
                'requiresAbsent': requires_absent,
                'absenceGuardHolds': data is None if requires_absent else None,
                'evidenceOnly': any(s.get('evidenceOnly') for s in chain),
@@ -393,6 +423,7 @@ def spec_sweep(pin):
                                'effectiveSuccessorId': effective.get(spec['path'], {}).get('id'),
                                'policy': 'Historical/staged preimages are retained, never independently executable. The effective current-byte successor is the check guard.'})
     return {'files': rows, 'drifted': drift, 'predecessorChainMismatches': chain_mismatches,
+            'bodyReplayMismatches': body_mismatches, 'bodyReplayCommands': replay_commands,
             'unrecognizedEffectivePaths': extras,
             'uncomposedHistoricalParks': parks, 'recompositionErrors': errors,
             'historicalComposedInputSweep': historical}
@@ -457,6 +488,7 @@ def main():
         result['records'] = rows
     print(json.dumps(result, ensure_ascii=False, indent=2))
     if args.check and (errors or specs['drifted'] or specs['predecessorChainMismatches'] or
+                       specs['bodyReplayMismatches'] or
                        specs['unrecognizedEffectivePaths'] or specs['recompositionErrors']):
         return 1
     return 0

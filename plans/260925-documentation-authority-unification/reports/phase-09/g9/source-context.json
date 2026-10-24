@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "d14d89865b44018db48d12fa8b3f5279a2dbc905",
+  "sourceCommit": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
   "memberships": {
     "changed518/step-03": 10,
     "changed518/step-04": 30,
@@ -631,10 +631,10 @@
       ],
       "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
       "authorPin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-      "currentFileSha256": "b0cc4d28bcdbb7a26371d09653f576e62655a91ab795ab96d3c53fed396fcadd",
+      "currentFileSha256": "52d2936caa40406912b5e6c932b937f7a3930f40ba0990fe3b562a02da132997",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl:7",
-      "evidenceSha256": "b8eaae766ebb0987fb1443a2eb74df4745be7af0b66d6427497ba0dd112940f9"
+      "evidenceSha256": "c41c97cdd6dfe60493945ea2bd99bdaec1d04c75e90acbcd9b59e098d32cf636"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:6",
@@ -1871,7 +1871,7 @@
       "currentFileSha256": "7e8f9fa875274013f49c64929188e3a640cecd1790447c7f83795d9319c70363",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
-      "evidenceSha256": "5ae2045ae18d6f3b0d002e46f88f055c9c12871dc87ea7c325e4b14b2f109157"
+      "evidenceSha256": "6d6914182ac2a513cac78623df396107a3fc65e749bafe81f0d8f7d2348fde2a"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:29",
@@ -2037,7 +2037,7 @@
       "currentFileSha256": "1cb5087f80db94afe6073864d920228aadffd0937dba97a7f96a08b05b862fd5",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:3",
-      "evidenceSha256": "65e58b5d1e71f56565d9cae83f2a61724323ce838fd726512085d57004eb5811"
+      "evidenceSha256": "0e921a5fb6fb5d175bfbe32ffd8737a44b68ce342b7ed8f582589cf164b709c9"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:4",
@@ -2382,7 +2382,7 @@
       "currentFileSha256": "7a8b9f85476aef152293a78ee0ffdc7a05ae6d4efb86b3bda824c805af84fa55",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
-      "evidenceSha256": "ef12f888184005a2430054035a5c2808cc3bc48cbb76bf30b694e2d73e940490"
+      "evidenceSha256": "c8131bb06a6d702f654f6e30609f304f8b548ba1ccf2cfbf691372e363931841"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:37",
@@ -2412,7 +2412,7 @@
       "currentFileSha256": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
-      "evidenceSha256": "ad86024681f80c6ea43ddadf8566f34314e568e7d0218fc426054ed417cc53e4"
+      "evidenceSha256": "e4303ab5e013b752173805485fee07f3ca92678868fac8d8e89a2a12b1ff372c"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:3",
@@ -3693,7 +3693,7 @@
       "currentFileSha256": "02ac1daf6c996d7dcf974675a1874fbc3a956c519ccea7678220b236c91668e8",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
-      "evidenceSha256": "79afeff52a950314c2d6a67b09f20e2149f431557b409fedffed06594f92c9e1"
+      "evidenceSha256": "66fa4b66094ea32bfce0eb17bc1a96a088d6e0f173b4bca8a6c5969cbb85d421"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:25",
@@ -4527,7 +4527,7 @@
       "currentFileSha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
-      "evidenceSha256": "3e0026689a77f776f77cfecd09af8b5ecce636ebf48e6eaaf9c43d6ef4e92f0c"
+      "evidenceSha256": "f97778052b1e42bbc5881e7256985e3877916db2a7a1058a239a384bed0dbffe"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
@@ -4775,7 +4775,7 @@
       "currentFileSha256": "076ba69d844865371234a8cf8fb2b1a5a354cada0da631e652d5f19a926ab525",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
-      "evidenceSha256": "e996f6fef3fcf8574c9b271a4c46d76a4b2746ba27ec0d117acd9bcc533866a1"
+      "evidenceSha256": "c6240890930f615b522cd48636364cc5d29b83aca40bcba80536323fb6681bce"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:35",
@@ -4807,7 +4807,7 @@
       "currentFileSha256": "a4a8c131bfa13f40ce2086e9f5d91b0448145cd7d4b1d0719ea2e537d966f0bf",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
-      "evidenceSha256": "1fe26d4a34df8245ab1840df6834aadccdcd00791bfd21a62636c80a261f68a6"
+      "evidenceSha256": "0f611a6d9725598e28ddffd31075f7651c9668957de0015456a3b0eb4b1bdee9"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:37",
@@ -4839,7 +4839,7 @@
       "currentFileSha256": "6e83274ddfcc916df9e8eac3ece36b446aef58d3d39c3bc1bc5af9fb6c8e2b33",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
-      "evidenceSha256": "8c15bc71e18d46c19a667de3374ec1b557c89d8955453998c397872d4883d31e"
+      "evidenceSha256": "2cc3edb87a3a764a9e68b9e0a3f75f430cc503dc16e1d255a1ab1ebae887748f"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:39",
@@ -4883,9 +4883,9 @@
       "path": "test/runner/operation-choice.test.mjs",
       "authorPin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "currentFileSha256": "c63508cfc4a45119efe7decf4fc8531dbfe8f45b9175f9045b8f1e0fa8e298a8",
-      "classification": "changed",
+      "classification": "moved",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
-      "evidenceSha256": "8bd9fcb4efca7dccffd2e68a7c965d23bb7b6179cdea343d882810d7fd05fb98"
+      "evidenceSha256": "e390f6205c661e4d05a655d9abf934cf04de76f45c59ceb98afc8bd90cfed1ec"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:17",
@@ -4931,7 +4931,7 @@
       "currentFileSha256": "654bf2ae222cf867790af89475bb3c93a839217e84b381de46ef83cead7b81a1",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
-      "evidenceSha256": "6b6f66820042e16104a4848114475da678d4f7f99ffbf6d5af289f2bef1a409e"
+      "evidenceSha256": "d6ee08a9a551708e9a998ba702b0d5ec62f54e64e58896cbd3a1d8a5cc1b8e1e"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:31",
@@ -5011,7 +5011,7 @@
       "currentFileSha256": "6a8407dc8627f9c849f0784049783e3b2661cc691c5ae3242d5d617e9386cd80",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:38",
-      "evidenceSha256": "6b1af0cf627a5e082c5ff13c8d511b218bb6ea05f46840c40302854a8bac6789"
+      "evidenceSha256": "5ee9cd42f9b71ea10cbfa2a5607dc24aa7ed5a2d897f74da45ecbfbad935042d"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:40",
@@ -5043,7 +5043,7 @@
       "currentFileSha256": "57c08385083b38d8b3ec766f5762585c6d2e02ad014d658667d8e4ba9757018a",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
-      "evidenceSha256": "664f29e4c59ead3e61ef301344f92ebe5ecc75123674382892fd531511c76fcd"
+      "evidenceSha256": "1d5f5eccd17169a857f8da31cfaa543347764c3aeb5189fedfd2fcb1ae548fc3"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:49",
@@ -5106,7 +5106,7 @@
       "currentFileSha256": "2e3efe6a2e0c076c6285d1fbea372b32df7276fd6471e3cbf383c095d9d26115",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:57",
-      "evidenceSha256": "ce1ccf3ac796989624c6b513522d9e2d1a70ce7485e5787c40caed8fa5f86558"
+      "evidenceSha256": "52fd788d8489282fd168e8b7d5d3db3844380a77c291107aacc88ca25525d9e4"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:58",
@@ -5301,7 +5301,7 @@
       "currentFileSha256": "6dfe848b3cc247dfcbc3b270ddde01248446ce5eb855b0f1d2ef9bc7ac4014d7",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
-      "evidenceSha256": "c94c60b0dd54876968b94c476908e90b21442dd0ed6ca26c25fdc391bbe8ea31"
+      "evidenceSha256": "bfe14be31729a006f1f86c2c8576039cc58a451e70147976eba22bce064010cd"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:86",
@@ -6246,7 +6246,7 @@
       "currentFileSha256": "fca216322b05c646aea8709a34fca4e22a061648db0690d2a0e72de9ae04ebf7",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
-      "evidenceSha256": "df2244e148f7bf3226fe180b25f45e3920473d726c5211734b6dda5391f42ad6"
+      "evidenceSha256": "d1a8a3c55a8f39ac56c8a874f4045111bb38a5c58ff2ba2f7206128c6e037378"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:115",
@@ -6321,7 +6321,7 @@
       "currentFileSha256": "040a28f6c0149542a735beebc2fba7635487895c676e51e3ce935e6a4314c0e9",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
-      "evidenceSha256": "61617bb6c71b484a44d2f7e83757b7b752be03d969a86ef3179e2c0ef4c1aa42"
+      "evidenceSha256": "b750890bb6ddbc5153282387404692625c6b1b9e4b118267f424e7e0abcc303e"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:126",
@@ -6415,7 +6415,7 @@
       "currentFileSha256": "343948dc2482165a1186829618c996e86c918e1ede41bea2dae92101df33c637",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:133",
-      "evidenceSha256": "14bc0a158261cf6a086059e018444010d0cc174e5ddb1a5e8e5fa25222e8a49d"
+      "evidenceSha256": "af534ae468c311ab98342ce04df4cfd845030fce3027794f24d7ff47d7536c6d"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:135",
@@ -6952,7 +6952,7 @@
       "currentFileSha256": "85718417b246338eb9e0e4828c543798eb9a3bd31279dc699825434056a593a7",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:183",
-      "evidenceSha256": "84d19d676f7145e6b3e50b289ed3f5de1b5fa1c2237429ac8beeb9ff2b120667"
+      "evidenceSha256": "6ea7c23a5dbf3cf3252671f6d608c051df4752193bde3dbc69def08b9ccedad7"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:185",
@@ -7258,7 +7258,7 @@
       "currentFileSha256": "17ced5c30498281261f3f2566b8530542e0bb6dbd29b491a3310e2547ea86642",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:225",
-      "evidenceSha256": "e6dc0ff05fafadf3244ad2a0c798f6028e342d6e45a31be817604d268f0b29f1"
+      "evidenceSha256": "9557d3ef0f7ccbffa8393e0cdf49fc858703f67df74377bc0af2e38654678e08"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:228",
@@ -7504,7 +7504,7 @@
       "currentFileSha256": "4b18dfb1c38ae129cd219eff1758d93ab0521a86c39a8183025682be7e1563d4",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
-      "evidenceSha256": "88491ecdc1fc467f1c9285cb3f90468426df7f5699c60c702127d8dda7702cbb"
+      "evidenceSha256": "323c6a7085caff4d5d34d3484e51a5b4a99c6b33858cdeba1ce051f6aaeeab01"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl:8",
@@ -8115,7 +8115,7 @@
       "currentFileSha256": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
-      "evidenceSha256": "d01b3d47bd349038957c0d97652b6fa599e891367f0c0d43c0b11865284dd05b"
+      "evidenceSha256": "6b7558b5fa5bdef0d17b88979aed02285344660d38d32176609eb2169ace1b00"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:155",
@@ -8175,7 +8175,7 @@
       "currentFileSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
-      "evidenceSha256": "f69b8bbd4ed7c70755c0b9f380cca09075917d943ef4973575335050fd7cb73b"
+      "evidenceSha256": "e5cae3cb7e682d9b91a1cc96b0f49ec77fd2725900a4821048e08fabe2416464"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl:17",
@@ -8355,7 +8355,7 @@
       "currentFileSha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
       "classification": "absent",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
-      "evidenceSha256": "bdf5fcfd179dbb9effce0043f4af3505b9ba20a656902ace9f848aab7ccc51be"
+      "evidenceSha256": "9b2adf64d610c60ff5fcac3506bb4580b50a0700d7a5e94949587bbdee06dd51"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:50",
@@ -8460,7 +8460,7 @@
       "currentFileSha256": "edb18d5c686152c5642ae1cea3ebfa2bd23daecdd7dc5f97673dfb0751a04a25",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
-      "evidenceSha256": "d71d736c615a633b316107c86ffe3a5b03bfc19988c9cd2e62a5eb8844d757b5"
+      "evidenceSha256": "d43155149f81f84d2e25d3250b6d05b6f604fe07bd627431f808bc16404ecc91"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:14",
@@ -8490,7 +8490,7 @@
       "currentFileSha256": "f04c17f51ba77ccb4a5e86d34f23803dee8f84282e11541bd00c5104afb9cd0f",
       "classification": "changed",
       "evidenceRef": "judgments.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:20",
-      "evidenceSha256": "1653794162307ea859117a3a258833dc34bbb7ed2fe76117fdf43f0476c0bd89"
+      "evidenceSha256": "ff3251110e0b2caf78e443fe69ee32d1aa477a84c15a94e7b6fe21a63aa9ae31"
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:32",
@@ -8735,8 +8735,8 @@
   ],
   "classificationCounts": {
     "unchanged": 55,
-    "moved": 88,
-    "changed": 353,
+    "moved": 89,
+    "changed": 352,
     "absent": 78
   }
 }

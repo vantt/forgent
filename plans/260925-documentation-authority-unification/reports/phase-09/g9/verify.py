@@ -11,7 +11,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w10-g9-rework')
+TMP = Path('/tmp/fgos-work/w11-g9')
 TMP.mkdir(parents=True, exist_ok=True)
 sp = importlib.util.spec_from_file_location('g9_sweep', HERE / 'sweep.py')
 sweep = importlib.util.module_from_spec(sp)
@@ -61,6 +61,10 @@ def main():
             assert (target.read_bytes() if target.exists() else b'') == before
         files.append({'path': path, 'beforeSha256': spec['beforeSha256'],
                       'expectedAfterSha256': spec['expectedAfterSha256'], 'roundtripExact': True})
+    # The owning sweep also binds body bytes to the replayed current chain.
+    specs = sweep.spec_sweep(pin)
+    assert not specs['bodyReplayMismatches'], specs['bodyReplayMismatches']
+    commands.extend(specs['bodyReplayCommands'])
     rows, cohorts = sweep.records_at(pin)
     assert sum(cohorts.values()) == 684 and len(rows) == 574
     assert not sweep.judgment_errors(rows)
@@ -123,7 +127,23 @@ def main():
             continue
         for site in twin['occurrences']:
             line = (sweep.ROOT / site['path']).read_text().splitlines()[site['line'] - 1]
-            assert '"' + site['key'] + '": "' + twin['newCommit'] + '"' in line, site
+            expected = site.get('currentCommit', twin['newCommit'])
+            assert '"' + site['key'] + '": "' + expected + '"' in line, site
+            if expected != twin['newCommit']:
+                # A regenerated report can legitimately advance its source pin.
+                # Authenticate the explicit refresh, never weaken to any ancestor.
+                refresh = site['refreshEvidence']
+                current = (sweep.ROOT / site['path']).read_bytes()
+                assert sweep.sha(current) == refresh['currentFileSha256']
+                assert sweep.blob(refresh['changedByCommit'], site['path']) == current
+                previous = sweep.blob(refresh['changedByCommit'] + '^', site['path'])
+                assert ('"' + site['key'] + '": "' + twin['newCommit'] + '"').encode() in previous
+                for ancestor, descendant in [(twin['newCommit'], expected), (expected, pin),
+                                              (refresh['changedByCommit'], pin)]:
+                    argv = ['git', '--no-optional-locks', 'merge-base', '--is-ancestor', ancestor, descendant]
+                    cp = subprocess.run(argv, cwd=sweep.ROOT, capture_output=True)
+                    commands.append({'argv': argv, 'exit': cp.returncode})
+                    assert cp.returncode == 0
             pure_repins += 1
     comparison = mapping['inputTreeComparison']
     cp = subprocess.run(comparison['command'], cwd=sweep.ROOT, capture_output=True)

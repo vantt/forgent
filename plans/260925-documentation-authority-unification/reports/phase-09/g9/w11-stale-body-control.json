@@ -1,0 +1,71 @@
+{
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "exit": 1,
+  "scratchCopy": "/tmp/fgos-work/w11-g9/control",
+  "mutation": "Old event-store body with CURRENT predecessorChain metadata",
+  "judgmentErrors": [],
+  "chainMetadataMismatches": [],
+  "sourceDrift": [],
+  "bodyReplayMismatches": [
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "error": "recomposed body bytes differ from current chain replay"
+    }
+  ],
+  "currentChainMetadataPreserved": true,
+  "selfRoundtripWasValid": {
+    "command": "patch --batch --fuzz=0 --reject-file=- -p1",
+    "forwardExit": 0,
+    "rollbackExit": 0,
+    "exactBytes": true,
+    "beforeEveryInvocationHashGuard": true,
+    "creationAbsenceGuard": false
+  },
+  "selfRoundtripCommands": [
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable historical subdirectory)",
+      "path": "docs/platform/event-store/spec.md",
+      "direction": "historical-step-forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/event-store/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable replay subdirectory)",
+      "path": "docs/platform/event-store/spec.md",
+      "direction": "forward",
+      "exit": 0,
+      "stdout": "patching file docs/platform/event-store/spec.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--reject-file=-",
+        "-p1"
+      ],
+      "cwd": "/tmp/fgos-work/w11-g9 (disposable replay subdirectory)",
+      "path": "docs/platform/event-store/spec.md",
+      "direction": "rollback",
+      "exit": 0,
+      "stdout": "patching file docs/platform/event-store/spec.md\n",
+      "stderr": ""
+    }
+  ]
+}
