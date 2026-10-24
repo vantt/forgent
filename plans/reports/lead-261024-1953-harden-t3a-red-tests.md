@@ -30,7 +30,7 @@ Times are test run time only (crate already built). No cargo or node run took mo
 | 6a | RT-02 | `packages/agent-protocol/rust/tests/terminal_vectors.rs` : `a_fifo_named_like_a_result_is_never_read_and_both_outbox_reads_return_none_promptly` (unix) | left `(None, None)`, right `(Some(None), Some(false))`: both `newest_complete` and `newest_unreadable` still blocked after 2 s | 4.0 s red (2 s watchdog per call), ms once fixed |
 | 6b | RT-02 | `terminal_vectors.rs` : `an_oversized_result_file_is_not_taken_as_complete` | `an oversized result was read whole and accepted` (left `Some(.../result-1.json)`) | about 0.1 s |
 | 7 | RT-08 | `contracts/fixtures/terminal/{claude,codex,agy,pi,omp}/vectors.json`, run by `terminal_every_cli_vector_resolves_as_recorded` | `claude: "usage-limit-on-an-idle-screen-is-blocked-usage-limit"`: left `{"outcome":"needs-human"}`, right `{"outcome":"blocked","reason":"usage-limit"}` | 0.01 s |
-| 8 | RT-01 (settle half) | `test/run-supervisor/attempt-steps.test.mjs` : "a terminal attempt stopped as needs-human is not a provider limit because the agent's own text on its screen mentions one" | **Not run end to end** (see below) | n/a |
+| 8 | RT-01 (settle half) | `test/run-supervisor/attempt-steps.test.mjs` : "a terminal attempt stopped as needs-human is not a provider limit because the agent's own text on its screen mentions one" | `notStrictEqual` fails: actual `'provider-limit'`, with classification `failure: {family: provider, code: provider-limit}`. The runner note shows the screen was read: "Its screen ended with: I hit a rate limit earlier ..." | about 15 ms (file 1.5 s through `runChosenTests`) |
 
 Run commands:
 - `cargo test -p fgos-observe --lib`
@@ -58,19 +58,21 @@ Both used `CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/harden-t3a-re
   - When T4 deletes the screen re-read, the test stays valid. It asserts only `classification.failure.code !== 'provider-limit'`.
   - It hands over to T4 with the settle fix.
 
+## Item 8: first version passed for the wrong reason (fixed in a follow-up commit)
+
+The coordinator ran it in the staged environment and it passed 11/11. Cause, found with temporary debug prints (since removed):
+
+- `paneScreenOf` (`settle-attempt.mjs:84-95`) caught `terminal-control-no-host-binary: cannot run .../release/bin/fgos (EACCES)` and returned `''`.
+- That happened because `workspace()` creates `bin/fgos` as an empty, non-executable file. `fs.writeFileSync(..., { mode: 0o755 })` applies `mode` only when it creates a file, so the fake host stayed non-executable.
+- With an empty screen, `terminalAdapterOutcome` returned `blocked`, and the test passed vacuously.
+
+The fix is in the test only: `paneShows` now runs `fs.chmodSync(host, 0o755)` after the write. With that, the screen is read and matches `/rate limit/i` (`settle-attempt.mjs:105`, `:127`), and the attempt settles as `provider-limit`. The defect exists as the red-team described.
+
+Run with: `node --input-type=module -e "import {runChosenTests} from './scripts/run-tests.mjs'; runChosenTests(['test/run-supervisor/attempt-steps.test.mjs'])"`, using this worktree's `CARGO_TARGET_DIR` and with `$HOME/.cargo/bin` on PATH. Result: 10 pass, 1 fail (this test).
+
 ## Could not reproduce or run
 
-- **8 (Node) was not run end to end.** Every test in `attempt-steps.test.mjs`, the existing ones included, fails before reaching any behaviour, with `git-addon-not-shipped`:
-  - The native addon must come from a release whose payload is this worktree, which `scripts/lib/git-addon-stage.mjs` (`cargo build --release -p fgos -p fgctl -p fgos-node-addon`) stages under `scripts/run-tests.mjs`.
-  - Setting `FGOS_HOST_BIN` to the activated host is not enough.
-  - Per the brief I skipped that setup.
 
-  What I verified with a scratch probe (deleted afterwards):
-  - the fake host script is accepted by `createTerminalControl(...).read`, which returns `result: 'screen'` with the same screen;
-  - the screen matches `SCREEN_LIMIT_PATTERNS` (`/rate limit/i`), so `terminalAdapterOutcome` returns `provider-limit`;
-  - `settlement.mjs:633,643` then keeps it.
-
-  The expected red is therefore `'provider-limit' !== 'provider-limit'` failing. This should be confirmed in the first run under `run-tests.mjs`.
 - **The B-A1 screen-changed case** (arbitration §4.1, third bullet) was not in the assigned list and was not written.
 - **RT-02's supervisor half** (the watch loop stalling) was not written. The protocol-level FIFO test is its owning proof. The supervisor is T4's crate.
 
@@ -82,8 +84,7 @@ Both used `CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/harden-t3a-re
   - It goes green with the B-O4 fix. Until then, any lane running the observe suite can see this red.
 
 Status: DONE_WITH_CONCERNS
-Summary: 14 red tests across 4 commits reproduce B-O1–B-O4, RT-02, RT-03–RT-05, RT-08 and RT-01's settle half. Every Rust test was run and fails on the stated assertion.
+Summary: 14 red tests reproduce B-O1–B-O4, RT-02, RT-03–RT-05, RT-08 and RT-01's settle half. Every test, the Node one included, was run and fails on its stated assertion.
 Concerns/Blockers:
-- The Node RT-01 test was not run end to end, because it needs the staged native addon; its red was confirmed by a probe instead.
 - The RT-08 vector change is a contract change that depends on owner Q1.
 - The existing friction lifecycle test is already flaky on main because of B-O4.

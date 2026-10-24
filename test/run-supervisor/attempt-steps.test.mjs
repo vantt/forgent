@@ -91,7 +91,9 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
 /** The fixture release's host answers a terminal-control read with `screen`, as the pane would show it. */
 function paneShows(w, screen) {
   const answer = JSON.stringify({ v: 1, protocol: 1, op: 'read', result: 'screen', screen });
-  fs.writeFileSync(path.join(w.release, 'bin', 'fgos'), `#!/bin/sh\ncat >/dev/null\ncat <<'ANSWER'\n${answer}\nANSWER\n`, { mode: 0o755 });
+  const host = path.join(w.release, 'bin', 'fgos');
+  fs.writeFileSync(host, `#!/bin/sh\ncat >/dev/null\ncat <<'ANSWER'\n${answer}\nANSWER\n`);
+  fs.chmodSync(host, 0o755); // workspace() created it empty; a write keeps the old mode
 }
 
 function gateExit(over = {}) {
