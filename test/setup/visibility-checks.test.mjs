@@ -12,8 +12,6 @@ import {
   checkConfinedPaneAccounts,
   DOCTOR_CHECKS,
   checkHerdrExecutorKinds,
-  readHerdrAgentKinds,
-  readHerdrIntegrationStatus,
 } from '../../src/setup/registrations.mjs';
 
 // Phase 01 group D. These are the checks that turn "the machine is not set up for
@@ -91,16 +89,10 @@ test('checkExecutorConfinement tolerates a config with no executors at all', () 
   assert.equal(checkExecutorConfinement({ executors: {} }).passed, true);
 });
 
-// Phase 05 group R3. herdr owns the list of agent kinds it can start and the
-// version of each integration hook; both are read from herdr's own commands
-// rather than copied into this repo, where a copy would go stale in silence.
-
-const HERDR_HELP = 'Options:\n      --kind <KIND>\n          [possible values: pi, claude, codex, agy, gemini]\n';
-const HERDR_STATUS = [
-  'claude: current (v8) (/home/u/.claude/hooks/herdr-agent-state.sh)',
-  'codex: outdated (v6 < v8) (/home/u/.codex/herdr-agent-state.sh)',
-  'antigravity-cli: not installed (/home/u/.gemini/config/hooks/herdr-agent-state.sh)',
-].join('\n');
+// herdr owns the list of agent kinds it can start and the version of each
+// integration hook; the terminal-control port reads both from herdr's own
+// commands rather than copying them into this repo, where a copy would go stale
+// in silence.
 
 const herdrExecutor = (id, { kind, command = 'claude' } = {}) => ({
   [id]: {
@@ -115,20 +107,8 @@ const herdrExecutor = (id, { kind, command = 'claude' } = {}) => ({
   },
 });
 
-const parsed = { kinds: ['pi', 'claude', 'codex', 'agy', 'gemini'], integrations: { claude: 'current', codex: 'outdated', 'antigravity-cli': 'not installed' } };
-
-test('readHerdrAgentKinds parses the list out of the command that enforces it', () => {
-  assert.deepEqual(readHerdrAgentKinds(() => HERDR_HELP), ['pi', 'claude', 'codex', 'agy', 'gemini']);
-  assert.equal(readHerdrAgentKinds(() => null), null, 'herdr absent is not this check\'s problem to report');
-  assert.equal(readHerdrAgentKinds(() => 'no possible values here'), null);
-});
-
-test('readHerdrIntegrationStatus reads each hook state, ignoring the paths after it', () => {
-  assert.deepEqual(readHerdrIntegrationStatus(() => HERDR_STATUS), {
-    claude: 'current', codex: 'outdated', 'antigravity-cli': 'not installed',
-  });
-  assert.equal(readHerdrIntegrationStatus(() => null), null);
-});
+// What the terminal-control route answers (the driver's own fixtures own the parsing of herdr's text).
+const parsed = () => ({ kinds: ['pi', 'claude', 'codex', 'agy', 'gemini'], integrations: { claude: 'current', codex: 'outdated', 'antigravity-cli': 'not installed' } });
 
 test('a config with no herdr executor has nothing to check', () => {
   assert.equal(checkHerdrExecutorKinds({ executors: { a: { kind: 'agent' } } }, parsed).passed, true);
@@ -165,8 +145,27 @@ test('a missing hook only notes itself -- nothing in this dispatch path conclude
   assert.match(r.message, /no .* integration hook installed/);
 });
 
+test('the row asks the terminal-control route, which reads herdr\'s own text', { skip: process.platform === 'win32' }, () => {
+  const fakeHerdr = path.resolve('packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh');
+  const previous = process.env.FGOS_HERDR_BIN;
+  process.env.FGOS_HERDR_BIN = fakeHerdr;
+  try {
+    const r = checkHerdrExecutorKinds({ executors: herdrExecutor('codex-herdr', { kind: 'codex' }) });
+    assert.equal(r.passed, false, r.message);
+    assert.match(r.message, /outdated herdr integration hook.*codex-herdr/);
+    const missing = checkHerdrExecutorKinds({ executors: herdrExecutor('weird', { kind: 'notreal' }) });
+    assert.match(missing.message, /herdr supports: pi, claude, codex, agy, gemini/);
+    process.env.FGOS_HERDR_BIN = '/no/such/herdr-binary';
+    const absent = checkHerdrExecutorKinds({ executors: herdrExecutor('claude-herdr', { kind: 'claude' }) });
+    assert.match(absent.message, /not evaluated/, 'a herdr that is not there is not this row\'s to report');
+  } finally {
+    if (previous === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = previous;
+  }
+});
+
 test('when herdr cannot be asked, kinds are not evaluated rather than guessed', () => {
-  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('claude-herdr', { kind: 'claude' }) }, { kinds: null });
+  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('claude-herdr', { kind: 'claude' }) }, () => ({ kinds: null, integrations: null }));
   assert.equal(r.passed, true);
   assert.match(r.message, /not evaluated/);
 });

@@ -105,7 +105,7 @@ impl Drop for Fixture {
 #[test]
 fn literal_scoped_commit_real_hook_and_replay() {
     let f = Fixture::new();
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::write(f.tree.join("[literal]"), "selected").unwrap();
     fs::write(f.tree.join("outside"), "outside").unwrap();
     let request = CommitRequest {
@@ -116,13 +116,13 @@ fn literal_scoped_commit_real_hook_and_replay() {
     };
     let result = f
         .driver
-        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "exact")
+        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "exact", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(result.status, ResultCode::Committed);
     assert_eq!(result.files, vec!["[literal]"]);
     assert_eq!(
         f.driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "exact")
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "exact", &wal::OsFileSystem)
             .unwrap()
             .oid,
         result.oid
@@ -143,7 +143,7 @@ fn hook_tree_tampering_reports_real_effect() {
     fs::write(&hook, "#!/bin/sh\nprintf hook > a\ngit add a\n").unwrap();
     fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
     git(&f.main, &["config", "core.hooksPath", "hooks"]);
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::write(f.tree.join("a"), "producer").unwrap();
     let request = CommitRequest {
         writes: vec!["a".into()],
@@ -153,7 +153,7 @@ fn hook_tree_tampering_reports_real_effect() {
     };
     let result = f
         .driver
-        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "hook")
+        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "hook", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(result.status, ResultCode::CommittedButContractViolation);
     assert!(result.oid.is_some());
@@ -204,6 +204,28 @@ fn sync_clean_and_conflict_resolution_have_exact_parents() {
             format!("{head} {target}")
         );
     }
+}
+#[test]
+fn a_sync_commit_hook_reads_the_operation_id_the_way_a_scoped_commit_hook_does() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = Fixture::new();
+    fs::write(f.main.join("incoming"), "target\n").unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "target"]);
+    let target = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
+    let seen = f.temp.join("seen");
+    let hooks = f.main.join("hooks");
+    fs::create_dir(&hooks).unwrap();
+    let hook = hooks.join("pre-commit");
+    fs::write(&hook, format!("#!/bin/sh\ngit config --get fgos.operationId > '{}'\n", seen.display())).unwrap();
+    fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+    git(&f.main, &["config", "core.hooksPath", "hooks"]);
+    let done = f
+        .driver
+        .start_sync(&f.repo, f.held(), &target, "consumer sync", "fixture", "sync-hook")
+        .unwrap();
+    assert_eq!(done.state, "done");
+    assert_eq!(fs::read_to_string(seen).unwrap().trim(), "sync-hook");
 }
 #[test]
 fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
@@ -293,18 +315,11 @@ fn sync_prepare_applies_declarations_to_skip_worktree_store_paths_in_the_index_o
     assert!(!f.tree.join(kept).exists() && !f.tree.join(gone).exists());
     assert_eq!(git(&f.tree, &["status", "--porcelain"]), "");
 }
-#[test]
-fn markers_include_tabs_and_diff3_but_skip_binary() {
-    for m in [b"<<<<<<<\tleft".as_slice(), b"|||||||| base", b">>>>>>>"] {
-        assert!(has_conflict_markers(m));
-    }
-    assert!(!has_conflict_markers(b"\0<<<<<<< left"));
-}
 
 #[test]
 fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
     let f = Fixture::new();
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     let request = CommitRequest {
         writes: vec!["a".into()],
         message: "noop".into(),
@@ -313,7 +328,7 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
     };
     assert_eq!(
         f.driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "noop")
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "noop", &wal::OsFileSystem)
             .unwrap()
             .status,
         ResultCode::Unchanged
@@ -321,7 +336,7 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
     fs::write(f.tree.join("a"), "later bytes").unwrap();
     assert_eq!(
         f.driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "noop")
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "noop", &wal::OsFileSystem)
             .unwrap()
             .status,
         ResultCode::Unchanged
@@ -389,7 +404,7 @@ fn baseline_only_cutover_commits_the_event_fence() {
             ResolveRepo::Repository(r) => r,
             _ => panic!(),
         };
-        let baseline = f.driver.preflight_commit(&main, vec![]).unwrap();
+        let baseline = f.driver.preflight_commit(&main, vec![], None).unwrap();
         for p in &deleted {
             fs::remove_file(f.main.join(p)).unwrap();
         }
@@ -407,7 +422,7 @@ fn baseline_only_cutover_commits_the_event_fence() {
         };
         let result = f
             .driver
-            .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover")
+            .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(result.status, ResultCode::Committed);
         assert_eq!(
@@ -445,7 +460,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
             Ok(())
         }
     }
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     let request = CommitRequest {
         writes: vec!["a".into()],
         message: "interrupted".into(),
@@ -525,7 +540,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
     chain
 }
 fn fresh_commit(f: &Fixture, id: &str) {
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::write(f.tree.join("fresh"), id).unwrap();
     let request = CommitRequest {
         writes: vec!["fresh".into()],
@@ -535,7 +550,7 @@ fn fresh_commit(f: &Fixture, id: &str) {
     };
     assert_eq!(
         f.driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", id)
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", id, &wal::OsFileSystem)
             .unwrap()
             .status,
         ResultCode::Committed
@@ -569,7 +584,7 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
             };
             assert_eq!(
                 f.driver
-                    .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "fresh")
+                    .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "fresh", &wal::OsFileSystem)
                     .unwrap()
                     .status,
                 ResultCode::Committed
@@ -603,7 +618,7 @@ fn explicit_recovery_observes_signed_commit_or_closes_unknown_without_replaying(
         let head = git(&f.tree, &["rev-parse", "HEAD"]);
         let outcome = f
             .driver
-            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert!(if committed {
             matches!(outcome, wal::Outcome::Commit { .. })
@@ -621,10 +636,10 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     let gitdir = git(&f.tree, &["rev-parse", "--absolute-git-dir"]);
     fs::write(Path::new(&gitdir).join("index.lock"), "native residue").unwrap();
     let error = f.driver
-        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
         .unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
-    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("retained index.lock runbook"));
     assert!(error.cause.contains("§11"));
     assert!(wal::Wal::open(&f.repo)
         .unwrap()
@@ -635,7 +650,7 @@ fn recovery_preserves_attempt_while_native_index_lock_exists() {
     fs::remove_file(Path::new(&gitdir).join("index.lock")).unwrap();
     git(&f.tree, &["reset", "-q", "HEAD"]);
     f.driver
-        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
         .unwrap();
     fresh_commit(&f, "fresh");
 }
@@ -644,7 +659,7 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
     let f = Fixture::new();
     let mut first = None;
     for n in 0..9 {
-        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
         fs::write(f.tree.join("a"), format!("version {n}")).unwrap();
         let request = CommitRequest {
             writes: vec!["a".into()],
@@ -655,7 +670,7 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
         let id = format!("bounded-{n}");
         let result = f
             .driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", &id)
+            .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", &id, &wal::OsFileSystem)
             .unwrap();
         if n == 0 {
             first = Some((baseline, request, result.oid));
@@ -673,7 +688,7 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
                 &baseline,
                 &request,
                 "fixture",
-                "bounded-0"
+                "bounded-0", &wal::OsFileSystem
             )
             .unwrap()
             .oid,
@@ -730,7 +745,7 @@ fn recovery_observes_hook_modified_overtaken_and_aba_commits() {
         }
         let result = f
             .driver
-            .recover_scoped_commit(&f.repo, f.held(), "fixture", "observe");
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "observe", &wal::OsFileSystem);
         if moved == 2 {
             let err = result.unwrap_err();
             assert_eq!(err.code, ResultCode::RecoveryRequired);
@@ -763,7 +778,7 @@ fn unknown_replay_keeps_cause_and_recovery_preserves_foreign_staging() {
     git(&f.tree, &["add", "human"]);
     let outcome = f
         .driver
-        .recover_scoped_commit(&f.repo, f.held(), "fixture", "unknown")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "unknown", &wal::OsFileSystem)
         .unwrap();
     assert!(
         matches!(outcome, wal::Outcome::CommitRejected { cause } if cause == "commit-effect-unknown")
@@ -771,7 +786,7 @@ fn unknown_replay_keeps_cause_and_recovery_preserves_foreign_staging() {
     assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "human");
     let error = f
         .driver
-        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "unknown")
+        .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "unknown", &wal::OsFileSystem)
         .unwrap_err();
     assert!(format!("{error:?}").contains("commit-effect-unknown"));
     assert_eq!(error.code, ResultCode::RecoveryRequired);
@@ -784,7 +799,7 @@ fn pre_attempt_recovery_does_not_unstage_a_changed_index() {
     fs::write(f.tree.join("human"), "keep staged").unwrap();
     git(&f.tree, &["add", "human"]);
     f.driver
-        .recover_scoped_commit(&f.repo, f.held(), "fixture", "prepared")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "prepared", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(
         git(&f.tree, &["diff", "--cached", "--name-only"]),
@@ -837,7 +852,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
         if residue {
             fs::write(&residue_path, "interrupted append").unwrap();
         }
-        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
         fs::write(f.tree.join("fresh"), "new checkout").unwrap();
         let receipt = f
             .driver
@@ -853,6 +868,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                 },
                 "fixture",
                 "new-checkout",
+                &wal::OsFileSystem,
             )
             .unwrap();
         assert_eq!(receipt.status, ResultCode::Committed);
@@ -878,7 +894,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
         );
         assert!(f
             .driver
-            .recover_scoped_commit(&f.repo, f.held(), "fixture", "dead")
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "dead", &wal::OsFileSystem)
             .is_err());
     }
 }
@@ -1034,7 +1050,7 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
     }
     for action in ["create", "remove", "move"] {
         let f = Fixture::new();
-        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
         let path = f.tree.to_str().unwrap();
         let kind = match action {
             "create" => wal::OperationKind::WorktreeCreate {
@@ -1118,6 +1134,7 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
                 },
                 "fixture",
                 "new",
+                &wal::OsFileSystem,
             )
             .unwrap_err();
         assert_eq!(err.code, ResultCode::RecoveryRequired, "{err:?}");
@@ -1150,7 +1167,7 @@ fn preexisting_reset_away_commit_is_evidence_not_a_receipt() {
     interrupted(&f, "never-ran", 2, false);
     let err = f
         .driver
-        .recover_scoped_commit(&f.repo, f.held(), "fixture", "never-ran")
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "never-ran", &wal::OsFileSystem)
         .unwrap_err();
     assert_eq!(err.code, ResultCode::RecoveryRequired);
     assert!(format!("{err:?}").contains(&old));
@@ -1285,7 +1302,7 @@ fn sync_native_index_lock_refusal_names_inspection_and_preserves_bytes() {
     fs::write(&path, b"external sync lock").unwrap();
     let error = f.driver.inspect_sync(&f.repo, f.held(), "fixture", "interrupted").unwrap_err();
     assert!(error.cause.starts_with("native-index-lock-unowned:"));
-    assert!(error.cause.contains("repairNativeIndexLock"));
+    assert!(error.cause.contains("retained index.lock runbook"));
     assert!(error.cause.contains("§11"));
     assert_eq!(fs::read(&path).unwrap(), b"external sync lock");
     assert!(wal::Wal::open(&f.repo).unwrap().inspect("interrupted").unwrap().outcome().is_none());
@@ -1399,10 +1416,10 @@ fn sync_observed_rejection_retry_recovers_each_pre_commit_interruption() {
 fn unknown_commit_recovery_is_an_error_but_pending_intent_can_be_abandoned() {
     let f = Fixture::new();
     let head = git(&f.tree, &["rev-parse", "HEAD"]);
-    let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "missing").unwrap_err();
+    let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "missing", &wal::OsFileSystem).unwrap_err();
     assert_eq!(error.cause, "unknown-scoped-commit-operation");
     interrupted(&f, "pending", 0, false);
-    let outcome = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "pending").unwrap();
+    let outcome = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", "pending", &wal::OsFileSystem).unwrap();
     assert_eq!(outcome, wal::Outcome::AbandonedBeforeAttempt);
     assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), head);
     assert_eq!(wal::Wal::open(&f.repo).unwrap().compacted("pending").unwrap().unwrap().outcome().unwrap(), wal::Outcome::AbandonedBeforeAttempt);
@@ -1489,13 +1506,13 @@ fn objects_of_commit(f: &Fixture, base: &str) -> u64 {
 /// A nested file is written and committed with the commit's receipt refused at
 /// its first object: the commit is on the branch, the chain has no outcome.
 fn unacknowledged_nested_commit(f: &Fixture, id: &'static str) -> String {
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::create_dir_all(f.tree.join("deep/er")).unwrap();
     fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
     let refusing = ObjectSteps::new(f, id, Some(1));
     assert!(f
         .driver
-        .scoped_commit_with_filesystem(&f.repo, f.held(), &baseline, &nested_request(), "fixture", id, &refusing)
+        .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", id, &refusing)
         .is_err());
     assert_eq!(objects_of_commit(f, &baseline.head), 5);
     baseline.head
@@ -1507,13 +1524,13 @@ fn loose_object(f: &Fixture, oid: &str) -> PathBuf {
 #[test]
 fn scoped_commit_makes_staged_objects_durable_before_the_branch_moves_and_the_commit_before_the_receipt() {
     let f = Fixture::new();
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::create_dir_all(f.tree.join("deep/er")).unwrap();
     fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
     let steps = ObjectSteps::new(&f, "durable", None);
     let result = f
         .driver
-        .scoped_commit_with_filesystem(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "durable", &steps)
+        .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "durable", &steps)
         .unwrap();
     assert_eq!(result.status, ResultCode::Committed);
     // Commit, root tree, two subtrees and the blob; the commit alone is new after the branch moved.
@@ -1525,11 +1542,11 @@ fn scoped_commit_makes_staged_objects_durable_before_the_branch_moves_and_the_co
 #[test]
 fn a_refused_staged_object_sync_never_reaches_git_commit() {
     let f = Fixture::new();
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     fs::create_dir_all(f.tree.join("deep/er")).unwrap();
     fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
     let steps = ObjectSteps::new(&f, "refused", None).refusing_staged_at(2);
-    let refused = f.driver.scoped_commit_with_filesystem(
+    let refused = f.driver.scoped_commit(
         &f.repo, f.held(), &baseline, &nested_request(), "fixture", "refused", &steps,
     );
     assert!(refused.is_err());
@@ -1546,7 +1563,7 @@ fn recovery_makes_the_new_objects_durable_before_it_reports_the_commit() {
     let recovering = ObjectSteps::new(&f, "interrupted", None).based_on(&base);
     let outcome = f
         .driver
-        .recover_scoped_commit_with_filesystem(&f.repo, f.held(), "fixture", "interrupted", &recovering)
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &recovering)
         .unwrap();
     assert!(matches!(outcome, wal::Outcome::Commit { contract_violation: false, .. }), "{outcome:?}");
     assert_eq!(recovering.seen(), objects_of_commit(&f, &base));
@@ -1562,7 +1579,7 @@ fn recovery_of_a_tip_with_an_unreadable_object_names_the_cause_and_keeps_the_evi
         let file = loose_object(&f, &object);
         fs::set_permissions(&file, std::os::unix::fs::PermissionsExt::from_mode(0o644)).unwrap();
         fs::remove_file(&file).unwrap();
-        let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", id).unwrap_err();
+        let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", id, &wal::OsFileSystem).unwrap_err();
         assert_eq!(error.code, ResultCode::RecoveryRequired, "{lost}");
         assert_eq!(error.cause, "commit-objects-unreadable", "{lost}");
         // The branch is not reset and the chain stays open for the owner.
@@ -1600,12 +1617,12 @@ fn staged_objects_a_cut_left_empty_are_healed_so_the_commit_names_readable_objec
     // Every object of the change emptied (Git cannot even list the trees), then only the blob.
     for blob_only in [false, true] {
         let f = Fixture::new();
-        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
         let emptied = leave_staged_objects_empty(&f, blob_only);
         assert_eq!(emptied.len(), if blob_only { 1 } else { 4 });
         let result = f
             .driver
-            .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "healed")
+            .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "healed", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(result.status, ResultCode::Committed);
         assert_eq!(git(&f.tree, &["show", "HEAD:deep/er/file"]), "new blob");
@@ -1624,7 +1641,7 @@ fn a_corrupt_staged_object_that_cannot_be_healed_refuses_before_git_commit() {
     if fs::metadata("/proc/self").unwrap().uid() == 0 {
         return;
     }
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     let emptied = leave_staged_objects_empty(&f, false);
     let blob = git(&f.tree, &["hash-object", "deep/er/file"]);
     assert!(emptied.contains(&blob));
@@ -1632,7 +1649,7 @@ fn a_corrupt_staged_object_that_cannot_be_healed_refuses_before_git_commit() {
     fs::set_permissions(&fanout, fs::Permissions::from_mode(0o555)).unwrap();
     let refused = f
         .driver
-        .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "unhealable");
+        .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "unhealable", &wal::OsFileSystem);
     fs::set_permissions(&fanout, fs::Permissions::from_mode(0o755)).unwrap();
     assert_eq!(refused.unwrap_err().cause, "object-file-corrupt");
     assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline.head);

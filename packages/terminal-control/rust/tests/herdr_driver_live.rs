@@ -23,7 +23,7 @@ fn herdr_live() {
     assert_eq!(geometry.tab_id, tab.tab_id);
     assert_eq!(geometry.panes.len(), 2);
     assert!(geometry.panes.iter().all(|p| p.rect.width > 0 && p.rect.height > 0));
-    let pty_known = geometry.panes.iter().filter(|p| p.pty.is_some()).count();
+    let pty_known = geometry.panes.iter().filter(|p| driver.pane_pty(&p.pane_id).is_some()).count();
     println!("area {:?}, {pty_known} of 2 panes reported a pty size", geometry.area);
 
     let info = driver.process_info(&second.pane_id).expect("process info");

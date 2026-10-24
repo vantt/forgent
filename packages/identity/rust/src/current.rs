@@ -6,7 +6,7 @@
 use crate::errors::Error;
 use crate::machine;
 use crate::refusal::Refusal;
-use crate::resolve::{resolve, WriterIdentity, WriterKey};
+use crate::resolve::{resolve, HeadRef, WriterIdentity, WriterKey};
 use crate::session::{self, Local, PidFacts};
 use fgos_process::facts::Record;
 use serde::Serialize;
@@ -115,6 +115,24 @@ pub fn os_record(pid: u32) -> Option<Record> {
 }
 
 
+/// The record of the process `head` names, or why it is not that process: not
+/// readable or not running, or running with another start time (its pid was
+/// reused). The one place that judges a head reference.
+pub(crate) fn read_head(head: &HeadRef) -> Result<Record, String> {
+    let record = os_record(head.pid)
+        .filter(|record| fgos_process::facts::judge_here(record) == fgos_process::facts::Verdict::Alive)
+        .ok_or_else(|| format!("process {} cannot be read or is not running, so it cannot be a session's head", head.pid))?;
+    match record.start_time.as_deref() {
+        Some(now) if now == head.start_time => Ok(record),
+        now => Err(format!(
+            "process {} started at {:?}, not {:?}: the pid was reused, so it is not the head",
+            head.pid,
+            now.unwrap_or("unknown"),
+            head.start_time
+        )),
+    }
+}
+
 /// The session the calling process is, with its full id and handle.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CurrentSession {
@@ -152,14 +170,15 @@ fn named(machine: &MachineInfo, local: Local) -> CurrentSession {
 /// own env does not carry it (`invalid-writer-key` when `key.source` is not
 /// one of the writer-id rule's env variables or the value is not a usable id).
 /// Same id, handle and CLI as [`current_session`] gives a process whose env
-/// holds the same key. `head_pid` is the process the CLI label of a shared
+/// holds the same key. `head` is the process the CLI label of a shared
 /// variable ([`crate::resolve::PI_SESSION_VAR`]) is read from, upward and
 /// itself included; the other keys ignore it, and `None` gives the neutral
-/// label.
+/// label. A head that is not running with the given start time (its pid was
+/// reused) is not trusted: the label is the neutral one, never a refusal.
 pub fn session_for(
     state_root: &Path,
     key: &WriterKey,
-    head_pid: Option<u32>,
+    head: Option<&HeadRef>,
 ) -> Result<CurrentSession, Refusal> {
     let local = session::key_local(key).ok_or_else(|| Refusal {
         reason: "invalid-writer-key",
@@ -171,8 +190,14 @@ pub fn session_for(
         ),
         candidates: Vec::new(),
     })?;
-    let tree = crate::proc_tree::os_process_tree();
-    let cli = crate::resolve::ancestry_cli(key.source, tree.as_ref(), head_pid);
+    // Only the shared variable's label needs the ancestry, so only it pays for
+    // the process-tree handle and the head read.
+    let cli = (key.source == crate::resolve::PI_SESSION_VAR)
+        .then(|| {
+            let trusted = head.filter(|head| read_head(head).is_ok()).map(|head| head.pid);
+            crate::resolve::ancestry_cli(key.source, crate::proc_tree::os_process_tree().as_ref(), trusted)
+        })
+        .flatten();
     let local = Local { cli: cli.unwrap_or(local.cli), ..local };
     Ok(named(&machine_info(state_root)?, local))
 }

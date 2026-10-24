@@ -159,12 +159,20 @@ export function runFullSuite({ cwd, spawn = spawnSync, timeoutMs = FULL_SUITE_TI
  * `stdio: 'inherit'` CLI use) so a mutation that breaks JS syntax can be
  * told apart from one a real assertion just caught.
  */
+/**
+ * The Cargo target a throwaway checkout builds into: one of its own beside this checkout's, kept warm across runs.
+ * Cargo keys path packages relative to the workspace root, so a checkout of another tree sharing this checkout's
+ * target would overwrite its artifacts and leave the next build here "fresh" on the other tree's sources.
+ */
+export function checkoutCargoTarget(env = process.env) {
+  return path.join(env.CARGO_TARGET_DIR || path.join(REPO_ROOT, 'target'), 'mutation-checkout');
+}
+
 export function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
   const relFiles = files.map((f) => path.relative(cwd, f));
   const env = buildTestEnv();
-  // The native door loads only the release its own payload belongs to, so the checkout under test stages its own
-  // (built into this checkout's shared Cargo target, never a cold target of the throwaway worktree).
-  env.CARGO_TARGET_DIR ||= path.join(REPO_ROOT, 'target');
+  // The native door loads only the release its own payload belongs to, so the checkout under test stages its own.
+  env.CARGO_TARGET_DIR = checkoutCargoTarget(env);
   ensureGitAddon(env, cwd);
   const result = spawn(process.execPath, buildTestArgv(relFiles, []), {
     cwd,

@@ -58,11 +58,15 @@ pub(crate) fn mirror_suffix(rest: &str) -> Result<Option<&str>, Error> {
             .any(|p| suffix.starts_with(p)))
     .then_some(suffix))
 }
+/// Event ref tips, the legacy mirrors, and the HEAD the same listing observed (when attached).
+type ListedTips = (Vec<Tip>, BTreeMap<String, Oid>, Option<HeadFact>);
+/// The listing that reads the event refs also lists `refs/heads/`, so the branch HEAD names, with
+/// its own listed value, comes with it (see `refs::list_with_head`).
 fn tips(
     port: &dyn Inspect,
     repo: &RepoHandle,
     streams: &[StreamId],
-) -> Result<(Vec<Tip>, BTreeMap<String, Oid>), Error> {
+) -> Result<ListedTips, Error> {
     let prefixes = [
         "refs/fgos/events/",
         "refs/fgos/branch-events/",
@@ -75,7 +79,8 @@ fn tips(
     .collect::<Result<Vec<_>, _>>()?;
     let mut tips = Vec::new();
     let mut legacy = BTreeMap::new();
-    for e in crate::refs::list(port, repo, &prefixes)? {
+    let (listed, head) = crate::refs::list_with_head(port, repo, &prefixes)?;
+    for e in listed {
         let name = e.name.as_str();
         let (rest, mirror) = if let Some(r) = name.strip_prefix("refs/fgos/remotes/") {
             (
@@ -130,7 +135,7 @@ fn tips(
             mirror,
         });
     }
-    Ok((tips, legacy))
+    Ok((tips, legacy, head))
 }
 fn legacy_files(
     port: &dyn Inspect,
@@ -180,9 +185,14 @@ fn read_legacy(
     repo: &RepoHandle,
     refs: &BTreeMap<String, Oid>,
     streams: &[StreamId],
+    listed_head: Option<HeadFact>,
 ) -> Result<Vec<LegacyEvent>, Error> {
     let authority = crate::fence::authority(port, repo)?;
-    let head = port.resolve_head(&authority).map_err(git_error)?;
+    // The listing observed `repo`'s HEAD; it answers for the authority only when both are one checkout.
+    let head = match listed_head {
+        Some(head) if authority.git_dir() == repo.git_dir() => head,
+        _ => port.resolve_head(&authority).map_err(git_error)?,
+    };
     let pin = crate::fence::pinned_at_head(port, &authority, &head).map_err(|error| {
         if refs.is_empty() && error.code == ErrorCode::EventStoreIo {
             Error::new(
@@ -235,7 +245,7 @@ pub fn read_with_view(
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
-    let (tips, legacy_refs) = tips(port, repo, req.streams)?;
+    let (tips, legacy_refs, listed_head) = tips(port, repo, req.streams)?;
     for (name, old) in &req.cursor.mirror_tips {
         let tip = tips
             .iter()
@@ -387,7 +397,7 @@ pub fn read_with_view(
         .iter()
         .map(|(n, o)| (n.clone(), o.as_str().into()))
         .collect();
-    let raw_legacy = read_legacy(port, repo, &legacy_refs, req.streams)?;
+    let raw_legacy = read_legacy(port, repo, &legacy_refs, req.streams, listed_head)?;
     let (work, porting): (Vec<_>, Vec<_>) = raw_legacy
         .into_iter()
         .partition(|e| !e.provenance.file.starts_with("porting/"));

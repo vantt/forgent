@@ -4,7 +4,7 @@
 //! directory before it. The caller-supplied root is opened once, no-follow, so a symlinked root is
 //! refused as well. The bytes and the revision come from the one descriptor returned here.
 use rustix::fs::{
-    fchmod, fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, ResolveFlags, CWD,
+    fchmod, fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, CWD,
 };
 use rustix::io::Errno;
 use sha2::{Digest, Sha256};
@@ -192,7 +192,9 @@ fn resolve_dir(
         Strategy::Openat2 => {
             let joined: std::path::PathBuf = dirs.iter().collect();
             let resolve =
-                ResolveFlags::BENEATH | ResolveFlags::NO_SYMLINKS | ResolveFlags::NO_MAGICLINKS;
+                rustix::fs::ResolveFlags::BENEATH
+                    | rustix::fs::ResolveFlags::NO_SYMLINKS
+                    | rustix::fs::ResolveFlags::NO_MAGICLINKS;
             match rustix::fs::openat2(root, &joined, DIR_FLAGS, Mode::empty(), resolve) {
                 Ok(fd) => Ok(Some(fd)),
                 Err(errno) => classify(errno, root, &joined).map(|()| None),

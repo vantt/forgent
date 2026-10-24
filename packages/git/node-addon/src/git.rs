@@ -1,7 +1,6 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
 mod config;
 mod recovery;
-mod native_lock;
 mod scoped_commit;
 mod sync;
 mod land;
@@ -165,7 +164,6 @@ impl GitPublication {
                 Ok(json!({"commits":page.commits.into_iter().map(|c| json!({"oid":c.oid,"parents":c.parents,"tree":c.tree})).collect::<Vec<_>>(),"nextCursor":page.next_cursor.map(|c| c.0),"complete":page.complete}))
             }
             "compareAndSwap" => Ok(json!(port.compare_and_swap(repo, &self.reference, &tip(&args["expected"])?, &tip(&args["next"])?, text(&args,"operationId")?).map_err(operation)?)),
-            "fetchRefs" => Ok(json!(port.fetch_refs(repo, text(&args,"remote")?, &strings(&args,"refspecs")?).map_err(operation)?)),
             "pushRefs" => {
                 let pairs: Vec<(String,String)> = serde_json::from_value(args["refs"].clone()).map_err(error)?;
                 let refs = pairs.iter().map(|(a,b)| Ok((RefName::parse(a).map_err(error)?, RefName::parse(b).map_err(error)?))).collect::<Result<Vec<_>>>()?;
@@ -220,9 +218,9 @@ pub fn inspect_git(
     let journal = if wal_present {
         let wal = wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;
         let scan = wal.scan(100_000).map_err(error)?;
-        json!({"initialized":true,"complete":scan.complete,"pendingCount":scan.unresolved,"retainedBytes":scan.retained_bytes,"ledgerBytes":scan.ledger_bytes,"oldestUnresolved":scan.oldest_unresolved.map(|(id,time)| json!({"operationId":id,"unixMillis":time.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis().to_string()})),"errors":scan.entries.iter().filter_map(|e| e.error.as_ref()).collect::<Vec<_>>()})
+        json!({"initialized":true,"complete":scan.complete,"pendingCount":scan.unresolved,"retainedBytes":scan.retained_bytes,"retainedChains":scan.retained_terminal,"oldestRetainedAtMs":scan.oldest_retained.map(|t| t.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() as u64),"ledgerEntries":scan.ledger_entries,"ledgerCapacityWarning":scan.ledger_capacity_warning,"ledgerBytes":scan.ledger_bytes,"oldestUnresolved":scan.oldest_unresolved.map(|(id,time)| json!({"operationId":id,"unixMillis":time.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis().to_string()})),"errors":scan.entries.iter().filter_map(|e| e.error.as_ref()).collect::<Vec<_>>()})
     } else {
-        json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"oldestUnresolved":null,"errors":[]})
+        json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"retainedChains":0,"oldestRetainedAtMs":null,"ledgerEntries":0,"ledgerCapacityWarning":false,"oldestUnresolved":null,"errors":[]})
     };
     let remote = remote.as_deref().unwrap_or("origin");
     let obsolete = obsolete_legacy_fetch_mapping(remote).map_err(operation)?;

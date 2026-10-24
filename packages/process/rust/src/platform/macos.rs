@@ -8,7 +8,7 @@ use std::process::{Child, Command};
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
-use crate::facts::{Holders, Observed, PidNs, ProcTuple, Scan, ScanFilter, UnreadableCause};
+use crate::facts::{Holders, Observed, PidNs, ProcTuple, Relation, Scan, ScanFilter, UnreadableCause};
 use crate::{FdSlot, ProcId};
 
 /// `pbi_status` of a process that has exited but is not yet reaped.
@@ -54,6 +54,22 @@ impl ProcessPlatform for Macos {
         Observed::Live { start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec) }
     }
 
+    fn relation_of(&self, pid: ProcId) -> Option<Relation> {
+        let info = bsd_info(pid).ok().filter(|info| info.pbi_status != SZOMB)?;
+        let raw = as_pid_t(pid)?;
+        // SAFETY: getsid only reads the kernel's process table.
+        let session = unsafe { libc::getsid(raw) };
+        Some(Relation {
+            pid,
+            parent: info.pbi_ppid,
+            group: info.pbi_pgid,
+            session: u32::try_from(session).ok()?,
+            tty_nr: i64::from(info.e_tdev),
+            // Wall-clock microseconds of the start: ordered like the Linux ticks, on another clock.
+            start_ticks: u64::from(info.pbi_start_tvsec) * 1_000_000 + u64::from(info.pbi_start_tvusec),
+        })
+    }
+
     fn lock_holders(&self, _dev: u64, _ino: u64) -> Holders {
         Holders::Unlistable
     }
@@ -97,4 +113,17 @@ fn bsd_info(pid: ProcId) -> Result<libc::proc_bsdinfo, Observed> {
         });
     }
     Ok(info)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn relation_of_this_process_names_its_parent() {
+        let me = ProcId(std::process::id());
+        let relation = Macos.relation_of(me).expect("this process is readable");
+        assert_eq!(relation.parent, std::os::unix::process::parent_id());
+        assert_eq!(relation.pid, me);
+    }
 }

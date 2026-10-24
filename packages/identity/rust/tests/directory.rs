@@ -127,9 +127,10 @@ fn a_dead_session_is_never_resolved_and_the_next_write_removes_it() {
     assert_eq!(files(&root), 1, "a read never removes");
 
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &after_death).unwrap();
-    assert_eq!(files(&root), 1, "the write removed the dead entry");
-    // Its role is free: another session takes it without --take.
+    assert_eq!(files(&root), 2, "a write that takes no role and is below the cap scans nothing, so it prunes nothing");
+    // A write that takes a role scans, removes the dead entry and finds its role free.
     directory::register(&root, entry("bbbb", Some(20), &["lead:MAIL"]), false, &after_death).unwrap();
+    assert_eq!(files(&root), 1, "the role write removed the dead entry");
 }
 
 #[test]
@@ -243,8 +244,11 @@ fn a_second_live_session_with_the_same_handle_is_refused_with_both_ids() {
     let refused = directory::register(&root, clash.clone(), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "handle-in-use");
     assert!(refused.detail.contains("fg-abc234/aaaa") && refused.detail.contains("fg-abc234/other"));
-    // Once the first one is dead the handle is free.
-    directory::register(&root, clash, false, &judge(&[10])).unwrap();
+    // Once the first one is dead the handle is free: the dead entry is replaced, not left beside it.
+    let taken = directory::register(&root, clash, false, &judge(&[10])).unwrap();
+    assert_eq!(taken.id, "fg-abc234/other");
+    assert_eq!(files(&root), 1);
+    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &judge(&[10])).unwrap().id, "fg-abc234/other");
 }
 
 #[test]
@@ -283,10 +287,28 @@ fn a_full_directory_refuses_a_new_entry_and_prune_is_the_way_out() {
     // A session already in the directory still refreshes.
     directory::register(&root, entry("s0", Some(1_000), &[]), false, &alive).unwrap();
 
+    // At the cap a write removes the dead entries first, so a new session fits.
+    let one_dead = judge(&[1_005]);
+    directory::register(&root, entry("extra", Some(1), &[]), false, &one_dead).unwrap();
+    assert_eq!(files(&root), MAX_ENTRIES, "one dead entry went, one session came");
+    assert!(!directory::list(&root, None, false, &one_dead).unwrap().sessions.iter().any(|s| s.handle == "claude-s5@fg"));
+
     // Every head dies: prune empties the directory and a new session fits.
     let all_dead = |_: &Record| Verdict::Dead;
     assert_eq!(directory::list(&root, None, true, &all_dead).unwrap().pruned, MAX_ENTRIES);
     directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap();
+}
+
+#[test]
+fn a_full_directory_of_entries_that_may_be_alive_is_never_pruned_by_a_write() {
+    let root = state_root();
+    let alive = judge(&[]);
+    for n in 0..MAX_ENTRIES {
+        directory::register(&root, entry(&format!("u{n}"), None, &[]), false, &alive).unwrap();
+    }
+    let refused = directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
+    assert_eq!(refused.reason, "directory-full");
+    assert_eq!(files(&root), MAX_ENTRIES, "unknown liveness is never removed");
 }
 
 #[test]
@@ -335,12 +357,17 @@ fn machine_root() -> PathBuf {
     root
 }
 
+fn head_of(pid: u32) -> fgos_identity::HeadRef {
+    let start_time = fgos_process::facts::identity_of(ProcId(pid)).unwrap().start_time;
+    fgos_identity::HeadRef { pid, start_time }
+}
+
 #[test]
 fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves() {
     let root = machine_root();
     let key = fgos_identity::WriterKey { source: "CODEX_THREAD_ID", value: "thread-9" };
     let roles = vec!["lead:MAIL".to_string()];
-    let listed = directory::register_writer(&root, None, &key, std::process::id(), &roles, false).unwrap();
+    let listed = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &roles, false).unwrap();
     assert_eq!(listed.id, "fg-abc234/thread-9");
     assert_eq!(listed.cli, "codex");
     assert!(listed.handle.starts_with("codex-"), "{}", listed.handle);
@@ -349,7 +376,7 @@ fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves()
     assert_eq!(found.id, listed.id);
     assert_eq!(directory::resolve(&root, "lead:MAIL", &judge(&[])).unwrap().id, listed.id);
     // the same key registers again as a refresh, the roles kept
-    let again = directory::register_writer(&root, None, &key, std::process::id(), &[], false).unwrap();
+    let again = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &[], false).unwrap();
     assert_eq!(again.roles, roles);
     let _ = fs::remove_dir_all(root);
 }
@@ -358,14 +385,22 @@ fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves()
 fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing() {
     let root = machine_root();
     let bad = fgos_identity::WriterKey { source: "OMP_SESSION_ID", value: "s-1" };
-    assert_eq!(directory::register_writer(&root, None, &bad, std::process::id(), &[], false).unwrap_err().reason, "invalid-writer-key");
+    assert_eq!(directory::register_writer(&root, None, &bad, &head_of(std::process::id()), &[], false).unwrap_err().reason, "invalid-writer-key");
 
-    let mut child = std::process::Command::new("true").spawn().unwrap();
-    let gone = child.id();
+    let mut child = std::process::Command::new("sleep").arg("5").spawn().unwrap();
+    let gone = head_of(child.id());
+    child.kill().unwrap();
     child.wait().unwrap();
     let key = fgos_identity::WriterKey { source: "CLAUDE_CODE_SESSION_ID", value: "s-2" };
-    assert_eq!(directory::register_writer(&root, None, &key, gone, &[], false).unwrap_err().reason, "head-not-live");
-    assert_eq!(directory::register_writer(&root, None, &key, u32::MAX, &[], false).unwrap_err().reason, "head-not-live");
+    assert_eq!(directory::register_writer(&root, None, &key, &gone, &[], false).unwrap_err().reason, "head-not-live");
+    let nobody = fgos_identity::HeadRef { pid: u32::MAX, start_time: "1".into() };
+    assert_eq!(directory::register_writer(&root, None, &key, &nobody, &[], false).unwrap_err().reason, "head-not-live");
+    // a live process with another start time is a reused pid, not the head
+    let mut reused = head_of(std::process::id());
+    reused.start_time.push('0');
+    let refusal = directory::register_writer(&root, None, &key, &reused, &[], false).unwrap_err();
+    assert_eq!(refusal.reason, "head-not-live");
+    assert!(refusal.detail.contains("pid was reused"), "{}", refusal.detail);
     assert_eq!(files(&root), 0, "a refused registration leaves no entry");
     let _ = fs::remove_dir_all(root);
 }

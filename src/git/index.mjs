@@ -1,4 +1,4 @@
-// Dormant facade. Never bypass the hot gate merely because Rust can spawn directly.
+// Facade. Never bypass the hot gate merely because Rust can spawn directly.
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, nativeHelperExe } from './native.mjs';
 function outsideGate() {
@@ -9,7 +9,7 @@ export function createGitPublication(options, loaderOptions) {
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitPublication(options.stateRoot, options.repoPath, options.trustedMain, options.reference, options.writer, nativeHelperExe(native));
   const facade = { close() { outsideGate(); return port.close(); } };
-  for (const method of ['resolveRepo', 'writeBlob', 'writeTree', 'writeCommit', 'readRef', 'readObject', 'walkCommits', 'compareAndSwap', 'fetchRefs', 'pushRefs', 'ensureFetchMapping', 'configuredFetchRefspecs', 'pushRefspecs', 'remoteUrl', 'machineId', 'gitFloorVerdict', 'fetchMappingProvenance', 'recover', 'supersede']) {
+  for (const method of ['resolveRepo', 'writeBlob', 'writeTree', 'writeCommit', 'readRef', 'readObject', 'walkCommits', 'compareAndSwap', 'pushRefs', 'ensureFetchMapping', 'configuredFetchRefspecs', 'pushRefspecs', 'remoteUrl', 'machineId', 'gitFloorVerdict', 'fetchMappingProvenance', 'recover', 'supersede']) {
     facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };
   }
   return Object.freeze(facade);
@@ -30,6 +30,5 @@ export { createGitLand } from './land.mjs';
 export { createGitSafeRestore } from './restore.mjs';
 
 export { createGitRepositoryConfig } from './config.mjs';
-export { createGitNativeLockRepair } from './native-lock.mjs';
 
 export { createGitRecovery } from "./recovery.mjs";

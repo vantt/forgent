@@ -2,7 +2,6 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  socketPathForSession,
   assertNotOperatorSession,
   isolatedSessionEnv,
   WorkerSessionError,
@@ -23,23 +22,10 @@ import {
 // live session belonging to someone else, with an item parked awaiting a human as
 // the sharpest case.
 
-test('C2: a session name resolves to that session own socket, never the default one', () => {
-  const home = '/home/someone';
-  assert.equal(
-    socketPathForSession('fgos-workers', { home }),
-    '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock',
-  );
-  assert.equal(
-    socketPathForSession('default', { home }),
-    '/home/someone/.config/herdr/herdr.sock',
-    'the default session keeps its own top-level socket path',
-  );
-});
-
 test('C2: a session name that could escape its directory is refused', () => {
   for (const bad of ['../default', 'a/b', '', '.', '..', 'has space', 'UPPER']) {
     assert.throws(
-      () => socketPathForSession(bad, { home: '/home/someone' }),
+      () => assertNotOperatorSession(bad, {}),
       (err) => err instanceof WorkerSessionError && err.code === 'invalid-session-name',
       `expected refusal for session name: ${JSON.stringify(bad)}`,
     );
@@ -72,7 +58,7 @@ test('C3: a distinct session name passes', () => {
   assert.equal(assertNotOperatorSession('fgos-workers', {}), true);
 });
 
-test('C2: the env handed to a worker points at its own session and drops the caller pane identity', () => {
+test('C2: the env handed to a worker names its own session, drops the caller pane identity and the socket it inherited', () => {
   const callerEnv = {
     PATH: '/usr/bin',
     HERDR_SESSION: 'cockpit',
@@ -81,10 +67,10 @@ test('C2: the env handed to a worker points at its own session and drops the cal
     HERDR_TAB_ID: 'wS:t7T',
     HERDR_WORKSPACE_ID: 'wS',
   };
-  const env = isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });
+  const env = isolatedSessionEnv(callerEnv, 'fgos-workers');
 
   assert.equal(env.HERDR_SESSION, 'fgos-workers');
-  assert.equal(env.HERDR_SOCKET_PATH, '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock');
+  assert.equal(env.HERDR_SOCKET_PATH, undefined, 'the cockpit socket must not win over the session; the driver derives the session socket from its name');
   assert.equal(env.PATH, '/usr/bin', 'unrelated variables pass through');
 
   // The caller's own pane identity must not travel with the worker: it names a
@@ -98,13 +84,13 @@ test('C2: the env handed to a worker points at its own session and drops the cal
 test('isolatedSessionEnv does not mutate the caller env it was handed', () => {
   const callerEnv = { HERDR_PANE_ID: 'wS:p231', HERDR_SESSION: 'cockpit' };
   const before = { ...callerEnv };
-  isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });
+  isolatedSessionEnv(callerEnv, 'fgos-workers');
   assert.deepEqual(callerEnv, before, 'the caller keeps its own environment intact');
 });
 
 test('C3 is enforced inside isolatedSessionEnv too, not only when asked separately', () => {
   assert.throws(
-    () => isolatedSessionEnv({ HERDR_SESSION: 'cockpit' }, 'cockpit', { home: '/home/someone' }),
+    () => isolatedSessionEnv({ HERDR_SESSION: 'cockpit' }, 'cockpit'),
     (err) => err instanceof WorkerSessionError && err.code === 'operator-session',
   );
 });

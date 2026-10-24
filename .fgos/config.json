@@ -1545,7 +1545,7 @@
     "allocationGraceMs": 60000,
     "retainFailedPaneMs": null,
     "layout": {
-      "policy": "measured-split",
+      "policy": "even-split",
       "minCols": 80,
       "minRows": 20,
       "maxPanesPerTab": 8

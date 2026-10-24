@@ -8,12 +8,10 @@ export function createGitRemote(options, loaderOptions) {
   outsideGate();
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitRemote(options.stateRoot, options.repoPath, options.trustedMain, options.writer);
-  const facade = {};
-  for (const method of ['fetchRefs', 'pushRefs', 'inspectRemote']) {
-    facade[method] = (args = {}, held = []) => {
+  return Object.freeze({
+    pushRefs(args = {}, held = []) {
       outsideGate();
-      return withNativeLocks(native, held, loans => port.call(method, args, loans));
-    };
-  }
-  return Object.freeze(facade);
+      return withNativeLocks(native, held, loans => port.call('pushRefs', args, loans));
+    },
+  });
 }

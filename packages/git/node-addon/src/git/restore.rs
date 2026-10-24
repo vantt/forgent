@@ -60,7 +60,8 @@ impl GitSafeRestore {
                             held,
                             &request,
                             &self.writer,
-                            text(&args, "operationId")?
+                            text(&args, "operationId")?,
+                            &wal::OsFileSystem
                         )
                         .map_err(operation)?))
                 }
@@ -93,6 +94,7 @@ impl GitSafeRestore {
                         held,
                         &self.writer,
                         text(&args, "operationId")?,
+                        &wal::OsFileSystem,
                     )
                     .map_err(operation)?;
                 Ok(json!({"acknowledged": true}))

@@ -2,7 +2,7 @@
 // worker runs under (Phase 01 group C1 of plans/260906-1831-dispatch-visibility-v0).
 //
 // WHY A PRIVATE HOME AT ALL. Two problems settle with one mechanism. It closes
-// the `$HOME/.config/herdr/herdr.sock` path a worker would otherwise use to reach
+// the default socket under `$HOME` that a worker would otherwise use to reach
 // the operator's own terminal cockpit (measured 2026-09-06: with a private HOME
 // that route is blocked, without one it is open), and it is the writable private
 // scratch that P00.1's Known Limitation already required before an agent CLI can

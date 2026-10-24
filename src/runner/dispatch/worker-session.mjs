@@ -53,25 +53,16 @@ function assertSessionName(name) {
 }
 
 /**
- * Where herdr keeps the API socket for a named session.
- *
- * The default session keeps a top-level socket; every other session gets its own
- * directory underneath. Both shapes were read off a live server rather than
- * guessed.
- */
-export function socketPathForSession(name, { home = process.env.HOME } = {}) {
-  assertSessionName(name);
-  if (name === DEFAULT_SESSION) return `${home}/.config/herdr/herdr.sock`;
-  return `${home}/.config/herdr/sessions/${name}/herdr.sock`;
-}
-
-/**
  * `baseEnv` pointed at a session a worker was launched in, so a later caller (the reaper, a
  * recovery) asks the server that owns the worker's pane instead of whichever one its own
- * environment names. Returns a new object.
+ * environment names. The session's socket is the driver's to derive from its name: a socket
+ * the caller inherited from another session is dropped, so it cannot win over it.
+ * Returns a new object.
  */
-export function envForSession(baseEnv, name, { home = baseEnv?.HOME ?? process.env.HOME } = {}) {
-  return { ...(baseEnv ?? {}), HERDR_SESSION: name, HERDR_SOCKET_PATH: socketPathForSession(name, { home }) };
+export function envForSession(baseEnv, name) {
+  const env = { ...(baseEnv ?? {}), HERDR_SESSION: name };
+  delete env.HERDR_SOCKET_PATH;
+  return env;
 }
 
 /**
@@ -103,21 +94,19 @@ export function assertNotOperatorSession(target, env = process.env) {
 /**
  * The environment a worker's pane should be addressed with.
  *
- * Points `HERDR_SESSION` and `HERDR_SOCKET_PATH` at the worker's own session, and
- * DROPS the caller's pane, tab and workspace identity. Those name panes inside the
- * operator's cockpit, which is precisely what the worker must not be able to
- * address; carrying them through would hand back by accident what the separate
- * session was chosen to take away.
+ * Points `HERDR_SESSION` at the worker's own session (the driver derives that session's
+ * socket from the name), and DROPS the caller's pane, tab and workspace identity and any
+ * socket it inherited. Those name panes inside the operator's cockpit, which is precisely
+ * what the worker must not be able to address; carrying them through would hand back by
+ * accident what the separate session was chosen to take away.
  *
  * Returns a new object; the caller's own environment is never mutated.
  */
-export function isolatedSessionEnv(callerEnv, target, { home = callerEnv?.HOME ?? process.env.HOME } = {}) {
+export function isolatedSessionEnv(callerEnv, target) {
   assertNotOperatorSession(target, callerEnv ?? {});
-  const env = { ...(callerEnv ?? {}) };
+  const env = envForSession(callerEnv, target);
   delete env.HERDR_PANE_ID;
   delete env.HERDR_TAB_ID;
   delete env.HERDR_WORKSPACE_ID;
-  env.HERDR_SESSION = target;
-  env.HERDR_SOCKET_PATH = socketPathForSession(target, { home });
   return env;
 }

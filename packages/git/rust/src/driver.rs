@@ -38,7 +38,6 @@ fn floor_record(key: &serde_json::Value, v: &GitFloorVerdict) -> serde_json::Val
 /// The recorded verdict when its key equals `key` exactly; anything
 /// unreadable, foreign or different is no record.
 fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVerdict> {
-    use std::io::Read;
     #[cfg(unix)]
     let file = {
         use std::os::unix::fs::OpenOptionsExt;
@@ -140,25 +139,26 @@ pub(crate) struct ConfigCache {
 static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> = Mutex::new(BTreeMap::new());
 static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTreeMap::new());
 
-fn refusal(cause: impl Into<String>) -> OperationError {
+fn io(error: std::io::Error) -> OperationError {
+    failure(format!("git-driver-io: {error}"))
+}
+/// A child stopped by its limits is one failure whichever door ran it; `detail.path` says which.
+fn child_failure(cause: &'static str, path: &'static str) -> OperationError {
     OperationError {
-        code: ResultCode::Refused,
-        cause: cause.into(),
-        retryable: false,
-        operation_id: None,
-        receipt: None,
-        exit_code: None,
-        signal: None,
-        stderr: Vec::new(),
-        detail: None,
+        detail: Some(Box::new(serde_json::json!({ "path": path }))),
+        ..failure(cause)
     }
 }
-fn io(error: std::io::Error) -> OperationError {
-    refusal(format!("git-driver-io: {error}"))
+fn borrow_failure(e: fgos_holder_lock::BorrowError) -> OperationError {
+    use fgos_holder_lock::BorrowError::{Deadline, OutputLimit};
+    match e {
+        Deadline { .. } => child_failure("git-timeout", "borrowed").with_diagnostic(e),
+        OutputLimit(_) => child_failure("git-output-limit", "borrowed").with_diagnostic(e),
+        e => failure(e.to_string()),
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // Other operation layers arrive after this inspection checkpoint.
 pub(crate) enum Policy {
     Inspect,
     Publication,
@@ -185,7 +185,7 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         watch: bool,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
         let run = if watch { fgos_holder_lock::run_borrowed_io_watched } else { fgos_holder_lock::run_borrowed_io };
-        run(self, spec, io).map_err(|e| refusal(e.to_string()))
+        run(self, spec, io).map_err(borrow_failure)
     }
 }
 
@@ -233,7 +233,7 @@ impl GitDriver {
                     });
             if !owned_marker {
                 // Safe roots need no permission change, but must still be checked.
-                trusted_directory(&root).map_err(|_| refusal(format!("untrusted-driver-directory: {}; refusing to chmod an unrelated root; point FGOS_STATE_ROOT/FGOS_STATE_HOME at an fgOS directory named fgos or repair its permissions manually", root.display())))?;
+                trusted_directory(&root).map_err(|_| failure(format!("untrusted-driver-directory: {}; refusing to chmod an unrelated root; point FGOS_STATE_ROOT/FGOS_STATE_HOME at an fgOS directory named fgos or repair its permissions manually", root.display())))?;
             }
         }
         let mut changed = secure_driver_directory(&root, 0o700, true)?;
@@ -250,16 +250,8 @@ impl GitDriver {
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");
-        match driver_directory_builder(0o500).create(&hooks) {
-            Ok(()) => {
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::PermissionsExt;
-                    fs::set_permissions(&hooks, fs::Permissions::from_mode(0o500)).map_err(io)?;
-                }
-            }
-            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => (),
-            Err(e) => return Err(io(e)),
+        if fs::symlink_metadata(&hooks).is_err() {
+            secure_driver_directory(&hooks, 0o500, false)?;
         }
         check_hooks(&hooks)?;
         let git = GIT
@@ -276,13 +268,13 @@ impl GitDriver {
                     })
             })
             .clone()
-            .ok_or_else(|| refusal("git-unavailable"))?;
+            .ok_or_else(|| failure("git-unavailable"))?;
         Ok(Self {
             state_root,
             hooks,
             git,
             containment: containment::select(&Default::default())
-                .map_err(|e| refusal(e.to_string()))?,
+                .map_err(|e| failure("git-containment-unavailable").with_diagnostic(e))?,
         })
     }
 
@@ -291,7 +283,7 @@ impl GitDriver {
             Ok(verdict) => Ok(verdict),
             Err(error) => {
                 // Floor probes cannot publish or carry an operation receipt.
-                let mut cached = refusal(format!("git-floor-probe-failed: {}", error.cause));
+                let mut cached = failure(format!("git-floor-probe-failed: {}", error.cause));
                 cached.exit_code = error.exit_code;
                 cached.signal = error.signal;
                 cached.stderr = error.stderr.clone();
@@ -306,7 +298,7 @@ impl GitDriver {
             Some(repo),
             repo.work_tree
                 .as_deref()
-                .ok_or_else(|| refusal("checkout-required"))?,
+                .ok_or_else(|| failure("checkout-required"))?,
             &[
                 "diff",
                 "--cached",
@@ -335,7 +327,7 @@ impl GitDriver {
         if self.git_floor_verdict()?.supported {
             Ok(())
         } else {
-            Err(refusal("git-floor-unsupported"))
+            Err(failure("git-floor-unsupported"))
         }
     }
 
@@ -364,32 +356,45 @@ impl GitDriver {
     fn read_repository_facts(&self, repo: &mut RepoHandle) -> Result<Vec<ConfigRecord>> {
         let config = self.config(repo)?;
         self.check_config(repo, &config)?;
-        // A long-lived handle reuses the formats its unchanged config stamp
-        // already answered; a checkout handle reads them afresh every call.
-        let cached = if repo.checkout_config.is_some() { None } else { self.cached_formats(repo)? };
-        (repo.object_format, repo.layout.refs) = match cached {
+        // Formats are config facts: reused exactly while the stamp that proved
+        // them still matches, read afresh when the stamp moved.
+        let formats = match self.cached_formats(repo)? {
             Some(formats) => formats,
             None => {
                 let formats = self.repository_formats(repo)?;
-                if repo.checkout_config.is_none() {
-                    if let Some(entry) = REPOSITORY_CONFIG.lock()
-                        .map_err(|_| refusal("config-cache-poisoned"))?.get_mut(&repo.git_dir)
-                    {
-                        entry.formats = Some(formats);
-                    }
-                }
+                self.keep_formats(repo, formats)?;
                 formats
             }
         };
+        (repo.object_format, repo.layout.refs) = formats;
         repo.layout.promisor = config.iter().any(|(_, k, v)| {
             (k.ends_with(".promisor") && v != b"false") || k == "extensions.partialclone"
         });
         Ok(config)
     }
 
+    // A checkout handle answers from its own operation-local cache, any other
+    // handle from the process-wide one; both only ever hold a validated stamp.
     fn cached_formats(&self, repo: &RepoHandle) -> Result<Option<(ObjectFormat, RefStorage)>> {
-        Ok(REPOSITORY_CONFIG.lock().map_err(|_| refusal("config-cache-poisoned"))?
+        if let Some(local) = &repo.checkout_config {
+            let local = local.lock().map_err(|_| failure("config-cache-poisoned"))?;
+            return Ok(local.as_ref().and_then(|entry| entry.formats));
+        }
+        Ok(REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
             .get(&repo.git_dir).and_then(|entry| entry.formats))
+    }
+
+    fn keep_formats(&self, repo: &RepoHandle, formats: (ObjectFormat, RefStorage)) -> Result<()> {
+        if let Some(local) = &repo.checkout_config {
+            if let Some(entry) = local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut() {
+                entry.formats = Some(formats);
+            }
+        } else if let Some(entry) = REPOSITORY_CONFIG.lock()
+            .map_err(|_| failure("config-cache-poisoned"))?.get_mut(&repo.git_dir)
+        {
+            entry.formats = Some(formats);
+        }
+        Ok(())
     }
 
     fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
@@ -397,18 +402,18 @@ impl GitDriver {
             &["rev-parse", "--show-object-format", "--show-ref-format"], Policy::Inspect, None, true,
             PATH_LIMIT, Duration::from_secs(30))?;
         if !out.success { return Err(out.error("git-command-failed")); }
-        let mut facts = std::str::from_utf8(&out.stdout).map_err(|_| refusal("repository-facts-invalid"))?.lines();
-        let object_format = match facts.next().ok_or_else(|| refusal("unsupported-object-format"))? {
+        let mut facts = std::str::from_utf8(&out.stdout).map_err(|_| failure("repository-facts-invalid"))?.lines();
+        let object_format = match facts.next().ok_or_else(|| failure("unsupported-object-format"))? {
             "sha1" => ObjectFormat::Sha1,
             "sha256" => ObjectFormat::Sha256,
-            _ => return Err(refusal("unsupported-object-format")),
+            _ => return Err(failure("unsupported-object-format")),
         };
-        let refs = match facts.next().ok_or_else(|| refusal("unsupported-ref-storage"))? {
+        let refs = match facts.next().ok_or_else(|| failure("unsupported-ref-storage"))? {
             "files" => RefStorage::Files,
             "reftable" => RefStorage::Reftable,
-            _ => return Err(refusal("unsupported-ref-storage")),
+            _ => return Err(failure("unsupported-ref-storage")),
         };
-        if facts.next().is_some() { return Err(refusal("unsupported-ref-storage")); }
+        if facts.next().is_some() { return Err(failure("unsupported-ref-storage")); }
         Ok((object_format, refs))
     }
 
@@ -432,21 +437,21 @@ impl GitDriver {
             let hint = fs::read(main.join(".git")).map_err(io)?;
             let hint = line(&hint)?
                 .strip_prefix("gitdir: ")
-                .ok_or_else(|| refusal("untrusted-worktree"))?;
+                .ok_or_else(|| failure("untrusted-worktree"))?;
             let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
             let common_hint = fs::read(admin.join("commondir"))
-                .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
+                .map_err(|_| failure("trusted-main-gitfile-unsupported"))?;
             let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
             let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
             if common.file_name() != Some(std::ffi::OsStr::new(".git"))
                 || admin.parent() != Some(common.join("worktrees").as_path())
                 || Path::new(line(&backlink)?) != main.join(".git")
             {
-                return Err(refusal("untrusted-worktree"));
+                return Err(failure("untrusted-worktree"));
             }
             common
                 .parent()
-                .ok_or_else(|| refusal("untrusted-worktree"))?
+                .ok_or_else(|| failure("untrusted-worktree"))?
                 .to_owned()
         } else {
             main
@@ -458,7 +463,7 @@ impl GitDriver {
                 .file_type()
                 .is_symlink()
             {
-                return Err(refusal("untrusted-worktree"));
+                return Err(failure("untrusted-worktree"));
             }
             fs::canonicalize(dir).map_err(io)?
         } else if main.join("HEAD").is_file() && main.join("objects").is_dir() {
@@ -468,7 +473,7 @@ impl GitDriver {
                 // A worker-controlled gitfile is never topology authority. The
                 // caller must supply the trusted main checkout; separate-git-dir
                 // needs an explicit trusted common-dir contract before support.
-                return Err(refusal("trusted-main-gitfile-unsupported"));
+                return Err(failure("trusted-main-gitfile-unsupported"));
             }
             return Ok(ResolveRepo::NotARepository);
         };
@@ -484,7 +489,7 @@ impl GitDriver {
                     let backlink = line(&backlink)?;
                     let checkout = Path::new(backlink)
                         .parent()
-                        .ok_or_else(|| refusal("untrusted-worktree"))?;
+                        .ok_or_else(|| failure("untrusted-worktree"))?;
                     if path.starts_with(checkout)
                         && (found.is_none()
                             || work_tree.as_ref().is_none_or(|prior| {
@@ -495,7 +500,7 @@ impl GitDriver {
                         if fs::canonicalize(admin.join(line(&registered_common)?)).map_err(io)?
                             != common
                         {
-                            return Err(refusal("untrusted-worktree"));
+                            return Err(failure("untrusted-worktree"));
                         }
                         work_tree = Some(fs::canonicalize(checkout).map_err(io)?);
                         found = Some(fs::canonicalize(admin).map_err(io)?);
@@ -510,7 +515,7 @@ impl GitDriver {
                     .take_while(|p| *p != main)
                     .any(|p| p.join(".git").exists())
             {
-                return Err(refusal("untrusted-worktree"));
+                return Err(failure("untrusted-worktree"));
             }
         }
         let repo = RepoHandle {
@@ -545,18 +550,18 @@ impl GitDriver {
         let root = repo
             .work_tree
             .as_deref()
-            .ok_or_else(|| refusal("checkout-required"))?;
+            .ok_or_else(|| failure("checkout-required"))?;
         let current = match self.resolve_topology(root, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
-            _ => return Err(refusal("untrusted-worktree")),
+            _ => return Err(failure("untrusted-worktree")),
         };
         if current.git_dir != repo.git_dir
             || current.common_dir != repo.common_dir
             || current.work_tree != repo.work_tree
         {
-            return Err(refusal("untrusted-worktree"));
+            return Err(failure("untrusted-worktree"));
         }
-        fgos_holder_lock::validate(h).map_err(|e| refusal(e.to_string()))?;
+        fgos_holder_lock::validate(h).map_err(borrow_failure)?;
         let out = self.invoke_input(
             Some(repo),
             root,
@@ -593,7 +598,7 @@ impl GitDriver {
     ) -> Result<Output> {
         self.require_floor()?;
         fgos_holder_lock::validate(handle)
-            .map_err(|e| refusal(format!("publication-borrow-unavailable: {e}")))?;
+            .map_err(|e| failure(format!("publication-borrow-unavailable: {e}")))?;
         self.publication_preflight(repo, handle)?;
         self.invoke_input(
             Some(repo),
@@ -629,7 +634,7 @@ impl GitDriver {
         );
         let mut sources = CONFIG_SOURCES
             .lock()
-            .map_err(|_| refusal("config-cache-poisoned"))?;
+            .map_err(|_| failure("config-cache-poisoned"))?;
         let globals = if let Some(paths) = sources.get(&environment) {
             paths.clone()
         } else {
@@ -653,12 +658,12 @@ impl GitDriver {
                     return Err(out.error("git-config-paths-unavailable"));
                 }
                 for path in std::str::from_utf8(&out.stdout)
-                    .map_err(|_| refusal("non-utf8-config-path"))?
+                    .map_err(|_| failure("non-utf8-config-path"))?
                     .lines()
                 {
                     let path = PathBuf::from(path);
                     if !path.is_absolute() {
-                        return Err(refusal("relative-config-path"));
+                        return Err(failure("relative-config-path"));
                     }
                     paths.push(path);
                 }
@@ -676,7 +681,7 @@ impl GitDriver {
         handle: &fgos_holder_lock::Handle,
     ) -> Result<()> {
         let mut cache = REPOSITORY_CONFIG.lock()
-            .map_err(|_| refusal("config-cache-poisoned"))?;
+            .map_err(|_| failure("config-cache-poisoned"))?;
         let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Publication, Some(handle))?;
         cache.insert(repo.git_dir.clone(), fresh);
         Ok(())
@@ -711,7 +716,7 @@ impl GitDriver {
             for (origin, _, _) in &records {
                 if let Some(path) = origin.strip_prefix(b"file:") {
                     let path = PathBuf::from(std::str::from_utf8(path)
-                        .map_err(|_| refusal("non-utf8-config-origin"))?);
+                        .map_err(|_| failure("non-utf8-config-origin"))?);
                     let path = if path.is_absolute() { path } else { repo.trusted_main_root.join(path) };
                     if !paths.contains(&path) { paths.push(path); }
                 }
@@ -722,7 +727,7 @@ impl GitDriver {
                 continue;
             }
             if before != ConfigStamp::read(paths)? {
-                return Err(refusal("repository-config-changed-during-read"));
+                return Err(failure("repository-config-changed-during-read"));
             }
             return Ok(ConfigCache { stamp: before, records, formats: None });
         }
@@ -730,8 +735,8 @@ impl GitDriver {
 
     fn config(&self, repo: &RepoHandle) -> Result<Vec<ConfigRecord>> {
         if let Some(config) = &repo.checkout_config {
-            let mut cache = config.lock().map_err(|_| refusal("config-cache-poisoned"))?;
-            let previous = cache.take().ok_or_else(|| refusal("checkout-facts-invalidated"))?;
+            let mut cache = config.lock().map_err(|_| failure("config-cache-poisoned"))?;
+            let previous = cache.take().ok_or_else(|| failure("checkout-facts-invalidated"))?;
             let fresh = self.validated_config(repo, Some(&previous), Policy::Inspect, None)?;
             let records = fresh.records.clone();
             *cache = Some(fresh);
@@ -742,11 +747,26 @@ impl GitDriver {
         // is retained between commands. A refusal keeps the last good stamp
         // so a long-lived read handle can recover after a config repair.
         let mut cache = REPOSITORY_CONFIG.lock()
-            .map_err(|_| refusal("config-cache-poisoned"))?;
+            .map_err(|_| failure("config-cache-poisoned"))?;
         let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Inspect, None)?;
         let records = fresh.records.clone();
         cache.insert(repo.git_dir.clone(), fresh);
         Ok(records)
+    }
+    /// One unadmitted `git config --list`, for the questions that must see everything the
+    /// configuration says, included files and global scope too. `annotate` is `--show-origin`,
+    /// `--show-scope` or both; `parse_config` reads the answer.
+    pub(crate) fn config_listing(
+        &self,
+        context: Option<&RepoHandle>,
+        root: &Path,
+        annotate: &[&str],
+        timeout: Duration,
+    ) -> Result<Output> {
+        let mut args = vec!["config", "--null"];
+        args.extend_from_slice(annotate);
+        args.push("--list");
+        self.invoke(context, root, &args, Policy::Inspect, None, false, PATH_LIMIT, timeout)
     }
     /// Read-only diagnostic shared with Remote admission. Scope, rather than
     /// origin spelling, determines trust even for linked worktrees and symlinks.
@@ -758,16 +778,7 @@ impl GitDriver {
             if context.is_some() && repo.git_dir == repo.common_dir {
                 continue;
             }
-            let out = self.invoke(
-                context,
-                &repo.trusted_main_root,
-                &["config", "--null", "--show-scope", "--list"],
-                Policy::Inspect,
-                None,
-                false,
-                PATH_LIMIT,
-                Duration::from_secs(30),
-            )?;
+            let out = self.config_listing(context, &repo.trusted_main_root, &["--show-scope"], Duration::from_secs(30))?;
             if !out.success {
                 return Err(out.error("git-config-failed"));
             }
@@ -793,44 +804,56 @@ impl GitDriver {
                 && (key != "credential.helper"
                     || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
             {
-                return Err(refusal(format!("repository-config-untrusted: {key}")));
+                return Err(failure(format!("repository-config-untrusted: {key}")));
             }
         }
         Ok(())
     }
     /// An owned handle local to one port call. It never escapes into the
-    /// long-lived port handle; the next call reads all facts afresh.
+    /// long-lived port handle; every call re-proves its facts against the
+    /// config stamp and reads afresh only what the stamp no longer covers.
     pub(crate) fn checkout_repository(&self, repo: &RepoHandle) -> Result<RepoHandle> {
         self.require_floor()?;
         let mut current = match self.resolve_topology(
-            repo.work_tree.as_deref().ok_or_else(|| refusal("checkout-required"))?,
+            repo.work_tree.as_deref().ok_or_else(|| failure("checkout-required"))?,
             &repo.trusted_main_root,
         )? {
             ResolveRepo::Repository(r) => r,
-            _ => return Err(refusal("untrusted-worktree")),
+            _ => return Err(failure("untrusted-worktree")),
         };
         if !current.same_checkout(repo) {
-            return Err(refusal("untrusted-worktree"));
+            return Err(failure("untrusted-worktree"));
         }
-        let config = self.validated_config(&current, None, Policy::Inspect, None)?;
+        // Seeded from the process-wide entry for this git dir; the stamp check
+        // inside decides whether it still stands or the config is read afresh.
+        let seed = REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
+            .get(&current.git_dir).cloned();
+        let config = self.validated_config(&current, seed.as_ref(), Policy::Inspect, None)?;
         current.checkout_config = Some(Mutex::new(Some(config)));
         self.read_repository_facts(&mut current)?;
         if current.object_format != repo.object_format || current.layout.refs != repo.layout.refs {
-            return Err(refusal("repository-format-changed"));
+            return Err(failure("repository-format-changed"));
         }
         if current.layout.promisor != repo.layout.promisor {
-            return Err(refusal("repository-promisor-changed"));
+            return Err(failure("repository-promisor-changed"));
+        }
+        // What this operation proved stands for the next handle of the same git dir.
+        let proven = current.checkout_config.as_ref()
+            .and_then(|local| local.lock().ok().and_then(|entry| entry.clone()));
+        if let Some(proven) = proven {
+            REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
+                .insert(current.git_dir.clone(), proven);
         }
         Ok(current)
     }
 
     pub(crate) fn refresh_checkout_facts(&self, repo: &RepoHandle) -> Result<()> {
         if let Some(config) = &repo.checkout_config {
-            *config.lock().map_err(|_| refusal("config-cache-poisoned"))? = None;
+            *config.lock().map_err(|_| failure("config-cache-poisoned"))? = None;
             let fresh = self.checkout_repository(repo)?;
-            let replacement = fresh.checkout_config.ok_or_else(|| refusal("checkout-facts-invalidated"))?
-                .into_inner().map_err(|_| refusal("config-cache-poisoned"))?;
-            *config.lock().map_err(|_| refusal("config-cache-poisoned"))? = replacement;
+            let replacement = fresh.checkout_config.ok_or_else(|| failure("checkout-facts-invalidated"))?
+                .into_inner().map_err(|_| failure("config-cache-poisoned"))?;
+            *config.lock().map_err(|_| failure("config-cache-poisoned"))? = replacement;
         } else {
             self.checkout_repository(repo)?;
         }
@@ -857,16 +880,7 @@ impl GitDriver {
         if out.success {
             return Ok(out.stdout);
         }
-        let cause = if repo.layout.promisor {
-            "promisor-object-unavailable"
-        } else if repo.layout.alternates {
-            "alternate-object-unavailable"
-        } else if repo.layout.shallow {
-            "shallow-history-incomplete"
-        } else {
-            "git-command-failed"
-        };
-        Err(out.error(cause))
+        Err(out.error(layout_cause(&repo.layout, "git-command-failed")))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -914,9 +928,9 @@ impl GitDriver {
             .map(|(_, _, v)| v);
         Ok(match configured {
             Some(bytes) => {
-                let value = std::str::from_utf8(&bytes).map_err(|_| refusal("non-utf8-hook-path"))?;
+                let value = std::str::from_utf8(&bytes).map_err(|_| failure("non-utf8-hook-path"))?;
                 if value.starts_with('~') {
-                    return Err(refusal("unresolved-hook-path"));
+                    return Err(failure("unresolved-hook-path"));
                 }
                 repo.trusted_main_root.join(value)
             }
@@ -1020,7 +1034,7 @@ impl GitDriver {
             .map(str::to_owned),
         );
         if policy == Policy::HookContext {
-            let repo = repo.ok_or_else(|| refusal("hook-repository-required"))?;
+            let repo = repo.ok_or_else(|| failure("hook-repository-required"))?;
             let hooks = self.repository_hooks(repo)?;
             argv.extend([
                 "-c".into(),
@@ -1104,7 +1118,7 @@ impl GitDriver {
                 // Repository transport policy is untrusted, including URL-scoped
                 // values which outrank generic -c values. Refuse the whole family.
                 if let Some(key) = self.untrusted_transport_config(repo)?.first() {
-                    return Err(refusal(format!(
+                    return Err(failure(format!(
                         "repository-transport-config-untrusted: {key}"
                     )));
                 }
@@ -1137,7 +1151,7 @@ impl GitDriver {
         if policy == Policy::Publication
             || ((policy == Policy::Remote || policy == Policy::HookContext) && loan.is_some())
         {
-            let loan = loan.ok_or_else(|| refusal("publication-borrow-required"))?;
+            let loan = loan.ok_or_else(|| failure("publication-borrow-required"))?;
             // A borrowed run is spawned by holder-lock with the descriptor
             // mapped, outside any containment domain, whichever driver this
             // machine selects: its drain cannot prove gone an escapee that
@@ -1162,14 +1176,14 @@ impl GitDriver {
                     stderr_limit: BORROWED_STDERR_LIMIT,
                     deadline: Instant::now()
                         .checked_add(timeout)
-                        .ok_or_else(|| refusal("invalid-git-deadline"))?,
+                        .ok_or_else(|| failure("invalid-git-deadline"))?,
                 },
                 watch,
             )?;
             // The effect stays recorded for recovery; a failed run already
             // reports failure, never plain success.
             if result.outcome.exit == Some(0) && !result.escaped.is_empty() {
-                return Err(crate::refs::recovery("containment-unproven"));
+                return Err(recovery("containment-unproven"));
             }
             return Ok(Output {
                 stdout: result.stdout,
@@ -1180,7 +1194,7 @@ impl GitDriver {
         }
         // Read-only batch plumbing needs stdin without holder authority.
         if !input.is_empty() && policy != Policy::Inspect {
-            return Err(refusal("git-input-requires-borrow"));
+            return Err(failure("git-input-requires-borrow"));
         }
         let watch_token = (self.containment.guarantee().level
             == containment::GuaranteeLevel::BestEffort
@@ -1203,7 +1217,7 @@ impl GitDriver {
             fd_map: Vec::new(),
             env: env.0,
             cwd: cwd.into(),
-            stdin: Some(reader_file(stdin_r)),
+            stdin: Some(pipe_file(stdin_r)),
             stdout: Some(pipe_file(stdout_w)),
             stderr: Some(pipe_file(stderr_w)),
             mode: StartMode::Direct,
@@ -1216,11 +1230,11 @@ impl GitDriver {
         let mut domain = self
             .containment
             .create(&id)
-            .map_err(|e| refusal(e.to_string()))?;
+            .map_err(|e| failure("git-containment-failed").with_diagnostic(e))?;
         let mut spawned = self
             .containment
             .spawn_in(&mut domain, spec)
-            .map_err(|e| refusal(e.to_string()))?;
+            .map_err(|e| failure("git-spawn-failed").with_diagnostic(e))?;
         let input = input.to_vec();
         std::thread::spawn(move || {
             use std::io::Write;
@@ -1247,7 +1261,7 @@ impl GitDriver {
                     std::thread::spawn(move || {
                         let _ = spawned.child.wait();
                     });
-                    return Err(refusal("containment-unproven"));
+                    return Err(failure("containment-unproven"));
                 }
                 break spawned.child.wait().map_err(io)?;
             }
@@ -1274,27 +1288,27 @@ impl GitDriver {
                 || self.containment.is_empty(&mut domain) != DomainState::Empty)
         {
             // Readers are detached, never block indefinitely on an escapee.
-            return Err(refusal("containment-unproven"));
+            return Err(failure("containment-unproven"));
         }
         let stdout = out
             .recv_timeout(Duration::from_secs(1))
-            .map_err(|_| refusal("containment-unproven"))?
+            .map_err(|_| failure("containment-unproven"))?
             .map_err(io)?;
         let stderr = redact(
             &err.recv_timeout(Duration::from_secs(1))
-                .map_err(|_| refusal("containment-unproven"))?
+                .map_err(|_| failure("containment-unproven"))?
                 .map_err(io)?,
         );
         if let Some(cause) = stopped {
-            return Err(refusal(cause));
+            return Err(child_failure(cause, "contained"));
         }
         if overflow.load(Ordering::Relaxed) {
-            return Err(refusal("git-output-limit"));
+            return Err(child_failure("git-output-limit", "contained"));
         }
         if status.success() {
             if let Some(token) = &watch_token {
                 if !containment::environment_marked(containment::WATCH_ENV, token).is_empty() {
-                    return Err(refusal("containment-unproven"));
+                    return Err(failure("containment-unproven"));
                 }
             }
         }
@@ -1337,16 +1351,7 @@ impl GitDriver {
         // Conservatively do not persist a verdict for any include directive,
         // including missing or currently inactive includeIf targets.
         let config = self
-            .invoke(
-                None,
-                &self.state_root,
-                &["config", "--null", "--show-origin", "--list"],
-                Policy::Inspect,
-                None,
-                false,
-                PATH_LIMIT,
-                Duration::from_secs(10),
-            )
+            .config_listing(None, &self.state_root, &["--show-origin"], Duration::from_secs(10))
             .ok()?;
         if !config.success {
             return None;
@@ -1388,7 +1393,7 @@ impl GitDriver {
         )?;
         let version = line(&out.stdout)?
             .strip_prefix("git version ")
-            .ok_or_else(|| refusal("git-version-invalid"))?
+            .ok_or_else(|| failure("git-version-invalid"))?
             .to_owned();
         let numeric: Vec<u32> = version
             .split('.')
@@ -1441,7 +1446,7 @@ impl GitDriver {
             )
         };
         if !run(&["init", "--bare", "--quiet", "."])?.success {
-            return Err(refusal("git-floor-probe-init"));
+            return Err(failure("git-floor-probe-init"));
         }
         let marker = dir.join("hook-ran");
         fs::write(
@@ -1502,7 +1507,7 @@ impl GitDriver {
         let fetch_marker = dir.join("fetch-ran");
         let transport = dir.join("transport");
         if fetch_marker.to_string_lossy().contains('\'') {
-            return Err(refusal("unsupported-probe-path"));
+            return Err(failure("unsupported-probe-path"));
         }
         fs::write(
             &transport,
@@ -1525,11 +1530,11 @@ impl GitDriver {
                 "core.sshCommand",
                 transport
                     .to_str()
-                    .ok_or_else(|| refusal("non-utf8-state-root"))?,
+                    .ok_or_else(|| failure("non-utf8-state-root"))?,
             ],
         ] {
             if !run(&args)?.success {
-                return Err(refusal("git-floor-probe-config"));
+                return Err(failure("git-floor-probe-config"));
             }
         }
         let missing = "1234567890123456789012345678901234567890";
@@ -1556,6 +1561,63 @@ impl GitDriver {
     }
 }
 
+/// Why a missing object is the layout's doing rather than a damaged repository: a promisor
+/// remote or an alternate may hold it. A shallow boundary alone cuts history, never objects.
+pub(crate) fn object_gap_cause(layout: &RepoLayout) -> Option<&'static str> {
+    if layout.promisor {
+        Some("promisor-object-unavailable")
+    } else if layout.alternates {
+        Some("alternate-object-unavailable")
+    } else {
+        None
+    }
+}
+/// The one name for a failed read: the layout feature that explains it, else `fallback`.
+pub(crate) fn layout_cause(layout: &RepoLayout, fallback: &'static str) -> &'static str {
+    object_gap_cause(layout)
+        .or(layout.shallow.then_some("shallow-history-incomplete"))
+        .unwrap_or(fallback)
+}
+
+/// What one literal ref holds: direct, symbolic or absent. A dangling symbolic ref is listed by no
+/// `for-each-ref` pattern, so a name that is not listed gets the symbolic probe before it may read
+/// as absent. `run` is the door the caller's Git children must use.
+pub(crate) fn read_ref_value(
+    repo: &RepoHandle,
+    name: &RefName,
+    run: &dyn Fn(&[&str]) -> Result<Output>,
+) -> Result<RefValue> {
+    let listing = run(&["for-each-ref", "--format=%(refname)%00%(objectname)%00%(symref)", "--", name.as_str()])?;
+    if !listing.success {
+        return Err(listing.error(layout_cause(&repo.layout, "git-command-failed")));
+    }
+    for l in listing.stdout.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
+        let fields: Vec<_> = l.split(|b| *b == 0).collect();
+        if fields.len() != 3 {
+            return Err(failure("invalid-ref-observation"));
+        }
+        if fields[0] != name.as_str().as_bytes() {
+            continue;
+        }
+        return if fields[2].is_empty() {
+            Oid::parse(line(fields[1])?, repo.object_format())
+                .map(RefValue::Direct)
+                .map_err(|_| failure("git-protocol-invalid-oid"))
+        } else {
+            symbolic_target(fields[2]).map(RefValue::Symbolic)
+        };
+    }
+    let probe = run(&["symbolic-ref", "--quiet", "--", name.as_str()])?;
+    match (probe.success, probe.code) {
+        (true, _) => symbolic_target(&probe.stdout).map(RefValue::Symbolic),
+        (false, Some(1)) => Ok(RefValue::Absent),
+        _ => Err(probe.error("read-ref-failed")),
+    }
+}
+fn symbolic_target(bytes: &[u8]) -> Result<RefName> {
+    RefName::parse(line(bytes)?).map_err(|_| failure("invalid-symbolic-target"))
+}
+
 pub(crate) struct Output {
     pub(crate) stdout: Vec<u8>,
     pub(crate) stderr: Vec<u8>,
@@ -1564,7 +1626,7 @@ pub(crate) struct Output {
 }
 impl Output {
     pub(crate) fn error(self, cause: &str) -> OperationError {
-        let mut e = refusal(cause);
+        let mut e = failure(cause);
         e.exit_code = self.code;
         e.stderr = self.stderr;
         e
@@ -1573,11 +1635,11 @@ impl Output {
 fn text_path(path: &Path) -> Result<String> {
     path.to_str()
         .map(str::to_owned)
-        .ok_or_else(|| refusal("non-utf8-authority-path"))
+        .ok_or_else(|| failure("non-utf8-authority-path"))
 }
 fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
-    std::str::from_utf8(bytes).map_err(|_| refusal("git-protocol-invalid-utf8"))
+    std::str::from_utf8(bytes).map_err(|_| failure("git-protocol-invalid-utf8"))
 }
 fn driver_directory_builder(mode: u32) -> fs::DirBuilder {
     let builder = fs::DirBuilder::new();
@@ -1610,50 +1672,13 @@ fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bo
             .read(true)
             .custom_flags(libc::O_NOFOLLOW | libc::O_DIRECTORY)
             .open(path)
-            .map_err(|e| refusal(format!("untrusted-driver-directory: {}: {e}; inspect the directory, restore owner read/search access if needed, remove foreign hooks files, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?;
+            .map_err(|e| failure(format!("untrusted-driver-directory: {}: {e}; inspect the directory, restore owner read/search access if needed, remove foreign hooks files, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?;
         let meta = file.metadata().map_err(io)?;
         if meta.uid() != current_uid() {
-            return Err(refusal("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
+            return Err(failure("untrusted-driver-directory: not owned by current user; no permission repair allowed"));
         }
         if mode == 0o500 {
-            use std::os::fd::IntoRawFd;
-            // fdopendir owns a duplicate, leaving the checked chmod fd alive.
-            let fd = file.try_clone().map_err(io)?.into_raw_fd();
-            // SAFETY: fd is an open directory descriptor, transferred on success.
-            let directory = unsafe { libc::fdopendir(fd) };
-            if directory.is_null() {
-                // SAFETY: failed fdopendir did not take ownership.
-                unsafe { libc::close(fd) };
-                return Err(io(std::io::Error::last_os_error()));
-            }
-            let mut populated = false;
-            let mut read_error = None;
-            loop {
-                // readdir_r reports read errors explicitly and reads this descriptor.
-                let mut entry = std::mem::MaybeUninit::<libc::dirent>::uninit();
-                let mut result = std::ptr::null_mut();
-                #[allow(deprecated)]
-                // SAFETY: directory is live, entry/result are valid output storage.
-                let code = unsafe { libc::readdir_r(directory, entry.as_mut_ptr(), &mut result) };
-                if code != 0 {
-                    read_error = Some(std::io::Error::from_raw_os_error(code));
-                    break;
-                }
-                if result.is_null() {
-                    break;
-                }
-                // SAFETY: successful readdir_r returned an initialized dirent.
-                let name = unsafe { std::ffi::CStr::from_ptr((*result).d_name.as_ptr()) };
-                if name.to_bytes() != b"." && name.to_bytes() != b".." {
-                    populated = true;
-                    break;
-                }
-            }
-            // SAFETY: close the directory and its duplicate fd exactly once.
-            unsafe { libc::closedir(directory) };
-            if populated || read_error.is_some() {
-                return Err(refusal(format!("trusted-hooks-not-empty-or-unreadable: {}{}; inspect it, remove foreign files or restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display(), read_error.map(|e| format!(": {e}")).unwrap_or_default())));
-            }
+            hooks_empty(path)?;
         }
         let wanted = if mode == 0o500 {
             mode
@@ -1673,14 +1698,14 @@ fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bo
 fn trusted_directory(path: &Path) -> Result<()> {
     let meta = fs::symlink_metadata(path).map_err(io)?;
     if !meta.is_dir() || meta.file_type().is_symlink() {
-        return Err(refusal(format!("untrusted-driver-directory: {} must be a real directory; run fgos doctor --fix (git-driver-directories)", path.display())));
+        return Err(failure(format!("untrusted-driver-directory: {} must be a real directory; run fgos doctor --fix (git-driver-directories)", path.display())));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
         // The state root must belong to this process's user, not a repository.
         if meta.mode() & 0o022 != 0 || meta.uid() != current_uid() {
-            return Err(refusal(format!("untrusted-driver-directory: {} mode {:04o}, uid {} (current {}); group/world writable or wrong owner; run fgos doctor --fix (git-driver-directories); only current-user-owned fgOS directories can be repaired", path.display(), meta.mode() & 0o777, meta.uid(), current_uid())));
+            return Err(failure(format!("untrusted-driver-directory: {} mode {:04o}, uid {} (current {}); group/world writable or wrong owner; run fgos doctor --fix (git-driver-directories); only current-user-owned fgOS directories can be repaired", path.display(), meta.mode() & 0o777, meta.uid(), current_uid())));
         }
     }
     Ok(())
@@ -1690,39 +1715,30 @@ fn current_uid() -> u32 {
     // SAFETY: getuid has no preconditions.
     unsafe { libc::getuid() }
 }
+fn hooks_empty(path: &Path) -> Result<()> {
+    if fs::read_dir(path).map_err(|e| failure(format!("trusted-hooks-unreadable: {}: {e}; inspect it and restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?.next().is_some() {
+        return Err(failure(format!("trusted-hooks-not-empty: {}; inspect it, remove foreign files, then rerun fgos doctor --fix (git-driver-directories)", path.display())));
+    }
+    Ok(())
+}
 fn check_hooks(path: &Path) -> Result<()> {
     trusted_directory(path)?;
-    if fs::read_dir(path).map_err(|e| refusal(format!("trusted-hooks-unreadable: {}: {e}; inspect it and restore owner read/search access, then rerun fgos doctor --fix (git-driver-directories)", path.display())))?.next().is_some() {
-        return Err(refusal(format!("trusted-hooks-not-empty: {}; inspect it, remove foreign files, then rerun fgos doctor --fix (git-driver-directories)", path.display())));
-    }
+    hooks_empty(path)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         if fs::metadata(path).map_err(io)?.permissions().mode() & 0o777 != 0o500 {
-            return Err(refusal(format!("trusted-hooks-permissions: {} must have mode 0500; run fgos doctor --fix (git-driver-directories)", path.display())));
+            return Err(failure(format!("trusted-hooks-permissions: {} must have mode 0500; run fgos doctor --fix (git-driver-directories)", path.display())));
         }
     }
     Ok(())
 }
 #[cfg(unix)]
-fn pipe_file(pipe: std::io::PipeWriter) -> File {
-    use std::os::fd::OwnedFd;
-    File::from(OwnedFd::from(pipe))
-}
+type OwnedPipe = std::os::fd::OwnedFd;
 #[cfg(windows)]
-fn pipe_file(pipe: std::io::PipeWriter) -> File {
-    use std::os::windows::io::OwnedHandle;
-    File::from(OwnedHandle::from(pipe))
-}
-#[cfg(unix)]
-fn reader_file(pipe: std::io::PipeReader) -> File {
-    use std::os::fd::OwnedFd;
-    File::from(OwnedFd::from(pipe))
-}
-#[cfg(windows)]
-fn reader_file(pipe: std::io::PipeReader) -> File {
-    use std::os::windows::io::OwnedHandle;
-    File::from(OwnedHandle::from(pipe))
+type OwnedPipe = std::os::windows::io::OwnedHandle;
+fn pipe_file(pipe: impl Into<OwnedPipe>) -> File {
+    File::from(pipe.into())
 }
 fn capture(
     mut input: impl Read + Send + 'static,
@@ -1756,12 +1772,20 @@ fn redact(bytes: &[u8]) -> Vec<u8> {
     String::from_utf8_lossy(bytes)
         .split_inclusive(char::is_whitespace)
         .map(|part| {
-            if let Some(scheme) = part.find("://") {
-                let start = scheme + 3;
+            if let Some(scheme_end) = part.find("://") {
+                let scheme = part[..scheme_end]
+                    .rsplit(|c: char| !(c.is_ascii_alphanumeric() || "+-.".contains(c)))
+                    .next()
+                    .unwrap_or("");
+                let start = scheme_end + 3;
                 let end = part[start..].find('/').map_or(part.len(), |i| start + i);
                 let mut result = part.to_owned();
+                // An ssh account name is not a secret; keeping it makes the display form
+                // the raw form, so a pinned URL binds the account.
                 if let Some(at) = part[start..end].rfind('@') {
-                    result.replace_range(start..start + at, "[redacted]");
+                    if crate::remote::userinfo_is_credential(scheme, &part[start..start + at]) {
+                        result.replace_range(start..start + at, "[redacted]");
+                    }
                 }
                 if let Some(q) = result.find('?') {
                     result.truncate(q);
@@ -1819,7 +1843,7 @@ fn repository_transport_config(key: &str) -> bool {
 pub(crate) fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
     let fields = nul_records(bytes)?;
     if fields.len() % 2 != 0 {
-        return Err(refusal("git-config-protocol"));
+        return Err(failure("git-config-protocol"));
     }
     fields
         .as_chunks::<2>()
@@ -1831,7 +1855,7 @@ pub(crate) fn parse_config(bytes: &[u8]) -> Result<Vec<ConfigRecord>> {
                 .position(|b| *b == b'\n')
                 .unwrap_or(pair[1].len());
             let key = std::str::from_utf8(&pair[1][..split])
-                .map_err(|_| refusal("git-config-protocol"))?
+                .map_err(|_| failure("git-config-protocol"))?
                 .to_ascii_lowercase();
             let value = pair[1].get(split + 1..).unwrap_or_default().to_vec();
             Ok((pair[0].to_vec(), key, value))
@@ -1844,7 +1868,7 @@ fn nul_records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
         return Ok(Vec::new());
     }
     if bytes.last() != Some(&0) {
-        return Err(refusal("git-nul-protocol-truncated"));
+        return Err(failure("git-nul-protocol-truncated"));
     }
     Ok(bytes[..bytes.len() - 1].split(|b| *b == 0).collect())
 }
@@ -1919,15 +1943,14 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
             if self.repo.layout().shallow {
                 return Ok(false);
             }
-            return Ok(self
-                .driver
-                .checked(self.repo, &["cat-file", "-e", "--", oid], Policy::Inspect)
-                .is_ok()
+            // Intact means the candidate is a commit and everything it reaches is present.
+            let kind = self.driver.checked(self.repo, &["cat-file", "-t", "--", oid], Policy::Inspect);
+            return Ok(kind.is_ok_and(|kind| kind == b"commit\n")
                 && self
                     .driver
                     .checked(
                         self.repo,
-                        &["rev-list", "--objects", oid, "--"],
+                        &["rev-list", "--objects", "--missing=error", "--end-of-options", oid],
                         Policy::Inspect,
                     )
                     .is_ok());
@@ -1950,23 +1973,22 @@ impl Inspect for GitDriver {
             || bounds.max_bytes == 0
             || bounds.max_bytes > 64 * 1024 * 1024
         {
-            return Err(refusal("invalid-walk-bounds"));
+            return Err(failure("invalid-walk-bounds"));
         }
         for o in tips.iter().chain(stop) {
             Oid::parse(o.as_str(), repo.object_format())
-                .map_err(|_| refusal("object-format-mismatch"))?;
+                .map_err(|_| failure("object-format-mismatch"))?;
         }
         let binding = wal::canonical_digest(&(
             tips.iter().map(Oid::as_str).collect::<Vec<_>>(),
             stop.iter().map(Oid::as_str).collect::<Vec<_>>(),
             &repo.common_dir(),
-        ))
-        .map_err(|e| refusal(e.to_string()))?;
+        ))?;
         let mut c: CommitCursor = match cursor {
             Some(c) if c.0.len() <= 64 * 1024 * 1024 => {
-                serde_json::from_slice(&c.0).map_err(|_| refusal("invalid-walk-cursor"))?
+                serde_json::from_slice(&c.0).map_err(|_| failure("invalid-walk-cursor"))?
             }
-            Some(_) => return Err(refusal("walk-cursor-overflow")),
+            Some(_) => return Err(failure("walk-cursor-overflow")),
             None => CommitCursor {
                 binding: binding.clone(),
                 pending: tips.iter().map(|o| o.as_str().into()).collect(),
@@ -1974,12 +1996,12 @@ impl Inspect for GitDriver {
             },
         };
         if c.binding != binding {
-            return Err(refusal("walk-cursor-request-mismatch"));
+            return Err(failure("walk-cursor-request-mismatch"));
         }
         let stop: BTreeSet<_> = stop.iter().map(Oid::as_str).collect();
         let shallow: BTreeSet<String> = if repo.layout.shallow {
             fs::read_to_string(repo.common_dir().join("shallow"))
-                .map_err(|e| refusal(e.to_string()))?
+                .map_err(|e| failure(e.to_string()))?
                 .lines()
                 .map(str::to_owned)
                 .collect()
@@ -1994,7 +2016,7 @@ impl Inspect for GitDriver {
                 continue;
             }
             let oid =
-                Oid::parse(&o, repo.object_format()).map_err(|_| refusal("invalid-cursor-oid"))?;
+                Oid::parse(&o, repo.object_format()).map_err(|_| failure("invalid-cursor-oid"))?;
             if !cached.contains_key(&o) {
                 let mut seeds = vec![o.clone()];
                 let count = bounds.max_commits - commits.len();
@@ -2003,14 +2025,14 @@ impl Inspect for GitDriver {
             }
             let Some(bytes) = cached.remove(&o) else {
                 if commits.is_empty() {
-                    return Err(refusal("walk-commit-exceeds-byte-bound"));
+                    return Err(failure("walk-commit-exceeds-byte-bound"));
                 }
                 c.pending.push_front(o);
                 break;
             };
             if total + bytes.len() > bounds.max_bytes {
                 if commits.is_empty() {
-                    return Err(refusal("walk-commit-exceeds-byte-bound"));
+                    return Err(failure("walk-commit-exceeds-byte-bound"));
                 }
                 c.pending.push_front(o);
                 break;
@@ -2018,35 +2040,35 @@ impl Inspect for GitDriver {
             let header = bytes
                 .windows(2)
                 .position(|w| w == b"\n\n")
-                .ok_or_else(|| refusal("invalid-commit"))?;
+                .ok_or_else(|| failure("invalid-commit"))?;
             let mut tree = None;
             let mut parents = vec![];
             for l in bytes[..header].split(|b| *b == b'\n') {
                 if let Some(v) = l.strip_prefix(b"tree ") {
                     if tree.is_some() {
-                        return Err(refusal("invalid-commit-tree"));
+                        return Err(failure("invalid-commit-tree"));
                     }
                     tree = Some(
                         Oid::parse(
-                            std::str::from_utf8(v).map_err(|_| refusal("invalid-oid"))?,
+                            std::str::from_utf8(v).map_err(|_| failure("invalid-oid"))?,
                             repo.object_format(),
                         )
-                        .map_err(|_| refusal("invalid-oid"))?,
+                        .map_err(|_| failure("invalid-oid"))?,
                     );
                 }
                 if let Some(v) = l.strip_prefix(b"parent ") {
                     parents.push(
                         Oid::parse(
-                            std::str::from_utf8(v).map_err(|_| refusal("invalid-oid"))?,
+                            std::str::from_utf8(v).map_err(|_| failure("invalid-oid"))?,
                             repo.object_format(),
                         )
-                        .map_err(|_| refusal("invalid-oid"))?,
+                        .map_err(|_| failure("invalid-oid"))?,
                     );
                 }
             }
             if !stop.contains(o.as_str()) {
                 if shallow.contains(&o) {
-                    return Err(refusal("shallow-history-incomplete"));
+                    return Err(failure("shallow-history-incomplete"));
                 }
                 for p in &parents {
                     if !c.visited.contains(p.as_str()) {
@@ -2059,7 +2081,7 @@ impl Inspect for GitDriver {
             commits.push(WalkCommit {
                 oid,
                 parents,
-                tree: tree.ok_or_else(|| refusal("invalid-commit-tree"))?,
+                tree: tree.ok_or_else(|| failure("invalid-commit-tree"))?,
             });
             if commits.len() == bounds.max_commits {
                 break;
@@ -2071,9 +2093,9 @@ impl Inspect for GitDriver {
         let next_cursor = if complete {
             None
         } else {
-            let bytes = serde_json::to_vec(&c).map_err(|_| refusal("invalid-walk-cursor"))?;
+            let bytes = serde_json::to_vec(&c).map_err(|_| failure("invalid-walk-cursor"))?;
             if bytes.len() > 64 * 1024 * 1024 {
-                return Err(refusal("walk-cursor-overflow"));
+                return Err(failure("walk-cursor-overflow"));
             }
             Some(WalkCursor(bytes))
         };
@@ -2086,75 +2108,45 @@ impl Inspect for GitDriver {
     fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
         self.require_floor()?;
         self.preflight(repo)?;
-        let symbolic = || -> Result<Option<RefName>> {
-            let out = self.invoke(
-                Some(repo),
-                &repo.trusted_main_root,
-                &["symbolic-ref", "--quiet", "HEAD"],
-                Policy::Inspect,
-                None,
-                true,
-                4096,
-                Duration::from_secs(30),
-            )?;
-            if out.success {
-                let name = std::str::from_utf8(&out.stdout)
-                    .map_err(|_| refusal("invalid-head-target"))?
-                    .trim_end_matches('\n');
-                Ok(Some(
-                    RefName::parse(name).map_err(|_| refusal("invalid-head-target"))?,
-                ))
-            } else if out.code == Some(1) {
-                Ok(None)
-            } else {
-                Err(out.error("head-observation-failed"))
-            }
+        let head = |args: &[&str]| {
+            self.invoke(Some(repo), &repo.trusted_main_root, args, Policy::Inspect, None, true, 4096, Duration::from_secs(30))
         };
-        let target = symbolic()?;
-        let out = self.invoke(
-            Some(repo),
-            &repo.trusted_main_root,
-            &["rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
-            Policy::Inspect,
-            None,
-            true,
-            4096,
-            Duration::from_secs(30),
-        )?;
-        if target != symbolic()? {
-            return Err(refusal("head-changed-during-read"));
-        }
+        let target_of = |name: &str| RefName::parse(name).map_err(|_| failure("invalid-head-target"));
+        // HEAD is read by two children, bracketed: the symbolic target first, then the commit with
+        // the target it was read under. One `rev-parse` reads HEAD several times, so a switch in
+        // the middle could pair one branch's commit with another's name; the two names must agree.
+        let first = head(&["symbolic-ref", "--quiet", "HEAD"])?;
+        let target = if first.success {
+            Some(target_of(line(&first.stdout).map_err(|_| failure("invalid-head-target"))?)?)
+        } else if first.code == Some(1) {
+            None
+        } else {
+            return Err(first.error("head-observation-failed"));
+        };
+        let out = head(&["rev-parse", "HEAD^{commit}", "--symbolic-full-name", "HEAD"])?;
         if out.success {
-            let value = std::str::from_utf8(&out.stdout)
-                .map_err(|_| refusal("invalid-head-oid"))?
-                .trim_end_matches('\n');
-            let commit =
-                Oid::parse(value, repo.object_format()).map_err(|_| refusal("invalid-head-oid"))?;
-            return Ok(match target {
-                Some(target) => HeadFact::Attached { target, commit },
-                None => HeadFact::Detached { commit },
-            });
+            let text = line(&out.stdout).map_err(|_| failure("invalid-head-oid"))?;
+            let (value, name) = text.split_once('\n').ok_or_else(|| failure("invalid-head-oid"))?;
+            let commit = Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
+            return match (target, name) {
+                (None, "HEAD") => Ok(HeadFact::Detached { commit }),
+                (Some(target), name) if target.as_str() == name => Ok(HeadFact::Attached { target, commit }),
+                _ => Err(failure("head-changed-during-read")),
+            };
         }
+        // Not born: a symbolic HEAD whose target is not listed is unborn.
         if let Some(target) = target {
-            let page =
-                self.list_refs(
-                    repo,
-                    &[RefPrefix::parse(target.as_str())
-                        .map_err(|_| refusal("invalid-head-target"))?],
-                    None,
-                    100_000,
-                )?;
+            let page = self.list_refs(
+                repo,
+                &[RefPrefix::parse(target.as_str()).map_err(|_| failure("invalid-head-target"))?],
+                None,
+                100_000,
+            )?;
             if !page.entries.iter().any(|e| e.name == target) && page.complete {
                 return Ok(HeadFact::Unborn { target });
             }
         }
-        Err(out.error(if repo.layout.promisor {
-            "promisor-object-unavailable"
-        } else if repo.layout.shallow {
-            "shallow-history-incomplete"
-        } else {
-            "head-object-unavailable"
-        }))
+        Err(out.error(layout_cause(&repo.layout, "head-object-unavailable")))
     }
     fn list_tree(
         &self,
@@ -2165,15 +2157,15 @@ impl Inspect for GitDriver {
         max_entries: usize,
     ) -> Result<TreePage> {
         Oid::parse(revision.as_str(), repo.object_format())
-            .map_err(|_| refusal("object-format-mismatch"))?;
+            .map_err(|_| failure("object-format-mismatch"))?;
         if prefix.contains(&0) || prefix.len() > 4096 || max_entries == 0 || max_entries > 100_000 {
-            return Err(refusal("invalid-tree-bounds"));
+            return Err(failure("invalid-tree-bounds"));
         }
         if cursor
             .as_ref()
             .is_some_and(|c| c.revision != *revision || c.prefix != prefix)
         {
-            return Err(refusal("tree-cursor-query-mismatch"));
+            return Err(failure("tree-cursor-query-mismatch"));
         }
         let kind = self.checked(
             repo,
@@ -2181,7 +2173,7 @@ impl Inspect for GitDriver {
             Policy::Inspect,
         )?;
         if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(refusal("revision-not-commit-or-tree"));
+            return Err(failure("revision-not-commit-or-tree"));
         }
         // Resolve the literal containing directory with NUL-framed byte input.
         // Git emits only that subtree, rather than the whole project each page.
@@ -2198,12 +2190,8 @@ impl Inspect for GitDriver {
             input.push(0);
             let output = self.inspect_input(repo, &["cat-file", "--batch-check", "-Z"], &input)?;
             if output.ends_with(b" missing\0") {
-                if repo.layout.promisor || repo.layout.alternates {
-                    return Err(refusal(if repo.layout.promisor {
-                        "promisor-object-unavailable"
-                    } else {
-                        "alternate-object-unavailable"
-                    }));
+                if let Some(cause) = object_gap_cause(&repo.layout) {
+                    return Err(failure(cause));
                 }
                 return Ok(TreePage {
                     entries: vec![],
@@ -2213,13 +2201,13 @@ impl Inspect for GitDriver {
             }
             let fields: Vec<_> = output.split(|b| *b == b' ' || *b == 0).collect();
             if fields.get(1) != Some(&b"tree".as_slice()) {
-                return Err(refusal("prefix-parent-not-tree"));
+                return Err(failure("prefix-parent-not-tree"));
             }
             tree_revision = Oid::parse(
-                std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-tree-oid"))?,
+                std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-tree-oid"))?,
                 repo.object_format(),
             )
-            .map_err(|_| refusal("invalid-tree-oid"))?;
+            .map_err(|_| failure("invalid-tree-oid"))?;
         }
         let bytes = self.checked(
             repo,
@@ -2238,7 +2226,7 @@ impl Inspect for GitDriver {
             let tab = record
                 .iter()
                 .position(|b| *b == b'\t')
-                .ok_or_else(|| refusal("invalid-tree-entry"))?;
+                .ok_or_else(|| failure("invalid-tree-entry"))?;
             let full_path = [directory, &record[tab + 1..]].concat();
             let path = full_path.as_slice();
             if !path.starts_with(prefix)
@@ -2248,23 +2236,23 @@ impl Inspect for GitDriver {
             }
             let fields: Vec<_> = record[..tab].split(|b| *b == b' ').collect();
             if fields.len() != 3 {
-                return Err(refusal("invalid-tree-entry"));
+                return Err(failure("invalid-tree-entry"));
             }
             let mode = std::str::from_utf8(fields[0])
                 .ok()
                 .and_then(|m| u32::from_str_radix(m, 8).ok())
-                .ok_or_else(|| refusal("invalid-tree-mode"))?;
+                .ok_or_else(|| failure("invalid-tree-mode"))?;
             let kind = match fields[1] {
                 b"blob" => ObjectType::Blob,
                 b"tree" => ObjectType::Tree,
                 b"commit" => ObjectType::Commit,
-                _ => return Err(refusal("invalid-tree-type")),
+                _ => return Err(failure("invalid-tree-type")),
             };
             let oid = Oid::parse(
-                std::str::from_utf8(fields[2]).map_err(|_| refusal("invalid-tree-oid"))?,
+                std::str::from_utf8(fields[2]).map_err(|_| failure("invalid-tree-oid"))?,
                 repo.object_format(),
             )
-            .map_err(|_| refusal("invalid-tree-oid"))?;
+            .map_err(|_| failure("invalid-tree-oid"))?;
             entries.push(ListedTreeEntry {
                 path: path.to_vec(),
                 mode,
@@ -2300,29 +2288,39 @@ impl Inspect for GitDriver {
     ) -> Result<RefPage> {
         if prefixes.is_empty() || prefixes.len() > 256 || max_entries == 0 || max_entries > 100_000
         {
-            return Err(refusal("invalid-ref-bounds"));
+            return Err(failure("invalid-ref-bounds"));
         }
         let binding: Vec<String> = prefixes.iter().map(|p| p.as_str().to_owned()).collect();
         if cursor.as_ref().is_some_and(|c| c.binding != binding) {
-            return Err(refusal("ref-cursor-query-mismatch"));
+            return Err(failure("ref-cursor-query-mismatch"));
         }
-        let bytes = self.checked(
-            repo,
-            &[
-                "for-each-ref",
-                "--sort=refname",
-                "--format=%(refname)%00%(objectname)%00%(symref)",
-            ],
-            Policy::Inspect,
-        )?;
+        // for-each-ref matches a pattern literally only up to a slash, so a
+        // prefix that is not a directory needs the two wildcard forms to select
+        // every ref that starts with those bytes. The filter below stays exact.
+        let mut args = vec![
+            "for-each-ref".to_owned(),
+            "--sort=refname".to_owned(),
+            "--format=%(refname)%00%(objectname)%00%(symref)%00%(HEAD)".to_owned(),
+        ];
+        for prefix in &binding {
+            if prefix.ends_with('/') {
+                args.push(prefix.clone());
+            } else {
+                args.push(format!("{prefix}*"));
+                args.push(format!("{prefix}*/**"));
+            }
+        }
+        let args: Vec<&str> = args.iter().map(String::as_str).collect();
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let mut entries = Vec::new();
+        let mut head = None;
         let mut more = false;
         for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
             let fields: Vec<_> = line.split(|b| *b == 0).collect();
-            if fields.len() != 3 {
-                return Err(refusal("invalid-ref-observation"));
+            if fields.len() != 4 {
+                return Err(failure("invalid-ref-observation"));
             }
-            let name = std::str::from_utf8(fields[0]).map_err(|_| refusal("non-utf8-ref-name"))?;
+            let name = std::str::from_utf8(fields[0]).map_err(|_| failure("non-utf8-ref-name"))?;
             if !binding.iter().any(|p| name.starts_with(p))
                 || cursor.as_ref().is_some_and(|c| name <= c.after.as_str())
             {
@@ -2342,24 +2340,28 @@ impl Inspect for GitDriver {
             let value = if fields[2].is_empty() {
                 RefValue::Direct(
                     Oid::parse(
-                        std::str::from_utf8(fields[1]).map_err(|_| refusal("invalid-ref-oid"))?,
+                        std::str::from_utf8(fields[1]).map_err(|_| failure("invalid-ref-oid"))?,
                         repo.object_format(),
                     )
-                    .map_err(|_| refusal("invalid-ref-oid"))?,
+                    .map_err(|_| failure("invalid-ref-oid"))?,
                 )
             } else {
                 RefValue::Symbolic(
                     RefName::parse(
                         std::str::from_utf8(fields[2])
-                            .map_err(|_| refusal("invalid-symbolic-target"))?,
+                            .map_err(|_| failure("invalid-symbolic-target"))?,
                     )
-                    .map_err(|_| refusal("invalid-symbolic-target"))?,
+                    .map_err(|_| failure("invalid-symbolic-target"))?,
                 )
             };
-            entries.push(RefEntry {
-                name: RefName::parse(name).map_err(|_| refusal("invalid-ref-name"))?,
-                value,
-            });
+            let name = RefName::parse(name).map_err(|_| failure("invalid-ref-name"))?;
+            // `%(HEAD)` is `*` on the one listed ref that HEAD, read once by this child, names.
+            // Only a direct branch is a HEAD fact (Git keeps `refs/heads/` to commits, so no object
+            // type read is needed); anything else is left to `resolve_head`.
+            if fields[3] == b"*" && name.as_str().starts_with("refs/heads/") && matches!(value, RefValue::Direct(_)) {
+                head = Some(name.clone());
+            }
+            entries.push(RefEntry { name, value });
         }
         let next_cursor = if more {
             Some(RefCursor {
@@ -2371,6 +2373,7 @@ impl Inspect for GitDriver {
         };
         Ok(RefPage {
             entries,
+            head,
             complete: !more,
             next_cursor,
         })
@@ -2383,9 +2386,9 @@ impl Inspect for GitDriver {
         max_blob_bytes: usize,
     ) -> Result<Vec<PathRead>> {
         Oid::parse(revision.as_str(), repo.object_format())
-            .map_err(|_| refusal("object-format-mismatch"))?;
+            .map_err(|_| failure("object-format-mismatch"))?;
         if paths.len() > 4096 || max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
-            return Err(refusal("invalid-path-read-bounds"));
+            return Err(failure("invalid-path-read-bounds"));
         }
         // Validate the root separately so a missing root never becomes absent paths.
         let kind = self.checked(
@@ -2394,7 +2397,7 @@ impl Inspect for GitDriver {
             Policy::Inspect,
         )?;
         if kind != b"commit\n" && kind != b"tree\n" {
-            return Err(refusal("revision-not-commit-or-tree"));
+            return Err(failure("revision-not-commit-or-tree"));
         }
         let mut input = Vec::new();
         for path in paths {
@@ -2406,7 +2409,7 @@ impl Inspect for GitDriver {
                     .split(|b| *b == b'/')
                     .any(|p| p == b".." || p == b"." || p.is_empty())
             {
-                return Err(refusal("invalid-literal-path"));
+                return Err(failure("invalid-literal-path"));
             }
             input.extend_from_slice(revision.as_str().as_bytes());
             input.push(b':');
@@ -2427,15 +2430,7 @@ impl Inspect for GitDriver {
             &input,
         )?;
         if !out.success {
-            return Err(out.error(if repo.layout.promisor {
-                "promisor-object-unavailable"
-            } else if repo.layout.alternates {
-                "alternate-object-unavailable"
-            } else if repo.layout.shallow {
-                "shallow-history-incomplete"
-            } else {
-                "path-read-failed"
-            }));
+            return Err(out.error(layout_cause(&repo.layout, "path-read-failed")));
         }
         let mut rest = out.stdout.as_slice();
         let mut result = Vec::new();
@@ -2443,45 +2438,39 @@ impl Inspect for GitDriver {
             let end = rest
                 .iter()
                 .position(|b| *b == 0)
-                .ok_or_else(|| refusal("invalid-path-header"))?;
+                .ok_or_else(|| failure("invalid-path-header"))?;
             let header = &rest[..end];
             rest = &rest[end + 1..];
             let value = if header.ends_with(b" missing") {
-                if repo.layout.promisor {
-                    PathValue::Error(refusal("promisor-object-unavailable"))
-                } else if repo.layout.alternates {
-                    PathValue::Error(refusal("alternate-object-unavailable"))
-                } else {
-                    PathValue::Absent
-                }
+                object_gap_cause(&repo.layout).map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause)))
             } else {
                 let fields: Vec<_> = header.split(|b| *b == b' ').collect();
                 if fields.len() != 3 {
-                    return Err(refusal("invalid-path-header"));
+                    return Err(failure("invalid-path-header"));
                 }
                 Oid::parse(
-                    std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-object-oid"))?,
+                    std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-object-oid"))?,
                     repo.object_format(),
                 )
-                .map_err(|_| refusal("invalid-object-oid"))?;
+                .map_err(|_| failure("invalid-object-oid"))?;
                 let kind = match fields[1] {
                     b"blob" => ObjectType::Blob,
                     b"tree" => ObjectType::Tree,
                     b"commit" => ObjectType::Commit,
                     b"tag" => ObjectType::Tag,
-                    _ => return Err(refusal("invalid-object-type")),
+                    _ => return Err(failure("invalid-object-type")),
                 };
                 let size = std::str::from_utf8(fields[2])
                     .ok()
                     .and_then(|s| s.parse::<usize>().ok())
-                    .ok_or_else(|| refusal("invalid-object-size"))?;
+                    .ok_or_else(|| failure("invalid-object-size"))?;
                 if size >= rest.len() || rest[size] != 0 {
-                    return Err(refusal("invalid-object-size"));
+                    return Err(failure("invalid-object-size"));
                 }
                 let value = if kind != ObjectType::Blob {
                     PathValue::NotABlob(kind)
                 } else if size > max_blob_bytes {
-                    PathValue::Error(refusal("blob-too-large"))
+                    PathValue::Error(failure("blob-too-large"))
                 } else {
                     PathValue::Blob(rest[..size].to_vec())
                 };
@@ -2494,7 +2483,7 @@ impl Inspect for GitDriver {
             });
         }
         if !rest.is_empty() {
-            return Err(refusal("unexpected-path-output"));
+            return Err(failure("unexpected-path-output"));
         }
         Ok(result)
     }
@@ -2517,21 +2506,7 @@ impl Inspect for GitDriver {
         Ok(config_facts(self, repo, "fgos.machineid")?.pop())
     }
     fn git_floor_verdict(&self) -> Result<GitFloorVerdict> {
-        let v = GitDriver::git_floor_verdict(self)?;
-        Ok(GitFloorVerdict {
-            version: v.version.clone(),
-            minimum: v.minimum.clone(),
-            supported: v.supported,
-            probes: v
-                .probes
-                .iter()
-                .map(|p| FloorProbe {
-                    name: p.name.clone(),
-                    passed: p.passed,
-                    evidence: p.evidence.clone(),
-                })
-                .collect(),
-        })
+        GitDriver::git_floor_verdict(self).cloned()
     }
     fn fetch_mapping_provenance(
         &self,
@@ -2544,48 +2519,50 @@ impl Inspect for GitDriver {
             Err(crate::wal::WalError::Io(e)) if e.kind() == std::io::ErrorKind::NotFound => {
                 return Ok(None)
             }
-            Err(e) => return Err(refusal(format!("git-wal-unreadable: {e}"))),
+            Err(e) => return Err(failure(format!("git-wal-unreadable: {e}"))),
         };
-        let scan = wal.scan(100_000).map_err(|e| refusal(e.to_string()))?;
+        let scan = wal.scan(100_000)?;
         if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
-            return Err(refusal("git-wal-unreadable"));
+            return Err(failure("git-wal-unreadable"));
         }
         let mut facts = Vec::new();
         for entry in scan.entries {
-            if let Ok(chain) = wal.inspect(&entry.operation_id) {
-                if matches!(
-                    chain.outcome(),
-                    Some(crate::wal::Outcome::ConfigApproved)
-                        | Some(crate::wal::Outcome::Transfer {
-                            acknowledged: true,
-                            unknown: false,
-                            ..
-                        })
-                ) {
-                    if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
-                        let crate::wal::ConfigChange {
-                            remote,
-                            url,
-                            refspecs,
-                            ..
-                        } = change.as_ref();
-                        if remote == _remote {
-                            facts.push((
-                                chain.config_sequence(),
-                                FetchMappingProvenance {
-                                    operation_id: entry.operation_id,
-                                    remote_url: url.clone(),
-                                    refspecs: refspecs.clone(),
-                                },
-                            ));
-                        }
+            if wal.compacted(&entry.operation_id)?.is_some() {
+                continue;
+            }
+            let chain = wal.inspect(&entry.operation_id)?;
+            if matches!(
+                chain.outcome(),
+                Some(crate::wal::Outcome::ConfigApproved)
+                    | Some(crate::wal::Outcome::Transfer {
+                        acknowledged: true,
+                        unknown: false,
+                        ..
+                    })
+            ) {
+                if let crate::wal::OperationKind::ConfigChange(change) = &chain.intent().kind {
+                    let crate::wal::ConfigChange {
+                        remote,
+                        url,
+                        refspecs,
+                        ..
+                    } = change.as_ref();
+                    if remote == _remote {
+                        facts.push((
+                            chain.config_sequence(),
+                            FetchMappingProvenance {
+                                operation_id: entry.operation_id,
+                                remote_url: url.clone(),
+                                refspecs: refspecs.clone(),
+                            },
+                        ));
                     }
                 }
             }
         }
         facts.sort_by_key(|(sequence, _)| *sequence);
         if facts.len() > 1 && facts[facts.len() - 1].0 == facts[facts.len() - 2].0 {
-            return Err(refusal("fetch-provenance-order-unknown"));
+            return Err(failure("fetch-provenance-order-unknown"));
         }
         Ok(facts.pop().map(|(_, fact)| fact))
     }
@@ -2723,14 +2700,42 @@ mod tests {
             _ => panic!("not repo"),
         }
     }
+    /// Points the driver at a Git that logs each argument list, so a test can count the
+    /// config listings and format reads a call really spawned.
+    fn log_git_children(driver: &mut GitDriver, dir: &Path) -> PathBuf {
+        let log = dir.join("children.log");
+        let script = dir.join("logging-git");
+        fs::write(&script, format!("#!/bin/sh\necho \"$*\" >> '{}'\nexec '{}' \"$@\"\n", log.display(), driver.git.display())).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        driver.git = script;
+        log
+    }
+    /// (config listings, format reads) spawned so far.
+    fn fact_reads(log: &Path) -> (usize, usize) {
+        let text = fs::read_to_string(log).unwrap_or_default();
+        (text.lines().filter(|l| l.contains("--show-origin")).count(),
+         text.lines().filter(|l| l.contains("--show-object-format")).count())
+    }
+
     #[test]
     fn checkout_stamp_rechecks_external_config_writes_between_children() {
         let state = Temp::new();
         let dir = Temp::new();
+        let logs = Temp::new();
         git(&dir.0, &["init", "-q"]);
-        let driver = GitDriver::new(&state.0).unwrap();
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        // The floor probe lists config itself; settle it before counting.
+        driver.require_floor().unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
         let repo = resolve(&driver, &dir.0);
+        let proven = fact_reads(&log);
+        assert_eq!(proven, (1, 1), "the first handle reads its config and formats once");
         let operation = driver.checkout_repository(&repo).unwrap();
+        assert_eq!(fact_reads(&log), proven, "a checkout handle answers from the facts the stamp still proves");
         driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
         // An independent writer, outside cooperative checkout exclusion.
         let root = dir.0.clone();
@@ -2738,10 +2743,18 @@ mod tests {
             .join().unwrap();
         let error = driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap_err();
         assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"));
+        // A new checkout handle sees the write too: the held stamp no longer matches.
+        let error = driver.checkout_repository(&repo).unwrap_err();
+        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"), "{}", error.cause);
         git(&dir.0, &["config", "--unset", "filter.external.clean"]);
         assert_eq!(driver.preflight(&operation).unwrap_err().cause, "checkout-facts-invalidated");
         let next = driver.checkout_repository(&repo).unwrap();
         driver.checked(&next, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        let reread = fact_reads(&log);
+        assert!(reread.0 > proven.0 && reread.1 > proven.1, "a moved stamp re-reads config and formats");
+        let again = driver.checkout_repository(&repo).unwrap();
+        driver.checked(&again, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        assert_eq!(fact_reads(&log), reread, "the re-read facts stand for the next handle");
     }
 
     // The config cache is shared by every driver in a process; a new driver must still see a
@@ -3003,6 +3016,93 @@ mod tests {
         assert!(repo.layout.shallow);
     }
     #[test]
+    fn a_failed_read_names_the_layout_cause_whichever_read_hits_it() {
+        // `layouts_preserve_missing_object_diagnostics_without_fetch` checks the cause of one read.
+        // The reads that turn a failed Git child into a cause each carry their own copy of the
+        // promisor, alternates and shallow ladder; each read must name the layout's cause.
+        let bogus = "1234567890123456789012345678901234567890";
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        fs::write(dir.0.join(".git/shallow"), format!("{bogus}\n")).unwrap();
+        let driver = GitDriver::new(&state.0).unwrap();
+
+        let causes = |repo: &RepoHandle| -> Vec<(&'static str, String)> {
+            let mut causes = Vec::new();
+            let mut note = |read: &'static str, e: OperationError| causes.push((read, e.cause));
+            note(
+                "checked",
+                driver
+                    .checked(repo, &["rev-list", bogus], Policy::Inspect)
+                    .unwrap_err(),
+            );
+            note(
+                "inspect_input",
+                driver
+                    .inspect_input(repo, &["rev-list", "--stdin"], bogus.as_bytes())
+                    .unwrap_err(),
+            );
+            note("resolve_head", driver.resolve_head(repo).unwrap_err());
+            causes
+        };
+        let expect = |causes: Vec<(&'static str, String)>, cause: &str| {
+            let want: Vec<_> = ["checked", "inspect_input", "resolve_head"]
+                .map(|read| (read, cause.to_owned()))
+                .into();
+            assert_eq!(causes, want);
+        };
+
+        // A shallow boundary only.
+        fs::write(dir.0.join(".git/HEAD"), format!("{bogus}\n")).unwrap();
+        expect(causes(&resolve(&driver, &dir.0)), "shallow-history-incomplete");
+        // Alternates as well as the shallow boundary: alternates name the cause.
+        fs::write(
+            dir.0.join(".git/objects/info/alternates"),
+            b"/missing/alternate\n",
+        )
+        .unwrap();
+        expect(causes(&resolve(&driver, &dir.0)), "alternate-object-unavailable");
+    }
+    #[test]
+    fn a_missing_tree_or_path_is_an_alternates_error_and_stays_absent_when_only_shallow() {
+        // The tree and path reads answer a missing object themselves: with alternates the object
+        // may live elsewhere, so absence is an error; a shallow boundary alone cuts history, not
+        // trees, so absence stays absence.
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(
+            &dir.0,
+            &["-c", "user.name=Test", "-c", "user.email=t@e", "commit", "--allow-empty", "-qm", "initial"],
+        );
+        let head = String::from_utf8(git(&dir.0, &["rev-parse", "HEAD"])).unwrap();
+        let driver = GitDriver::new(&state.0).unwrap();
+        let reads = |repo: &RepoHandle| {
+            let head = Oid::parse(head.trim(), repo.object_format()).unwrap();
+            (
+                driver.list_tree(repo, &head, b"nope/x", None, 10),
+                driver.read_paths_at(repo, &head, &[b"nope/x".to_vec()], 1024),
+            )
+        };
+
+        fs::write(dir.0.join(".git/shallow"), head.as_bytes()).unwrap();
+        let (tree, paths) = reads(&resolve(&driver, &dir.0));
+        assert!(tree.unwrap().entries.is_empty());
+        assert!(matches!(paths.unwrap()[0].value, PathValue::Absent));
+
+        fs::write(
+            dir.0.join(".git/objects/info/alternates"),
+            b"/missing/alternate\n",
+        )
+        .unwrap();
+        let (tree, paths) = reads(&resolve(&driver, &dir.0));
+        assert_eq!(tree.unwrap_err().cause, "alternate-object-unavailable");
+        match &paths.unwrap()[0].value {
+            PathValue::Error(e) => assert_eq!(e.cause, "alternate-object-unavailable"),
+            other => panic!("{other:?}"),
+        }
+    }
+    #[test]
     fn linked_registration_and_fake_gitdir() {
         let state = Temp::new();
         let dir = Temp::new();
@@ -3095,6 +3195,7 @@ mod tests {
             .err()
             .unwrap();
         assert_eq!(err.cause, "git-timeout");
+        assert_eq!(err.detail.unwrap()["path"], "contained");
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -3388,11 +3489,11 @@ impl GitDriver {
             ObjectType::Blob => "blob",
             ObjectType::Tree => "tree",
             ObjectType::Commit => "commit",
-            _ => return Err(refusal("unsupported-hash-object-type")),
+            _ => return Err(failure("unsupported-hash-object-type")),
         };
         let out = self.inspect_input(repo, &["hash-object", "-t", kind, "--stdin"], bytes)?;
-        Oid::parse(std::str::from_utf8(&out).map_err(|_| refusal("invalid-object-id"))?.trim(), repo.object_format())
-            .map_err(|_| refusal("invalid-object-id"))
+        Oid::parse(std::str::from_utf8(&out).map_err(|_| failure("invalid-object-id"))?.trim(), repo.object_format())
+            .map_err(|_| failure("invalid-object-id"))
     }
     pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
         self.require_floor()?;
@@ -3411,13 +3512,7 @@ impl GitDriver {
         if out.success {
             Ok(out.stdout)
         } else {
-            Err(out.error(if repo.layout.promisor {
-                "promisor-object-unavailable"
-            } else if repo.layout.alternates {
-                "alternate-object-unavailable"
-            } else {
-                "git-command-failed"
-            }))
+            Err(out.error(layout_cause(&repo.layout, "git-command-failed")))
         }
     }
     fn commit_batch(
@@ -3444,7 +3539,7 @@ impl GitDriver {
             .cloned()
             .chain(
                 std::str::from_utf8(&revisions)
-                    .map_err(|_| refusal("invalid-utf8"))?
+                    .map_err(|_| failure("invalid-utf8"))?
                     .lines()
                     .map(str::to_owned),
             )
@@ -3455,23 +3550,23 @@ impl GitDriver {
         let mut selected = Vec::new();
         let mut remaining = byte_budget;
         let lines: Vec<_> = std::str::from_utf8(&headers)
-            .map_err(|_| refusal("invalid-utf8"))?
+            .map_err(|_| failure("invalid-utf8"))?
             .lines()
             .collect();
         if lines.len() != ids.len() {
-            return Err(refusal("invalid-batch-headers"));
+            return Err(failure("invalid-batch-headers"));
         }
         for (n, (oid, header)) in ids.iter().zip(lines).enumerate() {
             let fields: Vec<_> = header.split(' ').collect();
             if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
                 if n == 0 {
-                    return Err(refusal("commit-missing-or-invalid"));
+                    return Err(failure("commit-missing-or-invalid"));
                 }
                 continue; // Future reads remain subject to their own page.
             }
             let size: usize = fields[2]
                 .parse()
-                .map_err(|_| refusal("invalid-object-size"))?;
+                .map_err(|_| failure("invalid-object-size"))?;
             if size <= remaining {
                 selected.push(oid.clone());
                 remaining -= size;
@@ -3488,31 +3583,31 @@ impl GitDriver {
             let end = bytes[at..]
                 .iter()
                 .position(|b| *b == b'\n')
-                .ok_or_else(|| refusal("invalid-object-header"))?
+                .ok_or_else(|| failure("invalid-object-header"))?
                 + at;
             let fields: Vec<_> = std::str::from_utf8(&bytes[at..end])
-                .map_err(|_| refusal("invalid-utf8"))?
+                .map_err(|_| failure("invalid-utf8"))?
                 .split(' ')
                 .collect();
             if fields.len() != 3 || fields[0] != oid || fields[1] != "commit" {
-                return Err(refusal("commit-missing-or-invalid"));
+                return Err(failure("commit-missing-or-invalid"));
             }
             let size: usize = fields[2]
                 .parse()
-                .map_err(|_| refusal("invalid-object-size"))?;
+                .map_err(|_| failure("invalid-object-size"))?;
             let start = end + 1;
             let end = start
                 .checked_add(size)
                 .filter(|e| *e < bytes.len())
-                .ok_or_else(|| refusal("invalid-object-size"))?;
+                .ok_or_else(|| failure("invalid-object-size"))?;
             if bytes[end] != b'\n' {
-                return Err(refusal("invalid-object-size"));
+                return Err(failure("invalid-object-size"));
             }
             objects.insert(oid, bytes[start..end].to_vec());
             at = end + 1;
         }
         if at != bytes.len() {
-            return Err(refusal("unexpected-batch-output"));
+            return Err(failure("unexpected-batch-output"));
         }
         Ok(objects)
     }

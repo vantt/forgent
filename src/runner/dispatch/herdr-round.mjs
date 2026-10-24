@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { DispatchError } from './dispatch-error.mjs';
 import { terminalRouteConfig } from '../../terminal-control/config.mjs';
-import { normalizeAgentName } from './herdr-agent.mjs';
+import { normalizeAgentName } from './proof-helpers.mjs';
 import { createRoundTerminalControl, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
@@ -104,7 +104,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
  * Apply declared confinement, before anything is launched.
  *
  * Two measures, and neither closes the hole alone. A private HOME closes the
- * `$HOME/.config/herdr/herdr.sock` fallback a worker would otherwise find
+ * default socket under `$HOME`, the fallback a worker would otherwise find
  * with no environment variable at all. It does NOT stop the worker reaching
  * the cockpit, because herdr injects `HERDR_SOCKET_PATH` into every pane it
  * creates and overwrites any override -- measured. What that leaves is the
@@ -334,7 +334,7 @@ export async function prepareTerminalAttempt(ctx) {
   const {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
-    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, anchorPaneId, terminalConfig,
+    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -394,7 +394,7 @@ export async function prepareTerminalAttempt(ctx) {
     herdrEnv: sessionEnv,
     config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
   });
-  const display = slotDisplay({ groupKey, agent: agentKind, model });
+  const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
     try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ }
@@ -410,7 +410,9 @@ export async function prepareTerminalAttempt(ctx) {
     }
     let slot;
     try {
-      slot = await tc.allocateAsync({ key, groupKey, display, cwd, env: {} });
+      // The batch size, when the caller knows it, lets the placement policy plan equal panes.
+      const groupSize = Number.isInteger(dispatchBatchSize) && dispatchBatchSize > 1 ? { groupSize: dispatchBatchSize } : {};
+      slot = await tc.allocateAsync({ key, groupKey, display, cwd, env: {}, ...groupSize });
     } catch (err) {
       throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
         `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);

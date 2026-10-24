@@ -23,7 +23,8 @@ mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub use repository_config::{obsolete_legacy_fetch_mapping, publication_fetch_mappings};
 pub mod wal;
-pub use driver::{GitDriver, WalReader};
+pub use driver::GitDriver;
+use driver::WalReader;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -164,17 +165,11 @@ pub enum RefValue {
 #[serde(rename_all = "kebab-case")]
 pub enum ResultCode {
     Unchanged,
-    Created,
     Committed,
-    Landed,
-    ConflictedOpen,
-    ConflictAborted,
     Busy,
     Stale,
     Refused,
-    Cancelled,
     Failed,
-    PublishedCheckoutPending,
     CommittedButContractViolation,
     RemoteOutcomeUnknown,
     RecoveryRequired,
@@ -191,6 +186,9 @@ pub struct Receipt {
     pub remote: Remote,
     pub consumer_settlement: ConsumerSettlement,
     pub attribution: Attribution,
+    /// Facts that did not fail the operation, such as a compaction left for a later call.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -243,13 +241,7 @@ pub enum Remote {
 pub enum ConsumerSettlement {
     NotOwnedByGit,
 }
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Attribution {
-    ThisInvocationWonCas,
-    EffectObservedOnly,
-    Uncertain,
-}
+pub use wal::Attribution;
 
 #[derive(Debug)]
 pub struct OperationError {
@@ -265,6 +257,68 @@ pub struct OperationError {
     pub detail: Option<Box<serde_json::Value>>,
 }
 pub type Result<T> = std::result::Result<T, OperationError>;
+
+/// The one constructor of an `OperationError`; every other one names its code.
+pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
+    OperationError {
+        code,
+        cause: cause.to_string(),
+        retryable: false,
+        operation_id: None,
+        receipt: None,
+        exit_code: None,
+        signal: None,
+        stderr: vec![],
+        detail: None,
+    }
+}
+pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Refused, cause)
+}
+pub(crate) fn failed(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Failed, cause)
+}
+pub(crate) fn recovery(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::RecoveryRequired, cause)
+}
+pub(crate) fn stale(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Stale, cause)
+}
+pub(crate) fn busy(cause: impl std::fmt::Display) -> OperationError {
+    OperationError {
+        retryable: true,
+        ..classified(ResultCode::Busy, cause)
+    }
+}
+impl OperationError {
+    /// Free text that explains a cause belongs in `detail`, never in the cause.
+    pub(crate) fn with_diagnostic(mut self, text: impl std::fmt::Display) -> Self {
+        let mut detail = match self.detail.take().map(|d| *d) {
+            Some(serde_json::Value::Object(map)) => map,
+            _ => Default::default(),
+        };
+        detail.insert("diagnostic".into(), text.to_string().into());
+        self.detail = Some(Box::new(detail.into()));
+        self
+    }
+}
+/// Every port names a WAL failure the same way: a refusal for a request that
+/// cannot proceed, recovery-required for a log that cannot be trusted, with
+/// the diagnostic text in `detail` and never in the cause.
+impl From<wal::WalError> for OperationError {
+    fn from(e: wal::WalError) -> Self {
+        use wal::WalError::*;
+        let code = match e {
+            Busy | OperationIdConflict | Untrusted | Unsupported | PublicationBorrowUnavailable => ResultCode::Refused,
+            Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
+        };
+        let named = classified(code, e.cause());
+        match e.diagnostic() {
+            Some(text) => named.with_diagnostic(text),
+            None => named,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectType {
@@ -366,13 +420,13 @@ pub struct ConfigFact {
     pub value: Vec<u8>,
     pub origin: PathBuf,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FloorProbe {
     pub name: String,
     pub passed: bool,
     pub evidence: String,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GitFloorVerdict {
     pub version: String,
     pub minimum: String,
@@ -485,6 +539,10 @@ pub struct RefEntry {
 #[derive(Debug)]
 pub struct RefPage {
     pub entries: Vec<RefEntry>,
+    /// The returned entry that HEAD names, when HEAD is attached to a direct branch (`refs/heads/`) that
+    /// this page returned. HEAD is read once by the listing's own child, so this name and that
+    /// entry's value are one observation; `None` (detached, unborn, or not listed) says nothing.
+    pub head: Option<RefName>,
     pub complete: bool,
     pub next_cursor: Option<RefCursor>,
 }
@@ -548,17 +606,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Lock-taking Git ports stay dormant until the Windows handoff exists (Q6).
 pub fn require_lock_scope_platform() -> Result<()> {
     if cfg!(target_os = "windows") {
-        return Err(OperationError {
-            code: ResultCode::Refused,
-            cause: "git-lockscope-unavailable-windows".into(),
-            retryable: false,
-            operation_id: None,
-            receipt: None,
-            exit_code: None,
-            signal: None,
-            stderr: vec![],
-        detail: None,
-        });
+        return Err(failure("git-lockscope-unavailable-windows"));
     }
     Ok(())
 }
@@ -570,26 +618,35 @@ pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, Commit
 pub(crate) fn literal_repo_path(path: &str) -> Result<()> {
     if path.is_empty() || path.starts_with('/') || path.contains('\0')
         || path.split('/').any(|p| p.is_empty() || p == "." || p == "..") {
-        return Err(refs::failure("invalid-literal-path"));
+        return Err(failure("invalid-literal-path"));
     }
     Ok(())
 }
 /// Exact scope spelling suitable for literal path staging or a resolver grant.
 pub(crate) fn fgos_scope_literal(path: &str) -> Result<()> {
-    if fgos_write_scope::canonicalize(path).map_err(refs::failure)? != path
+    if fgos_write_scope::canonicalize(path).map_err(failure)? != path
         || path.contains('*')
         || path.chars().any(char::is_control)
     {
-        return Err(refs::failure("unscopable-conflict-path"));
+        return Err(failure("unscopable-conflict-path"));
     }
     Ok(())
 }
 
 mod sync;
-pub use sync::{has_conflict_markers, SyncResult};
+pub use sync::SyncResult;
 
 mod grant;
 
 mod native_lock;
 pub use native_lock::{NativeLockArtifact, NativeLockReport};
 pub use repository_config::HooksReport;
+
+/// The one place a git mutation asks for flushed bytes. `-c` beats repository
+/// and global configuration, so a `core.fsyncMethod=writeout-only` setting
+/// cannot turn a durable write into one that never reaches stable storage.
+pub(crate) fn durable_args<'a>(args: &[&'a str]) -> Vec<&'a str> {
+    let mut all = vec!["-c", "core.fsync=all", "-c", "core.fsyncMethod=fsync"];
+    all.extend_from_slice(args);
+    all
+}

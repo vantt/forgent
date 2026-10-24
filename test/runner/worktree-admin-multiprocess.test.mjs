@@ -47,9 +47,8 @@ function addingChild(root, base, tag, count) {
   return new Promise((resolve) => child.once('exit', (code) => resolve({ code, stderr })));
 }
 
-// Each worktree add runs git inside bwrap (about 0.5 s), so 20 rounds cost 70-90 s. 5 rounds keep
-// 8 real processes racing for the worktree-admin lock; go back to 20 once contained git is cheap.
-const ROUNDS = 5;
+// 8 real processes race for the worktree-admin lock 20 times each (160 contained adds, about 35 s).
+const ROUNDS = 20;
 
 test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: 240000 }, async () => {
   const { root, git } = tempRepo();

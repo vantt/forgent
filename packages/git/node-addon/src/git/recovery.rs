@@ -1,4 +1,4 @@
-//! Mechanical dormant recovery transport; dispatch and authority live in Rust.
+//! Mechanical recovery transport; dispatch and authority live in Rust.
 use super::{
     handover::{Loan, consume},
     operation, text,

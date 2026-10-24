@@ -6,6 +6,8 @@ import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from '../../src/runner/di
 // Everything that touches the outside world is injected, so the whole session
 // lifecycle is exercised here without a herdr install and without a terminal.
 
+const SESSION_SOCKET = '/home/op/.config/herdr/sessions/fgos-worker/herdr.sock';
+
 /** A terminal-control client whose `capabilities` answers come from `answers` (true = a server answers; the last repeats). */
 function fakeTerminal(answers = [true]) {
   let asked = 0;
@@ -13,7 +15,7 @@ function fakeTerminal(answers = [true]) {
     capabilities() {
       const up = answers[Math.min(asked, answers.length - 1)];
       asked += 1;
-      return { result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: up ? { pid: 1 } : null };
+      return { result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: up ? { pid: 1 } : null, endpoint: { socketPath: SESSION_SOCKET } };
     },
   };
   return { client, asked: () => asked, terminalControlFor: () => client };
@@ -52,9 +54,35 @@ test('a session already up is reused, and its own socket is what addresses it', 
   }));
   assert.equal(spawned, 0, 'a running session is not started again');
   assert.equal(out.startedServer, false);
-  assert.equal(out.socketPath, '/home/op/.config/herdr/sessions/fgos-worker/herdr.sock');
-  assert.equal(out.env.HERDR_SOCKET_PATH, out.socketPath);
+  assert.equal(out.socketPath, SESSION_SOCKET);
   assert.equal(out.env.HERDR_SESSION, 'fgos-worker');
+  assert.equal(out.env.HERDR_SOCKET_PATH, undefined, 'the session is named, its socket is the driver\'s to derive');
+});
+
+test('the socket the boot looks at is the one the route names, not one it builds itself', async () => {
+  const checked = [];
+  const out = await ensureWorkerSession('fgos-worker', baseOpts({
+    callerEnv: { HOME: '/home/op', HERDR_SOCKET_PATH: '/cockpit/herdr.sock' },
+    terminalControlFor: () => ({ capabilities: () => ({ result: 'capabilities', serverIncarnation: { pid: 1 }, endpoint: { socketPath: '/route/says/herdr.sock' } }) }),
+    existsSync: (p) => { checked.push(p); return true; },
+  }));
+  assert.equal(out.socketPath, '/route/says/herdr.sock');
+  assert.deepEqual(checked, ['/route/says/herdr.sock'], 'the cockpit socket the caller inherited is never looked at');
+  assert.equal(out.env.HERDR_SOCKET_PATH, undefined);
+});
+
+test('a route that names no socket stops the boot before anything is looked at or started', async () => {
+  for (const terminalControlFor of [
+    () => ({ capabilities() { throw new Error('host binary missing'); } }),
+    () => ({ capabilities: () => ({ result: 'capabilities', serverIncarnation: null, endpoint: { socketPath: null } }) }),
+  ]) {
+    let touched = 0;
+    await assert.rejects(
+      () => ensureWorkerSession('fgos-worker', baseOpts({ terminalControlFor, existsSync: () => { touched += 1; return false; }, spawnFn: () => { touched += 1; return { unref() {} }; } })),
+      (e) => e.code === 'worker-session-server-unknown' && /did not name its socket/.test(e.message),
+    );
+    assert.equal(touched, 0);
+  }
 });
 
 test('the addressing environment drops the caller pane identity', async () => {
@@ -94,20 +122,42 @@ test('the shared worker session has a name, so a reader can see which one it is'
   assert.notEqual(DEFAULT_WORKER_SESSION, 'default');
 });
 
+/** What the OS says about the socket: `connects` is a list of 'refused' | 'accepted', the last repeating. */
+function fakeSocket(connects, { statSeq } = {}) {
+  let n = 0;
+  let looks = 0;
+  return {
+    connectFn: async () => {
+      const outcome = connects[Math.min(n, connects.length - 1)];
+      n += 1;
+      if (outcome === 'refused') throw Object.assign(new Error('refused'), { code: 'ECONNREFUSED' });
+    },
+    statFn: () => {
+      const st = statSeq ? statSeq[Math.min(looks, statSeq.length - 1)] : { ino: 7, mtimeMs: 1 };
+      looks += 1;
+      return st;
+    },
+  };
+}
+
+/** A terminal client that answers only once `isUp()` says a server was started. */
+const terminalUpWhen = (isUp) => ({
+  terminalControlFor: () => ({
+    capabilities: () => ({ result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: isUp() ? { pid: 1 } : null, endpoint: { socketPath: SESSION_SOCKET } }),
+  }),
+});
+
 test('a socket file a dead server left behind is cleared, not treated as a live session', async () => {
   // The trap this closes: the file is evidence a server once ran, never that
   // one is running. Read as "already up" it wedges every confined dispatch
   // from then on, each refusing with confinement-unavailable until somebody
-  // deletes the file by hand.
+  // deletes the file by hand. The OS refusing the connect twice is the proof.
   let unlinked = null;
   let spawned = 0;
-  // The first look is the liveness check against the stale socket; the server started after answers.
-  const terminal = fakeTerminal([false, true]);
-
-  // Present at first; gone once unlinked, then written again by the server.
   let present = true;
   const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
-    terminalControlFor: terminal.terminalControlFor,
+    ...terminalUpWhen(() => spawned > 0),
+    ...fakeSocket(['refused']),
     existsSync: () => present,
     unlinkFn: (p) => { unlinked = p; present = false; },
     spawnFn: () => { spawned += 1; present = true; return { unref() {} }; },
@@ -116,6 +166,53 @@ test('a socket file a dead server left behind is cleared, not treated as a live 
   assert.match(unlinked ?? '', /fgos-worker\/herdr\.sock$/, 'the dead socket was removed');
   assert.equal(spawned, 1, 'and a server was actually started in its place');
   assert.equal(res.startedServer, true);
+});
+
+test('an answer without a server incarnation keeps the socket', async () => {
+  let unlinked = 0;
+  await assert.rejects(
+    () => ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
+      terminalControlFor: fakeTerminal([false]).terminalControlFor,
+      ...fakeSocket(['accepted']),
+      existsSync: () => true,
+      unlinkFn: () => { unlinked += 1; },
+      spawnFn: () => ({ unref() {} }),
+    })),
+    (e) => e.code === 'worker-session-server-unknown',
+  );
+  assert.equal(unlinked, 0);
+});
+
+test('a socket refused once and then answering is not removed', async () => {
+  // A socket file exists between bind() and listen(): one refusal can be a
+  // server that is still starting.
+  let unlinked = 0;
+  let spawned = 0;
+  const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
+    terminalControlFor: fakeTerminal([false, true]).terminalControlFor,
+    ...fakeSocket(['refused']),
+    existsSync: () => true,
+    unlinkFn: () => { unlinked += 1; },
+    spawnFn: () => { spawned += 1; return { unref() {} }; },
+  }));
+  assert.equal(unlinked, 0);
+  assert.equal(spawned, 0);
+  assert.equal(res.startedServer, false);
+});
+
+test('two refusals on different socket files are not proof the server is dead', async () => {
+  let unlinked = 0;
+  await assert.rejects(
+    () => ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
+      terminalControlFor: fakeTerminal([false]).terminalControlFor,
+      ...fakeSocket(['refused'], { statSeq: [{ ino: 7, mtimeMs: 1 }, { ino: 8, mtimeMs: 2 }] }),
+      existsSync: () => true,
+      unlinkFn: () => { unlinked += 1; },
+      spawnFn: () => ({ unref() {} }),
+    })),
+    (e) => e.code === 'worker-session-server-unknown',
+  );
+  assert.equal(unlinked, 0);
 });
 
 test('a socket that answers is left alone -- a live session is never restarted', async () => {

@@ -121,7 +121,7 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
 /// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
-/// [--project] [--prune]`, `fgos identity mint <kind> [--release <number>]
+/// [--project] [--prune]`, `fgos identity pins [--forget <machine-id>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
@@ -157,6 +157,10 @@ fn project_identity_request(
         Some("mint") => (
             fgos_identity::Verb::Mint { kind: String::new(), release: None },
             &["--release", "--dir"],
+        ),
+        Some("pins") => (
+            fgos_identity::Verb::Pins { forget: None },
+            &["--forget", "--dir"],
         ),
         Some(other) => {
             return Err(format!(
@@ -275,6 +279,12 @@ fn project_identity_request(
                     return Err("--drop-role requires a value".into());
                 }
                 drop_role = Some(flag_value);
+            }
+            "--forget" => {
+                if flag_value.is_empty() {
+                    return Err("--forget requires a machine id".into());
+                }
+                request.verb = fgos_identity::Verb::Pins { forget: Some(flag_value) };
             }
             "--handle" => {
                 if flag_value.is_empty() {

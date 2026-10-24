@@ -58,7 +58,7 @@ test('refspec check rejects broad namespace wildcards and agrees with Git on mis
   try {
     for (const installed of [false, true]) {
       if (installed) fixEventStoreRefspec(f.repo, f.ctx);
-      assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, checkGit(f.repo, 'git-publication-refspecs', f.ctx.loaderOptions).passed);
+      assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions).passed);
     }
     f.git('config', '--add', 'remote.origin.fetch', '+refs/*:refs/unsafe/*');
     assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false);

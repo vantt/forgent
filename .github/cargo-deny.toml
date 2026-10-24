@@ -3,6 +3,15 @@
 multiple-versions = "warn"
 # Existing workspace path dependencies omit publish=false; --locked pins the external graph.
 wildcards = "warn"
+# One YAML parser in the workspace: saphyr-parser behind fgos-yaml-doc (docs/platform/yaml-document/spec.md section 10).
+deny = [
+    { crate = "serde_yaml" },
+    { crate = "serde_yml" },
+    { crate = "serde_yaml_ng" },
+    { crate = "yaml-rust" },
+    { crate = "yaml-rust2" },
+    { crate = "unsafe-libyaml" },
+]
 
 [sources]
 unknown-registry = "deny"
