@@ -805,7 +805,7 @@ runner:
   defaults:
     # @fgos:doc The tier a seat runs at when nothing else names one. Values: nano | mini | standard | advanced | flagship | frontier. Default: standard.
     tier: standard
-  # @fgos:doc Milliseconds one run may take before it is stopped. Minimum: 60000. Maximum: 14400000. Default: 900000.
+  # @fgos:doc Milliseconds one run may take before it is stopped. Maximum: 14400000. Default: 900000.
   timeoutMs: 900000
   # @fgos:doc How many units run at once.
   parallel:

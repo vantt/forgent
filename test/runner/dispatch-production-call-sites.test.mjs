@@ -22,7 +22,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -208,7 +208,7 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
   const root = fixtureRepo();
   try {
     const fgosDir = path.join(root, '.fgos');
-    const cfg = loadRunnerConfigFromDir(root);
+    const cfg = loadRunnerConfigForDir(root);
     await executeExecutorCli('mock-non-assignment', { tier: 'standard', model: 'sonnet', sharedCwd: true,
       prompt: 'hello world',
       cwd: root,

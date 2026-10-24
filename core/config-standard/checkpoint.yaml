@@ -2,5 +2,5 @@
 # see: fgos config standard
 # @fgos:doc The fallback timer of the event-log checkpoint.
 checkpoint:
-  # @fgos:doc Seconds between checkpoints of the event log when no other trigger fired. Minimum: 1. Default: 3600.
+  # @fgos:doc Seconds between checkpoints of the event log when no other trigger fired. Minimum: 0. Default: 3600.
   fallbackIntervalSec: 3600

@@ -35,7 +35,7 @@ test('a duration too large to count is refused with the text that was typed', ()
 });
 
 test('runner.timeoutMs is held to the same ceiling as a run timeout', async () => {
-  const { loadRunnerConfigFromDir } = await import('../../src/runner/dispatch/config.mjs');
+  const { loadRunnerConfigForDir } = await import('../../src/runner/dispatch/config.mjs');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cfg-timeout-'));
   try {
     fs.mkdirSync(path.join(dir, '.fgos'));
@@ -48,9 +48,9 @@ test('runner.timeoutMs is held to the same ceiling as a run timeout', async () =
       },
     });
     write(RUN_TIMEOUT_MAX_MS);
-    assert.equal(loadRunnerConfigFromDir(dir).timeoutMs, RUN_TIMEOUT_MAX_MS);
+    assert.equal(loadRunnerConfigForDir(dir).timeoutMs, RUN_TIMEOUT_MAX_MS);
     write(RUN_TIMEOUT_MAX_MS + 1);
-    assert.throws(() => loadRunnerConfigFromDir(dir), /timeoutMs.*at most 4h/);
+    assert.throws(() => loadRunnerConfigForDir(dir), /runner\.timeoutMs \(maximum\)/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

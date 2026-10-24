@@ -12,7 +12,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { executeExecutorCli, runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { collectExecutorProfileWarnings } from '../../src/setup/executor-profile-warnings.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -81,7 +81,7 @@ test('a "for" left on an agent executor is inert: the dispatch still runs under 
   const result = await executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(written(root), 'first:hello');
-  const warnings = collectExecutorProfileWarnings(loadRunnerConfigFromDir(root));
+  const warnings = collectExecutorProfileWarnings(loadRunnerConfigForDir(root));
   assert.ok(warnings.some((w) => w.id === 'executor.fake.agent-for-inert'), JSON.stringify(warnings));
 });
 

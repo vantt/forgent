@@ -367,9 +367,9 @@ test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict uncl
   // call below now lands squarely on loop.mjs's own DISCOVERY DISPATCH
   // sweep (tsk-5mj/tsk-4v6, pre-dating this item), unlike before when a
   // fresh item safely sat at `clarify`, a stage that sweep never touches.
-  // Without a configured fake executor, `ensureRunnerConfigForDir` would
-  // bootstrap a default pointed at whatever real assistant CLI it
-  // auto-detects on PATH and dispatch it for real research -- exactly the
+  // Without a configured fake executor, `loadRunnerConfigForDir` would
+  // use whatever real assistant CLI it detects on PATH as the executor
+  // and dispatch it for real research -- exactly the
   // non-determinism every other dispatch-adjacent test in this file
   // already guards against via `writeRunnerConfig`. This scripted
   // executor produces no verdict fence, so the sweep's own no-callerVerdict

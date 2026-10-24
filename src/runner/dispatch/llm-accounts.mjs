@@ -46,20 +46,17 @@ function aliasOf(pool, families) {
 }
 
 /**
- * Read `runner.llmAccounts` from the merged runner config.
+ * Read `runner.llmAccounts` from the merged runner config. A project file holding an inventory never gets
+ * here: the config door refuses it (`config-key-in-wrong-file`).
  *
  * @param {object} runnerConfig the merged runner section.
- * @param {{projectConfig?: object}} [options] the raw project config, to report an inventory declared there.
  * @returns {{pools: Record<string, {accounts: Record<string, {label: string, disabled: boolean, stores: Record<string, string>}>}>, problems: {code: string, at: string, detail: string}[]}}
  */
-export function readLlmAccounts(runnerConfig, { projectConfig } = {}) {
+export function readLlmAccounts(runnerConfig) {
   const pools = {};
   const problems = [];
   const problem = (code, at, detail) => problems.push({ code, at, detail });
 
-  if (projectConfig?.runner?.llmAccounts !== undefined) {
-    problem('project-llm-accounts', 'runner.llmAccounts', 'the account inventory is machine-wide; declare it in ~/.fgos/config.json, not in the project config');
-  }
   const inventory = runnerConfig?.llmAccounts;
   if (inventory === undefined) return { pools, problems };
   if (!isPlainObject(inventory)) {
@@ -163,8 +160,8 @@ function legacyStores(account) {
  *
  * @returns {{onlyLegacy: {pool: string, account: string}[], onlyNew: {pool: string, account: string}[], storeMismatch: {pool: string, account: string, legacy: object, current: object}[], problems: object[]}}
  */
-export function compareWithLegacyInventory(runnerConfig, options = {}) {
-  const { pools, problems } = readLlmAccounts(runnerConfig, options);
+export function compareWithLegacyInventory(runnerConfig) {
+  const { pools, problems } = readLlmAccounts(runnerConfig);
   let legacy = {};
   try {
     legacy = validateProviderAccountInventory(runnerConfig, 'runner config');

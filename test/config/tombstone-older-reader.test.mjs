@@ -7,12 +7,11 @@ import path from 'node:path';
 
 import { readSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
-import { ensureRunnerConfigForDir, loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 
 // What a migrated project's `.fgos/config.json` holds (docs/platform/config/spec.md section 13).
 const TOMBSTONE = 'moved to .fgos/config.yaml; upgrade fgOS\n';
 
-// Today's Node readers stand in for an older release: each must refuse the tombstone loudly and
+// The old Node reader stands in for an older release: it must refuse the tombstone loudly and
 // must not write a fresh `config.json` (which would start an unconfined default executor) nor a
 // `config.yaml` of its own.
 test('an older release refuses a migrated project and writes no config file', () => {
@@ -24,8 +23,6 @@ test('an older release refuses a migrated project and writes no config file', ()
   const before = fs.readdirSync(fgos).sort();
 
   assert.throws(() => readSharedConfig(dir), /cannot parse shared config at ".*config\.json"/);
-  assert.throws(() => loadRunnerConfigFromDir(dir), /config\.json" is not valid JSON/);
-  assert.throws(() => ensureRunnerConfigForDir(dir), SyntaxError);
 
   assert.deepEqual(fs.readdirSync(fgos).sort(), before, 'no file was created or removed');
   assert.equal(fs.readFileSync(path.join(fgos, 'config.json'), 'utf8'), TOMBSTONE);

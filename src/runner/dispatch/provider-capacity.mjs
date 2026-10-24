@@ -51,18 +51,6 @@ function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-export function rejectProjectProviderAccountInventory(projectConfig, sourceLabel = 'project config') {
-  const providers = projectConfig?.runner?.providers;
-  if (!isPlainObject(providers)) return;
-  for (const [provider, entry] of Object.entries(providers)) {
-    if (isPlainObject(entry) && entry.accounts !== undefined) {
-      throw new ProviderCapacityConfigError(
-        `runner config (${sourceLabel}#runner.providers.${provider}.accounts) is global-only; declare provider account inventory in ~/.fgos/config.json, not project config.`,
-      );
-    }
-  }
-}
-
 export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'runner config') {
   const runnerSection = isPlainObject(runnerConfig?.runner) ? runnerConfig.runner : runnerConfig;
   const providers = runnerSection?.providers;

@@ -4,16 +4,14 @@
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { explainCapability } from '../../../src/runner/execution/explain.mjs';
 import { bind } from '../../../src/runner/execution/bind.mjs';
-import { loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
+import { committedConfigDir } from '../../helpers/committed-config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const headless = { headless: true, herdrPresent: false };
 
 function deepseekConfig() {
@@ -111,7 +109,7 @@ test('explain carries a refusal instead of a binding', () => {
 });
 
 test('explain on the committed config agrees with bind() for every capability', () => {
-  const runnerConfig = loadRunnerConfigFromDir(repoRoot);
+  const runnerConfig = loadRunnerConfigForDir(committedConfigDir());
   for (const capability of Object.keys(runnerConfig.capabilities)) {
     for (const session of [headless, { headless: true, herdrPresent: true }]) {
       const explained = explainCapability(runnerConfig, { capability, session });

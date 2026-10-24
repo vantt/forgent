@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseTierCell, isExtendedTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
-import { loadRunnerConfigFromDir, supportsPolicyTier, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, supportsPolicyTier, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
@@ -80,7 +80,7 @@ function loadWith(projectPolicies, globalPolicies) {
   process.env.USERPROFILE = home;
   process.stderr.write = (chunk) => { stderr.push(String(chunk)); return true; };
   try {
-    return { cfg: loadRunnerConfigFromDir(dir), stderr: stderr.join('') };
+    return { cfg: loadRunnerConfigForDir(dir), stderr: stderr.join('') };
   } finally {
     process.stderr.write = prevWrite;
     process.env.HOME = prevHome;
@@ -96,21 +96,20 @@ test('a project config may write a list and model@pool cells', () => {
 
 test('a project config with a malformed cell fails to load and names the cell', () => {
   assert.throws(() => loadWith({ claude: { standard: [] } }), /modelPolicies\.claude\.standard/);
-  assert.throws(() => loadWith({ claude: { standard: 'sonnet@' } }), /no pool/);
+  assert.throws(() => loadWith({ claude: { standard: 'sonnet@' } }), /runner\.modelPolicies\.claude\.standard \(oneOf\)/);
 });
 
-test('the global config keeps plain strings but drops list and model@pool cells, naming each once', () => {
-  // Every fgOS release on the machine reads the global config; an older one fails on a list.
+test('the global config\'s list, model@pool and object cells are read as written, one cell form for both layers', () => {
   const { cfg, stderr } = loadWith(
     { claude: { standard: 'sonnet' } },
-    { claude: { advanced: 'opus', flagship: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' } },
+    { claude: { advanced: 'opus', flagship: ['opus@vertex', 'opus'], frontier: { model: 'opus', effort: 'high' } }, deepseek: { standard: 'deepseek-v4@openrouter' } },
   );
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
-  assert.equal(cfg.modelPolicies.claude.flagship, undefined);
-  assert.equal(cfg.modelPolicies.deepseek?.standard, undefined);
-  assert.match(stderr, /runner\.modelPolicies\.claude\.flagship/);
-  assert.match(stderr, /runner\.modelPolicies\.deepseek\.standard/);
+  assert.deepEqual(cfg.modelPolicies.claude.flagship, ['opus@vertex', 'opus']);
+  assert.deepEqual(cfg.modelPolicies.claude.frontier, { model: 'opus', effort: 'high' });
+  assert.equal(cfg.modelPolicies.deepseek.standard, 'deepseek-v4@openrouter');
+  assert.equal(stderr, '', 'nothing is filtered, so nothing is reported');
 });
 
 function bindConfig(cell) {
@@ -195,18 +194,8 @@ test('an object cell\'s effort reaches the binding as the cell\'s promise, and s
 test('a project config may write object cells; a bad one fails to load and names the cell', () => {
   const { cfg } = loadWith({ claude: { standard: 'sonnet', advanced: { model: 'opus', effort: 'high' } } });
   assert.deepEqual(cfg.modelPolicies.claude.advanced, { model: 'opus', effort: 'high' });
-  assert.throws(() => loadWith({ claude: { advanced: { model: 'opus', effort: 'xhigh' } } }), /modelPolicies\.claude\.advanced.*effort/);
-  assert.throws(() => loadWith({ claude: { advanced: { effort: 'high' } } }), /modelPolicies\.claude\.advanced.*model/);
-});
-
-test('the global config drops an object cell like a list cell, naming it once', () => {
-  const { cfg, stderr } = loadWith(
-    { claude: { standard: 'sonnet' } },
-    { claude: { advanced: 'opus', frontier: { model: 'opus', effort: 'high' } } },
-  );
-  assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
-  assert.equal(cfg.modelPolicies.claude.frontier, undefined);
-  assert.match(stderr, /runner\.modelPolicies\.claude\.frontier/);
+  assert.throws(() => loadWith({ claude: { advanced: { model: 'opus', effort: 'xhigh' } } }), /runner\.modelPolicies\.claude\.advanced \(oneOf\)/);
+  assert.throws(() => loadWith({ claude: { advanced: { effort: 'high' } } }), /runner\.modelPolicies\.claude\.advanced \(oneOf\)/);
 });
 
 test('bind runs the model of an object cell like the model of a string cell', () => {

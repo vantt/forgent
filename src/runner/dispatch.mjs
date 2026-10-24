@@ -12,10 +12,8 @@
 export {
   RunnerConfigError,
   loadRunnerConfig,
-  KNOWN_ASSISTANT_CLI_NAMES,
-  detectAssistantCli,
-  DEFAULT_RUNNER_CONFIG,
-  SUPPORTED_EXECUTOR_TEMPLATES,
+  DEFAULT_RUNNER_CONFIG, // still read by the setup registrations until they move to the config door
+  loadRunnerConfigForDir,
   loadRunnerConfigFromDir,
   ensureRunnerConfigForDir,
   EXECUTOR_KINDS,
@@ -33,7 +31,6 @@ export { compileDispatchPlan } from './dispatch/plan.mjs';
 
 export {
   ProviderCapacityConfigError,
-  rejectProjectProviderAccountInventory,
   validateProviderAccountInventory,
   providerAccountInventory,
   hasProviderAccounts,

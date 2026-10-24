@@ -12,7 +12,7 @@ import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleR
 import { bindable, bindableExecute, bindableFile } from '../helpers/work-seat-config.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
-import { RunnerConfigError, FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
@@ -302,13 +302,22 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   // Declare the executor explicitly: with no project config, the runner
   // bootstraps one from whichever assistant CLI the machine has on PATH, which
   // a machine without one (a CI runner) cannot satisfy.
-  writeProjectConfig(tempDir, { runner: bindableFile(structuredClone(FRESH_PROJECT_RUNNER_CONFIG)) });
+  writeProjectConfig(tempDir, { runner: bindableFile({ executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] } }) });
 
-  const decided = await decideExecutorCli(undefined, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    assignment: assignment.assignmentId,
-  });
+  // The runner config is read through the config door, which also reads the machine's global file: give
+  // this test an empty one rather than whatever an earlier test's child process left under HOME.
+  const prevHome = process.env.HOME;
+  process.env.HOME = mkTempDir();
+  let decided;
+  try {
+    decided = await decideExecutorCli(undefined, {
+      cwd: tempDir,
+      repoRoot: tempDir,
+      assignment: assignment.assignmentId,
+    });
+  } finally {
+    process.env.HOME = prevHome;
+  }
 
   assert.equal(decided.mechanism, 'out-of-process');
   assert.equal(decided.executorId, 'claude');

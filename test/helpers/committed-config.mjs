@@ -20,9 +20,9 @@ export function committedRunnerConfig() {
   return JSON.parse(committedConfigText()).runner;
 }
 
-/** A project directory holding only the committed config, for tests that read it through the config loader. */
+/** A project directory holding the committed config's `runner` section, for tests that read it through the runner loader. */
 export function committedConfigDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-committed-config-'));
-  writeRawProjectConfig(dir, committedConfigText());
+  writeRawProjectConfig(dir, JSON.stringify({ runner: committedRunnerConfig() }));
   return dir;
 }
