@@ -110,7 +110,7 @@ test('orphan reasons agree between gate-go, gate-exit and the receipt', () => {
 test('terminal outcomes are the interactive subset of the agent protocol results', () => {
   assert.deepEqual(Object.keys(outcomes.outcomes), ['ready', 'blocked', 'delivered', 'delivery-unknown', 'completed', 'needs-human']);
   for (const name of Object.keys(outcomes.outcomes)) assert.ok(name in agentProtocol.results, `${name} is an agent-protocol result`);
-  assert.deepEqual(outcomes.outcomes.blocked.fields.reason.enum, ['trust-dialog', 'login']);
+  assert.deepEqual(outcomes.outcomes.blocked.fields.reason.enum, ['trust-dialog', 'login', 'usage-limit']);
   for (const reason of outcomes.outcomes.blocked.fields.reason.enum) assert.ok(agentProtocol.results.blocked.reason.enum.includes(reason));
   assert.ok('resultPath' in outcomes.outcomes.completed.fields);
 });

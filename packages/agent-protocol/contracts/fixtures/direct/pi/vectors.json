@@ -1,6 +1,5 @@
 {
   "cli": "pi",
-  "stdinPolicy": "null-device",
   "source": "real tail, pi exit on missing key",
   "vectors": [
     {

@@ -3,7 +3,7 @@
   "description": "Outcomes an interactive (terminal mode) adapter names. They are the terminal subset of agent-protocol.v1.json `results`, plus the wire shape the supervisor uses to record and compare them. An adapter reads what the agent shows and returns one outcome per step; it never opens a tab, picks a model, changes a timeout or retries.",
   "outcomes": {
     "ready": { "fields": {}, "meaning": "the CLI shows an empty prompt and can take the brief" },
-    "blocked": { "fields": { "reason": { "enum": ["trust-dialog", "login"] } }, "meaning": "the CLI waits for something only a person can do; the supervisor stops with a named stop cause and the pane stays (release retain)" },
+    "blocked": { "fields": { "reason": { "enum": ["trust-dialog", "login", "usage-limit"] } }, "meaning": "the CLI waits for something only a person can do (a trust dialog, a dead login, or a used-up usage limit shown where the agent has stopped: the detector says blocked, or an idle screen shows the limit line); the supervisor stops with a named stop cause and the pane stays (release retain)" },
     "delivered": { "fields": {}, "meaning": "the brief is confirmed submitted (the CLI shows it working or the composer is empty), not merely visible. Only this outcome lets the supervisor send BRIEF_DELIVERED" },
     "delivery-unknown": { "fields": {}, "meaning": "submission could not be confirmed; the adapter never resends blind and the supervisor sends no BRIEF_DELIVERED" },
     "completed": { "fields": { "resultPath": "absolute path of launch.outboxDir/result-<N>.json" }, "meaning": "the agent finished and the result file exists; the supervisor then types the exit command" },
@@ -11,12 +11,11 @@
   },
   "wire": {
     "shape": "{ \"outcome\": <name>, ...fields }; one JSON object; `outcome` is exactly one key of `outcomes`",
-    "order": "ready -> (blocked | delivered | delivery-unknown) -> completed | needs-human; ready is never reported after delivered, and completed only after delivered",
-    "usageLimit": "usage-limit is a direct-mode blocked reason only; a terminal adapter reports a usage limit as needs-human"
+    "order": "ready -> (blocked | delivered | delivery-unknown) -> completed | needs-human; ready is never reported after delivered, and completed only after delivered"
   },
   "mapping": {
     "toStop": "blocked, needs-human and delivery-unknown end the run early: the supervisor stops the agent through the normal stop path with stop cause `cancel` (stop-requested.v1.json keeps its closed cause list), so gate-exit and the receipt read cancelled",
-    "toReceiptReason": "the receipt's optional `reason` carries `terminal:<outcome>` or `terminal:blocked:<reason>` so the settle step and a person can tell why; the pane is released with retain"
+    "toReceiptReason": "the receipt's optional `reason` carries `terminal:<outcome>` or `terminal:blocked:<reason>` so the settle step and a person can tell why; the pane is released with retain. Reasons (a step that went well carries none): `terminal:blocked:trust-dialog`, `terminal:blocked:login`, `terminal:blocked:usage-limit`, `terminal:needs-human`, `terminal:delivery-unknown` are rendered by the protocol from the outcome; the supervisor adds `terminal:foreground-not-agent`, `terminal:agent-not-started`, `terminal:result-unreadable` and `terminal:completed-no-exit` for ends no adapter outcome sits behind (constants in the protocol crate)"
   },
   "vectors": "packages/agent-protocol/contracts/fixtures/terminal/<cli>/vectors.json, one per CLI; each step expects one `outcome` object of this contract"
 }
