@@ -1,0 +1,63 @@
+{
+  "verdict": "APPROVE_WITH_REWORK",
+  "commit": "0763c2259",
+  "scope": "G8 direct-link retention (984829939), Lead cold timing (5c3b57347), w8 REWORK follow-up (25e8842d3)",
+  "findings": [
+    {
+      "id": "direct-link-targets-really-linked",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "All 4 retained files are linked from ruling roots at d3efc70c5 and HEAD; exactly 4 targets fall outside the prior 888; sizes sum to 783,918 B.",
+      "evidence": "minimum-constitution.md:235,244,332; evidence-payload-relocation-policy.md:15,96; audit/direct-links.json.gz (646 refs: 27 ruling, 619 navigation; only 4 targets not in beforeRetainedPaths); git cat-file -s at pin and HEAD; build-design.py:266-276 infers ruling roots from 'Document type:' header"
+    },
+    {
+      "id": "no-root-or-outside-plan-link-into-archive",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "No ruling or navigation root, and no file outside the plan (incl. docs/), links to an archived path, at the pin or at HEAD. Retained-to-archived links recompute exactly to the recorded 1,025 (939 .md links from 117 files + 86 Markdown links inside 6 retained .json); extra=0.",
+      "evidence": "independent scan of retained .md/.json in trees d3efc70c5 and HEAD vs audit/partition.json.gz records (6,026); audit/retained-archive-links.json.gz; design.md:13 documents archive-ref resolution"
+    },
+    {
+      "id": "json-path-strings-undocumented",
+      "severity": "low",
+      "verdict": "NOTE",
+      "summary": "200 retained JSON files carry 40,641 repo-relative path strings naming archived files (e.g. step-08-tree-prune-manifest.json 7,015; retired-unit-decisions.json 3,272). Not links and no live reader found, but design.md's recovery note covers Markdown links only.",
+      "evidence": "scan at d3efc70c5; partition.json.gz counts.unresolvedLiveSources=0; design.md:13. Fix: one sentence + counts in design.md."
+    },
+    {
+      "id": "pin-partition-archives-gate-evidence",
+      "severity": "medium",
+      "verdict": "CARRY-TO-F",
+      "summary": "At HEAD 70 of 92 evidence paths in preflip-gate-status.json (incl. G8's own w2/w4/w5 reviews) and 3 new phase-09 Markdown links point at files the d3efc70c5 partition archives. The one-hop rule follows Markdown links only, so a JSON gate register never retains its evidence even after an F rebuild.",
+      "evidence": "preflip-gate-status.json gates[*].evidence resolved against partition records; new readers g9/receipt.md, git-one-door/wrapper-escapes/receipt.md, reviews/w6-misc-rework-review.md. Fix at F: decide explicitly whether the cutover gate register's evidence stays at tip or resolves via archive ref."
+    },
+    {
+      "id": "cold-timing-method",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "Fresh --no-hardlinks clone per variant; per-object fsync + POSIX_FADV_DONTNEED, fincore before/after eviction and each add; times only 'git worktree add --detach'; cold label only when eviction proven and pre-add residency 0. Limits: one cold sample per variant, objects-only eviction, writeback excluded and possibly overlapping runs. Gate criterion (median of 3 < 60 s, target <= 20 s) is met by a wide margin either way.",
+      "evidence": "rehearse.py:266-310; rehearsal.json coldMethod, filesystemStat ext4 nvme; preflip-execution-plan.md row 8"
+    },
+    {
+      "id": "cold-timing-numbers-match-logs",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "Committed audit/rehearsal-commands.json.gz worktree-add rows equal rehearsal.json runs: 2.9292/2.7071/2.9036 s and 41.7036/10.5524/12.4394 s, exit 0; medians 2.904 and 12.439 s; eviction 704,667,648 -> 0; residency chain 0 -> 230,699,008 / 382,160,896 holds; per-file sums equal totals. Evidence unchanged since w8 (git diff --quiet f2162d9ff HEAD).",
+      "evidence": "rehearsal.json variants[*]; audit/rehearsal-commands.json.gz; receipt.md 'Lead run outside the sandbox'"
+    },
+    {
+      "id": "raw-stdout-log-not-committed",
+      "severity": "low",
+      "verdict": "NOTE",
+      "summary": "Receipt cites /tmp/fgos-work/w5-d5e-rehearse.log, which is not committed and does not persist; the committed structured command log suffices.",
+      "evidence": "receipt.md Lead run section"
+    },
+    {
+      "id": "w8-archive-receipt-json-stale",
+      "severity": "low",
+      "verdict": "REWORK",
+      "summary": "25e8842d3 added the corrected top-level fields but left the old values in place, so receipt.json contradicts itself: proofs.verifierExit 2 / verifierStatus blocked-rehearsal-not-current / rehearsalRerunCompleted false / newTimingRuns 0 / coldCacheEvidence false / checkARevalidated false; coldRunImplementation.runtimeExercised false; deferred still lists the timing and parity runs; top-level blocker keeps the errno-30 text (historicalBlocker got only the status). design.md line 3 still says 'Current status: blocked ... exits 2'.",
+      "evidence": "archive/receipt.json at HEAD; git show 25e8842d3; archive/design.md:3. Fix: move the stale proofs/runtimeExercised/deferred/blocker into historicalBlocker (or drop them), set proofs from verification.json/rehearsal.json, add a superseded pointer to design.md."
+    }
+  ]
+}

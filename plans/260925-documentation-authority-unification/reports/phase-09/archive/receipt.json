@@ -68,41 +68,10 @@
     "targetFiles": 628,
     "asset": "audit/retained-archive-links.json.gz"
   },
-  "proofs": {
-    "builderExit": 0,
-    "builderLog": "audit/rebuild-d5e.log",
-    "verifierExit": 2,
-    "verifierStatus": "blocked-rehearsal-not-current",
-    "structuralCustodyVerified": true,
-    "verifierLog": "audit/verify-d5e.log",
-    "pythonSyntaxParsed": true,
-    "rehearsalAttemptExit": 1,
-    "rehearsalAttemptLog": "audit/rehearse-d5e.log",
-    "rehearsalRerunCompleted": false,
-    "newTimingRuns": 0,
-    "coldCacheEvidence": false,
-    "checkARevalidated": false,
-    "newLinkParityRevalidated": false
-  },
-  "coldRunImplementation": {
-    "externalScratch": true,
-    "perObjectFsyncAndPosixFadvise": true,
-    "fincoreBeforeAndAfterEviction": true,
-    "residencyBeforeAndAfterEachAdd": true,
-    "labelsFromMeasuredResidency": true,
-    "warmFallbackRequiresOwnerColdRun": true,
-    "runtimeExercised": false
-  },
-  "blocker": "Sandbox denies mkdir /var/tmp/fgos-work with errno 30 (Read-only file system). /tmp is tmpfs, not external real-disk scratch. Re-run with writable external real-disk scratch and the existing >20 GiB free-space guard; no repository scope expansion is needed.",
   "attempt1BundleAbsent": true,
   "attempt1OtherFilesUnchanged": true,
   "historicalRehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "historicalColdClaimRejected": true,
-  "deferred": [
-    "Both real-disk timing variants and measured eviction",
-    "Current full A/B/H/I and link/test parity",
-    "Current rehearsal bundle and full custody verification"
-  ],
   "sourceGuards": {
     "sourceGitWrites": false,
     "sourcePairAccounting": false,
@@ -128,5 +97,59 @@
   "coldCacheEvidence": true,
   "checkARevalidated": true,
   "runtimeExercised": true,
-  "leadRunCommit": "5c3b57347"
+  "leadRunCommit": "5c3b57347",
+  "historicalSandboxAttempt": {
+    "proofs": {
+      "builderExit": 0,
+      "builderLog": "audit/rebuild-d5e.log",
+      "verifierExit": 2,
+      "verifierStatus": "blocked-rehearsal-not-current",
+      "structuralCustodyVerified": true,
+      "verifierLog": "audit/verify-d5e.log",
+      "pythonSyntaxParsed": true,
+      "rehearsalAttemptExit": 1,
+      "rehearsalAttemptLog": "audit/rehearse-d5e.log",
+      "rehearsalRerunCompleted": false,
+      "newTimingRuns": 0,
+      "coldCacheEvidence": false,
+      "checkARevalidated": false,
+      "newLinkParityRevalidated": false
+    },
+    "coldRunImplementation": {
+      "externalScratch": true,
+      "perObjectFsyncAndPosixFadvise": true,
+      "fincoreBeforeAndAfterEviction": true,
+      "residencyBeforeAndAfterEachAdd": true,
+      "labelsFromMeasuredResidency": true,
+      "warmFallbackRequiresOwnerColdRun": true,
+      "runtimeExercised": false
+    },
+    "blocker": "Sandbox denies mkdir /var/tmp/fgos-work with errno 30 (Read-only file system). /tmp is tmpfs, not external real-disk scratch. Re-run with writable external real-disk scratch and the existing >20 GiB free-space guard; no repository scope expansion is needed.",
+    "deferred": [
+      "Both real-disk timing variants and measured eviction",
+      "Current full A/B/H/I and link/test parity",
+      "Current rehearsal bundle and full custody verification"
+    ],
+    "note": "Sandbox attempt before the Lead run; superseded by leadRunCommit 5c3b57347 (cold rehearsal, verify-design exit 0). Kept as history only."
+  },
+  "coldRunImplementation": {
+    "externalScratch": true,
+    "perObjectFsyncAndPosixFadvise": true,
+    "fincoreBeforeAndAfterEviction": true,
+    "residencyBeforeAndAfterEachAdd": true,
+    "labelsFromMeasuredResidency": true,
+    "warmFallbackRequiresOwnerColdRun": true,
+    "runtimeExercised": true
+  },
+  "deferred": [],
+  "postMeasurementEdits": [
+    {
+      "path": "design.md",
+      "change": "Line 3 status sentence corrected from the sandbox-blocked status to the verified Lead run. rehearsal.json measuredMainArtifacts keeps the sha256 of the bytes that were measured; the archive is rebuilt and retimed at F, which regenerates both."
+    },
+    {
+      "path": "receipt.json",
+      "change": "Sandbox-attempt fields moved under historicalSandboxAttempt; current coldRunImplementation and deferred reflect the Lead run."
+    }
+  ]
 }
