@@ -27,7 +27,7 @@ Verbatim ERROR and `suite:` lines of the npm run (no other ERROR; the two `ERROR
 ```
 run-tests: ERROR: test suite left temporary directories behind (name prefix: count):
   fgos-tp-*: 3
-  A test file must install test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.   (text as printed: "must import test/helpers/process-tmp-root.mjs first")
+  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.
 suite: 595 files, 7970 test() calls, 633 s wall (baseline 595 / 7970 / 202 s at eeaa950dc)
 suite: this change against acefe7f3f: +131 -185 test() calls, 3 new CLI/host spawn site(s), 1 without a reason
 suite: warning: 12 test title(s) appear in more than one file (`node scripts/test-proof-inventory.mjs --duplicates` lists them)
