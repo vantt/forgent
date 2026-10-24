@@ -33,7 +33,7 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored, record_of_head_text};
 use fgos_mailbox_core::{
-    mode_pointer, render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat,
+    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat,
     Cli, Finished, Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal,
     RegisterRequest, Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
 };
@@ -118,21 +118,10 @@ pub struct Claimed {
     ticket: FinishTicket,
 }
 
-/// Why a step drain prints only the pointer line.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PointerReason {
-    /// Every pending item is too large alone for the channel.
-    TooLarge,
-    /// The CLI is in pointer mode (`mailbox.postToolUse.pointerClis`): its
-    /// step drain never claims; the model reads its mail with
-    /// `inbox --claim`.
-    Mode,
-}
-
-/// A step drain that writes the pointer line alone and finishes nothing.
+/// A step drain that writes the pointer line alone and finishes nothing:
+/// every pending item is too large alone for the channel.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PointerOnly {
-    pub reason: PointerReason,
     /// The items the line names.
     pub count: u32,
     /// Whether the drain stamped `last_drain_at`: only when the stamp was
@@ -145,12 +134,8 @@ pub struct PointerOnly {
 impl PointerOnly {
     /// The pointer line in the CLI's output shape.
     pub fn reply(&self) -> HookReply {
-        let line = match self.reason {
-            PointerReason::TooLarge => too_large_pointer(self.count),
-            PointerReason::Mode => mode_pointer(self.count),
-        };
         HookReply {
-            stdout: self.shape.render(&line),
+            stdout: self.shape.render(&too_large_pointer(self.count)),
         }
     }
 }
@@ -338,19 +323,6 @@ pub fn begin(
             Checkpoint::Stop
         }
         HookEvent::PostToolUse => match facts.post_tool_use_max_bytes {
-            Some(_) if hook.post_tool_use.pointer_clis.contains(&call.adapter) => {
-                let pointed = state.point(key, generation, now, limits, ids);
-                if pointed.count == 0 {
-                    return after(QuietReason::NothingEligible, changed | pointed.changed);
-                }
-                // A registering call has no mail, so `changed` is the stamp alone.
-                return Begun::Pointer(PointerOnly {
-                    reason: PointerReason::Mode,
-                    count: pointed.count,
-                    changed: changed | pointed.changed,
-                    shape,
-                });
-            }
             Some(bound) => Checkpoint::BoundedStep(bound),
             None => return after(QuietReason::NoStepBound, changed),
         },
@@ -360,7 +332,6 @@ pub fn begin(
     let Some(token) = claim.token else {
         if claim.too_large > 0 {
             return Begun::Pointer(PointerOnly {
-                reason: PointerReason::TooLarge,
                 count: claim.too_large,
                 changed,
                 shape,

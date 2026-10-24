@@ -57,17 +57,12 @@ export function refuseV6Home(target, tmp, worktrees) {
 
 // ---------------------------------------------------------------- the contract text
 
-/** A section of the frame contract (`[name]` up to the next section, trailing blank lines dropped). */
-export function frameSection(repo, name) {
-  const lines = fs.readFileSync(path.join(repo, FRAME), 'utf8').split('\n');
-  const start = lines.indexOf(`[${name}]`);
-  if (start < 0) throw new Error(`the frame contract has no [${name}]`);
-  const end = lines.findIndex((l, i) => i > start && /^\[[a-z.-]+\]$/.test(l));
-  return lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trimEnd();
-}
-
-/** The fixed text of the pointer line, after its count: what finds it in a model-input record. */
-export const pointerNeedle = (repo) => frameSection(repo, 'message.pointer').split('{{count}}').at(-1);
+/**
+ * The fixed text of V7c arm P's pointer line, after its count: what finds it in a model-input
+ * record. Pointer mode is retired; the line is kept here, as V7c's frame contract had it, so
+ * V7c's recorded runs still score the same.
+ */
+export const POINTER_NEEDLE = ' message(s) from other agents are waiting; read them with: fgos mailbox inbox --claim';
 
 // ---------------------------------------------------------------- the addendum
 

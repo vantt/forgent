@@ -397,8 +397,8 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
 }
 
 #[test]
-fn inbox_claim_after_a_pointer_line_offers_every_pending_message_once() {
-    let fgos = TempFgos::new("verb-inbox-after-pointer");
+fn inbox_claim_offers_every_pending_message_once() {
+    let fgos = TempFgos::new("verb-inbox-claim-all");
     let name = with_head(&fgos, "head-a");
     for body in ["first", "second", "third"] {
         assert!(
@@ -413,22 +413,6 @@ fn inbox_claim_after_a_pointer_line_offers_every_pending_message_once() {
             .recorded
         );
     }
-    // The pointer a pointer-mode hook prints: it names the count and claims nothing.
-    let pointed = fgos
-        .record()
-        .hold(Wait::Try, T0, &limits(), |state, ids| {
-            let generation = state.binding(&key("head-a")).unwrap().generation;
-            let pointed = state.point(&key("head-a"), generation, T0, &limits(), ids);
-            Reported {
-                value: pointed,
-                changed: pointed.changed,
-            }
-        })
-        .unwrap()
-        .value
-        .value;
-    assert_eq!(pointed.count, 3);
-
     let clock = || T0;
     let mut out = Vec::new();
     let done = inbox_claim(

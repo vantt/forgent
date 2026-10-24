@@ -45,6 +45,12 @@ fn an_unknown_mailbox_key_is_ignored_and_reported_to_the_caller() {
         vec!["mailbox.nope", "mailbox.queue.capp"]
     );
     assert_eq!(loaded.limits.max_offers, 4);
+    // A config written while pointer mode existed loads, its retired key reported.
+    let retired = json!({ "mailbox": { "postToolUse": { "pointerClis": ["codex"] } } });
+    assert_eq!(
+        load(Some(&retired)).unwrap().ignored_keys,
+        vec!["mailbox.postToolUse.pointerClis"]
+    );
 }
 
 #[test]
@@ -74,6 +80,7 @@ fn a_wrong_type_or_a_value_the_core_rejects_makes_the_section_invalid_and_names_
         json!({ "mailbox": { "maxOffers": { "x": 1 } } }),
         "mailbox.maxOffers",
     );
+    wrong(json!({ "mailbox": { "maxOffers": [3] } }), "mailbox.maxOffers");
     assert_eq!(
         load(Some(
             &json!({ "mailbox": { "maxOffers": 4_294_967_296_u64 } })
@@ -101,43 +108,6 @@ fn the_empty_section_setup_writes_and_the_opt_in_flag_load_as_the_defaults() {
             "{section}: the setup flag is a contract key, never reported as unknown"
         );
     }
-}
-
-#[test]
-fn the_pointer_key_takes_a_list_of_cli_names_and_refuses_an_unknown_name() {
-    use fgos_mailbox::hook::Adapter;
-    assert!(defaults().hook.post_tool_use.pointer_clis.is_empty());
-    let with = |clis: Value| json!({ "mailbox": { "postToolUse": { "pointerClis": clis } } });
-
-    let loaded = load(Some(&with(json!(["codex"])))).unwrap();
-    assert_eq!(loaded.hook.post_tool_use.pointer_clis, vec![Adapter::Codex]);
-    let mut expected = defaults();
-    expected.hook.post_tool_use.pointer_clis = vec![Adapter::Codex];
-    assert_eq!(loaded, expected, "only the listed key changes");
-
-    assert_eq!(
-        load(Some(&with(json!(["codex", "gemini"])))),
-        Err(LimitsError::Rejected(
-            "mailbox.postToolUse.pointerClis".to_string()
-        ))
-    );
-    assert_eq!(
-        load(Some(&with(json!("codex")))),
-        Err(LimitsError::WrongType(
-            "mailbox.postToolUse.pointerClis".to_string()
-        ))
-    );
-    // A number where the contract has a list, and a list where it has a number.
-    assert_eq!(
-        load(Some(&with(json!(1)))),
-        Err(LimitsError::WrongType(
-            "mailbox.postToolUse.pointerClis".to_string()
-        ))
-    );
-    assert_eq!(
-        load(Some(&json!({ "mailbox": { "maxOffers": [3] } }))),
-        Err(LimitsError::WrongType("mailbox.maxOffers".to_string()))
-    );
 }
 
 #[test]

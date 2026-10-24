@@ -31,11 +31,11 @@ mod wake;
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
-    MessageView, NoticeFacts, Pointed, Recipient, Refusal, SendOutcome, SendRequest,
+    MessageView, NoticeFacts, Recipient, Refusal, SendOutcome, SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use frame::{
-    frame_sections, mode_pointer, pointer_reserve, render, too_large_pointer, worst_case_len, FRAME_SEPARATOR,
+    frame_sections, pointer_reserve, render, too_large_pointer, worst_case_len, FRAME_SEPARATOR,
 };
 pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,

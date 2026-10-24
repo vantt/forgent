@@ -313,13 +313,6 @@ pub fn too_large_pointer(count: u32) -> String {
     )
 }
 
-/// The line a step drain of a CLI in pointer mode prints in place of the
-/// frames: it names how many items wait and the command that reads them,
-/// and claims nothing.
-pub fn mode_pointer(count: u32) -> String {
-    fill(section("message.pointer"), &[("count", &count.to_string())])
-}
-
 /// What a bounded step keeps free for the pointer line: its length at the
 /// largest count, plus the blank line that joins it to the frames.
 pub fn pointer_reserve() -> usize {

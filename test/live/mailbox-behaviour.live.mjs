@@ -367,7 +367,7 @@ function context({ dry, stage = null }) {
   if (broken.length) die(`frozen files changed: ${broken.join(', ')}`);
   const masks = confinedMasks(dry);
   const windowSec = readJson(path.join(CONTRACTS, 'limits.v1.json')).keys.find((k) => k.key === 'mailbox.human.fallbackWindowSec').default;
-  const needle = v7.pointerNeedle(REPO_ROOT);
+  const needle = v7.POINTER_NEEDLE;
   const measured = addendum ? { addendum: addendum.name, ...MEASURE.measured(addendum, needle) } : { effort: V6_CODEX_EFFORT };
   const install = piOmpInstall();
   const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };

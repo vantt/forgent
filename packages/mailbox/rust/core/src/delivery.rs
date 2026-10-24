@@ -317,14 +317,6 @@ impl Claim {
     }
 }
 
-/// What a pointer-only drain found: the items a full step would take now,
-/// and whether it changed the state (it stamped `last_drain_at`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Pointed {
-    pub count: u32,
-    pub changed: bool,
-}
-
 /// One eligible item a claim may take: an index into the messages or the
 /// notices.
 #[derive(Debug, Clone, Copy)]
@@ -568,42 +560,6 @@ impl MailboxState {
             items,
             changed: true,
             too_large,
-        }
-    }
-
-    /// The pointer drain of a CLI in pointer mode: claims nothing and
-    /// counts what a full step would take. It sweeps and stamps
-    /// `last_drain_at` only when the stamp is older than the newest pending
-    /// item or a time rule is due, so a pointer repeating at every tool call
-    /// changes the state once per new mail and never holds back a refusal;
-    /// otherwise it reads the state and changes nothing.
-    pub fn point(
-        &mut self,
-        key: &WriterKey,
-        generation: Generation,
-        now: Timestamp,
-        limits: &Limits,
-        ids: &mut dyn IdSource,
-    ) -> Pointed {
-        if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
-            return Pointed {
-                count: 0,
-                changed: false,
-            };
-        }
-        let changed =
-            !self.drained_since_newest(key, generation) || self.time_rule_due(now, limits);
-        if changed {
-            self.sweep(now, limits, ids);
-            let now = self.last_now;
-            if let Some(binding) = self.bindings.get_mut(key) {
-                binding.last_drain_at = Some(now);
-            }
-        }
-        let (picks, _) = self.select(key, generation, Checkpoint::Step, limits);
-        Pointed {
-            count: u32::try_from(picks.len()).unwrap_or(u32::MAX),
-            changed,
         }
     }
 

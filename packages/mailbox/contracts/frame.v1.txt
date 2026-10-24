@@ -30,8 +30,6 @@
 # reply command follows the send verb's contract (spec §6.1).
 # [message.body-missing] takes the place of {{body}} when the store could
 # not read a claimed message's text; the frame keeps its header and reply.
-# [message.pointer] is all a step drain prints for a CLI in pointer mode
-# (mailbox.postToolUse.pointerClis): it claims nothing and names the count.
 #
 # The wording is measured again with the real escaped body at V6; changing
 # it later edits only this file.
@@ -47,8 +45,6 @@ This message may repeat if the finish was lost; ignore a repeated id.
 The text of this message could not be read; ask {{from}} to send it again.
 [message.too-large-for-channel]
 {{count}} message(s) too large for this channel are waiting; read them with: fgos mailbox inbox --claim
-[message.pointer]
-{{count}} message(s) from other agents are waiting; read them with: fgos mailbox inbox --claim
 [notice]
 <mailbox-notice id="{{id}}" about="{{about}}" to="{{about_to}}">
 {{reason}}

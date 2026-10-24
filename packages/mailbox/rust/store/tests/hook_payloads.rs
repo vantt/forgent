@@ -14,7 +14,7 @@ use common::{
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::hook::{
     begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
-    HookLimits, PointerReason, QuietReason,
+    HookLimits, QuietReason,
 };
 use fgos_mailbox_core::Cli;
 use fgos_mailbox_core::{
@@ -90,8 +90,7 @@ struct Drain {
     writer: WriterKey,
     head: HeadFacts,
     tested: TestedClis,
-    /// The hook's limits as the loader yields them; a test may list the
-    /// CLI in `postToolUse.pointerClis`.
+    /// The hook's limits as the loader yields them.
     hook_limits: HookLimits,
     /// The CLIs whose Stop drains, as `send` passes them to the core.
     stop_drains: BTreeSet<Cli>,
@@ -777,7 +776,6 @@ fn a_step_drain_with_only_too_large_mail_prints_the_pointer_alone_and_finishes_n
         let Begun::Pointer(pointer) = begun else {
             panic!("{adapter:?}: expected the pointer alone, got {begun:?}");
         };
-        assert_eq!(pointer.reason, PointerReason::TooLarge);
         assert_eq!(pointer.count, 1);
         let stdout = pointer.reply().stdout;
         assert_eq!(
@@ -942,16 +940,6 @@ fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_cli_and_store
     assert!(!snapshot.contains("@fg-test"), "the handle is never stored");
 }
 
-/// A drain whose CLI is listed in `mailbox.postToolUse.pointerClis`,
-/// registered by its first hook.
-fn pointer_mode(adapter: Adapter) -> Drain {
-    let mut drain = Drain::new(adapter);
-    drain.hook_limits.post_tool_use.pointer_clis = vec![adapter];
-    let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
-    assert_eq!(first, quiet(QuietReason::NothingEligible));
-    drain
-}
-
 fn pointer_of(begun: Begun) -> fgos_mailbox::hook::PointerOnly {
     match begun {
         Begun::Pointer(pointer) => pointer,
@@ -960,46 +948,10 @@ fn pointer_of(begun: Begun) -> fgos_mailbox::hook::PointerOnly {
 }
 
 #[test]
-fn a_post_tool_use_drain_for_a_pointer_mode_cli_claims_nothing_and_emits_the_pointer_line() {
-    let mut drain = pointer_mode(Adapter::Codex);
-    drain.add_peer("peer");
-    let first = drain.send("peer", "first", false);
-    let second = drain.send("peer", "second", false);
-
-    let pointer = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-
-    assert_eq!(pointer.reason, PointerReason::Mode);
-    assert_eq!(pointer.count, 2);
-    let line = fgos_mailbox_core::mode_pointer(2);
-    assert!(
-        line.contains("2 message(s) from other agents are waiting")
-            && line.ends_with("fgos mailbox inbox --claim"),
-        "{line}"
-    );
-    assert_eq!(
-        serde_json::from_str::<Value>(&pointer.reply().stdout).unwrap(),
-        accepted(Adapter::Codex, files::ACCEPTED_POST_TOOL_USE, &line)
-    );
-    for id in [first, second] {
-        let header = drain.state.message(&id).unwrap();
-        assert_eq!(header.state, MessageState::Recorded);
-        assert_eq!(header.offers, 0);
-    }
-    // A CLI not in the list still has its mail framed at the same step.
-    let mut framed = Drain::registered(Adapter::Codex);
-    framed.add_peer("peer");
-    framed.send("peer", "framed", false);
-    take(framed.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-}
-
-#[test]
 fn a_repeating_pointer_stamps_the_last_drain_once_per_new_mail_and_writes_nothing_on_later_calls() {
-    // Both pointer reasons: the mode, and mail too large for the step.
+    // Mail too large for the step: the pointer is all the drain prints.
     let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
-    for (mut drain, body) in [
-        (pointer_mode(Adapter::Codex), "small".to_string()),
-        (Drain::registered(Adapter::Codex), too_large),
-    ] {
+    for (mut drain, body) in [(Drain::registered(Adapter::Codex), too_large)] {
         drain.add_peer("peer");
         drain.send("peer", &body, false);
 
@@ -1064,10 +1016,7 @@ fn a_claim_left_in_flight_beside_too_large_mail_is_offered_again_once_its_deadli
 #[test]
 fn a_pointer_call_past_a_messages_record_ttl_refuses_it_writes_once_and_then_changes_nothing() {
     let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
-    for (mut drain, body) in [
-        (pointer_mode(Adapter::Codex), "small".to_string()),
-        (Drain::registered(Adapter::Codex), too_large),
-    ] {
+    for (mut drain, body) in [(Drain::registered(Adapter::Codex), too_large)] {
         drain.add_peer("peer");
         let id = drain.send("peer", &body, false);
         let first = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
