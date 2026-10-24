@@ -117,6 +117,7 @@ Interface mismatches to settle with the Git leads (not owner questions). ES phas
 | Item | From | What | When | Source |
 |---|---|---|---|---|
 | H33 | HARDEN (`claude-p74h@fg-server2`), owner 2026-10-24 20:00 (T3-04a decisions 30–32) | Delete the legacy `work.friction` fence: `run_lazy_migration`, `LegacyFrictionSource`/`LegacyFrictionRecord` (`packages/work-state/rust/src/legacy_friction.rs`), `fgos friction migrate`, `wiring/friction_sources.rs`, doctor row `observe-friction-migrated` (`checkObserveFrictionMigrated`) and its tests, the `.fgos/observe/.lock/TOMBSTONE` fence; about −780 lines | One release after the Event Store cutover (fences live one release). Before it, HARDEN's T3-04a takes the lazy migration off the friction write path, after the cutover; HARDEN announces it | [council](../reports/council-261024-1947-harden-t3a-arbitration.md) §5 |
+| H31-A test | WORK's own follow-up from reviewing HARDEN's H31-A (`c42f30dc1`), 2026-10-24 21:20 | Owning proof that a migrated write admission is refused with refspec-missing when a `refs/fgos/remotes/<remote>/legacy` mirror differs from the pin, next to `tracked_fence_without_fetched_legacy_is_refspec_missing` in `tests/reader_review_regressions.rs` | Next WORK code wave | HARDEN 04b inputs `bc5f37187` |
 
 ## Execution model
 
