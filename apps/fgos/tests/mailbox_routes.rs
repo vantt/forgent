@@ -157,7 +157,9 @@ impl Scene {
             .stderr(Stdio::piped())
             .spawn()
             .unwrap();
-        child.stdin.take().unwrap().write_all(payload).unwrap();
+        // A call refused before it reads its payload (a usage error) may close
+        // stdin first; the broken pipe is then this writer's, not the hook's.
+        let _ = child.stdin.take().unwrap().write_all(payload);
         child.wait_with_output().unwrap()
     }
 
@@ -1342,6 +1344,93 @@ fn the_hook_and_a_sender_resolve_the_same_identity_state_root_under_an_explicit_
     // Without the pinned root the sender reads HOME's, which knows no machine.
     let unpinned = send_to(&scene, &own.handle, false);
     assert_eq!(unpinned.status.code(), Some(1), "{unpinned:?}");
+}
+
+/// `fgos mailbox status --json` from the main checkout: its exit code and envelope data.
+fn status_json(scene: &Scene) -> (Option<i32>, serde_json::Value) {
+    let out = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    (out.status.code(), envelope["data"].clone())
+}
+
+#[test]
+fn a_project_migrated_to_config_yaml_names_the_migration_in_the_hook_outcome_status_and_the_verbs()
+{
+    let scene = Scene::new("config-migrated");
+    identity_root(&scene);
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let name = scene.head_name();
+    // What `fgos config migrate` leaves: the section in config.yaml, the tombstone in config.json.
+    fs::write(
+        scene.main().join(".fgos/config.yaml"),
+        "mailbox:\n  hook:\n    budgetMs: 4000\n",
+    )
+    .unwrap();
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        format!("{}\n", fgos_config::files::TOMBSTONE),
+    )
+    .unwrap();
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
+    assert_eq!(hook_outcome(&scene).as_deref(), Some("config:migrated"));
+
+    let (code, data) = status_json(&scene);
+    assert_eq!(
+        code,
+        Some(1),
+        "a config the mailbox cannot read fails status"
+    );
+    assert_eq!(data["config"], "config:migrated");
+    assert_eq!(data["record"], "ok", "the record is still read: {data}");
+    assert_eq!(data["hookOutcome"]["reason"], "config:migrated");
+
+    let sent = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &name, "hello"],
+        b"",
+    );
+    assert_eq!(sent.status.code(), Some(1));
+    assert!(
+        String::from_utf8_lossy(&sent.stdout).contains("config.yaml"),
+        "{sent:?}"
+    );
+}
+
+#[test]
+fn a_pre_migration_config_json_with_a_wrong_mailbox_value_leaves_its_reason_until_it_is_fixed() {
+    let scene = Scene::new("config-wrong");
+    identity_root(&scene);
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let config = scene.main().join(".fgos/config.json");
+    fs::write(&config, r#"{"mailbox":{"hook":{"budgetMs":"fast"}}}"#).unwrap();
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(out.stdout.is_empty(), "{out:?}");
+    assert_eq!(hook_outcome(&scene).as_deref(), Some("config:wrong-type"));
+    let (code, data) = status_json(&scene);
+    assert_eq!(
+        (code, &data["config"]),
+        (Some(1), &serde_json::json!("config:wrong-type"))
+    );
+
+    fs::write(&config, r#"{"mailbox":{"hook":{"budgetMs":4000}}}"#).unwrap();
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert_eq!(
+        hook_outcome(&scene),
+        None,
+        "a config read again clears its reason"
+    );
+    let (code, data) = status_json(&scene);
+    assert_eq!((code, &data["config"]), (Some(0), &serde_json::Value::Null));
 }
 
 #[test]

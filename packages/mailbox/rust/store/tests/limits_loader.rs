@@ -80,13 +80,24 @@ fn a_wrong_type_or_a_value_the_core_rejects_makes_the_section_invalid_and_names_
         json!({ "mailbox": { "maxOffers": { "x": 1 } } }),
         "mailbox.maxOffers",
     );
-    wrong(json!({ "mailbox": { "maxOffers": [3] } }), "mailbox.maxOffers");
+    wrong(
+        json!({ "mailbox": { "maxOffers": [3] } }),
+        "mailbox.maxOffers",
+    );
     assert_eq!(
         load(Some(
             &json!({ "mailbox": { "maxOffers": 4_294_967_296_u64 } })
         )),
         Err(LimitsError::Rejected("mailbox.maxOffers".to_string()))
     );
+    // The word a hook outcome and `status` name each error by.
+    let codes = [
+        LimitsError::WrongType(String::new()),
+        LimitsError::Rejected(String::new()),
+        LimitsError::Unreadable(String::new()),
+    ]
+    .map(|e| e.code());
+    assert_eq!(codes, ["wrong-type", "rejected", "unreadable"]);
 }
 
 #[test]

@@ -26,7 +26,7 @@ use fgos_host_runtime::{
 use fgos_identity::cli_dirs::claude_config_dir;
 use fgos_mailbox::adapters::version::VersionSources;
 use fgos_mailbox::adapters::TestedClis;
-use fgos_mailbox::limits::{load, read_project_config, Loaded};
+use fgos_mailbox::limits::{load, Loaded};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
@@ -254,6 +254,25 @@ fn failed(text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
 /// The record directory and its limits, or the failed answer; opens no
 /// record.
 fn locate(json: bool) -> Result<(PathBuf, Loaded, Option<String>), Box<MailboxAnswer>> {
+    let fgos_dir = record_dir(json)?;
+    let loaded = super::mailbox_config::project_limits(&fgos_dir)
+        .map_err(|f| failed(format!("mailbox config: {}", f.detail), json, None))?;
+    let warning = ignored_keys_warning(&loaded);
+    Ok((fgos_dir, loaded, warning))
+}
+
+/// The warning naming unknown mailbox config keys, when there are any.
+fn ignored_keys_warning(loaded: &Loaded) -> Option<String> {
+    (!loaded.ignored_keys.is_empty()).then(|| {
+        format!(
+            "fgos: warning: ignored unknown mailbox config keys: {}",
+            loaded.ignored_keys.join(", ")
+        )
+    })
+}
+
+/// The record directory of the caller's project, or the failed answer.
+fn record_dir(json: bool) -> Result<PathBuf, Box<MailboxAnswer>> {
     let cwd = std::env::current_dir()
         .map_err(|_| failed(record_error_text("cwd-unreadable"), json, None))?;
     let fgos_dir = super::mailbox_root::mailbox_fgos_dir(
@@ -268,18 +287,7 @@ fn locate(json: bool) -> Result<(PathBuf, Loaded, Option<String>), Box<MailboxAn
         };
         failed(text, json, None)
     })?;
-    let defaults = load(None).map_err(|e| failed(format!("mailbox config: {e}"), json, None))?;
-    let config = read_project_config(&fgos_dir, defaults.hook.hook.max_read_bytes)
-        .map_err(|e| failed(format!("mailbox config: {e}"), json, None))?;
-    let loaded =
-        load(config.as_ref()).map_err(|e| failed(format!("mailbox config: {e}"), json, None))?;
-    let warning = (!loaded.ignored_keys.is_empty()).then(|| {
-        format!(
-            "fgos: warning: ignored unknown mailbox config keys: {}",
-            loaded.ignored_keys.join(", ")
-        )
-    });
-    Ok((fgos_dir, loaded, warning))
+    Ok(fgos_dir)
 }
 
 /// The record directory, its record and its limits, or the failed answer.
@@ -343,16 +351,32 @@ fn list(long: bool, json: bool) -> MailboxAnswer {
     }
 }
 
-/// `status`: the record's verdict and the spec §9 signals, report-only.
+/// `status`: the record's verdict and the spec §9 signals, report-only. A
+/// project config the mailbox cannot read fails the answer and is named in
+/// it (`config`), while the record is still read under the contract's
+/// defaults.
 fn status(json: bool) -> MailboxAnswer {
-    let (fgos_dir, loaded, warning) = match locate(json) {
-        Ok(located) => located,
+    let fgos_dir = match record_dir(json) {
+        Ok(dir) => dir,
         Err(answer) => return *answer,
     };
+    let (loaded, config_failure) = match super::mailbox_config::project_limits(&fgos_dir) {
+        Ok(loaded) => (loaded, None),
+        Err(failure) => match load(None) {
+            Ok(defaults) => (defaults, Some(failure)),
+            Err(e) => return failed(format!("mailbox config: {e}"), json, None),
+        },
+    };
+    let warning = ignored_keys_warning(&loaded);
     let answer = verbs::status(&fgos_dir, now(), &loaded.limits);
     let mut data = answer.json;
     let mut text = answer.text;
-    data["ok"] = Value::from(answer.record_ok);
+    let ok = answer.record_ok && config_failure.is_none();
+    data["ok"] = Value::from(ok);
+    if let Some(failure) = &config_failure {
+        data["config"] = Value::from(failure.reason.clone());
+        text = format!("config: {} ({})\n{text}", failure.reason, failure.detail);
+    }
     // A head whose handle does not name it alone (Identity holds it for
     // another session, or another head derives it too) is named with the
     // full id that still reaches it.
@@ -376,11 +400,7 @@ fn status(json: bool) -> MailboxAnswer {
         data,
         text,
         json,
-        exit: if answer.record_ok {
-            EXIT_DONE
-        } else {
-            EXIT_REFUSED
-        },
+        exit: if ok { EXIT_DONE } else { EXIT_REFUSED },
         already_written: false,
         warning,
     }

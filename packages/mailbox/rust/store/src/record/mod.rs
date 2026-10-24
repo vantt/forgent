@@ -695,7 +695,7 @@ pub(crate) fn open_regular(path: &Path) -> io::Result<File> {
 
 /// The bytes of the regular file at `path`, opened as [`open_regular`]
 /// does, refused with `InvalidData` when it holds more than `cap` bytes.
-pub(crate) fn read_regular_capped(path: &Path, cap: u64) -> io::Result<Vec<u8>> {
+pub fn read_regular_capped(path: &Path, cap: u64) -> io::Result<Vec<u8>> {
     let file = open_regular(path)?;
     let mut bytes = Vec::new();
     file.take(cap.saturating_add(1)).read_to_end(&mut bytes)?;

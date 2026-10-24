@@ -58,6 +58,17 @@ impl std::fmt::Display for LimitsError {
     }
 }
 
+impl LimitsError {
+    /// The fixed word a hook outcome and `status` name this error by.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::WrongType(_) => "wrong-type",
+            Self::Rejected(_) => "rejected",
+            Self::Unreadable(_) => "unreadable",
+        }
+    }
+}
+
 impl std::error::Error for LimitsError {}
 
 /// The contract's keys a reader deserialises, with their defaults; the

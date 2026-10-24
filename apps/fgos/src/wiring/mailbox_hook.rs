@@ -15,6 +15,7 @@
 //! then the shell, which reads the breaker before stdin, opens the record
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
+use super::mailbox_config::{is_config_reason, project_limits};
 use super::mailbox_identity::{ensure_registered, session_of, state_root};
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
@@ -22,7 +23,6 @@ use fgos_mailbox::hook::outcome_log;
 use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
 use fgos_mailbox::hook::shell::{self, GateState, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
-use fgos_mailbox::limits::{load, read_project_config};
 use fgos_mailbox::record::Paths;
 use fgos_mailbox_core::{Cli, Timestamp, WriterKey};
 use std::ffi::OsString;
@@ -87,16 +87,20 @@ fn run(args: &[OsString]) {
     let Ok(fgos_dir) = super::mailbox_root::mailbox_fgos_dir(project_dir.as_deref(), &cwd) else {
         return;
     };
-    let Ok(defaults) = load(None) else {
-        return;
+    let paths = Paths::new(&fgos_dir);
+    // A config error is quiet on the CLI's channel and never counted by the
+    // breaker, but its reason is left for `status`; once the config reads
+    // again, that reason is cleared.
+    let loaded = match project_limits(&fgos_dir) {
+        Ok(loaded) => loaded,
+        Err(failure) => {
+            outcome_log::record_reason(&paths, adapter, event, &failure.reason, now());
+            return;
+        }
     };
-    // A config error is quiet and never counted by the breaker.
-    let Ok(config) = read_project_config(&fgos_dir, defaults.hook.hook.max_read_bytes) else {
-        return;
-    };
-    let Ok(loaded) = load(config.as_ref()) else {
-        return;
-    };
+    if outcome_log::latest_reason(&paths).is_some_and(|r| is_config_reason(&r)) {
+        outcome_log::clear(&paths);
+    }
     let gate = WriteGate::new();
     // The watchdog writes nothing on its way out: a stalled disk must not
     // keep the process from exiting.
@@ -138,7 +142,6 @@ fn run(args: &[OsString]) {
         &mut std::io::stdin().lock(),
         &mut std::io::stdout().lock(),
     );
-    let paths = Paths::new(&fgos_dir);
     outcome_log::record(&paths, adapter, event, &outcome, now());
     // Make sure Identity knows the head: on the call that bound it to a new
     // generation (quiet by construction), and again on a later quiet call
