@@ -142,3 +142,12 @@ test('the busy step is running only while its tool call has no output: the promp
   assert.equal(wake.busyStep([codexMsg, codex]), true);
   assert.equal(wake.busyStep([codexMsg, codex, { type: 'response_item', payload: { type: 'function_call_output', call_id: 'c3' } }]), false);
 });
+
+test('closing a retained probe ends only what may hold its login copy, and settles the copy only once none of it is left', () => {
+  const procs = [{ pid: 10, comm: 'zsh' }, { pid: 11, comm: 'claude' }, { pid: 12, comm: 'node' }, { pid: 13, comm: 'sh' }];
+  assert.deepEqual(wake.headsLeft(procs), [11, 12], 'the pane\'s shell holds no login and is left for a person to close');
+  assert.deepEqual(wake.closeStep({ result: { login: 'kept with the retained pane: …' }, heads: [11] }), { action: 'end', pids: [11] });
+  assert.deepEqual(wake.closeStep({ result: { login: 'kept with the retained pane: …' }, heads: [] }), { action: 'settle' });
+  assert.deepEqual(wake.closeStep({ result: { login: 'unchanged, removed' }, heads: [] }), { action: 'done', why: 'the login copy was already settled: unchanged, removed' });
+  assert.deepEqual(wake.closeStep({ result: { login: undefined }, heads: [11] }), { action: 'done', why: 'the probe held no login copy' });
+});

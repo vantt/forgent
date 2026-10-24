@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4cdbf2e27141a45a53661dfd0bc2952b0e1720b0c09e29d540a9e0ef4285696e",
+  "payloadDigest": "ec2807f83e9738ef0483b31f281e6dd2f84fa149c21f35bb7ac215c8e11aad9f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -827,12 +827,12 @@
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
     "scripts/lib/mailbox-behaviour-v7.mjs": "0096791c2b6fcfa007a0803ba61faa3bf6133f6b402db36ba50f1f00f1c20ede",
     "scripts/lib/mailbox-behaviour-v7e.mjs": "758ccd2c2548dd4c4ee9a675f15f73fedec14a20c1a697a3b3679c7297cf3640",
-    "scripts/lib/mailbox-behaviour-v7f.mjs": "229fb21ec95cdc8bae8cd2311ecf20bef56e48bca6444f4e378fc125eccaf87a",
+    "scripts/lib/mailbox-behaviour-v7f.mjs": "62976a1420a7579fc35b299f4d75bf6381c8fcc14f22be1f2eafd7d9bd6d309b",
     "scripts/lib/mailbox-behaviour-v7g.mjs": "0694d46306095dcdad54ef4d9f1055211433161139ba41c49268be7212604111",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "9397499e19f492cb6a435390d4571daadef5d60ae2e7586db7ee578df2913322",
     "scripts/lib/mailbox-role-recorder.mjs": "ba14471ab7ce65cdefa43e5256acd4e882c18a3a651bae3338ec2bc0616d7ead",
-    "scripts/lib/mailbox-wake-probe.mjs": "10fb76ff403e9307b9f8b3dbc69a233eae4fd922085414c74b671b817a29682c",
+    "scripts/lib/mailbox-wake-probe.mjs": "7dbb49a27d152d16631098acdcd122796628bfd4edd79fca9f87e23139b4590f",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",

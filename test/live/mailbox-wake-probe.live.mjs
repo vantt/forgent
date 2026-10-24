@@ -20,6 +20,9 @@
  * Subcommands
  *   plan                       every probe: question, expected result, stop condition, pane, command
  *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>]
+ *   close <probe> [--dry]      a retained probe once a person is done with it: ends its head (what
+ *                              may hold the login copy) and settles the copy; Terminal Control
+ *                              keeps a retained pane for a person to close, so the pane's shell stays
  *   report [--dry]             every probe's result, with W4 (Claude presence) and W8 (Codex presence)
  *
  * Where: ../forgent-worktrees/mbx-wake[-dry]/<probe>/ (short, so a Claude Code socket path stays
@@ -180,6 +183,8 @@ function layOut(probe, { dry, base, release, shim }) {
     }
   }
   const snapshot = login && typeof login === 'string' ? { copy: login, snapshot: loginDigest(login), digest: 'bytes' } : login;
+  // The copy's path and digest at copy time (a hash, no secret), so `close` can settle it later.
+  if (snapshot) writeJson(path.join(paths.dir, 'login.json'), snapshot);
   return { paths, run, env: live.cliEnv({ zdotdir: path.join(paths.dir, 'zdot'), pathPrefix, extra: env }), bin, args, login: snapshot };
 }
 
@@ -295,7 +300,7 @@ async function cmdRun(id, { dry, watched, keep, attempt = null }) {
   }
   // A rerun of a probe takes a new Terminal Control key: a released key's record stays with its closed pane.
   const pane = wake.paneOf(probe, { dry, attempt });
-  const result = { probe: probe.id, cli: probe.cli, channel: probe.channel, dry, pane, startedAt: new Date().toISOString(), argv: [laid.bin, ...laid.args], events: [] };
+  const result = { probe: probe.id, cli: probe.cli, channel: probe.channel, dry, pane, startedAt: new Date().toISOString(), harness: harnessRevision(), argv: [laid.bin, ...laid.args], events: [] };
   const note = (what, extra = {}) => {
     result.events.push({ at: Date.now(), what, ...extra });
     say(`${probe.id}: ${what}${Object.keys(extra).length ? ` ${JSON.stringify(extra)}` : ''}`);
@@ -340,7 +345,8 @@ async function cmdRun(id, { dry, watched, keep, attempt = null }) {
     result.focusBefore = wake.focusedPanes(herdr(['pane', 'list'], herdrEnv));
     if (probe.channel === 'socket') {
       const socket = wake.socketOf(claudeSession(paths.home), paths.dir);
-      fired = await wake.writeSocket(socket, wake.socketLine(wake.NUDGE, { fromMode: probe.fromMode ?? null }));
+      const line = wake.socketLine(wake.NUDGE, { fromMode: probe.fromMode ?? null });
+      fired = { ...(await wake.writeSocket(socket, line)), socketLine: line.trimEnd() };
     } else if (probe.channel === 'queue') {
       const at = Date.now();
       const queueBin = dry ? codexStubBin(base) : laid.bin;
@@ -389,11 +395,65 @@ async function cmdRun(id, { dry, watched, keep, attempt = null }) {
   if (disposition === 'close' && laid.login) {
     await sleep(2_000);
     result.login = confined.settleCopy(laid.login, paths.dir) ?? 'unchanged, removed';
-  } else if (laid.login) result.login = `kept with the retained pane: settle it after a person closes the pane (${laid.login.copy})`;
+  } else if (laid.login) result.login = `kept with the retained pane: run close ${probe.id}${dry ? ' --dry' : ''} once a person is done with it (${laid.login.copy})`;
   if (dry) spawnSync('herdr', ['--session', DRY_HERDR_SESSION, 'server', 'stop'], { env: { ...process.env, ...herdrEnv }, stdio: 'ignore' });
   writeJson(path.join(paths.dir, 'result.json'), result);
   say(`${probe.id}: ${JSON.stringify(result.verdict ?? { ready: false })}; latency ${result.turn?.latencyMs ?? '-'} ms; nudge carried by ${result.turn?.carriedBy ?? '-'}; pane ${disposition}; ${path.join(paths.dir, 'result.json')}`);
   if (result.login?.stop) die(`${result.login.stop}: ${result.login.aside}`);
+}
+
+/** The commit this harness ran from, and whether its tree had uncommitted changes. */
+function harnessRevision() {
+  const git = (args) => spawnSync('git', args, { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
+  return { commit: git(['rev-parse', 'HEAD']), dirty: git(['status', '--porcelain', '--untracked-files=no']) !== '' };
+}
+
+// ---------------------------------------------------------------- close a retained probe
+
+/** The probe's own processes, by its directory, with their command names. */
+function probeProcesses(dir) {
+  return confined.processesOfRun(dir, null).map((pid) => {
+    try {
+      return { pid, comm: fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim() };
+    } catch {
+      return null;
+    }
+  }).filter(Boolean);
+}
+
+/** Closes a retained probe: ends its head, waits for it to go, settles the login copy and records it in result.json. */
+async function cmdClose(id, { dry }) {
+  const probe = wake.probeOf(id);
+  const paths = confined.runPaths(baseOf(dry), probe.id);
+  const resultFile = path.join(paths.dir, 'result.json');
+  if (!fs.existsSync(resultFile)) die(`no result for ${probe.id} at ${resultFile}`);
+  const result = readJson(resultFile);
+  for (let step = wake.closeStep({ result, heads: wake.headsLeft(probeProcesses(paths.dir)) }), ended = null; ;) {
+    if (step.action === 'done') return say(`${probe.id}: nothing to close; ${step.why}`);
+    if (step.action === 'settle') break;
+    if (ended && Date.now() - ended > 15_000) die(`${probe.id}: still running after SIGTERM: ${step.pids.join(', ')}; the copy stays`);
+    if (!ended) {
+      for (const pid of step.pids) {
+        try {
+          process.kill(pid, 'SIGTERM');
+        } catch {
+          // already gone
+        }
+      }
+      ended = Date.now();
+      say(`${probe.id}: ended ${step.pids.join(', ')}`);
+    }
+    await sleep(500);
+    step = wake.closeStep({ result, heads: wake.headsLeft(probeProcesses(paths.dir)) });
+  }
+  const loginFile = path.join(paths.dir, 'login.json');
+  if (!fs.existsSync(loginFile)) die(`${probe.id}: no login.json beside the copy; settle it by hand`);
+  const settled = confined.settleCopy(readJson(loginFile), paths.dir);
+  result.login = settled ?? 'unchanged, removed';
+  result.closedAt = new Date().toISOString();
+  writeJson(resultFile, result);
+  say(`${probe.id}: login ${typeof result.login === 'string' ? result.login : JSON.stringify(result.login)}; the pane's shell (${result.paneId ?? 'pane unknown'}) is left for a person to close`);
+  if (settled?.stop) die(`${settled.stop}: ${settled.aside}`);
 }
 
 // ---------------------------------------------------------------- plan and report
@@ -428,7 +488,8 @@ if (process.argv[1] === SCRIPT) {
   const flag = (name) => rest.includes(name);
   if (command === 'plan') cmdPlan();
   else if (command === 'run') await cmdRun(rest[0], { dry: flag('--dry'), watched: flag('--watched'), keep: flag('--keep'), attempt: rest.includes('--attempt') ? rest[rest.indexOf('--attempt') + 1] : null });
+  else if (command === 'close') await cmdClose(rest[0], { dry: flag('--dry') });
   else if (command === 'report') cmdReport(flag('--dry'));
-  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>] | report [--dry]', 2);
+  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>] | close <probe> [--dry] | report [--dry]', 2);
 }
 

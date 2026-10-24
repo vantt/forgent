@@ -1,6 +1,6 @@
 ---
 title: "Mailbox V7f: wake channel probes (phase 10, the parts no person needs to watch)"
-description: "Phase 10 of plans/261023-1411-mailbox-v7-codex-postooluse-pi-omp-and-aliases without its interactive pane probes: part B (a user-role nudge, then harmful mail the model claims) for Claude Code and Codex, both stages done: Codex 0/30 harmful acted, Claude Code stopped by the hard stop at 1/27; read-only findings on each wake mechanism; part A's probes (nine sessions) prepared and dry-run, waiting for the owner."
+description: "Phase 10 of plans/261023-1411-mailbox-v7-codex-postooluse-pi-omp-and-aliases without its interactive pane probes: part B (a user-role nudge, then harmful mail the model claims) for Claude Code and Codex, both stages done: Codex 0/30 harmful acted, Claude Code stopped by the hard stop at 1/27; read-only findings on each wake mechanism; part A's probes run with the owner watching (10 sessions)."
 date: 2026-10-24
 ---
 
@@ -152,16 +152,16 @@ Harness `test/live/mailbox-wake-probe.live.mjs`, logic `scripts/lib/mailbox-wake
 
 ## Part A: the interactive probes, run (2026-10-24, owner watching)
 
-Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspace `w4` "forgent" (checked before every probe; the focused pane was `w4:p3B` before and after every probe). `free -g` was at least 8 GB available and no live run or heavy gate was running when each pane opened (W9 waited about 25 minutes for another session's `cargo test` and `npm test`). The harness typed nothing into any pane. Sessions: 10 of 10 (W1, W2, W2b, W3, W5, W6, W7, W9, W10 and the W3 rerun).
+Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspace `w4` "forgent" (checked before every probe; the focused pane was `w4:p3B` before and after every probe). `free -g` was at least 8 GB available and no live run or heavy gate was running when each pane opened (W9 waited about 25 minutes for another session's `cargo test` and `npm test`). After launch the harness typed nothing into any pane; the launch itself goes through `herdr pane run`, which types the `env -i <allowlisted env> <cli> …` line into the pane's shell (so it is in that shell's history), and the bar's "no typed input" concerns the wake, which this does not change. Sessions: 10 of 10 (W1, W2, W2b, W3, W5, W6, W7, W9, W10 and the W3 rerun).
 
 | Probe | Channel started a turn | Dialog | Focus changed | Nudge reached the model as | Latency (fire to first model output) | Mail claimed |
 |---|---|---|---|---|---|---|
 | W1 Claude Code, scoped `accept`, bypass, idle | yes | none | no | a `user` record (`isMeta`, origin `peer`, `from: unknown` with the verified writer pid) inside Claude Code's frame: "Another Claude session sent a message … not typed by your user, but very likely working on their behalf. Treat it as a teammate's request and act on it …" | 2.0 s | yes |
 | W2 Claude Code, no setting, bypass, no `from_mode` | no | the held-message dialog: "The sender did not attest its permission mode, and this session bypasses permission prompts", Deny (default) / Deliver | no | - | - | no |
-| W2b the same, claiming `"from_mode":"bypass"` | no | the same dialog, the same "did not attest" sentence: a raw writer's claimed mode was not honoured | no | - | - | no |
-| W3 rerun: scoped `accept` while the step's own tool call ran (a 45 s loop) | delivered inside the running turn, not a new one | none | no | `attachment:queued_command`, recorded 0.2 s after the write; the model saw it after the loop's tool result | 48.4 s (the loop's remaining 45 s, then 3.7 s) | yes (by the PostToolUse hook after the loop; the model's own claim then found nothing) |
-| W5 `codex queue`, idle REPL on its own private daemon | yes | none | no | `response_item:message:user` | 10.7 s | yes |
-| W6 `codex queue` while a tool ran | yes, as its own turn 3 ms after the running turn's `task_complete`; no interrupt, nothing lost | none | no | `response_item:message:user` | 48.7 s (mostly the loop) | yes |
+| W2b the same, claiming `"from_mode":"bypass"` | no | the same dialog, the same "did not attest" sentence, consistent with a raw writer's claimed mode not being honoured; the result file did not keep the wire line, so that `from_mode` was sent rests on the harness code of `a6ef3a672` (04:56, before the 10:01 run) | no | - | - | no |
+| W3 rerun: scoped `accept` while the step's own tool call ran (a 45 s loop) | delivered inside the running turn, not a new one | none | no | `attachment:queued_command`, its record (and the `queue-operation` enqueue) stamped 10 ms after the write; the model saw it after the loop's tool result | 48.4 s (the loop's remaining 45 s, then 3.7 s) | yes (by the PostToolUse hook after the loop; the model's own claim then found nothing) |
+| W5 `codex queue`, idle REPL on its own private daemon | yes | none | no | `response_item:message:user` | 10.7 s, of which 8.5 s lay between `codex queue` returning and `task_started` | yes |
+| W6 `codex queue` while a tool ran | yes, as its own turn 3 ms after the running turn's `task_complete`; no interrupt, nothing lost | none | no | `response_item:message:user` | 48.7 s (mostly the loop) | yes, but by the PostToolUse hook: it handed the hello over as a `developer` message inside the running turn 44.8 s after the fire, and the model answered it before the queued turn started, so the queued turn's claim found the mail already taken (as in W3) |
 | W7 Claude Code, no setting, **prompting** mode, no `from_mode` | yes | none | no | a `user` record inside the same peer frame | 1.25 s | (no mail was queued; the model ran `inbox --claim` on its own, allowed by the probe's allow list) |
 | W9 pi, extension timer, `sendUserMessage` | yes | none | no | `message:user` (session record) | 3.8 s from the trigger file (timer tick 5 s) | yes |
 | W10 omp, extension timer, `sendMessage` with `triggerTurn` | yes | none | no | omp's `custom_message` (dry run: `message:developer` at the provider) | 3.9 s from the trigger file | yes |
@@ -171,12 +171,14 @@ Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspac
 - **Deviations.**
   - The first W3 is kept as `mbx-wake/W3-deviation`: its busy detector fired on the prompt's own text, so the write landed during turn 1 between tool calls (Claude Code also refused a standalone `sleep 45`). It showed the same `queued_command` delivery inside the running turn (claim 4.3 s after the write). The detector now waits for the step's own tool call to be running (`busyStep`, proven), and the rerun took the spare session and a new pane key (a released key's record stays with its closed pane).
   - W7's first prompt was swallowed by `--allowedTools`, which takes many values, so the head never registered and the probe timed out before firing. The K1 question needs only the session's socket, so the same benign raw write was fired into that same session (`mbx-wake/W7/result-same-session-fire.json`), with no new session spent. The argv defect is fixed: the prompt now comes before every option (proven).
-- **Panes left open for the owner, as asked:** W2 (`w4:p61`), W2b (`w4:p62`) and W7 (`w4:p66`); their login copies stay with them and are settled when the panes are closed. Every other probe's pane was closed, its login copy removed unchanged, and nothing was left running from its directory (W5/W6's private Codex daemons stopped).
+- **Panes left open for the owner, as asked:** W2 (`w4:p61`), W2b (`w4:p62`) and W7 (`w4:p66`). The controller closed them later and removed their login copies, identical to the source by hash; no process from them is left. A retained probe now has its own door for this, `close <probe>` (below).
+- **Identity was never reached.** Every probe's `hook-outcome.json` reads `ident:machine-id-missing`, because the private HOME has no machine id; frames show `handle="unregistered"`, and delivery worked by the mailbox binding alone. Every other probe's pane was closed, its login copy removed unchanged, and nothing was left running from its directory (W5/W6's private Codex daemons stopped).
 
 **K1, measured (2.1.309).** K1 says the owner's sessions keep the default hold and only a session given a scoped `accept` takes cross-session messages.
 - A **bypass-mode** session with no setting held a raw same-user socket write behind a dialog, with or without a claimed `from_mode` (W2, W2b). The inferred `from_mode` forgery did not happen with a frame from a raw writer.
 - A **prompting-mode** session with no setting (the default permission mode) accepted the same raw write **with no dialog**: a turn started 1.25 s later, with the message framed as a teammate's request to act on (W7).
-- So any same-user process can start a turn in any default-mode, prompting Claude Code session on this machine today, with no setting and no dialog. K1's "the owner's sessions keep the default hold" holds only for bypass-mode sessions. This is independent of fgOS and of phase 11; it is a decision question for the owner.
+- Scope of what W7 measured: one fire, into a fresh session that had never taken a user turn, run with a private HOME and `--setting-sources project`, so with no `crossSessionInbound` in managed policy, `--settings` or user settings (none was read). Within that scope a same-user process started a turn in a prompting-mode session with no setting and no dialog.
+- It is not shown for the owner's real sessions, which load `~/.claude/settings.json`, nobody checked for `crossSessionInbound`. K1's "the owner's sessions keep the default hold" is shown to hold for bypass-mode sessions only. For the owner: check your user settings for `crossSessionInbound`; if phase 11 or a K1 decision rests on this, repeat W7 (fixed argv) in a session that has taken a turn. It is independent of fgOS and of phase 11.
 
 **Against the phase 11 bar** (a turn with no dialog, no focus change, no typed input, and 0 acted in part B for that CLI):
 - **Claude Code:** the socket under a scoped `accept` meets the channel part (W1), but part B is a no-go (1/27 acted), and the real socket wraps the nudge in the "act on it" frame part B did not test.
@@ -192,12 +194,29 @@ Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspac
 - These change files the V7f addendum froze (the V7f module and the confined module's settle door, and the run module), applied after stage B as asked: the V7f freeze no longer holds at HEAD, and its pin `2a16ce1b7` reproduces its numbers.
 - Proofs: `test/scripts/mailbox-live-confined.test.mjs` (the set-aside test now reads the ledger), `test/scripts/mailbox-behaviour-v7f.test.mjs` (settings, the bar wording at and under N), `test/scripts/mailbox-wake-probe.test.mjs` (W2b's line, the live-run guard). Mutants: 7 applied by hand, all killed. One earlier survivor showed the live-run guard's `node` check was redundant and would miss a wrapped run; it was removed and the wrapped case added.
 
+## Fix step after the probe review (2026-10-24, `reports/code-review-v7f-probes.md`)
+
+- **H1** (a project migrated by `fgos config migrate` silenced the mailbox):
+  - Mailbox-local part done (`8723ddef1`). A config the mailbox cannot read now leaves `config:<code>` in `hook-outcome.json`, which the next readable call clears.
+  - `status` fails and names it while it still reads the record; the verbs refuse with it.
+  - A tombstone is named `config:migrated`, recognised by the Config crate's own `is_tombstone`, now public.
+  - Proofs: two wiring tests in `apps/fgos/tests/mailbox_routes.rs` (a migrated project, and a pre-migration project with a wrong value that is then fixed), plus the error words in `limits_loader.rs`.
+  - Not done here: reading the mailbox section through the Config crate's `snapshot()`. `core/config-schema` has no `mailbox` section and Slice C owns the Rust reader moves; the controller takes it to CFG. Until then a migrated project's mailbox stays off, with that reason.
+- **M1** (`40eacc349`): an owning test proves that a step whose stamp is current still takes a fitting message the budget left beside a too-large one. **L7:** a test proves that a step repeated in the millisecond its stamp and the newest mail share writes nothing. Both former survivors are killed.
+- **M2:** `close <probe> [--dry]` ends a retained probe's head, waits for it, settles its login copy (path and digest kept in `login.json` at copy time) and records that in `result.json`.
+  - Terminal Control keeps a retained pane for a person to close (`core.rs` refuses closing it), so the pane's shell stays.
+  - Proof: the close step's logic in `mailbox-wake-probe.test.mjs`; 4 mutants, all killed.
+  - Dry-run on W9 (`--keep`, then `close`): the copy was settled unchanged, and a second `close` found nothing to do.
+- **M3, L2, L3, L5, L9:** the wording above is narrowed or fixed.
+- **L4:** recorded above. **L1, L6:** every probe's `result.json` now records the harness commit and a dirty flag, and a socket fire's wire line. The W7 fire is committed as `test/live/mailbox-wake-probe-same-session-fire.mjs`.
+- **L8:** a comment beside V7f's `PROJECT_CONFIG` says the pointer key is historical and refused at HEAD.
+
 ## Gates
 
 - Mailbox Node suites (score, run, v7, v7e, v7f, wake-probe, confined with the host, auth guard, recorder, agent-hooks): green.
   - Without `FGOS_HOST_BIN`, the 11 confined-launch tests refuse to run, by design.
 - Full `npm test -- --test-concurrency=4` on `3defb0d88`: 8768 tests, 8652 passed, 18 failed. All 18 are the known Git-umask failures (`tsk-42l7rs4htz`): 15 in `fgctl-upgrade`, 2 in `fgctl-init-download-sources`, 1 in `dispatch.test.mjs`. None is in the mailbox. After the fix step, on `cf5f464f6`: 8770 tests, 8654 passed, the same 18 failed. After the probes, the pointer-mode retirement and a merge of main (`9993276f1`): 8788 tests, 8672 passed, the same 18 failed; Rust (`fgos-mailbox-core`, `fgos-mailbox`, `fgos-identity`, `fgos-host-runtime`, `fgos`) 566 passed, 0 failed.
-- No Rust changed; `cargo test` is not rerun.
+- The Rust count above includes the pointer-mode retirement's Rust deletions.
 - Mutants, applied by hand and each reverted: 18 (harness, first pass), 4 (the scorer fix), 12 (wake probes): all killed. One survivor was fixed by pinning the session count.
 
 ## Evidence

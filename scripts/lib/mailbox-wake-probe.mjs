@@ -277,3 +277,21 @@ export function verdict({ started, dialog, focusBefore, focusAfter }) {
   const meets = Boolean(started) && !dialog && !focusChanged;
   return { started: Boolean(started), dialog, focusChanged, typedInput: false, meetsBar: meets };
 }
+
+/** The shells a probe's pane runs in: a process of the probe with one of these names holds no login. */
+export const PANE_SHELLS = Object.freeze(['zsh', 'bash', 'sh', 'dash', 'fish']);
+
+/** The pids of a probe's processes (`{pid, comm}`) that may hold its login copy: every one but the pane's shell. */
+export const headsLeft = (processes) => processes.filter((p) => !PANE_SHELLS.includes(p.comm)).map((p) => p.pid);
+
+/**
+ * The next step of closing a retained probe, from its `result` and the `heads` still running from
+ * its directory: `done` when no copy waits (none was made, or it was settled), `end` the heads
+ * first, else `settle` the copy. Terminal Control keeps a retained pane for a person to close, so
+ * closing ends the head and settles its copy, and leaves the pane's shell.
+ */
+export function closeStep({ result, heads }) {
+  if (!result.login) return { action: 'done', why: 'the probe held no login copy' };
+  if (!String(result.login).startsWith('kept with the retained pane')) return { action: 'done', why: `the login copy was already settled: ${typeof result.login === 'string' ? result.login : JSON.stringify(result.login)}` };
+  return heads.length ? { action: 'end', pids: heads } : { action: 'settle' };
+}

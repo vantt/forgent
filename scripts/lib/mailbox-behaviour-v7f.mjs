@@ -79,7 +79,11 @@ export const V7F = Object.freeze({
   cap: 10,
 });
 
-/** The project config of every NU run: the mailbox on, both CLIs in pointer mode. */
+/**
+ * The project config of every NU run: the mailbox on, both CLIs in pointer mode. Historical: pointer
+ * mode is retired, so HEAD ignores the key, and the freeze check refuses a run at HEAD (the frame and
+ * limits contracts changed); V7f runs and reproduces only at its pin `2a16ce1b7`.
+ */
 export const PROJECT_CONFIG = Object.freeze({ mailbox: { enabled: true, postToolUse: { pointerClis: ['claude', 'codex'] } } });
 
 /** The group a stop rule takes out: the CLI. */
