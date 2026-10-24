@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d5b13466e7a65bf21ee342a3f90bc1e12428423b2c59479d7f66617235709714",
+  "payloadDigest": "65f787d5d58b68c12a2e764baf7ca72357a889f2fdd8745acbf5ab79dd31d8c5",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -824,9 +824,10 @@
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
     "scripts/lib/mailbox-behaviour-run.mjs": "7aeb8f2b298ce5b939ac3377f8ab702450b2321bcc5944e24d52a7d29b9d43ff",
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
-    "scripts/lib/mailbox-behaviour-v7.mjs": "87dfe16bcc00a911c17e16b771362fa07c19e6150e13d6a5c11a02111f763374",
+    "scripts/lib/mailbox-behaviour-v7.mjs": "0096791c2b6fcfa007a0803ba61faa3bf6133f6b402db36ba50f1f00f1c20ede",
     "scripts/lib/mailbox-behaviour-v7e.mjs": "758ccd2c2548dd4c4ee9a675f15f73fedec14a20c1a697a3b3679c7297cf3640",
-    "scripts/lib/mailbox-behaviour-v7f.mjs": "96baed4bc8a15ebffd8d729a5072f064eec437956611a88fe782e543b39413da",
+    "scripts/lib/mailbox-behaviour-v7f.mjs": "229fb21ec95cdc8bae8cd2311ecf20bef56e48bca6444f4e378fc125eccaf87a",
+    "scripts/lib/mailbox-behaviour-v7g.mjs": "0694d46306095dcdad54ef4d9f1055211433161139ba41c49268be7212604111",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "9397499e19f492cb6a435390d4571daadef5d60ae2e7586db7ee578df2913322",
     "scripts/lib/mailbox-role-recorder.mjs": "ba14471ab7ce65cdefa43e5256acd4e882c18a3a651bae3338ec2bc0616d7ead",

@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -57,6 +57,7 @@ import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
 import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
 import * as v7f from '../../scripts/lib/mailbox-behaviour-v7f.mjs';
+import * as v7g from '../../scripts/lib/mailbox-behaviour-v7g.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
@@ -150,6 +151,29 @@ const MEASURES = {
     }),
     report: ({ results, addendum, stage }) => v7f.report({ results, addendum, stage }),
     sample: 'sample-v7f',
+  },
+  v7g: {
+    clis: ['claude'],
+    build: v7g.addendumV7g,
+    cells: v7g.cells,
+    baselines: v7g.baselines,
+    measured: (addendum) => ({
+      models: Object.fromEntries(addendum.clis.map((c) => [c.cli, c.model])),
+      // Claude Code's effort rides its argv (the conversation); no Codex head runs, so no Codex config takes one.
+      effort: null,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: v7g.groupOf,
+      projectConfig: () => v7g.PROJECT_CONFIG,
+      scoreRun: (evidence) => v7g.scoreRun(evidence),
+      rules: v7g.stopRules,
+      phases: v7g.stagePhases,
+      order: v7g.stageOrder,
+      conversation: (cell) => v7g.conversation(cell, { noMcp: runs.CLAUDE_NO_MCP }),
+    }),
+    report: ({ results, addendum, stage }) => v7g.report({ results, addendum, stage }),
+    sample: 'sample-v7g',
   },
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
@@ -748,6 +772,19 @@ const WIRING_V7F = ['claude', 'codex'].flatMap((cli) => [
   [cli, 'B', 'fail', 'error'],
 ]);
 
+/**
+ * V7g's wiring runs: Claude Code's stub over stream-json input, the framed nudge as turn 2, the
+ * mailbox at its default delivery. A stub that never claims runs no tool in turn 2, so the mail
+ * sent without wake stays pending (the Stop hook keeps it): not-acted, never an exclusion.
+ */
+const WIRING_V7G = [
+  ['LR', 'act', 'acted'],
+  ['B', 'ignore', 'not-acted'],
+  ['MX', 'act', 'acted'],
+  ['M', 'no-claim', 'not-acted'],
+  ['B', 'fail', 'error'],
+];
+
 async function cmdCheckAddendum() {
   const failures = [];
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
@@ -768,6 +805,7 @@ async function cmdCheckAddendum() {
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
+    : ADDENDUM_NAME === 'v7g' ? WIRING_V7G.map(([variant, behaviour, want]) => [v7g.cells().find((c) => c.variant === variant), behaviour, want])
     : WIRING_V7.map(([arm, variant, behaviour, want]) => [[...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant), behaviour, want]);
   for (const [cell, behaviour, want] of wiring) {
     const arm = cell.arm;
@@ -779,7 +817,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (ADDENDUM_NAME === 'v7f' && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1453,7 +1491,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f] check | freeze [v7c|v7e|v7f] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g] check | freeze [v7c|v7e|v7f|v7g] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
