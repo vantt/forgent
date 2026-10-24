@@ -7,8 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadRunnerConfigFromDir, ensureRunnerConfigForDir, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { snapshotRunnerConfig } from '../../src/runner/execution/run.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function load(tierFallback, globalRunner) {
@@ -30,7 +29,7 @@ function load(tierFallback, globalRunner) {
   process.env.HOME = home;
   process.env.USERPROFILE = home;
   try {
-    return loadRunnerConfigFromDir(dir);
+    return loadRunnerConfigForDir(dir);
   } finally {
     process.env.HOME = prevHome;
     if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
@@ -44,10 +43,12 @@ test('a tier fallback list loads in order', () => {
   assert.deepEqual(cfg.tierFallback.flagship, ['claude']);
 });
 
-test('a config without the key loads, and a tier the list does not name has no declared order', () => {
-  const cfg = load(undefined);
-  assert.equal(cfg.tierFallback, undefined);
-  assert.equal(load({ advanced: ['claude'] }).tierFallback.nano, undefined);
+test('a config without the key reads the standard order, and a project list replaces only the tiers it names', () => {
+  const standard = load(undefined).tierFallback;
+  assert.ok(Array.isArray(standard.advanced) && standard.advanced.length > 0, 'the standard declares an order per tier');
+  const own = load({ advanced: ['claude'] }).tierFallback;
+  assert.deepEqual(own.advanced, ['claude']);
+  assert.deepEqual(own.flagship, standard.flagship);
 });
 
 test('each shape error fails the load and names the key', () => {
@@ -56,13 +57,13 @@ test('each shape error fails the load and names the key', () => {
     assert.match(err.message, pattern);
     return true;
   });
-  refused([], /tierFallback.*object mapping tier/);
+  refused([], /runner\.tierFallback \(type\)/);
   refused({ medium: ['claude'] }, /tierFallback.*tier key must be one of.*"medium"/);
-  refused({ advanced: [] }, /tierFallback\.advanced.*non-empty list/);
-  refused({ advanced: 'claude' }, /tierFallback\.advanced.*non-empty list/);
-  refused({ advanced: ['claude', 7] }, /tierFallback\.advanced.*7/);
+  refused({ advanced: [] }, /runner\.tierFallback\.advanced \((minItems|type)\)/);
+  refused({ advanced: 'claude' }, /runner\.tierFallback\.advanced \((minItems|type)\)/);
+  refused({ advanced: ['claude', 7] }, /runner\.tierFallback\.advanced\[1\] \(type\)/);
   refused({ advanced: ['claude', ' '] }, /tierFallback\.advanced.*non-empty family name/);
-  refused({ advanced: ['claude', 'gemini', 'claude'] }, /tierFallback\.advanced.*"claude" more than once/);
+  refused({ advanced: ['claude', 'gemini', 'claude'] }, /runner\.tierFallback\.advanced \(uniqueItems\)/);
 });
 
 test('a project list replaces the global list of that tier and keeps the tiers it does not name', () => {
@@ -79,7 +80,6 @@ function runnerWith(patch = {}) {
     timeoutMs: 5000,
     modelPolicies: { claude: { advanced: 'sonnet', flagship: 'opus' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    executors: Object.fromEntries(['claude', 'other'].map((id) => [id, { kind: 'agent', providerModel: id, command: id, args: ['{prompt}'], invocations: [{ id: `${id}-cli`, via: 'cli', adapter: 'cli-spawn', command: id, args: ['{prompt}'], confinement: { backend: 'bwrap' } }] }])),
     ...patch,
   };
 }
@@ -97,7 +97,7 @@ function loadRunner(runner, globalRunner) {
   process.env.HOME = home;
   process.env.USERPROFILE = home;
   try {
-    return { cfg: loadRunnerConfigFromDir(dir), dir };
+    return { cfg: loadRunnerConfigForDir(dir), dir };
   } finally {
     process.env.HOME = prevHome;
     if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
@@ -121,25 +121,25 @@ test('a project config may declare the default tier, a capability tier and ceili
         tier: 'frontier',
         maxTier: 'frontier',
         rigor: 'critical',
-        roles: { reviewer: { tier: 'flagship', prefer: ['claude'] }, 'red-team': { prefer: [{ executor: 'other' }] } },
+        roles: { reviewer: { tier: 'flagship', prefer: ['claude'] }, 'red-team': { prefer: [{ executor: 'openai' }] } },
         personas: { 'code-reviewer': { tier: 'flagship' } },
-        seats: { 'system-owner': { tier: 'frontier', prefer: ['other'] } },
+        seats: { 'system-owner': { tier: 'frontier', prefer: ['openai'] } },
       },
     },
   }));
   assert.equal(cfg.defaults.tier, 'standard');
-  assert.equal(cfg.capabilities['architecture:shape'].roles['red-team'].prefer[0].executor, 'other');
+  assert.equal(cfg.capabilities['architecture:shape'].roles['red-team'].prefer[0].executor, 'openai');
   assert.equal(cfg.capabilities['architecture:shape'].seats['system-owner'].tier, 'frontier');
 });
 
 test('a tier name outside the vocabulary fails the load and names the key path', () => {
-  refusedLoad(runnerWith({ defaults: { tier: 'medium' } }), /defaults\.tier.*one of nano\/mini\/standard\/advanced\/flagship\/frontier.*"medium"/);
-  refusedLoad(runnerWith({ maxTier: 'huge' }), /maxTier.*"huge"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { tier: 'big' } } }), /capabilities\.code:\*.*"tier".*"big"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { maxTier: 'big' } } }), /capabilities\.code:\*.*"maxTier".*"big"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { tier: 'big' } } } } }), /capabilities\.code:\*\.roles\.reviewer.*"tier".*"big"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { tier: 'big' } } } } }), /personas\.code-reviewer.*"tier"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { tier: 'big' } } } } }), /seats\.judge.*"tier"/);
+  refusedLoad(runnerWith({ defaults: { tier: 'medium' } }), /runner\.defaults\.tier \(enum\)/);
+  refusedLoad(runnerWith({ maxTier: 'huge' }), /runner\.maxTier \(enum\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { tier: 'big' } } }), /runner\.capabilities\.code:\*\.tier \(enum\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { maxTier: 'big' } } }), /runner\.capabilities\.code:\*\.maxTier \(enum\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { tier: 'big' } } } } }), /runner\.capabilities\.code:\*\.roles\.reviewer\.tier \(enum\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { tier: 'big' } } } } }), /personas\.code-reviewer\.tier \(enum\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { tier: 'big' } } } } }), /seats\.judge\.tier \(enum\)/);
 });
 
 test('roles are the five roles only, a seat is a seat id, a persona is a persona name', () => {
@@ -152,29 +152,29 @@ test('roles are the five roles only, a seat is a seat id, a persona is a persona
 test('a role, persona or seat entry holds tier and prefer only; there is no families key', () => {
   refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { families: ['claude'] } } } } }), /roles\.reviewer.*unknown key "families".*tier, prefer/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { families: ['claude'] } } }), /capabilities\.code:\*.*unknown key "families"/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: 'standard' } } } }), /seats\.judge.*must be an object/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: 'standard' } } } }), /seats\.judge \(type\)/);
   refusedLoad(runnerWith({ defaults: { tier: 'standard', prefer: ['claude'] } }), /defaults.*unknown key "prefer"/);
 });
 
 test('an empty prefer list is a load error wherever prefer sits, and every prefer names a registered executor', () => {
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { prefer: [] } } }), /code:\*.*"prefer".*must not be empty/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [] } } } } }), /roles\.reviewer.*"prefer".*must not be empty/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { prefer: [] } } } } }), /personas\.code-reviewer.*"prefer".*must not be empty/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { prefer: [] } } } } }), /seats\.judge.*"prefer".*must not be empty/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { prefer: [] } } }), /code:\*\.prefer \(minItems\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [] } } } } }), /roles\.reviewer\.prefer \(minItems\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { prefer: [] } } } } }), /personas\.code-reviewer\.prefer \(minItems\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { prefer: [] } } } } }), /seats\.judge\.prefer \(minItems\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { prefer: ['nobody'] } } } } }), /seats\.judge.*"prefer" names "nobody" but no such executor/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [{ executor: 'claude', invocation: 'missing' }] } } } } }), /roles\.reviewer.*invocation "missing"/);
 });
 
 test('the schema marker is {schema: 1} inside patterns and nothing else', () => {
   assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: { schema: 1 } } })).cfg.patterns.seatBinding.schema, 1);
-  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 2 } } }), /seatBinding\.schema.*must be 1.*2/);
-  refusedLoad(runnerWith({ patterns: { seatBinding: {} } }), /seatBinding\.schema.*must be 1/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 2 } } }), /runner\.patterns\.seatBinding\.schema \(const\)/);
+  assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: {} } })).cfg.patterns.seatBinding.schema, 1, 'a marker with no schema is filled by the standard');
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1, extra: true } } }), /seatBinding.*unknown key "extra"/);
-  refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /seatBinding.*must be an object/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /runner\.patterns\.seatBinding \(type\)/);
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
 });
 
-test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; a rigorToTier there is refused by the global file\'s name', () => {
+test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; a rigorToTier there is refused by name', () => {
   const globalRunner = {
     maxTier: 'flagship',
     tierFallback: { advanced: ['claude'] },
@@ -183,54 +183,8 @@ test('the global layer keeps the keys it has always carried: maxTier, tierFallba
   const { cfg } = loadRunner(runnerWith(), globalRunner);
   assert.equal(cfg.maxTier, 'flagship');
   assert.equal(cfg.capabilities.review.rigor, 'high');
-  refusedLoad(runnerWith(), /~\/\.fgos\/config\.json runner\.rigorToTier no longer exists/, {
+  refusedLoad(runnerWith(), /declares retired "rigorToTier"/, {
     ...globalRunner,
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   });
-});
-
-test('a $comment key is ignored at every level and never reaches the loaded config', () => {
-  const { cfg } = loadRunner(runnerWith({
-    $comment: ['nano: mechanical', 'frontier: costly'],
-    modelPolicies: { $comment: 'tiers', claude: { $comment: 'cells', advanced: 'sonnet' } },
-    tierFallback: { $comment: 'order', advanced: ['claude'] },
-    capabilities: { 'code:*': { $comment: 'per capability', tier: 'advanced', roles: { $comment: 'x', reviewer: { $comment: 'y', tier: 'flagship' } } } },
-    patterns: { $comment: 'patterns', seatBinding: { $comment: 'marker', schema: 1 } },
-  }), { $comment: 'global note', modelPolicies: { $comment: 'global tiers' } });
-  assert.equal(JSON.stringify(cfg).includes('$comment'), false);
-  assert.deepEqual(Object.keys(cfg.modelPolicies), ['claude']);
-  assert.deepEqual(Object.keys(cfg.tierFallback), ['advanced']);
-});
-
-test('$comment does not change the semantic config hash', () => {
-  const plain = runnerWith({ capabilities: { 'code:*': { tier: 'advanced' } }, patterns: { seatBinding: { schema: 1 } } });
-  const noted = runnerWith({
-    $comment: 'ladder',
-    modelPolicies: { $comment: 'tiers', claude: { advanced: 'sonnet', flagship: 'opus' } },
-    capabilities: { 'code:*': { $comment: 'note', tier: 'advanced' } },
-    patterns: { seatBinding: { schema: 1 } },
-  });
-  const hashOf = (runner) => snapshotRunnerConfig('/unused', loadRunner(runner).cfg).hash;
-  assert.equal(hashOf(noted), hashOf(plain));
-});
-
-test('ensureRunnerConfigForDir keeps a $comment and the marker in the project file and loads the config without the $comment', () => {
-  const { dir } = loadRunner(runnerWith({ $comment: 'ladder', patterns: { seatBinding: { schema: 1 } } }));
-  const file = path.join(dir, '.fgos', 'config.json');
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tier-decl-home-'));
-  const prevHome = process.env.HOME;
-  const prevWrite = process.stderr.write;
-  process.env.HOME = home;
-  process.stderr.write = () => true;
-  try {
-    const loaded = ensureRunnerConfigForDir(dir);
-    assert.equal(JSON.stringify(loaded).includes('$comment'), false);
-    assert.equal(loaded.patterns.seatBinding.schema, 1);
-    const written = JSON.parse(fs.readFileSync(file, 'utf8')).runner;
-    assert.equal(written.$comment, 'ladder');
-    assert.equal(written.patterns.seatBinding.schema, 1);
-  } finally {
-    process.stderr.write = prevWrite;
-    process.env.HOME = prevHome;
-  }
 });

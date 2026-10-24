@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError, loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -400,7 +400,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     worktree: fs.realpathSync(worktreeDir),
   };
   // What a bind records: the digest of the seat config it was bound under.
-  const configDigest = seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest;
+  const configDigest = seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest;
   if (attempts) record.bindings = { 'producer/1': attempts(unitRunId, configDigest) };
   if (bindings) record.bindings = bindings(unitRunId, configDigest);
   if (writeUnitJson) {
@@ -479,7 +479,7 @@ test('mutating gate: a config committed after the bind refuses the write, whatev
   const { baseAssignment, run, record, repoRoot, configDigest } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
-    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+    { runnerConfig: loadRunnerConfigForDir(repoRoot), session: {} },
   );
   const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
   // The snapshot kept in unit.json still carries the config the seat was bound under; the committed one moved on.
@@ -488,7 +488,7 @@ test('mutating gate: a config committed after the bind refuses the write, whatev
   committed.runner.defaults.tier = 'advanced';
   committed.runner.modelPolicies.node.advanced = 'node-adv';
   writeProjectConfig(repoRoot, committed);
-  assert.notEqual(seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest, configDigest);
+  assert.notEqual(seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest, configDigest);
   await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
 });
 
@@ -498,7 +498,7 @@ test('mutating gate: a recorded bindingInput that carries a config copy of its o
   });
   const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
-    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+    { runnerConfig: loadRunnerConfigForDir(repoRoot), session: {} },
   );
   const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
   // Reaches the point after the gate: the executable it would spawn is not the point of this test.

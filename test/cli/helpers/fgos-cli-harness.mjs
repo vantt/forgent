@@ -539,10 +539,7 @@ function advanceThroughDiscoveryToPlanning(cwd, id, verify = 'npm test -- proven
 // config timeout below, so a fallback that fires kills it and a real
 // --no-timeout override does not.
 function writeShortRunnerConfig(cwd, timeoutMs) {
-  // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs) so
-  // ensureRunnerConfigForDir's mergeConfigDefaults finds nothing missing to
-  // rewrite -- an in-call rewrite would dirty the working tree and trip
-  // return's own clean-tree check, unrelated to what this test proves.
+  // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs), as a project file once held them.
   const cfg = {
     executor: { command: process.execPath, args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },

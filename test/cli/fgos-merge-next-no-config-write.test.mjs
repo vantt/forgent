@@ -2,8 +2,8 @@
 // timeout must stay lazy.
 //
 // `resolveVerifyTimeoutMs` (bin/fgos.mjs) falls through to
-// `ensureRunnerConfigForDir`, which WRITES a default runner block into
-// `.fgos/config.json` and warns on stderr when none exists yet. Before the
+// `loadRunnerConfigForDir`, which reads the runner config and writes nothing
+// (it once wrote a default runner block into `.fgos/config.json`). Before the
 // use-case split, `sync-root` resolved its timeout only AFTER its
 // item/worktree/branch/Iron-Law guards, and `merge next` only ever resolved
 // one by actually reaching `approve`/`sync-root` — so a refusal, or a

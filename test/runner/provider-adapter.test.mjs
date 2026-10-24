@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
@@ -105,7 +105,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapter-home-'));
     process.env.HOME = tempHomeDir;
     throwawayDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapter-fgosDir-'));
-    cfg = loadRunnerConfigFromDir(committedConfigDir());
+    cfg = loadRunnerConfigForDir(committedConfigDir());
   });
 
   after(() => {
@@ -581,7 +581,7 @@ describe('Phase E step 1: resolveVerifiedProviderArgs production binder', () => 
   });
 
   test('the real production call site (resolveExecutorCommand) uses ProviderAdapter for every claude-family executor in the live repository config, with zero divergence', () => {
-    const cfg = loadRunnerConfigFromDir(committedConfigDir());
+    const cfg = loadRunnerConfigForDir(committedConfigDir());
     const originalWrite = process.stderr.write;
     const captured = [];
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
@@ -604,7 +604,7 @@ describe('Phase E step 1: resolveVerifiedProviderArgs production binder', () => 
   });
 
   test('a non-claude provider family (e.g. openai-codex) never even attempts ProviderAdapter rendering at the resolveExecutorCommand call site', () => {
-    const cfg = loadRunnerConfigFromDir(committedConfigDir());
+    const cfg = loadRunnerConfigForDir(committedConfigDir());
     const originalWrite = process.stderr.write;
     const captured = [];
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
