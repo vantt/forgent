@@ -346,16 +346,6 @@ fn fdinfo_locks(info: &str) -> impl Iterator<Item = LockEntry> + '_ {
     info.lines().filter_map(|line| parse_lock(line.strip_prefix("lock:")?))
 }
 
-/// Read the kernel lock table to EOF on one open seq_file. Short reads are
-/// page boundaries, not EOF. This is not atomic: presence is evidence, while
-/// absence still requires the caller's shared-lock probe before clearance.
-pub fn lock_table_entries() -> io::Result<Vec<LockEntry>> {
-    use std::io::Read;
-    let mut text = String::new();
-    File::open("/proc/locks")?.read_to_string(&mut text)?;
-    Ok(text.lines().filter_map(parse_lock).collect())
-}
-
 /// This process as named by this proc mount. Reject a mount from an ancestor
 /// PID namespace: its numbers cannot safely be passed to pidfd/kcmp syscalls.
 pub fn proc_self_pid() -> io::Result<ProcId> {
@@ -508,70 +498,6 @@ mod tests {
         let entries = fdinfo_locks("lock: 1: FLOCK ADVISORY WRITE 42 00:2f:98765 0 EOF").collect::<Vec<_>>();
         assert_eq!(entries[0].pid, 42);
         assert_eq!(entries[0].token, "00:2f:98765");
-    }
-
-    #[test]
-    fn a_large_userspace_buffer_does_not_make_proc_locks_a_complete_snapshot() {
-        use std::io::Read;
-        use std::os::fd::AsRawFd;
-        let dir = std::env::temp_dir().join(format!("fgos-process-table-pages-{}", std::process::id()));
-        fs::create_dir(&dir).unwrap();
-        let file = File::create(dir.join("ranges")).unwrap();
-        // Use nonadjacent POSIX ranges so even 64 KiB-page kernels need
-        // multiple seq_file pages, without depending on the fd limit.
-        // SAFETY: sysconf reads the host page size; fcntl reads a live flock.
-        let page = unsafe { libc::sysconf(libc::_SC_PAGESIZE) };
-        assert!(page > 0);
-        let count = page as usize / 32 + 128;
-        for n in 0..count {
-            let mut lock: libc::flock = unsafe { std::mem::zeroed() };
-            lock.l_type = libc::F_WRLCK as _;
-            lock.l_whence = libc::SEEK_SET as _;
-            lock.l_start = (n * 2) as _;
-            lock.l_len = 1;
-            assert_eq!(unsafe { libc::fcntl(file.as_raw_fd(), libc::F_SETLK, &lock) }, 0);
-        }
-        let mut table = File::open("/proc/locks").unwrap();
-        let mut bytes = vec![0; 1024 * 1024];
-        let first = table.read(&mut bytes).unwrap();
-        let second = table.read(&mut bytes).unwrap();
-        assert!(first < bytes.len(), "kernel read filled userspace buffer");
-        assert!(second > 0, "expected more than one seq_file page of real locks");
-        eprintln!("proc/locks: {count} real range locks, 1 MiB request, first {first} bytes, next {second} bytes");
-        let ino = {
-            use std::os::unix::fs::MetadataExt;
-            file.metadata().unwrap().ino().to_string()
-        };
-        // Other tests (and host processes) can change the seq_file between
-        // pages. Wait for one complete observation of our stable ranges;
-        // the old single-page reader can never satisfy this assertion.
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
-        loop {
-            let entries = lock_table_entries().unwrap();
-            let seen = entries.iter().filter(|entry| entry.kind == "POSIX"
-                && entry.pid == i64::from(std::process::id())
-                && entry.token.rsplit(':').next() == Some(ino.as_str())).count();
-            if seen == count { break; }
-            assert!(std::time::Instant::now() < deadline,
-                "expected {count} held ranges across seq_file pages, saw {seen}");
-            std::thread::sleep(std::time::Duration::from_millis(10));
-        }
-        drop(file);
-        fs::remove_dir_all(dir).unwrap();
-    }
-
-    #[test]
-    fn kernel_table_and_fdinfo_agree_on_the_locker_stamp() {
-        use std::os::fd::AsRawFd;
-        let path = std::env::temp_dir().join(format!("fgos-process-table-{}", std::process::id()));
-        let file = File::create(&path).unwrap();
-        // SAFETY: lock a live test-owned file.
-        assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0);
-        let token = own_lock_token(&file).unwrap();
-        let me = proc_self_pid().unwrap();
-        assert!(lock_table_entries().unwrap().iter().any(|entry| entry.kind == "FLOCK" && entry.pid == i64::from(me.0) && entry.token == token));
-        drop(file);
-        fs::remove_file(path).unwrap();
     }
 
     #[test]

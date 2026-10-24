@@ -24,7 +24,7 @@
 // copied hook without that optional client warns and continues.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
@@ -438,6 +438,37 @@ function staleWorktreeIndexRefusal(committingToplevel) {
   return `commit refused: "${branch}" has moved to ${branchTip} since this worktree was last synced (${lastSynced}) -- likely an external force-move (e.g. approve's merge landing a sibling child). This worktree's files/index are stale and a commit right now would silently carry the OLD content of every other tracked file, reverting them. Run "fgos resync-worktree" in this worktree to repair it, then retry the commit.`;
 }
 
+// The Git one-door census (packages/git/contracts/mutation-census.v1.json) records a digest of every
+// file the one-door scan judges. A commit that stages such a file without the regenerated census would
+// leave main's census stale, so the staged digests are compared with the staged census: no scan, no
+// build. Commits touching nothing the scan judges, or a repository without a census, pass untouched.
+async function censusDriftRefusal(committingToplevel) {
+  const git = (args) => execFileSync('git', args, {
+    cwd: committingToplevel, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const scanPath = path.resolve(__dirname, '../scripts/git-one-door-scan.mjs');
+  if (!fs.existsSync(scanPath)) return null; // a copied hook without its scan has no census to judge by
+  try {
+    const { MUTATION_CENSUS_PATH, censusDrift, declaredProduct } = await import(pathToFileURL(scanPath).href);
+    if (!git(['ls-files', '--stage', '--', MUTATION_CENSUS_PATH]).trim()) return null;
+    const product = declaredProduct(committingToplevel);
+    const staged = git(['diff', '--cached', '--name-only', '--no-renames', '-z']).split('\0')
+      .filter((name) => name && (!product || product(name)));
+    if (staged.length === 0) return null;
+    const changes = new Map(staged.map((name) => {
+      let source = null;
+      // Decoded as utf8, the very input the scan hashes (readFileSync(..., 'utf8')): bytes would diverge on invalid sequences.
+      try { source = git(['cat-file', 'blob', `:${name}`]); } catch { /* deleted from the index */ }
+      return [name, source];
+    }));
+    const drift = censusDrift(JSON.parse(git(['show', `:${MUTATION_CENSUS_PATH}`])), committingToplevel, changes);
+    return drift.length === 0 ? null
+      : `commit refused: the Git one-door census does not match the staged files (${drift.slice(0, 5).join(', ')}${drift.length > 5 ? `, and ${drift.length - 5} more` : ''}). Run "node scripts/git-one-door-scan.mjs --write-census" and stage ${MUTATION_CENSUS_PATH} (a merge needs a regenerated census, not either side's).`;
+  } catch (error) {
+    return `commit refused: could not check the Git one-door census against the staged files (${error.message}). Repair the index or the census and retry.`;
+  }
+}
+
 async function warnOnConventionViolations(committingToplevel) {
   if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return;
 
@@ -518,6 +549,12 @@ async function main() {
   const rootRefusal = rootFileRefusal(committingToplevel);
   if (rootRefusal) {
     refuse(rootRefusal);
+    return;
+  }
+
+  const censusRefusal = await censusDriftRefusal(committingToplevel);
+  if (censusRefusal) {
+    refuse(censusRefusal);
     return;
   }
 
