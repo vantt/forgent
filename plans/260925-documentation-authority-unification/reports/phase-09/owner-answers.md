@@ -128,3 +128,13 @@ Measured cost: the plan history origin does not yet have is 363 MB (16,363 objec
 Scope: a non-main branch only. No main landing, no documentation cutover, no deletes.
 
 Work cutover: WORK reported "cutover xong" on fg-server2 at 21:00. design-lap is not cut over and must not pull main. Before resuming, DOC checked that `fgos run` writes no Work events: turns 688 and 689 created no `.fgos/events` file, only assignment and runtime state.
+
+## L13-13 — Night wave rulings: third import, check pins, archive evidence (Lead, 2026-10-25 03:20)
+
+Decided by the Lead under A42 and L13-6.
+
+1. **The third main import, 571a996f5, was never accounted.** The ratchet was red on three legacy files. The Lead widened the resync turn's writable list to `docs/reading-map.md`, because that file is the surviving navigation holder and must match main's new probe count and its config verbs. The Lead also allowed one scanner change: a shard marked `appliedToDocs: false` is reported as `preparedPendingApply` and is not resolved against the live tree. A shard without that flag that points at a missing file still fails. The work was done in 7693ae514 and d786e305e and reviewed in w11-import3.
+2. **Checks that prove authoring use the commit that wrote them.** Live correctness belongs to the shared rebind check. `misc-fix/rebind.py --check` now replays its authoring at its own commit, and on the live tree it checks the binding hash, `reviewStatus` and the non-binding fields against later recorded rebinds. A one-shot authoring check must never again compare against live bytes. Every check that reads committed bytes takes an explicit `--pin`.
+3. **Old Doer commits are kept with local refs.** `keep/doer-pin-92260972c` and `keep/doer-pin-a27d85d0a` stay until the end of the track, because records once pinned them and they could otherwise be garbage collected.
+4. **Archive retention at F.** In the gate register, 70 of the 92 evidence paths point at files that the archive partition moves out of the tip, because the retention rule follows only Markdown links. Ruling: the rebuild at F also keeps every file named as evidence in `preflip-gate-status.json` and in the final status ledger. These are owning records (class a under L12-128). The rebuild's link parity check must count them.
+5. **A side effect the Lead accepted.** Turn 695 staged a checkout git addon under ignored `.fgos/runtime/git-addon/` in worktree d3, outside its writable list. It stayed local to that worktree and touched no shared target. Later briefs forbid loading native addons.

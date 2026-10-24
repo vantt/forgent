@@ -232,8 +232,8 @@
       ],
       "commit": "5c3b57347",
       "pin": "d3efc70c5",
-      "note": "Manifest/partition at d3efc70c5: 6,918 files, 6,026 to archive, 892 retained; direct ruling links retain 4 files / 783,918 B (L13-9 item 2, 984829939). Lead cold timing (5c3b57347): reduced tip 2.93 s cold / 2.90 s median; pre-freeze 41.70 s cold / 12.44 s median; verify-design.py exit 0 at its pin. w5-d5c 8/2: both REWORKs (retained rulings link to archived files; no true cold run) were addressed by 984829939 and 5c3b57347, with no independent re-review found. The archive ref exists only in the disposable rehearsal clone (design.md); no local archive ref was found in the repository. 123 retained files keep 1,025 links to archived targets, documented as resolving through the archive ref. Publication (origin push + main manifest merge) needs cutover approval (S2).",
-      "remaining": "Get an independent review of the direct-link retention and cold timing, then at F rebuild the partition, re-enumerate readers to 0 unresolved and retime from a cold cache.",
+      "note": "Manifest/partition at d3efc70c5: 6,918 files, 6,026 to archive, 892 retained; direct ruling links retain 4 files / 783,918 B (L13-9 item 2, 984829939). Lead cold timing (5c3b57347): reduced tip 2.93 s cold / 2.90 s median; pre-freeze 41.70 s cold / 12.44 s median; verify-design.py exit 0 at its pin. w5-d5c 8/2: both REWORKs (retained rulings link to archived files; no true cold run) were addressed by 984829939 and 5c3b57347, with no independent re-review found. The archive ref exists only in the disposable rehearsal clone (design.md); no local archive ref was found in the repository. 123 retained files keep 1,025 links to archived targets, documented as resolving through the archive ref. Publication (origin push + main manifest merge) needs cutover approval (S2). w14-g8-retention-timing-review: direct-link retention (4 files, 783,918 B) and cold timing (2.93 s / 41.70 s, fresh clones, measured eviction) APPROVE; the stale receipt fields were moved under historicalSandboxAttempt in f67e0f676.",
+      "remaining": "At F: rebuild the partition keeping register evidence (L13-13.4), re-enumerate readers to 0 unresolved and retime from a cold cache.",
       "blockers": [
         "984829939 and 5c3b57347 (w5-d5c REWORK fixes) not independently re-reviewed",
         "Partition bound to d3efc70c5; rebuild required at F",
@@ -325,7 +325,8 @@
       "At F, after applying every composed patch, rerun the ownership/ledger binding resolution and rebind: review w9-composition-fix found 661 bindings unresolved after the full patch chain (2 at HEAD), e.g. 339 in platform-foundations.md from block-position shifts. The final-pin rebind must cover composed patches, not only GAP-05.",
       "Size the post-apply rebind as two groups: 361 bindings broken by the composed patch chain and 46 already unresolved at the pin (w10-composition-rework); the 661 figure from w9 counts assertions across the full chain",
       "Legacy drift scan after applying the prepared w8/w9 shards reports 2 gaps (README, repo-layout-vision) because its source join does not follow supersession; fix the join or carry them before the scan gate at F (w11-import3 F3)",
-      "Every check that reads committed bytes takes an explicit --pin; run them at F, not at a moving HEAD"
+      "Every check that reads committed bytes takes an explicit --pin; run them at F, not at a moving HEAD",
+      "G8 rebuild at F keeps every file named as evidence in preflip-gate-status.json and the final status ledger (L13-13.4); 70 of 92 register evidence paths would otherwise be archived (w14-g8-retention-timing-review)"
     ],
     "external": [
       "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",
