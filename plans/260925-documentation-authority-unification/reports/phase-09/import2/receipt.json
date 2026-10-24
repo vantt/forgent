@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "status": "blocked",
+  "sourceHead": "dac65ad8ba135e8acf33438c8790efc222133e37",
+  "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w3-import2-brief.md",
+  "needsWrites": [
+    "docs/reading-map.md"
+  ],
+  "blocker": "Task 2 must update the existing detailed navigation holder docs/reading-map.md section 5 for three imported Terminal/Git/YAML entries. That path is outside the exact write scope. Stopped under the brief, without editing it or duplicating the holder.",
+  "scan": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+    "sha256": "bfaa9d4271ebc772fe33027cbfae62cef9b50c9b6968fb7909b829aa06a886a9",
+    "counts": {
+      "postFinalPinFiles": 5,
+      "postInventoryPinFiles": 33,
+      "files": 33,
+      "filesWithUnprovenChange": 5,
+      "missingChangedUnits": 17
+    },
+    "checkExit": 0,
+    "missingBySource": [
+      {
+        "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "counts": {
+          "currentUnits": 166,
+          "changedSinceInventory": 13,
+          "changedSinceFinal": 0,
+          "missingCurrent": 2,
+          "missingChangedSinceInventory": 2,
+          "missingChangedSinceFinal": 0
+        },
+        "units": [
+          {
+            "anchor": "5-high-level-component-authority-register",
+            "digest": "2cf73fb7faa401dafde89b07119f4a5181bbe92232d67b936ecc5c068f602384"
+          },
+          {
+            "anchor": "unheaded-block-25",
+            "digest": "9819ff097e5460c144503f4feb1ee09463529060b03882c2deafe01fb9ebe148"
+          }
+        ]
+      },
+      {
+        "sourcePath": "docs/specs/distribution.md",
+        "counts": {
+          "currentUnits": 44,
+          "changedSinceInventory": 28,
+          "changedSinceFinal": 10,
+          "missingCurrent": 9,
+          "missingChangedSinceInventory": 9,
+          "missingChangedSinceFinal": 9
+        },
+        "units": [
+          {
+            "anchor": "data-dictionary",
+            "digest": "ea2e6b86ff3cfb046074dd1da3defe6ff5f212c8528f6124837782848f91eddc"
+          },
+          {
+            "anchor": "unheaded-block-5",
+            "digest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd"
+          },
+          {
+            "anchor": "setup",
+            "digest": "3ddc0439eab8352041049e0935f8d5c4b51b519b2bc13d2db2c2503f0971d8af"
+          },
+          {
+            "anchor": "unheaded-block-9",
+            "digest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7"
+          },
+          {
+            "anchor": "business-rules",
+            "digest": "2bf8f761d6f896e77001be77524779fbeb2d871183170be2112ff5aa6403de19"
+          },
+          {
+            "anchor": "unheaded-block-16",
+            "digest": "5800c000957e2ab00a37613ce7a1eaf82e0b941da1280fd8e2c19829386ecf2f"
+          },
+          {
+            "anchor": "lịch-sử-quyết-định",
+            "digest": "d71c624ba65b9c20499c1d6033fe9748cb9c61ddb770c011fd25b37979cca2e5"
+          },
+          {
+            "anchor": "unheaded-block-17",
+            "digest": "45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a"
+          },
+          {
+            "anchor": "unheaded-block-23",
+            "digest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212"
+          }
+        ]
+      },
+      {
+        "sourcePath": "docs/specs/observe.md",
+        "counts": {
+          "currentUnits": 27,
+          "changedSinceInventory": 27,
+          "changedSinceFinal": 2,
+          "missingCurrent": 2,
+          "missingChangedSinceInventory": 2,
+          "missingChangedSinceFinal": 2
+        },
+        "units": [
+          {
+            "anchor": "owns",
+            "digest": "c6d3ff381aeb510ef54a48e3ba171bee0de005c3464ba697990a3b613420a5a6"
+          },
+          {
+            "anchor": "unheaded-block-3",
+            "digest": "39cfbe4a9a2fb100d91ee501bbb8818f6de52fc8ffa8c5fff5019bd8a0ee4e0f"
+          }
+        ]
+      },
+      {
+        "sourcePath": "docs/specs/reading-map.md",
+        "counts": {
+          "currentUnits": 3,
+          "changedSinceInventory": 2,
+          "changedSinceFinal": 2,
+          "missingCurrent": 2,
+          "missingChangedSinceInventory": 2,
+          "missingChangedSinceFinal": 2
+        },
+        "units": [
+          {
+            "anchor": "reading-map-sản-phẩm",
+            "digest": "27c830b14aa03e662057073b1f73ae34bfd2282ca2bac8498001d4f3ac0e17ca"
+          },
+          {
+            "anchor": "unheaded-block-2",
+            "digest": "aa5ef3b591f7b65841e3f7a389df5ae06c44ff7f6e948e9d0e21fc3e7fcdfc64"
+          }
+        ]
+      },
+      {
+        "sourcePath": "docs/specs/runner.md",
+        "counts": {
+          "currentUnits": 517,
+          "changedSinceInventory": 148,
+          "changedSinceFinal": 2,
+          "missingCurrent": 2,
+          "missingChangedSinceInventory": 2,
+          "missingChangedSinceFinal": 2
+        },
+        "units": [
+          {
+            "anchor": "business-rules",
+            "digest": "f182ae334ab9402bcb21c9a4568e96cea5a0fde149656b2722f152dcb16a45e9"
+          },
+          {
+            "anchor": "unheaded-block-93",
+            "digest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208"
+          }
+        ]
+      }
+    ]
+  },
+  "navigationEvidence": {
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceSha256": "70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b",
+    "successorPath": "docs/reading-map.md",
+    "successorSha256": "1e7296664eb04d3858a2b3a092cf949b31dc43bc39979797dfdea6d7bb673332",
+    "entries": [
+      {
+        "entry": "docs/platform/terminal-control/spec.md",
+        "source": {
+          "line": 63,
+          "text": "- `docs/platform/terminal-control/spec.md` — spec thành phần Terminal Control: nguồn duy nhất trả lời \"key này chạy ở pane nào\" trên terminal multiplexer (cổng trên theo key, driver herdr khai báo khả năng, layout đo thật + policy cắm được, luật gom tab); source: `packages/terminal-control/rust`, contracts: `packages/terminal-control/contracts/`; Node chỉ gọi qua route nội bộ `fgos internal terminal-control` (`src/terminal-control/client.mjs` client mỏng, `src/terminal-control/config.mjs` mục `terminal.*`); doctor/setup: `src/setup/terminal-control-checks.mjs` (hai dòng `terminal-control` và `terminal-allocations`, không có fix `terminal-dir`: store tự tạo thư mục); migration Node đã xong. Key của một lần chạy agent là attempt id; supervisor gọi in-process theo key (§12)."
+        },
+        "successor": {
+          "line": 185,
+          "text": "- `docs/platform/terminal-control/spec.md` — spec thành phần Terminal Control: nguồn duy nhất trả lời \"key này chạy ở pane nào\" trên terminal multiplexer (cổng trên theo key, driver herdr khai báo khả năng, layout đo thật + policy cắm được, luật gom tab); source: `packages/terminal-control/rust`, contracts: `packages/terminal-control/contracts/`; Node chỉ gọi qua route nội bộ `fgos internal terminal-control` (`src/terminal-control/client.mjs` client mỏng, `src/terminal-control/config.mjs` mục `terminal.*`); doctor/setup: `src/setup/terminal-control-checks.mjs`; migration Node đã xong. Key của một lần chạy agent là attempt id; supervisor gọi in-process theo key (§12)."
+        }
+      },
+      {
+        "entry": "docs/platform/git/spec.md",
+        "source": {
+          "line": 64,
+          "text": "- `docs/platform/git/spec.md` — spec thành phần Git (foundation): một authority cho mọi thao tác repository qua các port có kiểu (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), file WAL dưới git common dir là authority phục hồi duy nhất (§10), một cửa remote cho Remote, Publication và bộ đếm sequence (§3), cửa kích hoạt C5 và sáu dòng doctor Git (§12), vector bằng chứng §15/§19; source: `packages/git/rust` (crate `fgos-git`), addon N-API kết hợp `packages/git/node-addon` (link cả `fgos-event-store`), facade Node `src/git/` (không có cổng `git(args)` công khai), contracts: `packages/git/contracts/`; script bằng chứng: `scripts/git/` (E1 `e1-power-cut.*`, E3 `e3-bench.mjs`, P-SPACE/P-RESOURCE `p-space*.{sh,mjs}`, P-RELEASE `p-release-checks.sh`)"
+        },
+        "successor": {
+          "line": 186,
+          "text": "- `docs/platform/git/spec.md` — spec thành phần Git (foundation): một authority cho mọi thao tác repository qua các port có kiểu (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), file WAL dưới git common dir là authority phục hồi duy nhất (§10), cửa kích hoạt C5 (§12), vector bằng chứng §15/§19; source: `packages/git/rust` (crate `fgos-git`), addon N-API kết hợp `packages/git/node-addon` (link cả `fgos-event-store`), facade Node `src/git/` (không có cổng `git(args)` công khai), contracts: `packages/git/contracts/`; script bằng chứng: `scripts/git/` (E1 `e1-power-cut.*`, E3 `e3-bench.mjs`, P-SPACE/P-RESOURCE `p-space*.{sh,mjs}`, P-RELEASE `p-release-checks.sh`)"
+        }
+      },
+      {
+        "entry": "docs/platform/yaml-document/spec.md",
+        "source": {
+          "line": 65,
+          "text": "- `docs/platform/yaml-document/spec.md` — spec thành phần YAML Document (L0 leaf, owner ký 2026-10-22; crate Rust `packages/yaml-doc/rust`, các consumer Rust và cửa Node đã xong; js-yaml đã xoá, RUL108 (every YAML parse goes through the native door) thay RUL101 (every YAML parse goes through one vendored js-yaml)): một authority cho đọc/sửa/merge YAML giữ nguyên byte không đụng tới, hai profile parse (`strict-config`, `tool`), comment là text có vị trí kèm chặn injection, merge primitive nhận luật từ caller; source dự kiến `packages/yaml-doc/rust` (crate `fgos-yaml-doc`), Node qua namespace `yaml` của native door sau facade `src/util/yaml.mjs` (thay js-yaml vendored, đã supersede RUL101 (every YAML parse goes through one vendored js-yaml)); bằng chứng: `plans/reports/spike-261022-0017-yaml-config-gate-evidence.md`"
+        },
+        "successor": {
+          "line": 187,
+          "text": "- `docs/platform/yaml-document/spec.md` — spec thành phần YAML Document (L0 leaf, owner ký 2026-10-22; crate Rust `packages/yaml-doc/rust` và các consumer Rust đã xong, cửa Node chưa làm): một authority cho đọc/sửa/merge YAML giữ nguyên byte không đụng tới, hai profile parse (`strict-config`, `tool`), comment là text có vị trí kèm chặn injection, merge primitive nhận luật từ caller; source dự kiến `packages/yaml-doc/rust` (crate `fgos-yaml-doc`), Node qua namespace `yaml` của native door sau facade `src/util/yaml.mjs` (thay js-yaml vendored, supersede RUL101 (the per-worktree dispatch lock is a kernel lock) khi land); bằng chứng: `plans/reports/spike-261022-0017-yaml-config-gate-evidence.md`"
+        }
+      }
+    ]
+  },
+  "commands": [
+    {
+      "command": "git status --short (initial)",
+      "exit": 0,
+      "result": "clean"
+    },
+    {
+      "command": "git show --no-patch --format=raw bc5589ed7",
+      "exit": 0
+    },
+    {
+      "command": "git diff bc5589ed7^1 bc5589ed7 -- docs/specs/distribution.md docs/specs/observe.md docs/specs/runner.md docs/specs/reading-map.md",
+      "exit": 0
+    },
+    {
+      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+      "exit": 0
+    },
+    {
+      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs --check",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "notCompleted": [
+    "Merge accounting and conflict/census reproduction",
+    "Step 0 current content/neighbour binding accounting and incoming obligation update",
+    "Legacy re-sync and rebinds to zero missing",
+    "Evidence relocation --before",
+    "Ratchet digest accounting and owning test"
+  ],
+  "restrictions": {
+    "repositoryGitWrites": false,
+    "fgosCli": false,
+    "lifecycleVerbs": false,
+    "outOfScopeWorkspaceWrites": false,
+    "productionSymbolEdits": false,
+    "independentAcceptance": false,
+    "previewStarted": false
+  },
+  "impactAnalysis": "degraded/unqueried: brief forbids fgOS CLI; no impact-analysis tool exposed; no production symbol edited"
+}
