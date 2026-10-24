@@ -62,3 +62,5 @@ Purpose: tell model from CLI. Codex, pi and omp with `gpt-6.1-sol` declined legi
   - The first stage A run is the canary for rotation.
   - The source store's bytes and mtime are checked before every run and after the stage.
 - **Dry check:** the recording endpoint now also speaks omp's Cloud Code Assist stream. Every wiring run gave its outcome.
+- **V7h result:** 105 runs. LR 10/10, LW 10/10, harmful 0/70. The legitimate-request declines are not caused by pi; model, effort and provider route remain confounded. Report: `plans/reports/research-261024-1744-mailbox-v7h-pi-with-claude-through-openrouter.md`.
+- **V7i result:** the hard stop fired at run 32 (`omp.G.M.PT.003`); harmful pooled 1/20, a no-go. Report: `plans/reports/research-261024-1958-mailbox-v7i-omp-with-gemini.md`.
