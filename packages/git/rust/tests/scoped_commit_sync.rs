@@ -491,7 +491,7 @@ fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
 /// The same interruption, recorded in the bounded form new intents use: the
 /// selected paths as a digest and a baseline without its dirty list.
 fn interrupted_digest(f: &Fixture, id: &str, phase: u8) -> wal::Chain {
-    interrupted_as(f, id, phase, false, false, None, true)
+    interrupted_as(f, id, phase, false, false, None, Some(&["a"]))
 }
 /// `stored_request` replaces the serialized request the intent persists, to
 /// reproduce what an earlier release wrote.
@@ -503,7 +503,7 @@ fn interrupted_resources(
     legacy: bool,
     stored_request: Option<String>,
 ) -> wal::Chain {
-    interrupted_as(f, id, phase, sync, legacy, stored_request, false)
+    interrupted_as(f, id, phase, sync, legacy, stored_request, None)
 }
 fn interrupted_as(
     f: &Fixture,
@@ -512,7 +512,8 @@ fn interrupted_as(
     sync: bool,
     legacy: bool,
     stored_request: Option<String>,
-    bounded: bool,
+    // The path set a bounded record carries as its digest; None writes the listed form.
+    bounded: Option<&[&str]>,
 ) -> wal::Chain {
     use wal::*;
     struct Held<'a>(&'a Handle);
@@ -550,13 +551,16 @@ fn interrupted_as(
     } else {
         OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
             worktree: baseline.worktree.clone(),
-            baseline: if bounded {
+            baseline: if bounded.is_some() {
                 serde_json::json!({"head": baseline.head, "reference": baseline.reference, "worktree": baseline.worktree, "authority": baseline.authority, "dirtyDigest": "0".repeat(64)}).to_string()
             } else {
                 serde_json::to_string(&baseline).unwrap()
             },
             request: stored_request.unwrap_or_else(|| serde_json::to_string(&request).unwrap()),
-            paths: if bounded { PathSet::of(&["a".to_string()]).unwrap() } else { vec!["a".into()].into() },
+            paths: match bounded {
+                Some(recorded) => PathSet::of(&recorded.iter().map(|p| p.to_string()).collect::<Vec<_>>()).unwrap(),
+                None => vec!["a".into()].into(),
+            },
             tree,
             cutover_grant: None,
         }))
@@ -903,6 +907,17 @@ fn recovery_of_a_bounded_record_unstages_only_its_own_paths() {
         matches!(outcome, wal::Outcome::CommitRejected { cause } if cause == "commit-effect-unknown")
     );
     assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "human");
+    // When the tree no longer shows exactly the recorded set, nothing is unstaged.
+    let f = Fixture::new();
+    interrupted_as(&f, "unknown-digest", 2, false, false, None, Some(&["a", "b"]));
+    let outcome = f
+        .driver
+        .recover_scoped_commit(&f.repo, f.held(), "fixture", "unknown-digest", &wal::OsFileSystem)
+        .unwrap();
+    assert!(
+        matches!(outcome, wal::Outcome::CommitRejected { cause } if cause == "commit-effect-unknown")
+    );
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "a");
 }
 #[test]
 fn unknown_replay_keeps_cause_and_recovery_preserves_foreign_staging() {

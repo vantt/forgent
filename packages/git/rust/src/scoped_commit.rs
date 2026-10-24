@@ -877,8 +877,12 @@ impl GitDriver {
                 }
             } else if self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])? == baseline.head {
                 // Staging a human left beside ours stays; only our paths are unstaged.
+                // A bounded record derives its paths from the intent's tree; unstage
+                // them only when they are exactly the recorded set, else leave the index.
                 let ours = self.recorded_paths(repo, &scope, payload, &baseline.head)?;
-                self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &ours)?;
+                if payload.paths.matches(&ours)? {
+                    self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &ours)?;
+                }
                 Outcome::CommitRejected {
                     cause: "commit-effect-unknown".into(),
                 }

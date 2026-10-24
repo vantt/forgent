@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9a5e26be05e15972f6d7e4716708f551e47ef43e3b793e88f282890600ad371e",
+  "payloadDigest": "e128c2acf880720dd454fd240d52b1eb6a693a901d84b8e0bd4b9014e5433e8b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -380,7 +380,7 @@
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
     "packages/git/rust/src/restore.rs": "8ebe818730acbc307af3cf3e4a2c7476876eae026a7ea2216d4b4a4a08e1e525",
-    "packages/git/rust/src/scoped_commit.rs": "4449d0ee696460e4f1e20cea0f4aedf162cd47b1e7c0609a88e87b31bb3afd63",
+    "packages/git/rust/src/scoped_commit.rs": "36b0599de1a091cd5ba9f67334babb0b9b16ca53972b6508136166d4fefab22d",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
     "packages/git/rust/src/sync.rs": "0fd36afdf42dc99246386d3ed9b87c2086c88edab260f99bbd9f2327c9a85cca",
     "packages/git/rust/src/wal.rs": "99f30b4647504c05a31a82267ed7a63cbd4c0db53906282be8fec621df7cdc11",
@@ -399,7 +399,7 @@
     "packages/git/rust/tests/refs_remote.rs": "0740609cdc54853897a2a67bd753e07ed128b06e7f59ccea1e9735f9df4c64a5",
     "packages/git/rust/tests/repository_config.rs": "71d201335b087e0dae4080e147421618693940a2007f7c6819f10b1a3dc8202a",
     "packages/git/rust/tests/safe_restore.rs": "17d2b23fcfee07473574f3d3f420aba4ca2cbf901480737247fd1f054d792c08",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "bf5d165af70c0629cc8efb1cbbde1e6aa07af6bd6aeb2030c3e53564dce7939d",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "c0ae7f6b0eb5b107a011e202a761a33575b89260ec6d6758e59316c6fb14155e",
     "packages/git/rust/tests/sequence.rs": "40fd63b603f193c20ade1d1dd20bc309c2defc1ce902deda9b4241693f777df1",
     "packages/git/rust/tests/ssh_transport.rs": "0c49c0d61922fc89472a7168711b8d27c1266a50bece8fc200534c1f5b6e8d41",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
