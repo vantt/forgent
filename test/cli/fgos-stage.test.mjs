@@ -89,7 +89,7 @@ import {
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 // `fgos plan --validate` runs validate-plan as a confined Unit; posture checks consult the machine
 // backend registry, kept file-local here (the child CLI inherits the env that points at it).
@@ -205,7 +205,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
     modelPolicies: { node: { nano: 'n', standard: 's', flagship: 'f', frontier: 'x' } },
   };
   const configFile = path.join(cwd, '.fgos', 'config.json');
-  const existingConfig = fs.existsSync(configFile) ? JSON.parse(fs.readFileSync(configFile, 'utf8')) : {};
+  const existingConfig = fs.existsSync(configFile) ? readProjectConfig(cwd) : {};
   writeProjectConfig(cwd, { ...existingConfig, runner: runnerCfg });
 
   // Interactive fgos plan without --verdict

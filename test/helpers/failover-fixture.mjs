@@ -77,6 +77,8 @@ if (match) {
 }
 `;
 
+const TIERS = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
+
 /**
  * A repo with a linked worktree and one executor per entry of `providers`
  * ({ executor: { family, logins: { accountId: marker } } }); `prefer` lists the executors in pool
@@ -142,9 +144,10 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
         const cell = cells[family] ?? 'fake';
         return [family, { nano: cell, mini: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell }];
       })),
-      ...(tierFallback ? { tierFallback } : {}),
+      // The walk after a failure follows the families listed here, so the fixture lists the families it serves.
+      tierFallback: tierFallback ?? Object.fromEntries(TIERS.map((tier) => [tier, [...new Set(Object.values(providers).map(({ family }) => family))]])),
       executors,
-      capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard' } },
+      capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard', tier: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   };

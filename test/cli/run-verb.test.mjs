@@ -13,7 +13,7 @@ seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -426,7 +426,7 @@ test('fgos run help names --input and --verify', () => {
 // one a seat resolves to, and an accepted dependence, are refused by name before any unit run exists; at or below the resolved tier everything works.
 const setRunnerConfig = (tmp, patch) => {
   const file = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   writeProjectConfig(tmp, { ...cfg, runner: patch(cfg.runner) });
 };
 

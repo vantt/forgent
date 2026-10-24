@@ -25,14 +25,14 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
 // other executor, never through a `fgos tool register` event.
 function declareExecutor(cwd, id, fields) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const cfg = fs.existsSync(configPath) ? readProjectConfig(cwd) : {};
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;

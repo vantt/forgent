@@ -5,7 +5,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');

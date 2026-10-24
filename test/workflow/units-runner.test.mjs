@@ -13,7 +13,7 @@ import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWo
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 if (!process.env.XDG_STATE_HOME) {
@@ -93,7 +93,7 @@ function setupRepo({ effortCli = false } = {}) {
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
         },
       },
-      capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' } },
+      capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
     },
   });
@@ -103,8 +103,7 @@ function setupRepo({ effortCli = false } = {}) {
 // A reviewed unit needs its reviewer in another provider family than its producer: two executors
 // whose commands are differently named links to node, both preferred for every capability.
 function useTwoFamilies(tmp) {
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const worker = path.join(tmp, 'worker.mjs');
   cfg.runner.executors = {};
   for (const name of ['alpha', 'beta']) {
@@ -448,13 +447,11 @@ test('--account pins provider account on every unit of the workflow run, kept fo
   const fakeHome = makeFixtureDir('fgos-home-');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  writeGlobalConfig(fakeHome, {
-    runner: {
-      providers: {
-        node: {
-          accounts: {
-            'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
-          },
+  writeAccountsFile(path.join(fakeHome, '.fgos'), {
+    providers: {
+      node: {
+        accounts: {
+          'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
         },
       },
     },
@@ -515,20 +512,17 @@ test('workflow with two units on different providers pins account only on matchi
   fixtures.push(fakeHome);
   fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  writeGlobalConfig(fakeHome, {
-    runner: {
-      providers: {
-        alpha: {
-          accounts: {
-            'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
-          },
+  writeAccountsFile(path.join(fakeHome, '.fgos'), {
+    providers: {
+      alpha: {
+        accounts: {
+          'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
         },
       },
     },
   });
 
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   const worker = path.join(tmp, 'worker.mjs');
   cfg.runner.executors = {};
   for (const name of ['alpha', 'beta']) {
@@ -542,8 +536,8 @@ test('workflow with two units on different providers pins account only on matchi
     cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.capabilities = {
-    'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard' },
-    'cap-beta': { prefer: [{ executor: 'beta' }], rigor: 'standard' },
+    'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard', tier: 'standard' },
+    'cap-beta': { prefer: [{ executor: 'beta' }], rigor: 'standard', tier: 'standard' },
   };
   writeProjectConfig(tmp, cfg);
 
@@ -584,13 +578,11 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
   fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  writeGlobalConfig(fakeHome, {
-    runner: {
-      providers: {
-        node: {
-          accounts: {
-            'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
-          },
+  writeAccountsFile(path.join(fakeHome, '.fgos'), {
+    providers: {
+      node: {
+        accounts: {
+          'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
         },
       },
     },
@@ -680,8 +672,7 @@ test('a unit\'s skills in a units file reach bind(), and a pool that cannot prov
   assert.notEqual(state.status, 'completed');
   assert.match(JSON.stringify(state.steps), /skills-unavailable/);
 
-  const cfgPath = path.join(tmp, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(tmp);
   cfg.runner.executors['test-node'].supports = { skills: ['docs-seeker'] };
   writeProjectConfig(tmp, cfg);
   const served = await startWorkflow({ unitsPath: file, ...opts(tmp) });

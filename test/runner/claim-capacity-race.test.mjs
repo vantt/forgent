@@ -9,7 +9,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { readClaim, readClaims, releaseClaim } from '../../src/state/runtime-coordination.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { createLockScope } from '../../src/holder-lock/index.mjs';
 import { withMainCheckout } from '../../src/runner/repo-locks.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
@@ -75,7 +75,7 @@ async function waitFor(predicate, what, timeoutMs = 15000) {
 
 test('two processes claiming the last worker slot: exactly one wins, the other gets worker-slot-ceiling', { skip: HOOK_TEST_SKIP }, async () => {
   const { repoRoot, dir } = initRepo();
-  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
   addTodo(dir, 'item-a');
   addTodo(dir, 'item-b');
 

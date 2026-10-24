@@ -10,7 +10,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import { probe } from '../../src/holder-lock/index.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
@@ -479,7 +478,7 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
 
 test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', async () => {
   const { repoRoot, dir } = setup();
-  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   // item-a is claimed and its worktree goes conclusively quiet.
   const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
@@ -501,7 +500,7 @@ test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drif
 
 test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', async () => {
   const { repoRoot, dir } = setup();
-  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });

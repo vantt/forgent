@@ -1,15 +1,18 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { readSharedConfig } from '../../src/config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../../src/config/global-config.mjs';
+import { readConfig, readMachineConfig } from '../../src/config/facade.mjs';
 import {
   globalConfigPath,
+  plainConfig,
   projectConfigPath,
+  readGlobalConfig,
+  readProjectConfig,
   writeGlobalConfig,
   writeProjectConfig,
   writeRawGlobalConfig,
@@ -17,28 +20,42 @@ import {
 } from './config-fixture.mjs';
 
 const mkTemp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-config-fixture-'));
+const mkRepo = () => {
+  const dir = mkTemp();
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  return dir;
+};
 
-// There is no list of tests allowed to write config.json by hand: byte-exact and malformed
+// There is no list of tests allowed to write a config file by hand: byte-exact and malformed
 // content goes through the raw writers, and test/architecture.test.mjs fails any other write.
 
-test('a config written by the helper is read back equal by the product reader, for both scopes', () => {
-  const value = { runner: { timeoutMs: 5000 }, nested: { list: [1, 'two', { three: 3 }] } };
-  const dir = mkTemp();
+test('a config written by the helper is read back equal by the helper readers and accepted by the product facade, for both scopes', () => {
+  const value = { runner: { timeoutMs: 120000 } };
+  const dir = mkRepo();
   const home = mkTemp();
   writeProjectConfig(dir, value);
-  writeGlobalConfig(home, value);
-  assert.deepEqual(readSharedConfig(dir), value);
-  assert.deepEqual(loadGlobalConfig(globalConfigPath(home)), value);
-  assert.equal(projectConfigPath(dir), path.join(dir, '.fgos', 'config.json'));
+  writeGlobalConfig(home, { runner: { timeoutMs: 180000 } });
+  assert.deepEqual(readProjectConfig(dir), value);
+  assert.deepEqual(readGlobalConfig(home), { runner: { timeoutMs: 180000 } });
+  assert.equal(projectConfigPath(dir), path.join(dir, '.fgos', 'config.yaml'));
+  assert.equal(globalConfigPath(home), path.join(home, '.fgos', 'config.yaml'));
+  assert.equal(readConfig({ projectRoot: dir, globalDir: path.join(home, '.fgos') }).value.runner.timeoutMs, 120000);
+  assert.equal(readMachineConfig({ globalDir: path.join(home, '.fgos') }).value.runner.timeoutMs, 180000);
 });
 
-test('a raw write reaches the product reader byte for byte, and malformed text raises the reader parse error', () => {
+test('a raw write lands byte for byte, and the readers return an empty config for an absent file', () => {
   const dir = mkTemp();
   const home = mkTemp();
-  writeRawProjectConfig(dir, '{ not json');
-  writeRawGlobalConfig(home, '{"a":1}');
-  assert.equal(fs.readFileSync(projectConfigPath(dir), 'utf8'), '{ not json');
-  assert.equal(fs.readFileSync(globalConfigPath(home), 'utf8'), '{"a":1}');
-  assert.throws(() => readSharedConfig(dir), /cannot parse shared config/);
-  assert.deepEqual(loadGlobalConfig(globalConfigPath(home)), { a: 1 });
+  assert.deepEqual(readProjectConfig(dir), {});
+  writeRawProjectConfig(dir, '{ not yaml');
+  writeRawGlobalConfig(home, '# @fgos:v1\n');
+  assert.equal(fs.readFileSync(projectConfigPath(dir), 'utf8'), '{ not yaml');
+  assert.equal(fs.readFileSync(globalConfigPath(home), 'utf8'), '# @fgos:v1\n');
+  assert.deepEqual(readGlobalConfig(home), {});
+});
+
+test('plainConfig turns a null-prototype tree into ordinary objects that deepEqual a literal', () => {
+  const tree = Object.assign(Object.create(null), { a: Object.assign(Object.create(null), { b: [1] }) });
+  assert.deepEqual(plainConfig(tree), { a: { b: [1] } });
+  assert.equal(Object.getPrototypeOf(plainConfig(tree)), Object.prototype);
 });

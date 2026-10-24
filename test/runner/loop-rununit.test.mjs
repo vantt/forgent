@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { initStore, addWork, moveWork, listWork, readRawEvents } from '../../src/state/store.mjs';
@@ -131,7 +131,7 @@ test('an index someone else staged in the worktree refuses the launch before the
   // The operator's worktree setup stages a stray file in each new checkout before the runner
   // launches anything. The retry resets the worktree to its dispatch baseline, which clears that index.
   const stage = writeWorker(fx.scriptDir, 'stage-stray', `import { execFileSync } from 'node:child_process';\nfs.writeFileSync('stray.txt', 'stray\\n');\nexecFileSync('git', ['add', 'stray.txt']);`);
-  writeSharedConfig(fx.repoRoot, { worktreeSetup: { commands: [`${JSON.stringify(process.execPath)} ${JSON.stringify(stage)}`] } });
+  writeProjectConfig(fx.repoRoot, { worktreeSetup: { commands: [`${JSON.stringify(process.execPath)} ${JSON.stringify(stage)}`] } });
   const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
 
   const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });

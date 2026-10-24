@@ -14,7 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -67,7 +67,7 @@ function eventLines(cwd) {
 // as this project's own `.fgos/config.json` declares `gitnexus`/`herdr`.
 function declareExecutor(cwd, id, fields) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
-  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const cfg = fs.existsSync(configPath) ? readProjectConfig(cwd) : {};
   cfg.runner ??= {};
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
   cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };

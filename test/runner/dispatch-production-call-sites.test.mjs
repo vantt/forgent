@@ -24,7 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
 const originalHome = process.env.HOME;
@@ -139,8 +139,7 @@ test('in-process dispatch with required confinement refuses without trusted harn
     agentType: 'general-assistant',
   }));
   // Add required confinement to the capability in config
-  const cfgPath = path.join(root, '.fgos', 'config.json');
-  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const cfg = readProjectConfig(root);
   cfg.runner.capabilities[IMPLEMENT_CAPABILITY].confinement = {
     mode: 'required',
     policy: 'host-write-denied',

@@ -16,6 +16,10 @@ export function withProviderFamilies(cfg, count = 4) {
   }
   for (const capability of Object.values(cfg.runner.capabilities || {})) {
     capability.prefer = names.map((executor) => ({ executor }));
+    // A seat, role or persona scope of the capability has a pool of its own, which wins over the capability's.
+    for (const group of ['seats', 'roles', 'personas']) {
+      for (const scope of Object.values(capability[group] || {})) scope.prefer = capability.prefer;
+    }
   }
   return cfg;
 }

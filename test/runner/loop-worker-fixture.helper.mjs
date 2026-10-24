@@ -8,7 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CONFINED_INVOCATION_ID = 'cli';
 
@@ -63,7 +63,7 @@ export function confinedRunnerConfig(config = {}) {
 export function persistRunnerConfig(repoRoot, config) {
   const file = path.join(repoRoot, '.fgos', 'config.json');
   let existing = {};
-  try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* none yet */ }
+  try { existing = readProjectConfig(repoRoot); } catch { /* none yet */ }
   fs.mkdirSync(path.dirname(file), { recursive: true });
   writeProjectConfig(repoRoot, { ...existing, runner: config });
 }
