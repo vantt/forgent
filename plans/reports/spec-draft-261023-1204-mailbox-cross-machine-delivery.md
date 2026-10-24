@@ -320,6 +320,9 @@ Agreed with the IDENT lead on 2026-10-23: the mailbox hook registers its head th
 - `mailbox.remote.enabled` depends on an Identity query "signing is available in this build", which I5 will expose.
 - The Event Store gaps (Rust `rebuildModule`, the undefined "tell the consumers" step) also block IDENT I4. They are raised with ES as a need of two consumers (board log 12:30 and 12:45).
 
-## Open point after Identity I5 (2026-10-23 16:58)
+## Trust in a machine's first key (settled 2026-10-24)
 
-Pinning on first sight means a machine that can push to the repository and is seen first gets trusted, with no list to approve it in advance. The signature proves that the same machine keeps writing; it does not prove the machine belongs in the project. Whether MAIL adds its own allowlist of machine handles for accepting remote mail (a MAIL policy on top of Identity's pins, which needs nothing from Identity) is a question for the owner before X-rungs that enable remote delivery. Draft recommendation: yes. The `mailbox.remote.allowMachines` list is proposed with no default value, and the owner fills it in.
+The owner chose B on 2026-10-24 09:59, and IDENT landed it as `179b917bf`.
+- **In Identity:** each pin has a state, `Seen` or `Confirmed`. The owner moves a machine to `Confirmed` with `fgos identity pins --confirm <machine-id> --fingerprint <fp>`, after comparing fingerprints; `--forget` moves it back to `Seen`. `Verified.state` carries the state, and this machine's own key always verifies as `Confirmed`.
+- **In MAIL:** only one boolean is proposed, `mailbox.remote.requireConfirmed`. When it is on, MAIL ingests remote mail only if `Verified.state == Confirmed`. MAIL keeps no list of its own, so Identity remains the only authority on which machines are trusted.
+- **Rejected:** a MAIL-side allowlist of machine handles (`mailbox.remote.allowMachines`). It would make two authorities for the same decision.
