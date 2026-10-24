@@ -52,28 +52,27 @@ function declareExecutor(cwd, id, fields) {
   writeProjectConfig(cwd, cfg);
 }
 
-// The standard declares two tool executors (gitnexus and herdr), so a project always has registered tools; what a
-// machine last observed of them is the local status overlay, which these tests write directly.
+// Tool executors are a project's own choice, never a standard value: a project that declares none is inactive. What a
+// machine last observed of the declared ones is the local status overlay, which these tests write directly.
 const checkedPresent = (cwd, ...ids) => writeLocalStatus(path.join(cwd, '.fgos'), Object.fromEntries(ids.map((id) => [id, { status: 'present' }])));
 
-test('tool-registry-configured fails as degraded while the standard\'s tools were never checked on this machine', () => {
-  const cwd = mkTemp('fgos-tool-registry-unchecked-');
+test('tool-registry-configured passes as inactive on a fresh project: the standard declares no tool executor', () => {
+  const cwd = mkTemp('fgos-tool-registry-inactive-');
   execFileSync('git', ['init', '-q'], { cwd });
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /^degraded — 0\/2 registered tool\(s\) present/);
-  assert.match(message, /fgos tool check/);
+  assert.equal(passed, true, message);
+  assert.match(message, /^inactive/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured passes when every registered tool is checked present (full)', () => {
+test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
-  checkedPresent(cwd, 'gitnexus', 'herdr', 'echo-tool');
+  checkedPresent(cwd, 'echo-tool');
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true, message);
-  assert.match(message, /^full — 3\/3/);
+  assert.match(message, /^full — 1\/1/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -81,11 +80,10 @@ test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing o
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
-  checkedPresent(cwd, 'gitnexus', 'herdr');
   // The declared tool was never checked, so it stays "unknown", which classifyRegistryPosture reports as degraded.
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, false, 'a declared-but-unverified tool must fail the check, not silently pass as before this fix');
-  assert.match(message, /^degraded — 2\/3/);
+  assert.match(message, /^degraded — 0\/1/);
   assert.match(message, /fgos tool check/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
