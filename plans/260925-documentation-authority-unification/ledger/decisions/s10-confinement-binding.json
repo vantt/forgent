@@ -11,8 +11,8 @@
       "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
       "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
       "targetOwner": "docs/platform/agent-confinement/spec.md",
-      "targetAnchor": "unheaded-block-47",
-      "targetUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "a42e58185c9dac1907439001b99aeae8a24d83200112199a9e834a7b94d85ee0",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "8. Policy resolution và edge cases",
@@ -20,15 +20,11 @@
       ],
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval.",
-      "reviewNote": "deep: e-042, source block-113 line 1104 and target block-47 line 370 byte-equal, digest a7af69f1 recomputed by hand, move is right for a verbatim paragraph carried into the mapped section, placement after the Reaper paragraph matches source order, rationale claims (byte for byte, limitations retained, identity already native in the prior package) all true, pending and no approval carried",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-e01-2300d6557.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+      "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval.\nL12-137 binding correction: docs/platform/agent-confinement/spec.md#unheaded-block-47 -> docs/platform/agent-confinement/spec.md#unheaded-block-45; existing explicit supersession chain, authenticated against current dual extractors; content changed; prior approval does not carry.",
+      "bindingSha256": "4629c6be74cb063c7cb1ba6c23771cfc7a15ef2a4ac215bf196b726382872aa6",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     }
   ]
 }

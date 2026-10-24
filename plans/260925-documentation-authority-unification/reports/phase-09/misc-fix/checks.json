@@ -1,6 +1,21 @@
 {
   "status": "scoped-replay-passed-not-gate-acceptance",
   "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "ownershipRebindReplay": {
+    "sourceCommit": "8cab0204d0c5399390a12121b6e663ec35248a8e",
+    "status": "historical-preimages-pass-current-pin-comparison-deferred",
+    "historicalPreimagePin": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+    "miscRebindCheckBeforeExit": 0,
+    "miscRebindCheckAfterExit": 0,
+    "effectiveBindingsChecked": 283,
+    "unchangedOverlays": 27,
+    "miscVerifierBeforeExit": 1,
+    "miscVerifierAfterExit": 1,
+    "failure": "AssertionError: proof.json at the unchanged current-pin versus delivered G6 artifact comparison",
+    "comparisonCustody": "Final-pin Lead recomposition per w5-rebind-apply-brief.md; no pin or assertion substituted",
+    "commandEvidence": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/checks.json",
+    "noReadinessClaim": true
+  },
   "sourcePinScope": "G6 tracked source blobs at input HEAD; record inputs remain working-tree inputs. Binding refresh replays its original W4 preimage pin.",
   "combinedVerifierResult": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verification.json",
   "commands": [

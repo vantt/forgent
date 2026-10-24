@@ -20,7 +20,7 @@ import subprocess
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 P = Path('plans/260925-documentation-authority-unification')
-SCRATCH = Path('/tmp/fgos-work/w5-rebind')
+SCRATCH = Path('/tmp/fgos-work/w5-rebind-apply/rebind')
 sys.path.insert(0, str(ROOT / P / 'reports/phase-09/ledgerfix'))
 from bindings import documents, supersessions, effective, at, payload, digest, sha
 
@@ -226,16 +226,14 @@ def main():
             bindingSha256=digest(updated), reviewStatusBefore=row.get('reviewStatus'),
             reviewStatusAfter=row.get('reviewStatus'), proposedReviewStatus=target.get('reviewStatus'),
             effectiveBinding=dict(file=ef,pointer=ep,binding=payload(current)), applied=False))
-    # Exercise the actual prior author/checker, not a second implementation of
-    # its cases. A hypothetical row migration may not invalidate this proof.
+    # Replay the owning overlay generator against its own historical preimages,
+    # not the direct rows being rebound. Its current overlay bytes must survive.
     misc = ROOT/P/'reports/phase-09/misc-fix/rebind.py'
     module = runpy.run_path(str(misc))
-    generate = module['generate']
-    generate.__globals__['documents'] = lambda: copy.deepcopy(proposed)
-    generate.__globals__['extract'] = lambda request: self_inclusive(extract(request))
+    module['generate'].__globals__['extract'] = lambda request: self_inclusive(extract(request))
     pin = json.loads((misc.parent/'binding-refresh.json').read_text())['sourceHead']
     try:
-        generate(pin)
+        module['check'](pin, proposed)
     except (AssertionError, ValueError) as error:
         blockers.append(dict(kind='required-proof-preimage-conflict', proof=str(misc.relative_to(ROOT)),
                              error=str(error), noRepositoryRowsChanged=True))
@@ -268,6 +266,10 @@ def main():
                   applied=sum(r['applied'] for r in records)), blockers=blockers,
                   ownershipComparison=ownership_comparison, rebindings=records)
     (HERE/'rebindings.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
+    rereview = [r['claimId'] for r in records if r['kind'] == 'content']
+    (HERE/'rereview-claim-ids.json').write_text(json.dumps(dict(
+        status='applied-pending-review' if not blockers else 'proposed-not-applied',
+        count=len(rereview), claimIds=rereview), ensure_ascii=False, indent=2)+'\n')
     print(json.dumps({k:report[k] for k in ('status','counts','blockers')}, ensure_ascii=False, indent=2))
     return 2 if blockers else 0
 

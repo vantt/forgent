@@ -15,11 +15,14 @@
       "claimKind": "specification",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Source H2 Data Dictionary is carried as the numbered H2 \"3. Work Item Data Dictionary\"; the title differs, the section scope is the same. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "827361074e830d7578a9647026a99ed3167345d915247ea3b82cbfe48f718984",
+      "rationale": "Source H2 Data Dictionary is carried as the numbered H2 \"3. Work Item Data Dictionary\"; the title differs, the section scope is the same. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#3-work-item-data-dictionary -> docs/platform/work-state/spec.md#3-work-item-data-dictionary; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
+      "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
       "targetAncestry": [
-        "Work State Specification"
-      ]
+        "Work State Specification",
+        "3. Work Item Data Dictionary"
+      ],
+      "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
@@ -30,12 +33,14 @@
       "claimKind": "specification",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Source: docs/specs/work-state.md:42-75#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nTarget: docs/platform/work-state/spec.md:60-93#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37 at d23045c2de83e3508fda8fd2580b43ece2e1e046.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-4 under docs/platform/work-state/spec.md#unheaded-block-4; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary\", target context \"Work State Specification / 3. Work Item Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
-      "targetUnitDigest": "1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37",
+      "rationale": "Source: docs/specs/work-state.md:42-75#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nTarget: docs/platform/work-state/spec.md:60-93#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37 at d23045c2de83e3508fda8fd2580b43ece2e1e046.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-4 under docs/platform/work-state/spec.md#unheaded-block-4; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary\", target context \"Work State Specification / 3. Work Item Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-4 -> docs/platform/work-state/spec.md#unheaded-block-4; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
+      "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
       "targetAncestry": [
         "Work State Specification",
         "3. Work Item Data Dictionary"
-      ]
+      ],
+      "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_f4fb783783bb1ad062f39d73e0165f86",

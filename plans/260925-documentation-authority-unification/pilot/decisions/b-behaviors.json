@@ -61,13 +61,16 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#add-verb -> docs/platform/work-state/spec.md#add-verb; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "5a8bd90404bdc7021a6d3ba75882493b6331b3d3640224d7e3e654c07cf523ad",
+      "targetUnitDigest": "f74252e08dee1df2d5cf579cc8d7810918b383049620ac4077e4681ba6acfb02",
       "targetAncestry": [
         "Work State Specification",
-        "9. Behaviors And Operations"
-      ]
+        "9. Behaviors And Operations",
+        "Add Verb"
+      ],
+      "bindingSha256": "2b66a21b25668a91a9e2db317146bf15bed151b6c1b661aa6547fb0514f75f3b",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_320ba6224015cc3877738795b80dabb7",
@@ -77,14 +80,16 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Source: docs/specs/work-state.md:866-871#unheaded-block-78 (current lines); unit SHA256 96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16.\nTarget: docs/platform/work-state/spec.md:715-720#unheaded-block-65 (current lines); unit SHA256 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445 at cd82746a8.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU8 add id (composed with U8 add required flags): \"đòi người\\ngọi tự điền mọi trường (kể cả tự đặt id kebab-case), khác hẳn UX \\\"nộp rồi đi\\\"\\ncủa `submit`.\" → \"đòi người\\ngọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\\nsinh id `tsk-<hash>` chống trùng từ title, khác UX \\\"nộp rồi đi\\\" của `submit`.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:933-959 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU8 test count: \"trực tiếp (9 file) tiếp tục dùng nguyên trạng;\" → \"trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`);\"; evidence root-authorities-truth-corrections-turn21.json; test/cli/fgos-intake-7.test.mjs:128-148 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 52d47cb364bfec23ebc829f8a28c9233b70cda5e); test/e2e/pr-gate.test.mjs:68-80 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 69959ce8f0de476d42ee219e8846b51ea35a5544).\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-78 under docs/platform/work-state/spec.md#unheaded-block-65; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Khai việc (add) — bề mặt nội bộ\", target context \"Work State Specification / 9. Behaviors And Operations / Add Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source: docs/specs/work-state.md:866-871#unheaded-block-78 (current lines); unit SHA256 96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16.\nTarget: docs/platform/work-state/spec.md:715-720#unheaded-block-65 (current lines); unit SHA256 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445 at cd82746a8.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU8 add id (composed with U8 add required flags): \"đòi người\\ngọi tự điền mọi trường (kể cả tự đặt id kebab-case), khác hẳn UX \\\"nộp rồi đi\\\"\\ncủa `submit`.\" → \"đòi người\\ngọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\\nsinh id `tsk-<hash>` chống trùng từ title, khác UX \\\"nộp rồi đi\\\" của `submit`.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:933-959 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU8 test count: \"trực tiếp (9 file) tiếp tục dùng nguyên trạng;\" → \"trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`);\"; evidence root-authorities-truth-corrections-turn21.json; test/cli/fgos-intake-7.test.mjs:128-148 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 52d47cb364bfec23ebc829f8a28c9233b70cda5e); test/e2e/pr-gate.test.mjs:68-80 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 69959ce8f0de476d42ee219e8846b51ea35a5544).\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-78 under docs/platform/work-state/spec.md#unheaded-block-65; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Khai việc (add) — bề mặt nội bộ\", target context \"Work State Specification / 9. Behaviors And Operations / Add Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-65 -> docs/platform/work-state/spec.md#unheaded-block-65; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+      "targetUnitDigest": "d6004980f8bdb50003e28eaa386059d97c51d1b635823d8af58aee6acc0caa2f",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
-      ]
+      ],
+      "bindingSha256": "13d847e34e6877cadb3066d5aeb17b6358224970d8245edd2f4b0c19b2bed432",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
@@ -111,13 +116,16 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#submit-verb. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#submit-verb. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#submit-verb -> docs/platform/work-state/spec.md#submit-verb; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "c94deabc102d0852530a7b68cef8520d4b138ebcb8bebb30ed32060c0a499ed7",
+      "targetUnitDigest": "9174cce69c473d51d4216e173317d45361ba8d5f9e3b1c7f448150ce21a61a64",
       "targetAncestry": [
         "Work State Specification",
-        "9. Behaviors And Operations"
-      ]
+        "9. Behaviors And Operations",
+        "Submit Verb"
+      ],
+      "bindingSha256": "4b567388ccb717451cde08aa5ca968d2af7d3ff040134bbec7e66540d7d9e053",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
@@ -127,14 +135,16 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-67. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-67. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-67 -> docs/platform/work-state/spec.md#unheaded-block-67; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+      "targetUnitDigest": "f8282cd8a7e103ee85953aeec2c8f24ab69c3d7c7581de2ab86357d599b32a03",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Submit Verb"
-      ]
+      ],
+      "bindingSha256": "a0a2ee9846a5bae3683586bca9c4d24f29c70b10342adae2d82d498941105eed",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_bee83aee35ec25ec87d88a57a984cf50",

@@ -1,5 +1,37 @@
 # Miscellaneous rework receipt
 
+## Ownership rebind replay at 8cab0204d (supersedes current-green claims below)
+
+`misc-fix/rebind.py` now reads historical decision JSON with `git show` at its
+recorded pin `23f6eaccf5eb195a8f50e5788d38f386a901b6d2`, including the eight
+packaging preimages. It no longer mistakes mutable direct rows for historical
+inputs. All prior assertions remain; the same `check()` owns both CLI replay
+and the rebind author's hypothetical-row preflight. Current overlay bytes,
+predecessor resolution, binding hashes and pending review status are still
+asserted. The unchanged dual extractors and binding recipe are reused.
+
+- `misc-fix/rebind.py --check`: **0 before / 0 after** applying 217 direct rows;
+  **283 effective historical bindings / 27 unchanged overlays** (21 content,
+  six neighbour-only). The final checker also replays both row sets in memory.
+- `misc-fix/verify.py`, scratch-plumbing-only replay: **1 before / 1 after**,
+  `AssertionError: proof.json` at the unchanged three-way comparison of two
+  generated runs and the delivered G6 proof. No G6 pin, artifact
+  or assertion was changed to force green. The apply brief explicitly reserves
+  this comparison and combined G2/G6 recomposition for the final-pin Lead.
+- Consequently the request that this verifier exit 0 remains **unmet**, not
+  silently waived. Its historical green below applies only to `4178dcc6e`.
+
+Exact commands, exits and stderr: [rebind/checks.json](../rebind/checks.json).
+Applied-row evidence, counts and review list: [rebind/receipt.md](../rebind/receipt.md).
+No A/B, gate acceptance, combined-verifier success or independent review claimed.
+Only scoped record tooling changed; no docs/code/default/dependency changed.
+Scratch is confined to `/tmp/fgos-work/w5-rebind-apply/`. Preview is deferred to
+Lead; no service/state write was made. Impact-analysis degraded: no live MCP
+tool; an initial CLI query failed (127, no installation), and was not repeated
+once the no-CLI brief had been read.
+
+## Earlier rework receipt (historical evidence retained)
+
 Status: **scoped corrections verified; assignment blocked on the combined G2/G6 verifier.** No gate accepted or independent approval claimed.
 Input HEAD: `4178dcc6e3445d5d9b8ffd55963cdd02a418af73`.
 Read first: [brief](../w5-misc-rework-brief.md), [review](../reviews/w5-misc-fix-review.md), [checks](checks.json), [rejudgment delta](rejudgment.json), [combined failure](../preserve-premise/verification.json).
