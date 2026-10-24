@@ -58,6 +58,7 @@ pub(crate) fn corrupt_loose_objects(common: &Path, oids: &[Oid]) -> io::Result<V
 /// `write-tree` need it.
 pub(crate) fn sync_loose_objects(common: &Path, oids: &[Oid], sync_files: bool) -> io::Result<Vec<PathBuf>> {
     let objects = common.join("objects");
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut files = Vec::new();
     let mut dirs = BTreeSet::new();
     let mut pending = Vec::new();

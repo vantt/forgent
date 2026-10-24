@@ -1084,7 +1084,7 @@ impl Directory {
         }
         #[cfg(not(target_os = "linux"))]
         {
-            let _ = path;
+            let _ = (path, common);
             Err(WalError::Unsupported)
         }
     }

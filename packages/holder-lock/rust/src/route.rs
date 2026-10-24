@@ -549,9 +549,9 @@ mod quiesce {
 
     #[cfg(test)]
     mod tests {
-        use super::{could_be_fgos, workspace_hit};
+        use super::could_be_fgos;
         #[cfg(unix)]
-        use super::{workspace_argument, workspace_dirs};
+        use super::{workspace_argument, workspace_dirs, workspace_hit};
         #[cfg(unix)]
         use std::path::{Path, PathBuf};
 
