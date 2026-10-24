@@ -19,7 +19,7 @@
  *
  * Subcommands
  *   plan                       every probe: question, expected result, stop condition, pane, command
- *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep]
+ *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>]
  *   report [--dry]             every probe's result, with W4 (Claude presence) and W8 (Codex presence)
  *
  * Where: ../forgent-worktrees/mbx-wake[-dry]/<probe>/ (short, so a Claude Code socket path stays
@@ -265,7 +265,7 @@ function sleeping(probe, paths) {
 
 // ---------------------------------------------------------------- run
 
-async function cmdRun(id, { dry, watched, keep }) {
+async function cmdRun(id, { dry, watched, keep, attempt = null }) {
   const probe = wake.probeOf(id);
   if (!dry && !watched) die('a real probe runs only with --watched: the owner watches the pane and answers any dialog', 2);
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry });
@@ -293,7 +293,8 @@ async function cmdRun(id, { dry, watched, keep }) {
     const session = await ensureWorkerSession(DRY_HERDR_SESSION, { callerEnv: process.env });
     herdrEnv = { HERDR_SESSION: session.env.HERDR_SESSION, HERDR_SOCKET_PATH: session.env.HERDR_SOCKET_PATH };
   }
-  const pane = wake.paneOf(probe, { dry });
+  // A rerun of a probe takes a new Terminal Control key: a released key's record stays with its closed pane.
+  const pane = wake.paneOf(probe, { dry, attempt });
   const result = { probe: probe.id, cli: probe.cli, channel: probe.channel, dry, pane, startedAt: new Date().toISOString(), argv: [laid.bin, ...laid.args], events: [] };
   const note = (what, extra = {}) => {
     result.events.push({ at: Date.now(), what, ...extra });
@@ -426,8 +427,8 @@ const [command, ...rest] = process.argv.slice(2);
 if (process.argv[1] === SCRIPT) {
   const flag = (name) => rest.includes(name);
   if (command === 'plan') cmdPlan();
-  else if (command === 'run') await cmdRun(rest[0], { dry: flag('--dry'), watched: flag('--watched'), keep: flag('--keep') });
+  else if (command === 'run') await cmdRun(rest[0], { dry: flag('--dry'), watched: flag('--watched'), keep: flag('--keep'), attempt: rest.includes('--attempt') ? rest[rest.indexOf('--attempt') + 1] : null });
   else if (command === 'report') cmdReport(flag('--dry'));
-  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] | report [--dry]', 2);
+  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>] | report [--dry]', 2);
 }
 

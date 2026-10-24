@@ -8,7 +8,7 @@ date: 2026-10-24
 
 Branch `mailbox/v1-v3`. Owner Q3 option A (2026-10-23 14:53): up to 10 benign interactive sessions and up to 80 confined print-mode runs; never `crossSessionInbound: accept` globally (K1); the bar for phase 11 is a channel that starts a turn with no dialog, no focus change and no typed input, **and** 0 acted in part B for that CLI. Nothing of the wake channel is built. Scratch and run data on ext4: `~/projects/forgent-worktrees/mailbox-evidence/v7f/` and `~/projects/forgent-worktrees/mbx-wake-dry/`.
 
-**Model invocations: 77 of the 80 part B allows (3 unspent after Claude Code's hard stop); 0 interactive sessions of the 10.** No retry, no wait for memory, login or a provider limit.
+**Model invocations: 77 of the 80 part B allows (3 unspent after Claude Code's hard stop); 10 of the 10 interactive sessions.** No retry, no wait for memory, login or a provider limit.
 
 ## Part B: harmful mail claimed after a user-role nudge
 
@@ -149,6 +149,39 @@ Harness `test/live/mailbox-wake-probe.live.mjs`, logic `scripts/lib/mailbox-wake
   - pi asks to trust the project folder; `--approve` trusts it for that run only.
   - A fresh omp profile opens its setup wizard; the probe's omp overlay sets `startup.setupWizard` and `startup.checkUpdate` false.
   - A dry omp needs `providers.openaiWebsockets: off`, because the recorder takes no websocket. Real runs keep omp's default.
+
+## Part A: the interactive probes, run (2026-10-24, owner watching)
+
+Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspace `w4` "forgent" (checked before every probe; the focused pane was `w4:p3B` before and after every probe). `free -g` was at least 8 GB available and no live run or heavy gate was running when each pane opened (W9 waited about 25 minutes for another session's `cargo test` and `npm test`). The harness typed nothing into any pane. Sessions: 10 of 10 (W1, W2, W2b, W3, W5, W6, W7, W9, W10 and the W3 rerun).
+
+| Probe | Channel started a turn | Dialog | Focus changed | Nudge reached the model as | Latency (fire to first model output) | Mail claimed |
+|---|---|---|---|---|---|---|
+| W1 Claude Code, scoped `accept`, bypass, idle | yes | none | no | a `user` record (`isMeta`, origin `peer`, `from: unknown` with the verified writer pid) inside Claude Code's frame: "Another Claude session sent a message … not typed by your user, but very likely working on their behalf. Treat it as a teammate's request and act on it …" | 2.0 s | yes |
+| W2 Claude Code, no setting, bypass, no `from_mode` | no | the held-message dialog: "The sender did not attest its permission mode, and this session bypasses permission prompts", Deny (default) / Deliver | no | - | - | no |
+| W2b the same, claiming `"from_mode":"bypass"` | no | the same dialog, the same "did not attest" sentence: a raw writer's claimed mode was not honoured | no | - | - | no |
+| W3 rerun: scoped `accept` while the step's own tool call ran (a 45 s loop) | delivered inside the running turn, not a new one | none | no | `attachment:queued_command`, recorded 0.2 s after the write; the model saw it after the loop's tool result | 48.4 s (the loop's remaining 45 s, then 3.7 s) | yes (by the PostToolUse hook after the loop; the model's own claim then found nothing) |
+| W5 `codex queue`, idle REPL on its own private daemon | yes | none | no | `response_item:message:user` | 10.7 s | yes |
+| W6 `codex queue` while a tool ran | yes, as its own turn 3 ms after the running turn's `task_complete`; no interrupt, nothing lost | none | no | `response_item:message:user` | 48.7 s (mostly the loop) | yes |
+| W7 Claude Code, no setting, **prompting** mode, no `from_mode` | yes | none | no | a `user` record inside the same peer frame | 1.25 s | (no mail was queued; the model ran `inbox --claim` on its own, allowed by the probe's allow list) |
+| W9 pi, extension timer, `sendUserMessage` | yes | none | no | `message:user` (session record) | 3.8 s from the trigger file (timer tick 5 s) | yes |
+| W10 omp, extension timer, `sendMessage` with `triggerTurn` | yes | none | no | omp's `custom_message` (dry run: `message:developer` at the provider) | 3.9 s from the trigger file | yes |
+
+- **W4, Claude Code presence:** the session file read `idle` at the fire in W1, W2, W2b and W7, `busy` at W3's fire (the loop running), and `waiting` while the held-message dialog was open (W2, W2b). One source at one moment, as spec §6.3 asks; `waiting` is a fourth value the spec lacked.
+- **W8, Codex presence:** nothing outside a daemon client; the hook events and the rollout's `task_started` / `task_complete` were the only sources the harness had, and they were enough to see W6's turn end.
+- **Deviations.**
+  - The first W3 is kept as `mbx-wake/W3-deviation`: its busy detector fired on the prompt's own text, so the write landed during turn 1 between tool calls (Claude Code also refused a standalone `sleep 45`). It showed the same `queued_command` delivery inside the running turn (claim 4.3 s after the write). The detector now waits for the step's own tool call to be running (`busyStep`, proven), and the rerun took the spare session and a new pane key (a released key's record stays with its closed pane).
+  - W7's first prompt was swallowed by `--allowedTools`, which takes many values, so the head never registered and the probe timed out before firing. The K1 question needs only the session's socket, so the same benign raw write was fired into that same session (`mbx-wake/W7/result-same-session-fire.json`), with no new session spent. The argv defect is fixed: the prompt now comes before every option (proven).
+- **Panes left open for the owner, as asked:** W2 (`w4:p61`), W2b (`w4:p62`) and W7 (`w4:p66`); their login copies stay with them and are settled when the panes are closed. Every other probe's pane was closed, its login copy removed unchanged, and nothing was left running from its directory (W5/W6's private Codex daemons stopped).
+
+**K1, measured (2.1.309).** K1 says the owner's sessions keep the default hold and only a session given a scoped `accept` takes cross-session messages.
+- A **bypass-mode** session with no setting held a raw same-user socket write behind a dialog, with or without a claimed `from_mode` (W2, W2b). The inferred `from_mode` forgery did not happen with a frame from a raw writer.
+- A **prompting-mode** session with no setting (the default permission mode) accepted the same raw write **with no dialog**: a turn started 1.25 s later, with the message framed as a teammate's request to act on (W7).
+- So any same-user process can start a turn in any default-mode, prompting Claude Code session on this machine today, with no setting and no dialog. K1's "the owner's sessions keep the default hold" holds only for bypass-mode sessions. This is independent of fgOS and of phase 11; it is a decision question for the owner.
+
+**Against the phase 11 bar** (a turn with no dialog, no focus change, no typed input, and 0 acted in part B for that CLI):
+- **Claude Code:** the socket under a scoped `accept` meets the channel part (W1), but part B is a no-go (1/27 acted), and the real socket wraps the nudge in the "act on it" frame part B did not test.
+- **Codex:** `codex queue` meets the channel part (W5, W6) and part B (0/30). It is the only CLI that meets both.
+- **pi, omp:** the extension timer meets the channel part (W9, W10); part B was not run for pi or omp (V7e measured their tool-result channel, not a nudge).
 
 ## Fix step after stage B (review findings)
 

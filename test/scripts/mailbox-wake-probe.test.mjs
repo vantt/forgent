@@ -29,6 +29,7 @@ test('each probe has its own pane key and label, and a dry pane never shares the
   const panes = wake.PROBES.filter((p) => p.sessions).map((p) => wake.paneOf(p));
   assert.equal(new Set(panes.map((p) => p.key)).size, panes.length);
   assert.deepEqual(wake.paneOf(wake.probeOf('W1')), { group: 'mbx-wake-v7f', key: 'mbx-wake-v7f-w1', label: 'V7f W1 · claude · scoped accept, bypass' });
+  assert.equal(wake.paneOf(wake.probeOf('W3'), { attempt: 2 }).key, 'mbx-wake-v7f-w3-a2', 'a rerun takes a new key');
   assert.deepEqual(wake.paneOf(wake.probeOf('W3'), { dry: true }), { group: 'mbx-wake-v7f-dry', key: 'mbx-wake-v7f-w3-dry', label: 'V7f W3 · claude · scoped accept, bypass, busy' });
 });
 
@@ -36,11 +37,13 @@ test('Claude Code\'s inbound setting is scoped to the probe\'s own settings file
   assert.equal(wake.claudeSettings(wake.probeOf('W1'), {}).crossSessionInbound, 'accept');
   assert.equal('crossSessionInbound' in wake.claudeSettings(wake.probeOf('W2'), {}), false);
   const bypass = wake.claudeArgs(wake.probeOf('W1'), { settings: '/p/s.json', noMcp: ['--strict-mcp-config'] });
-  assert.deepEqual(bypass.slice(0, 9), ['--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', '/p/s.json', '--strict-mcp-config']);
+  assert.equal(bypass[0], wake.firstPrompt(wake.probeOf('W1')), 'the prompt comes before every option');
+  assert.deepEqual(bypass.slice(1, 10), ['--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', '/p/s.json', '--strict-mcp-config']);
   assert.ok(bypass.includes('--dangerously-skip-permissions'));
   const prompting = wake.claudeArgs(wake.probeOf('W7'), { settings: '/p/s.json', noMcp: [] });
   assert.ok(!prompting.includes('--dangerously-skip-permissions'));
   assert.deepEqual(prompting.slice(prompting.indexOf('--permission-mode'), prompting.indexOf('--permission-mode') + 2), ['--permission-mode', 'default']);
+  assert.deepEqual(prompting.slice(prompting.indexOf('--allowedTools')), ['--allowedTools', 'Bash(ls)', 'Bash(fgos mailbox inbox --claim)'], 'nothing after the variadic allow list');
   assert.match(wake.firstPrompt(wake.probeOf('W3')), /Run: ls\. Then Run: for i in 1 2 3; do sleep 15; done Then/);
   assert.doesNotMatch(wake.firstPrompt(wake.probeOf('W1')), /sleep/);
 });

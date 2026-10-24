@@ -99,9 +99,9 @@ export function probeOf(id) {
 }
 
 /** The pane of a probe: its Terminal Control key and the label the person watching reads. */
-export function paneOf(probe, { dry = false } = {}) {
+export function paneOf(probe, { dry = false, attempt = null } = {}) {
   const what = { socket: `${probe.setting ? `scoped ${probe.setting}` : 'no setting'}, ${probe.mode}${probe.fromMode ? `, claims ${probe.fromMode}` : ''}`, queue: 'codex queue', 'extension-timer': 'extension timer' }[probe.channel];
-  return { group: `${GROUP}${dry ? '-dry' : ''}`, key: `${GROUP}-${probe.id.toLowerCase()}${dry ? '-dry' : ''}`, label: `V7f ${probe.id} · ${probe.cli} · ${what}${probe.busy ? ', busy' : ''}` };
+  return { group: `${GROUP}${dry ? '-dry' : ''}`, key: `${GROUP}-${probe.id.toLowerCase()}${attempt ? `-a${attempt}` : ''}${dry ? '-dry' : ''}`, label: `V7f ${probe.id} · ${probe.cli} · ${what}${probe.busy ? ', busy' : ''}` };
 }
 
 /** The first prompt of a probe's session: one line (a pane's launch line is typed), one tool call to register, then a wait for the user. */
@@ -120,7 +120,8 @@ export function claudeArgs(probe, { settings, noMcp }) {
   const mode = probe.mode === 'bypass'
     ? ['--dangerously-skip-permissions']
     : ['--permission-mode', 'default', '--allowedTools', 'Bash(ls)', 'Bash(fgos mailbox inbox --claim)'];
-  return ['--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', settings, ...noMcp, ...mode, firstPrompt(probe)];
+  // The prompt goes first: `--allowedTools` takes every value after it, and would take a prompt placed last (W7's first run).
+  return [firstPrompt(probe), '--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', settings, ...noMcp, ...mode];
 }
 
 /** The one wire line of a socket write: a user message whose content is the nudge, with no `session_id`; `fromMode` adds the writer's own permission-mode claim. */
