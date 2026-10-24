@@ -85,6 +85,13 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
       if (worker.exitCode === null && worker.signalCode === null) worker.kill('SIGKILL');
       await exited;
       if (holder) holder.release();
+      // The hook polls for `go`; removing the fixture before it has seen the file would leave it, and the git
+      // commit above it, looping forever after the run.
+      const hookPid = fs.existsSync(ready) ? Number(fs.readFileSync(ready, 'utf8')) : 0;
+      // Still this fixture's hook, never a process that reused the pid.
+      const alive = () => { try { return fs.readFileSync(`/proc/${hookPid}/cmdline`, 'utf8').includes(hooks); } catch { return false; } };
+      for (const deadline = Date.now() + 5000; hookPid > 0 && alive() && Date.now() < deadline;) await pause();
+      if (hookPid > 0 && alive()) process.kill(hookPid, 'SIGKILL');
       fs.rmSync(temp, { recursive: true, force: true });
     }
   });

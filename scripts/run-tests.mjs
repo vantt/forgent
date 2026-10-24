@@ -212,6 +212,7 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
   );
   child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
   return {
+    pid: child.pid,
     stop() {
       child.kill('SIGTERM');
       return fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
@@ -237,6 +238,33 @@ export function snapshotGitIdentity(cwd) {
     lines.push(...configEntries(path.join(dirs.gitDir, 'config.worktree'), pattern).map((line) => `worktree: ${line}`));
   }
   return lines.sort();
+}
+
+/**
+ * Processes still running after the suite whose command line names one of `roots` (the run's own temp dirs):
+ * a fixture's child the test never stopped, about to lose the directory it runs in.
+ */
+/** Every process's pid and command line, read from /proc without starting a process (Linux; elsewhere none). */
+function processTable() {
+  let entries;
+  try { entries = fs.readdirSync('/proc'); } catch { return []; }
+  const procs = [];
+  for (const entry of entries) {
+    if (!/^\d+$/.test(entry)) continue;
+    try { procs.push({ pid: Number(entry), args: fs.readFileSync(`/proc/${entry}/cmdline`, 'utf8').split('\0').join(' ').trim() }); } catch { /* gone */ }
+  }
+  return procs;
+}
+
+export function strayProcessesUnder(roots, { table = processTable, exclude = [] } = {}) {
+  const names = roots.filter(Boolean).flatMap((root) => {
+    let real = root;
+    try { real = fs.realpathSync(root); } catch { /* already gone */ }
+    return [...new Set([root, real])].map((dir) => dir + path.sep);
+  });
+  if (names.length === 0) return [];
+  const skip = new Set([process.pid, ...exclude]);
+  return table().filter((proc) => !skip.has(proc.pid) && names.some((name) => proc.args.includes(name)));
 }
 
 /**
@@ -431,6 +459,7 @@ export function runSelectedTests(files, {
   let timedOut = [];
   const tempLeftovers = {};
   let strayWorktrees = [];
+  let strayProcesses = [];
   const supervisor = watchdog && runTemp
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
@@ -449,6 +478,9 @@ export function runSelectedTests(files, {
       for (const [prefix, count] of Object.entries(leftoverTempPrefixes(root))) tempLeftovers[prefix] = (tempLeftovers[prefix] || 0) + count;
     }
     strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
+    // The per-file supervisor is still exiting from its SIGTERM; it is this run's own, not a test's.
+    try { strayProcesses = strayProcessesUnder([runTemp, fixtureRoot], { exclude: supervisor ? [supervisor.pid] : [] }); } catch { strayProcesses = []; }
+    for (const { pid } of strayProcesses) { try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ } }
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -483,6 +515,14 @@ export function runSelectedTests(files, {
     log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
     for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
     log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  result.strayProcesses = strayProcesses;
+  if (strayProcesses.length) {
+    log('run-tests: ERROR: test suite left processes running in its temp dir (killed now):');
+    for (const { pid, args } of strayProcesses) log(`  ${pid}: ${args.slice(0, 200)}`);
+    log('  A test that starts a process must stop it, and wait for it, before it removes the fixture the process runs in.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 
