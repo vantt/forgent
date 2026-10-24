@@ -1,0 +1,136 @@
+{
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "checkoutHead": "eb744281deba853f201cda15dcb4876300a1d638",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "4178dcc6e^{commit}"
+      ],
+      "exit": 0,
+      "stdout": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "eb744281deba853f201cda15dcb4876300a1d638\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--pin",
+        "4178dcc6e",
+        "--out",
+        "/tmp/fgos-work/w8-g6-fix/final-1"
+      ],
+      "exit": 0,
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--pin",
+        "4178dcc6e",
+        "--out",
+        "/tmp/fgos-work/w8-g6-fix/final-2"
+      ],
+      "exit": 0,
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 623, \"preserve-operand-reachability-unchanged\": 1394, \"preserve-source-confirmed-history\": 2926, \"repoint-proposal\": 6}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 260, in <module>\n    if __name__ == '__main__': main()\n  File \"/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py\", line 26, in main\n    assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'\nAssertionError: G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification\n"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--name-only",
+        "HEAD",
+        "--",
+        "docs",
+        "src",
+        "scripts",
+        "test",
+        "packages",
+        "apps"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "comparisons": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
+      "sha256": "b8b32effba8c44a995891818fb73968c68811e34af7a4255338a2e790a76fa0c",
+      "bytes": 16215952,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
+      "sha256": "b2389689addadac32646858af08734227f1a5c4d365f642d44cc6ff8b263a126",
+      "bytes": 18404,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
+      "sha256": "679e550c715322a2aa3232864b36c1c90bb2e7fdf9e7a4ffba9b119bb47e7d65",
+      "bytes": 1339446,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
+      "sha256": "f47a97ceaa9fefe9f39b9f0618145ead70d85055a56c4a10e7139118a0ac76e2",
+      "bytes": 254745,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/prepared-patches.json",
+      "sha256": "56f51603d5cd65c1af2a8d17e11dc72408693a4e526b14a4423ec57abc1e4b5a",
+      "bytes": 3139,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    }
+  ],
+  "stdoutByteIdentical": true,
+  "noReadinessClaim": true,
+  "independentApproval": false,
+  "preparedPatchApplied": false,
+  "scratch": "/tmp/fgos-work/w8-g6-fix"
+}

@@ -1,5 +1,58 @@
 # Miscellaneous rework receipt
 
+## Current G6 fixes (supersedes all earlier G6 counts and verifier status)
+
+The L13-10 / `w8-g6-fix-brief.md` replay stays at source pin
+`4178dcc6e3445d5d9b8ffd55963cdd02a418af73`. Current owning receipts:
+[details](../preserve-premise/receipt.md), [per-row delta](../preserve-premise/fix-delta.json),
+[double replay](../preserve-premise/fix-replay.json), [checks](checks.json).
+
+| G6 result | Before | After |
+|---|---:|---:|
+| Source-confirmed history | 2,574 | **2,926** |
+| Stable operand reachability | 1,416 | **1,394** |
+| Park: unconfirmed premise | 959 | **623** |
+| Park: unbound passage | 137 | 137 |
+| Park: absent source | 2 | 2 |
+| Park: source removed by cutover | 162 | 162 |
+| Dated wrapper note | 163 | 163 |
+| Explicit repoint result | 0 | **6** |
+| Bounded confirmations | 3,990 | **4,320** |
+| Total parks | 1,260 | **924** |
+| Open rows (parks + notes + repoints) | 1,423 | **1,093** |
+
+Conservation: **4,320 + 924 + 163 + 6 = 5,413** (4,804 + 609), plus the
+unchanged **38** retire-with-tree exclusions. f07526 previously had a repoint
+disposition hidden inside its park result; its result is now explicit, together
+with the two dispatch siblings and three live-link repoints. The dispatch
+four-line patch is prepared, not applied to docs.
+
+All **15** reviewed operand bugs are corrected. All **25** removed-source rows
+now name a concrete recheck holder and per-row reason, rather than printing an
+empty successor list. New file-level evidence moves **137 distillery parks**
+and **182 dated-report parks** to history; another **32 + 3** previously stable
+rows gain that evidence. No live `docs/history/<feature>/` convention acquires
+file-level historical framing. The 163 wrapper positions / 73 review-batch
+files remain covered; later note placement/merging/dating is recorded but not
+applied.
+
+`misc-fix/verify.py` exits **0**, through the scratch-only adapter in
+[verification.json](../preserve-premise/verification.json). It changes only
+scratch plumbing (including its rebind subprocess), never assertions, pins or
+repository output destinations. The entire owning G6 assertion section passes
+verbatim, as do the 283 historical bindings / 27 overlays and 141 doctor checks
+(136 literal + 5 loop-registered) / 32 fixes. Two independent final G6 runs also
+prove **five** generated artifacts byte-identical, including the prepared patch;
+the misc verifier itself compares its existing four outputs.
+
+The **unmodified combined** `preserve-premise/verify.py --pin HEAD` exits **1 only
+at the G2 delivered-pin assertion**, not a G6 assertion. G2 refresh/shared-pin
+replay and gate acceptance remain with Lead. No G2 proof was bypassed. Earlier
+receipts below remain historical, not current-green or current-count claims.
+No Git mutation, fgOS CLI, docs/product edit, test suite or pair accounting;
+scratch only `/tmp/fgos-work/w8-g6-fix/`. Impact-analysis degraded/unqueried and
+preview deferred under the brief's no-CLI/no-extra-state constraints.
+
 ## Ownership rebind replay at 8cab0204d (supersedes current-green claims below)
 
 `misc-fix/rebind.py` now reads historical decision JSON with `git show` at its

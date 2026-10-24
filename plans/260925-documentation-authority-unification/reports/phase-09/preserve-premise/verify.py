@@ -24,13 +24,13 @@ def main():
     # delivered artifacts must be refreshed by their owner, not silently skipped
     # when a records-only G6 turn has a newer source pin.
     assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'
-    scratch = pathlib.Path('/tmp/fgos-work/w6-misc-sentence');scratch.mkdir(parents=True,exist_ok=True)
+    scratch = pathlib.Path('/tmp/fgos-work/w8-g6-fix');scratch.mkdir(parents=True,exist_ok=True)
     commands, comparisons = [], []
     with tempfile.TemporaryDirectory(prefix='double-replay-',dir=scratch) as name:
         base = pathlib.Path(name)
         for label, script, extra, owning, outputs in [
             ('census','join.py',['--rescan'],CENSUS,['join.json','residue.json','post-pin-literals.json','post-pin-dynamics.json']),
-            ('preserve','proof.py',[],HERE,['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json']),
+            ('preserve','proof.py',[],HERE,['proof.json','retire-with-tree.json','judgments.json','history-wrapper-proposals.json','prepared-patches.json']),
         ]:
             stdouts = []
             for round in (1,2):
@@ -87,6 +87,7 @@ def main():
         assert all(r.get('reason') and r.get('owner') for r in dynamics['rows'])
         assert all(r['owningProofs'] for r in dynamics['rows'] if r['status']=='joined-owning-test')
         assert collections.Counter(r['stage'] for r in proof['rows']) == {'step-03':4804,'step-04':609}
+        import hashlib
         assert len({r['rowId'] for r in proof['rows']}) == 5413
         assert len(proof['negativeDecisionProbes']) == 10 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
         assert all('source' in r and 'spans' in r for r in proof['negativeDecisionProbes'])
@@ -100,7 +101,7 @@ def main():
         # consumer itself and cannot serve as successor proposals (L12-35(7)).
         self_successors={'f07697','f08033','f08047'}
         for id in live_pointers:
-            expected='park-current-passage-unbound' if id in {'f08077','f08079'} else 'park-unconfirmed-preserve-premise'
+            expected = 'repoint-proposal' if id == 'f08071' else ('park-current-passage-unbound' if id in {'f08077','f08079'} else 'park-unconfirmed-preserve-premise')
             assert rows[id]['result']==expected and rows[id]['evidence'] is None
             assert rows[id]['candidateSuccessors'] or (id in self_successors and rows[id]['excludedSelfSuccessor']==rows[id]['file'])
         removed_ids = ['f00515','f00521','f00525','f01225','f08411']
@@ -108,8 +109,57 @@ def main():
         wrapper_ids = ['f05646','f05655','f05661','f05671','f05677','f05693','f05720','f05730','f05742','f06391','f06167']
         assert all(rows[id]['result']=='judgment-preserve-with-dated-note' and rows[id]['successor']['presentAfterCutover'] for id in wrapper_ids)
         assert rows['f06167']['evidence'] is None
-        assert rows['f07526']['result']=='park-unconfirmed-preserve-premise' and rows['f07526']['proposedDisposition']=='repoint-proposal'
-        assert rows['f07526']['successor']['path']=='docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
+        repoints = {
+            'f08113':'docs/platform/packaging-distribution/history/distribution-vision.md',
+            'f08071':'docs/platform/coexistence/spec.md',
+            'f06985':'docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md',
+            'f07526':'docs/platform/agent-coordination/architecture/dispatch-control-plane.md',
+            'f07527':'docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md',
+            'f07528':'docs/platform/agent-coordination/README.md',
+        }
+        assert {r['rowId'] for r in rows.values() if r['result']=='repoint-proposal'} == set(repoints)
+        for id, successor in repoints.items():
+            assert rows[id]['proposedDisposition']=='repoint-proposal' and rows[id]['evidence'] is None
+            assert rows[id]['successor']['path']==successor and rows[id]['successor']['presentAfterCutover']
+            assert rows[id]['successor']['sha256']==hashlib.sha256(source(successor).encode()).hexdigest()
+        patch_record = json.loads((HERE/'prepared-patches.json').read_text())
+        assert patch_record['sourceCommit']==pin and len(patch_record['patches'])==1
+        patch, = patch_record['patches']
+        assert patch['rowIds']==['f07526','f07527','f07528'] and patch['status']=='prepared-not-applied'
+        assert [r['line'] for r in patch['replacements']]==[22,29,33,37]
+        before = source(patch['file']); after = before
+        assert hashlib.sha256(before.encode()).hexdigest()==patch['sourceSha256']
+        for replacement in patch['replacements']:
+            assert replacement['before'] in before.splitlines()[replacement['line']-1]
+            assert after.count(replacement['before'])==1
+            after = after.replace(replacement['before'],replacement['after'])
+        assert hashlib.sha256(after.encode()).hexdigest()==patch['proposedSha256']
+        import difflib
+        assert patch['patch']==''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+patch['file'],tofile='b/'+patch['file']))
+        assert 'The three inline-code legacy paths were repointed to their docs/platform holders at cutover' in after
+        assert not any('docs/architect/' in after.splitlines()[line-1] for line in [29,33,37])
+        assert all(rows[id]['preparedPatch']=='prepared-patches.json#patches[0]' for id in patch['rowIds'])
+        normalized_ids = 'f00144 f00417 f00418 f00419 f00429 f03463 f03478 f04208 f04387 f06557 f06569 f06829 f07654 f08000 f08062'.split()
+        for id in normalized_ids:
+            assert rows[id]['result'] in {'preserve-operand-reachability-unchanged','preserve-source-confirmed-history'}
+            assert all(r['beforePresent'] and r['afterPresent'] and not r['unsafeLiteral'] and not r['wildcard'] for r in rows[id]['normalizedOperands'])
+        assert rows['f00144']['normalizedOperands'][0]['path']=='AGENTS.md'
+        assert rows['f07654']['normalizedOperands'][0]['path']=='packages/run-supervisor/contracts'
+        assert rows['f00417']['normalizedOperands'][0]['path']=='docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md'
+        no_destination = [r for r in rows.values() if r['result']=='park-source-removed-by-cutover' and not r['sourceSuccessors']]
+        assert len(no_destination)==25
+        assert collections.Counter(r['file'] for r in no_destination)=={'docs/specs/reading-map.md':24,'docs/specs/workflow.md':1}
+        for row in no_destination:
+            holder = 'docs/reading-map.md' if row['file']=='docs/specs/reading-map.md' else 'docs/platform/workflow/spec.md'
+            assert row['recheckHolder']['path']==holder and row['recheckHolder']['presentAfterCutover']
+            assert row['recheckHolder']['sha256']==hashlib.sha256(source(holder).encode()).hexdigest()
+            assert 'with no move destination' in row['blocker'] and holder in row['blocker'] and row['rowId'] in row['blocker']
+            assert row['actionReason'] and row['currentUnit']
+        assert len(proof['operandControls'])==13 and {p['rule'] for p in proof['operandControls']}=={'line-locator','import-prefix','full-bound-path','outside-docs-presence'}
+        assert all(p['actual']==p['expected'] for p in proof['operandControls'])
+        assert len(proof['fileEvidenceControls'])==10
+        assert sum(p['positive'] for p in proof['fileEvidenceControls'])==4
+        assert all(p['actual']==('preserve-source-confirmed-history' if p['positive'] else 'park-unconfirmed-preserve-premise') for p in proof['fileEvidenceControls'])
         assert not any(r['result'].startswith('preserve-') for r in rows.values() if not r['sourcePresentAfterCutover'])
         same_unit, = [p for p in proof['negativeDecisionProbes'] if p['case']=='marker elsewhere in the same bound unit']
         assert 'e.g.' in same_unit['currentUnit'] and same_unit['bound']==[1]
@@ -122,8 +172,18 @@ def main():
         # maintain a second sentence splitter in this boundary verifier.
         import sys
         sys.path.insert(0,str(HERE))
-        from proof import historical_evidence
+        from proof import historical_evidence, file_evidence
         for row in rows.values():
+            if (row['evidence'] or {}).get('kind','').startswith('file-'):
+                raw = source(row['file'])
+                assert row['evidence']==file_evidence(raw,row['file'])
+                assert row['evidence']['text'] in raw
+                if row['evidence']['kind']=='file-external-repository-header':
+                    assert row['file'].startswith(('docs/distillery/sources/','docs/distillery/reports/'))
+                else:
+                    assert row['file'].startswith(('archive/plans/','plans/reports/'))
+                    assert row['evidence']['location']==row['file'] and row['evidence']['dateMarker'] in row['file']
+                assert row['result']=='preserve-source-confirmed-history'
             if (row['evidence'] or {}).get('kind') in {'explicit-external-or-example-framing','explicit-path-placeholder'}:
                 raw = source(row['file'])
                 bound_text='\n'.join(raw.splitlines()[n-1] for n in row['currentLines'])
@@ -187,9 +247,9 @@ def main():
     result = dict(sourceCommit=pin,status='records-replay-passed-not-gate-acceptance',commands=commands,comparisons=comparisons,
                   scriptDigests={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in scripts},
                   counts={'G2':join['counts'],'G6':proof['counts']},wrapperReviewBatchCoverage=wrapper_coverage,
-                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=10,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=5),
+                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=10,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=5,operandControls=13,fileEvidenceControls=10),
                   followupChecks=dict(reviewedDynamicSites=132,individuallyJudgedReaderHints=13,additionalDynamicSites=len(dynamics['rows'])-132,
-                                      deletedCensusSources=len(deleted),livePointersParked=29,deletedSourcePreservesParked=5,missedWrappersNowNoted=11,allEnumeratedWrapperLines=len(wrapper_lines)),
+                                      deletedCensusSources=len(deleted),reviewedLivePointers=29,reviewedLivePointersParked=28,reviewedLivePointersRepointed=1,deletedSourcePreservesParked=5,missedWrappersNowNoted=11,allEnumeratedWrapperLines=len(wrapper_lines)),
                   manualDynamicJudgmentsSourceCommit=dynamics['judgmentSourceCommit'],
                   noReadinessClaim=True,independentApproval=False,
                   notRun=['npm test','scripts/run-tests.mjs','cargo test --workspace','owning product tests (records-only custody task; no product behavior changed, temporary fixture Git writes are allowed)','fgos CLI / impact capability query (forbidden by brief)','pair accounting (Lead A1 custody)','final-pin F census and independent G2/G6 review','markdown preview (Lead custody)'])

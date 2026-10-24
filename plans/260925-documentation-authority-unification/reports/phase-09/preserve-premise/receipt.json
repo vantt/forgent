@@ -1,118 +1,814 @@
 {
-  "status": "scoped-work-complete-combined-g2-final-pin-pending",
+  "status": "scoped-g6-fixes-verified-combined-g2-pin-pending",
   "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
-  "checkoutHead": "77bdddccbdb42fa9193088095bdeb9a143eec671",
+  "checkoutHead": "eb744281deba853f201cda15dcb4876300a1d638",
   "gateId": "step3-step4-preserve-premise-review",
   "independentApproval": false,
   "noReadinessClaim": true,
-  "predicate": "Resolve the bound span's column, then search only its containing sentence/table cell, delimited by |, . , ; and em dash (keeping e.g. intact). A placeholder within the bound span is independently sufficient for an illustrative reason; an unrelated marker is not used.",
-  "leadRuling": {
-    "authority": "A42 in w6-misc-sentence-brief.md",
-    "rows": ["f00445", "f08621", "f08646", "f08700"],
-    "result": "preserve-operand-reachability-unchanged",
-    "evidence": null,
-    "reason": "Real citations with targets present at the source pin and after physical moves; same result before the whole-unit rule.",
-    "furtherAdjudicationRequested": false
-  },
+  "authority": "L12-137; L13-10 under A42; w8-g6-fix-brief.md",
+  "reused": [
+    "operand normalization step",
+    "historical_evidence and exact span binding",
+    "physical-move.mjs physical simulator",
+    "owning G6 assertion section extracted by misc-fix/verify.py"
+  ],
   "countsBefore": {
-    "baselineCommit": "77bdddccbdb42fa9193088095bdeb9a143eec671",
-    "sourceConfirmedHistory": 2524,
-    "operandReachabilityUnchanged": 1415,
-    "unconfirmedParks": 1010,
-    "unboundParks": 137,
-    "absentSourceParks": 2,
-    "removedSourceParks": 162,
-    "datedNoteProposals": 163,
-    "exampleFramedRowsIncludingPlaceholderCitations": 6,
-    "boundedConfirmations": 3939,
-    "totalParks": 1311,
-    "openJudgmentOrNoteRows": 1474
+    "byResult": {
+      "judgment-preserve-with-dated-note": 163,
+      "park-current-passage-unbound": 137,
+      "park-source-absent": 2,
+      "park-source-removed-by-cutover": 162,
+      "park-unconfirmed-preserve-premise": 959,
+      "preserve-operand-reachability-unchanged": 1416,
+      "preserve-source-confirmed-history": 2574
+    },
+    "byStage": {
+      "step-03": 4804,
+      "step-04": 609
+    },
+    "excludedRetireWithTree": 38,
+    "finalBatchPopulation": {
+      "step-03": 130,
+      "step-04": 33
+    },
+    "recordBatches": 136,
+    "total": 5413
   },
   "countsAfter": {
-    "step3Preserves": 4804,
-    "step4Preserves": 609,
-    "premiseRows": 5413,
-    "excludedRetireWithTree": 38,
-    "matrixCatalogBatches": 136,
-    "verifiedZeroEdgeBatches": 27,
-    "sourceConfirmedHistory": 2574,
-    "operandReachabilityUnchanged": 1416,
-    "boundedConfirmations": 3990,
-    "unconfirmedParks": 959,
-    "unboundParks": 137,
-    "absentSourceParks": 2,
-    "removedSourceParks": 162,
-    "totalParks": 1260,
-    "datedNoteProposals": 163,
-    "openJudgmentOrNoteRows": 1423,
-    "exampleFramedRowsIncludingPlaceholderCitations": 57,
-    "explicitPathPlaceholderEvidenceRows": 55,
-    "localExampleMarkerEvidenceRows": 2,
-    "exampleOrPlaceholderConfirmedRows": 56,
-    "negativeSourceBindingAndEvidenceControls": 10,
-    "positiveEvidenceControls": 5,
-    "byteIdenticalG6Artifacts": 4
-  },
-  "expectedCountDiscrepancy": {
-    "briefExpectedExampleRows": 5,
-    "actualExampleOrPlaceholderEvidenceRows": 57,
-    "additionalMarkerFreeIllustrativePlaceholders": 52,
-    "formerlyUnconfirmedParksNowConfirmed": 51,
-    "newEvidenceButStillRemovedSourcePark": "f03419",
-    "changedEvidenceOrResultRows": 53,
-    "reason": "The requested standalone-placeholder rule applies generally, not only to f07822/f08072. No row-id whitelist was added; source removal still wins over evidence.",
-    "owningDelta": "sentence-delta.json"
-  },
-  "namedFindings": {
-    "f07821": {
-      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-      "line": 67,
-      "columnStart": 939,
-      "result": "preserve-operand-reachability-unchanged",
-      "evidence": null
+    "byResult": {
+      "judgment-preserve-with-dated-note": 163,
+      "park-current-passage-unbound": 137,
+      "park-source-absent": 2,
+      "park-source-removed-by-cutover": 162,
+      "park-unconfirmed-preserve-premise": 623,
+      "preserve-operand-reachability-unchanged": 1394,
+      "preserve-source-confirmed-history": 2926,
+      "repoint-proposal": 6
     },
-    "f07822Evidence": {"kind": "explicit-path-placeholder", "text": "docs/history/<id>/iron-law-evidence.md", "placeholder": "<id>"},
-    "f08072Evidence": {"kind": "explicit-path-placeholder", "text": "docs/history/<feature>/", "placeholder": "<feature>"},
-    "fivePriorRowsStillConfirm": ["f00167", "f08807", "f07822", "f08072", "f08073"],
-    "nineRowsStillParkWithNoEvidence": ["f00166", "f03953", "f07667", "f08643", "f08645", "f08668", "f08681", "f08748", "f08817"],
-    "selfSuccessorRowsStillParked": ["f07697", "f08033", "f08047"],
-    "allWrapperPositionsStillCovered": 163,
-    "namedWrapperBatchFilesCovered": 73
+    "byStage": {
+      "step-03": 4804,
+      "step-04": 609
+    },
+    "excludedRetireWithTree": 38,
+    "finalBatchPopulation": {
+      "step-03": 130,
+      "step-04": 33
+    },
+    "recordBatches": 136,
+    "total": 5413
+  },
+  "totals": {
+    "boundedConfirmations": 4320,
+    "parks": 924,
+    "datedNotes": 163,
+    "repoints": 6,
+    "openRows": 1093,
+    "changedResults": 373,
+    "changedRows": 502
+  },
+  "fileRules": [
+    {
+      "rule": "file-external-repository-header",
+      "rows": 169,
+      "files": 12,
+      "beforeByResult": {
+        "park-unconfirmed-preserve-premise": 137,
+        "preserve-operand-reachability-unchanged": 32
+      },
+      "afterByResult": {
+        "preserve-source-confirmed-history": 169
+      },
+      "rowsFromPark": 137,
+      "rowIds": [
+        "f01012",
+        "f01014",
+        "f01015",
+        "f01016",
+        "f01017",
+        "f01018",
+        "f01019",
+        "f01020",
+        "f01021",
+        "f01022",
+        "f01023",
+        "f01024",
+        "f01025",
+        "f01026",
+        "f01027",
+        "f01028",
+        "f01029",
+        "f01030",
+        "f01031",
+        "f01032",
+        "f01033",
+        "f01034",
+        "f01035",
+        "f01036",
+        "f01037",
+        "f01038",
+        "f01039",
+        "f01040",
+        "f01041",
+        "f01042",
+        "f01043",
+        "f01044",
+        "f01045",
+        "f01046",
+        "f01047",
+        "f01048",
+        "f01049",
+        "f01050",
+        "f01051",
+        "f01052",
+        "f01053",
+        "f01054",
+        "f01055",
+        "f01056",
+        "f01057",
+        "f01058",
+        "f01059",
+        "f01060",
+        "f01061",
+        "f01062",
+        "f01063",
+        "f01064",
+        "f01065",
+        "f01066",
+        "f01067",
+        "f01068",
+        "f01069",
+        "f01070",
+        "f01071",
+        "f01072",
+        "f01073",
+        "f01074",
+        "f01075",
+        "f01076",
+        "f01077",
+        "f01078",
+        "f01079",
+        "f01080",
+        "f01081",
+        "f01082",
+        "f01083",
+        "f01084",
+        "f01085",
+        "f01086",
+        "f01087",
+        "f01088",
+        "f01089",
+        "f01090",
+        "f01091",
+        "f01092",
+        "f01093",
+        "f01094",
+        "f01095",
+        "f01105",
+        "f01108",
+        "f01115",
+        "f01116",
+        "f01117",
+        "f01118",
+        "f01119",
+        "f01120",
+        "f01121",
+        "f01122",
+        "f01123",
+        "f01124",
+        "f01125",
+        "f01126",
+        "f01127",
+        "f01128",
+        "f01129",
+        "f01130",
+        "f01131",
+        "f01132",
+        "f01133",
+        "f01134",
+        "f01135",
+        "f01136",
+        "f01137",
+        "f01138",
+        "f01139",
+        "f01140",
+        "f01142",
+        "f01143",
+        "f01144",
+        "f01145",
+        "f01146",
+        "f01147",
+        "f01148",
+        "f01149",
+        "f01150",
+        "f01151",
+        "f01153",
+        "f01154",
+        "f01155",
+        "f01156",
+        "f01157",
+        "f01158",
+        "f01159",
+        "f01160",
+        "f01161",
+        "f01162",
+        "f01163",
+        "f01164",
+        "f01165",
+        "f01166",
+        "f01167",
+        "f01168",
+        "f01169",
+        "f01170",
+        "f01171",
+        "f01172",
+        "f01173",
+        "f01174",
+        "f01175",
+        "f01176",
+        "f01177",
+        "f01178",
+        "f01179",
+        "f01180",
+        "f01181",
+        "f01182",
+        "f01183",
+        "f01184",
+        "f01185",
+        "f01188",
+        "f01189",
+        "f01190",
+        "f01191",
+        "f01192",
+        "f01193",
+        "f01194",
+        "f01195",
+        "f01196",
+        "f01197",
+        "f01198",
+        "f01199",
+        "f01200",
+        "f01201",
+        "f01202"
+      ]
+    },
+    {
+      "rule": "file-dated-report-location",
+      "rows": 185,
+      "files": 120,
+      "beforeByResult": {
+        "park-unconfirmed-preserve-premise": 182,
+        "preserve-operand-reachability-unchanged": 3
+      },
+      "afterByResult": {
+        "preserve-source-confirmed-history": 185
+      },
+      "rowsFromPark": 182,
+      "rowIds": [
+        "f00194",
+        "f00195",
+        "f00196",
+        "f00197",
+        "f00198",
+        "f00199",
+        "f00200",
+        "f00201",
+        "f00202",
+        "f00203",
+        "f00204",
+        "f00205",
+        "f00206",
+        "f00207",
+        "f00208",
+        "f00209",
+        "f00210",
+        "f00211",
+        "f00212",
+        "f00213",
+        "f00214",
+        "f00215",
+        "f00216",
+        "f00217",
+        "f00218",
+        "f00219",
+        "f00220",
+        "f00221",
+        "f00222",
+        "f00223",
+        "f00224",
+        "f00225",
+        "f00226",
+        "f00227",
+        "f00228",
+        "f00229",
+        "f00230",
+        "f00232",
+        "f00233",
+        "f00234",
+        "f00235",
+        "f00236",
+        "f00237",
+        "f00238",
+        "f00239",
+        "f00240",
+        "f00241",
+        "f00242",
+        "f00243",
+        "f00244",
+        "f00245",
+        "f00246",
+        "f00247",
+        "f00248",
+        "f00249",
+        "f00250",
+        "f00251",
+        "f00252",
+        "f00253",
+        "f00254",
+        "f00255",
+        "f00256",
+        "f00257",
+        "f00258",
+        "f00259",
+        "f00260",
+        "f00261",
+        "f00262",
+        "f00263",
+        "f00264",
+        "f00265",
+        "f00266",
+        "f00267",
+        "f00268",
+        "f00269",
+        "f00270",
+        "f00271",
+        "f00272",
+        "f00273",
+        "f00274",
+        "f00275",
+        "f00276",
+        "f00277",
+        "f00278",
+        "f00279",
+        "f00280",
+        "f00281",
+        "f00282",
+        "f00283",
+        "f00284",
+        "f00285",
+        "f00286",
+        "f00288",
+        "f00289",
+        "f00290",
+        "f00291",
+        "f00292",
+        "f00293",
+        "f00294",
+        "f00295",
+        "f00296",
+        "f00297",
+        "f00298",
+        "f00299",
+        "f00300",
+        "f00301",
+        "f00302",
+        "f00303",
+        "f00304",
+        "f00305",
+        "f00306",
+        "f00307",
+        "f00308",
+        "f00309",
+        "f00310",
+        "f00311",
+        "f00312",
+        "f00313",
+        "f00314",
+        "f00315",
+        "f00316",
+        "f00317",
+        "f00318",
+        "f00319",
+        "f00320",
+        "f00323",
+        "f00332",
+        "f00350",
+        "f00367",
+        "f00368",
+        "f00369",
+        "f00370",
+        "f00371",
+        "f00372",
+        "f00373",
+        "f00374",
+        "f00375",
+        "f00376",
+        "f00377",
+        "f00378",
+        "f00379",
+        "f00381",
+        "f00383",
+        "f00384",
+        "f00385",
+        "f00387",
+        "f00392",
+        "f00393",
+        "f00394",
+        "f00395",
+        "f00397",
+        "f00398",
+        "f00399",
+        "f00400",
+        "f00401",
+        "f00402",
+        "f00403",
+        "f00404",
+        "f00405",
+        "f00407",
+        "f00412",
+        "f00414",
+        "f00415",
+        "f00416",
+        "f00417",
+        "f00418",
+        "f00419",
+        "f00421",
+        "f00423",
+        "f00424",
+        "f00425",
+        "f00426",
+        "f00429",
+        "f08511",
+        "f08512",
+        "f08513",
+        "f08514",
+        "f08515",
+        "f08516",
+        "f08517",
+        "f08518",
+        "f08519",
+        "f08520",
+        "f08521",
+        "f08522"
+      ]
+    }
+  ],
+  "normalizedReviewRows": [
+    {
+      "rowId": "f00144",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "AGENTS.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f00417",
+      "result": "preserve-source-confirmed-history",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f00418",
+      "result": "preserve-source-confirmed-history",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f00419",
+      "result": "preserve-source-confirmed-history",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f00429",
+      "result": "preserve-source-confirmed-history",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f03463",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/distillery/porting-log.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f03478",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f04208",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/distillery/porting-log.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f04387",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/history/gate-approve-vs-movenext-semantics/CONTEXT.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f06557",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/decisions/index.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f06569",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/backlog.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f06829",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/decisions/index.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f07654",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "packages/run-supervisor/contracts",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f08000",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/ui-spec/generated/coverage-report.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    },
+    {
+      "rowId": "f08062",
+      "result": "preserve-operand-reachability-unchanged",
+      "operands": [
+        {
+          "afterPresent": true,
+          "beforePresent": true,
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "removedByMoveOrStep6": false,
+          "successors": [],
+          "unsafeLiteral": false,
+          "wildcard": false
+        }
+      ]
+    }
+  ],
+  "noDestinationActions": {
+    "count": 25,
+    "readingMapHolder": "docs/reading-map.md",
+    "readingMapRows": 24,
+    "workflowHolder": "docs/platform/workflow/spec.md",
+    "workflowRows": [
+      "f08335"
+    ],
+    "retiredAdditionalRows": 0,
+    "owningEvidence": "fix-delta.json#noDestinationActions",
+    "reason": "Each bound unit is live navigation/source summary requiring recheck in a non-identical holder, not automatic retirement or inherited preserve."
+  },
+  "generalRuleAdditionalConfirmations": [
+    "f08493",
+    "f08561"
+  ],
+  "repointProposals": [
+    {
+      "rowId": "f06985",
+      "successor": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "presentAfterCutover": true,
+        "sha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1"
+      },
+      "preparedPatch": null
+    },
+    {
+      "rowId": "f07526",
+      "successor": {
+        "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "presentAfterCutover": true,
+        "sha256": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d"
+      },
+      "preparedPatch": "prepared-patches.json#patches[0]"
+    },
+    {
+      "rowId": "f07527",
+      "successor": {
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "presentAfterCutover": true,
+        "sha256": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb"
+      },
+      "preparedPatch": "prepared-patches.json#patches[0]"
+    },
+    {
+      "rowId": "f07528",
+      "successor": {
+        "path": "docs/platform/agent-coordination/README.md",
+        "presentAfterCutover": true,
+        "sha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0"
+      },
+      "preparedPatch": "prepared-patches.json#patches[0]"
+    },
+    {
+      "rowId": "f08071",
+      "successor": {
+        "path": "docs/platform/coexistence/spec.md",
+        "presentAfterCutover": true,
+        "sha256": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f"
+      },
+      "preparedPatch": null
+    },
+    {
+      "rowId": "f08113",
+      "successor": {
+        "path": "docs/platform/packaging-distribution/history/distribution-vision.md",
+        "presentAfterCutover": true,
+        "sha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e"
+      },
+      "preparedPatch": null
+    }
+  ],
+  "preparedPatch": {
+    "evidence": "prepared-patches.json",
+    "count": 1,
+    "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+    "lines": [
+      22,
+      29,
+      33,
+      37
+    ],
+    "applied": false
+  },
+  "controls": {
+    "operand": 13,
+    "fileEvidence": 10,
+    "oldNegativeBindingAndSentence": 10,
+    "oldPositiveExamples": 5,
+    "physicalNegative": 3
+  },
+  "wrappers": {
+    "rows": 163,
+    "reviewBatchFiles": 73,
+    "twoNoteFiles": 73,
+    "notesApplied": false,
+    "compositionInstructions": "history-wrapper-proposals.json#compositionInstructions"
   },
   "evidence": {
     "owningRows": "proof.json",
     "openRows": "judgments.json",
-    "beforeAfterDelta": "sentence-delta.json",
-    "doubleReplay": "sentence-replay.json",
-    "miscVerifierAndOwningG6Assertions": "misc-checks.json",
-    "combinedFailureAndExactAdapters": "verification.json",
-    "historicalPinDiagnosticOnly": "historical-pin-diagnostic.json"
+    "beforeAfter": "fix-delta.json",
+    "doubleReplay": "fix-replay.json",
+    "miscVerifier": "../misc-fix/checks.json",
+    "combinedFailureAndAdapter": "verification.json"
   },
   "commandExits": {
     "proofAtRequestedPin": 0,
     "doubleReplayRound1": 0,
     "doubleReplayRound2": 0,
-    "scopeAdaptedMiscVerifierAtRequestedPin": 0,
+    "miscVerifierScratchOnlyAdapter": 0,
+    "owningG6Assertions": 0,
     "combinedVerifierAtHead": 1,
-    "historicalPinDiagnosticOnly": 0,
     "gitDiffCheck": 0
   },
   "combinedBlocker": {
     "deliveredG2Pin": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
     "failedAssertion": "G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification",
-    "staleG2RustProofLocatorsAtRequestedG6Pin": 33,
     "owner": "Lead / G2 final-pin owner",
-    "noOtherDiagnosticAssertionFailures": true,
-    "caveat": "The diagnostic checks each population at its own pin, without G2 replay or shared-pin equality. It is not combined verification or evidence that re-pinning alone is sufficient."
+    "noG6ReplayBeforeStop": true
   },
-  "miscReceiptHandoff": {
-    "pathNotWritten": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md",
-    "replacementRecordedIn": "receipt.md#real-counts-not-the-expected-five",
-    "reason": "Parallel turn owns misc-fix/**; scoped brief explicitly requires placing the count/ruling update here instead."
-  },
-  "scratch": "/tmp/fgos-work/w6-misc-sentence/",
-  "impactAnalysis": "degraded/unqueried; capability CLI forbidden by brief and no exposed GitNexus tool",
+  "scratch": "/tmp/fgos-work/w8-g6-fix/",
+  "impactAnalysis": "degraded/unqueried; CLI forbidden by brief, no exposed GitNexus tool",
   "noRepositoryGitMutation": true,
-  "noComponentBoundaryChange": true,
-  "notRun": ["fgos CLI/lifecycle", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "product tests (records-only work)", "pair accounting", "markdown preview (Lead custody)"]
+  "noProductChange": true,
+  "notRun": [
+    "fgos CLI / impact query / lifecycle",
+    "Git mutations / pair accounting",
+    "npm test / scripts/run-tests.mjs / cargo test --workspace",
+    "docs or product edits",
+    "markdown preview (Lead custody; no extra state writes)"
+  ]
 }

@@ -7,7 +7,7 @@ Missing premise evidence becomes an owned judgment/park, never an exemption.
 """
 import sys
 sys.dont_write_bytecode = True
-import argparse, collections, hashlib, json, pathlib, posixpath, re, subprocess, tempfile
+import argparse, collections, difflib, hashlib, json, pathlib, posixpath, re, subprocess, tempfile
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
 OLD = HERE.parent.parent / 'phase-08'
@@ -54,7 +54,61 @@ def unit_at(source, lines):
     return '\n'.join(text[start:end])
 
 
-def historical_evidence(source, lines, reason, unit, span):
+def normalize_operand(path, bound_text, consumer=''):
+    """Normalize locators/imports; expand only an unambiguous bound path token."""
+    def clean(value):
+        value = value.split('#')[0].lstrip('@').rstrip('.,:')
+        if '<' not in value: value = value.rstrip('>')
+        return re.sub(r':\d+(?:-\d+)?$', '', value).rstrip('/')
+    path = clean(path)
+    tokens = re.findall(r'@?(?:[\w.<>*?{}+-]+/)+[\w./<>*?{}@+:#-]+', bound_text)
+    # Reject prose prefixes (repo/docs, <repo>/docs) as repo-relative tokens.
+    # Explicit relative Markdown destinations, however, resolve at the consumer.
+    longer = set()
+    for token in tokens:
+        token = clean(token)
+        if not token.startswith(('docs/','./','../',path.split('/')[0]+'/')): continue
+        if path in token and token != path:
+            if token.startswith(('./','../')):
+                if not consumer: continue
+                token = posixpath.normpath(posixpath.join(posixpath.dirname(consumer),token))
+            longer.add(token)
+    return next(iter(longer)) if len(longer) == 1 else path
+
+
+def after_presence(path, before, wildcard, unsafe, present):
+    # Physical simulation copies docs/ only; other tracked operands are untouched.
+    if wildcard or unsafe: return None
+    return present(path) if path.startswith('docs/') else before
+
+
+def file_evidence(source, file):
+    """L13-10: a real introductory marker AND the approved location are required."""
+    header = re.split(r'(?m)^#{2,6} ', source, maxsplit=1)[0]
+    if file.startswith(('docs/distillery/sources/', 'docs/distillery/reports/')):
+        front = re.match(r'\A---\n(.*?)\n---(?:\n|$)', source, re.S)
+        if front and re.search(r'(?m)^type: git-repo\s*$', front[1]):
+            url = re.search(r'(?m)^url: https?://[^\n]+', front[1])
+            local = re.search(r'(?m)^local: upstreams/[^\n]+', front[1])
+            if url and local:
+                return dict(kind='file-external-repository-header', text='type: git-repo\n'+url[0]+'\n'+local[0])
+        # Reports have prose rather than source frontmatter. Only introductory
+        # Source/clone declarations count, never an incidental body example.
+        marker = re.search(r'(?im)^(?:Source(?: snapshot| root)?:[^\n]*(?:\n`[^\n]+)?|Source: local clone[^\n]*)', header)
+        if marker and re.search(r'(?:^|/)upstreams/[\w-]+|`upstreams/[\w-]+', marker[0]):
+            return dict(kind='file-external-repository-header', text=marker[0])
+        marker = re.search(r'Mechanical inventory pass over .*?for the distillery source `docs/distillery/sources/[^`]+`\.', header, re.S)
+        if marker:
+            return dict(kind='file-external-repository-header', text=marker[0])
+    if file.startswith(('archive/plans/', 'plans/reports/')):
+        date = re.search(r'(?<!\d)(?:20\d{2}-\d{2}-\d{2}|2\d(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01]))(?!\d)', file)
+        title = re.search(r'(?m)^#{1,6} [^\n]+', source)
+        if date and title:
+            return dict(kind='file-dated-report-location', text=title[0], location=file, dateMarker=date[0])
+    return None
+
+
+def historical_evidence(source, lines, reason, unit, span, file=''):
     """Content + bound positions + reason, not a role/path whitelist."""
     line = min(lines)
     prefix = '\n'.join(source.splitlines()[:line])
@@ -122,7 +176,7 @@ def historical_evidence(source, lines, reason, unit, span):
         if not text or current[col:col+len(text)] != text:
             occurrences = [m.start() for m in re.finditer(re.escape(text),current)] if text else []
             col = occurrences[0] if len(occurrences)==1 else -1
-        if col < 0: return None
+        if col < 0: return file_evidence(source, file)
         start, end = 0, len(current)
         for boundary in re.finditer(r'(?i)\||(?<!e\.g)\. |; |—', current):
             if boundary.end() <= col: start = boundary.end()
@@ -134,7 +188,7 @@ def historical_evidence(source, lines, reason, unit, span):
             return {'kind':'explicit-path-placeholder', 'text':text, 'placeholder':placeholder[0]}
         if marker:
             return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
-    return None
+    return file_evidence(source, file)
 
 
 def premise(source_present, bound, stable_targets, evidence, wrapper, source_survives=True):
@@ -183,7 +237,7 @@ def main():
         if file not in source_cache:
             source_cache[file] = git('show',pin+':'+file).decode() if tracked.get(file) in ('100644','100755') else None
         return source_cache[file]
-    base = pathlib.Path('/tmp/fgos-work/w6-misc-sentence');base.mkdir(parents=True,exist_ok=True)
+    base = pathlib.Path('/tmp/fgos-work/w8-g6-fix');base.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='preserve-',dir=base) as name:
         scratch = pathlib.Path(name)
         run = subprocess.run(['node',str(HERE/'physical-move.mjs'),pin,name],cwd=ROOT,capture_output=True,text=True,check=True)
@@ -227,13 +281,14 @@ def main():
                 targets += re.findall(r'docs/[\w./<>*?{}@+-]+',token)
                 for dest in re.findall(r'\]\(([^) ]+)',token):
                     if not re.match(r'(?:\w+:|#)',dest): targets.append(posixpath.normpath(posixpath.join(posixpath.dirname(rec['file']),dest)))
-            paths = sorted({p.split('#')[0].rstrip('/') for p in targets if p and not p.startswith(('http:','https:'))})
+            bound_text = '\n'.join(source.splitlines()[n-1] for n in bound) if bound else ''
+            paths = sorted({normalize_operand(p,bound_text,rec['file']) for p in targets if p and not p.startswith(('http:','https:'))})
             reach = []
             for p in paths:
                 unsafe = '..' in pathlib.PurePosixPath(p).parts or pathlib.PurePosixPath(p).is_absolute()
                 wildcard = bool(re.search(r'[<>*?{}]',p))
                 before = bool(tracked.get(p)) or any(t.startswith(p.rstrip('/')+'/') for t in tracked)
-                after = present(p) if p.startswith('docs/') and not wildcard and not unsafe else None
+                after = after_presence(p,before,wildcard,unsafe,present)
                 reach.append(dict(path=p,beforePresent=before,afterPresent=after,wildcard=wildcard,unsafeLiteral=unsafe,
                                   removedByMoveOrStep6=p in moving,successors=[dict(path=t,present=present(t),sha256=sha((candidate/t).read_bytes()) if (candidate/t).is_file() else None) for t in move_map.get(p,[])]))
             stable = bool(reach) and all(r['beforePresent'] and r['afterPresent'] and not r['wildcard'] for r in reach)
@@ -243,7 +298,7 @@ def main():
             inside_snapshot = bool(snapshot and current_line and current_line > source.count('\n',0,snapshot.start())+1)
             wrapper = bool(bound and not inside_snapshot and 'docs/specs/runner.md' in current_text and
                            ('Superseded by:' in current_text or ('CoordinationSession' in current_text and re.search(r'(?i)retir|history|historical',current_text))))
-            evidence = historical_evidence(source,bound,reason,unit,spans[0]) if bound else None
+            evidence = historical_evidence(source,bound,reason,unit,spans[0],rec['file']) if bound else None
             if bound and 'frozen rename copy at 4ee0e3a3c' in reason:
                 origin = git('show','4ee0e3a3c:'+rec['file']).decode()
                 if source == origin:
@@ -272,7 +327,14 @@ def main():
                 check['candidateSuccessors'] = successors
                 if result == 'park-source-removed-by-cutover':
                     check['owner'] = 'Documentation consumer-composition owner / Lead'
-                    check['blocker'] = 'Physical cutover removes '+rec['file']+'; operand reachability does not conserve this passage. Review '+row[0]+' in the non-identical successor(s) '+', '.join(s['path'] for s in check['sourceSuccessors'])+' and compose/review its effective disposition; never inherit a preserve from the deleted location.'
+                    if check['sourceSuccessors']:
+                        check['blocker'] = 'Physical cutover removes '+rec['file']+'; operand reachability does not conserve this passage. Review '+row[0]+' in the non-identical successor(s) '+', '.join(s['path'] for s in check['sourceSuccessors'])+' and compose/review its effective disposition; never inherit a preserve from the deleted location.'
+                    else:
+                        holder = {'docs/specs/reading-map.md':'docs/reading-map.md', 'docs/specs/workflow.md':'docs/platform/workflow/spec.md'}[rec['file']]
+                        assert present(holder)
+                        check['recheckHolder'] = dict(path=holder,presentAfterCutover=True,sha256=sha((candidate/holder).read_bytes()))
+                        check['actionReason'] = 'The bound unit is a live navigation/source summary citing '+', '.join(paths)+'; its subject must be checked in the non-identical holder, not silently retired or inherited from the deleted map/spec.'
+                        check['blocker'] = 'Physical cutover removes '+rec['file']+' with no move destination. Recheck '+row[0]+' ('+', '.join(paths)+') and its bound unit in '+holder+'; compose/review any missing navigation or retire the obsolete clause explicitly. '+check['actionReason']
                 elif result == 'park-current-passage-unbound':
                     check['owner'] = 'G9 source-binding reviewer / Documentation consumer-composition owner'
                     check['blocker'] = 'Rebind '+row[0]+' in '+rec['file']+' from the recorded spans to one exact current source unit at final pin F; only then rejudge its preserve premise. No digest-only carry over passage drift.'
@@ -286,13 +348,25 @@ def main():
                     any(s['path'] == rec['file'] for r in reach for s in r['successors'])):
                 check['excludedSelfSuccessor'] = rec['file']
                 check['blocker'] += ' L12-35(7): the physical move destination is this consumer itself, not an eligible successor link. Review whether to label the legacy coordinate as non-link provenance or remove the live navigation outside literal carriage; do not propose a self-link.'
-            if bound and re.search(r'(?i)Canonical architecture moved to:', '\n'.join(source.splitlines()[max(0,current_line-3):current_line])):
-                successor = 'docs/platform/agent-coordination/architecture/dispatch-control-plane.md'
-                assert present(successor) and any(successor==s['path'] for r in reach for s in r['successors'])
-                check.update(proposedDisposition='repoint-proposal',
+            repoints = {
+                'f08113':'docs/platform/packaging-distribution/history/distribution-vision.md',
+                'f08071':'docs/platform/coexistence/spec.md',
+                'f06985':'docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md',
+                'f07526':'docs/platform/agent-coordination/architecture/dispatch-control-plane.md',
+                'f07527':'docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md',
+                'f07528':'docs/platform/agent-coordination/README.md',
+            }
+            if row[0] in repoints:
+                successor = repoints[row[0]]
+                assert bound and source_survives and present(successor) and successor != rec['file']
+                assert any(successor==s['path'] for r in reach for s in r['successors'])
+                check.update(result='repoint-proposal',proposedDisposition='repoint-proposal',evidence=None,
                              successor=dict(path=successor,sha256=sha((candidate/successor).read_bytes()),presentAfterCutover=True),
-                             recommendationReason='This is a live "Canonical architecture moved to" navigation assertion before the proposal body, not literal source evidence. Repoint only its legacy destination to the prepared architecture holder; authority still awaits the flip.',
-                             blocker='Lead/consumer-composition owner must compose and independently review this navigation replacement with the owning file patch; no product bytes changed in this records turn.')
+                             recommendationReason='L13-10 / exhaustive G6 review: this bound navigation must remain reachable after cutover; its legacy operand retires. Use the exact named holder, not historical framing.',
+                             blocker='Compose and independently review '+row[0]+' with the owning file patch before flip; no product bytes changed in this records turn.')
+                if row[0] in {'f07526','f07527','f07528'}:
+                    check['preparedPatch'] = 'prepared-patches.json#patches[0]'
+                    check['blocker'] += ' Apply only the single prepared patch covering all three sibling paths AND the line-22 declaration.'
             rows.append(check)
         assert collections.Counter(r['stage'] for r in rows) == {'step-03':4804,'step-04':609}
         assert len(retired) == 38 and all(r['sourceRemoved'] for r in retired)
@@ -343,10 +417,74 @@ def main():
             evidence = historical_evidence(source,bound,reason,unit_at(source,bound),span)
             assert evidence and evidence['kind']==expected
             positives.append(dict(case=case,source=source,span=span,reason=reason,evidence=evidence))
+        # Scoped controls for the new operand and file-level rules; old sentence
+        # controls above remain the owning proof for their unchanged behavior.
+        operand_controls = []
+        for rule, value, text, expected, positive in [
+            ('line-locator','docs/backlog.md:88-90','', 'docs/backlog.md', True),
+            ('line-locator','docs/backlog.md:latest','', 'docs/backlog.md:latest', False),
+            ('import-prefix','@AGENTS.md','', 'AGENTS.md', True),
+            ('import-prefix','AG@ENTS.md','', 'AG@ENTS.md', False),
+            ('full-bound-path','agent-coordination/verification','See `docs/platform/agent-coordination/verification/panel/P05.2.md`', 'docs/platform/agent-coordination/verification/panel/P05.2.md', True),
+            ('full-bound-path','agent-coordination/verification','See `docs/platform/other.md`', 'agent-coordination/verification', False),
+            ('full-bound-path','a/b','`docs/a/b/one.md` and `docs/a/b/two.md`','a/b',False),
+        ]:
+            actual = normalize_operand(value,text)
+            assert actual == expected, (rule,value,actual)
+            operand_controls.append(dict(rule=rule,operand=value,boundText=text,positive=positive,expected=expected,actual=actual))
+        actual = normalize_operand('packages/run-supervisor/contracts','[contracts](../../../packages/run-supervisor/contracts)', 'docs/platform/run-supervisor/spec.md')
+        assert actual == 'packages/run-supervisor/contracts'
+        operand_controls.append(dict(rule='full-bound-path',operand='packages/run-supervisor/contracts',boundText='[contracts](../../../packages/run-supervisor/contracts)',consumer='docs/platform/run-supervisor/spec.md',positive=True,expected=actual,actual=actual))
+        for path, before, wildcard, unsafe, positive, expected in [
+            ('packages/run-supervisor/contracts',True,False,False,True,True),
+            ('packages/missing',False,False,False,False,False),
+            ('packages/<id>',True,True,False,False,None),
+            ('../packages/contracts',True,False,True,False,None),
+            ('docs/specs/retired.md',True,False,False,False,False),
+        ]:
+            actual = after_presence(path,before,wildcard,unsafe,lambda p:False)
+            assert actual == expected
+            operand_controls.append(dict(rule='outside-docs-presence',operand=path,beforePresent=before,wildcard=wildcard,unsafe=unsafe,positive=positive,expected=expected,actual=actual))
+        file_controls = []
+        external = '---\ntype: git-repo\nurl: https://example.org/upstream/repo\nlocal: upstreams/repo\n---\n# Repo index\n\n## Findings\nSee docs/specs/x.md'
+        for case, file, source, expected in [
+            ('external source header','docs/distillery/sources/repo.md',external,'file-external-repository-header'),
+            ('external report header','docs/distillery/reports/repo.md','# Extraction\n\nSource: local clone at `upstreams/repo`, HEAD `abc1234`.\n\n## Findings\nSee docs/specs/x.md','file-external-repository-header'),
+            ('same directory without external marker','docs/distillery/sources/repo.md','# Local index\n\n## Findings\nSee docs/specs/x.md',None),
+            ('external marker in body only','docs/distillery/reports/repo.md','# Local report\n\n## Findings\nSource: local clone at `upstreams/repo`.\nSee docs/specs/x.md',None),
+            ('outside source location','docs/history/repo.md',external,None),
+            ('dated archived report','archive/plans/260901-project/reports/proof.md','# Proof report\n\n## Findings\nSee docs/specs/x.md','file-dated-report-location'),
+            ('dated report filename','plans/reports/review-260901-proof.md','# Review report\n\n## Findings\nSee docs/specs/x.md','file-dated-report-location'),
+            ('undated report','plans/reports/proof.md','# Proof report\n\n## Findings\nSee docs/specs/x.md',None),
+            ('dated live history convention','docs/history/260901-project/proof.md','# Proof report\n\n## Findings\nSee docs/specs/x.md',None),
+            ('date without real header','archive/plans/260901-project/proof.md','See docs/specs/x.md',None),
+        ]:
+            line = len(source.splitlines()); span = dict(line=line,text='docs/specs/x.md')
+            bound = bind_spans(source,[span])
+            evidence = historical_evidence(source,bound,'retained native path',unit_at(source,bound),span,file)
+            assert (evidence or {}).get('kind') == expected, case
+            actual = premise(True,bool(bound),False,evidence,False)
+            assert actual == ('preserve-source-confirmed-history' if expected else 'park-unconfirmed-preserve-premise')
+            file_controls.append(dict(case=case,file=file,source=source,span=span,evidence=evidence,actual=actual,positive=expected is not None))
+        file = 'docs/platform/proposals/dispatch-control-plane-redesign.md'
+        before = source_of(file); after = before
+        replacements = [
+            (22,'The three inline-code legacy paths are retained pending cutover','The three inline-code legacy paths were repointed to their docs/platform holders at cutover'),
+            (29,'docs/architect/agent-coordination/architecture/dispatch-control-plane.md','docs/platform/agent-coordination/architecture/dispatch-control-plane.md'),
+            (33,'docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md','docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md'),
+            (37,'docs/architect/agent-coordination/README.md','docs/platform/agent-coordination/README.md'),
+        ]
+        for line, old, new in replacements:
+            assert old in before.splitlines()[line-1] and after.count(old) == 1
+            after = after.replace(old,new)
+        patch = dict(file=file,rowIds=['f07526','f07527','f07528'],status='prepared-not-applied',sourceSha256=sha(before),proposedSha256=sha(after),
+                     replacements=[dict(line=line,before=old,after=new) for line,old,new in replacements],
+                     patch=''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+file,tofile='b/'+file)))
+        dump(args.out/'prepared-patches.json',dict(sourceCommit=pin,patches=[patch],independentApproval=False,noReadinessClaim=True))
         counts = dict(total=len(rows),byStage=dict(collections.Counter(r['stage'] for r in rows)),byResult=dict(collections.Counter(r['result'] for r in rows)),excludedRetireWithTree=len(retired),recordBatches=len(catalog),finalBatchPopulation=batch_counts)
         report = dict(sourceCommit=pin,authority='L12-137; G6; L12-121 method extended, not inherited',
                       inputs={f:sha((OLD/f).read_bytes()) for f in ['step-07-consumer-cutover-matrix.json','step-05-cutover-move-set.json','step-07-post-move-proof.mjs','step-02j-census-maps-portals-prose.json']},
-                      counts=counts,physical=physical,zeroEdgeBatches=zero_edge_batches,negativeDecisionProbes=probes,positiveEvidenceControls=positives,
+                      counts=counts,physical=physical,zeroEdgeBatches=zero_edge_batches,negativeDecisionProbes=probes,positiveEvidenceControls=positives,operandControls=operand_controls,fileEvidenceControls=file_controls,
                       noReadinessClaim=True,independentApproval=False,
                       scope='Tracked source blobs and physical scratch moves only. Exact source spans + reason/operand/source digests per final identity; retained reachability proves operand stability, not contract/runtime parity. Unconfirmed premises are owned parks. No checkout move, source edit, CLI, Git write, live state or test execution.',rows=rows)
         dump(args.out/'proof.json',report)
@@ -354,10 +492,12 @@ def main():
         judgments = [r for r in rows if not r['result'].startswith('preserve-')]
         # One owning evidence row in proof.json. Secondary indexes carry locators,
         # decisions and digests, not duplicate multi-kilobyte source passages.
-        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors','excludedSelfSuccessor','sourcePresentAfterCutover','sourceSuccessors','successor','recommendationReason']
+        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors','excludedSelfSuccessor','sourcePresentAfterCutover','sourceSuccessors','successor','recommendationReason','recheckHolder','actionReason','preparedPatch']
         dump(args.out/'judgments.json',dict(sourceCommit=pin,count=len(judgments),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in judgments]))
         keys += ['decisionOwner','successor','proposedDatedNote','alternatives','recommendationReason']
-        dump(args.out/'history-wrapper-proposals.json',dict(sourceCommit=pin,count=sum('decisionOwner' in r for r in rows),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in rows if 'decisionOwner' in r]))
+        dump(args.out/'history-wrapper-proposals.json',dict(sourceCommit=pin,count=sum('decisionOwner' in r for r in rows),owningEvidence='proof.json#rows[rowId]',
+             compositionInstructions=dict(status='deferred-not-applied',placement='After the closing header fence; before Literal Snapshot. Never insert a note inside the fenced header.',merge='Merge the two notes in each of the 73 two-note files into one note naming both successors.',date='Use the actual flip date at composition, not the draft date 2026-10-23.',wording='For f06391, change records to recorded when composing its owning patch.'),
+             rows=[{k:r[k] for k in keys if k in r} for r in rows if 'decisionOwner' in r]))
         print(json.dumps(counts,sort_keys=True))
 
 
