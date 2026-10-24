@@ -68,6 +68,7 @@ author: WORK lane controller, session forgent-cd (claude-uygd@fg-server2, roles 
    - the owner machine, only with the owner's go;
    - remove the rehearsal clone and mirror, and `land-261023`;
    - test follow-up on `internal_lock_routes.rs`: drop the redundant 50 ms sleep and kill the child process group (TEST and HARDEN nits);
+   - H33, received from HARDEN at 20:10 and approved by the owner: delete the legacy `work.friction` fence one release after the cutover. It is recorded in the ES plan's "Hand-offs received for after the cutover" table.
    - the backlog item: migrate reuses fgctl's process classification (now partly done by `556453735`).
 
 ## Rollback notes
