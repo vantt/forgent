@@ -103,3 +103,45 @@ Notes on the table: (1) `test/event-store/work-consumer.test.mjs` hosts one temp
 Status: DONE_WITH_CONCERNS
 Summary: Start trigger skipped, origin/main merged (acefe7f3f), focused checks and cargo workspace (1522 pass) green; npm test had 0 failures but run-tests ERROR (3 leftover fgos-tp dirs): the cause is a seal child of a fixture-dir repo outliving the root, fixed in test helpers (e2e and runner dirs re-run clean) but not yet re-proven by a second full gate.
 Concerns/Blockers: second full gate needed (needs your go); no per-file time table available from the runner; 17 newer commits on origin/main not merged; `background-seal-confined.test.mjs:32` boundary warning open; leftover cause of the third dir not isolated beyond e2e.
+
+---
+
+# Addendum: second merge, second gate, process-tmp-root review
+
+## Second merge (`f230d87ca`, origin/main `641151f0c`, includes H32 c31cf38b4)
+Conflicts: `.githooks/pre-commit` (imports: kept `pathToFileURL` from main and `spawnSync` from the branch), `CHANGELOG.md` (both intents kept), the census (main's side, regenerated; `--check` still the same 5 `unresolved-binary` sites). Against both parents: no file at 0 bytes; against the branch parent only small edits to the hook (+38/-1) and CHANGELOG (+2/-1); against main the only large deletions are WORK's own rewrites listed in the first merge. Baseline regenerated (596 files). Boundary reason added at `background-seal-confined.test.mjs:32`: the `suite:` line now reads `0 without a reason`. Focused checks: cargo test + clippy `-D warnings` on the four crates green; Node dirs (event-store state setup git cli architecture githooks e2e holder-lock) 3763 tests, 0 fail, no ERROR.
+
+## Second full gate (commit `f230d87ca`; start 11:15:58, load 3.73 / 11.94 / 9.07)
+- `npm test`: rc=0, 622 s wall (suite line 605 s), end load 1.82. `ℹ tests 8630, pass 8532, fail 0, cancelled 0, skipped 33, todo 65`. No `run-tests: ERROR` line at all: the leftover-directory ERROR is gone (and with it the third leftover, which I did not need to isolate).
+- `cargo test --locked --workspace`: rc=0, 527 s, 1520 passed, 0 failed, 12 ignored.
+- Verbatim `suite:` lines:
+```
+suite: 596 files, 7972 test() calls, 605 s wall (baseline 596 / 7972 / 202 s at 5dd6b8eae)
+suite: this change against 641151f0c: +131 -185 test() calls, 3 new CLI/host spawn site(s), 0 without a reason
+suite: warning: 12 test title(s) appear in more than one file (`node scripts/test-proof-inventory.mjs --duplicates` lists them)
+```
+- Per-file time (second reporter forwarded through `npm test --`; sum of each file's top-level test durations, which over-counts files whose tests run concurrently; whole-suite sum 7970 s over 605 s wall):
+
+| file | top-level sum s | tests |
+|---|---|---|
+| test/runner/loop.test.mjs | 407 | 99 |
+| test/cli/fgos-merge.test.mjs | 264 | 62 |
+| test/cli/fgos-return.test.mjs | 218 | 58 |
+| test/run-supervisor/crash-matrix-adopt-resume.test.mjs | 187 | 30 |
+| test/runner/execution/run.test.mjs | 165 | 82 |
+| test/workflow/workflow-runner.test.mjs | 157 | 64 |
+| test/runner/execution/run-provider-failover.test.mjs | 151 | 30 |
+| test/intake/plan.test.mjs | 115 | 92 |
+| test/e2e/runner-loop.test.mjs | 114 | 13 |
+| test/cli/fgos-claim.test.mjs | 108 | 32 |
+
+`loop.test.mjs` is the longest file (407 s of top-level time, 99 tests; 345 s alone on an idle machine earlier). Its elapsed time inside the full run was about 259 s by my reporter's event timestamps (approximate: events arrive batched). I have not run main's equivalents, so the 605 s against about 410 s on main is not attributed to a file here; the per-file sums above are the data to diff against a main run with the same reporter (`/tmp/.../scratchpad/w8-times-reporter.mjs`).
+
+## process-tmp-root.mjs review (TEST's four checks)
+1. Bounded: yes. `waitForSealChildren` stops at a 20 s deadline (`SEAL_CHILD_WAIT_MS`) shared by the private root and every watched dir, polling every 50 ms; it also returns early when no listed child is alive, and any scan error is swallowed, so the exit hook cannot hang a file.
+2. Identity: a child is a seal child only if its real command line contains `<dir>/` (the private root or a registered fixture dir) and ` events seal `, it is not this process, and liveness is judged through the process door from the scanned `tuple` (pid with start time), never from a bare pid.
+3. A child alive at the bound is not waited on further, the root is removed, and the child's later writes land outside the removed tree. It is not silent: `run-tests` lists processes whose command line names its temp or fixture root (stray-process ERROR, killed and reported) and reports leftover `fgos-tp-*` directories (the ERROR seen in the first gate came from exactly this). Both checks ran silent in the second gate.
+4. Owning proof: `test/scripts/run-tests.test.mjs`. It owned the private-root removal and signal behaviour but not the seal-child wait, so I added "a test process waits at exit for a detached seal child that names its private root or a watched fixture dir" (real child processes; the watched child outlives the other). It fails with `watchSealChildrenOf` made a no-op and passes with it (checked both ways). Baseline regenerated for the one added test.
+
+Status: DONE
+Summary: Second gate green: npm test rc=0 with no ERROR (8630 tests, 0 fail) and cargo workspace 1520 pass; leftover-dir ERROR gone; helper reviewed and one owning proof added.
