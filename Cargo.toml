@@ -39,6 +39,11 @@ exclude = [
 ]
 resolver = "2"
 
+# The native addon is read and hashed whole by every Node process that loads it, so its size is a start-up
+# cost: strip the symbol tables from release builds (21.6 MB to 16.4 MB for the addon).
+[profile.release]
+strip = "symbols"
+
 [workspace.package]
 version = "0.2.0"
 edition = "2021"

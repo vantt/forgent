@@ -21,6 +21,7 @@ fgos-identity = { path = "../../identity/rust", default-features = false, featur
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-yaml-doc = { path = "../../yaml-doc/rust" }
+fgos-config = { path = "../../config/rust" }
 
 [build-dependencies]
 napi-build = "=2.2.4"

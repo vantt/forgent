@@ -184,19 +184,19 @@ pub(crate) fn token_revision(global_dir: &Path) -> Option<(usize, String)> {
     Some((file.bytes.len(), file.revision))
 }
 
-/// Opens each source once.
-pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotError> {
+/// Opens the machine's own sources once: the global file and, when unconfined, the accounts file.
+fn machine_reads(req: &SnapshotRequest) -> Result<Vec<Result<Src, FileError>>, SnapshotError> {
     let max = Profile::StrictConfig.limits().input_bytes;
     let (parent, dir) = split_global(&req.global_dir)?;
-    let project = |role, root| open_source(role, root, Path::new(".fgos"), max);
-    let mut reads = vec![project("project", &req.project_root)];
-    if req.trusted_root != req.project_root {
-        reads.push(project("project@trusted", &req.trusted_root));
-    }
-    reads.push(open_source("global", parent, dir, max));
+    let mut reads = vec![open_source("global", parent, dir, max)];
     if req.class == SessionClass::Unconfined {
         reads.push(accounts_source(&req.global_dir, max));
     }
+    Ok(reads)
+}
+
+/// The sources of every read that succeeded, or every refusal found; an operating-system error ends it.
+fn collect(reads: Vec<Result<Src, FileError>>) -> Result<Vec<Src>, SnapshotError> {
     let (mut out, mut refused) = (Vec::new(), Vec::new());
     for read in reads {
         match read {
@@ -207,6 +207,23 @@ pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotEr
     }
     fail_if_any(refused)?;
     Ok(out)
+}
+
+/// Opens each source once.
+pub(crate) fn read_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotError> {
+    let max = Profile::StrictConfig.limits().input_bytes;
+    let project = |role, root| open_source(role, root, Path::new(".fgos"), max);
+    let mut reads = vec![project("project", &req.project_root)];
+    if req.trusted_root != req.project_root {
+        reads.push(project("project@trusted", &req.trusted_root));
+    }
+    reads.extend(machine_reads(req)?);
+    collect(reads)
+}
+
+/// The machine's sources alone (no project): what the machine view reads.
+pub(crate) fn machine_sources(req: &SnapshotRequest) -> Result<Vec<Src>, SnapshotError> {
+    collect(machine_reads(req)?)
 }
 
 struct Layer {
@@ -380,9 +397,11 @@ pub(crate) fn build(
             column: found.map(|(_, span)| span.column),
         }
     };
+    // Only the sections a file wrote are validated; the rest is the bundled standard.
+    let written = |name: &str| docs.values().any(|(_, json)| json.get(name).is_some());
     let violations = ctx
         .schemas
-        .validate(&merged.value)
+        .validate_sections(&merged.value, written)
         .map_err(|refusal| SnapshotError::Refused(vec![refusal]))?;
     let mut errors: Vec<ConfigRefusal> = violations
         .into_iter()

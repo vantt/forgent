@@ -38,6 +38,14 @@
  "differences": [
   {
    "path": [
+    "terminal",
+    "layout",
+    "policy"
+   ],
+   "reason": "the standard is terminal-control's default placement policy (even-split, packages/terminal-control/contracts/placement-policy.v1.json); the pinned authoring source predates that and names measured-split"
+  },
+  {
+   "path": [
     "herdrOrchestrator",
     "autoDiscover"
    ],

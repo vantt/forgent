@@ -408,6 +408,7 @@ name = "fgos-node-addon"
 version = "0.2.0"
 dependencies = [
  "fgos-canonical-json",
+ "fgos-config",
  "fgos-durable-file",
  "fgos-event-store",
  "fgos-git",

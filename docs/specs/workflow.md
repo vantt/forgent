@@ -73,6 +73,8 @@ N1 ràng **hai cửa thi hành** (`fgos run`, `fgos workflow start`). Nó **khô
 
 ### 2.1 Tên các phần (N13 — owner 2026-10-19 chọn "Playbook proposer")
 
+> **Thuật ngữ đổi theo D-ADR0073 (owner 2026-10-24):** "guide" trong spec này nay gọi là **workflow** (file định nghĩa); **case** giữ nguyên; danh từ **run** chỉ còn nghĩa một ghế chạy một lần. Bảng dưới giữ chữ cũ tới khi văn bản spec được chuyển cùng đợt nhập spec "mức độ áp pattern"; khi đọc, thay "guide" bằng "workflow".
+
 "Runner" hôm nay chỉ ba thứ khác nhau: vòng frontier của Work (`bin/fgos-runner.mjs`, `src/runner/loop.mjs`), Execution Core cộng dispatch (`src/runner/**`), và bộ lập lịch workflow (`src/workflow/runner.mjs`). Bản thân `src/workflow/runner.mjs` gói năm vai (helper ghế/handoff, vòng DAG, helper khoá, nguồn start, các verb của case). Owner nhận xét đúng.
 
 **Quy ước:** trong từ vựng kiến trúc của spec này, từ *runner* đứng một mình không gọi tên vai trò hay component nào; khi trích dẫn tên cũ phải ghi rõ (Work driver loop / Execution Core / Playbook proposer). Các định danh vật lý đang sống — `bin/fgos-runner.mjs`, `src/runner/**`, `src/workflow/runner.mjs`, hàng khoá `runner`, nhánh cấu hình `runner.*`, `docs/specs/runner.md` — giữ nguyên cho tới một bước L10 riêng được owner duyệt. Chữ "sequencer" bị thu hồi cùng 0049 §4.
@@ -631,6 +633,20 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | R1-relay | panelist 2, 3 | relay ghi lồng về host | owner chọn từ chối; relay là F16 |
 
 ## 17. Lịch sử quyết định
+
+### D-ADR0073 (bộ từ workflow / case / unit / pattern / run) — một chữ cho một tầng; supersede phần thuật ngữ "guide" của D-ADR0070
+
+- **Trạng thái:** **Settled (owner 2026-10-24 12:45, "ok giữ case, chốt bộ từ đi em").**
+- **Bối cảnh:** chữ "pattern" đang gọi cả cơ chế trong code (`solo`, `reviewed`, `panel`, `debate`) lẫn bộ params có tên (`code-change`, `consult`, gọi là preset); chữ "workflow" gọi component, file định nghĩa và một lần chạy; chữ "run" gọi ba tầng (`wf-run-…` là case, `unit-run-…` là unit, `runs/NN` là một ghế chạy một lần, mà Run Supervisor lại gọi là "attempt"); chữ "guide" trùng nghĩa thường ngày (tài liệu hướng dẫn). Owner thấy lẫn trong lúc thiết kế "mức độ áp pattern" ([spec nháp](../../plans/261023-1619-collaboration-degree-spec/spec-draft.md)).
+- **Quyết định:**
+  1. **workflow** = file định nghĩa có phiên bản (thay chữ "guide"); **playbook** = workflow mà mọi điểm rẽ đều listed-routes-only; workflow do conductor lái (ví dụ `coding/feature`) là loại còn lại. "Workflow" (viết hoa) vẫn là tên component.
+  2. **case** = một bản chạy của một workflow, có sổ, mốc, khung, consent, worktree và việc đóng của riêng nó; unit giao vào case phải qua admission của case. Giữ khái niệm vì một workflow chạy nhiều lần đồng thời và unit có thể đứng ngoài case.
+  3. **unit** = một việc giao cho cửa chạy, trong case hoặc đứng một mình.
+  4. **loop** = bốn cơ chế trong code; **pattern** = loop + params mặc định + bất biến + lời hứa (là "preset" hôm nay); **params** = chỉnh cho một lần chạy; **seat** = một vai trong pattern.
+  5. **run** (danh từ) = một ghế chạy một lần; không dùng cho case hay unit. Bỏ chữ "attempt".
+  6. **Lệnh giữ nguyên:** `fgos run` (động từ: chạy một unit, unit có một hoặc nhiều run); `fgos workflow start` mở một case của workflow được gọi tên, `status|answer|resume|close` thao tác trên case.
+- **Hình thức:** đổi tên trong văn bản spec diễn ra khi nhập spec "mức độ áp pattern" vào `workflow.md` và `runner.md`; đổi tên loop/pattern trong code thuộc Phần A của spec đó; đổi id và thư mục (`wf-run-…`→`case-…`, `.fgos/workflow-runs/`→`.fgos/cases/`, `unit-run-…`→`unit-…`, "attempt"→"run" trong Run Supervisor) thuộc backlog `wf-physical-rename`, có migration.
+- **Đảo lại nếu:** một tầng mới xuất hiện mà bộ từ này không gọi tên được mà không dùng một chữ cho hai tầng.
 
 ### D-ADR0070 (workflow guide + admission ledger) — Workflow là guide + ledger admission; agent chọn thứ tự; supersede một phần 0048 §2 và 0049 §4
 

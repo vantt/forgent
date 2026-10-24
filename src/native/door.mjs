@@ -28,6 +28,11 @@ function ownRelease(bin) {
       && fs.realpathSync(path.join(found.releaseRoot, payload)) === fs.realpathSync(OWN_PAYLOAD_ROOT) ? found : null;
   } catch { return null; }
 }
+/** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 2 is
+ * the first with `snapshot` and `init`, so an addon from before them fails by name instead of at its first call. */
+export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
+  && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && typeof v.holderLock === 'number'
+  && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && v.config >= 2;
 /** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation, then
  * `native-addon.json`. `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {
@@ -62,7 +67,7 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
       helperExes.set(addon, resolved);
     }
     const v = addon.versions(); // Enforce the process marker before exposing any crate.
-    if (v.napi !== entry.napiVersion || typeof v.git !== 'string' || typeof v.eventStore !== 'string' || typeof v.process !== 'number' || typeof v.durableFile !== 'string' || typeof v.canonicalJson !== 'number' || typeof v.holderLock !== 'number' || typeof v.sessionIdentity !== 'number' || typeof v.yaml !== 'number') throw unavailable('combined addon ABI mismatch');
+    if (!combinedAbiMatches(v, entry.napiVersion)) throw unavailable('combined addon ABI mismatch');
     loaded = { file, addon };
     return addon;
   } catch (err) {
@@ -74,9 +79,9 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
  * addon it just built), else this payload's own release. A process holds one addon, so a second file is refused anyway. */
 export const nativeDoor = () => own ??= loaded?.addon ?? loadNativeAddon();
 /** The value of a JSON text an addon entry returned. `JSON.parse` defines each key as an own property, so a `__proto__`
- * key stays data; `special` lists `[path, 'nan' | 'inf' | '-inf']` for the floats JSON has no form for. */
-export function fromDoorJson(text, { special = [] } = {}) {
-  let value = JSON.parse(text);
+ * key stays data (and with `nullPrototype` every object has no prototype at all, so a config key can never name one); `special` lists `[path, 'nan' | 'inf' | '-inf']` for the floats JSON has no form for. */
+export function fromDoorJson(text, { special = [], nullPrototype = false } = {}) {
+  let value = JSON.parse(text, nullPrototype ? (_key, node) => (node !== null && typeof node === 'object' && !Array.isArray(node) ? Object.setPrototypeOf(node, null) : node) : undefined);
   for (const [path, word] of special) {
     const restored = word === 'nan' ? NaN : word === 'inf' ? Infinity : -Infinity;
     if (path.length === 0) { value = restored; continue; }

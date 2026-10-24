@@ -4,7 +4,7 @@ Depends on 06. Suggested executor: sonnet. Cap: facade 260 lines (it absorbs D's
 
 ## Context
 
-Spec section 12: one Node facade module replaces `src/config/shared-config-file.mjs` and `global-config.mjs`; it is the only Node code that reads a config file. D's `src/config/machine-config.mjs` [D-ASSUMED: `checkConfig`, `fixConfig`, `readMachineAccounts`, `withMachineAccounts`] is its first half; this phase makes one module of both and deletes the interim `withMachineAccounts` (C16: the unconfined snapshot already carries the accounts layer).
+Spec section 12: one Node facade module replaces `src/config/shared-config-file.mjs` and `global-config.mjs`; it is the only Node code that reads a config file. D-11's client functions (`checkConfig`, `fixConfig`, `readMachineAccounts`; `machine-config.mjs` was never created) is its first half; this phase makes one module of both and deletes the interim `withMachineAccounts` (C16: the unconfined snapshot already carries the accounts layer).
 
 ## Files it may touch
 
@@ -17,7 +17,7 @@ The facade exports a small surface, each function one door call plus marshalling
 - `readConfig({ projectRoot, globalDir, sections, origins })` -> `{ value, revisions, accounts, origins? }`; `readMachineConfig({ globalDir, sections })` (no project); `projectConfigPresent(projectRoot)` (does a `config.yaml`, `config.json` or a tombstone exist; replaces the two `existsSync` calls at `cli.mjs:384,841`; answered by `snapshot`'s revisions, no extra file read in Node).
 - `explainConfigPath(...)`, `applyConfigPatch(...)`, `initConfigFile(...)`, `checkConfig(...)`, `fixConfig(...)`, `readMachineAccounts(...)` (D's, unchanged semantics).
 - **Defaults are computed at call time**: `globalDir` is `path.join(os.homedir(), '.fgos')` on every call (the reason `global-config.mjs:20-29` made it a function: tests override `HOME`), never frozen at import.
-- **Session class** is read from D's marker environment variable here and nowhere else in Node (D11 [D-ASSUMED]); an argument overrides it for callers that already know.
+- **Session class** is read from the marker environment variable `FGOS_CONFINED` here and nowhere else in Node; an argument overrides it for callers that already know.
 - **Define semantics and prototype-free objects (C2):** results come from `fromDoorJson(text, { nullPrototype: true })`; each returned section is a prototype-free object tree, arrays are plain.
 - **Errors:** a door failure becomes `ConfigDoorError` with `.code` (the failure id, e.g. `config-parse`, `config-schema`, `config-key-out-of-scope`, `config-legacy-shadowed`), `.refusals` (`[{ id, file, line, column, path, keyword }]`), and a message of the form `<id> <file>:<line>:<column> <path>` per refusal, never a value. A missing addon is the door's own error and passes through unchanged (no fallback). A helper `isConfigRefusal(err)` serves C7 and C14.
 - Nothing is cached in Node: one call is the cost (spec section 12: about 12 µs plus the digest check).
@@ -45,3 +45,11 @@ Facade shape and error type: `facade.test.mjs`. Everything below it is B/D/05/06
 ## Rollback
 
 Revert: D's `machine-config.mjs` returns with the import lines; nothing else calls the facade yet.
+
+## Landed (2026-10-24, landing B)
+
+- `src/config/facade.mjs` (kernel row in the manifest; imports only `../native/door.mjs`): `readConfig` (needs `projectRoot`, a `TypeError` otherwise so a forgotten root cannot silently become the machine view), `readMachineConfig`, `projectConfigPresent`, `readMachineAccounts`, `checkConfig`, `fixConfig`, `initConfigFile`, `ConfigDoorError`, `isConfigRefusal`, `CONFINED_MARKER_ENV`. **No `explainConfigPath`, `applyConfigPatch`, `withMachineAccounts`, `machine-config.mjs`** (coordinator answer 1, decision C22); nothing imports the facade yet (landing B moves no reader: `rg "config/facade" src bin scripts` finds none).
+- Defaults per call: `globalDir` from `os.homedir()` and the session class from `FGOS_CONFINED=1` are computed in `call`, never at import; an argument overrides both. `undefined` fields are dropped from the request (the addon refuses a `null` list).
+- `isConfigRefusal(err)`: a `ConfigDoorError` whose code is not one of the door's own ids (`config-request-invalid`, `config-io`, `config-trusted-root-unresolved`, `config-internal-error`). This is the test C7 and C14 use; a missing addon (`git-addon-*`) is not a `ConfigDoorError` and passes through unchanged.
+- `projectConfigPresent` answers from the snapshot's `project` revision, so a migration tombstone counts as absent (it is no source); the two `existsSync` calls it replaces in `dispatch/cli.mjs` asked about a legacy file only, phase 11 settles what they should now mean.
+- Lines: facade 72 (cap 260), `facade.test.mjs` 120 (plan 120). The marker is pinned to the launch driver's export in the facade test (the crate's side is pinned by `dispatch-confinement-machine-private.test.mjs`).

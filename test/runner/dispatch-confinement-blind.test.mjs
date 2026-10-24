@@ -101,13 +101,15 @@ function makeProject() {
   const tempRoot = path.join(root, 'confinement-temp');
   const peerHome = write(path.join(tempRoot, 'disp_peer', 'home', 'transcript.txt'), 'PEER-HOME\n');
 
-  // A fixture home with no `.fgos/private`: the driver resolves `{home}` from HOME, so the host's own
-  // machine-private directory can never change what these tests compare.
+  // A fixture home with no `.fgos/private` and an absent Claude socket base: the driver resolves
+  // `{home}` from HOME and `{claudeSocketBase}` from XDG_RUNTIME_DIR, so the host's own
+  // machine-private directories can never change what these tests compare.
   const home = path.join(root, 'home');
+  const claudeSocketBase = path.join(root, 'run-user-absent');
   fs.mkdirSync(home, { recursive: true });
 
   return {
-    root, home, proj, fgosDir, runDir, ownDir, ownBrief, ownRef, peerReport, gateAnswer, repoFile, herdrDir, socket,
+    root, home, claudeSocketBase, proj, fgosDir, runDir, ownDir, ownBrief, ownRef, peerReport, gateAnswer, repoFile, herdrDir, socket,
     tempRoot, peerHome, homeDir: path.join(tempRoot, 'disp_self', 'home'), outbox: path.join(runDir, 'outbox'),
   };
 }
@@ -131,15 +133,21 @@ function requestFor(project, { blind = true, script = 'process.exit(0)', context
   });
 }
 
-/** `os.homedir()` is what the driver resolves `{home}` from; point it at the fixture for one synchronous call. */
+/**
+ * `os.homedir()` and `$XDG_RUNTIME_DIR` are what the driver resolves `{home}` and
+ * `{claudeSocketBase}` from; point them at the fixture for one synchronous call.
+ */
 function withFixtureHome(project, fn) {
-  const previous = process.env.HOME;
+  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR };
   process.env.HOME = project.home;
+  process.env.XDG_RUNTIME_DIR = project.claudeSocketBase;
   try {
     return fn();
   } finally {
-    if (previous === undefined) delete process.env.HOME;
-    else process.env.HOME = previous;
+    for (const [name, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
   }
 }
 

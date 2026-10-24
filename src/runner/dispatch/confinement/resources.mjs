@@ -15,6 +15,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
 import { createRoundTerminalControl, resolveHerdrBin } from '../terminal-slot.mjs';
+import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 
 /**
  * `hostRead: blind` leaves the host readable except what other dispatches and live agent
@@ -33,6 +34,9 @@ export const BLIND_HIDDEN_ROOTS = Object.freeze([
   '{herdrSocketDir}',
   '{confinementTempRoot}',
 ]);
+
+/** The directory Claude Code keeps one control socket per open session in (`<pid>.sock`). */
+export const SESSION_SOCKET_DIR = 'cc-socks';
 
 /**
  * Hidden roots a blind launch creates (mode 0700) when missing instead of skipping them: an
@@ -69,12 +73,51 @@ export function createBlindRootsWhenMissing(fgosDir) {
 /**
  * Host directories that hold per-machine private files and are hidden from EVERY confined
  * dispatch, whatever its `hostRead` (spec section 9.3). `{home}` is the host user's home, not a
- * dispatch's private home. A listed path is a directory: the mask is `--tmpfs`. A path another
- * component owns (Config's accounts and token directory today) enters here as one more entry.
+ * dispatch's private home; `{claudeSocketBase}` is where Claude Code puts its session socket
+ * directory (resolveClaudeSocketBase). A listed path is a directory: the mask is `--tmpfs`. A path
+ * another component owns (Config's accounts and token directory) enters here as one more entry.
+ * A write into a Claude Code session socket starts a turn in that session, so a worker that could
+ * connect there could steer the owner's sessions.
  */
 export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{home}/.fgos/private',
+  `{claudeSocketBase}/${SESSION_SOCKET_DIR}`,
 ]);
+
+const absoluteOrNull = (value) => (typeof value === 'string' && path.isAbsolute(value) ? value : null);
+
+/**
+ * The directory Claude Code creates its session socket directory in, in its own order: the user
+ * runtime directory, else `$CLAUDE_CODE_TMPDIR`, else the temp directory (`TMPDIR`, `TMP`, `TEMP`,
+ * then `/tmp`).
+ */
+export function resolveClaudeSocketBase({ env = process.env } = {}) {
+  return userRuntimeDir({ env })
+    ?? absoluteOrNull(env.CLAUDE_CODE_TMPDIR)
+    ?? absoluteOrNull(env.TMPDIR) ?? absoluteOrNull(env.TMP) ?? absoluteOrNull(env.TEMP) ?? '/tmp';
+}
+
+/**
+ * Creates `<base>/cc-socks` owner-only when it is missing, so it exists, and is masked, before a
+ * worker starts: a directory that appears on the host after launch would be visible to the worker.
+ * Claude Code accepts an existing owner-only directory of its user. Skipped when the base is not a
+ * real directory of this user (Claude Code cannot bind there either); an existing entry is left
+ * exactly as it is, never chmod-ed or chown-ed.
+ */
+export function ensureSessionSocketDir(base, { uid = process.getuid?.() } = {}) {
+  let parent;
+  try {
+    parent = fs.lstatSync(base);
+  } catch {
+    return;
+  }
+  if (!parent.isDirectory() || parent.uid !== uid) return;
+  try {
+    fs.mkdirSync(path.join(base, SESSION_SOCKET_DIR), { mode: 0o700 });
+  } catch {
+    // EEXIST leaves the entry as it is; any other error leaves nothing to mask.
+  }
+}
 
 /** Whether a confinement request asks for `hostRead: blind`, by override or by its policy. */
 export function requestIsBlind(request) {
@@ -275,11 +318,14 @@ export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {}, env = pro
 }
 
 /**
- * The absolute machine-private roots (MACHINE_PRIVATE_ROOTS with `{home}` filled in) that exist
- * on this host. A root that does not exist is skipped: there is nothing to hide.
+ * The absolute machine-private roots (MACHINE_PRIVATE_ROOTS with `{home}` and `{claudeSocketBase}`
+ * filled in) that exist on this host, after creating the session socket directory when it is
+ * missing (ensureSessionSocketDir). A root that does not exist is skipped: there is nothing to hide.
  */
-export function resolveMachinePrivateRoots({ homeDir = os.homedir() } = {}) {
-  return existingDirectories(MACHINE_PRIVATE_ROOTS, { '{home}': path.resolve(homeDir) });
+export function resolveMachinePrivateRoots({ homeDir = os.homedir(), claudeSocketBase = resolveClaudeSocketBase() } = {}) {
+  const base = path.resolve(claudeSocketBase);
+  ensureSessionSocketDir(base);
+  return existingDirectories(MACHINE_PRIVATE_ROOTS, { '{home}': path.resolve(homeDir), '{claudeSocketBase}': base });
 }
 
 /** The templates with their tokens filled in, real-pathed, kept when they are directories, without repeats. */
@@ -315,6 +361,7 @@ export function resolveConfinementResources({
   providerSources = {},
   blind = false,
   homeDir = os.homedir(),
+  claudeSocketBase = resolveClaudeSocketBase(),
 } = {}) {
   if (!dispatchId || typeof dispatchId !== 'string') {
     throw new ConfinementResourceError('confinement-grant-invalid', 'dispatchId is required.');
@@ -503,7 +550,7 @@ export function resolveConfinementResources({
     allocation: 'existing',
     ...extra,
   });
-  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir });
+  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase });
   for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true }));
 
   // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
