@@ -196,7 +196,7 @@ Owner's go at 09:59. Each pane opened as a new tab in the focused herdr workspac
 
 - Mailbox Node suites (score, run, v7, v7e, v7f, wake-probe, confined with the host, auth guard, recorder, agent-hooks): green.
   - Without `FGOS_HOST_BIN`, the 11 confined-launch tests refuse to run, by design.
-- Full `npm test -- --test-concurrency=4` on `3defb0d88`: 8768 tests, 8652 passed, 18 failed. All 18 are the known Git-umask failures (`tsk-42l7rs4htz`): 15 in `fgctl-upgrade`, 2 in `fgctl-init-download-sources`, 1 in `dispatch.test.mjs`. None is in the mailbox. After the fix step, on `cf5f464f6`: 8770 tests, 8654 passed, the same 18 failed.
+- Full `npm test -- --test-concurrency=4` on `3defb0d88`: 8768 tests, 8652 passed, 18 failed. All 18 are the known Git-umask failures (`tsk-42l7rs4htz`): 15 in `fgctl-upgrade`, 2 in `fgctl-init-download-sources`, 1 in `dispatch.test.mjs`. None is in the mailbox. After the fix step, on `cf5f464f6`: 8770 tests, 8654 passed, the same 18 failed. After the probes, the pointer-mode retirement and a merge of main (`9993276f1`): 8788 tests, 8672 passed, the same 18 failed; Rust (`fgos-mailbox-core`, `fgos-mailbox`, `fgos-identity`, `fgos-host-runtime`, `fgos`) 566 passed, 0 failed.
 - No Rust changed; `cargo test` is not rerun.
 - Mutants, applied by hand and each reverted: 18 (harness, first pass), 4 (the scorer fix), 12 (wake probes): all killed. One survivor was fixed by pinning the session count.
 
