@@ -26,8 +26,7 @@ import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run
 import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { ConfigDoorError, readConfig, readMachineConfig } from '../../config/facade.mjs';
+import { ConfigDoorError, readConfig, readStandardValue } from '../../config/facade.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
 import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // EXECUTOR_ADAPTERS lives in ./adapters.mjs (leaf module) so config loading
@@ -158,22 +157,6 @@ function refuseGlobalRigorToTier(origins) {
 const warnedGlobalExtendedCells = new Set();
 
 /**
- * The tier cell the layers below the global one give (the standard's, nothing sits between): the machine view read
- * with a global directory that holds no file. A global cell that wins over the project never has a project cell
- * under it, so this is what the effective value held before the global file was read.
- */
-function valueBelowGlobal(family, tier) {
-  const emptyGlobalParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-no-global-'));
-  try {
-    const { value } = readMachineConfig({ globalDir: path.join(emptyGlobalParent, '.fgos'), class: 'confined', sections: ['runner'] });
-    const cell = value.runner?.modelPolicies?.[family]?.[tier];
-    return cell === undefined ? undefined : JSON.parse(JSON.stringify(cell));
-  } finally {
-    fs.rmSync(emptyGlobalParent, { recursive: true, force: true });
-  }
-}
-
-/**
  * Every fgOS release on the machine reads the global config; an older one fails on a list or an object cell and
  * passes `model@pool` to the CLI as a model id, so these forms belong in a project config until every release reads
  * them. A global cell written that way is dropped from the effective value (in memory, the file is never
@@ -188,9 +171,10 @@ function dropGlobalExtendedTierCells(cfg, origins) {
     const [, family, tier] = cell;
     const tierMap = cfg.modelPolicies?.[family];
     if (!tierMap || !isExtendedTierCell(tierMap[tier])) continue;
-    const below = valueBelowGlobal(family, tier);
-    if (below === undefined) delete tierMap[tier];
-    else tierMap[tier] = below;
+    // The layer below the global one is the standard (the project sits above, accounts and detected hold no cell).
+    const below = readStandardValue(`runner.modelPolicies.${family}.${tier}`);
+    if (below.present) tierMap[tier] = below.value;
+    else delete tierMap[tier];
     const cellName = `modelPolicies.${family}.${tier}`;
     if (warnedGlobalExtendedCells.has(cellName)) continue;
     warnedGlobalExtendedCells.add(cellName);

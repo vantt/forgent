@@ -59,6 +59,9 @@ export const readMachineConfig = (options = {}) => call('snapshot', options);
 /** Whether `projectRoot` has a project config file: a YAML file or a legacy JSON one. A migration tombstone is no source. */
 export const projectConfigPresent = (projectRoot, options = {}) => readConfig({ ...options, projectRoot, sections: [] }).revisions.project !== 'absent';
 
+/** The bundled standard's value at a dotted path (`runner.modelPolicies.claude.advanced`), reading no file: `{ present, value }`. */
+export const readStandardValue = (path) => call('standardValue', { path });
+
 /** The account pools alone, valid with no usable project or global file: `{ present, state, revision, runner }`. */
 export const readMachineAccounts = (options = {}) => call('accounts', options);
 

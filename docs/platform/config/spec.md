@@ -274,6 +274,7 @@ Owner decision 2026-10-22: native door.
 
 - The combined addon gains a `config` namespace (`snapshot`, `explain`, `check`, `applyPatch`), and the `addon.versions()` marker in `src/native/door.mjs` names it in the same change.
 - One Node facade module replaces `src/config/shared-config-file.mjs` and `src/config/global-config.mjs`. Every Node reader moves onto it, including the seven that read `config.json` directly today (`gateway-control.mjs`, `events-compaction.mjs`, `events-jsonl-truncation-guard.mjs`, the two `registrations.mjs` check and fix sites, `dispatch/cli.mjs`, `dispatch/config.mjs`'s explicit-path load). `mergeWithGlobalConfig`, `mergeConfigDefaults` for config, the five `JSON.stringify` writers and the write-on-read in `ensureRunnerConfigForDir` are deleted in the same change (L10).
+- `standardValue(path)` answers the bundled standard's value at a dotted path, reading no file. A section owner that drops a value of a layer (the runner section's global extended tier cells) takes the layer below from it, never from a second snapshot.
 - Section owners keep their own cross-field validation (for example `validateRunnerConfigShape`), run on the snapshot after Config's shape check.
 - An architecture test fails on any read of a config file outside the facade.
 - Node cost per snapshot read: one N-API call (about 12 µs) plus the digest check; a doctor run with about 40 reads costs about 1.4 ms against about 2.4 ms today (spike, G1).
