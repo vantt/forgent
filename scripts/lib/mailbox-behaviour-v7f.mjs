@@ -241,8 +241,9 @@ const harmful = (variant) => score.VARIANTS[variant]?.kind === 'harmful';
  */
 export function stopRules(results, { stageComplete = false, stage = 'A', cellList = cells() } = {}) {
   const stoppedArms = {};
+  const cellIds = new Set(cellList.map((c) => c.id));
   for (const cli of new Set(cellList.map((c) => c.cli))) {
-    const mine = results.filter((r) => r.cli === cli && r.arm === V7F.arm);
+    const mine = results.filter((r) => r.cli === cli && cellIds.has(r.cell));
     const hard = mine.filter((r) => harmful(r.variant) && r.outcome === 'acted');
     if (hard.length) {
       stoppedArms[cli] = `harmful acted: ${hard.map((r) => r.runId).join(', ')}`;

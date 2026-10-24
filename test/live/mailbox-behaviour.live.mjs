@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`; the tightened instruction: `v7j`, `v7k`, `v7l`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -60,6 +60,7 @@ import * as v7f from '../../scripts/lib/mailbox-behaviour-v7f.mjs';
 import * as v7g from '../../scripts/lib/mailbox-behaviour-v7g.mjs';
 import * as v7h from '../../scripts/lib/mailbox-behaviour-v7h.mjs';
 import * as v7i from '../../scripts/lib/mailbox-behaviour-v7i.mjs';
+import * as v7j from '../../scripts/lib/mailbox-behaviour-v7j.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
@@ -221,6 +222,30 @@ const MEASURES = {
     report: ({ results, compares, addendum, stage }) => v7i.report({ results, addendum, stage, compare: Object.fromEntries(['v7e', 'v7h', 'v7c'].map((k) => [k, compares[k] ? runs.readResults(compares[k]) : []])) }),
     sample: 'sample-v7i',
   },
+  // Owner 2A: instruction version 2 on the bare nudge (v7j), the socket frame (v7k) and V6's hook path (v7l).
+  ...Object.fromEntries(Object.entries(v7j.MEASURES).map(([name, m]) => [name, {
+    clis: m.clis,
+    build: m.build,
+    cells: m.cells,
+    baselines: m.baselines,
+    instructionFile: v7j.INSTRUCTION_FILE,
+    measured: (addendum) => ({
+      models: score.MODELS,
+      effort: null,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: m.groupOf,
+      projectConfig: m.projectConfig,
+      ...(m.scoreRun ? { scoreRun: m.scoreRun } : {}),
+      rules: m.rules,
+      phases: m.phases,
+      order: m.order,
+      ...(m.conversation ? { conversation: (cell) => m.conversation(cell, { noMcp: runs.CLAUDE_NO_MCP }) } : {}),
+    }),
+    report: ({ results, addendum, stage }) => m.report({ results, addendum, stage }),
+    sample: `sample-${name}`,
+  }])),
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
 /** Every CLI a pin records: V6's two, and the CLIs of the addendum it runs. */
@@ -442,7 +467,9 @@ function context({ dry, stage = null }) {
   const needle = v7.POINTER_NEEDLE;
   const measured = addendum ? { addendum: addendum.name, ...MEASURE.measured(addendum, needle) } : { effort: V6_CODEX_EFFORT };
   const install = piOmpInstall();
-  const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
+  // An addendum measuring another receiver instruction reads it from its own frozen file.
+  const data = { ...readData(), ...(MEASURE?.instructionFile ? { instruction: fs.readFileSync(path.join(REPO_ROOT, MEASURE.instructionFile), 'utf8') } : {}) };
+  const common = { base, stage, dry, data, masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, natives: install.natives, ...measured };
   // pi's and omp's login: the account's Codex login, read fresh from its omp profile at every
   // start (a scratch one, and the recording endpoint as the provider, for a dry run).
   const pairOfCli = (cli) => addendum?.pairs?.find((p) => p.cli === cli) ?? null;
@@ -856,6 +883,13 @@ const WIRING_V7G = [
   ['B', 'fail', 'error'],
 ];
 
+/** The tightened instruction's wiring runs: per path, a cell, the stand-in's behaviour and the outcome it must give. */
+const WIRING_2A = {
+  v7j: [['LR', 'act', 'acted'], ['LW', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7k: [['LR', 'act', 'acted'], ['LW', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7l: [['LR', 'act', 'acted'], ['LW', 'ignore', 'not-acted'], ['LR', 'fail', 'error']],
+};
+
 async function cmdCheckAddendum() {
   const failures = [];
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
@@ -876,6 +910,7 @@ async function cmdCheckAddendum() {
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7h' ? wiringOfPairs(v7h.PAIRS).map(([p, variant, behaviour, want]) => [[...v7h.baselines(), ...v7h.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
+    : WIRING_2A[ADDENDUM_NAME] ? WIRING_2A[ADDENDUM_NAME].map(([variant, behaviour, want]) => [MEASURE.cells().find((c) => c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7i' ? wiringOfPairs(v7i.PAIRS).map(([p, variant, behaviour, want]) => [[...v7i.baselines(), ...v7i.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
     : ADDENDUM_NAME === 'v7g' ? WIRING_V7G.map(([variant, behaviour, want]) => [v7g.cells().find((c) => c.variant === variant), behaviour, want])
@@ -890,7 +925,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (['v7f', 'v7g', 'v7h', 'v7i'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g', 'v7h', 'v7i', 'v7j', 'v7k', 'v7l'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1564,7 +1599,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7l] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7l] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

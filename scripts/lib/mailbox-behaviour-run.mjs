@@ -529,7 +529,8 @@ export async function runOne(ctx, cell, runId) {
   // A talking run's model, effort and instructions travel off the argv, and a pi or omp run's
   // provider and login are the pair's; the ledger entry records them.
   const launchSettings = talking?.settings ? talking.settings({ instruction })
-    : ext ? { model: ctx.models[cell.cli], provider: ctx.providers?.[cell.cli] ?? confined.ACCOUNT_PROVIDER, thinking: ctx.effort, instructionSha256: crypto.createHash('sha256').update(instruction).digest('hex') } : null;
+    : ext ? { model: ctx.models[cell.cli], provider: ctx.providers?.[cell.cli] ?? confined.ACCOUNT_PROVIDER, thinking: ctx.effort, instructionSha256: crypto.createHash('sha256').update(instruction).digest('hex') }
+      : { model: (ctx.models ?? score.MODELS)[cell.cli], effort: cell.cli === 'codex' ? ctx.effort : 'the CLI default (none passed)', instructionSha256: crypto.createHash('sha256').update(instruction).digest('hex') };
   const settled = confined.settleLoginCopy(prepared, launchSettings ? { launchSettings } : {});
   const output = `${fs.readFileSync(stdoutFile, 'utf8')}\n${fs.readFileSync(stderrFile, 'utf8')}`;
   // pi and omp exit 0 when the provider refuses, and a talking CLI ends its input cleanly; their last turn says so.
