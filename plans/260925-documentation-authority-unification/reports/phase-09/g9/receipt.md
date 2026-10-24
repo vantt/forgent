@@ -1,6 +1,152 @@
-# Gloss polish and sweep hygiene receipt
+# G9 per-record source-binding review
 
-## Current live-check / replay hardening
+## Current park review
+
+Turn-start pin: **`0763c2259ee3bf1801f4dc9621cbfa7955a156b6`**, resolved with
+`git rev-parse HEAD` before reading the records. This is a check pin, **not final
+pin F**. The older receipts below are historical, not current completion claims.
+
+Reviewed all **338 formerly owned parks**, each against its complete physical
+record, bound source passage and current pinned passage. No path/category rule
+supplies the new verdicts: [park-decisions.json](park-decisions.json) names every
+record separately, its record/evidence hashes, one disposition and a specific
+changed-byte explanation. Revisions remain separate. The other **236 records**
+keep their dispositions. Scope remains **574 physical records / 684 cohort
+memberships**, not pair accounting.
+
+### Before and after
+
+| Disposition | All records before | All records after | Former parks after |
+| --- | ---: | ---: | ---: |
+| still-valid-as-recorded | 229 | 517 | 288 |
+| needs-recomposition | 7 | 20 | 13 |
+| superseded-or-retired | 0 | 32 | 32 |
+| owned-park | 338 | 5 | 5 |
+| **Total** | **574** | **574** | **338** |
+
+The [before sweep](parks-before-check.json) passed at the same pin. Current
+locators, passage digests and full record digests remain on **every** judgment
+in [judgments.json](judgments.json), joined to [passages.json](passages.json).
+The review reads **14,922 passage occurrences** for the formerly parked rows;
+[park-review-evidence.json](park-review-evidence.json) retains **4,112 distinct
+complete changed/absent deltas**, including large whole-file dependencies, and
+hashes of the exact cited record items. Unchanged/moved witnesses reuse the
+existing evidence instead of duplicating their text. An absent file has no
+invented current line: its pinned-tree absence, deletion/rename record and
+actual successor evidence are explicit.
+
+### Shared causes, separately bound rows
+
+Each group has one explanation in `park-decisions.json.groups`; each member
+still has its own reason, disposition and evidence.
+
+| Group | Rows | Judgment and common cause |
+| --- | ---: | --- |
+| doc-navigation | 16 | Check rosters, manifest membership and safety wording changed, not the identity/role of the preserved navigation. |
+| config-fixture | 65 | `writeProjectConfig`/global/raw helpers and the Seat Binding schema change runtime config fixtures, not maintained documentation roots. |
+| git-infrastructure | 67 | Inspect/Worktree/Land and fixture doors replace raw Git topology, checkout, release and hook plumbing; unchanged document operands remain separately witnessed. |
+| process-lock-identity | 78 | Native Process/Identity/lock/durable primitives replace local implementations; their tuples, runtime files, sockets and messages remain non-document operations. |
+| seat-workflow | 40 | Explicit seats, pools/tiers and case admission replace role/rigor-derived plumbing; execution outputs and workflow/persona definitions remain runtime data. |
+| source-contract-data | 22 | Cargo coordinates, protocol vectors, YAML parsing and code metrics are code/runtime contract inputs, not documentation authority. |
+| current-body | 13 | Use a guarded current-byte body, not a stale preservation premise or hunk. |
+| retired-consumer | 32 | A named later deletion/rename, accounting record or composition retirement action owns the historical consumer. |
+| external-input | 5 | The missing input is a particular owner-selected backlog claim or persisted Work/knowledge export, not a request for a generic reviewer. |
+
+The **32 supersessions** name exact later records and pointers: 23 records for
+22 distinct deleted/renamed source/test paths, the two removed approval history
+comments (one record), the
+exception-accounting successor, four reading-map revisions and three distribution
+edge revisions. Reading-map retirement points to
+`composition/actions.json#/actions/3` and the detailed `docs/reading-map.md`
+section 5; distribution edge revisions point to the explicit `retiresWithTree`
+record at `phase-08/step-03-records/batch-040.jsonl:4`. These are record
+supersessions, **not** claims that still-present source trees have already been
+deleted or promoted. The original distribution retirement record stays valid.
+Deletion and rename commits, before/after hashes and current absence are verified;
+Identity's real provider successor is read, not invented.
+
+### Recomposition
+
+Twelve former parks reuse their existing selected G9 bodies. One new body is
+prepared for `packages/distribution/rust/src/workspace.rs`: its module comment
+still cited `docs/specs/distribution.md:297`, while the implementation already uses
+`GitDriver::open_at`/`trusted_main_root`. The comment-only patch names the current
+`activation-binding.md` **Git Common Directory Discovery** contract, retaining
+main-checkout versus linked-worktree semantics. No executable Rust byte changes.
+The target contract is separately line/hash-bound in that row's additional evidence.
+
+[park-supplemental-specs.json](park-supplemental-specs.json) feeds the **existing**
+`spec_chains` → `recompose` → sweep/verify door; it does not create another patch
+application mechanism. [recomposed.json](recomposed.json) now has **546 bodies**.
+All original **545 before/after hashes and diffs are unchanged**;
+[final audit](park-final-audit.json) compares them against the turn-start packet.
+Every body is
+forward/rollback byte-exact under `patch --batch --fuzz=0 --reject-file=- -p1`;
+recomposition made **1,518 patch calls**, all exit 0. Fifteen historical chain
+inputs still use the existing exact authored-edit relocation; none is an unresolved
+preimage problem. No prepared body was applied to the source checkout.
+
+### Every remaining owned park
+
+All paths below are relative to the plan's `reports/` directory. Each is also
+an exact full-path id in `judgments.json` and `park-decisions.json`.
+
+| Record | Named owner | Missing input and concrete next action |
+| --- | --- | --- |
+| `phase-08/step-03-records/batch-126.jsonl:2` (`docs/backlog.md`) | Backlog owner / documentation-unification plan owner | STR70a still asserts the old `work-state.md:647-675` decision/outcome precedent and STR62 the old `:864` parent/deps/blocks/sibling model. Choose the intended current replacement claims through the owning backlog writer, reconcile them with WORK, replace the measured citations and regenerate the projection. Retire the removed js-yaml advisory binding; return the writer inputs and exact resulting row identities. |
+| `phase-08/step-05-records/generators-skills-and-support.jsonl:66` (`docs/backlog.md`) | Backlog owner / documentation-unification plan owner | The later registry/support record inherits the same STR70a claim; it cannot infer a new product intention from a changed line number. Carry the same authoritative backlog correction into this separate revision and show its resulting source binding; the js-yaml advisory is gone. |
+| `phase-08/step-05-records/generators-skills-and-support.jsonl:200` (`scripts/knowledge-migration.mjs`) | Knowledge registry owner / documentation-unification plan owner | Export folded topics/docs and the authorized inventory rows (`topicId`, `role`, `purposeSlug`, `oldPath`, `currentPath`). Join each document to exactly one source/target identity, then re-review the 22 registry-dependent operations before any move. ScopedCommit replacing raw staging does not supply those missing persisted values. |
+| `phase-08/step-05-records/runtime-judgment-part-27.jsonl:35` (`src/runner/loop.mjs`) | **WORK lane owner** | Export the claimed ready-validation candidates, their `docsRef`, actual content roots and `plan.md` bytes. Bind each plan and compare READY/non-READY verdicts before/after its move, proving non-READY does not mutate Work. The changed branch-settlement code supplies none of these inputs. |
+| `phase-08/step-05-records/runtime-judgment-part-27.jsonl:39` (`src/runner/operation-choice.mjs`) | **WORK lane owner** | Export the selected item/stage/content root for **each** operation-specific plan lookup, including the final branch. Bind those plans independently and compare eligibility/selected operation before/after moving them; the earlier planner branch cannot stand in for the final branch. |
+
+**needsWrites:** `docs/backlog.md`, for the two named backlog rows/revisions
+above, through its owning writer. It was **not edited**. No `.fgos/`, registry
+or secret data was inspected or requested as a new write grant. The three other
+parks need authorized read exports, not guessed paths or code edits.
+
+### Reproduce and verify
+
+Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9` and
+`P=0763c2259ee3bf1801f4dc9621cbfa7955a156b6`.
+
+| Actual command, in order | Exit |
+| --- | ---: |
+| `python3 -B "$G/review-parks.py" --pin "$P"` | 0 |
+| `python3 -B "$G/recompose.py" --pin "$P"` | 0 |
+| `python3 -B "$G/judge.py" --pin "$P"` | 0 |
+| `python3 -B "$G/sweep.py" --check --pin "$P"` | 0 |
+| `python3 -B "$G/verify.py" --pin "$P"` | 0 |
+| `git diff --check` | 0 |
+
+Exact argv/exits/output hashes: [park-check-commands.json](park-check-commands.json).
+The [current sweep](park-sweep-check.json) has zero drift, chain mismatches,
+body replay mismatches or judgment errors. [Verification](park-verify-run.json)
+preserves all four original controls, 10 pure-pin checks and 12 patch-id
+equivalences, and authenticates all reviewed source deltas and successor records.
+The owning validator also rejects missing exact dependency reviews, missing
+supersession records and missing concrete park inputs. The old blanket
+changed-dependency rejection is replaced by an exact **record + complete evidence
+hash + authored per-row decision + dependency locator/digest** requirement;
+source drift still reopens that row. No failure is waived by a flag or test branch.
+
+Scratch uses only the existing unique `tempfile` workspaces below
+`/tmp/fgos-work/`; the final sequence leaves **no new residue** and never removes
+the shared base. [Scratch proof](park-scratch-proof.json).
+
+Prior art reused: G9 source extraction/digest joins, exact hunk relocation,
+existing chain/replay door, GNU patch, named composition retirement actions and
+actual Git removal/rename history. **impact-analysis: degraded**: fgOS CLI is
+explicitly forbidden and this session has no impact-analysis MCP tool; local
+callers are the G9 judge, sweep and verify only. No product/runtime contract,
+component boundary, law, test suite or install configuration changes. No Git
+writes, fgOS CLI/lifecycle calls, suites, live docs, ledgers, composition files,
+state, secrets or authority promotion. No preview service was started under the
+exact write grant. Independent semantic acceptance, final F and cutover remain
+outside this author review.
+
+## Historical gloss-polish receipt
+
+### Earlier live-check / replay hardening
 
 Check HEAD: **`8b4d778d32b5930ab7c80d9d19b2f26b95441ee1`**, not final pin F.
 The complete [reproduction](w13-reproduction.json) exits **0**. The existing

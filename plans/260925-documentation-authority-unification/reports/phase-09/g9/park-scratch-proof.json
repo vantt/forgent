@@ -1,0 +1,7 @@
+{
+  "base": "/tmp/fgos-work",
+  "policy": "Unique tempfile directories owned and removed by existing recompose.workspace; shared base untouched.",
+  "beforeEntries": [],
+  "afterEntries": [],
+  "newResidues": []
+}

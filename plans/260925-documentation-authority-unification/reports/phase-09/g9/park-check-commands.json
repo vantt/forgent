@@ -1,0 +1,68 @@
+[
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/review-parks.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "72d2b1a41bd8141f9ba3042607bf7d67a6fac1f7d83ab701d6539525a22032d2",
+    "stderr": "",
+    "output": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-run.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "af4168bc7c2403798508f5b0f42d4fa74c1e766993f86237d8aac3c325b33f44",
+    "stderr": "",
+    "output": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-recompose-run.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "39ec290d9aa1a77109e50d95521883ce8540e7c18c810330d353a4c7a955e17c",
+    "stderr": "",
+    "output": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-judge-run.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+      "--check",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "7de1c4ed88dbf90e0e2182b3abdc998e23c7065128b4d86435d3b4eed269c680",
+    "stderr": "",
+    "output": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-sweep-check.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "e8ddc2cd0da3b9fc30f39cb14d4c0d667d1910756e88fbd510f0039bb9af442b",
+    "stderr": "",
+    "output": "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-verify-run.json"
+  }
+]

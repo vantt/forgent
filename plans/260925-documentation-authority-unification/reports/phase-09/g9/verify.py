@@ -2,6 +2,7 @@
 """Replay G9 current-byte bodies and evidence joins; no product/test execution."""
 import argparse
 import copy
+import difflib
 import importlib.util
 import json
 from pathlib import Path
@@ -14,6 +15,105 @@ sp = importlib.util.spec_from_file_location('g9_recompose', HERE / 'recompose.py
 recompose = importlib.util.module_from_spec(sp)
 sp.loader.exec_module(recompose)
 sweep = recompose.sweep
+
+
+def verify_park_reviews(pin, rows, commands):
+    """Own proof for the explicit reviews: complete deltas and named successors."""
+    packet = sweep.load(HERE / 'park-decisions.json')
+    evidence = sweep.load(HERE / 'park-review-evidence.json')
+    decisions = {r['id']: r for r in packet['rows']}
+    reviews = {r['id']: r for r in evidence['rows']}
+    assert len(decisions) == len(packet['rows']) == 338
+    assert set(decisions) == set(reviews)
+    originals, _ = sweep.scope()
+    for row in rows:
+        if row['id'] not in decisions:
+            continue
+        decision = decisions[row['id']]
+        review = reviews[row['id']]
+        assert decision['group'] in packet['groups']
+        assert review['recordSha256'] == row['recordSha256'] == decision['recordSha256']
+        assert review['evidenceSha256'] == sweep.evidence_digest(row['passages']) == decision['evidenceSha256']
+        entry = originals[row['id']]
+        bound = sweep.bound_passages(entry)
+        assert review['passagesRead'] == len(row['passages']) == len(bound)
+        changed = [(old, now) for old, now in zip(bound, row['passages'])
+                   if now['classification'] in ('changed', 'absent')]
+        assert len(review['passages']) == len(changed)
+        claims = {str(i.get('id') or i.get('referenceId') or i.get('edgeId')): i
+                  for field in ['edges', 'references', 'dynamicTraces', 'authorAddedReferences']
+                  for i in entry['record'].get(field, [])}
+        for (old, now), join in zip(changed, review['passages']):
+            assert join['passageId'] == now['passageId']
+            assert join['recordedDisposition'] == now.get('recordedDisposition')
+            claim = claims.get(str(now['passageId']).split('/caller')[0], {})
+            assert join['claimSha256'] == sweep.sha(json.dumps(claim, sort_keys=True, ensure_ascii=False))
+            delta = evidence['deltas'][join['deltaRef'].split('#', 1)[1]]
+            for key in ['path', 'currentPath', 'oldStartLine', 'oldEndLine', 'startLine', 'endLine',
+                        'boundSha256', 'currentSha256', 'currentFileSha256', 'classification', 'locator']:
+                assert delta[key] == now.get(key), (row['id'], key)
+            after = now.get('currentText')
+            if after is None and now.get('currentReadCommand'):
+                raw = sweep.blob(pin, now['currentPath']).decode()
+                after = ''.join(raw.splitlines(True)[now['startLine'] - 1:now['endLine']])
+            assert sweep.sha(old['text']) == now['boundSha256']
+            assert (sweep.sha(after) if after is not None else None) == now['currentSha256']
+            expected = ''.join(difflib.unified_diff(old['text'].splitlines(True),
+                               (after or '').splitlines(True), fromfile='bound', tofile='current'))
+            assert delta['diff'] == expected, row['id']
+        for key in ['additionalEvidence', 'successorEvidence']:
+            if key in decision:
+                site = decision[key]
+                data = sweep.blob(pin, site['path'])
+                text = b''.join(data.splitlines(True)[site['startLine'] - 1:site['endLine']])
+                assert sweep.sha(text) == site['sha256']
+        if decision['disposition'] != 'superseded-or-retired':
+            continue
+        successor = decision['supersedingRecord']
+        path = successor['path']
+        if successor['kind'] == 'git-change':
+            commit = successor['commit']
+            argv = ['git', '--no-optional-locks', 'merge-base', '--is-ancestor', commit, pin]
+            cp = subprocess.run(argv, cwd=sweep.ROOT, capture_output=True)
+            commands.append({'argv': argv, 'exit': cp.returncode})
+            assert cp.returncode == 0
+            assert sweep.sha(sweep.blob(commit + '^', path)) == successor['beforeSha256']
+            after = sweep.blob(commit, path)
+            assert (sweep.sha(after) if after is not None else None) == successor['afterSha256']
+            assert sweep.sha(sweep.git('diff', commit + '^', commit, '--', path)) == successor['gitDiffSha256']
+            if successor['afterSha256'] is None:
+                assert sweep.blob(pin, path) is None
+        elif successor['kind'] == 'jsonl-record':
+            line = sweep.blob(pin, path).decode().splitlines()[successor['line'] - 1]
+            assert sweep.sha(line) == successor['sha256']
+            assert json.loads(line)[successor['requiredField']] is True
+        else:
+            assert successor['kind'] == 'json-pointer'
+            data = sweep.blob(pin, path)
+            assert sweep.sha(data) == successor['sha256']
+            value = json.loads(data)
+            for part in successor['pointer'].strip('/').split('/'):
+                value = value[int(part)] if isinstance(value, list) else value[part]
+            assert value == successor['expected']
+    # Exercise the real owning validator against falsified author output.
+    judgments = sweep.load(HERE / 'judgments.json')
+    original_load = sweep.load
+    for field, disposition in [('reviewedDependencies', 'still-valid-as-recorded'),
+                                ('supersedingRecord', 'superseded-or-retired'),
+                                ('missingInput', 'owned-park')]:
+        altered = copy.deepcopy(judgments)
+        target = next(j for j in altered['rows'] if j.get('reviewRef') and
+                      j['disposition'] == disposition and field in j)
+        target.pop(field)
+        try:
+            sweep.load = lambda path: altered if path == HERE / 'judgments.json' else original_load(path)
+            assert any(e['id'] == target['id'] for e in sweep.judgment_errors(rows)), field
+        finally:
+            sweep.load = original_load
+    return {'reviewedRows': len(decisions), 'distinctFullDeltas': len(evidence['deltas']),
+            'negativeControls': ['missing exact dependency review rejected',
+                                 'missing named superseding record rejected',
+                                 'missing concrete park input rejected']}
 
 
 def main():
@@ -72,14 +172,20 @@ def main():
     for judgment in judgments:
         row = byid[judgment['id']]
         if judgment['disposition'] == 'still-valid-as-recorded':
-            assert not any(p['passageId'] in ('explicit-overlap-dependency', 'canonical-source-dependency')
-                           and p['classification'] in ('changed', 'absent') for p in row['passages']), row['id']
+            changed_dependencies = [{'path': p['currentPath'], 'passageId': p['passageId'],
+                                     'currentSha256': p['currentSha256']} for p in row['passages']
+                                    if p['passageId'] in ('explicit-overlap-dependency', 'canonical-source-dependency')
+                                    and p['classification'] in ('changed', 'absent')]
+            if changed_dependencies:
+                assert judgment.get('reviewRef'), row['id']
+                assert judgment.get('reviewedDependencies') == changed_dependencies, row['id']
         for actual, witness in zip(row['passages'], judgment['evidence']):
             body = {k: v for k, v in actual.items() if k not in ['passageId', 'recordedDisposition']}
             stored = bodies[witness['evidenceRef'].split('#', 1)[1]]
             # Retrieval commit can differ when source bytes are unchanged.
             assert {k: v for k, v in body.items() if k != 'currentReadCommand'} == {
                 k: v for k, v in stored.items() if k != 'currentReadCommand'}
+    park_reviews = verify_park_reviews(pin, rows, commands)
     # Negative controls mutate evidence in memory, never source/record files.
     changed = copy.deepcopy(rows[0])
     changed['passages'][0]['currentSha256'] = '0' * 64
@@ -151,7 +257,7 @@ def main():
     result = {'pin': pin, 'status': 'pass', 'uniqueRecords': len(rows),
               'cohortMemberships': sum(cohorts.values()), 'effectiveFiles': len(files),
               'roundtripFiles': files, 'purePinFieldsVerified': pure_repins,
-              'patchIdEquivalencesVerified': len(twins),
+              'patchIdEquivalencesVerified': len(twins), 'parkReviews': park_reviews,
               'negativeControls': ['changed passage digest rejects judgment', 'missing row rejects judgment',
                                    'changed record body rejects judgment',
                                    'same source bytes at another commit retain their content-bound judgment'],

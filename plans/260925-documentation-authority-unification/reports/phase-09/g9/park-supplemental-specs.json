@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "patches": [
+    {
+      "id": "park-review:workspace-root-citation",
+      "path": "packages/distribution/rust/src/workspace.rs",
+      "beforeSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+      "expectedAfterSha256": "0403e75c4515224d10470129e7a1363896bf36d67fba9df6fb2e4c2bb9250dc2",
+      "diff": "--- a/packages/distribution/rust/src/workspace.rs\n+++ b/packages/distribution/rust/src/workspace.rs\n@@ -1,6 +1,8 @@\n //! Workspace root, workspaceId, and workStateId resolution.\n //!\n-//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the\n+//! Follows the Git Common Directory Discovery contract in\n+//! `docs/platform/packaging-distribution/contracts/activation-binding.md`\n+//! (under Init Pipeline And Root Binding) for workspace root discovery: the\n //! main checkout of the repository holding the start directory, as the Git\n //! component resolves it (never the linked worktree's own top level).\n //!\n",
+      "rollbackDiff": "--- a/packages/distribution/rust/src/workspace.rs\n+++ b/packages/distribution/rust/src/workspace.rs\n@@ -1,8 +1,6 @@\n //! Workspace root, workspaceId, and workStateId resolution.\n //!\n-//! Follows the Git Common Directory Discovery contract in\n-//! `docs/platform/packaging-distribution/contracts/activation-binding.md`\n-//! (under Init Pipeline And Root Binding) for workspace root discovery: the\n+//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the\n //! main checkout of the repository holding the start directory, as the Git\n //! component resolves it (never the linked worktree's own top level).\n //!\n",
+      "roundtrip": {
+        "command": "patch --batch --fuzz=0 --reject-file=- -p1",
+        "forwardExit": 0,
+        "rollbackExit": 0,
+        "exactBytes": true,
+        "beforeEveryInvocationHashGuard": true,
+        "creationAbsenceGuard": false
+      },
+      "purpose": "Comment-only current source citation; no executable Rust bytes change.",
+      "independentAcceptance": false
+    }
+  ]
+}
