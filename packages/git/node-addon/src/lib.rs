@@ -38,7 +38,7 @@ pub fn versions() -> Result<Value> {
                 "addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts,
                 "process": process::contract_version().map_err(|e| e.to_string())?,
                 // The crates carry the workspace version; the canonical vectors are the `canonical.v1` file.
-                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 1, "sessionIdentity": 1, "yaml": 1, "config": 1,
+                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 1, "sessionIdentity": 1, "yaml": 1, "config": 2,
             }))
         })
         .clone()

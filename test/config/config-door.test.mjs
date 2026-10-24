@@ -8,7 +8,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 // The door resolves the main checkout through a Git driver that keeps its directories under the state root.
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-door-state-'));
@@ -31,8 +33,9 @@ const mode = (file) => (fs.statSync(file).mode & 0o777).toString(8);
 
 test('the addon marker names the config namespace at the version this payload calls', () => {
   const v = nativeDoor().versions();
-  assert.equal(v.config, 1);
+  assert.equal(v.config, 2);
   assert.equal(combinedAbiMatches(v, v.napi), true);
+  assert.equal(combinedAbiMatches({ ...v, config: 1 }, v.napi), false, 'an addon before snapshot and init');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
 });
 
@@ -82,4 +85,76 @@ test('fix creates the machine files once as the repair a check offered and refus
   assert.deepEqual([mode(path.join(d.global, 'private')), mode(path.join(d.global, 'private/gateway-token'))], ['700', '600']);
   assert.deepEqual(call('fix', args).changed, [], 'a second run changes nothing');
   assert.equal(refusal('fix', { ...args, class: 'confined' }).id, 'config-write-confined');
+});
+
+test('snapshot is the standard under a project value, narrowed to the sections asked for, with where each came from', () => {
+  const d = dirs('snapshot');
+  lay(path.join(d.project, '.fgos/config.yaml'), '# @fgos:v1\nrunner:\n  timeoutMs: 120000\n');
+  const all = call('snapshot', { projectRoot: d.project, globalDir: d.global, class: 'unconfined' });
+  assert.equal(all.value.runner.timeoutMs, 120000);
+  assert.equal(all.value.gateBypass.level, 'off', 'a key no file sets is the standard');
+  assert.equal(all.accounts, 'present');
+  assert.equal(all.revisions.project.length, 64);
+  assert.equal(Object.getPrototypeOf(all.value.runner), null);
+  const part = call('snapshot', { projectRoot: d.project, globalDir: d.global, class: 'unconfined', sections: ['gateBypass'], origins: ['runner.timeoutMs'] });
+  assert.deepEqual(Object.keys(part.value), ['gateBypass']);
+  const [origin] = part.origins;
+  assert.deepEqual([origin.path, origin.layer, origin.line], ['runner.timeoutMs', 'project', 3]);
+  assert.equal(origin.file.endsWith('config.yaml'), true);
+});
+
+test('snapshot without a project root is the machine view and a confined session has no accounts layer', () => {
+  const d = dirs('machine');
+  lay(path.join(d.project, '.fgos/config.yaml'), 'gateway:\n  port: 1\n');
+  lay(path.join(d.global, 'config.yaml'), 'gateway:\n  port: 5555\n');
+  const machine = call('snapshot', { globalDir: d.global, class: 'unconfined', sections: ['gateway'] });
+  assert.equal(machine.value.gateway.port, 5555, 'the project file beside it is never read');
+  assert.equal('project' in machine.revisions, false);
+  fs.rmSync(path.join(d.project, '.fgos/config.yaml'));
+  const confined = call('snapshot', { projectRoot: d.project, globalDir: d.global, class: 'confined', sections: [] }).accounts;
+  assert.equal(confined, 'unavailable-confined');
+});
+
+test('a linked worktree takes command values from the main checkout and a plain directory is its own root', () => {
+  const d = dirs('trusted');
+  const main = path.join(d.root, 'main');
+  fs.mkdirSync(main);
+  initFixtureRepo(main);
+  lay(path.join(main, '.fgos/config.yaml'), '# @fgos:v1\ninvariantChecks:\n  commands: [trusted-check]\n');
+  const linked = path.join(d.root, 'linked');
+  execFileSync('git', ['worktree', 'add', '-q', linked, '-b', 'linked'], { cwd: main });
+  lay(path.join(linked, '.fgos/config.yaml'), '# @fgos:v1\ninvariantChecks:\n  commands: [planted-check]\n');
+  const read = (project) => call('snapshot', { projectRoot: project, globalDir: d.global, class: 'unconfined', sections: ['invariantChecks'] }).value.invariantChecks.commands;
+  assert.deepEqual(read(linked), ['trusted-check']);
+  assert.deepEqual(read(linked), ['trusted-check'], 'the memoised root answers the same');
+  assert.deepEqual(read(main), ['trusted-check']);
+  lay(path.join(d.project, '.fgos/config.yaml'), '# @fgos:v1\ninvariantChecks:\n  commands: [own-check]\n');
+  assert.deepEqual(read(d.project), ['own-check']);
+});
+
+test('snapshot refuses by failure id, listing every refusal with its position and no value', () => {
+  const d = dirs('refused');
+  lay(path.join(d.project, '.fgos/config.yaml'), `gateway:\n  port: ${SECRET}\n  bind: ${SECRET}\n`);
+  const failure = refusal('snapshot', { projectRoot: d.project, globalDir: d.global, class: 'unconfined' });
+  assert.equal(failure.id, failure.refusals[0].id);
+  assert.deepEqual(failure.refusals.map((r) => [r.id, r.path, r.line]), [['config-key-out-of-scope', 'gateway.bind', 3], ['config-key-out-of-scope', 'gateway.port', 2]]);
+  assert.equal(failure.refusals.every((r) => r.file.endsWith('config.yaml')), true);
+  assert.equal(JSON.stringify(failure).includes(SECRET), false);
+  assert.equal(refusal('snapshot', { globalDir: d.global, class: 'maybe' }).id, 'config-request-invalid');
+  assert.equal(refusal('snapshot', { globalDir: 'relative', class: 'unconfined' }).keyword, 'globalDir');
+  assert.equal(refusal('snapshot', { globalDir: d.global, class: 'unconfined', surprise: 1 }).id, 'config-request-invalid');
+});
+
+test('init creates the header-only file once and keeps an existing file', () => {
+  const d = dirs('init');
+  const args = { projectRoot: d.project, globalDir: d.global, class: 'unconfined', target: 'project' };
+  const made = call('init', args);
+  assert.equal(made.created, true);
+  const text = fs.readFileSync(path.join(d.project, '.fgos/config.yaml'), 'utf8');
+  assert.match(text, /^# @fgos:v1\n/);
+  assert.equal(text.split('\n').every((line) => line === '' || line.startsWith('#')), true);
+  assert.deepEqual({ ...call('init', args) }, { created: false, revision: made.revision });
+  assert.equal(call('init', { globalDir: d.global, class: 'unconfined', target: 'global' }).created, true);
+  assert.equal(refusal('init', { ...args, class: 'confined' }).id, 'config-write-confined');
+  assert.equal(refusal('init', { ...args, target: 'accounts' }).keyword, 'target');
 });

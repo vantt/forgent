@@ -7,15 +7,18 @@
 //! `config-request-invalid` (the request breaks the entry's contract; the keyword names the field),
 //! `config-trusted-root-unresolved` (the main checkout could not be established; the keyword is the cause)
 //! and `config-internal-error` (a panic, caught at the boundary, nothing printed).
+use std::ffi::OsString;
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Mutex, PoisonError};
 
+use fgos_config::cache::{snapshot_cached, SnapshotCache};
 use fgos_config::detect::{Detectors, NoDetectors, PathDetectors};
 use fgos_config::machine::{self, accounts};
-use fgos_config::snapshot::{AccountsState, Context, SessionClass};
+use fgos_config::snapshot::{AccountsState, Context, SessionClass, Snapshot};
 use fgos_config::snapshot::{SnapshotError, SnapshotRequest};
 use fgos_config::ConfigRefusal;
 use fgos_git::{GitDriver, ResolveRepo};
+use fgos_yaml_doc::path::{format_path, parse_path};
 use napi::Result;
 use napi_derive::napi;
 use serde::Deserialize;
@@ -28,6 +31,8 @@ type Res<T> = std::result::Result<T, Failure>;
 
 /// Main checkouts the door remembers, one per project root.
 const MEMO_SLOTS: usize = 16;
+/// Snapshots the door keeps; each is validated against its files on every read, so a hit is never stale.
+const CACHE_SLOTS: usize = 8;
 
 /// Every field an entry may take; an entry reads what it needs and an unknown field is refused.
 #[derive(Default, Deserialize)]
@@ -36,9 +41,12 @@ struct Request {
     global_dir: String,
     class: String,
     project_root: Option<String>,
+    sections: Option<Vec<String>>,
+    origins: Vec<String>,
     rows: Vec<String>,
     ids: Vec<String>,
     acknowledge: bool,
+    target: Option<String>,
 }
 
 fn detailed(id: &str, more: More) -> Failure {
@@ -224,6 +232,80 @@ fn entry(args: Value, run: impl FnOnce(Request) -> Res<Value>) -> Result<String>
     })?)
 }
 
+/// The snapshot as the door reports it: the value (only `sections` when named), where each requested path
+/// came from, the revision of each source, whether accounts were readable, and the notices.
+fn render(snapshot: &Snapshot, a: &Request) -> Res<Value> {
+    let value = match (&snapshot.value, &a.sections) {
+        (Value::Object(map), Some(keep)) => map
+            .iter()
+            .filter(|(k, _)| keep.contains(k))
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect(),
+        (value, _) => value.clone(),
+    };
+    let mut out = json!({
+        "value": value, "revisions": snapshot.revisions, "accounts": accounts_name(snapshot.accounts),
+        "notices": snapshot.notices.iter().map(|(id, path)| json!({"id": id, "path": path})).collect::<Vec<_>>(),
+    });
+    let wanted = a
+        .origins
+        .iter()
+        .map(|t| parse_path(t).map_err(|_| invalid("origins")))
+        .collect::<Res<Vec<_>>>()?;
+    if !wanted.is_empty() {
+        let found = snapshot
+            .origins
+            .iter()
+            .filter(|o| wanted.iter().any(|p| o.path.starts_with(p)));
+        out["origins"] = found
+            .map(|o| {
+                let p = &o.provenance;
+                json!({ "path": format_path(&o.path), "layer": p.layer, "role": p.role, "file": p.file, "line": p.line, "column": p.column, "described": o.described })
+            })
+            .collect();
+    }
+    Ok(out)
+}
+
+type Slot = ((SnapshotRequest, Option<OsString>), SnapshotCache);
+
+/// The snapshot of `req` through the door's cache, the least recently used slot out first. A slot is keyed by
+/// the request and the `PATH` that decides a detected value.
+fn cached(req: &SnapshotRequest, path: Option<OsString>, ctx: &Context, a: &Request) -> Res<Value> {
+    static CACHE: Mutex<Vec<Slot>> = Mutex::new(Vec::new());
+    let mut slots = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
+    let key = (req.clone(), path);
+    let slot = match slots.iter().position(|(held, _)| *held == key) {
+        Some(at) => slots.remove(at),
+        None => (key, SnapshotCache::default()),
+    };
+    slots.push(slot);
+    if slots.len() > CACHE_SLOTS {
+        slots.remove(0);
+    }
+    let (_, cache) = slots.last_mut().ok_or_else(|| invalid("cache"))?;
+    render(snapshot_cached(cache, ctx, req).map_err(Failure::from)?, a)
+}
+
+/// The effective value now. With a project root: project over global over standard (accounts when
+/// unconfined, `command` values from the main checkout). Without: the machine view, which never reads a
+/// project. `{ projectRoot?, globalDir, class, sections?, origins? }`.
+#[napi(namespace = "config", js_name = "snapshot")]
+pub fn snapshot_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        let detectors = on_path();
+        let ctx = context(&detectors)?;
+        let roots = a.roots(true)?;
+        if a.project_root.is_some() {
+            return cached(&roots, detectors.path.clone(), &ctx, &a);
+        }
+        render(
+            &machine::snapshot(&ctx, &roots.global_dir, roots.class)?,
+            &a,
+        )
+    })
+}
+
 /// The account pools alone, readable with no valid project or global file: `{ present, state, revision,
 /// runner }`. `{ globalDir, class }`.
 #[napi(namespace = "config", js_name = "accounts")]
@@ -242,7 +324,7 @@ mod unix {
     use fgos_config::doctor::{check, Consumer, Severity};
     use fgos_config::repair::fix;
     use fgos_config::scope::SourceKind;
-    use fgos_config::write::{target_revision, WriteRequest};
+    use fgos_config::write::{init, target_revision, WriteRequest};
 
     const LOCK_WAIT_MS: u64 = 5_000;
 
@@ -285,6 +367,24 @@ mod unix {
             .map(|(fix, path)| json!({ "fix": fix, "path": path }));
         Ok(json!({ "changed": changed.collect::<Vec<_>>(), "skipped": done.skipped }))
     }
+
+    pub fn init_entry(a: Request) -> Res<Value> {
+        let target = match a.target.as_deref() {
+            Some("project") => SourceKind::Project,
+            Some("global") => SourceKind::Global,
+            _ => return Err(invalid("target")),
+        };
+        if target == SourceKind::Project {
+            a.project()?;
+        }
+        let made = init(
+            &a.roots(false)?,
+            target,
+            &fgos_holder_lock::state_root::lock_root(),
+            LOCK_WAIT_MS,
+        )?;
+        Ok(json!({ "created": made.created, "revision": made.revision }))
+    }
 }
 
 /// Writes and the findings engine need the no-follow primitives of Durable File, which are Unix only.
@@ -296,6 +396,7 @@ mod unix {
         Err(failure("config-platform-unsupported", "write"))
     }
     pub use check_entry as fix_entry;
+    pub use check_entry as init_entry;
 }
 
 /// The findings of the config files of a project and the machine, each source judged on its own, with the
@@ -312,4 +413,11 @@ pub fn check_config(args: Value) -> Result<String> {
 #[napi(namespace = "config", js_name = "fix")]
 pub fn fix_config(args: Value) -> Result<String> {
     entry(args, unix::fix_entry)
+}
+
+/// Creates the header-only file of a scope that has none: `{ created, revision }`; an existing file, legacy
+/// JSON included, is kept. `{ projectRoot?, globalDir, class, target: "project" | "global" }`.
+#[napi(namespace = "config", js_name = "init")]
+pub fn init_config(args: Value) -> Result<String> {
+    entry(args, unix::init_entry)
 }

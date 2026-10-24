@@ -28,11 +28,11 @@ function ownRelease(bin) {
       && fs.realpathSync(path.join(found.releaseRoot, payload)) === fs.realpathSync(OWN_PAYLOAD_ROOT) ? found : null;
   } catch { return null; }
 }
-/** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs, so an addon from
- * before a namespace fails by name instead of at its first call. */
+/** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 2 is
+ * the first with `snapshot` and `init`, so an addon from before them fails by name instead of at its first call. */
 export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
   && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && typeof v.holderLock === 'number'
-  && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && typeof v.config === 'number';
+  && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && v.config >= 2;
 /** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation, then
  * `native-addon.json`. `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {
