@@ -1,0 +1,622 @@
+{
+ "version": 1,
+ "about": "Owning cases of the machine files: the private directory, the gateway token file, the accounts-only read and the mode findings. A case lays files out under project/ and home/.fgos/ as the snapshot fixture does and adds raw (path to exact bytes; @PAD@ is `pad` letters), dirs, links (path to the relative target it links to) and modes (path to octal) applied in that order. Op: ensure_dir, modes (fix: also run fix_modes), token_ensure (text, or generate; holdLock makes a child process hold global-config), token_read, accounts_read, accounts_equals_snapshot. Expect: code with path and reason (the keyword), or the op's result; sentinels never appear in any shown form of a refusal.",
+ "schemas": {
+  "runner": [
+   "type: object",
+   "properties:",
+   "  note: {type: string}",
+   "  llmAccounts:",
+   "    type: object",
+   "    x-fgos-file: accounts",
+   "    x-fgos-scope: global-only",
+   "    additionalProperties:",
+   "      type: object",
+   "      additionalProperties:",
+   "        type: object",
+   "        properties:",
+   "          login: {type: string, x-fgos-sensitivity: secret-reference}",
+   "  providers:",
+   "    type: object",
+   "    additionalProperties:",
+   "      type: object",
+   "      properties:",
+   "        accounts:",
+   "          type: object",
+   "          x-fgos-file: accounts",
+   "          x-fgos-scope: global-only",
+   "          additionalProperties:",
+   "            type: object",
+   "            properties:",
+   "              login: {type: string, x-fgos-sensitivity: secret-reference}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  port: {type: integer}",
+   "  token: {type: string, x-fgos-file: token, x-fgos-sensitivity: secret-value, x-fgos-scope: global-only}"
+  ]
+ },
+ "standard": {
+  "gateway": [
+   "gateway:",
+   "  port: 8080"
+  ]
+ },
+ "cases": [
+  {
+   "id": "private-dir-created-0700",
+   "why": "spec 3: the private directory is created 0700 beneath the global directory",
+   "input": {
+    "op": "ensure_dir"
+   },
+   "expect": {
+    "dirMode": "700"
+   }
+  },
+  {
+   "id": "private-dir-symlinked-refused",
+   "why": "spec 9: a symlinked private directory is config-path-symlink and nothing is created through it",
+   "input": {
+    "op": "ensure_dir",
+    "raw": {
+     "outside/keep": "x"
+    },
+    "links": {
+     "home/.fgos/private": "outside"
+    }
+   },
+   "expect": {
+    "code": "config-path-symlink"
+   }
+  },
+  {
+   "id": "global-dir-symlinked-refused",
+   "why": "spec 9: a symlinked ~/.fgos is refused before private is made",
+   "input": {
+    "op": "ensure_dir",
+    "raw": {
+     "outside/keep": "x"
+    },
+    "links": {
+     "home/.fgos": "outside"
+    }
+   },
+   "expect": {
+    "code": "config-path-symlink"
+   }
+  },
+  {
+   "id": "modes-report-and-fix-the-four-paths",
+   "why": "spec 9: config file, private, accounts and token are checked; fix sets exactly those through the descriptor",
+   "input": {
+    "op": "modes",
+    "fix": true,
+    "files": {
+     "home/.fgos/config.yaml": [
+      "a: 1"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "runner: {}"
+     ]
+    },
+    "raw": {
+     "home/.fgos/private/gateway-token": "tok\n",
+     "home/.fgos/other.txt": "x"
+    },
+    "modes": {
+     "home/.fgos/config.yaml": "644",
+     "home/.fgos/private": "755",
+     "home/.fgos/private/accounts.yaml": "640",
+     "home/.fgos/private/gateway-token": "644",
+     "home/.fgos/other.txt": "644"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "config.yaml",
+      "600",
+      "644"
+     ],
+     [
+      "private/accounts.yaml",
+      "600",
+      "640"
+     ],
+     [
+      "private/gateway-token",
+      "600",
+      "644"
+     ],
+     [
+      "private",
+      "700",
+      "755"
+     ]
+    ],
+    "after": [],
+    "modesAfter": {
+     "config.yaml": "600",
+     "private": "700",
+     "private/accounts.yaml": "600",
+     "private/gateway-token": "600",
+     "other.txt": "644"
+    }
+   }
+  },
+  {
+   "id": "modes-clean-or-missing-paths-report-nothing",
+   "why": "spec 9: a path that does not exist or already has its mode is no finding",
+   "input": {
+    "op": "modes",
+    "raw": {
+     "home/.fgos/private/gateway-token": "tok\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600",
+     "home/.fgos/private": "700"
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "token-ensure-creates-0600-one-line",
+   "why": "spec 8: created only when missing, mode 0600 at creation, one line and a final newline",
+   "input": {
+    "op": "token_ensure",
+    "text": "0123456789abcdef"
+   },
+   "expect": {
+    "result": "created",
+    "bytes": "0123456789abcdef\n",
+    "mode": "600",
+    "dirMode": "700"
+   }
+  },
+  {
+   "id": "token-ensure-keeps-the-existing-token",
+   "why": "spec 8: an existing token is never rotated",
+   "input": {
+    "op": "token_ensure",
+    "text": "new-token",
+    "raw": {
+     "home/.fgos/private/gateway-token": "old-token\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "result": "exists",
+    "bytes": "old-token\n"
+   }
+  },
+  {
+   "id": "token-ensure-generated-is-64-hex",
+   "why": "spec 8: the production token is 32 operating-system random bytes as lowercase hex",
+   "input": {
+    "op": "token_ensure",
+    "generate": true
+   },
+   "expect": {
+    "result": "created",
+    "hexLength": 64,
+    "mode": "600"
+   }
+  },
+  {
+   "id": "token-ensure-waits-for-the-global-config-lock",
+   "why": "spec 8 and the lock registry: a held global-config lock gives config-write-conflict after the bound and writes nothing",
+   "input": {
+    "op": "token_ensure",
+    "text": "never-written",
+    "holdLock": true,
+    "waitMs": 300
+   },
+   "expect": {
+    "code": "config-write-conflict",
+    "reason": "lock-held",
+    "absent": "private/gateway-token",
+    "minMs": 250
+   }
+  },
+  {
+   "id": "token-read-valid-with-final-newline",
+   "why": "spec 8: one line and a final newline",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "abc-DEF_123.xyz\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "value": "abc-DEF_123.xyz"
+   }
+  },
+  {
+   "id": "token-read-valid-without-final-newline",
+   "why": "D6: the final newline is optional",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "abc123"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "value": "abc123"
+   }
+  },
+  {
+   "id": "token-read-owner-read-only-is-valid",
+   "why": "D6: a mode that is not wider than 0600 is valid",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "abc123\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "400"
+    }
+   },
+   "expect": {
+    "value": "abc123"
+   }
+  },
+  {
+   "id": "token-read-at-512-characters-is-valid",
+   "why": "D6: the line limit is 512 characters",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "@PAD@\n"
+    },
+    "pad": 512,
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "length": 512
+   }
+  },
+  {
+   "id": "token-read-absent",
+   "why": "spec 9: a missing file is not an error here; the caller decides (doctor fails it)",
+   "input": {
+    "op": "token_read"
+   },
+   "expect": {
+    "absent": true
+   }
+  },
+  {
+   "id": "token-read-group-readable-refused",
+   "why": "D6: wider than 0600 is config-token-invalid, reason mode, no byte of the value",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "SENTINEL-token-value-123\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "640"
+    },
+    "sentinels": [
+     "SENTINEL-token-value-123"
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "mode"
+   }
+  },
+  {
+   "id": "token-read-two-lines-refused",
+   "why": "D6: exactly one line",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "SENTINEL-token-value-123\nsecond-line\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    },
+    "sentinels": [
+     "SENTINEL-token-value-123",
+     "second-line"
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "shape"
+   }
+  },
+  {
+   "id": "token-read-trailing-space-refused",
+   "why": "D6: printable ASCII without a space",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "SENTINEL-token-value-123 \n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    },
+    "sentinels": [
+     "SENTINEL-token-value-123"
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "shape"
+   }
+  },
+  {
+   "id": "token-read-empty-line-refused",
+   "why": "D6: non-empty",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "shape"
+   }
+  },
+  {
+   "id": "token-read-non-ascii-refused",
+   "why": "D6: printable ASCII only",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "tökën-SENTINEL-token-value-123\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    },
+    "sentinels": [
+     "SENTINEL-token-value-123"
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "shape"
+   }
+  },
+  {
+   "id": "token-read-over-512-characters-refused",
+   "why": "D6: more than 512 characters is refused",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "home/.fgos/private/gateway-token": "@PAD@\n"
+    },
+    "pad": 513,
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "shape"
+   }
+  },
+  {
+   "id": "token-read-symlink-refused",
+   "why": "D6: a symlinked token file is refused and not followed",
+   "input": {
+    "op": "token_read",
+    "raw": {
+     "outside/real-token": "SENTINEL-token-value-123\n"
+    },
+    "modes": {
+     "outside/real-token": "600"
+    },
+    "dirs": [
+     "home/.fgos/private"
+    ],
+    "links": {
+     "home/.fgos/private/gateway-token": "outside/real-token"
+    },
+    "sentinels": [
+     "SENTINEL-token-value-123"
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "reason": "symlink"
+   }
+  },
+  {
+   "id": "accounts-read-beside-a-broken-project-and-global-file",
+   "why": "D7: the accounts layer reads with no valid project or global file",
+   "input": {
+    "op": "accounts_read",
+    "raw": {
+     "project/.fgos/config.json": "{ broken",
+     "home/.fgos/config.json": "also {broken"
+    },
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  llmAccounts:",
+      "    main:",
+      "      acc1: {login: ~/.sentinel-login-one}",
+      "  providers:",
+      "    gemini:",
+      "      accounts:",
+      "        g1: {login: ~/.g1}"
+     ]
+    }
+   },
+   "expect": {
+    "present": true,
+    "state": "present",
+    "value": {
+     "runner": {
+      "llmAccounts": {
+       "main": {
+        "acc1": {
+         "login": "~/.sentinel-login-one"
+        }
+       }
+      },
+      "providers": {
+       "gemini": {
+        "accounts": {
+         "g1": {
+          "login": "~/.g1"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "accounts-read-confined-does-not-open-the-file",
+   "why": "spec 9: a confined session has no accounts layer; the file is not opened (a broken one is not an error)",
+   "input": {
+    "op": "accounts_read",
+    "class": "confined",
+    "raw": {
+     "home/.fgos/private/accounts.yaml": "runner: [broken"
+    }
+   },
+   "expect": {
+    "present": false,
+    "state": "unavailable-confined",
+    "value": null
+   }
+  },
+  {
+   "id": "accounts-read-missing-file",
+   "why": "spec 3: a missing accounts file is present false, not an error",
+   "input": {
+    "op": "accounts_read"
+   },
+   "expect": {
+    "present": false,
+    "state": "present",
+    "value": null
+   }
+  },
+  {
+   "id": "accounts-read-wrong-type-names-path-and-keyword",
+   "why": "spec 9: a value of the wrong type is a schema error naming file, path and keyword, never the value",
+   "input": {
+    "op": "accounts_read",
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  llmAccounts:",
+      "    main: SENTINEL-wrong-type"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-wrong-type"
+    ]
+   },
+   "expect": {
+    "code": "config-schema",
+    "path": "runner.llmAccounts.main",
+    "reason": "type"
+   }
+  },
+  {
+   "id": "accounts-read-syntax-error-names-position-not-value",
+   "why": "spec 9: a break next to an account entry names line and column and holds no byte of the value",
+   "input": {
+    "op": "accounts_read",
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  llmAccounts:",
+      "    main:",
+      "      acc1: {login: SENTINEL-login-value",
+      "      acc2: ["
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-login-value"
+    ]
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "accounts-read-keeps-a-key-no-schema-describes",
+   "why": "spec 4: an undescribed key is kept for doctor, never an error here",
+   "input": {
+    "op": "accounts_read",
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  mystery: 1",
+      "  llmAccounts:",
+      "    main:",
+      "      acc1: {login: ~/.a}"
+     ]
+    }
+   },
+   "expect": {
+    "present": true,
+    "state": "present",
+    "value": {
+     "runner": {
+      "llmAccounts": {
+       "main": {
+        "acc1": {
+         "login": "~/.a"
+        }
+       }
+      },
+      "providers": {}
+     }
+    }
+   }
+  },
+  {
+   "id": "accounts-read-equals-the-full-snapshot-subtree",
+   "why": "D7: the accounts-only read judges and merges as the full snapshot does",
+   "input": {
+    "op": "accounts_equals_snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  note: hello"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  llmAccounts:",
+      "    main:",
+      "      acc1: {login: ~/.sentinel-login-one}",
+      "  providers:",
+      "    gemini:",
+      "      accounts:",
+      "        g1: {login: ~/.g1}"
+     ]
+    }
+   },
+   "expect": {
+    "equal": true
+   }
+  }
+ ]
+}

@@ -1,0 +1,59 @@
+# Config Slice D, phases 06 (comment renderer), 07 (project migration), 08 (findings engine)
+
+Branch `cfg/slice-d-migrate` (from `cfg/slice-d` at phase 03), worktree `/home/vantt/projects/forgent-worktrees/cfg-slice-d-migrate`. Not pushed, not merged. `origin/main` was not merged in (no merge allowed in this task). Impact analysis inactive (`rg` cross-check: nothing outside `packages/config` imports `fgos_config` yet).
+
+## Result
+
+| Phase | Commit | State |
+|---|---|---|
+| 06 renderer + `refresh` | `00f64acb4` | done, within caps |
+| 07 project migration | `b666a9981` | done, `migrate.rs` exactly at its 420 cap |
+| 08 findings engine | `d2902fa0c`, `24c8ceb0e` | **partial and over its cap: needs an owner decision (below)** |
+
+Evidence: `cargo test -p fgos-config --jobs 4` green (own target dir), `clippy --all-targets -D warnings` 0 errors, `cargo fmt --check` clean, `node --test test/config/tombstone-older-reader.test.mjs` green. No `npm test`, no workspace test. Counted Rust source set: 4,506 after phase 03 -> 5,645 now (+1,139; phases 04 and 05 are not in this branch).
+
+### 06 comment renderer
+- `docs::scan(ctx, name, bytes)` and the internal `docs::plan` (one door for detection and rewrite). A key is flagged `Missing` or `Drift` against `grammar::doc_lines`, the same function a door uses; no schema node or no description = no expectation; JSON sources scan empty; keys inside lists are not addressed.
+- `write::Edit::Docs`, `write::refresh`; `edit` became `pub(crate) produce(ctx, edits, acknowledge, actor, reason, base, name)`, `validate` split into `snapshot_with`. `Docs` mixed with another edit refuses `config-key-out-of-scope` keyword `docs-edit-alone`; on an absent file it writes nothing and creates no directory; on legacy JSON it refuses `config-format-legacy-json`. Only the leading doc run is replaced, so why lines and notes keep text and order (golden case with a note between doc and why, and a second doc run that stays a note).
+- Owning proof: `tests/golden_docs.rs` over `contracts/fixtures/docs.v1.json` (16 cases; every writing case is refreshed twice and the second run must apply nothing). Slice B's `write_golden`, `write_concurrency` unchanged and green. Falsified once by editing an expected line.
+- Small additions outside the ownership row, both one-liners in `grammar.rs` (`is_doc_line`, later `is_grammar_line`, `Reason::migrated`, `is_migrated_reason`) because the grammar contract is read only there.
+- Caps: `docs.rs` 102/180; `write.rs` grew 343 -> 432 (+89 against +60): +62 from 06, the rest are the `hold` lock helper, `without_project` and `pub(crate)` opens that 07/08 call (no new copy of the lock code).
+
+### 07 migration (`migrate::project`)
+- Decisions D11-D17 implemented as written, plus: the report carries `kept`, `unknown_kept`, `dropped_redundant/retired/out_of_scope`, `doc_converted`, `machine_overrides`, `backup`, `resumed`, `already_migrated`, `dry_run`. Paths only; fixtures assert no value appears in a report or refusal.
+- **Equivalence** through Canonical JSON in two reads: over no machine file at all the old JSON (after the listed exclusions) and the produced YAML must read identically, else `config-migrate-equivalence-failed` listing paths; over this machine's files any difference is listed as a machine override. This replaced reading the global file by hand and also catches a drop that changes a `replace`-merge map (golden case `rep.a`).
+- `$comment` may be a string or a list of strings (this repository's is a list). Text equal to the schema render (compared by words) is dropped, other text becomes plain `#` notes after the doc lines of its key; a line starting `@fgos:` aborts `config-migrate-source-invalid` (`forged-grammar-line`).
+- Tombstone is the exact text plus one final newline (the reader accepts both; older release test passes). Backup `.fgos/runtime/config-migrate/<rev16>-config.json` 0600 in a 0700 directory, create-only, an existing different content under the name is `config-write-conflict`/`backup-differs`. Lock `project-config`; stages observed (`BackupWritten`, `YamlCreated`, `SecondCheck`, `TombstoneWritten`).
+- Ids appended to `failure-codes.v1.json`: `config-migrate-equivalence-failed`, `-machine-overrides-pending`, `-source-invalid`; `contracts/migration.v1.json`; tag line `migrated-source-tag`. Expect a trivial textual merge with 04/05, which append to the same array.
+- Proofs: `tests/golden_migrate.rs` (29 cases in `migrate.v1.json` + the real-file rehearsal, below), `tests/migrate_files.rs` (7: modes, symlinked `.fgos`, crash after backup, crash between YAML and tombstone then finish, JSON edited mid-run, two writers, backup name collision), `test/config/tombstone-older-reader.test.mjs` (today's `readSharedConfig`, `loadRunnerConfigFromDir`, `ensureRunnerConfigForDir` all refuse the tombstone and write nothing).
+- Deviation: no second `real-project-config.copy.json`. `authoring-source.config.json` is already the pinned copy of this repository's file (sha `7d89f588...`, same as the tracked file now); the test asserts the sha against `repo-differences.v1.json`. One door.
+
+### Rehearsal on a scratch copy of this repository's `.fgos/config.json` (under `.fgos/runtime/tmp/`, deleted after; tracked file untouched)
+- With an empty global: **kept 15** values (`herdrOrchestrator.autoDiscover`, `runner.executor.*`, three capability/executor descriptions, `runner.timeoutMs`, `maxTier`, `generatedPaths`, `idleTimeoutMs`, `gateBypass.level`, `cleanup.ttlDays`, `invariantChecks.commands`, `docRegistry.enforce`, `worktreeSetup.commands`), **dropped redundant 257**, **retired 1** (`lock.predecessorKillWaitMs`), **out of scope 2** (`gateway.port` = standard, `gateway.token` = null), **`runner.$comment` converted** (kept as 6 plain note lines above `runner`, because the schema's `runner` description is not the ladder), unknown kept 0, machine overrides 0. YAML 102 lines (from 1,557), `config.json` is the tombstone, backup 42,924 bytes 0600. **Equivalence verdict: passed** (twice, plus the golden twin check that the migrated snapshot equals the JSON file's own legacy read minus the dropped sections).
+- With the owner's real global file as it is today the run cannot start at all: `config-schema merge-type-mismatch` at `runner.modelPolicies.openai.nano` (the legacy global holds a string where the project and standard hold a map). That is a finding about the machine's global file, not about the migration.
+- With a copy of the owner's global from which the token, `runner.llmAccounts` and that one key were removed: **26 machine overrides** (all `runner.capabilities.*` descriptions/confinement the global sets differently from the standard); without the flag the run stops `config-migrate-machine-overrides-pending` listing the 26 paths, with `--accept-machine-overrides` it passes and writes the same file.
+- Follow-up for the owner (not built): the tier-ladder `$comment` is duplicated by the doc lines the seat-binding schema already renders on `maxTier`; today it lands as notes. Deleting it needs a rule beyond D15 ("equal to the render of any key under the same section").
+
+### 08 findings engine (`doctor::check`, `doctor::fix`, `contracts/doctor-rows.v1.json`)
+Built: every section 11 row computable from the crate today, each source judged alone (`snapshot_with` over the standard only, other machine files hidden), then the merged read for layers that are sound alone but disagree; severity per consumer from the contract (`config-doc-drift` warn/fail, wrong-file key already in its destination warn); findings carry row, file, line, column, path, fix id and a keyword detail, never a value. Rows: parse, schema (with the refusal id as detail), legacy-shadowed, format-legacy-json (legacy JSON reports only that plus parse/schema/placement rows), doc-drift, comment-missing-doc, comment-missing-why, comment-migrated-why, unknown-key, redundant-value (`plain` or `needs-acknowledgement`), key-in-wrong-file (copy fix only for a global-file key whose destination lacks it, none for a project file), secret-outside-private (loose files directly under `~/.fgos`), migrate-backup-stale (30 days by mtime, `now` injected), global-permissions and machine-files (from the facts below). `fix` applies `refresh-docs` and `remove-redundant` through the write transaction (a mapping holding only standard values goes whole; a note needs `acknowledge`), skips legacy JSON, and reports other fix ids as skipped. Proof: `tests/golden_doctor.rs` over `doctor.v1.json` (19 check cases, 6 repair cases; repairs run twice, second applies nothing; no-echo `absent` assertions).
+
+Not built, and why: phases 04 and 05 (`machine.rs`, `relocate.rs`) are being written in the sibling worktree and have no committed API. The rows that need what only they observe take it as data through `MachineFacts { modes: Vec<ModeFinding>, machine_files: Option<String>, destinations: Vec<(path, Destination)> }` (`ModeFinding` already exists in `files.rs`). The fixes `chmod`, `create-machine-files`, `copy-to-destination`, `move-under-private` are declared in the contract and listed as skipped by `fix`; they belong with the machine-file component and need `machine::fix_modes`, `machine::token::ensure`, `relocate` stage 1. Wiring `MachineFacts` from `machine::`/`relocate::` and those four fixes is the remaining step once 04/05 land. `no-echo.v1.json` got no appended case: the doctor fixture asserts the same property (one proof).
+
+Sweep (plan step 3, read-only, scratch copies only): of the config files on this machine only this repository's project file exists (forgent-mailbox holds the identical file; no forgentX, mdview or mcp-skill-hub config exists). Result for it: `config-format-legacy-json` warn, `config-schema` fail at `gateway.port` (`config-key-out-of-scope`), `config-key-in-wrong-file` fail at `gateway.token`: exactly the two keys migration drops, nothing else. The owner's global file is legacy JSON and shows the `modelPolicies.openai.nano` merge mismatch above once the project file is sound; it needs a decision before phase 12 registers fail rows (loosen schema, fix the file, or warn for legacy).
+
+## Decision question: `doctor.rs` is over its cap (parks only the landing of 08)
+
+**What is happening.** `doctor.rs` is 509 lines against a cap of 400, with the four machine fixes still to come (about 60-100 more). The rest is under or at cap (`docs.rs` 102/180, `migrate.rs` 415/420); the running Rust delta of 06-08 is +1,139 against caps summing 1,060.
+**Cause.** Measured: rustfmt expands the per-row `Finding` construction and the two repair loops; the base x 1.8 estimate (220) assumed rows as table data, but the rows need per-file position lookups, the merged read and the strays scan. No row was dropped to fit.
+**Options.**
+- A. Raise the `doctor.rs` cap to about 600 (ceiling 2,900 still holds if 09-14 stay under their caps; the sum would be 2,810 plus this). Gain: land as is. Harm: the module is the largest in the crate.
+- B. Move the repairs (`fix`, `FixReport`, `yaml_file`, `redundant_roots`, about 110 lines) to their own module `repair.rs`, adding one `pub mod` line to `lib.rs` (a file only 03 owns). Gain: `doctor.rs` about 400, each module one job. Harm: one new file and a touched shared line.
+- C. Trim by dropping `config-secret-outside-private` and the stale-backup scan until their fixes exist. Gain: about 50 lines. Harm: two spec rows missing, against the full-scope rule.
+**Recommendation.** B (cleanest boundary: findings versus repairs).
+**Scope.** Only 08 landing; 06 and 07 stand regardless.
+
+## Other notes
+- Merge conflicts to expect: `failure-codes.v1.json` (same array tail as 04/05), `tests/common/mod.rs` (one helper appended), `write.rs` is mine alone.
+- `write.rs` helpers exported for phase 10: `hold`, `conflict`, `io_error`, `dir_identity`, `without_project`, `snapshot_with`, `produce`.
+
+Status: DONE_WITH_CONCERNS

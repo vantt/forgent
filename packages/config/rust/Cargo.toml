@@ -7,11 +7,21 @@ edition.workspace = true
 fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-canonical-json = { path = "../../canonical-json/rust" }
 # Only the writer id types are used; the host provider (and its host-runtime, git and convention edges) stays out.
 fgos-identity = { path = "../../identity/rust", default-features = false }
-serde_json.workspace = true
+# The host provider's edges (the `fgos config` verbs); the addon and the gateway build without them.
+fgos-host-runtime = { path = "../../host-runtime/rust", optional = true }
+fgos-git = { path = "../../git/rust", optional = true }
+# preserve_order: the global JSON is rewritten with its keys in the order they were read (relocate.rs).
+serde_json = { workspace = true, features = ["preserve_order"] }
 sha2.workspace = true
 jsonschema.workspace = true
+
+[features]
+# Off by default: only `apps/fgos` turns it on, so the addon and the gateway never pull the host runtime.
+default = []
+host-provider = ["dep:fgos-host-runtime", "dep:fgos-git", "fgos-identity/provider"]
 
 [dev-dependencies]
 # The feature set a product build has (apps/fgos, work-state and distribution turn these on and Cargo

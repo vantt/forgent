@@ -97,9 +97,10 @@ export const CONTROL_ORDER = Object.freeze({
   workspace: Object.freeze({ own: 2, shared: 1 }),
 });
 
-// The hidden roots of `hostRead: blind` and the question whether a request asks for it live in
-// resources.mjs, which resolves them; they are part of this vocabulary and re-exported here.
-export { BLIND_HIDDEN_ROOTS, requestIsBlind } from './resources.mjs';
+// The hidden roots of `hostRead: blind`, the machine-private roots hidden from every dispatch and the
+// question whether a request asks for blind live in resources.mjs, which resolves them; they are part of
+// this vocabulary and re-exported here.
+export { BLIND_HIDDEN_ROOTS, MACHINE_PRIVATE_ROOTS, requestIsBlind } from './resources.mjs';
 
 export const GRANT_ACCESS_LEVELS = Object.freeze({
   'read-write': 3,

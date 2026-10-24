@@ -1,6 +1,6 @@
 ---
 area: agent-confinement-authority
-updated: 2026-09-11
+updated: 2026-10-23
 coverage: implemented
 ---
 
@@ -9,7 +9,7 @@ coverage: implemented
 > **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).
 > Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)
 > trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,
-> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)
+> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 9 falsification probes (8 probe gốc cộng `machine-private-hidden`, §9.3; probe thứ mười `peer-run-hidden` chỉ cho blind). Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)
 > chỉ di trú sang backend reference ở dạng fixture (P04.md R4) — bản `.fgos/config.json` thật vẫn giữ hand-rolled `command:"bwrap"` argv,
 > không có key `confinement`; live migration để deferred cho một phase sau (P06 thử tạm rồi revert nguyên trạng, sha256-verified). Live dogfood
 > coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.
@@ -1191,7 +1191,8 @@ phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.
 trừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override
 chỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều
 mù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không
-`blind` giữ nguyên từng byte.
+`blind` giữ nguyên từng byte khi host không có machine-private root nào (§9.3); khi có, argv chỉ
+thêm các mask của §9.3 và không thêm gì khác.
 
 Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn
 `/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;
@@ -1236,13 +1237,61 @@ spawn: `blind-requires-confinement` (mode không phải `required`/không có po
 `blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context
 ref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /
 `confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc
-không qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)
+không qua). Probe `peer-run-hidden` (thứ mười, chỉ cho dispatch blind; fingerprint và cache riêng)
 dựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline
 của tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ
 mask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |
 backend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead
 trong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng
-localhost.
+localhost. Thư mục riêng của máy (`~/.fgos/private`) không còn nằm trong giới hạn này: §9.3 che nó
+với mọi dispatch, blind hay không. Một file đơn lẻ trong thư mục project (như
+`.fgos/secrets.local.env`) vẫn chưa được che: §9.3 chỉ che thư mục.
+
+### 9.3 Machine-private roots — thư mục riêng của máy, che với mọi worker
+
+Một số thư mục host giữ file riêng của máy mà không worker nào cần: runner chạy ngoài sandbox,
+tự đọc file, tự lease rồi chỉ giao cho worker đúng thứ nó được cấp. `MACHINE_PRIVATE_ROOTS`
+(`src/runner/dispatch/confinement/resources.mjs`, cạnh `BLIND_HIDDEN_ROOTS`) là danh sách các thư
+mục đó. Danh sách là dữ liệu của contract, không phải code của driver. Mục đầu tiên:
+`{home}/.fgos/private` (`{home}` là home của user host, không phải private home của một
+dispatch; thư mục này giữ `accounts.yaml` và `gateway-token`, xem
+`docs/platform/config/spec.md` §9). Config và Secrets chỉ *khai đường dẫn của mình*; việc che
+thuộc về Confinement Authority. Muốn che thêm một thư mục thì thêm một mục vào danh sách và một
+case vào probe, không thêm cơ chế.
+
+- **Che với mọi dispatch có mount view**, bất kể `hostRead` (`allow` hoặc `blind`; `deny` vẫn
+  `unsupported`, §9.1). Khác §9.2: không cần `blind`, và không phụ thuộc policy.
+- **Cơ chế đã có, không thêm cơ chế mới.** Mỗi root tồn tại trên host thành một resource
+  `hidden-root` (cùng loại với §9.2, đánh dấu `machinePrivate`); driver bwrap che bằng `--tmpfs`
+  lên thư mục rồi `--remount-ro` ở cuối, sau các mount và sau `bindAttemptFiles`. Không có file
+  mask: mỗi mục trong danh sách là một thư mục.
+- **Root không tồn tại trên host lúc launch thì bị bỏ qua** (không có gì để che); bước setup tạo
+  thư mục chạy trước mọi dispatch (giới hạn có tên: một dispatch chạy trước setup không thấy mask,
+  và thư mục chưa có thì cũng chưa có gì để lộ).
+- **Từ chối trước khi spawn**: workspace, cwd, repo root hoặc bất kỳ mount được cấp nào nằm trong
+  một machine-private root bị từ chối với `machine-private-hides-workspace`, cho mọi request bị
+  confine (mask sẽ che mất chính thứ worker được cấp). Từ chối, không bao giờ chạy mà không che.
+- **Attestation** ghi các root đó trong `hiddenRoots` (field của §9.2); `effectiveControls.hostRead`
+  vẫn là giá trị của policy (`allow`), nên `hiddenRoots` mới là chỗ nói chính xác điều gì được che.
+- **Dấu báo "đang bị confine"**: driver bwrap đặt biến môi trường `FGOS_CONFINED=1` cho mọi worker
+  (một dòng `--setenv`, hằng `CONFINED_MARKER_ENV` trong `drivers/bwrap.mjs`); Config đọc nó để biết
+  session đang confine (`session_class`, `packages/config/rust/src/session.rs`, hằng cùng tên được
+  test ghim bằng nhau) và từ chối lịch sự thay vì để lệnh vỡ trên file thiếu. Đây là thông tin cho
+  session, **không phải ranh giới bảo mật**: worker tự bỏ được biến này, và khi đó chỉ mất lời từ
+  chối lịch sự; không hành vi nào bảo vệ dữ liệu dựa vào nó, ranh giới là sandbox (mask ở trên).
+  Probe `machine-private-hidden` khẳng định worker thật thấy biến này.
+- **Probe `machine-private-hidden`** (thuộc bộ probe chuẩn, không chỉ dispatch blind): dưới từng
+  built-in policy (`host-write-denied`, `workspace-write`), worker không đọc được file đặt trong
+  một `{home}/.fgos/private` giả dựng (`ENOENT`, thư mục rỗng), vẫn ghi được outbox, workspace cư
+  xử đúng policy; dispatch blind chạy thêm cùng các case dưới `hostRead: blind`. Argv đi qua
+  `prepareBwrapSync` với resource do chính resolver sinh ra. Falsifier: bỏ mask thì worker phải
+  đọc được file. Fingerprint probe mang digest của danh sách (`machinePrivate`), nên mọi proof cũ
+  hết hạn đúng một lần và được chạy lại ở lần spawn bắt buộc kế tiếp (§6.6).
+
+Giới hạn: chỉ thư mục (file đơn lẻ như `.fgos/secrets.local.env` chưa được che, xem §9.2 cuối);
+chỉ chặn đọc qua mount view của worker bị confine (một agent tương tác không confine chạy với tư
+cách user và đọc được mọi thứ user đọc được, xem Secrets §7.3); và không che khỏi chính runner,
+nơi duy nhất cần đọc các file này.
 
 ## 10. Lộ trình rollout và trạng thái hoàn thành
 
@@ -1251,7 +1300,7 @@ localhost.
 | S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |
 | S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |
 | S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |
-| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |
+| S3 - Prove | Probe harness committed (9 falsification probes: 8 probe gốc cộng `machine-private-hidden` từ §9.3; thứ mười `peer-run-hidden` chỉ cho blind) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |
 | S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |
 | S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |
 | Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |
@@ -1299,7 +1348,8 @@ Probe phải nằm trong repo và chạy lại được. Với default bwrap, pr
 - descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel
   được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;
 - `executor-credentials` grant đọc được nhưng không ghi được;
-- host read và network vẫn khả dụng, để chứng minh attestation không overclaim.
+- host read và network vẫn khả dụng, để chứng minh attestation không overclaim;
+- mỗi machine-private root (§9.3) không đọc được dưới từng built-in policy, kèm falsifier.
 
 Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong
 proof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe
@@ -1339,6 +1389,7 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 | Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |
 | Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |
 | Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |
+| 2026-10-23: danh sách `MACHINE_PRIVATE_ROOTS` (mục đầu `{home}/.fgos/private`) che với mọi dispatch có mount view, bất kể `hostRead`; một danh sách, cơ chế `hidden-root`/`--tmpfs` sẵn có, không file mask; Secrets thêm đường dẫn của mình bằng cách thêm một mục và một case probe (§9.3). Chủ sở hữu giao hướng "D trước C" ngày 2026-10-23 | Config spec §9 và cổng G6 cần `~/.fgos/private` bị che với mọi worker, và Secrets câu hỏi 4 cần cùng một thứ cho đường dẫn bí mật; hai nhu cầu một danh sách, không có cơ chế thứ hai |
 
 ## 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)
 
@@ -1348,7 +1399,7 @@ Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P
 2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).
 3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).
 4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).
-5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).
+5. **Probe harness:** 9 bài probe falsification độc lập (8 bài gốc cộng `machine-private-hidden` thêm theo §9.3; bài thứ mười `peer-run-hidden` chỉ chạy cho dispatch blind) đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).
 6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).
 7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07).
 

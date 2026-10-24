@@ -35,7 +35,8 @@ impl Bed {
             std::env::temp_dir().join(format!("fgos-config-cache-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("project/.fgos")).unwrap();
-        let schema = json!({"s": ["type: object", "properties:", "  a: {type: integer}", "  e: {type: string, x-fgos-absent: detected}"]});
+        let schema = json!({"s": ["type: object", "properties:", "  a: {type: integer}", "  e: {type: string, x-fgos-absent: detected}"],
+            "t": ["type: object", "properties:", "  k: {type: string, x-fgos-file: token, x-fgos-scope: global-only, x-fgos-sensitivity: secret-value}"]});
         let schema_files = files(&schema, true);
         let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
         let standard_files = files(&json!({"s": ["s:", "  a: 1"]}), false);
@@ -171,4 +172,32 @@ fn a_refused_read_is_not_cached() {
         snapshot_cached(&mut cache, &ctx, &req).unwrap().value["s"]["a"],
         4
     );
+}
+
+#[test]
+fn a_change_to_the_token_file_alone_misses() {
+    let bed = Bed::new("token");
+    let ctx = Context {
+        schemas: &bed.schemas,
+        standard: &bed.standard,
+        digest: "d",
+        detectors: &NoDetectors,
+    };
+    let (req, mut cache) = (
+        bed.request(SessionClass::Unconfined),
+        SnapshotCache::default(),
+    );
+    let (global, token) = (
+        bed.dir.join("home/.fgos"),
+        bed.dir.join("home/.fgos/private"),
+    );
+    fs::create_dir_all(&token).unwrap();
+    fs::write(global.join("config.yaml"), "t:\n  k: old\n").unwrap();
+    // The token file holds the key, so the global file's copy is shadowed and the read is sound.
+    fs::write(token.join("gateway-token"), "tok\n").unwrap();
+    snapshot_cached(&mut cache, &ctx, &req).unwrap();
+    // Without it the same global file is a key in the wrong file: the cache must not answer.
+    fs::remove_file(token.join("gateway-token")).unwrap();
+    assert!(snapshot_cached(&mut cache, &ctx, &req).is_err());
+    assert_eq!((cache.stats.hits, cache.stats.misses), (0, 1));
 }

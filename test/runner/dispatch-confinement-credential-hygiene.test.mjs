@@ -86,6 +86,39 @@ test('a codex-home credential copy is owner-only', async () => {
   } finally { process.umask(previous); f.cleanup(); }
 });
 
+test('a leased login still reaches the private home while the machine-private directory is masked', async () => {
+  const f = fixture();
+  try {
+    const home = path.join(f.tmp, 'host-home');
+    const privateDir = path.join(home, '.fgos', 'private');
+    fs.mkdirSync(privateDir, { recursive: true });
+    const plan = {
+      contract: 'confinement-plan.v1',
+      dispatchId: 'disp_masked',
+      decision: 'execute',
+      coverage: {},
+      resources: resolveConfinementResources({
+        dispatchId: 'disp_masked',
+        context: {},
+        grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }],
+        backendConfig: { tempRoot: f.tempRoot },
+        homeDir: home,
+      }),
+    };
+    const prepared = await prepareBwrap(
+      plan,
+      requestFor('disp_masked', { kind: 'home-files', home: f.accountHome, files: ['.codex/auth.json'] }),
+      { id: 'bwrap', type: 'bwrap', config: {} },
+    );
+    const args = prepared.invocation.args;
+    const realPrivate = fs.realpathSync(privateDir);
+    assert.ok(args.some((arg, i) => arg === '--tmpfs' && args[i + 1] === realPrivate), 'the private directory is masked');
+    assert.equal(fs.readFileSync(path.join(plan.resources.find((r) => r.resource === 'private-home').hostTarget, '.codex', 'auth.json'), 'utf8'), '{"token":"placeholder"}');
+    assert.equal(prepared.providerCapacity?.credentialProvisioned, true);
+    await prepared.cleanup();
+  } finally { f.cleanup(); }
+});
+
 test('cleanup removes the home and the now-empty <dispatchId> directory', async () => {
   const f = fixture();
   try {

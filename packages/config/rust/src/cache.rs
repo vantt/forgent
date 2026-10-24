@@ -1,6 +1,7 @@
 //! Cache by content (spec section 5): a snapshot is reused while every source's size and sha256,
-//! the bundle digest and the request are unchanged. The cache is a value the caller owns.
-use crate::snapshot::{build, read_sources, Context, Snapshot, SnapshotError, SnapshotRequest};
+//! the token file, the bundle digest and the request are unchanged. The cache is a value the caller owns.
+use crate::snapshot::{build, read_sources, token_revision};
+use crate::snapshot::{Context, Snapshot, SnapshotError, SnapshotRequest};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CacheStats {
@@ -8,7 +9,9 @@ pub struct CacheStats {
     pub misses: u64,
 }
 
-type Key = (SnapshotRequest, String, Vec<Option<(usize, String)>>);
+type Sum = Option<(usize, String)>;
+/// The request, the bundle digest, each source's sum and the token file's.
+type Key = (SnapshotRequest, String, Vec<Sum>, Sum);
 
 #[derive(Default)]
 pub struct SnapshotCache {
@@ -27,7 +30,8 @@ pub fn snapshot_cached<'c>(
     let sums = srcs
         .iter()
         .map(|s| s.file.as_ref().map(|f| (f.bytes.len(), f.revision.clone())));
-    let key: Key = (req.clone(), ctx.digest.to_string(), sums.collect());
+    let token = token_revision(&req.global_dir);
+    let key: Key = (req.clone(), ctx.digest.to_string(), sums.collect(), token);
     if matches!(&cache.held, Some((Some(held), _)) if *held == key) {
         cache.stats.hits += 1;
     } else {

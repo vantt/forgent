@@ -10,6 +10,7 @@ fgos-work-state = { path = "../../packages/work-state/rust" }
 fgos-observe = { path = "../../packages/observe/rust" }
 fgos-convention = { path = "../../packages/convention/rust" }
 fgos-identity = { path = "../../packages/identity/rust" }
+fgos-config = { path = "../../packages/config/rust", features = ["host-provider"] }
 fgos-run-result = { path = "../../packages/run-result/rust" }
 fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }

@@ -1,5 +1,7 @@
 # Phase 14: The gateway reads the token file
 
+> **Moved to Slice C** (owner decision 2026-10-24 10:00, option B). Not built in Slice D; this file is the detailed spec Slice C's plan links to. Slice C's plan says where it lands and which numbers (caps, ownership order) changed. Read "Slice D" below as "the slice that executes this phase".
+
 Depends on 04 (token rules). Independent of 05-13; may land in parallel with them. Suggested executor: haiku (small edit) with a sonnet check of the dependency cost. Cap: 60 lines in `gateway.rs`.
 
 ## Context

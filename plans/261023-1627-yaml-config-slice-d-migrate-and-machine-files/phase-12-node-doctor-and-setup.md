@@ -1,5 +1,7 @@
 # Phase 12: Node doctor rows, setup and the token row
 
+> **Moved to Slice C** (owner decision 2026-10-24 10:00, option B). Not built in Slice D; this file is the detailed spec Slice C's plan links to. Slice C's plan says where it lands and which numbers (caps, ownership order) changed. Read "Slice D" below as "the slice that executes this phase".
+
 Depends on 11. Suggested executor: sonnet; independent sonnet review before landing. Shared file: `src/setup/registrations.mjs` (board "File chung dễ va"): post a log line first, merge `origin/main` at start and end.
 
 ## Context

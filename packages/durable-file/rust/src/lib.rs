@@ -421,6 +421,6 @@ pub fn sync_directory(dir: &Path) -> io::Result<()> {
 mod beneath;
 #[cfg(unix)]
 pub use beneath::{
-    ensure_dir_beneath, open_beneath, open_beneath_with, BeneathError, BeneathRefusal, Dir,
-    DirIdentity, OpenedFile, Read, Strategy,
+    ensure_dir_beneath, open_beneath, open_beneath_with, open_dir_beneath, BeneathError,
+    BeneathRefusal, Dir, DirIdentity, OpenedFile, Read, Strategy,
 };

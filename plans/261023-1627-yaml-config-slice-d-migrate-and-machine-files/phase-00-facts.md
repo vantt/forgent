@@ -57,3 +57,16 @@ All lines re-verified; stale ones corrected; the reader list, the confinement pi
 ## Risk / rollback
 
 No risk (documents only). Rollback: delete the edits to this file and the board line.
+
+## Re-verification, 2026-10-23 (executor, worktree `cfg/slice-d`)
+
+Result: every prior-art and "exists" line above held except the corrections below. Detail and evidence in `plans/reports/phase-261023-2022-cfg-slice-d-machine-private-mask.md`.
+
+- `readSharedConfig` sites in `src` and `bin`: **76** (the count G-D1 quotes).
+- Confinement line numbers confirmed: `BLIND_HIDDEN_ROOTS` `resources.mjs:26`, `requestIsBlind` `:35`, `resolveBlindHiddenRoots` `:197`, blind-only mask `drivers/bwrap.mjs:574-589`, `hidden-root` into `hiddenRoots` `authority.mjs:97-98`, `probePeerRunHidden` `harness.mjs:468`, `BUILTIN_POLICY_IDS` `policies.mjs:66`. `git log` on the confinement paths: last commit `fc0cceec5` (2026-10-22, state door), no open lane.
+- `x-fgos-file` annotations: `gateway.token` (token), `runner.llmAccounts` and `providers.*.accounts` (accounts). 16 schemas, 15 standard files.
+- Account and token readers (108 matching lines in 19 files; phase 13 and 14 edit list): `src/runner/dispatch/{provider-capacity (34),llm-accounts (14),provider-account-probe (8),provider-credential-renewal (1)}.mjs`, `src/runner/execution/{bind,explain,run,account-pin,account-rotation}.mjs`, `src/workflow/case-start.mjs`, `src/verbs/dispatch/reconcile.mjs`, `src/runner/gateway-control.mjs` (message only), `src/setup/{registrations (15),model-pool-checks (12),executor-profile-warnings,agy-permissions}.mjs`, `bin/fgos.mjs` and `src/cli/command-registry.mjs` (help text only), `apps/fgos-gateway/src/gateway.rs` (3, token read). Read from the merged runner config (`runnerConfig` parameter): the `src/runner` and `src/workflow` consumers; raw global-file reads: `registrations.mjs` (token and the `:2106`/`:4284` checks), `model-pool-checks.mjs`, `reconcile.mjs`, `inspect.mjs`; writer: `registrations.mjs` token fix and `bin-discovery.mjs`.
+- Confinement argv pins (tests that assert `--tmpfs` or `--remount-ro`): `test/runner/dispatch-confinement-blind.test.mjs`, `dispatch-confinement-backend-p03.test.mjs`, `dispatch-confinement-authority.test.mjs`. Probe-count pins: `dispatch-confinement-blind.test.mjs` (8 and 9), `dispatch-confinement-backend-p03.test.mjs` (8, message "all 8"), `test/runner/dispatch-r9-performance-cache.test.mjs` (string fixture only), `src/setup/registrations.mjs:5592` (hard-coded "all 8"), spec lines (header, S3 row, section 13 item 5, "thứ chín").
+- D5 numbers: `cargo tree -p fgos-config -e normal` 154 lines; gateway manifest 582 lines. Gateway release build wall time not measured (the build is out of this task's resource limits; recorded as not measured). `RepoHandle::trusted_main_root` is `pub` (`packages/git/rust/src/lib.rs:137`). `rustix` in the workspace has `fs` and `process` features only; for the token randomness choose `std::fs` on `/dev/urandom` (Unix).
+- Impact analysis: `fgos tool query --capability impact-analysis --status present` returns no providers: **inactive**; callers were checked with `rg`.
+- Not done in this pass: the read-only sweep of the owner's machines' config files (step 8, needs a throwaway build of the crate) is left to the phase that decides row severities (phase 08); parking noted in the report.

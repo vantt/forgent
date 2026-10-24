@@ -1,5 +1,7 @@
 # Phase 15: Machine rollout (stage 1 everywhere, stage 2 per machine on the owner's gate)
 
+> **Split** (owner decision 2026-10-24 10:00, option B). Stage 1 (copy accounts and the token into `~/.fgos/private` with `fgos config migrate --global`, source kept) is available after Slice D. Stage 2 (remove the old keys, `--finish --machine-checked`, owner gate G-D3) waits for Slice C's readers landed and activated; its preconditions that name phases 12 to 14 now mean Slice C's.
+
 Depends on 05, 08, 12, 13, 14 landed on main and activated. Suggested executor: haiku for the runbook text, the lead (sonnet) for the commands. Owner gate G-D3 per machine for stage 2.
 
 ## Context

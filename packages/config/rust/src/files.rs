@@ -109,7 +109,7 @@ pub fn read_beneath(
 }
 
 /// A `config.json` whose whole content is the tombstone (with or without one final newline).
-fn is_tombstone(bytes: &[u8]) -> bool {
+pub(crate) fn is_tombstone(bytes: &[u8]) -> bool {
     let text = TOMBSTONE.as_bytes();
     bytes == text
         || (bytes.len() == text.len() + 1 && bytes.starts_with(text) && bytes.ends_with(b"\n"))
