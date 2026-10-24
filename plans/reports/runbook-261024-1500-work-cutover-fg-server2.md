@@ -50,7 +50,10 @@ Check: `git -C "$W" rev-parse HEAD` and `git -C "$LW" rev-parse HEAD` both print
 3. Tracked event changes of this machine: `git -C "$M" status --porcelain --untracked-files=all -- .fgos/events .fgos/events.jsonl docs/distillery/state/porting .gitattributes`.
    - Empty: continue.
    - Modified or new shards: commit and push them with the current release (they merge by `merge=union`): `cd "$M" && git add -- <the exact paths listed> && git diff --cached --stat && git commit -m "chore(events): push this machine's events before the cutover" && git push origin main && cd /tmp`.
-4. Other machines: `git -C "$M" fetch origin && git -C "$M" log --oneline -5 origin/main`. Every machine had to push by 14:50. **If `origin/main` is no longer an ancestor of `$TIP`** (`git -C "$M" merge-base --is-ancestor origin/main "$TIP" || echo MOVED`): stop, tell me; I merge it into the branch, regenerate baseline and census last, rebuild the release (about 10 min), and you resume at step 1.
+4. Other machines: `git -C "$M" fetch origin && git -C "$M" log --oneline -5 origin/main`. Every machine had to push by 14:50. **If `origin/main` is no longer an ancestor of `$TIP`** (`git -C "$M" merge-base --is-ancestor origin/main "$TIP" || echo MOVED`), look at what moved: `git -C "$M" diff --stat "$TIP"...origin/main`.
+   - Only `plans/` (board lines, reports): the release payload does not contain `plans/`, so the release built from `$TIP` still matches. In step 4 use `git merge --no-ff -m "merge: work/es-cutover (Work Event Store cutover code)" "$TIP"` instead of `--ff-only` (after `git merge --ff-only origin/main` to bring the checkout to main); everything else is unchanged, and `fromCommit` of step 5 is that merge commit.
+   - Tracked event files: they were pushed by a machine after the stop; pull them (`git merge --ff-only origin/main`) and redo step 3 (baseline) before step 4 with the same `--no-ff` merge. The migrate reads HEAD, so they are imported.
+   - Anything else (code, `docs/`, `packages/`, `src/`): stop and tell me; I merge it into the branch, regenerate baseline and census, rebuild the release (about 10 min), and you resume at step 1.
 
 ## Step 2. Backups
 
@@ -87,7 +90,7 @@ The branch does not touch `AGENTS.md`, `.claude/settings.json` or `CLAUDE.md`, s
 
 ```bash
 cd "$M"
-git merge-base --is-ancestor HEAD "$TIP" && echo FF-OK      # expect FF-OK
+git merge-base --is-ancestor HEAD "$TIP" && echo FF-OK      # expect FF-OK (else the --no-ff case of step 1.4)
 git merge --ff-only "$TIP"                                    # expect "Fast-forward"
 git rev-parse HEAD                                            # expect $TIP
 grep -c AGENTKIT-OMP:START AGENTS.md                          # expect 1
