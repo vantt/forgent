@@ -493,4 +493,20 @@ mod tests {
 
         let _ = fs::remove_dir_all(&root);
     }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_symlinked_case_shard_is_refused_and_its_target_never_changes() {
+        let root = create_test_dir("symlink");
+        let external = create_test_dir("symlink-external");
+        let target = external.join("outside.jsonl");
+        fs::write(&target, "original external bytes\n").unwrap();
+        std::os::unix::fs::symlink(&target, shard::shard_path(&root, "cases").unwrap()).unwrap();
+
+        assert!(open_case(&root, "c-1", "plain", None).is_err(), "open_case wrote through a symlinked shard");
+        assert_eq!(fs::read_to_string(&target).unwrap(), "original external bytes\n");
+
+        let _ = fs::remove_dir_all(&root);
+        let _ = fs::remove_dir_all(&external);
+    }
 }
