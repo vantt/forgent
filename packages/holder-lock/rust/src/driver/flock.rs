@@ -220,7 +220,7 @@ impl LockDriver for FlockDriver {
 
     fn prepare_borrow(&self, request: &mut fgos_process::mapped::MappedSpawn) {
         // The child leads its own group; the unreaped leader pins this group id.
-        request.process_group = true;
+        request.lead = fgos_process::mapped::MappedLead::Group;
     }
 
     fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {

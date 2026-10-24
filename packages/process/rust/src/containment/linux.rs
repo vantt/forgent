@@ -6,14 +6,15 @@ use std::fs::{self, File};
 use std::io::{self, Read};
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::{Command, Stdio};
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
-use super::pgroup::{self, apply_stdio, wait_until, ListFn, Members, Unlistable, POLL};
-use super::{ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SelectEnv, SpawnSpec, Spawned, StartMode};
+use super::pgroup::{self, wait_until, ListFn, Members, Unlistable, POLL};
+use super::{ContainmentDomain, GateChild, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SelectEnv, SpawnSpec, Spawned, StartMode};
 use crate::control::{self, Signal};
 use crate::facts::{self, ProcTuple, Verdict};
+use crate::mapped::{spawn_mapped, MappedLead};
 use crate::platform::linux::read_stat;
 use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
 
@@ -146,12 +147,12 @@ impl ContainmentDriver for BwrapPidns {
         // bwrap reports the gate's host pid on this pipe once the namespace stands.
         let (read_end, write_end) = cloexec_pipe()?;
         let info_slot = spec.fd_map.iter().map(|(slot, _)| slot.0 + 1).max().unwrap_or(3).max(3);
-        let mut cmd = Command::new(&prefix[0]);
-        cmd.args(&prefix[1..]).arg("--info-fd").arg(info_slot.to_string()).arg("--").args(&spec.argv);
+        let mut request = pgroup::gate_request(prefix.clone(), &spec, MappedLead::Caller);
+        request.argv.extend(["--info-fd".into(), info_slot.to_string().into(), "--".into()]);
+        request.argv.extend(spec.argv.iter().map(Into::into));
         let mut mapped: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
         mapped.push((FdSlot(info_slot), &write_end));
-        apply_stdio(&mut cmd, &spec);
-        let mut child = control::spawn_with_fds(cmd, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
+        let mut child = spawn_mapped(&request, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
         drop(write_end);
 
         let gate_pid = match read_child_pid(read_end) {
@@ -261,7 +262,7 @@ fn refusal_line(prefix: &[String]) -> Option<String> {
 /// `direct` mode it has no `--die-with-parent`, so killing only the monitor
 /// would leave the gate and the agent running with no record of them. Killing
 /// the namespace's init (every child of the monitor) takes the namespace down.
-fn end_failed_spawn(monitor: &mut Child) {
+fn end_failed_spawn(monitor: &mut GateChild) {
     for _ in 0..50 {
         let Ok(children) = members(monitor.id(), true, None) else {
             break;
@@ -303,29 +304,7 @@ impl ContainmentDriver for LinuxPgroup {
     }
 
     fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError> {
-        use std::os::unix::process::CommandExt;
-        let Some((program, args)) = spec.argv.split_first() else {
-            return Err(ContainmentError::SpawnFailed("empty gate command".into()));
-        };
-        let mut cmd = Command::new(program);
-        cmd.args(args);
-        apply_stdio(&mut cmd, &spec);
-        // SAFETY: setsid is async-signal-safe and touches no memory of the parent.
-        unsafe {
-            cmd.pre_exec(|| {
-                if libc::setsid() < 0 {
-                    return Err(io::Error::last_os_error());
-                }
-                Ok(())
-            });
-        }
-        let mapped: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
-        let mut child = control::spawn_with_fds(cmd, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
-        let Some(root) = tuple_of(ProcId(child.id())) else {
-            let _ = child.kill();
-            let _ = child.wait();
-            return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
-        };
+        let (child, root) = pgroup::spawn_leader(&spec, tuple_of)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::LinuxPgroup(root.clone()));
         Ok(Spawned { child, root })
