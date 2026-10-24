@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b50095a5c6dc13ee25400575bf9295e92d323abfdadbbec13fc1d3db68c0d47d",
+  "payloadDigest": "d9b575ffe68f1b0a6f29688976f14ad55baa815fd61a365c5b50562753c1db67",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -308,7 +308,7 @@
     "packages/event-store/rust/src/sync.rs": "5490054b566437cec4e9974959048e2ae9ad2f257fdc38ae9a15884a030784d8",
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
     "packages/event-store/rust/src/walk.rs": "429928b27ac16e6bc1cb14dbbd56e30e02aafda1b140a479c78502c913b2e392",
-    "packages/event-store/rust/tests/append_recovery.rs": "fb956bf800c04a7ce6ed0ab4c838073f3b9f1ce867f39381ff51daa0b677d811",
+    "packages/event-store/rust/tests/append_recovery.rs": "c9cdfd1dff2ad7d9aaf38eb84bb90cbb99069f280cde64c846b5eee38bd231fa",
     "packages/event-store/rust/tests/branch_local_refs.rs": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
     "packages/event-store/rust/tests/checkpoint.rs": "082d41b7dbeb3bf2000e36a4456def251e98967795da86b9564337b6a937ab5b",
     "packages/event-store/rust/tests/common/mod.rs": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",

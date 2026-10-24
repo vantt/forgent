@@ -44,6 +44,12 @@ fn append_ack_hashes_seen_and_cursor_are_verified() {
 fn append_returns_each_event_as_it_is_stored_whatever_the_payload_key_order() {
     // This test binary is built with serde_json's preserve_order (unified from a dev-dependency), as the
     // native addon is, so a payload map keeps the caller's key order unless append hands back the stored line.
+    // Without preserve_order every map is sorted and the asserts below pass with or without the fix.
+    assert_eq!(
+        serde_json::to_string(&json!({"z":1,"a":2})).unwrap(),
+        r#"{"z":1,"a":2}"#,
+        "this test needs serde_json's preserve_order"
+    );
     let r = Repo::new();
     let events = [fgos_event_store::append::EventInput {
         event_type: "work.add".into(),
