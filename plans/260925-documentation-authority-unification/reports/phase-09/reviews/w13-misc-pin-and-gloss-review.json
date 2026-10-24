@@ -1,0 +1,56 @@
+{
+  "verdict": "pass-with-findings",
+  "head": "aaf127d23",
+  "commits": ["901c41dea", "0fe6c4381"],
+  "findings": [
+    {
+      "id": "A-M1",
+      "severity": "medium",
+      "verdict": "fix-before-F",
+      "summary": "The live overlay check compares only the four binding keys. On live rows, the old assertions bindingSha256==digest, reviewStatus=='pending' and whole-shard equality now run only at the authoring commit. Live edits to reviewStatus, bindingSha256, disposition, sourceContent or claimId go unnoticed, and so does the 136/5 disposition correction. The receipt overclaims that all earlier assertions remain.",
+      "evidence": "misc-fix/rebind.py check_live compares payload() only; rebind/rebind.py --check reports binding drift only. Reviewer controls on in-memory live ledgers: unrecorded payload edit on row 3 caught; row 2 reviewStatus=approved, row 2 disposition/sourceContent changed and row 2 bindingSha256 zeroed all pass."
+    },
+    {
+      "id": "A-L1",
+      "severity": "low",
+      "verdict": "fix",
+      "summary": "rebind.py --check and verify.py leave /tmp/fgos-work/w11-misc-pin (misc/ and verify/) after every run, so the receipt's 'deleted' claim no longer holds.",
+      "evidence": "The scratch was present before this review (mtimes 02:15 and 02:26) and is rewritten by each check. No cleanup exists in rebind.extract or verify.main."
+    },
+    {
+      "id": "B-L1",
+      "severity": "low",
+      "verdict": "fix",
+      "summary": "The vertical-list label rule only fires when an adjacent list line is also a witness. A lone glossed item that loses its single label in a longer list is not flagged.",
+      "evidence": "g9/w11-followup.py audit_glosses: vertical = vertical_label(before) and neighbors, where neighbors are witnesses at line +/-1."
+    },
+    {
+      "id": "B-L2",
+      "severity": "low",
+      "verdict": "optional",
+      "summary": "recompose.workspace() can race between concurrent runs: the root is removed between FileExistsError and TemporaryDirectory, giving FileNotFoundError, or an empty root is left behind.",
+      "evidence": "g9/recompose.py workspace(): mkdir(parents=True) then try/except FileExistsError, and rmdir only if this process created the root."
+    },
+    {
+      "id": "B-L3",
+      "severity": "low",
+      "verdict": "fix-wording",
+      "summary": "The gloss on witness #2 calls the Stop-drain decision an open fork, then states its answer in the same parentheses.",
+      "evidence": "w10-gloss-audit.json witnesses[2].after; witness #0 shows the decision was answered on 2026-10-20."
+    },
+    {
+      "id": "A-pass",
+      "severity": "info",
+      "verdict": "pass",
+      "summary": "Scope is misc-fix/** only. The authoring commit is found by git log (ad94156cf). Authored shard, record and effective loop all pass. rebind.py --check exits 0. verify.py exits 0 and rewrites only volatile fields (restored). Both Doer controls fail as expected, and the reviewer's unrecorded payload edit is caught.",
+      "evidence": "Reviewer runs at aaf127d23; checks.json SHA-256 1d2f6c8a... restored; git status clean."
+    },
+    {
+      "id": "B-pass",
+      "severity": "info",
+      "verdict": "pass",
+      "summary": "Glosses #35-39, #62, #65, #47, #50, #59, #94 and #2 read correctly. The audit covers 104 witnesses, 102 pass and 2 reviewed. Independent patch --fuzz=0 replay of the git and holder-lock chains is byte-exact forward and on rollback. sweep --check --pin HEAD exits 0 and creates no directory under /tmp/fgos-work. Receipt counts 21,194 per row and 20,621 unique are correct.",
+      "evidence": "Reviewer replay from the eb744281d preimage, 2 steps each; witness lines equal the replayed bytes (0 mismatches over 4 files); /tmp/fgos-work listing identical before and after sweep."
+    }
+  ]
+}
