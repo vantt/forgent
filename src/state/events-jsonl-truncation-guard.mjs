@@ -30,6 +30,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { readConfig } from "../config/facade.mjs";
 import { createGitInspect, gitPortOptions } from "../git/inspect.mjs";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
@@ -464,13 +465,10 @@ export function runOpportunisticMainCheckoutChecks(
 
         let configFallbackIntervalSec = null;
         try {
-          const sharedConfigPath = path.join(realRepoRoot, ".fgos", "config.json");
-          if (fs.existsSync(sharedConfigPath)) {
-            const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, "utf8"));
-            configFallbackIntervalSec = cfg?.checkpoint?.fallbackIntervalSec;
-          }
+          configFallbackIntervalSec = readConfig({ projectRoot: realRepoRoot, sections: ["checkpoint"] }).value.checkpoint?.fallbackIntervalSec;
         } catch {
-          // ignore
+          // A config the door refuses (or cannot load) leaves the interval unset: the built-in default applies
+          // and `fgos doctor` reports the refusal. This guard widens nothing.
         }
 
         const effectiveFallbackIntervalSec =

@@ -4,8 +4,8 @@
 // and the layout floor: callers read them from `capabilities`, the route refuses
 // a bad value. Read-only; setup writes the defaults (`registerConfigDefault`).
 
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../config/global-config.mjs';
+import path from 'node:path';
+import { isConfigRefusal, readConfig } from '../config/facade.mjs';
 
 export const TERMINAL_CONFIG_KEY = 'terminal';
 
@@ -22,11 +22,6 @@ export const DEFAULT_TERMINAL_CONFIG = Object.freeze({
 /** Every setting, as its dotted path in the `terminal` section. */
 const SETTINGS = ['allocationGraceMs', 'retainFailedPaneMs', 'layout.policy', 'layout.minCols', 'layout.minRows', 'layout.maxPanesPerTab'];
 
-function sectionOf(config) {
-  const section = config?.[TERMINAL_CONFIG_KEY];
-  return section && typeof section === 'object' && !Array.isArray(section) ? section : {};
-}
-
 const readSetting = (section, name) => name.split('.').reduce((value, key) => value?.[key], section);
 
 /** The route's flat key of a setting (`layout.minCols` -> `minCols`). */
@@ -41,18 +36,23 @@ function defaultOf(name, defaults) {
  * resolveTerminalConfig(repoRoot, { globalConfigPath, defaults }) ->
  *   { entries: [{ name, value, source }], values: { [dotted name]: value } }
  *
- * `source` is `project`, `global` or `default`; an explicit `null` counts as set.
- * `defaults` is the core's `capabilities.defaults` (a core default reads as
- * `undefined` without it). Throws when a config file cannot be parsed.
+ * `source` is `project`, `global` or `default` (the value came only from the
+ * standard); an explicit `null` counts as set. `defaults` is the core's
+ * `capabilities.defaults` (a core default reads as `undefined` without it).
+ * `globalConfigPath` names a global config file whose directory replaces `~/.fgos`.
+ * Throws the door's refusal when a config file is unusable.
  */
 export function resolveTerminalConfig(repoRoot, { globalConfigPath, defaults } = {}) {
-  const project = sectionOf(readSharedConfig(repoRoot));
-  const global = sectionOf(globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig());
+  const { value, origins } = readConfig({
+    projectRoot: repoRoot,
+    globalDir: globalConfigPath ? path.dirname(globalConfigPath) : undefined,
+    sections: [TERMINAL_CONFIG_KEY],
+    origins: [TERMINAL_CONFIG_KEY],
+  });
+  const layers = new Map(origins.map((origin) => [origin.path, origin.layer]));
   const entries = SETTINGS.map((name) => {
-    const fromProject = readSetting(project, name);
-    if (fromProject !== undefined) return { name, value: fromProject, source: 'project' };
-    const fromGlobal = readSetting(global, name);
-    if (fromGlobal !== undefined) return { name, value: fromGlobal, source: 'global' };
+    const layer = layers.get(`${TERMINAL_CONFIG_KEY}.${name}`);
+    if (layer === 'project' || layer === 'global') return { name, value: readSetting(value[TERMINAL_CONFIG_KEY], name), source: layer };
     return { name, value: defaultOf(name, defaults), source: 'default' };
   });
   return { entries, values: Object.fromEntries(entries.map((e) => [e.name, e.value])) };
@@ -88,7 +88,8 @@ export function terminalRouteConfig(repoRoot, { globalConfigPath } = {}) {
   let entries;
   try {
     ({ entries } = resolveTerminalConfig(repoRoot, { globalConfigPath }));
-  } catch {
+  } catch (err) {
+    if (!isConfigRefusal(err)) throw err;
     return {};
   }
   const config = {};
@@ -105,7 +106,8 @@ export function retainFailedPaneMsOf(repoRoot, { globalConfigPath } = {}) {
   try {
     const { values } = resolveTerminalConfig(repoRoot, { globalConfigPath });
     return isPositiveInteger(values.retainFailedPaneMs) ? values.retainFailedPaneMs : null;
-  } catch {
+  } catch (err) {
+    if (!isConfigRefusal(err)) throw err;
     return null;
   }
 }

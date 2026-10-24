@@ -21,11 +21,16 @@ import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';
 import path from 'node:path';
 
 import { DEFAULTS } from '../state/work.mjs';
+
+/** `workerSlots.ceiling` of the project that owns the `.fgos` directory `dir` (null: no ceiling armed); a refused config file throws. */
+export function readWorkerSlotCeiling(dir) {
+  return readConfig({ projectRoot: path.dirname(dir), sections: ['workerSlots'] }).value.workerSlots?.ceiling;
+}
 
 /**
  * Read `releaseTrigger` off the MOST RECENT settle-to-'todo' event for
@@ -160,7 +165,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     && (actor === 'session' || actor === 'human')
     && isReclaimEligible(repoRoot, id, effectiveClaimRole);
 
-  const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
+  const ceiling = readWorkerSlotCeiling(dir);
 
   // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no
   // longer writes a durable work.move(->doing), so the ORIGINAL claim's

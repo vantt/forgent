@@ -25,6 +25,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { readConfig } from '../config/facade.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitScopedCommit } from '../git/scoped-commit.mjs';
 import { commitLegacyEventFiles } from './legacy-event-git-adapter.mjs';
@@ -165,12 +166,11 @@ export function verifyCompactionCandidate(originalEntries, candidateEvents) {
   return { ok: true, reason: 'clean', totalEvents: before.length };
 }
 
+// An opportunistic guard: a config the door refuses (or cannot load) reads as "no configured threshold" and the
+// built-in default applies; `fgos doctor` reports the refusal.
 function readConfigThreshold(repoRoot) {
   try {
-    const sharedConfigPath = path.join(repoRoot, '.fgos', 'config.json');
-    if (!fs.existsSync(sharedConfigPath)) return null;
-    const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, 'utf8'));
-    const value = cfg?.checkpoint?.compactionEventThreshold;
+    const value = readConfig({ projectRoot: repoRoot, sections: ['checkpoint'] }).value.checkpoint?.compactionEventThreshold;
     return typeof value === 'number' ? value : null;
   } catch {
     return null;

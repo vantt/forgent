@@ -1,5 +1,5 @@
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { mergeWithGlobalConfig } from '../config/global-config.mjs';
+import path from 'node:path';
+import { readConfig } from '../config/facade.mjs';
 
 // Phase 09 extends the existing eventStore registration with this ONE shape.
 export const EVENT_STORE_DEFAULTS = Object.freeze({ seal: Object.freeze({ intervalSec: 300 }), sync: Object.freeze({ intervalSec: 300 }), rebuild: Object.freeze({ maxAttempts: 5 }), remote: 'origin' });
@@ -21,6 +21,8 @@ export function eventStoreConfig(config = {}) {
   if (typeof result.remote !== 'string' || !/^[A-Za-z0-9_-]+$/.test(result.remote)) throw invalid('remote');
   return result;
 }
+/** The event-store settings of the project at `root`; `globalConfigPath` names a global config file whose directory replaces `~/.fgos`. A refused config file throws. */
 export function readEventStoreConfig(root, globalConfigPath) {
-  return eventStoreConfig(mergeWithGlobalConfig(readSharedConfig(root), globalConfigPath));
+  const globalDir = globalConfigPath ? path.dirname(globalConfigPath) : undefined;
+  return eventStoreConfig(readConfig({ projectRoot: root, globalDir, sections: ['eventStore'] }).value);
 }

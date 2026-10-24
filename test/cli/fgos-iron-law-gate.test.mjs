@@ -205,14 +205,15 @@ test('a missing ironLaw key fails closed to ask — the root approve above still
   assert.match(result.stderr, /Iron Law/);
 });
 
-test('an unrecognized ironLaw.level fails closed to ask rather than reading as warn (D7)', () => {
+test('an unrecognized ironLaw.level is refused by name and the approve never proceeds, so it never reads as warn (D7)', () => {
   const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-bogus');
   writeIronLawLevel(cwd, 'whatever');
 
   const result = run(cwd, ['approve', 'gate-level-bogus']);
-  assert.equal(result.status, 4, `an unknown level is never the permissive one: ${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /Iron Law/);
+  assert.equal(result.status, 1, `an unknown level is never the permissive one: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /config-schema .*ironLaw\.level/, 'the refusal names the config file path that holds the bad level');
+  assert.notEqual(stateView(cwd).work['gate-level-bogus'].status, 'delivered', 'the approve did not go through');
 });
 
 // ─── D8: the warn-level record ─────────────────────────────────────────────
