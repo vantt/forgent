@@ -455,8 +455,12 @@ async function censusDriftRefusal(committingToplevel) {
   const git = (args) => execFileSync('git', args, {
     cwd: committingToplevel, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const scanPath = path.resolve(__dirname, '../scripts/git-one-door-scan.mjs');
-  if (!fs.existsSync(scanPath)) return null; // a copied hook without its scan has no census to judge by
+  // The committing checkout's own scanner judges its own census: a branch that changes the scan's rules
+  // regenerates the census with them, so main's scanner would see drift that is not there. A checkout
+  // without one (a probe tree) falls back to the hook's own; a copied hook with neither has nothing to judge by.
+  const scanPath = [committingToplevel, path.resolve(__dirname, '..')]
+    .map((root) => path.join(root, 'scripts/git-one-door-scan.mjs')).find((file) => fs.existsSync(file));
+  if (!scanPath) return null;
   try {
     const { MUTATION_CENSUS_PATH, censusDrift, declaredProduct } = await import(pathToFileURL(scanPath).href);
     if (!git(['ls-files', '--stage', '--', MUTATION_CENSUS_PATH]).trim()) return null;
