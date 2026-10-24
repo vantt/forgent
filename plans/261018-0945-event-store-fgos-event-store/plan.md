@@ -112,6 +112,12 @@ Interface mismatches to settle with the Git leads (not owner questions). ES phas
 | M9 | no Git door materializes a reviewed commit's bytes into the main checkout | ScopedCommit `sourceCommit` mode under main 50 with the hook run from HEAD's tree (only if Q5 stays at its default) | 05 | 08, 11 | **Not planned: needs a Git spec amendment**, A2 in the Git plan; Git recommends Q5 (a), which needs no Git change |
 | M10 | `components.nativeAddon` optional until Git 07; spec §23.2 item 9 needs activation to refuse a payload without it | required from the release that carries ES-09, or an ES activation check | 01/07 | 10 | Accepted: Git phase 05 req 7a, `fgctl` refuses a linux-x64 candidate without the addon from Git 05's release; windows-x64 required at Git 07 |
 
+## Hand-offs received for after the cutover
+
+| Item | From | What | When | Source |
+|---|---|---|---|---|
+| H33 | HARDEN (`claude-p74h@fg-server2`), owner 2026-10-24 20:00 (T3-04a decisions 30–32) | Delete the legacy `work.friction` fence: `run_lazy_migration`, `LegacyFrictionSource`/`LegacyFrictionRecord` (`packages/work-state/rust/src/legacy_friction.rs`), `fgos friction migrate`, `wiring/friction_sources.rs`, doctor row `observe-friction-migrated` (`checkObserveFrictionMigrated`) and its tests, the `.fgos/observe/.lock/TOMBSTONE` fence; about −780 lines | One release after the Event Store cutover (fences live one release). Before it, HARDEN's T3-04a takes the lazy migration off the friction write path, after the cutover; HARDEN announces it | [council](../reports/council-261024-1947-harden-t3a-arbitration.md) §5 |
+
 ## Execution model
 
 - **Doors:** each phase lead runs through `fgos workflow start --units <phase units file>` or `fgos run "<brief>" --provider <id> --writes <owned paths> --worktree <linked worktree>`, after `fgos dispatch decide`. No raw CLI session acts as a lead.
