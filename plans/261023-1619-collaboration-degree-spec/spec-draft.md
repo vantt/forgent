@@ -1,6 +1,6 @@
 # Spec draft, Part A: patterns declared in config, params tuned per unit
 
-Status: draft for owner approval. Nothing here is implemented; no area spec changes until the owner approves it and section 18 is merged.
+Status: approved by the owner 2026-10-24 18:09 ("duyệt phần A"). Not implemented; the area specs change when section 18 is merged in the implementation work.
 Date: 2026-10-24. Code facts verified at main `4065cbd68` and re-checked at `be939a764` where the second panel cites it.
 Language: area specs are Vietnamese; quoted current sentences stay verbatim, all other text is English.
 
