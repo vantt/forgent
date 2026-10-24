@@ -1,112 +1,338 @@
 {
- "version": 1,
- "authority": "L12-137",
- "gates": [
-  {
-   "gateId": "changed-binding-independent-review",
-   "g": "G0",
-   "status": "partial",
-   "evidence": [],
-   "commit": "8a9385eca",
-   "pin": null,
-   "note": "b3 38/4, b4 20/2, b2 49/1 so far; b1, b5 running"
+  "version": 1,
+  "authority": "L12-137",
+  "asOf": {
+    "commit": "01e64719d",
+    "date": "2026-10-24",
+    "finalPinF": null,
+    "basis": "Committed evidence only: preflip-execution-plan.md section 2, owner-answers.md L13-1..L13-9, reviews/*, receipts, review-batches.json, w2-review-notes.md. A review of a delta is not counted as approval of a whole gate; pending re-review rows and Lead fixes without an independent review count as not approved."
   },
-  {
-   "gateId": "L12-96-uncomposed-duty",
-   "g": "G1",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "non-behavioral-census-join",
-   "g": "G2",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "dropped-claims-register",
-   "g": "G3",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "git-one-door-census-widening",
-   "g": "G4",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "retention-L11-23-L11-25",
-   "g": "G5",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "step3-step4-preserve-premise-review",
-   "g": "G6",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "composition-independent-review",
-   "g": "G7",
-   "status": "partial",
-   "evidence": [
-    "reviews/g7-c1-review.json",
-    "reviews/g7-c2-review.json",
-    "reviews/g7-c3-review.json",
-    "reviews/g7-c4-review.json",
-    "reviews/g7-c5-review.json",
-    "reviews/g7-c6-review.json",
-    "reviews/g7-c7-review.json"
-   ],
-   "commit": "8a9385eca",
-   "pin": null,
-   "note": "385/387 APPROVE at 8a9385eca; 2 REWORK (c5 fgos-merge.test.mjs stray blank line; c7 fix-bare-citation-findings.md RUL home); 36 deferred to G9; parks pending (D2)"
-  },
-  {
-   "gateId": "L12-129-archive-ref-and-checkout",
-   "g": "G8",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "source-context-and-post-pin-recomposition",
-   "g": "G9",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "final-code-holder-land-rehearsal",
-   "g": "G10",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
-  },
-  {
-   "gateId": "cutover-release-with-docs-lease",
-   "g": "G11",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
+  "gates": [
+    {
+      "gateId": "changed-binding-independent-review",
+      "g": "G0",
+      "status": "partial",
+      "evidence": [
+        "review-batches.json",
+        "reviews/g0-b1-review.json",
+        "reviews/g0-b2-review.json",
+        "reviews/g0-b3-review.json",
+        "reviews/g0-b4-review.json",
+        "reviews/g0-b5-review.json",
+        "reviews/w2-g0-delta-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w7-rebind-review.json",
+        "g0fix/receipt.md",
+        "ledgerfix/receipt.md",
+        "ledgerfix/recipe-migration.json",
+        "rebind/receipt.md",
+        "rebind/rereview-claim-ids.json"
+      ],
+      "commit": "6f5b9419d",
+      "pin": null,
+      "note": "First pass at 8a9385eca: b1 51/4, b2 49/1, b3 38/4, b4 20/2, b5 19/3 (177 APPROVE / 14 REWORK of 191). Fixes e70742232, ae9b9a6ef; delta review 10/2 at ae9b9a6ef; ledger recipe migration fd161a8c2 changed 47 stored hashes and made the register 257 rows. w4-ledger-d7b at 77db6ed2b: 73/257 changedBindings rows not current or not joined to their ledger row (64 rebound by 4b62385cb in the ledger only, 8 legacy drift from bc5589ed7, claim_af89c4e6 superseded by s15 bindingRefresh/5). The register was last written at fd161a8c2. 217 drifting rows rebound in 8e7c6ee93 (w7-rebind 217 APPROVE / 3 REWORK on location); 124 content rows are pending re-review and the 3 REWORK rows were corrected by the Lead in 6f5b9419d without an independent review. No verdict file binds {id, bindingSha256, targetUnitDigest, APPROVE} at current digests for all rows.",
+      "remaining": "Re-review the 124 pending content rebind rows and the 3 rows corrected in 6f5b9419d, then at F re-join every changedBindings row to its ledger row and produce a verdict join with 0 missing, 0 mismatched and 0 open REWORK.",
+      "blockers": [
+        "124 content rebind rows pending re-review (rebind/rereview-claim-ids.json)",
+        "3 rows corrected in 6f5b9419d (claim_26b3a49a move->merge, claim_2e2bc926, claim_5ba6768e) not independently re-reviewed",
+        "73/257 changedBindings rows in phase-08/step-08-preflip-gates.json not current at 77db6ed2b; register not re-joined since fd161a8c2 (w4-ledger-d7b REWORK HEAD-gate-changedBindings, LF-claim_af89c4e6-current)",
+        "Earlier approvals were bound to pre-migration hashes and M1 digests; no current-digest verdict file exists",
+        "Final pin F not recorded"
+      ]
+    },
+    {
+      "gateId": "L12-96-uncomposed-duty",
+      "g": "G1",
+      "status": "partial",
+      "evidence": [
+        "carries/receipt.md",
+        "composition/receipt.md",
+        "composition/member-joins.json",
+        "composition/area-holder-table.json",
+        "composition/gap05-placement-proposal.json",
+        "composition/w2-gap05-verification.json",
+        "late-areas/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "reviews/w2-g1-carries-review.json",
+        "reviews/w2-late-areas-review.json",
+        "reviews/w3-d1b-resync-review.json",
+        "reviews/w3-d7-resync-review.json",
+        "reviews/w4-ledger-d7b-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json"
+      ],
+      "commit": "d22072da2",
+      "pin": null,
+      "note": "D1 carries f534aeaea (44 claims; w2-g1-carries 69/5 at cffe725b9). D1b/D7 re-sync 7be0cbc52, d9bedf229 (reviews 61/6, 21/3), fixed in fd161a8c2/dff50b64c (w4-ledger-d7b approves the LF-*/D7b doc items), shell-helper and doctor-split follow-ups approved in w5/w6. Late-area holders e5af4c501 (seat-binding, workflow, end-user contracts; w2-late-areas 20/2). D2/D2b composed family 8/13/17 records (member-joins 48/16/8) in 5fe778624 and d22072da2. No independent review of the composition records was found. GAP-05 placement still awaits the Lead; dead-vocabulary guard 9/1 and citation-drift test 31/1 (124 new findings) in composition/receipt.md.",
+      "remaining": "Get an independent per-member review of the D2 family 8/13/17 records, have the Lead place GAP-05 dynamic-023895, and close the citation-drift and dead-vocabulary owning guards on the post-move scratch replay.",
+      "blockers": [
+        "No independent review found for composition/** (family 8 successor scan sets, family 13 convention/citation-drift scan, family 17 area-holder table)",
+        "GAP-05 placement proposal (composition/gap05-placement-proposal.json) awaits Lead approval; test/runner/dead-vocabulary-guard.test.mjs red (L13-7 D class)",
+        "test/scripts/check-decision-citation-drift.test.mjs real-repo baseline case reports 124 new findings (open parity gap per composition/receipt.md)",
+        "No per-member APPROVE join over all 115 members found",
+        "Pending content rebind re-review (rebind/rereview-claim-ids.json) overlaps carried claims"
+      ]
+    },
+    {
+      "gateId": "non-behavioral-census-join",
+      "g": "G2",
+      "status": "final-pin",
+      "evidence": [
+        "census-join/receipt.md",
+        "reviews/w2-g2-census-review.json",
+        "reviews/w2-g2-dyn-delta.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w6-misc-rework-review.md",
+        "preserve-premise/verification.json"
+      ],
+      "commit": "b25dadae2",
+      "pin": "3d0169f39",
+      "note": "All 1,126 ids joined at pin 3d0169f39 (646 owning-test joins, 293 grade-record REJECT confirmations, 187 owned judgments); 143 post-pin dynamic sites (87 proof joins, 56 source judgments) and 16 post-pin literal occurrences. w2-g2-census 231/33; every REWORK fixed and approved in w3-g2g6-delta (G2 rows all APPROVE). 8 post-pin literal judgments are still open (w3-g2g6-delta G2-postpin-literal-judgments: 5 runner.yaml reasons defer the real judgment). At 4178dcc6e, 33 owning-proof locators in packages/git/rust/tests/{inspect,recovery_matrix,scoped_commit_sync}.rs no longer point at a #[test] line (w6-misc-rework). preserve-premise/verify.py --pin HEAD exits 1 only on the G2 census pin (L13-9 item 4, w7-header-sentence).",
+      "remaining": "At F, re-run join.py with --pin F and --rescan, refresh the 33 moved Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review.",
+      "blockers": [
+        "Pinned to 3d0169f39, not F",
+        "33 G2 Rust test locators moved since the pin",
+        "8 post-pin literal judgments open",
+        "preserve-premise/verify.py exits 1 on the G2 census pin"
+      ]
+    },
+    {
+      "gateId": "dropped-claims-register",
+      "g": "G3",
+      "status": "final-pin",
+      "evidence": [
+        "carries/receipt.md",
+        "reviews/w2-g3-packaging-review.json"
+      ],
+      "commit": "f534aeaea",
+      "pin": null,
+      "note": "dropped-001..017 each APPROVE in w2-g3-packaging-review at cffe725b9 (G3-ties APPROVE, no tie). The register has no dropped-needs-* status, but every entry still reads restored-pending-review (dropped-010 superseded-pending-review). docs/platform/packaging-distribution and host-invocation-routing changed after the review (7be0cbc52, fd161a8c2, 4b62385cb, ad94156cf, 30ed2bbf4); no evidence was found that the 17 restore targets were re-checked at current digests. The 5 packaging REWORKs of that review belong to G1 and were fixed in later waves.",
+      "remaining": "At F, re-check the 17 register targets at their current anchor and unit digest, get a delta review for any changed target, and move the register statuses off *-pending-review.",
+      "blockers": [
+        "Per-id approvals are bound to cffe725b9; targets edited afterwards",
+        "Register statuses still restored-pending-review / superseded-pending-review"
+      ]
+    },
+    {
+      "gateId": "git-one-door-census-widening",
+      "g": "G4",
+      "status": "external",
+      "evidence": [
+        "git-one-door/receipt.md",
+        "git-one-door/exemption-proposal.md",
+        "git-one-door/declared-exemptions/receipt.md",
+        "git-one-door/wrapper-callers/receipt.md",
+        "git-one-door/wrapper-escapes/receipt.md",
+        "git-one-door/git-owner-review-request.md",
+        "reviews/w2-g4-code-review.json",
+        "reviews/w4-g4-declare-review.json",
+        "reviews/w5-g4-wrapper-review.json",
+        "reviews/w6-g4-escape-review.json"
+      ],
+      "commit": "53499dc9d",
+      "pin": null,
+      "note": "Census undeclared 58 -> 19 -> 25 declared under owner L13-6 answer A (1 cold hook .githooks/pre-commit, 10 byte-pinned tooling, 9 missing-capability, 5 configured commands). 2e57b8bc1 declarations, db4b7de4d caller binding, 1c64b1904 escape refusal: w6-g4-escape 6/1 confirms scanner 0 sites twice, census reproduces, 23/23 focused tests. The w6 REWORK (spec sentence overclaims; aliased export still lets a caller inherit a declared wrapper) was addressed by the Lead in 53499dc9d with no independent re-review found. test/git/one-door.test.mjs ran 4/6 in the w4 reviewer environment (addon not shipped). L13-6 requires the Git owner to review the declarations; L13-9: review branch review/doc-git-one-door goes to HARDEN only after WORK posts \"cutover xong\".",
+      "remaining": "Git owner (HARDEN) must review the declarations on the review branch, and 53499dc9d needs an independent check.",
+      "blockers": [
+        "Git owner / HARDEN review of the 25 declarations not done; review-branch push waits for WORK \"cutover xong\" (L13-9)",
+        "53499dc9d (w6 REWORK fix) not independently re-reviewed",
+        "Aliased-export scan gap is an open Git-owner item (git-one-door/git-owner-review-request.md)"
+      ]
+    },
+    {
+      "gateId": "retention-L11-23-L11-25",
+      "g": "G5",
+      "status": "unmet",
+      "evidence": [
+        "resync-b/verify-resync.mjs",
+        "resync-b/adjudications.json"
+      ],
+      "commit": null,
+      "pin": null,
+      "note": "No evidence found of the retentionReceipts span sha256 check at W0 or at any later commit (no log or receipt). Related only: resync-b/verify-resync.mjs asserts the L11-25 routing/banner prefix in the reading-map entry union, and resync-b/adjudications.json keeps the L11-25 banner; the two compounding-to-knowledge lines have no committed check.",
+      "remaining": "Run the retentionReceipts hash check (holder-lock spec line 8, reading-map banner spans, both compounding-to-knowledge lines) now and again at F, and commit the log.",
+      "blockers": [
+        "No committed hash-check evidence",
+        "Final pin F not recorded"
+      ]
+    },
+    {
+      "gateId": "step3-step4-preserve-premise-review",
+      "g": "G6",
+      "status": "partial",
+      "evidence": [
+        "preserve-premise/receipt.md",
+        "preserve-premise/sentence-delta.json",
+        "preserve-premise/sentence-replay.json",
+        "misc-fix/receipt.md",
+        "reviews/w2-g6-preserve-review.json",
+        "reviews/w3-g2g6-delta-review.json",
+        "reviews/w5-misc-fix-review.json",
+        "reviews/w6-misc-rework-review.json",
+        "reviews/w7-header-sentence-review.json"
+      ],
+      "commit": "afb5bb35c",
+      "pin": "4178dcc6e",
+      "note": "5,413 rows (4,804 + 609) at pin 4178dcc6e: 3,990 bounded confirmations, 1,260 parks, 163 dated wrapper notes, 1,423 open judgment/note rows; proof.py replays byte-identical twice; 10 negative controls park. Review chain: w2-g6 68/50 (sampled by stratum), w3 delta 103/1, w5 9/2, w6 10/1, w7 14/2. The two w7 REWORKs (misc-fix/verify.py line-75 pin, misc-fix/receipt.md counts) were applied by the Lead in c5586146c with no independent re-review found. L13-9 item 3 accepts the illustrative-placeholder rule (6 -> 57 rows). At F: 186 G6 rows and 86 wrapper successor digests changed by 7be0cbc52/6d275ad81 need a refresh (w3-g2g6-delta finding 4). The combined preserve-premise/verify.py is blocked on the G2 pin.",
+      "remaining": "Get c5586146c independently checked, get an APPROVE on every overturn/judgment row (the reviews so far were sampled), then refresh the proof at F and replay it twice.",
+      "blockers": [
+        "c5586146c (w7 REWORK fixes) not independently re-reviewed",
+        "No exhaustive APPROVE over the 1,423 open judgment/note rows and every overturn (w2-g6 was a stratified sample)",
+        "186 G6 rows and 86 wrapper successor digests to refresh at F",
+        "Combined verifier blocked on the G2 census pin"
+      ]
+    },
+    {
+      "gateId": "composition-independent-review",
+      "g": "G7",
+      "status": "partial",
+      "evidence": [
+        "review-batches.json",
+        "reviews/g7-c1-review.json",
+        "reviews/g7-c2-review.json",
+        "reviews/g7-c3-review.json",
+        "reviews/g7-c4-review.json",
+        "reviews/g7-c5-review.json",
+        "reviews/g7-c6-review.json",
+        "reviews/g7-c7-review.json",
+        "composition/receipt.md",
+        "composition/w2-independent-verification.json",
+        "composition/w2-predecessor-recomposition.json",
+        "w1-review-notes.md",
+        "w2-review-notes.md",
+        "rebind/rereview-claim-ids.json"
+      ],
+      "commit": "d22072da2",
+      "pin": null,
+      "note": "Of 423 specs, 387 reviewed at 8a9385eca: 385 APPROVE, 2 REWORK (c5 test/cli/fgos-merge.test.mjs stray blank line; c7 docs/how-to/fix-bare-citation-findings.md RUL home); 36 deferred to G9. D2 recomposed both REWORK specs and composed park actions (5fe778624, d22072da2): 11 of 15 unfinished parks completed, 4 park actions blocked on missing holders. 62 effective specs pass fuzz=0 round trips (bytes only, not semantic approval). No independent review of the recomposed REWORK specs or of the 101 park actions was found. The 4 blocked actions predate the D6 holders (e5af4c501) and no recomposition after D6 was found. Many target files changed after 8a9385eca, so digest-bound approvals reopen per id at F.",
+      "remaining": "Recompose the 4 blocked park actions against the D6 holders, then get an independent review of the 2 recomposed REWORK specs and all 101 park actions, and re-check every approved spec digest at F.",
+      "blockers": [
+        "2 REWORK specs recomposed but not re-reviewed",
+        "101 park actions without independent review",
+        "4 park actions blocked: system-overview f07928/f07929, architecture-intent 8 Related/evidence rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751",
+        "124 content rebind rows plus 3 corrected rows (6f5b9419d) pending re-review",
+        "36 specs deferred to G9; approvals bound to 8a9385eca bytes"
+      ]
+    },
+    {
+      "gateId": "L12-129-archive-ref-and-checkout",
+      "g": "G8",
+      "status": "partial",
+      "evidence": [
+        "archive/receipt.md",
+        "archive/design.md",
+        "archive/manifest.json",
+        "archive/verification.json",
+        "archive/rehearsal.json",
+        "archive/link-closure.json",
+        "reviews/w2-g8-archive-review.json",
+        "reviews/w4-g8-archive-review.json",
+        "reviews/w5-d5c-archive-review.json"
+      ],
+      "commit": "5c3b57347",
+      "pin": "d3efc70c5",
+      "note": "Manifest/partition at d3efc70c5: 6,918 files, 6,026 to archive, 892 retained; direct ruling links retain 4 files / 783,918 B (L13-9 item 2, 984829939). Lead cold timing (5c3b57347): reduced tip 2.93 s cold / 2.90 s median; pre-freeze 41.70 s cold / 12.44 s median; verify-design.py exit 0 at its pin. w5-d5c 8/2: both REWORKs (retained rulings link to archived files; no true cold run) were addressed by 984829939 and 5c3b57347, with no independent re-review found. The archive ref exists only in the disposable rehearsal clone (design.md); no local archive ref was found in the repository. 123 retained files keep 1,025 links to archived targets, documented as resolving through the archive ref. Publication (origin push + main manifest merge) needs cutover approval (S2).",
+      "remaining": "Get an independent review of the direct-link retention and cold timing, then at F rebuild the partition, re-enumerate readers to 0 unresolved and retime from a cold cache.",
+      "blockers": [
+        "984829939 and 5c3b57347 (w5-d5c REWORK fixes) not independently re-reviewed",
+        "Partition bound to d3efc70c5; rebuild required at F",
+        "No local archive ref in the repository (rehearsal clone only)",
+        "Publication (S2) needs owner cutover approval"
+      ]
+    },
+    {
+      "gateId": "source-context-and-post-pin-recomposition",
+      "g": "G9",
+      "status": "partial",
+      "evidence": [
+        "late-areas/receipt.md",
+        "late-areas/legacy-drift.json",
+        "import2/receipt.md",
+        "resync-a/receipt.md",
+        "resync-b/receipt.md",
+        "w0-deferred-rebinds.json",
+        "w0-prior-overlap-replay.json",
+        "composition/w2-predecessor-recomposition.json",
+        "reviews/w4-import2-review.json"
+      ],
+      "commit": "4b62385cb",
+      "pin": null,
+      "note": "Done so far: legacy drift re-syncs (7be0cbc52, d9bedf229, 4b62385cb); scan-legacy-drift at 77db6ed2b shows 33 files, 3,066 units, 0 missing (w4-import2 legacy-drift-rerun APPROVE). Pin F not recorded. No evidence found of the planned interim re-judgment of the 518 records plus 10/9/125 overlaps, of the W0 deferred 11/4/7 records, or of a G9 review. 36 G7 specs deferred here; 19 predecessors recomposed mechanically in D2b need a G9 delta review. w4-import2 REWORK source-pin-provenance is open: records pin pre-rebase Doer SHAs (92260972c) reachable only from plan/260925-w1-d1.",
+      "remaining": "Record F, re-judge the 518 records, overlaps and every spec whose file changed since 5e03159 at F, recompose drifted specs, run the all-spec hash sweep to 0 drift and get a source review.",
+      "blockers": [
+        "Final pin F not recorded",
+        "Interim and final re-judgment of 518 + 144 records not done",
+        "Doer-SHA record pins not re-pinned to plan-branch SHAs (w4-import2 REWORK)",
+        "No G9 review"
+      ]
+    },
+    {
+      "gateId": "final-code-holder-land-rehearsal",
+      "g": "G10",
+      "status": "external",
+      "evidence": [],
+      "commit": null,
+      "pin": null,
+      "note": "No rehearsal evidence found. It needs Git spec section 7 consent (requested on the board at 28127bc15, L13-1; no consent recorded) and the G11 release, and runs on the G8 shrunk rehearsal clone.",
+      "remaining": "After section 7 consent and the G11 release, run holder Land publish, non-holder refusal and rollback on the shrunk clone at the F code commit and commit the receipt JSON.",
+      "blockers": [
+        "Git owner section 7 consent not recorded",
+        "Depends on G11 release and F",
+        "Depends on G8 rehearsal clone at F"
+      ]
+    },
+    {
+      "gateId": "cutover-release-with-docs-lease",
+      "g": "G11",
+      "status": "external",
+      "evidence": [],
+      "commit": null,
+      "pin": null,
+      "note": "SEAT agreed to stage a docs-lease release from the cutover candidate commit (L13-1). No release id, manifest provenance or installed-host route proof found.",
+      "remaining": "SEAT stages release R with sourcePin equal to the F code commit; the Lead then proves docs-lease acquire/status/release/abandon in a disposable clone.",
+      "blockers": [
+        "SEAT release not staged",
+        "Depends on F",
+        "WORK cutover stop: DOC launches no fgos run, pull or push until \"cutover xong\" (L13-9)"
+      ]
+    }
+  ],
+  "cutoverReadiness": {
+    "summary": "No gate is met-local. Every gate needs work before or at final pin F, or an external owner. The cutover approval packet cannot be sent yet.",
+    "beforeFinalPin": [
+      "Re-review the 124 pending content rebind rows in rebind/rereview-claim-ids.json and the 3 rows corrected in 6f5b9419d (G0, G7)",
+      "Get independent re-reviews of the Lead REWORK fixes: c5586146c (G6), 6f5b9419d (G0/G7), 53499dc9d (G4 spec sentence), 984829939 and 5c3b57347 (G8)",
+      "Recompose the 4 blocked park actions against the D6 holders (system-overview f07928/f07929, architecture-intent rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751) (G7)",
+      "Get an independent review of composition/**: the 2 recomposed REWORK specs, the 101 park actions and the family 8/13/17 records (G1, G7)",
+      "Lead places GAP-05 dynamic-023895 so the dead-vocabulary guard is green, and closes the citation-drift 124-finding gap (G1)",
+      "Get an exhaustive APPROVE of every G6 overturn/judgment row, including the 1,423 open judgment/note rows (G6)",
+      "Run and commit the G5 retention hash check (G5)",
+      "Do the interim G9 re-judgment of the 518 records, the 10/9/125 overlaps and the W0 deferred 11/4/7 records (G9)"
+    ],
+    "atFinalPinUnderLease": [
+      "Import main (M2) with merge accounting and record F; no further main import after it",
+      "Re-pin Doer-SHA record pins to plan-branch SHAs, keeping plan/260925-w1-d* branches until then (w4-import2 REWORK)",
+      "G9: run the all-spec hash sweep at F, recompose drifted specs (including the 36 deferred G7 specs and 19 predecessors) and get a source review",
+      "G0: re-join all changedBindings rows to the ledger at F (73/257 stale at 77db6ed2b) and run the verdict join to 0 missing or mismatched",
+      "G7: re-check every approved spec digest at F and get delta reviews",
+      "G2: run join.py --pin F --rescan, refresh the 33 Rust locators, settle the 8 open literal judgments, get preserve-premise/verify.py to exit 0 and get a delta review",
+      "G6: refresh the proof at F (186 rows, 86 wrapper digests plus any later drift), replay twice and get a review",
+      "G3: re-check the 17 register targets at F and set their final statuses",
+      "G5: hash check at F",
+      "Pair-account every new plan-branch commit",
+      "Run the full suite in an isolated clone at F with main-vs-branch attribution",
+      "G8: rebuild the partition at F, re-enumerate readers and time a cold checkout (after G10 per W4)",
+      "Write the final status ledger and get an independent review of it"
+    ],
+    "external": [
+      "WORK posts \"cutover xong\"; until then DOC launches no fgos run, pull or push (L13-9)",
+      "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",
+      "Git owner gives section 7 consent (G10)",
+      "SEAT stages the docs-lease release from the F code commit; the Lead proves the four routes in a disposable clone (G11)",
+      "Lead runs the G10 holder Land rehearsal on the shrunk clone with that release",
+      "Owner decides S2, the archive ref push and main manifest merge (G8 publication)",
+      "Owner approves the cutover (lease + Land) as a separate decision"
+    ]
   }
- ]
 }
