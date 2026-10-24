@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2537a780e1af180e5090b663c60a2849fe52e53b98d7d165ca5133f9e28d9ac9",
+  "payloadDigest": "efed55ecaf14ece9de66877507871ddc1309f94b2322696e321c7632653dc8d1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -186,7 +186,7 @@
     "packages/agent-protocol/rust/src/terminal/omp.rs": "f146515522a34917b6bd45b6b6f23acf6685e543941978361a970c12775918a5",
     "packages/agent-protocol/rust/src/terminal/pi.rs": "f86d99b2511a66b63eb74a6c168b99ddd584b441fdeaacd5a0b6a8464130a37f",
     "packages/agent-protocol/rust/tests/direct_vectors.rs": "287adbd0bb43ffed9ec20c81085d33d4b9423266eeda4098ea6ce71548d324ba",
-    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "ea87b279fb961f9099d6fdf4070cb6646143daab811c48d50d28ad2af8346820",
+    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "3d3b4b3a58e8b15375588532a6e30a50712fa51a65e16810aca90ff9bc336f58",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/config/rust/src/bundle.rs": "066da64b715b88fcca6f1cf51f2cf2d04e3ad79d6224d7b3b413b47375063e88",
     "packages/config/rust/src/cache.rs": "a7f20461334a2ead32208e1cb89b573688f142e62320360f592c4ca2d795c4b2",
