@@ -30,9 +30,9 @@ Danh bạ do IDENT dựng từ các dòng `IDENT roster` mà chính các máy gh
 
 | Handle máy | Machine id | Ghi chú | IDENT trên release đang chạy |
 |---|---|---|---|
-| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ đến thư viện cửa MAIL (release `447cb9a4` từ main `e604ec15f`, có `3cee85c9a`; dòng SEAT 13:45) |
+| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ đến I5 (release có `285059829`; dòng SEAT 10-24 09:40); khoá máy `SHA256:nOLa4ePZzHDsvDbfW3bDXDeApfNlHgRAsnJSESF/GMg` (dòng SEAT 10-24 09:40) |
 | `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ đến I5 và `HeadRef` (release `b9c2465e` từ main `ea5e57c57`, 10-23 21:10); khoá máy `SHA256:RqduuhHrX6sqIyUeETIs/gjzaavwUXYsSAqoLwbcMZ4` |
-| `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ (release main `199d85223`, 10-23 08:57) |
+| `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ đến đăng ký rẻ hơn (release `d6d3d082` từ main `8387c8177`, 10-24 09:37; dòng OPC 09:50); khoá máy `SHA256:3/rco5+DYLiAsbOFISb+t0a16sIZBOav7DNKGsBmt3s` (dòng OPC 10-24 10:55) |
 
 Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (handle phiên và máy, đọc từ `fgos identity session`) và nhận vai trên máy mình; cột "Máy" có dấu `?` là IDENT suy từ log board, lead xác nhận hoặc sửa.
 
