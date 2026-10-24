@@ -1,0 +1,17 @@
+# Apply the ownership rebinds (Doer brief, records slice)
+
+Status: Lead brief under L12-137. This continues `w5-rebind-brief.md`. The previous turn located all 217 rows: 93 anchor-only, 124 content (`rebind/receipt.md`, `rebindings.json`, `rereview-claim-ids.json`, commit 7bbad6f12). It stopped before applying them for three reasons. Lead rulings (A42):
+
+1. **The preimage conflict is resolved in the misc-fix tool, not in the reproduction checker.** `misc-fix/rebind.py --check` reads the 8 packaging preimages from the working tree. These are plan record tooling from this phase, not the pinned reproduction tooling of L13-3. Change `misc-fix/rebind.py` (and `misc-fix/verify.py` if it shares the read) so that it reads its historical preimages from its own recorded pin with `git show <pin>:<path>`. It must keep every assertion. Prove that `--check` passes before and after the 217 rows are applied. Do not edit any embedded phase-06 checker.
+2. **The G2/G6 combined verifier and the W4 `proof.json` comparison** are final-pin recomposition items (G2 is pinned to 3d0169f39). They are not part of this turn. Do not touch census-join or preserve-premise.
+3. **A/B and audit-ownership** cannot run under your confinement (`git-floor-probe-failed`, read-only file system). The Lead runs `reports/phase-08/audit-report.py` after the merge. Do not claim A/B.
+
+Do:
+- Re-run `rebind/rebind.py --check` against the current tree (HEAD now includes later edits to `docs/platform/git/spec.md` and others). Refresh the proposals for any new drift with the same rules, then apply all rows to the owning decision files. Content rows get reviewStatus pending (A22) and are listed in `rereview-claim-ids.json`; anchor-only rows keep their status. Apply the ownership resolution for `claim_f8e2b48d…` (H1, move, pending) as proposed.
+- `rebind.py --check` exits 0 after the apply. `misc-fix/rebind.py --check` and `misc-fix/verify.py` exit 0 both before and after the apply.
+- Run `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test test/scripts/doc-rationale-reproduction.test.mjs` (releasePath from /home/vantt/projects/forgentX/.fgos/installation/activation.json) and report the real result. If it is blocked by confinement, say so with the stderr and do not guess.
+- Update `rebind/receipt.md` and `rebindings.json` (`applied: true`, actual review statuses after the apply), with counts and the exit code of every command.
+
+Writable (exact): plans/260925-documentation-authority-unification/pilot/decisions/**, plans/260925-documentation-authority-unification/ledger/decisions/**, plans/260925-documentation-authority-unification/reports/phase-09/rebind/**, plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py, plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py, plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/checks.json, plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md. No pair accounting (the Lead does it). Never a git write (the runner commits), never the fgos CLI, never .fgos/ or secrets, never docs/ or code, never scripts/run-tests.mjs or npm test. Scratch /tmp/fgos-work/w5-rebind-apply/ only.
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
