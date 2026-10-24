@@ -17,6 +17,8 @@ Specs (signed 2026-10-22, amended 2026-10-23): [Config](../../docs/platform/conf
 
 > Frame approved by the owner 2026-10-23 20:19 (D first; C landing A in parallel).
 
+> Ceiling raised by the owner 2026-10-24 09:13 (option A): Slice D source ceiling **3,300 lines** (measured 2,181 added / 97 removed after phases 00-08); per-phase caps stand for the remaining phases, and a phase that would pass its cap stops and reports.
+
 ## Outcome
 
 1. **G6 closed through the Confinement Authority.** The spec lists machine-private host roots hidden from every confined dispatch whatever its `hostRead` (first entry `{home}/.fgos/private`), with a dated decision line; the bwrap driver masks them with the existing `--tmpfs` directory mask; a harness probe proves it under every built-in policy. Config declares the path, never masks. The same list answers Secrets open question 4 (Secrets adds its paths later as list entries).
