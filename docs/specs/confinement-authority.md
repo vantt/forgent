@@ -1252,12 +1252,36 @@ với mọi dispatch, blind hay không. Một file đơn lẻ trong thư mục p
 Một số thư mục host giữ file riêng của máy mà không worker nào cần: runner chạy ngoài sandbox,
 tự đọc file, tự lease rồi chỉ giao cho worker đúng thứ nó được cấp. `MACHINE_PRIVATE_ROOTS`
 (`src/runner/dispatch/confinement/resources.mjs`, cạnh `BLIND_HIDDEN_ROOTS`) là danh sách các thư
-mục đó. Danh sách là dữ liệu của contract, không phải code của driver. Mục đầu tiên:
-`{home}/.fgos/private` (`{home}` là home của user host, không phải private home của một
-dispatch; thư mục này giữ `accounts.yaml` và `gateway-token`, xem
-`docs/platform/config/spec.md` §9). Config và Secrets chỉ *khai đường dẫn của mình*; việc che
-thuộc về Confinement Authority. Muốn che thêm một thư mục thì thêm một mục vào danh sách và một
-case vào probe, không thêm cơ chế.
+mục đó. Danh sách là dữ liệu của contract, không phải code của driver. Các mục:
+
+- `{home}/.fgos/private` (`{home}` là home của user host, không phải private home của một
+  dispatch; thư mục này giữ `accounts.yaml` và `gateway-token`, xem
+  `docs/platform/config/spec.md` §9).
+- `{claudeSocketBase}/cc-socks` (`{claudeSocketBase}` là chỗ Claude Code đặt thư mục socket, theo
+  đúng thứ tự của nó: `$XDG_RUNTIME_DIR` khi là đường dẫn tuyệt đối, nếu không thì
+  `$CLAUDE_CODE_TMPDIR`, nếu không thì thư mục tạm `TMPDIR`/`TMP`/`TEMP`/`/tmp`; hàm
+  `resolveClaudeSocketBase`, đọc runtime dir qua đúng một cửa `userRuntimeDir` của
+  `src/run-supervisor/runtime-dir.mjs`, cửa mà `resolveRuntimeSocketDir` cũng dùng). Claude Code
+  giữ ở đây một control socket cho mỗi phiên đang mở (`<pid>.sock`). Đo trên Claude Code 2.1.309: một
+  tiến trình cùng user ghi byte thô vào socket đó, không `from_mode`, thì một phiên ở chế độ
+  permission mặc định và không có `crossSessionInbound` nhận lời ghi như tin nhắn vai user, không
+  hỏi gì, và bắt đầu một lượt sau khoảng 1,25 giây. Trước mục này, `--ro-bind / /` vẫn cho worker
+  bị confine `connect()` tới socket đó dưới mọi built-in policy và dưới `blind` (probe
+  `machine-private-hidden` với falsifier bỏ mask đo đúng điều này), tức worker lái được phiên
+  Claude đang mở của chủ máy. Worker không cần thư mục này: dưới `--ro-bind / /` một Claude Code
+  chạy trong sandbox vốn đã không tạo được socket của mình ở đó (`EROFS`), và sau mask vẫn đúng như
+  vậy. Thư mục anh em `$XDG_RUNTIME_DIR/fgos` (socket của run supervisor, bind ghi được cho launch
+  terminal) không bị che. Chỉ che đúng `cc-socks`, không che cả runtime dir.
+  **Tạo trước khi resolve**: thiếu `cc-socks` thì resolver tạo nó mode 0700
+  (`ensureSessionSocketDir`) trước khi tính các root, nên thư mục luôn có mặt, và bị che, từ lúc
+  launch; nếu không, phiên Claude đầu tiên mở *sau* khi worker chạy sẽ tạo thư mục mới mà worker
+  thấy được (bind mount chia sẻ cây thư mục với host). Chỉ tạo khi base là thư mục thật (không phải
+  symlink) của chính user; base thiếu hoặc của người khác thì bỏ qua (Claude Code cũng không bind
+  được ở đó). Một mục đã có không bao giờ bị đổi mode hay owner. Claude Code nhận thư mục 0700 sẵn có
+  của user mình.
+
+Config và Secrets chỉ *khai đường dẫn của mình*; việc che thuộc về Confinement Authority. Muốn che
+thêm một thư mục thì thêm một mục vào danh sách và một case vào probe, không thêm cơ chế.
 
 - **Che với mọi dispatch có mount view**, bất kể `hostRead` (`allow` hoặc `blind`; `deny` vẫn
   `unsupported`, §9.1). Khác §9.2: không cần `blind`, và không phụ thuộc policy.
@@ -1267,7 +1291,8 @@ case vào probe, không thêm cơ chế.
   mask: mỗi mục trong danh sách là một thư mục.
 - **Root không tồn tại trên host lúc launch thì bị bỏ qua** (không có gì để che); bước setup tạo
   thư mục chạy trước mọi dispatch (giới hạn có tên: một dispatch chạy trước setup không thấy mask,
-  và thư mục chưa có thì cũng chưa có gì để lộ).
+  và thư mục chưa có thì cũng chưa có gì để lộ). Riêng `cc-socks` được resolver tạo trước (xem mục
+  trên), vì thư mục đó xuất hiện cùng phiên Claude, không qua setup.
 - **Từ chối trước khi spawn**: workspace, cwd, repo root hoặc bất kỳ mount được cấp nào nằm trong
   một machine-private root bị từ chối với `machine-private-hides-workspace`, cho mọi request bị
   confine (mask sẽ che mất chính thứ worker được cấp). Từ chối, không bao giờ chạy mà không che.
@@ -1282,13 +1307,24 @@ case vào probe, không thêm cơ chế.
   Probe `machine-private-hidden` khẳng định worker thật thấy biến này.
 - **Probe `machine-private-hidden`** (thuộc bộ probe chuẩn, không chỉ dispatch blind): dưới từng
   built-in policy (`host-write-denied`, `workspace-write`), worker không đọc được file đặt trong
-  một `{home}/.fgos/private` giả dựng (`ENOENT`, thư mục rỗng), vẫn ghi được outbox, workspace cư
-  xử đúng policy; dispatch blind chạy thêm cùng các case dưới `hostRead: blind`. Argv đi qua
-  `prepareBwrapSync` với resource do chính resolver sinh ra. Falsifier: bỏ mask thì worker phải
-  đọc được file. Fingerprint probe mang digest của danh sách (`machinePrivate`), nên mọi proof cũ
+  một `{home}/.fgos/private` giả dựng (`ENOENT`, thư mục rỗng), không `connect()` được tới một
+  unix socket đang listen trong một `{claudeSocketBase}/cc-socks` giả dựng (`ENOENT`), vẫn
+  ghi được outbox, workspace cư xử đúng policy; dispatch blind chạy thêm cùng các case dưới
+  `hostRead: blind`. Argv đi qua `prepareBwrapSync` với resource do chính resolver sinh ra.
+  Hai falsifier: bỏ mọi mask thì worker phải đọc được file và connect được tới socket; chỉ bỏ mask
+  `cc-socks` thì worker phải connect được tới socket trong khi file vẫn bị che, nên điều kiện socket
+  có bằng chứng riêng. Fingerprint probe mang digest của danh sách (`machinePrivate`), nên mọi proof cũ
   hết hạn đúng một lần và được chạy lại ở lần spawn bắt buộc kế tiếp (§6.6).
 
 Giới hạn: chỉ thư mục (file đơn lẻ như `.fgos/secrets.local.env` chưa được che, xem §9.2 cuối);
+host xoá rồi tạo lại một thư mục đang bị che thì mất mask (kernel tháo tmpfs khỏi dentry đã xoá):
+logind xoá `/run/user/<uid>` khi user đăng xuất phiên cuối, và tmpfs mới ở lần đăng nhập sau đi vào
+sandbox không có mask, nên worker sống qua một lần đăng xuất lại thấy `cc-socks`; base mà runner và
+phiên Claude thấy khác nhau (`XDG_RUNTIME_DIR` khác nhau, hoặc không có `XDG_RUNTIME_DIR` và
+`TMPDIR` của hai bên khác nhau) và socket đặt bằng `--messaging-socket-path` nằm ngoài mục này;
+`/tmp` thì đã bị `--tmpfs /tmp` che sẵn; socket điều khiển nằm ngoài runtime dir không thuộc mục
+này (socket herdr `~/.config/herdr/` chỉ được che cho dispatch `blind`, §9.2; socket app-server
+daemon của Codex nằm dưới `CODEX_HOME`);
 chỉ chặn đọc qua mount view của worker bị confine (một agent tương tác không confine chạy với tư
 cách user và đọc được mọi thứ user đọc được, xem Secrets §7.3); và không che khỏi chính runner,
 nơi duy nhất cần đọc các file này.
@@ -1390,6 +1426,7 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 | Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |
 | Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |
 | 2026-10-23: danh sách `MACHINE_PRIVATE_ROOTS` (mục đầu `{home}/.fgos/private`) che với mọi dispatch có mount view, bất kể `hostRead`; một danh sách, cơ chế `hidden-root`/`--tmpfs` sẵn có, không file mask; Secrets thêm đường dẫn của mình bằng cách thêm một mục và một case probe (§9.3). Chủ sở hữu giao hướng "D trước C" ngày 2026-10-23 | Config spec §9 và cổng G6 cần `~/.fgos/private` bị che với mọi worker, và Secrets câu hỏi 4 cần cùng một thứ cho đường dẫn bí mật; hai nhu cầu một danh sách, không có cơ chế thứ hai |
+| 2026-10-24: thêm `{claudeSocketBase}/cc-socks` (control socket của phiên Claude Code) vào `MACHINE_PRIVATE_ROOTS`, che với mọi dispatch; token `{claudeSocketBase}` theo thứ tự của Claude Code (`$XDG_RUNTIME_DIR`, `$CLAUDE_CODE_TMPDIR`, thư mục tạm), runtime dir đọc qua một cửa `userRuntimeDir`; resolver tạo `cc-socks` 0700 khi thiếu để mask có từ lúc launch; một case socket và một falsifier riêng cho socket trong probe `machine-private-hidden`, không cơ chế mới (§9.3). Chủ sở hữu chọn phương án A ngày 2026-10-24 | Một lời ghi thô vào socket đó bắt đầu một lượt trong phiên Claude đang mở mà không hỏi; trước đó worker bị confine `connect()` được tới nó dưới mọi policy và dưới `blind` |
 
 ## 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)
 
