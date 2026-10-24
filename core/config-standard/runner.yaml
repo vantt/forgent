@@ -364,6 +364,8 @@ runner:
       prefer:
         - executor: claude
           invocation: claude-cli-bwrap
+        - executor: openai
+          invocation: codex-cli-bwrap
       confinement:
         mode: required
         policy: host-write-denied
@@ -377,6 +379,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         mutates: true
@@ -390,13 +393,14 @@ runner:
         outputKind: finding
         mutates: false
     fgos-coding-implement:
-      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude as fallback."
+      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude then openai as fallback."
       prefer:
         - executor: gemini
           invocation: omp-herdr
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       tier: advanced
     "code:implement":
       description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
@@ -406,6 +410,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         domain: code
@@ -431,6 +436,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: verification
         domain: code
@@ -454,6 +460,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       serves:
         outputKind: change
         domain: code
@@ -695,6 +702,7 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
+        - openai
       description: "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
     "docs:write":
       description: "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it."
