@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { git, mkTempDir, initRepo, installHook, initRepoWithHook, sessionEnv, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The real pre-commit hook and the real host: a staged `.fgos/config.yaml` is checked with
 // `fgos config check` before it is committed (docs/platform/config/spec.md section 11).
@@ -13,8 +14,7 @@ const skip = HOOK_TEST_SKIP;
 
 /** Stages `text` as the project config of `repoRoot` and commits it as one session with an empty home. */
 function commitConfig(repoRoot, text, overlay = {}) {
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.yaml'), text);
+  writeRawProjectConfig(repoRoot, text);
   git(repoRoot, ['add', '.fgos/config.yaml']);
   const home = mkTempDir('fgos-hook-config-home-');
   return spawnSync('git', ['commit', '-q', '-m', 'config'], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv({ HOME: home, FGOS_SESSION_ID: 'session-config', ...overlay }) });
@@ -55,8 +55,7 @@ test('a commit that stages a clean config file passes the check', { skip }, () =
 test('a commit that stages no config file never runs the check', { skip }, () => {
   const repoRoot = initRepoWithHook('fgos-hook-config-none-');
   fs.writeFileSync(path.join(repoRoot, 'note.txt'), 'x\n');
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.yaml'), 'gateBypass:\n  level: [unclosed\n');
+  writeRawProjectConfig(repoRoot, 'gateBypass:\n  level: [unclosed\n');
   git(repoRoot, ['add', 'note.txt']);
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'note'], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv({ FGOS_SESSION_ID: 'session-config' }) });

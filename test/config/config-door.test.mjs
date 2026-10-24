@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The door resolves the main checkout through a Git driver that keeps its directories under the state root.
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-door-state-'));
@@ -150,10 +151,11 @@ test('init creates the header-only file once and keeps an existing file', () => 
   const args = { projectRoot: d.project, globalDir: d.global, class: 'unconfined', target: 'project' };
   const made = call('init', args);
   assert.equal(made.created, true);
-  const text = fs.readFileSync(path.join(d.project, '.fgos/config.yaml'), 'utf8');
+  const text = readRawProjectConfig(d.project);
   assert.match(text, /^# @fgos:v1\n/);
   assert.equal(text.split('\n').every((line) => line === '' || line.startsWith('#')), true);
-  assert.deepEqual({ ...call('init', args) }, { created: false, revision: made.revision });
+  assert.equal(made.file, 'config.yaml');
+  assert.deepEqual({ ...call('init', args) }, { created: false, file: 'config.yaml', revision: made.revision });
   assert.equal(call('init', { globalDir: d.global, class: 'unconfined', target: 'global' }).created, true);
   assert.equal(refusal('init', { ...args, class: 'confined' }).id, 'config-write-confined');
   assert.equal(refusal('init', { ...args, target: 'accounts' }).keyword, 'target');

@@ -25,7 +25,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig, statGatewayToken } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
@@ -296,8 +296,7 @@ test('fgos doctor --fix (CLI e2e) creates the gateway token file through the rea
   const fixedEntry = data.fixed.find((f) => f.id === 'gateway-token-configured');
   assert.ok(fixedEntry, 'doctor --fix did not report the gateway-token-configured fix');
   assert.equal(fixedEntry.changed, true);
-  const tokenFile = path.join(homeDir, '.fgos', 'private', 'gateway-token');
-  assert.equal(fs.statSync(tokenFile).mode & 0o777, 0o600);
+  assert.equal(statGatewayToken(path.join(homeDir, '.fgos')).mode & 0o777, 0o600);
   assert.equal(data.checks.find((c) => c.id === 'gateway-token-configured').passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

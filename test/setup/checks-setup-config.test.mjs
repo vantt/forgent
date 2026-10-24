@@ -4,7 +4,7 @@
 // trong 120s của file gốc, nên gom theo chủ đề sẽ đẻ ra nhóm vượt ngưỡng 30s.
 import '../helpers/process-tmp-root.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { legacyProjectConfigPath, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
+import { legacyProjectConfigPath, writeRawLegacyProjectConfig, projectConfigExists } from '../helpers/config-fixture.mjs';
 import { test } from 'node:test';
 import {
   DEFAULT_LEVEL,
@@ -82,7 +82,7 @@ test('fgos setup leaves an existing legacy config.json alone and creates no conf
   const { data } = JSON.parse(result.stdout);
   assert.equal(data.configPath, legacyProjectConfigPath(cwd));
   assert.equal(data.configCreated, false);
-  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'config.yaml')), false);
+  assert.equal(projectConfigExists(cwd), false);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

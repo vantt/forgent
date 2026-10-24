@@ -396,7 +396,7 @@ mod unix {
             &fgos_holder_lock::state_root::lock_root(),
             LOCK_WAIT_MS,
         )?;
-        Ok(json!({ "created": made.created, "revision": made.revision }))
+        Ok(json!({ "created": made.created, "file": made.file, "revision": made.revision }))
     }
 }
 
@@ -428,7 +428,7 @@ pub fn fix_config(args: Value) -> Result<String> {
     entry(args, unix::fix_entry)
 }
 
-/// Creates the header-only file of a scope that has none: `{ created, revision }`; an existing file, legacy
+/// Creates the header-only file of a scope that has none: `{ created, file, revision }`; an existing file, legacy
 /// JSON included, is kept. `{ projectRoot?, globalDir, class, target: "project" | "global" }`.
 #[napi(namespace = "config", js_name = "init")]
 pub fn init_config(args: Value) -> Result<String> {

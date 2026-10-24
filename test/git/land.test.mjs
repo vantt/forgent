@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture, evidence } from './land-fixture.mjs';
 import { createGitLand } from '../../src/git/land.mjs';
-import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeRawProjectConfig, readRawProjectConfig } from '../helpers/config-fixture.mjs';
 test('Land binds actual consumer verification and returns an established receipt after an external ABA', async () => {
   const f = fixture(); try {
     const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'land', request: f.request });
@@ -79,7 +79,7 @@ test('Land materializes tracked non-event store bytes stripped by worker allocat
   const f = fixture(); try {
     fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); writeRawProjectConfig(f.repo, '{"base":true}\n'); f.git('add', '.fgos/config.yaml'); f.git('commit', '-qm', 'non-event store config'); f.request.target = f.git('rev-parse', 'HEAD');
     const p = f.port(); const request = { ...f.request, files: [{ path: '.fgos/config.yaml', bytes: [...Buffer.from('{"candidate":true}\n')] }] }; const { candidate: c } = await p.prepare({ operationId: 'store-bytes', request });
-    assert.equal(fs.readFileSync(path.join(c.worktree, '.fgos/config.yaml'), 'utf8'), '{"candidate":true}\n'); assert.equal((await p.publish(evidence(c))).checkout, 'reconciled');
+    assert.equal(readRawProjectConfig(c.worktree), '{"candidate":true}\n'); assert.equal((await p.publish(evidence(c))).checkout, 'reconciled');
   } finally { f.close(); }
 });
 test('a conflict aborts only the operation candidate and preserves both refs and main bytes', async () => {
@@ -101,7 +101,7 @@ test('an ignored store collision publishes once with a pending checkout and pres
   const f = fixture(); try {
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, '.fgos'), { recursive: true }); writeRawProjectConfig(f.repo, '{"incoming":true}'); f.git('add', '.fgos/config.yaml'); f.git('commit', '-qm', 'incoming non-event config'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
     fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), '.fgos/\n'); writeRawProjectConfig(f.repo, 'keep local config');
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'ignored-store', request: f.request }); assert.equal((await p.publish(evidence(c))).checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(fs.readFileSync(path.join(f.repo, '.fgos/config.yaml'), 'utf8'), 'keep local config');
+    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'ignored-store', request: f.request }); assert.equal((await p.publish(evidence(c))).checkout, 'pending'); assert.equal(f.git('rev-parse', 'HEAD'), c.candidate); assert.equal(readRawProjectConfig(f.repo), 'keep local config');
     const walDir = path.join(f.repo, '.git/fgos/git/operations/ignored-store');
     assert.match(fs.readFileSync(path.join(walDir, fs.readdirSync(walDir).filter(x => /^\d+\.json$/.test(x)).sort().at(-1)), 'utf8'), /pendingStoreCollision/);
   } finally { f.close(); }

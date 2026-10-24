@@ -16,6 +16,7 @@ import {
   refreshGlobalBinCache,
   resolveFgosBin,
 } from '../../src/setup/bin-discovery.mjs';
+import { globalConfigPath } from '../helpers/config-fixture.mjs';
 
 const cacheFile = (globalDir) => path.join(globalDir, 'runtime', 'bin-cache.json');
 const writeCache = (globalDir, globalFgosPath) => {
@@ -98,7 +99,7 @@ test('refreshGlobalBinCache writes the resolved PATH bin and reports changed:tru
     assert.equal(changed, true);
     assert.deepEqual(readCache(dir), { globalFgosPath: binPath });
     assert.equal(fs.statSync(cacheFile(dir)).mode & 0o777, 0o600);
-    assert.equal(fs.existsSync(path.join(dir, 'config.json')), false, 'the cache never lands in config');
+    assert.equal(fs.existsSync(globalConfigPath(path.dirname(dir))), false, 'the cache never lands in config');
   } finally {
     process.env.PATH = originalPath;
   }

@@ -12,7 +12,7 @@ import { changedPaths, commitOnBranch, commitUnitWork as nativeCommitUnitWork, p
 
 import { acquireSync, createLockScope, resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
-import { writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeRawProjectConfig, readRawProjectConfig } from '../../helpers/config-fixture.mjs';
 const baselines = new Map(), custody = new Map();
 function commitUnitWork(args) {
   return nativeCommitUnitWork({ baseline: baselines.get(args.worktree), custody: custody.get(args.worktree), ...args });
@@ -152,7 +152,7 @@ test('tracked modified .fgos files stay out of a broad scoped commit', () => wit
   assert.deepEqual(r.outOfScope, []);
   assert.deepEqual(committed(dir), ['a.txt']);
   assert.equal(git(dir, 'show', 'HEAD:.fgos/config.yaml'), 'base\n');
-  assert.equal(fs.readFileSync(path.join(dir, '.fgos/config.yaml'), 'utf8'), 'modified\n');
+  assert.equal(readRawProjectConfig(dir), 'modified\n');
 }));
 
 test('i. a pre-commit hook that adds a file is caught after the commit', () => withRepo(undefined, (dir) => {

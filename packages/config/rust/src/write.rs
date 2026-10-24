@@ -14,7 +14,7 @@ use sha2::{Digest, Sha256};
 
 use crate::docs;
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
-use crate::files::{PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
+use crate::files::{JSON_NAME, PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
 use crate::grammar::{block_for_changed_key, block_for_new_key, doc_lines, header_lines};
 use crate::grammar::{Actor, Reason};
 use crate::locks::{hold, GLOBAL_CONFIG, PROJECT_CONFIG};
@@ -440,6 +440,8 @@ pub fn refresh(
 #[derive(Debug, PartialEq, Eq)]
 pub struct InitResult {
     pub created: bool,
+    /// The name of the file the scope holds now: `config.yaml`, or the legacy `config.json` that was left alone.
+    pub file: &'static str,
     /// The revision of the file now (the existing one when nothing was created).
     pub revision: String,
 }
@@ -473,12 +475,14 @@ pub fn init(
     let _scope = hold(lock, &fgos_dir, lock_root, lock_wait_ms)?;
     let max = Profile::StrictConfig.limits().input_bytes;
     let existing = |source: Source| match source {
-        Source::Yaml(file) | Source::LegacyJson(file) => Some(file.revision),
+        Source::Yaml(file) => Some((YAML_NAME, file.revision)),
+        Source::LegacyJson(file) => Some((JSON_NAME, file.revision)),
         Source::Absent => None,
     };
-    if let Some(revision) = existing(select_source(&root, &dir, max)?) {
+    if let Some((file, revision)) = existing(select_source(&root, &dir, max)?) {
         return Ok(InitResult {
             created: false,
+            file,
             revision,
         });
     }
@@ -490,14 +494,16 @@ pub fn init(
     match install_once_with_mode(&root.join(&dir), name, &bytes, file_mode).map_err(io_error)? {
         Installed::Created => Ok(InitResult {
             created: true,
+            file: YAML_NAME,
             revision: sha(&bytes),
         }),
         // Lost a race with a creator outside the lock.
         Installed::AlreadyExists => {
-            let revision = existing(select_source(&root, &dir, max)?);
+            let (file, revision) = existing(select_source(&root, &dir, max)?).ok_or_else(|| conflict("revision-changed"))?;
             Ok(InitResult {
                 created: false,
-                revision: revision.ok_or_else(|| conflict("revision-changed"))?,
+                file,
+                revision,
             })
         }
     }

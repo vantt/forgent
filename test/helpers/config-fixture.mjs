@@ -125,3 +125,38 @@ export function capabilityServedBy(executors, name, { tier = 'standard', rigor =
   }
   return entry;
 }
+
+/** Whether the project under `dir` holds a config file (the YAML one). */
+export function projectConfigExists(dir) {
+  return fs.existsSync(projectConfigPath(dir));
+}
+
+/** The paths of the project config files present under `dir`: the YAML file and a legacy JSON one, either or both. */
+export function existingProjectConfigPaths(dir) {
+  return [projectConfigPath(dir), legacyProjectConfigPath(dir)].filter((file) => fs.existsSync(file));
+}
+
+/** The bytes of the project config under `dir`, exactly as on disk. */
+export function readRawProjectConfig(dir) {
+  return fs.readFileSync(projectConfigPath(dir), 'utf8');
+}
+
+/** The bytes of the global config under `home`, exactly as on disk. */
+export function readRawGlobalConfig(home) {
+  return fs.readFileSync(globalConfigPath(home), 'utf8');
+}
+
+/** The gateway token file of the global directory `globalDir` (`<globalDir>/private/gateway-token`). */
+export function gatewayTokenPath(globalDir) {
+  return path.join(globalDir, 'private', 'gateway-token');
+}
+
+/** `fs.statSync` of the gateway token file under the global directory `globalDir`. */
+export function statGatewayToken(globalDir) {
+  return fs.statSync(gatewayTokenPath(globalDir));
+}
+
+/** The text of the gateway token file under the global directory `globalDir`. */
+export function readGatewayToken(globalDir) {
+  return fs.readFileSync(gatewayTokenPath(globalDir), 'utf8');
+}

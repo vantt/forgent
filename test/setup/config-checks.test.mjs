@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 import { CONFIG_CHECKS } from '../../src/setup/config-checks.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
-import { legacyProjectConfigPath, writeProjectConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { legacyProjectConfigPath, writeProjectConfig, writeRawLegacyProjectConfig, writeRawProjectConfig, statGatewayToken, readGatewayToken } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const contract = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/config/contracts/doctor-rows.v1.json'), 'utf8'));
@@ -100,13 +100,12 @@ test('the gateway token row fails with the fix named, the fix creates the privat
     const first = fix('gateway-token-configured').fix(project);
     assert.equal(first.changed, true, first.message);
     assert.equal(fs.statSync(path.join(home, '.fgos/private')).mode & 0o777, 0o700);
-    const token = path.join(home, '.fgos/private/gateway-token');
-    assert.equal(fs.statSync(token).mode & 0o777, 0o600);
+    assert.equal(statGatewayToken(path.join(home, '.fgos')).mode & 0o777, 0o600);
     assert.equal(row('gateway-token-configured').check(project).passed, true);
 
-    const before = fs.readFileSync(token, 'utf8');
+    const before = readGatewayToken(path.join(home, '.fgos'));
     assert.equal(fix('gateway-token-configured').fix(project).changed, false);
-    assert.equal(fs.readFileSync(token, 'utf8'), before, 'an existing token is never rotated');
+    assert.equal(readGatewayToken(path.join(home, '.fgos')), before, 'an existing token is never rotated');
   });
 });
 

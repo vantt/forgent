@@ -193,9 +193,8 @@ test("sync-root discriminates on !item.parent, NOT resolveRoot: a root whose par
 test('a missing ironLaw key fails closed to ask — the root approve above still refuses (D7)', () => {
   const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-absent');
-  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.ok(
-    !fs.existsSync(configPath) || readProjectConfig(cwd).ironLaw === undefined,
+    readProjectConfig(cwd).ironLaw === undefined,
     'this case only means anything while the key is genuinely absent',
   );
 

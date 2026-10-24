@@ -14,7 +14,7 @@
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeAccountsFile } from '../helpers/config-fixture.mjs';
 import {
   DOCTOR_CHECKS,
   FIX_REGISTRATIONS,
@@ -905,15 +905,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
   const cwd = mkTemp('doctor-provider-capacity-cwd-');
   const fgosHome = path.join(homeDir, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  fs.mkdirSync(path.join(fgosHome, 'private'), { recursive: true });
-  fs.writeFileSync(path.join(fgosHome, 'private', 'accounts.yaml'), `runner:
-  providers:
-    openai-codex:
-      accounts:
-        tetnu:
-          label: Tetnu
-          credentialSource: {kind: codex-home, home: ${path.join(homeDir, 'codex-tetnu')}}
-`);
+  writeAccountsFile(fgosHome, { providers: { 'openai-codex': { accounts: { tetnu: { label: 'Tetnu', credentialSource: { kind: 'codex-home', home: path.join(homeDir, 'codex-tetnu') } } } } } });
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');

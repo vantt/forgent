@@ -4019,15 +4019,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       // Each scope gets its header-only config file when it has none (a legacy config.json counts as
       // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
-      const configFileOf = (fgosDir) => {
-        const yaml = path.join(fgosDir, 'config.yaml');
-        const legacy = path.join(fgosDir, 'config.json');
-        return !fs.existsSync(yaml) && fs.existsSync(legacy) ? legacy : yaml;
-      };
-      const configPath = configFileOf(path.join(repoRoot, '.fgos'));
-      const { created: configCreated } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
-      const globalConfigPath = configFileOf(path.join(os.homedir(), '.fgos'));
-      const { created: globalConfigCreated } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
+      const { created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
+      const configPath = path.join(repoRoot, '.fgos', configFile);
+      const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
+      const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a

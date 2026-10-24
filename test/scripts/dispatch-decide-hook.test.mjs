@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Real, live runs of the actual hook script -- no fixture stands in for
 // `decide`'s own real subprocess call (tsk-60f's own verify field demands
@@ -100,7 +100,7 @@ test('ignores a non-Agent/Task tool call entirely -- never even calls decide', (
 test('blocks (exit 2) when the project config is refused, naming the refusal ids and `fgos config check`', () => {
   const repoRoot = mkTempGitRepo();
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.yaml'), 'runner: [unclosed\n');
+  writeRawProjectConfig(repoRoot, 'runner: [unclosed\n');
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
   assert.equal(result.status, 2, result.stderr);
   assert.match(result.stderr, /BLOCKED/);

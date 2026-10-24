@@ -8,6 +8,16 @@ import path from 'node:path';
 
 import { readConfig, readMachineConfig } from '../../src/config/facade.mjs';
 import {
+  capabilityServedBy,
+  existingProjectConfigPaths,
+  gatewayTokenPath,
+  legacyProjectConfigPath,
+  projectConfigExists,
+  readGatewayToken,
+  readRawGlobalConfig,
+  readRawProjectConfig,
+  statGatewayToken,
+  writeRawLegacyProjectConfig,
   globalConfigPath,
   plainConfig,
   projectConfigPath,
@@ -58,4 +68,30 @@ test('plainConfig turns a null-prototype tree into ordinary objects that deepEqu
   const tree = Object.assign(Object.create(null), { a: Object.assign(Object.create(null), { b: [1] }) });
   assert.deepEqual(plainConfig(tree), { a: { b: [1] } });
   assert.equal(Object.getPrototypeOf(plainConfig(tree)), Object.prototype);
+});
+
+test('a capability entry served by a fixture executor restates every seat, role and persona scope the standard declares for it', () => {
+  const entry = capabilityServedBy(['alpha', 'beta'], 'architecture:critique');
+  assert.deepEqual(entry.prefer, [{ executor: 'alpha' }, { executor: 'beta' }]);
+  assert.equal(entry.tier, 'standard');
+  assert.deepEqual(entry.seats.producer, { prefer: entry.prefer, tier: 'standard' }, 'the standard names real CLIs for this seat; the fixture executor replaces them');
+  const wildcard = capabilityServedBy('alpha', 'code:implement');
+  assert.deepEqual(wildcard.roles['red-team'], { prefer: [{ executor: 'alpha' }], tier: 'standard' }, 'a <family>:* scope of the standard applies too');
+});
+
+test('the raw readers, the existence check and the gateway token helpers name the files the writers write', () => {
+  const dir = mkTemp();
+  assert.equal(projectConfigExists(dir), false);
+  writeRawProjectConfig(dir, 'text');
+  assert.equal(projectConfigExists(dir), true);
+  assert.equal(readRawProjectConfig(dir), 'text');
+  assert.deepEqual(existingProjectConfigPaths(dir), [projectConfigPath(dir)]);
+  writeRawLegacyProjectConfig(dir, '{}');
+  assert.deepEqual(existingProjectConfigPaths(dir), [projectConfigPath(dir), legacyProjectConfigPath(dir)]);
+  writeRawGlobalConfig(dir, 'global');
+  assert.equal(readRawGlobalConfig(dir), 'global');
+  fs.mkdirSync(path.dirname(gatewayTokenPath(path.join(dir, '.fgos'))), { recursive: true });
+  fs.writeFileSync(gatewayTokenPath(path.join(dir, '.fgos')), 'tok\n', { mode: 0o600 });
+  assert.equal(readGatewayToken(path.join(dir, '.fgos')), 'tok\n');
+  assert.equal(statGatewayToken(path.join(dir, '.fgos')).mode & 0o777, 0o600);
 });

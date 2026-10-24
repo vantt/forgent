@@ -32,6 +32,7 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
+import { projectConfigExists } from '../helpers/config-fixture.mjs';
 
 
 test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
@@ -91,7 +92,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
   // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.yaml')), true);
+  assert.equal(projectConfigExists(copyRoot), true);
 
   fs.rmSync(copyRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

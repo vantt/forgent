@@ -76,6 +76,7 @@ fn an_existing_file_is_kept_whether_yaml_or_legacy_json() {
     let first = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
     let again = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
     assert!(first.created && !again.created);
+    assert_eq!((first.file, again.file), ("config.yaml", "config.yaml"));
     assert_eq!(again.revision, first.revision);
 
     let fgos = r.project_root.join(".fgos");
@@ -83,6 +84,7 @@ fn an_existing_file_is_kept_whether_yaml_or_legacy_json() {
     fs::write(fgos.join("config.json"), "{\"runner\":{}}").unwrap();
     let legacy = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
     assert!(!legacy.created);
+    assert_eq!(legacy.file, "config.json", "the scope still holds its legacy file");
     assert!(
         !fgos.join("config.yaml").exists(),
         "a yaml file beside legacy json would shadow it"

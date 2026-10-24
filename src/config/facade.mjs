@@ -71,5 +71,5 @@ export const checkConfig = (options) => call('check', options);
 /** Applies the named repairs (`ids`) a check offered: `{ changed: [{ fix, path }], skipped }`. A confined session is refused. */
 export const fixConfig = (options) => call('fix', options);
 
-/** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, revision }`. */
+/** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, file, revision }`, `file` being the name the scope holds now (`config.yaml`, or a legacy `config.json` left alone). */
 export const initConfigFile = (options) => call('init', options);
