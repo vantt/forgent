@@ -61,8 +61,28 @@ def main():
     old = json.loads((ROOT / P / 'reports/phase-08/step-08-tree-prune-manifest.json').read_text())
     assert len(prior) == sum(len(r['scriptRefs']) for r in old['inventory'])
     for r in prior:
-        if r['readerPath'].startswith(('test/', 'scripts/', 'src/')):
-            assert r['targetDisposition'] == 'retain', r
+        if r['readerPath'].startswith(('test/', 'scripts/', 'src/')) and r['targetDisposition'] != 'retain':
+            assert r['owningProof'] is None
+            if r['readerDisposition'] == 'fixture-pattern-does-not-match-target':
+                pattern = '[0-9]+'.join(re.escape(part) for part in re.split(r'\$\{[^}]+\}', r['template']))
+                assert not re.fullmatch(pattern, r['targetPath'])
+            else:
+                assert r['readerDisposition'] == 'fixture-scratch-output-not-tip-read', r
+                assert r['text'] == (ROOT / r['readerPath']).read_text().splitlines()[r['line'] - 1]
+                assert 'path.join(scratch,' in r['text'] and 'readFileSync' in r['text']
+    references = load('external-references.json')
+    for r in references['references'] + references['navigationReferences']:
+        assert r['targetPath'] in kept, r
+        assert r['text'] == (ROOT / r['readerPath']).read_text(errors='replace').splitlines()[r['line'] - 1]
+    corrections = load('retained-set-corrections.json')
+    assert len(corrections['rows']) == 22 and sum(r['previousSize'] for r in corrections['rows']) == 23297481
+    for r in corrections['rows']:
+        if r['disposition'] == 'archive': assert r['path'] in moving
+        else:
+            assert r['path'] in kept and all('retained reader closure:' not in s for s in r['currentReasons'])
+            assert any(x['targetPath'] == r['path'] for x in references['navigationReferences'])
+    for name in ['minimum-constitution.md', 'current-authority-map-2026-09-25.md', 'reports/phase-08/step-08-preflip-gates.json', 'reports/phase-06/step-08-report.md']:
+        assert P + name in kept
     restored = {r['path'] for r in old['directoryReaderCorrection']['restoredFiles']}
     assert len(restored) == 6 and restored <= set(kept)
     reachable = {l.split(b' ', 1)[0].decode() for l in git('rev-list', '--objects', pin).splitlines()}
@@ -100,7 +120,7 @@ def main():
             assert len(record['pairRows']) == record['beforeUnaccountedPairs']
             rows = record['pairRows']; assert len({(r['commit'], r['path']) for r in rows}) == len(rows)
             assert sum(r['commit'] == rehearsal['removalCommit'] for r in rows) == record['removalPairs']
-        assert len(rehearsal['tests']) == 20
+        assert len(rehearsal['tests']) == 22
         baseline = {}; reduced = {}
         for t in rehearsal['tests']:
             data = gzip.decompress((ROOT / t['log']).read_bytes())
@@ -108,13 +128,34 @@ def main():
             cases = [re.sub(r' \([0-9.]+ms\)$', '', s) for s in t['failedTitles'] if s != '✖ failing tests:']
             (baseline if t['phase'] == 'baseline' else reduced)[t['file']] = (t['exit'], sorted(set(cases)))
         assert baseline == reduced
+        checks = rehearsal['linkChecks']
+        for name in ['check-doc-candidate-status', 'retirement-links-resolve']:
+            sides = [r for r in checks if r['check'] == name]
+            assert len(sides) == 2 and all(r['exit'] == 0 for r in sides)
+            assert sides[0]['result'] == sides[1]['result'], 'new metadata/link finding: ' + name
+        for r in checks:
+            if 'log' in r:
+                data = gzip.decompress((ROOT / r['log']).read_bytes())
+                assert hashlib.sha256(data).hexdigest() == r['sha256']
+        for record in pairs:
+            assert record['afterBOk'] and record['afterHNewFindings'] == 0 and record['afterIOk']
+            for phase in ['before', 'after']:
+                filename = pathlib.PurePosixPath(record['manifest']).name
+                full = load(phase + '-' + filename)
+                assert full['A']['ok'] == (phase == 'after')
+                assert full['H']['findings'] == next(r['result']['findings'] for r in checks if r['check'] == 'check-doc-candidate-status' and r['phase'] == 'baseline')
         for variant in rehearsal['variants']:
             assert len(variant['runs']) == 3 and all(r['exit'] == 0 for r in variant['runs'])
-        observed = {'bundleHeadsAndDigestVerified': True, 'testsPerSide': 10, 'baselineFailureParity': True,
+            assert variant['runs'][0]['cache'].startswith('cold fallback:')
+            assert variant['medianSeconds'] < 60
+        observed = {'bundleHeadsAndDigestVerified': True, 'testsPerSide': 11, 'baselineFailureParity': True,
             'accountingRecipesGreen': len(pairs), 'realDisk': rehearsal['findmnt'], 'variantTipBytes': [r['tipBytes'] for r in rehearsal['variants']]}
     result = {'inputCommit': pin, 'exit': 0, 'partitionFiles': len(entries), 'movingFiles': len(moving),
         'retainedFiles': len(kept), 'retirementSpecs': len(specs), 'gatePrograms': len(gates['programs']), 'reviewedTen': 10,
         'historicalReaderFiles': 47, 'historicalJoins': 135, 'priorScriptRefOccurrences': len(prior),
+        'externalReferenceJoinsVerified': len(references['references']), 'navigationReferenceJoinsVerified': len(references['navigationReferences']),
+        'falseBasenameRowsReviewed': 22, 'falseBasenameRowsArchived': sum(r['disposition'] == 'archive' for r in corrections['rows']),
+        'falseBasenameRowsNowRequiredByNavigation': sum(r['disposition'] != 'archive' for r in corrections['rows']),
         'sixRestoredInputsRetained': True, 'alreadyPrunedRecoveryBlobsVerified': len(recovery),
         'negativeProbes': negative, 'mainManifestBytes': (HERE / 'manifest.json').stat().st_size,
         'auditCompressedBytes': sum(r['size'] for r in m['auditAssets']), 'rehearsalCustody': observed,

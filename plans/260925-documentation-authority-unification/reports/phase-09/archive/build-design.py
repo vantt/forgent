@@ -44,6 +44,7 @@ def main():
     # Retained check roots. Their entire literal/dependency closure is retained;
     # glob/directory inputs are explicitly seeded below (not inferred from a basename).
     protected = set()
+    navigation = set()
     reasons = collections.defaultdict(set)
     def keep(path, why):
         if path in files:
@@ -51,9 +52,11 @@ def main():
     for p, r in files.items():
         rel = p[len(P):]
         if rel == 'plan.md' or re.fullmatch(r'phase-\d\d-[^/]+\.md', rel):
-            keep(p, 'plan navigation: entry plan and phase contracts, not product authority')
+            navigation.add(p)
+            keep(p, 'plan navigation: ' + P + 'plan.md (phase table / entry contract)')
         if pathlib.PurePosixPath(p).name in ('owner-answers.md', 'preflip-gate-status.json', 'preflip-execution-plan.md', 'progress.md') or p.endswith('-brief.md'):
-            keep(p, 'plan navigation: decisions, execution boundary, brief or gate status')
+            navigation.add(p)
+            keep(p, 'plan navigation: ' + P + 'reports/phase-09/preflip-execution-plan.md sections 1-4 (decisions / boundary / briefs / status)')
         if p.endswith('.json') and p.startswith((P + 'ledger/decisions/', P + 'pilot/decisions/')):
             keep(p, 'retained ownership.mjs and audit-ownership.mjs enumerate JSON inputs in these exact decision directories')
         if p.endswith('.json') and p.startswith((P + 'pilot/first-round/', P + 'pilot/second-round/')):
@@ -81,7 +84,64 @@ def main():
         'shipped-path-conventions-inventory.json': 'scripts/verify-phase-01.mjs reads committed inventory; generate-doc-inventory.mjs reads pinned inventory blob; retain current input, not just historical object',
         'dropped-claims-register.json': 'scripts/check-doc-inventory-gates.mjs DEFAULT_DROPPED_CLAIMS_REGISTER_PATH: current claim-disposition gate input',
     }
+    # Exact read contracts replace the old outside-plan basename fan-out. A
+    # run-dir receipt.json or a test's fixture output is not a read of our file.
+    product_inputs.update({
+        'minimum-constitution.json': 'scripts/check-doc-constitution.mjs DEFAULT_CONSTITUTION_PATH; check-doc-retirement.mjs gatherInputs',
+        'transitional-switchboard.json': 'scripts/check-doc-candidate-status.mjs DEFAULT_SWITCHBOARD_PATH; runCli',
+        'claim-ledger.schema.json': 'scripts/check-doc-constitution.mjs DEFAULT_SCHEMA_PATH; runCli',
+        'reports/doc-inventory.json': 'scripts/check-doc-inventory-gates.mjs DEFAULT_INVENTORY_PATH / loadInventory (default from generate-doc-inventory.mjs:30)',
+        'ledger/conflict-resolutions.json': 'scripts/check-doc-retirement.mjs DEFAULT_CONFLICT_RESOLUTIONS_PATH / gatherInputs',
+        'ledger/retiring-roots.json': 'scripts/check-doc-retirement.mjs DEFAULT_RETIRING_ROOTS_PATH / gatherInputs',
+        'reports/phase-08/step-06-evidence-consumer-table.json': 'scripts/check-evidence-relocation.mjs DEFAULT_CONSUMER_TABLE_PATH / runCli',
+        'shipped-path-conventions-inventory.md': 'scripts/verify-phase-01.mjs:308 committedMd read (current fixed-end verifier input)',
+    })
     for name, why in product_inputs.items(): keep(P + name, why)
+    keep(P + 'reports/phase-08/step-08-preflip-gates.json', P + 'reports/phase-09/preflip-execution-plan.md:3 gate register (G0-G11)')
+    # Enumerate EVERY tracked outside-plan file, including docs and other plans.
+    # Store raw grep-equivalent lines as well as normalized targets. No basename
+    # joins: exact paths, relative Markdown links, directories and globs only.
+    import posixpath
+    external_refs = []
+    navigation_refs = []
+    raw_external = []
+    target_pattern = re.compile(re.escape(P) + r'[A-Za-z0-9_./*{}?,-]*')
+    link_pattern = re.compile(r'\[[^\]]*\]\(\s*<?([^\s)>]+)')
+    for p in all_entries:
+        if p.startswith(A): continue
+        if p.startswith(P) and p not in navigation: continue
+        text = (root / p).read_bytes().decode('utf8', errors='replace')
+        if '\0' in text: continue
+        outside = not p.startswith(P)
+        for number, line in enumerate(text.splitlines(), 1):
+            if outside and P.rstrip('/') in line:
+                raw_external.append({'readerPath': p, 'line': number, 'text': line})
+            targets = set()
+            if outside:
+                for match in target_pattern.finditer(line):
+                    literal = match.group().rstrip('.,')
+                    # Brace alternatives are explicit paths, not basename guesses.
+                    choices = [literal]
+                    brace = re.search(r'\{([^{}]+)\}', literal)
+                    if brace:
+                        choices = [literal[:brace.start()] + x + literal[brace.end():] for x in brace[1].split(',')]
+                    for candidate in choices:
+                        if candidate in files: targets.add(candidate)
+                        elif '*' in candidate:
+                            import fnmatch
+                            targets.update(x for x in files if fnmatch.fnmatchcase(x, candidate))
+            for match in link_pattern.finditer(line):
+                value = match[1].split('#')[0].split('?')[0]
+                if re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I): continue
+                candidate = posixpath.normpath(posixpath.join(posixpath.dirname(p), value))
+                if candidate in files: targets.add(candidate)
+                # Directory references name a container, not every descendant.
+                # Its exact reader sets are seeded separately above.
+            for target in sorted(targets):
+                row = {'readerPath': p, 'line': number, 'targetPath': target, 'text': line}
+                (external_refs if outside else navigation_refs).append(row)
+                keep(target, ('outside-plan path/link: ' if outside else 'plan navigation link: ') + p + ':' + str(number))
+    emit('external-references.json', {'inputCommit': pin, 'scan': 'all tracked non-symlink files outside the plan, excluding .fgos; full-path lines plus normalized exact/glob/directory and relative Markdown targets', 'rawLines': raw_external, 'references': external_refs, 'navigationReferences': navigation_refs})
     for p in files:
         if re.search(r'/review-request-step10-.*-(345f15d95|287a22d33)\.json$', p):
             keep(p, 'round3/4 rationale directory-filter input')
@@ -100,10 +160,22 @@ def main():
         nonlocal bodies_count
         bodies_count += 1
         for line_no, line in enumerate(text.splitlines(), 1):
+            # A retained program's output/provenance names are not input reads.
+            # Directory/indirect read tuples are still scanned conservatively.
+            if re.match(r'\s*(?:write|fs\.writeFileSync)\(', line): continue
+            if re.search(r'\bevidence\s*:', line) and not re.search(r'\bread\(|readFile|read_text|read_bytes', line): continue
             names = set(NAME.findall(line))
             for name in names:
                 for target in byname.get(name, []):
                     if target == path: continue
+                    # Outside-plan reads are seeded from exact input contracts
+                    # and full-path/link enumeration above, never name matches.
+                    if not path.startswith(P): continue
+                    # A quoted basename resolves beside a plan program, not to
+                    # every unrelated same-name record elsewhere in the plan.
+                    if len(byname[name]) > 1 and not (
+                        posixpath.dirname(target) == posixpath.dirname(path)
+                        or target[len(P):] in line or target in line): continue
                     edges[path].add(target)
                     witnesses.setdefault((path, target), {'field': field, 'line': line_no, 'text': line[:800]})
             if re.search(r'glob\(|rglob\(|readdir|listdir|iterdir|walk\(|\.filter\(|startsWith\(|endsWith\(', line):
@@ -187,7 +259,8 @@ def main():
         for src in sorted(live):
             for dst in edges.get(src, []):
                 if dst not in protected:
-                    keep(dst, 'retained reader closure: ' + src); changed = True
+                    witness = witnesses[(src, dst)]
+                    keep(dst, 'retained plan reader: ' + src + '#' + witness['field'] + ':' + str(witness['line']) + ' ' + witness['text']); changed = True
                 if dst in sources and dst not in live:
                     live.add(dst); changed = True
     # Join the old scriptRefs conservatively for non-plan reader roots. Fixture
@@ -195,7 +268,10 @@ def main():
     for row in prune['inventory']:
         for ref in row.get('scriptRefs', []):
             if isinstance(ref, str) and ref.startswith(('scripts/', 'test/', 'src/')):
-                keep(row['path'], 'prior scriptRefs retained product/test boundary: ' + ref)
+                # Old scriptRefs include fixture writes and malformed patterns.
+                # Preserve their custody below, but only a current exact reader
+                # or navigation link can justify tip retention.
+                pass
     moving = set(files) - protected
     # Retire standalone replay entrypoints (all bytes archived), transitively
     # including their importing/calling plan entrypoints. Retained current proof
@@ -218,9 +294,9 @@ def main():
         'composition/compose.py', 'composition/finalize.py', 'composition/replay-scans.mjs',
         'preserve-premise/physical-move.mjs', 'preserve-premise/proof.py', 'preserve-premise/verify.py']}
     assert original_ten <= gate_programs
-    retired = (set(sources) & moving) | ((enumerating_programs | historical_programs) & set(files) - live)
+    retired = ((set(sources) & moving) | ((enumerating_programs | historical_programs) & set(files) - live)) - protected
     while True:
-        new = {s for s in sources if s.startswith(P) and s not in live and (edges.get(s, set()) & (moving | retired))} - retired
+        new = {s for s in sources if s.startswith(P) and s not in live and (edges.get(s, set()) & (moving | retired))} - retired - protected
         if not new: break
         retired |= new
     moving |= retired
@@ -246,6 +322,26 @@ def main():
             else:
                 reader_path = re.split(r'[:#]', ref, maxsplit=1)[0]
             disposition = 'retain' if row['path'] in protected else ('archive' if row['path'] in moving else 'already-pruned')
+            if reader_path.startswith(('test/', 'scripts/', 'src/')) and disposition != 'retain':
+                # Validate the historical constructed-filename claim literally.
+                template = re.search(r'constructed filename: ([^)]+)', ref) if isinstance(ref, str) else None
+                if not template:
+                    locator = re.search(r':([0-9]+)', ref)
+                    assert locator, (row['path'], ref)
+                    number = int(locator[1])
+                    source_line = (root / reader_path).read_text().splitlines()[number - 1]
+                    assert 'path.join(scratch,' in source_line and 'readFileSync' in source_line and pathlib.PurePosixPath(row['path']).name in source_line
+                    script_refs.append({'targetPath':row['path'],'ref':ref,'readerPath':reader_path,
+                        'targetDisposition':disposition,'readerDisposition':'fixture-scratch-output-not-tip-read',
+                        'owningProof':None,'line':number,'text':source_line,
+                        'proof':'Unchanged owning test reads its freshly generated scratch output, not the committed plan record'})
+                    continue
+                pattern = '[0-9]+'.join(re.escape(part) for part in re.split(r'\$\{[^}]+\}', template[1]))
+                assert not re.fullmatch(pattern, row['path']), (row['path'], ref)
+                script_refs.append({'targetPath': row['path'], 'ref': ref, 'readerPath': reader_path,
+                    'targetDisposition': disposition, 'readerDisposition': 'fixture-pattern-does-not-match-target',
+                    'owningProof': None, 'proof': 'Historical scriptRef rejected: fixture constructed filename does not match this path; unchanged product fixture behaviour, no tip read retired.', 'template': template[1]})
+                continue
             script_refs.append({'targetPath': row['path'], 'ref': ref, 'readerPath': reader_path,
                 'targetDisposition': disposition,
                 'readerDisposition': 'retain-reader-and-input' if disposition == 'retain' else ('archive-entrypoint' if reader_path in moving else 'repoint-historical-execution-context'),
@@ -270,7 +366,8 @@ def main():
         hits = targets & moving
         if not hits: continue
         if src in moving: action = 'archive-with-inputs'
-        elif src in sources: action = 'UNRESOLVED-live-source'
+        elif src in live: action = 'UNRESOLVED-live-source'
+        elif src in sources: action = 'linked-historical-source-archive-execution-context'
         else: action = 'historical-record-replay-context'
         record_readers.append({'readerPath': src, 'action': action,
             'targets': [{'path': p, **witnesses[(src,p)]} for p in sorted(hits)],
@@ -306,6 +403,28 @@ def main():
         'limitations': ['Static and pin-bounded; all directory/enumeration residues require final-pin review, not arbitrary-program reachability proof.',
             'Retirement is a proposed cutover disposition, not independent acceptance or permission to disable current pre-flip gates.',
             'Current product inventory corpus is retained, so the ~0.2 GB aspirational tip is not claimed.']}
+    previous = json.loads(gzip.decompress(git('show', '7f1eb147f:' + A + 'audit/partition.json.gz')))
+    false_rows = [r for r in previous['retained'] if r['path'] not in {
+        P + 'reports/identity-registry.json', P + 'reports/phase-02-identity-registry.json'} and any(
+        s.startswith('retained reader closure: ') and s.split(': ', 1)[1] in {
+            'packages/run-supervisor/rust/src/adopt.rs', 'test/verbs/dispatch-recovery.test.mjs',
+            'docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/case-brief.mjs',
+            'docs/history/submit-add-field-parity-goaltier-editable/verify.sh',
+            'scripts/check-legacy-docs-ratchet.mjs', 'test/scripts/generate-doc-inventory.test.mjs',
+            'scripts/propose-doc-decisions.mjs'}
+        or 'constructed filename:' in s for s in r['reasons'])]
+    assert len(false_rows) == 22 and sum(r['size'] for r in false_rows) == 23297481
+    corrections = []
+    for row in false_rows:
+        path = row['path']
+        assert path in moving or any(s.startswith(('plan navigation link:', 'outside-plan path/link:')) for s in reasons[path])
+        corrections.append({'path': path, 'previousSize': row['size'], 'previousFalseReasons': row['reasons'],
+            'disposition': 'archive' if path in moving else 'retain-required-navigation-link',
+            'currentReasons': sorted(reasons[path]) if path in protected else [],
+            'note': 'Basename-only reader removed; exact navigation link takes precedence under the brief' if path in protected else 'No current tip input: unrelated basename / fixture output / comment / help / mismatching template'})
+    prior_moving = {r['path'] for r in previous['records']}
+    emit('retained-set-corrections.json', {'inputCommit':pin,'reviewedRows':22,'reviewedBytes':23297481,
+        'rows':corrections,'formerlyArchivedOutsideReferences':[r for r in external_refs if r['targetPath'] in prior_moving]})
     emit('partition.json', manifest)
     emit('reader-patches/standalone-retirement-specs.json', {'inputCommit':pin,'specs':patch_specs})
     emit('reader-patches/historical-replay-specs.json', {'inputCommit':pin,'historicalReaderFiles':len(set(r['readerPath'] for r in historical)),
@@ -320,7 +439,7 @@ def main():
     emit('reader-patches/enumeration-review.json', {'inputCommit':pin,'status':'review-required-not-completeness-proof',
         'candidateOccurrences':len(enumerators), 'entries':list(grouped_enumerators.values()), 'retainedDirectorySets':['pilot/decisions/*.json','pilot/first-round/*.json','pilot/second-round/*.json','ledger/decisions/*.json','reports/phase-02-doc-inventory.parts/**','reports/phase-06/review-request-step10-.*-(345f15d95|287a22d33).json','reports/phase-06/review-step10-.*-345f15d95.md']})
     emit('prior-prune-recovery.json', {'inputCommit':pin,'records':[{'path':r['path'],'blobId':r['gitBlob'],'sha256':r['sha256'],'size':r['bytes'], 'sourceManifest':prune_path} for r in prune['inventory'] if r['action']=='remove']})
-    emit('scan-receipt.json', {'inputCommit':pin,'planFilesScanned':len(files),'sourceFilesScanned':len(sources),'bytesScanned':scanned_bytes,
+    emit('scan-receipt.json', {'externalReferenceJoins':len(external_refs),'navigationReferenceJoins':len(navigation_refs),'outsidePlanBasenameJoins':0,'inputCommit':pin,'planFilesScanned':len(files),'sourceFilesScanned':len(sources),'bytesScanned':scanned_bytes,
         'codeLikeBodiesScanned':bodies_count,'sourceTargetJoins':sum(map(len,edges.values())), 'enumerationCandidates':len(enumerators),
         'historicalJoins':len(historical),'priorScriptRefJoins':len(script_refs),'retainedProofRoots':sorted(live),
         'retainedEmbeddedReadRoots':embedded_roots,

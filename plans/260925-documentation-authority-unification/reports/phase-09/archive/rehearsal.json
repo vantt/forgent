@@ -1,79 +1,92 @@
 {
-  "sourceCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
+  "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "archiveRef": "refs/heads/archive/260925-records",
-  "archiveCommit": "c2db4ec83419e01b5513d33157ed3edc77b9a11d",
-  "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
-  "accountedCandidate": "bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88",
-  "preFreezeCandidate": "8f7dcee88e85bed286e9da7097f5e7a2a24e1c58",
-  "filesystemStat": "ext2/ext3 ef53 4096 122654446 9799283",
+  "archiveCommit": "b9ce940e293d27fb03751063b5f5e2db304fdf83",
+  "removalCommit": "b4fd9a7d6b5b7c795b1a034f9a9f56134c10cc64",
+  "accountedCandidate": "98a121070744e334bb2333bfcd2f10ec672e7ec4",
+  "preFreezeCandidate": "dd78c6b18fca66243a624dae1d8c165e1e9fe23c",
+  "filesystemStat": "ext2/ext3 ef53 4096 122654446 8417059",
   "findmnt": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
-  "physicalScratch": "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch",
-  "logicalScratch": "/tmp/fgos-work/w2-d5b-disk",
-  "warmCache": true,
+  "physicalScratch": "/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-final-inputs",
+  "logicalScratch": "/tmp/fgos-work/w4-d5c-final-inputs",
+  "warmCache": false,
+  "coldMethod": "drop_caches not writable/permitted; first add in a fresh --no-hardlinks --no-checkout clone per variant (brief-authorized fallback, not physical cache eviction)",
   "variants": [
     {
       "variant": "after-final-pin-without-gates",
-      "commit": "bf6c4d5fd6aeca94fc0024d92f215c66a8e92a88",
-      "files": 10547,
-      "tipBytes": 679257054,
-      "planFiles": 406,
-      "planBytes": 495380203,
-      "archiveTipBytes": 21745,
+      "commit": "98a121070744e334bb2333bfcd2f10ec672e7ec4",
+      "files": 11156,
+      "tipBytes": 818290357,
+      "planFiles": 890,
+      "planBytes": 633051680,
+      "archiveTipBytes": 50093,
       "runs": [
         {
           "run": 1,
-          "seconds": 5.6556453770026565,
-          "exit": 0
+          "seconds": 2.4145886469632387,
+          "exit": 0,
+          "cache": "cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/after-final-pin-without-gates-fresh-clone"
         },
         {
           "run": 2,
-          "seconds": 4.588815063005313,
-          "exit": 0
+          "seconds": 6.091207563877106,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/after-final-pin-without-gates-fresh-clone"
         },
         {
           "run": 3,
-          "seconds": 4.444476593984291,
-          "exit": 0
+          "seconds": 6.01169649604708,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/after-final-pin-without-gates-fresh-clone"
         }
       ],
-      "medianSeconds": 4.588815063005313
+      "medianSeconds": 6.01169649604708
     },
     {
       "variant": "before-final-pin-with-gates",
-      "commit": "8f7dcee88e85bed286e9da7097f5e7a2a24e1c58",
-      "files": 13910,
-      "tipBytes": 1970867003,
-      "planFiles": 3769,
-      "planBytes": 1786990152,
-      "archiveTipBytes": 21745,
+      "commit": "dd78c6b18fca66243a624dae1d8c165e1e9fe23c",
+      "files": 14439,
+      "tipBytes": 2117345765,
+      "planFiles": 4173,
+      "planBytes": 1932107088,
+      "archiveTipBytes": 50093,
       "runs": [
         {
           "run": 1,
-          "seconds": 19.039110076031648,
-          "exit": 0
+          "seconds": 49.51505667902529,
+          "exit": 0,
+          "cache": "cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/before-final-pin-with-gates-fresh-clone"
         },
         {
           "run": 2,
-          "seconds": 9.562469732947648,
-          "exit": 0
+          "seconds": 27.737128988141194,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/before-final-pin-with-gates-fresh-clone"
         },
         {
           "run": 3,
-          "seconds": 12.286731401924044,
-          "exit": 0
+          "seconds": 13.364804548909888,
+          "exit": 0,
+          "cache": "warm",
+          "timingRepo": "/tmp/fgos-work/w4-d5c-final-inputs/before-final-pin-with-gates-fresh-clone"
         }
       ],
-      "medianSeconds": 12.286731401924044
+      "medianSeconds": 27.737128988141194
     }
   ],
   "bundle": {
     "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/rehearsal.bundle",
-    "size": 1718847,
-    "sha256": "2bc10cbcb9feea4473d39d448b63301a037fe0cba7d987473b5d780a69410471",
-    "prerequisiteCommit": "e158e672682f4b305230e099f72a1b10adda25e7",
+    "size": 1770283,
+    "sha256": "0cf6258c71469f1ae80a1b1a9a05044fa3b4f7092e7a206eee9bbcb61bdb6834",
+    "prerequisiteCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
     "verifyExit": 0
   },
-  "gatePrograms": 18,
+  "gatePrograms": 43,
   "reviewedTen": [
     "plans/260925-documentation-authority-unification/reports/phase-09/carries/replay-focused-proofs.py",
     "plans/260925-documentation-authority-unification/reports/phase-09/carries/verify-carries.mjs",
@@ -86,15 +99,15 @@
     "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
     "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"
   ],
-  "temporaryGateFiles": 3363,
-  "retainedFilesVerified": 399,
+  "temporaryGateFiles": 3283,
+  "retainedFilesVerified": 883,
   "tests": [
     {
       "phase": "baseline",
       "file": "test/scripts/doc-rationale-reproduction.test.mjs",
       "exit": 1,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-rationale-reproduction.test.mjs.log.gz",
-      "sha256": "5029e5bf128d40c1c00e6bcddc31c7869407b58a9492f2cf0f788dbb4da3af00",
+      "sha256": "0fee3397f23c51a604b811b95abc1b02ab334d54ec3dd6cd3ce83fe976825c21",
       "summary": [
         "ℹ tests 8",
         "ℹ pass 6",
@@ -103,11 +116,11 @@
         "ℹ skipped 0"
       ],
       "failedTitles": [
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (46821.813623ms)",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (78948.60177ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10980.581547ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10261.693074ms)",
         "✖ failing tests:",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (46821.813623ms)",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (78948.60177ms)"
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10980.581547ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10261.693074ms)"
       ]
     },
     {
@@ -115,7 +128,7 @@
       "file": "test/scripts/doc-runner-liveness.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-runner-liveness.test.mjs.log.gz",
-      "sha256": "df3b33638a3999226f1649d89e67f40352b98a5c1742fcb122b095197508317c",
+      "sha256": "2b14669b28f2ccf8164028e99d6de4b10b8803e6882eafc7f4615eab3d8dd229",
       "summary": [
         "ℹ tests 1",
         "ℹ pass 1",
@@ -130,7 +143,7 @@
       "file": "test/scripts/generate-doc-inventory.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-doc-inventory.test.mjs.log.gz",
-      "sha256": "d3333c63af8bd577f7d95d37b0b694792225a335caa6b4f53918599139a92f84",
+      "sha256": "db2dd706d28013379e0ed7e0647c300de218413cda498aba82dfddfa5c5851ed",
       "summary": [
         "ℹ tests 96",
         "ℹ pass 96",
@@ -145,10 +158,10 @@
       "file": "test/scripts/verify-phase-02.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-verify-phase-02.test.mjs.log.gz",
-      "sha256": "00e5bda58458036e42ae7950e0dfdde5f2cba071d70863c89b2c00addc620f6d",
+      "sha256": "007c2ab12b14bb2bd564d5a8e9d40b4e615d8b942b0a7eb358ab75c81744155b",
       "summary": [
-        "ℹ tests 6",
-        "ℹ pass 6",
+        "ℹ tests 16",
+        "ℹ pass 16",
         "ℹ fail 0",
         "ℹ cancelled 0",
         "ℹ skipped 0"
@@ -160,7 +173,7 @@
       "file": "test/scripts/check-doc-retirement.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-retirement.test.mjs.log.gz",
-      "sha256": "725599b1a846e72fa2a8fc649373a558390da2c439771f458d19c6a6cf396c0f",
+      "sha256": "1c3217dcc2084b07b9e312aeacafb7702de5a116f013827a7872ede5ddee78fa",
       "summary": [
         "ℹ tests 36",
         "ℹ pass 36",
@@ -172,10 +185,25 @@
     },
     {
       "phase": "baseline",
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-candidate-status.test.mjs.log.gz",
+      "sha256": "29193fb725d508245de4e60342964e5aa82ffb9f61d0777969cf319f2b7c71ae",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "baseline",
       "file": "test/scripts/check-evidence-relocation.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-evidence-relocation.test.mjs.log.gz",
-      "sha256": "bef65b6738bbd2f37dd4290c61e79a6316dbe2b04bf2202bc1987a9cd2b17932",
+      "sha256": "0082b6e16cd65738ade2098a0eba7ea4bd23e292e63cd3c67acc40e1d6f9ca82",
       "summary": [
         "ℹ tests 41",
         "ℹ pass 41",
@@ -190,7 +218,7 @@
       "file": "test/scripts/doc-review-format.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-review-format.test.mjs.log.gz",
-      "sha256": "b906983fab5a8dc07aea94e58ec9e5e6b77760f62b966b6b77f8545ba5d3b8b5",
+      "sha256": "70b704189ad589ac3cf478d7caec4530683e55652051579d15e07529e3f1e805",
       "summary": [
         "ℹ tests 25",
         "ℹ pass 25",
@@ -205,7 +233,7 @@
       "file": "test/scripts/doc-restoration-proofs.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-doc-restoration-proofs.test.mjs.log.gz",
-      "sha256": "eb3803e1930a66456107783ea6cd6916def94047013e36f81ea60d527a08ac04",
+      "sha256": "dfafef8ec71eef8b52cfa31765232a1daf8d8c28e3e528c66a354507eaed220e",
       "summary": [
         "ℹ tests 5",
         "ℹ pass 5",
@@ -220,7 +248,7 @@
       "file": "test/scripts/check-doc-constitution.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-constitution.test.mjs.log.gz",
-      "sha256": "e9c347d407c5b5297e058d4d99c1b3de630ab7c4112298b0ffb4b2e555beb3df",
+      "sha256": "ac512ded0f9761b1b0fe391f3d82d3c846c89a19edb2e40ad421402658d78fe0",
       "summary": [
         "ℹ tests 65",
         "ℹ pass 65",
@@ -235,7 +263,7 @@
       "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-generate-shipped-path-inventory.test.mjs.log.gz",
-      "sha256": "ddaab8db4c99428423a01082e05158b6ad3986a698168a70084d137da5638191",
+      "sha256": "ee8d07881531f54f38c4afd67fb3a427bb3014c6fdfa65e0436a104ea0e9f790",
       "summary": [
         "ℹ tests 10",
         "ℹ pass 10",
@@ -250,7 +278,7 @@
       "file": "test/scripts/doc-rationale-reproduction.test.mjs",
       "exit": 1,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-rationale-reproduction.test.mjs.log.gz",
-      "sha256": "aea96c50bf042e32fe50580fead8d81d4eb753364490ae39263f16db2c4ddc44",
+      "sha256": "670e8c95b158255ff31a5e6350004895f624d644404455eabbc0c2fd095c76a0",
       "summary": [
         "ℹ tests 8",
         "ℹ pass 6",
@@ -259,11 +287,11 @@
         "ℹ skipped 0"
       ],
       "failedTitles": [
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19602.406848ms)",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (17690.576402ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10308.404257ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10345.173107ms)",
         "✖ failing tests:",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (19602.406848ms)",
-        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (17690.576402ms)"
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (10308.404257ms)",
+        "✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (10345.173107ms)"
       ]
     },
     {
@@ -271,7 +299,7 @@
       "file": "test/scripts/doc-runner-liveness.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-runner-liveness.test.mjs.log.gz",
-      "sha256": "549eda6525f7d208ca12b1517e02a33addecc95f6d8dace31c9c2e42580bb69f",
+      "sha256": "3f216f9db2b6127da798f316d4330c96287b2adaa5b66e57bdadd3b553a93215",
       "summary": [
         "ℹ tests 1",
         "ℹ pass 1",
@@ -286,7 +314,7 @@
       "file": "test/scripts/generate-doc-inventory.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-doc-inventory.test.mjs.log.gz",
-      "sha256": "8b36c72b102c29b0a8dbb838a3efedd7e95eac5df34a8b29610e97d96251c506",
+      "sha256": "c5c89bd0cb6cf16d7082607ab0315cbeb0eb5079f255b23bfbe92cb10895cdf8",
       "summary": [
         "ℹ tests 96",
         "ℹ pass 96",
@@ -301,10 +329,10 @@
       "file": "test/scripts/verify-phase-02.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-verify-phase-02.test.mjs.log.gz",
-      "sha256": "5a33836d016edd84655deaaa0188c4988a6a4e49edeab3787d505f40f847bb3e",
+      "sha256": "80063fb3b2eaf07384866aebdd82fa4192a0936b3b748b2a0ff66426bf38fb0f",
       "summary": [
-        "ℹ tests 6",
-        "ℹ pass 6",
+        "ℹ tests 16",
+        "ℹ pass 16",
         "ℹ fail 0",
         "ℹ cancelled 0",
         "ℹ skipped 0"
@@ -316,7 +344,7 @@
       "file": "test/scripts/check-doc-retirement.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-retirement.test.mjs.log.gz",
-      "sha256": "cc9969fee6943626a70316e5d4baa490e387e6d74554f7036be7ee34ce8ba5b9",
+      "sha256": "e5be1fe415ec9bfdba6af907a57954bbc8a66e6ca1fd5b96b431040cf9fe1b8c",
       "summary": [
         "ℹ tests 36",
         "ℹ pass 36",
@@ -328,10 +356,25 @@
     },
     {
       "phase": "reduced",
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-candidate-status.test.mjs.log.gz",
+      "sha256": "2d5308889b3fc290788fc5ef989c3818fd2aef04e7902bede26dc03b1396de54",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "failedTitles": []
+    },
+    {
+      "phase": "reduced",
       "file": "test/scripts/check-evidence-relocation.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-evidence-relocation.test.mjs.log.gz",
-      "sha256": "9b5763787048704ab8146c22f145f770c2ef0616703d64209055ee6f85a49276",
+      "sha256": "d60fd8993886c800a97647f20b58c9b2bfc0591392f10026ce54f6407b09d7bc",
       "summary": [
         "ℹ tests 41",
         "ℹ pass 41",
@@ -346,7 +389,7 @@
       "file": "test/scripts/doc-review-format.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-review-format.test.mjs.log.gz",
-      "sha256": "bf5cf1a8b934c68b2c6a0b33e8e95378def95073e8c03728e3abac6744c2c12e",
+      "sha256": "4577bb7f9d58d1d4353b26ef6d9f3cdea01e21cb90d669a252a0cb297f37f5af",
       "summary": [
         "ℹ tests 25",
         "ℹ pass 25",
@@ -361,7 +404,7 @@
       "file": "test/scripts/doc-restoration-proofs.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-doc-restoration-proofs.test.mjs.log.gz",
-      "sha256": "6cfce9a45109dd07f89dc20d01e9bedf2e62959945e67bcbfb5363984ce78ef8",
+      "sha256": "c9f0432bab7b2f5675c1beff338a487d3650da75384b89088f60f64fdc0caeb7",
       "summary": [
         "ℹ tests 5",
         "ℹ pass 5",
@@ -376,7 +419,7 @@
       "file": "test/scripts/check-doc-constitution.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-constitution.test.mjs.log.gz",
-      "sha256": "e2e9a47c4600d22e5f4ca0072f3ece64ea58e81f4481e61f8a52befa38203f7d",
+      "sha256": "734006705f3eb48880401637406a7ac42a00964cd7dafd6651f968334c2b5d4e",
       "summary": [
         "ℹ tests 65",
         "ℹ pass 65",
@@ -391,7 +434,7 @@
       "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "exit": 0,
       "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-generate-shipped-path-inventory.test.mjs.log.gz",
-      "sha256": "8ff209f76e578b48d5b96bde4ade521c680894aa34805288df22121c519dbcef",
+      "sha256": "5400c52b62ef251b03bc86be762a4d6144705bf9bbe33620f1cda60b1475bd2e",
       "summary": [
         "ℹ tests 10",
         "ℹ pass 10",
@@ -402,17 +445,176 @@
       "failedTitles": []
     }
   ],
+  "linkChecks": [
+    {
+      "phase": "baseline",
+      "check": "check-doc-candidate-status",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-candidate-status.json.gz",
+      "sha256": "801d84f5b40809941ef7b3dcb69a2878a600a52739dcd8cf91c978e1a72da033",
+      "result": {
+        "counts": {
+          "files": 627,
+          "byStatus": {
+            "promoted": 3,
+            "candidate": 221,
+            "legacy-current": 0,
+            "non-authority": 1,
+            "unrouted": 402
+          },
+          "exemptUnrouted": 302,
+          "checked": 224,
+          "findings": 4,
+          "byType": {
+            "missing-candidate-fields": 4
+          }
+        },
+        "findings": [
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "phase": "baseline",
+      "check": "check-doc-retirement",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/baseline-check-doc-retirement.json.gz",
+      "sha256": "3849dcc0bb70b5ca96a722fd4b4a6181406db56943d985a9eb5d380ed92e20d2",
+      "result": null,
+      "error": "check-doc-retirement error loading input: inventory shards unreadable (/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-final-inputs/repo/plans/260925-documentation-authority-unification/reports/doc-inventory.json: missing shard doc-inventory.parts/part-0001.jsonl). The shards are not committed; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit 23f6eaccf5eb195a8f50e5788d38f386a901b6d2 --identity-registry plans/260925-documentation-authority-unification/reports/identity-registry.json --json-out plans/260925-documentation-authority-unification/reports/doc-inventory.json --md-out plans/260925-documentation-authority-unification/reports/doc-inventory.md\n"
+    },
+    {
+      "phase": "baseline",
+      "check": "retirement-links-resolve",
+      "exit": 0,
+      "result": {
+        "scope": "production links-resolve evaluator only; unrelated inventory fixture inputs",
+        "findings": [],
+        "results": [
+          {
+            "gate": "promotionGate",
+            "id": "links-resolve",
+            "rule": "Every relative link and Related path resolves.",
+            "enforcedBy": "script",
+            "status": "pass",
+            "measure": "none: unresolved relative links or Related paths in candidate and promoted documents"
+          }
+        ]
+      }
+    },
+    {
+      "phase": "reduced",
+      "check": "check-doc-candidate-status",
+      "exit": 0,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-candidate-status.json.gz",
+      "sha256": "801d84f5b40809941ef7b3dcb69a2878a600a52739dcd8cf91c978e1a72da033",
+      "result": {
+        "counts": {
+          "files": 627,
+          "byStatus": {
+            "promoted": 3,
+            "candidate": 221,
+            "legacy-current": 0,
+            "non-authority": 1,
+            "unrouted": 402
+          },
+          "exemptUnrouted": 302,
+          "checked": 224,
+          "findings": 4,
+          "byType": {
+            "missing-candidate-fields": 4
+          }
+        },
+        "findings": [
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          },
+          {
+            "type": "missing-candidate-fields",
+            "path": "docs/platform/work-state/contracts/non-transitioning-records.md",
+            "message": "no header block; missing: Document type, Audience, Purpose, Design status, Last reviewed, Related"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "phase": "reduced",
+      "check": "check-doc-retirement",
+      "exit": 1,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/archive/audit/reduced-check-doc-retirement.json.gz",
+      "sha256": "9679a07c5badd789bb31619844222e8cc855ff1f7cad01697fa29a0a0d333df5",
+      "result": null,
+      "error": "check-doc-retirement error loading input: inventory shards unreadable (/home/vantt/projects/forgentX-p9-w1-d4/plans/260925-documentation-authority-unification/reports/phase-09/archive/.scratch/w4-d5c-final-inputs/repo/plans/260925-documentation-authority-unification/reports/doc-inventory.json: missing shard doc-inventory.parts/part-0001.jsonl). The shards are not committed; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit 98a121070744e334bb2333bfcd2f10ec672e7ec4 --identity-registry plans/260925-documentation-authority-unification/reports/identity-registry.json --json-out plans/260925-documentation-authority-unification/reports/doc-inventory.json --md-out plans/260925-documentation-authority-unification/reports/doc-inventory.md\n"
+    },
+    {
+      "phase": "reduced",
+      "check": "retirement-links-resolve",
+      "exit": 0,
+      "result": {
+        "scope": "production links-resolve evaluator only; unrelated inventory fixture inputs",
+        "findings": [],
+        "results": [
+          {
+            "gate": "promotionGate",
+            "id": "links-resolve",
+            "rule": "Every relative link and Related path resolves.",
+            "enforcedBy": "script",
+            "status": "pass",
+            "measure": "none: unresolved relative links or Related paths in candidate and promoted documents"
+          }
+        ]
+      }
+    }
+  ],
   "accounting": [
     {
       "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
       "embeddedKey": "scripts",
-      "recipeSha256": "f5df994e910ea939ed7b6e2cbcd40c0c8e4903dd9f8a800eaad28fead61e7838",
-      "slice": "Exact A setup and const exceptions..historicalEqual; only A serialization added, H/B/ownership not invoked.",
+      "recipeSha256": "f5591bc62b5a914b3d40307732282bc6fb2f2c31df42b0a1613b337ecc045013",
+      "recipeScope": "Entire unchanged checks.mjs; only exact exception-array rows appended in clone",
+      "afterBOk": true,
+      "afterHFindings": 4,
+      "afterHNewFindings": 0,
+      "afterIOk": true,
+      "afterRecipeExit": 1,
       "beforeExit": 1,
-      "beforeUnaccountedPairs": 3618,
-      "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
-      "removalPairs": 3409,
-      "preexistingPendingPairs": 209,
+      "beforeUnaccountedPairs": 3432,
+      "removalCommit": "b4fd9a7d6b5b7c795b1a034f9a9f56134c10cc64",
+      "removalPairs": 3384,
+      "preexistingPendingPairs": 48,
       "afterExit": 0,
       "afterAOk": true,
       "afterUnaccountedPairs": 0,
@@ -422,13 +624,18 @@
     {
       "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
       "embeddedKey": "readOnlyScripts",
-      "recipeSha256": "1c45d9750b1a503382ca74556258b6c477fa9e928eb9277aea7ee9f3423212d1",
-      "slice": "Exact A setup and const exceptions..historicalEqual; only A serialization added, H/B/ownership not invoked.",
+      "recipeSha256": "29f161963a3927a6848613e8319e24877034c5455357b3e63f355d5faac35d3c",
+      "recipeScope": "Entire unchanged checks.mjs; only exact exception-array rows appended in clone",
+      "afterBOk": true,
+      "afterHFindings": 4,
+      "afterHNewFindings": 0,
+      "afterIOk": true,
+      "afterRecipeExit": 1,
       "beforeExit": 1,
-      "beforeUnaccountedPairs": 3618,
-      "removalCommit": "ffab973828530caa61db9ade641e67178097323c",
-      "removalPairs": 3409,
-      "preexistingPendingPairs": 209,
+      "beforeUnaccountedPairs": 3432,
+      "removalCommit": "b4fd9a7d6b5b7c795b1a034f9a9f56134c10cc64",
+      "removalPairs": 3384,
+      "preexistingPendingPairs": 48,
       "afterExit": 0,
       "afterAOk": true,
       "afterUnaccountedPairs": 0,
@@ -439,42 +646,42 @@
   "measuredMainArtifacts": [
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/manifest.json",
-      "size": 6611,
-      "sha256": "ab5ed93bd771e0c08d8333195b0c911803d0f310444df638c9badc3e1a26f96e"
+      "size": 7291,
+      "sha256": "099333e2acaaeb902c9d17adec2725cf7cdecf8439e95eb01e7cee29ad75c63f"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/design.md",
-      "size": 10109,
-      "sha256": "4fab37b0a857a5852d3331743f9a990bd3f7ea8c7370b842ee0b3bf661607b31"
+      "size": 9132,
+      "sha256": "17355d5f8c28607ec4a65acc0b8839427844f49252a2a2a24f458659577eead4"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.md",
-      "size": 1044,
-      "sha256": "34b9795350ac1e2057c3029475589ef33f716ca63d401eb9e43d411195c4f906"
+      "size": 462,
+      "sha256": "a7310a32b3391d73e10bb9466fd21e24e210081cbfafbc09a4e1f2b36359a913"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/receipt.json",
-      "size": 300,
-      "sha256": "8ce59535f5b49d13adf800e7d83c8e29561e653958734126d6d705fa664d22fe"
+      "size": 202,
+      "sha256": "4523cb49e94b61e9ace1a70e561a0eb188b5d7379068f03bad6af3ef159e84f7"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/rehearsal.json",
-      "size": 241,
-      "sha256": "21128310b8ed9322f452ba97f220545ad0be1485540903d0d7f9121b11658e31"
+      "size": 28237,
+      "sha256": "b1714969e85a00c2f482284bc37314a9d54fac4903513fad0577163673557869"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/verification.json",
-      "size": 955,
-      "sha256": "e00fd706acac2981df0843794827e689c2de1dcbb7ac89ddadd96215a7c6de5d"
+      "size": 1478,
+      "sha256": "d0a4492da7981137af79c6e835a12fc2cb4612d04b5ff49d47217fef8105437b"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-09/archive/reader-patches/README.md",
-      "size": 2485,
-      "sha256": "624a19e01f663b3206418e998c9fce7e047f70953f968448bbe193e53ed9baa0"
+      "size": 3291,
+      "sha256": "a2b997ed2f3b2d5717c5b64139747053647c5577e40443cf9d879d0012704f2c"
     }
   ],
   "postMeasurementNote": "Receipt and rehearsal outputs are written after measured commits. Their exact delta must be added at F; no final-tree claim.",
-  "releaseId": "sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+  "releaseId": "sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8",
   "rustFreshness": "activated addon only; working-tree Rust freshness not established",
   "noSourceGitWrites": true,
   "noProductOrTestSourceChange": true

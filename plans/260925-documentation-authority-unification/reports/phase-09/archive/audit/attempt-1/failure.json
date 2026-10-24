@@ -1,0 +1,5 @@
+{
+  "structuralFailure": "Two plan-navigation program links were overridden by retirement classification; corrected to retain linked historical source, execute only in bound archive context",
+  "fixtureFailure": "Ten unchanged verifier cleanup cases fail equally on both sides: extensionless CommonJS npm fixture inherits source package type=module from physical scoped scratch; add a CommonJS package boundary in the scratch tmp directory only",
+  "newLinkFindings": 0
+}

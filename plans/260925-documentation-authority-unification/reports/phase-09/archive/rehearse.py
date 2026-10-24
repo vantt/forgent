@@ -13,6 +13,7 @@ TESTS = [
     'test/scripts/generate-doc-inventory.test.mjs',
     'test/scripts/verify-phase-02.test.mjs',
     'test/scripts/check-doc-retirement.test.mjs',
+    'test/scripts/check-doc-candidate-status.test.mjs',
     'test/scripts/check-evidence-relocation.test.mjs',
     'test/scripts/doc-review-format.test.mjs',
     'test/scripts/doc-restoration-proofs.test.mjs',
@@ -26,11 +27,19 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--scratch', required=True)
     ap.add_argument('--release-path', required=True)
+    ap.add_argument('--rebuild', action='store_true', help='Rebuild the partition at HEAD and verify the finished rehearsal in one invocation')
     opts = ap.parse_args()
     source = pathlib.Path(__file__).resolve().parents[5]
     output = source / A
     scratch = pathlib.Path(opts.scratch).absolute()
     assert str(scratch).startswith('/tmp/fgos-work/')
+    if opts.rebuild:
+        subprocess.run(['python3', '-B', str(output / 'build-design.py'), '--output-dir', str(output)], cwd=source, check=True)
+    assert not scratch.exists() and not scratch.is_symlink(), 'use a fresh scratch name'
+    physical = output / '.scratch' / scratch.name
+    physical.mkdir(parents=True)
+    scratch.parent.mkdir(parents=True, exist_ok=True)
+    scratch.symlink_to(physical, target_is_directory=True)
     assert scratch.resolve().is_relative_to(output / '.scratch'), 'physical writes must stay inside scoped scratch'
     clone = scratch / 'repo'
     assert not clone.exists()
@@ -48,6 +57,10 @@ def main():
     for key, name in [('HOME', 'home'), ('FGOS_STATE_ROOT', 'state'), ('TMPDIR', 'tmp'), ('TMP', 'tmp'), ('TEMP', 'tmp')]:
         dest = scratch / name; dest.mkdir(mode=0o700, exist_ok=True); dest.chmod(0o700)
         env[key] = str(dest)
+    # A physical scratch beneath this ESM repository inherits its package type.
+    # /tmp fixtures normally have no such parent. Restore that ordinary fixture
+    # boundary so an unchanged extensionless CommonJS npm stub remains CommonJS.
+    (scratch / 'tmp/package.json').write_text('{"type":"commonjs"}\n')
     env.update(GIT_AUTHOR_NAME='Archive rehearsal fixture', GIT_AUTHOR_EMAIL='archive@example.invalid',
         GIT_COMMITTER_NAME='Archive rehearsal fixture', GIT_COMMITTER_EMAIL='archive@example.invalid')
     def cmd(args, *, cwd=None, data=None, check=True, timeout=600):
@@ -88,6 +101,7 @@ def main():
         for path in fixture_paths: path.unlink()
         fixture_paths.clear()
     tests = []
+    link_checks = []
     def run_tests(phase):
         stage_addon()
         for file in TESTS:
@@ -105,6 +119,32 @@ def main():
                 'summary': [s for s in text.splitlines() if re.match(r'^(?:ℹ|#) (?:tests|pass|fail|skipped|cancelled) ', s)],
                 'failedTitles': [s for s in text.splitlines() if s.startswith(('not ok ', '✖ '))]})
             print(json.dumps(tests[-1], ensure_ascii=False), flush=True)
+        # Full unchanged candidate-status and retirement CLIs are attempted.
+        # Saved inventory shards are absent at this pin; record that limitation,
+        # then exercise retirement's actual link evaluator with real metadata.
+        for name in ['check-doc-candidate-status', 'check-doc-retirement']:
+            cp = cmd(['node', 'scripts/' + name + '.mjs', '--json'], check=False, timeout=600)
+            log = phase + '-' + name + '.json.gz'
+            (output / 'audit' / log).write_bytes(gzip.compress(cp.stdout + cp.stderr, mtime=0))
+            document = json.loads(cp.stdout) if cp.stdout.startswith(b'{') else None
+            link_checks.append({'phase': phase, 'check': name, 'exit': cp.returncode, 'log': A + 'audit/' + log,
+                'sha256': hashlib.sha256(cp.stdout + cp.stderr).hexdigest(), 'result': document,
+                'error': cp.stderr.decode(errors='replace') if document is None else None})
+        evaluator = r"""
+import fs from 'node:fs';
+import {checkCandidateMetadata, DEFAULT_SWITCHBOARD_PATH} from './scripts/check-doc-candidate-status.mjs';
+import {trackedPlatformDocs, DEFAULT_CONSTITUTION_PATH} from './scripts/check-doc-constitution.mjs';
+import {evaluateRetirement} from './scripts/check-doc-retirement.mjs';
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8')), root=process.cwd(), constitution=read(DEFAULT_CONSTITUTION_PATH);
+const candidateStatus=checkCandidateMetadata({files:trackedPlatformDocs(root), readFile:p=>fs.readFileSync(p,'utf8'), switchboard:read(DEFAULT_SWITCHBOARD_PATH),constitution,repoRoot:root});
+// Only links-resolve is asserted; unrelated inventory measures below are fixture
+// inputs, NOT a substitute inventory, cutover pass, or baseline modification.
+const inputs={candidateStatus,conservation:{open:[],invariant:[]},inventory:{},aliasTable:{entries:[]},aliasFindings:[],previousRegistries:[],ratchetResult:null,cutoverRows:{total:0,byReason:{}},usageDrift:[],promotion:{}};
+console.log(JSON.stringify({scope:'production links-resolve evaluator only; unrelated inventory fixture inputs', findings:candidateStatus.findings.filter(f=>['unresolved-link','unresolved-related'].includes(f.type)),results:evaluateRetirement(inputs,constitution).filter(r=>r.id==='links-resolve')}));
+"""
+        cp = cmd(['node', '--input-type=module', '-e', evaluator])
+        result = json.loads(cp.stdout)
+        link_checks.append({'phase': phase, 'check': 'retirement-links-resolve', 'exit': cp.returncode, 'result': result})
         unstage_addon()
     run_tests('baseline')
     # Archive is an augmented full source snapshot. Newly generated audit objects
@@ -141,12 +181,10 @@ def main():
     removed = commit('docs(archive): rehearse reader-justified tip removal', pin)
     checkout(removed)
     assert not git('status', '--porcelain').strip()
-    # Isolate A's unchanged recipe, not ownership/H/B. The owning test stops in
-    # ownership at this pin; that must not prevent observing the removal commit.
-    def slice_a(text):
-        return (text[:text.index('const B=')] + text[text.index('const exceptions='):text.index('const result=')]
-            + "\nconst A={historicalOffenders:bad,historicalEqual,newWorkingViolations:wb,accountedPairs,unaccountedPairs,ok:!unaccountedPairs.length&&!wb.length};\n"
-            + "fs.writeFileSync(outputDir+'/A.json',JSON.stringify(A));console.log(JSON.stringify({ok:A.ok,unaccountedPairs:A.unaccountedPairs.length,working:A.newWorkingViolations.length}));process.exitCode=A.ok?0:1;\n")
+    # Run the ENTIRE unchanged checks.mjs, including B/H/I, independently of
+    # the owning test's earlier ownership stage. No A-only slice hides new H.
+    def read_checks(dest, filename):
+        return json.loads((dest / filename.replace('-reproduction.json', '-checks.json')).read_text())
     accounting = []
     stage_addon()
     for filename, key in RECIPES:
@@ -154,9 +192,11 @@ def main():
         original = (clone / path).read_text(); document = json.loads(original)
         script = document[key]['checks.mjs']
         dest = scratch / ('A-' + filename); dest.mkdir()
-        (dest / 'checks.mjs').write_text(slice_a(script))
+        (dest / 'checks.mjs').write_text(script)
         before = cmd(['node', str(dest / 'checks.mjs'), '--output-dir', str(dest)], check=False)
-        prior = json.loads((dest / 'A.json').read_text())
+        before_checks = read_checks(dest, filename)
+        (output / 'audit' / ('before-' + filename + '.gz')).write_bytes(gzip.compress(json.dumps(before_checks).encode(), mtime=0))
+        prior = before_checks['A']
         pairs = prior['unaccountedPairs']
         removal_pairs = [p for p in pairs if p['commit'] == removed]
         previous_pairs = [p for p in pairs if p['commit'] != removed]
@@ -174,15 +214,23 @@ def main():
         assert original.count(json.dumps(script, ensure_ascii=False)) == 1
         replacement = original.replace(json.dumps(script, ensure_ascii=False), json.dumps(amended, ensure_ascii=False), 1)
         (clone / path).write_text(replacement)
-        (dest / 'checks.mjs').write_text(slice_a(amended))
+        (dest / 'checks.mjs').write_text(amended)
         after = cmd(['node', str(dest / 'checks.mjs'), '--output-dir', str(dest)], check=False)
-        result = json.loads((dest / 'A.json').read_text())
-        assert not result['newWorkingViolations'] and result['ok'] and after.returncode == 0
+        after_checks = read_checks(dest, filename)
+        (output / 'audit' / ('after-' + filename + '.gz')).write_bytes(gzip.compress(json.dumps(after_checks).encode(), mtime=0))
+        result = after_checks['A']
+        assert not result['newWorkingViolations'] and result['ok']
+        baseline_h = next(r['result']['findings'] for r in link_checks if r['phase'] == 'baseline' and r['check'] == 'check-doc-candidate-status')
+        assert after_checks['H']['findings'] == baseline_h, 'new H finding after removal'
+        assert after_checks['B']['ok'], 'frozen tooling pin changed'
         accounting.append({'manifest': path, 'embeddedKey': key, 'recipeSha256': hashlib.sha256(script.encode()).hexdigest(),
-            'slice': 'Exact A setup and const exceptions..historicalEqual; only A serialization added, H/B/ownership not invoked.',
+            'recipeScope': 'Entire unchanged checks.mjs; only exact exception-array rows appended in clone',
+            'afterBOk': after_checks['B']['ok'], 'afterHFindings': len(after_checks['H']['findings']),
+            'afterHNewFindings': 0, 'afterIOk': after_checks['I']['equalToHEAD'] and after_checks['I']['frozenBaselineUnchanged'],
+            'afterRecipeExit': after.returncode,
             'beforeExit': before.returncode, 'beforeUnaccountedPairs': len(pairs),
             'removalCommit': removed, 'removalPairs': len(removal_pairs), 'preexistingPendingPairs': len(previous_pairs),
-            'afterExit': after.returncode, 'afterAOk': result['ok'], 'afterUnaccountedPairs': len(result['unaccountedPairs']),
+            'afterExit': 0 if result['ok'] else 1, 'afterAOk': result['ok'], 'afterUnaccountedPairs': len(result['unaccountedPairs']),
             'afterWorkingViolations': len(result['newWorkingViolations']),
             'pairRows': new_rows, 'noBPinOrAllowlistChange': True})
     unstage_addon()
@@ -214,14 +262,21 @@ def main():
             meta, path = row.split('\t', 1); size = meta.split()[3]
             if size != '-': sizes.append((path, int(size)))
         timings = []
+        # Cache eviction is not permitted in this worker. The brief explicitly
+        # accepts the first add in a fresh clone as the cold-run fallback.
+        cold_clone = scratch / (name + '-fresh-clone')
+        cmd(['git', '-c', 'core.hooksPath=/dev/null', 'clone', '--no-hardlinks', '--no-checkout', str(clone), str(cold_clone)], cwd=scratch)
         for i in range(1, 4):
             wt = scratch / (name + '-' + str(i)); assert not wt.exists()
             start = time.perf_counter()
-            git('worktree', 'add', '--detach', str(wt), oid)
+            cp = cmd(['git', '-c', 'core.hooksPath=/dev/null', 'worktree', 'add', '--detach', str(wt), oid], cwd=cold_clone)
             seconds = time.perf_counter() - start
             assert git('-C', str(wt), 'rev-parse', 'HEAD').decode().strip() == oid
-            timings.append({'run': i, 'seconds': seconds, 'exit': 0})
-            git('worktree', 'remove', str(wt))
+            timings.append({'run': i, 'seconds': seconds, 'exit': cp.returncode,
+                'cache': 'cold fallback: first worktree add in fresh no-hardlinks/no-checkout clone' if i == 1 else 'warm',
+                'timingRepo': str(cold_clone)})
+            cmd(['git', '-c', 'core.hooksPath=/dev/null', 'worktree', 'remove', str(wt)], cwd=cold_clone)
+        shutil.rmtree(cold_clone)
         variants.append({'variant': name, 'commit': oid, 'files': len(sizes), 'tipBytes': sum(n for p, n in sizes),
             'planFiles': sum(p.startswith(P) for p, n in sizes), 'planBytes': sum(n for p, n in sizes if p.startswith(P)),
             'archiveTipBytes': sum(n for p, n in sizes if p.startswith(A)), 'runs': timings,
@@ -237,12 +292,13 @@ def main():
     result = {'sourceCommit': pin, 'archiveRef': manifest['archiveRef'], 'archiveCommit': archive,
         'removalCommit': removed, 'accountedCandidate': candidate, 'preFreezeCandidate': with_gates,
         'filesystemStat': filesystem, 'findmnt': findmnt, 'physicalScratch': str(scratch.resolve()),
-        'logicalScratch': str(scratch), 'warmCache': True, 'variants': variants,
+        'logicalScratch': str(scratch), 'warmCache': False,
+        'coldMethod': 'drop_caches not writable/permitted; first add in a fresh --no-hardlinks --no-checkout clone per variant (brief-authorized fallback, not physical cache eviction)', 'variants': variants,
         'bundle': {'path': A + 'audit/rehearsal.bundle', 'size': bundle.stat().st_size,
             'sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(), 'prerequisiteCommit': pin, 'verifyExit': 0},
         'gatePrograms': len(gates['programs']), 'reviewedTen': gates['reviewedTen'],
         'temporaryGateFiles': len(gates['temporaryInputs']), 'retainedFilesVerified': len(partition['retained']),
-        'tests': tests, 'accounting': [{k: v for k, v in r.items() if k != 'pairRows'} for r in accounting],
+        'tests': tests, 'linkChecks': link_checks, 'accounting': [{k: v for k, v in r.items() if k != 'pairRows'} for r in accounting],
         'measuredMainArtifacts': measured_artifacts,
         'postMeasurementNote': 'Receipt and rehearsal outputs are written after measured commits. Their exact delta must be added at F; no final-tree claim.',
         'releaseId': release_manifest['artifactDigest'], 'rustFreshness': 'activated addon only; working-tree Rust freshness not established',
@@ -250,6 +306,11 @@ def main():
     for name, data in [('pair-accounting.json', accounting), ('rehearsal-commands.json', command_log), ('test-results.json', tests)]:
         (output / 'audit' / (name + '.gz')).write_bytes(gzip.compress((json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n').encode(), mtime=0))
     (output / 'rehearsal.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
-    print(json.dumps({k: v for k, v in result.items() if k not in ('tests', 'reviewedTen', 'measuredMainArtifacts')}, ensure_ascii=False), flush=True)
+    print(json.dumps({k: v for k, v in result.items() if k not in ('tests', 'linkChecks', 'reviewedTen', 'measuredMainArtifacts')}, ensure_ascii=False), flush=True)
+    if opts.rebuild:
+        subprocess.run(['python3', '-B', str(output / 'verify-design.py')], cwd=source, check=True)
+    shutil.rmtree(physical)
+    scratch.unlink()
+    physical.parent.rmdir()
 
 if __name__ == '__main__': main()
