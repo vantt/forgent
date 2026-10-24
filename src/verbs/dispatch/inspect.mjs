@@ -1,5 +1,5 @@
 import { inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
-import { loadGlobalConfig } from '../../config/global-config.mjs';
+import { readMachineConfig } from '../../config/facade.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 import { readAttemptView } from './show-run.mjs';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
@@ -31,7 +31,8 @@ export function inspectDispatchUseCase(ctx, options = {}) {
     try {
       if (options.providerCapacity === true) {
         return inspectProviderCapacity({
-          runnerConfig: loadGlobalConfig(options.globalConfigPath),
+          // The machine's own runner (global file, accounts layer when unconfined, standard), never a project's.
+          runnerConfig: readMachineConfig({ sections: ['runner'], globalDir: options.globalConfigPath ? path.dirname(options.globalConfigPath) : undefined }).value.runner,
           runtimeDir: options.runtimeDir,
         });
       }
