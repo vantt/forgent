@@ -1,0 +1,88 @@
+{
+  "verdict": "REWORK",
+  "scope": {
+    "A": "c25e8cf6a via 3e1612222",
+    "B": "33cc5539d",
+    "C": "d8d77543a",
+    "reviewedHead": "35c7f92bf"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "high",
+      "verdict": "fail",
+      "summary": "21 appended source-parity rows keep historical sourceAnchor/sourceUnitDigest under status current-complete-unit-present; carries/verify-carries.mjs:87 requires a current source unit, so 35 rows fail (21 new + 14 pre-existing distribution.md rows 301,305,312-323).",
+      "evidence": "Replay of verify-carries.mjs parity loop at worktree (dlopen blocked): freshAtWorktree 310/345, staleIdx 301,305,312-344."
+    },
+    {
+      "id": "F2",
+      "severity": "medium",
+      "verdict": "fail",
+      "summary": "claim_2e2bc926 successor (withStateTx, appendEventCore lock-free core, 'not a Work-to-Event-Store cutover') is true at plan pin but stale versus main: Work Event Store cutover merged at 42c5a0a55 (2026-10-24 20:50); events.mjs removed, Work appends through the Event Store consumer gate.",
+      "evidence": "git log --first-parent main: 42c5a0a55 merge work/es-cutover; main:src/state/event-log.mjs header; main:src/state/store.mjs imports work-event-store.mjs; 14e6ef8b0 not ancestor of plan HEAD."
+    },
+    {
+      "id": "F3",
+      "severity": "low",
+      "verdict": "fail",
+      "summary": "claim_5ba6768e changedClauses: both clauses list the same union of six changeSources instead of per-clause sources.",
+      "evidence": "g0-content-redecisions.json bindingRefresh row for claim_5ba6768e."
+    },
+    {
+      "id": "F4",
+      "severity": "low",
+      "verdict": "fail",
+      "summary": "claim_320ba622 rationale names only required-field and id clauses; diff also changes '(9 file)' to 'trong nhiều file (ví dụ ...)'.",
+      "evidence": "word diff of source unit (work-state.md@11733af37) vs target unheaded-block-65."
+    },
+    {
+      "id": "F5",
+      "severity": "low",
+      "verdict": "note",
+      "summary": "Stale overlay pointers retired via duplicate effective rows 124-126 (same claim+binding as /6,/20,/21); current row named in prose only; future in-place rebind must update both.",
+      "evidence": "bindingRefresh/124-126 vs /6,/20,/21: claimId and bindingSha256 equal."
+    },
+    {
+      "id": "F6",
+      "severity": "info",
+      "verdict": "note",
+      "summary": "g0rework/verify.py exits 0 while audit-report.py exits 1 with checks.mjs not run (126) in both manifests; disclosed, not a green audit.",
+      "evidence": "verify.py JSON: fullAuditPassed false, nativeDependentChecksNotRun 2 manifests."
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "verdict": "note",
+      "summary": "Doer receipt status is blocked over an addon-cache side effect (df2c8ce8230fecdf); no such dir under worktree or main .fgos/runtime/git-addon; Lead should record acceptance of the exception.",
+      "evidence": "ls .fgos/runtime/git-addon in worktree and main checkout."
+    },
+    {
+      "id": "F8",
+      "severity": "low",
+      "verdict": "note",
+      "summary": "d8d77543a parity base is correct and not weaker, but committed-mode base drifts after any later edit of source-parity.json (fails closed); pin to receipt.json.sourceHead.",
+      "evidence": "git log -1 -- source-parity.json -> c25e8cf6a; c25e8cf6a^ = 568a11f21 = receipt sourceHead."
+    },
+    {
+      "id": "A-pass",
+      "severity": "info",
+      "verdict": "pass",
+      "summary": "Scope in writable list; 3 supersede re-decisions cite existing main commits and spec sections; 127 bindings recompute, all pending; sample 5 parity digests correct; 15 sampled rationales true; d5ba1eda remainder 797c7185; stale pointers resolve to current-binding rows; rebind --check 0; g0rework/verify.py 0.",
+      "evidence": "independent hash recompute 0 mismatches; git show of 10416a6b0, 63b777873, 11733af37, bd8d64fdd, 4a4e8446e, 64de0de56."
+    },
+    {
+      "id": "B-pass",
+      "severity": "info",
+      "verdict": "pass",
+      "summary": "Exactly 15 /parked records carry carriedBlocker (record, /parked, sha match, open); dispositions 13/0/1/1; step04-029:1 still-valid with 000484/000485 retired via e71381aba; backlog action edits directly; reason/group fixes present; recomposed.json kept correctly (bodies owned by composition chain); sweep --check --pin HEAD 0; counts 526/15/31/2 and 296/9/31/2 match.",
+      "evidence": "population scan of judgments.json vs phase-08 record lines; sweep.py exit 0 at 35c7f92bf and d8d77543a."
+    },
+    {
+      "id": "C-pass",
+      "severity": "info",
+      "verdict": "pass",
+      "summary": "Uncommitted base HEAD, committed base parent of last parity-writing commit (568a11f21); keeps prefix-equality and 21-row assertions; not weaker than before (old form could only fail after commit).",
+      "evidence": "d8d77543a diff; verify.py exit 0 at 35c7f92bf."
+    }
+  ]
+}

@@ -326,7 +326,8 @@
       "Size the post-apply rebind as two groups: 361 bindings broken by the composed patch chain and 46 already unresolved at the pin (w10-composition-rework); the 661 figure from w9 counts assertions across the full chain",
       "Legacy drift scan after applying the prepared w8/w9 shards reports 2 gaps (README, repo-layout-vision) because its source join does not follow supersession; fix the join or carry them before the scan gate at F (w11-import3 F3)",
       "Every check that reads committed bytes takes an explicit --pin; run them at F, not at a moving HEAD",
-      "G8 rebuild at F keeps every file named as evidence in preflip-gate-status.json and the final status ledger (L13-13.4); 70 of 92 register evidence paths would otherwise be archived (w14-g8-retention-timing-review)"
+      "G8 rebuild at F keeps every file named as evidence in preflip-gate-status.json and the final status ledger (L13-13.4); 70 of 92 register evidence paths would otherwise be archived (w14-g8-retention-timing-review)",
+      "After the final main import, redo the claim_2e2bc926 supersede against main Event Store cutover 42c5a0a55 (events.mjs removed on main), L13-15.2"
     ],
     "external": [
       "Git owner / HARDEN reviews the 25 git one-door declarations on review/doc-git-one-door (G4)",

@@ -142,3 +142,11 @@ Decided by the Lead under A42 and L13-6.
 ## L13-14 — G9 judges drift, not inherited blockers (Lead, 2026-10-25 03:55)
 
 Decided by the Lead under A42. The w15 review found that the G9 park judgment treats records that already carried a phase-08 blocker in four different ways (5 still valid, 5 recompose, 1 superseded, 4 parked). Examples of such a blocker are a Work export and registry inventory rows. The ruling: a G9 disposition depends only on whether the source drift breaks the record's claim. A blocker the record already carried stays owned where it was recorded, linked through `carriedBlocker`, and does not make the record a G9 park. Brief: `w15-g9-park-rule-brief.md`.
+
+## L13-15 — Content rework follow-up (Lead, 2026-10-25 04:45)
+
+Decided by the Lead under A42.
+
+1. **Turn 702's safety exception is accepted.** The Doer reported that `checks.mjs` may have reached addon staging, which would write an ignored cache under `.fgos/runtime/git-addon/` in its own worktree. That is the same side effect accepted in L13-13.5. The w16 review found no such directory on the host, so the write probably stayed inside the Doer sandbox. Later briefs forbid running `phase-08/audit-report.py` inside a Doer turn; the Lead runs it outside the sandbox.
+2. **The events.lock successor is decided at F.** The successor named for `claim_2e2bc926` (`withStateTx` / `appendEventCore`) is true at the plan's pin. Main has since cut Work over to the Event Store (42c5a0a55, 2026-10-24 20:50), and `events.mjs` is gone there. The re-decision is redone after the final main import, as a final-pin duty.
+3. **A check must not report success when part of it did not run.** A verifier that skips a sub-check reports "partial" and names the part that was skipped.
