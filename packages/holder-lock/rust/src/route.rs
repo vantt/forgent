@@ -447,6 +447,23 @@ mod quiesce {
         versioned_node || matches!(base, "bun" | "deno" | "fgos" | "fgos-runner" | "fgos-gateway")
     }
 
+    /// How a process belongs to one workspace, if it does. A cwd inside the
+    /// workspace counts in workspace-only mode (the caller filters what the
+    /// process is); otherwise it counts only when the argv could be fgOS, so
+    /// an idle shell or an agent session sitting in the checkout is not a
+    /// writer. A process whose argv cannot be read still counts.
+    fn workspace_hit(cmdline: Option<&[String]>, cwd: Option<&Path>, dirs: &[PathBuf], state_root: &Path, workspace_only: bool) -> Option<&'static str> {
+        let argv = cmdline.unwrap_or_default();
+        let in_workspace = cwd.is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d)));
+        if in_workspace && (workspace_only || could_be_fgos(cmdline)) {
+            Some("cwd")
+        } else if (workspace_only && workspace_argument(argv, cwd, dirs)) || (!workspace_only && names_payload(argv, dirs, state_root)) {
+            Some("cmdline")
+        } else {
+            None
+        }
+    }
+
     /// Owner uid of `/proc/<pid>`: a process that made itself non-dumpable
     /// (ssh-agent, gpg-agent) shows as root and is another user's process
     /// for this scan.
@@ -494,12 +511,8 @@ mod quiesce {
             // all the same, without a root.
             let mut hit: Option<(&str, Option<&Path>)> = None;
             for (root, dirs) in &per_root {
-                if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
-                    hit = Some(("cwd", Some(root.as_path())));
-                } else if (workspace_only && workspace_argument(&argv, view.cwd.as_deref(), dirs))
-                    || (!workspace_only && names_payload(&argv, dirs, &state_root))
-                {
-                    hit = Some(("cmdline", Some(root.as_path())));
+                if let Some(matched) = workspace_hit(view.cmdline.as_deref(), view.cwd.as_deref(), dirs, &state_root, workspace_only) {
+                    hit = Some((matched, Some(root.as_path())));
                 }
                 if hit.is_some() {
                     break;
@@ -536,7 +549,7 @@ mod quiesce {
 
     #[cfg(test)]
     mod tests {
-        use super::could_be_fgos;
+        use super::{could_be_fgos, workspace_hit};
         #[cfg(unix)]
         use super::{workspace_argument, workspace_dirs};
         #[cfg(unix)]
@@ -589,6 +602,21 @@ mod quiesce {
                 "duplicates collapse and a vanished directory is kept as given"
             );
             std::fs::remove_dir_all(&base).unwrap();
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn a_cwd_in_the_workspace_counts_only_for_a_process_that_could_be_fgos() {
+            let dirs = vec![PathBuf::from("/workspace")];
+            let (cwd, state) = (Some(Path::new("/workspace/sub")), Path::new("/state"));
+            let hit = |parts: &[&str], only: bool| workspace_hit(Some(&argv(parts)), cwd, &dirs, state, only);
+            assert_eq!(hit(&["/usr/bin/zsh"], false), None, "an idle shell is not a writer");
+            assert_eq!(hit(&["claude"], false), None, "an agent session is not a writer");
+            assert_eq!(hit(&["node", "bin/fgos.mjs", "run"], false), Some("cwd"));
+            assert_eq!(hit(&["fgos", "run", "x"], false), Some("cwd"));
+            assert_eq!(hit(&["/usr/bin/zsh"], true), Some("cwd"), "workspace-only leaves the filtering to the caller");
+            assert_eq!(workspace_hit(None, cwd, &dirs, state, false), Some("cwd"), "an unreadable argv still counts");
+            assert_eq!(workspace_hit(Some(&argv(&["/usr/bin/zsh"])), Some(Path::new("/elsewhere")), &dirs, state, false), None);
         }
 
         #[test]

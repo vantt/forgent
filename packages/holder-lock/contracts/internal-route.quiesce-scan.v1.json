@@ -14,7 +14,7 @@
   "scan": {
     "linux": [
       "/proc/*/environ carrying FGOS_STATE_ROOT or a path under a given root",
-      "/proc/*/cwd inside the root or inside any --dir the caller listed; the route never runs Git",
+      "/proc/*/cwd inside the root or inside any --dir the caller listed, counted only when the process could be fgOS (node, bun, deno, fgos, fgos-runner, fgos-gateway, or an argv that cannot be read), so an idle shell or agent session is not a writer; with --workspace-only every such cwd counts and the caller filters; the route never runs Git",
       "/proc/*/cmdline naming a fgOS payload (a staged release, bin/fgos.mjs, fgos-runner, fgos-gateway) or --cwd of a given root"
     ],
     "otherPlatforms": "result unavailable: a person confirms that no fgOS process is left",
