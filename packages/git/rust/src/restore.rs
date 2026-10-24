@@ -409,6 +409,7 @@ impl GitDriver {
             // A case-only alias is tracked only when it names the same index
             // entry on disk. Case folding alone would admit a distinct file on
             // case-sensitive filesystems (or an untracked hard link).
+            #[cfg(unix)]
             let collision_metadata = fs::symlink_metadata(root.join(p));
             let folded = p.to_lowercase();
             let tracked_alias = tracked.iter().filter(|indexed| indexed.to_lowercase() == folded).any(|indexed| {
@@ -423,7 +424,10 @@ impl GitDriver {
                     }
                 }
                 #[cfg(not(unix))]
-                { false }
+                {
+                    let _ = indexed;
+                    false
+                }
             });
             if !tracked.contains(p) && !tracked_alias && !request.allowed_replacements.contains(p) {
                 return Err(failure(format!("restore-untracked-target-collision: {p}; list in allowedReplacements to replace")));
@@ -538,7 +542,10 @@ impl GitDriver {
         .into_iter()
         .collect();
         let mut paths = BTreeMap::new();
+        #[cfg(unix)]
         let mut clean_modes = BTreeMap::new();
+        #[cfg(not(unix))]
+        let clean_modes = BTreeMap::new();
         for p in &preview.paths {
             safe_path(checkout::root(repo)?, p)?;
             let path = checkout::root(repo)?.join(p);
@@ -949,16 +956,18 @@ impl GitDriver {
                     safe_path(checkout::root(&repo)?, p)?;
                     let path = checkout::root(&repo)?.join(p);
                     if fs::symlink_metadata(&path).is_ok_and(|m| m.is_file()) {
-                        let mut mode = mode.clone();
+                        let mode = mode.clone();
                         #[cfg(unix)]
-                        if snapshot.mode_changes.contains(p) {
+                        let mode = if snapshot.mode_changes.contains(p) {
                             use std::os::unix::fs::PermissionsExt;
                             let incoming =
                                 fs::metadata(&path).map_err(failure)?.permissions().mode();
-                            mode = fs::Permissions::from_mode(
+                            fs::Permissions::from_mode(
                                 (mode.mode() & !0o111) | (incoming & 0o111),
-                            );
-                        }
+                            )
+                        } else {
+                            mode
+                        };
                         fs::set_permissions(path, mode).map_err(failure)?;
                         filesystem
                             .checkpoint("restore-after-path-mode")
@@ -1043,7 +1052,6 @@ impl GitDriver {
         name: &str,
         destination: &Path,
     ) -> Result<()> {
-        use std::io::Write;
         let repo = self.checkout_repository(repo)?;
         let scope = checkout::scope(&repo, held)?;
         let wal = Wal::open(&repo)?;
@@ -1097,6 +1105,7 @@ impl GitDriver {
         let filename = Path::new(name).file_name().ok_or_else(|| failure("restore-extract-path"))?;
         #[cfg(unix)]
         {
+            use std::io::Write;
             use std::{ffi::CString, os::{fd::{AsRawFd, FromRawFd}, unix::{ffi::OsStrExt, fs::MetadataExt}}};
             let checked = fs::metadata(&destination).map_err(failure)?;
             let dir = extraction_directory;
@@ -1116,10 +1125,13 @@ impl GitDriver {
             output.write_all(&bytes).map_err(failure)?;
             output.sync_all().map_err(failure)?;
             dir.sync_all().map_err(failure)?;
+            Ok(())
         }
         #[cfg(not(unix))]
-        return Err(failure("restore-extract-platform-unsupported"));
-        Ok(())
+        {
+            let _ = (bytes, filename);
+            Err(failure("restore-extract-platform-unsupported"))
+        }
     }
     fn restore_evidence_authority<'a>(
         &self,

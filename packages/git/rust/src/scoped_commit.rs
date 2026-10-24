@@ -298,6 +298,8 @@ pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Res
         let lease = scope
             .handle("dispatch-cwd")
             .ok_or_else(|| failure("checkout-custody-required"))?;
+        #[cfg(not(unix))]
+        let _ = lease;
         #[cfg(unix)]
         if lease.path() != crate::refs::custody_lock_path(repo, root(repo)?)? {
             return Err(failure("checkout-custody-stale"));
