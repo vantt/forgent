@@ -1350,7 +1350,7 @@ test('loadRunnerConfigForDir refuses a global file that holds the retired rigorT
   writeGlobalConfig(homeDir, { runner: { rigorToTier: { low: 'nano' } } });
   assert.throws(
     () => withHome(homeDir, () => loadRunnerConfigForDir(dir)),
-    (err) => err instanceof RunnerConfigError && /retired "rigorToTier"/.test(err.message) && /delete the key/.test(err.message),
+    (err) => err instanceof RunnerConfigError && err.message.includes('~/.fgos/config.json') && /rigorToTier no longer exists/.test(err.message) && /delete the key/.test(err.message) && !err.message.includes(dir),
   );
 });
 

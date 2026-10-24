@@ -23,10 +23,10 @@ import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
-import { parseTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
+import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ConfigDoorError, readConfig } from '../../config/facade.mjs';
+import { ConfigDoorError, readConfig, readStandardValue } from '../../config/facade.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
 import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // EXECUTOR_ADAPTERS lives in ./adapters.mjs (leaf module) so config loading
@@ -141,6 +141,50 @@ function normalizeConfigConfinement(cfg) {
 }
 
 /**
+ * `runner.rigorToTier` is retired. Set in the global file it is refused here, naming that file (the shape check
+ * below names the project directory, which is not where the key is).
+ */
+function refuseGlobalRigorToTier(origins) {
+  const at = origins.find((o) => o.layer === 'global' && (o.path === 'runner.rigorToTier' || o.path.startsWith('runner.rigorToTier.')));
+  if (!at) return;
+  // The provenance file of the global layer is `global:<name>`.
+  const file = `~/.fgos/${String(at.file ?? 'config.json').replace(/^global:/, '')}`;
+  throw new RunnerConfigError(
+    `${file}${Number.isInteger(at.line) ? `:${at.line}:${at.column}` : ''} runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.`,
+  );
+}
+
+const warnedGlobalExtendedCells = new Set();
+
+/**
+ * Every fgOS release on the machine reads the global config; an older one fails on a list or an object cell and
+ * passes `model@pool` to the CLI as a model id, so these forms belong in a project config until every release reads
+ * them. A global cell written that way is dropped from the effective value (in memory, the file is never
+ * rewritten) and named once per process on stderr. The layer that set a cell comes from the snapshot's provenance.
+ */
+function dropGlobalExtendedTierCells(cfg, origins) {
+  const seen = new Set();
+  for (const { path: at, layer } of origins) {
+    const cell = layer === 'global' ? /^runner\.modelPolicies\.([^.[]+)\.([^.[]+)/.exec(at) : null;
+    if (!cell || seen.has(`${cell[1]}.${cell[2]}`)) continue;
+    seen.add(`${cell[1]}.${cell[2]}`);
+    const [, family, tier] = cell;
+    const tierMap = cfg.modelPolicies?.[family];
+    if (!tierMap || !isExtendedTierCell(tierMap[tier])) continue;
+    // The layer below the global one is the standard (the project sits above, accounts and detected hold no cell).
+    const below = readStandardValue(`runner.modelPolicies.${family}.${tier}`);
+    if (below.present) tierMap[tier] = below.value;
+    else delete tierMap[tier];
+    const cellName = `modelPolicies.${family}.${tier}`;
+    if (warnedGlobalExtendedCells.has(cellName)) continue;
+    warnedGlobalExtendedCells.add(cellName);
+    process.stderr.write(
+      `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list, "model@pool" or {model, pool?, effort?} cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
+    );
+  }
+}
+
+/**
  * Reads the runner config of the project at `dir` through the config door: project over global over the
  * standard, the detected executor filled in, accounts from the machine's accounts file. Nothing is created
  * or rewritten by a read. A refusal of the door (a file that does not parse, a key in the wrong scope, a
@@ -150,8 +194,9 @@ function normalizeConfigConfinement(cfg) {
  */
 export function loadRunnerConfigForDir(dir) {
   let runner;
+  let origins;
   try {
-    runner = readConfig({ projectRoot: dir, sections: ['runner'] }).value.runner;
+    ({ value: { runner }, origins } = readConfig({ projectRoot: dir, sections: ['runner'], origins: ['runner.modelPolicies', 'runner.rigorToTier'] }));
   } catch (err) {
     if (err instanceof ConfigDoorError) throw new RunnerConfigError(err.message, { code: err.code });
     throw err;
@@ -165,6 +210,8 @@ export function loadRunnerConfigForDir(dir) {
   // The facade's objects have no prototype; the runner code and its callers take ordinary objects (a JSON round trip
   // keeps every key an own key, `__proto__` included).
   const cfg = JSON.parse(JSON.stringify(runner));
+  refuseGlobalRigorToTier(origins);
+  dropGlobalExtendedTierCells(cfg, origins);
   validateRunnerConfigShape(cfg, `${path.join(dir, '.fgos')} runner`);
   return normalizeConfigConfinement(cfg);
 }

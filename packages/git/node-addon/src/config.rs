@@ -46,6 +46,7 @@ struct Request {
     ids: Vec<String>,
     acknowledge: bool,
     target: Option<String>,
+    path: Option<String>,
 }
 
 fn detailed(id: &str, more: More) -> Failure {
@@ -302,6 +303,19 @@ pub fn snapshot_entry(args: Value) -> Result<String> {
         let ctx = context(&detectors)?;
         let roots = a.roots(true)?;
         cached(&roots, a.project_root.is_none(), &ctx, &a)
+    })
+}
+
+/// The bundled standard's value at one path, with no file read: `{ present, value }`; a path the standard does
+/// not hold is `{ present: false, value: null }`. `{ path }`, a dotted path such as `runner.modelPolicies.claude.advanced`.
+#[napi(namespace = "config", js_name = "standardValue")]
+pub fn standard_value_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        let path = parse_path(a.path.as_deref().ok_or_else(|| invalid("path"))?)
+            .map_err(|_| invalid("path"))?;
+        let ctx = context(&NoDetectors)?;
+        let found = ctx.standard.value_at(&path);
+        Ok(json!({ "present": found.is_some(), "value": found }))
     })
 }
 

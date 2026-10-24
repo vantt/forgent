@@ -33,9 +33,9 @@ const mode = (file) => (fs.statSync(file).mode & 0o777).toString(8);
 
 test('the addon marker names the config namespace at the version this payload calls', () => {
   const v = nativeDoor().versions();
-  assert.equal(v.config, 2);
+  assert.equal(v.config, 3);
   assert.equal(combinedAbiMatches(v, v.napi), true);
-  assert.equal(combinedAbiMatches({ ...v, config: 1 }, v.napi), false, 'an addon before snapshot and init');
+  assert.equal(combinedAbiMatches({ ...v, config: 2 }, v.napi), false, 'an addon before standardValue');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
 });
 
