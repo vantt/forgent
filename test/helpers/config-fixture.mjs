@@ -32,6 +32,17 @@ export function writeGlobalConfig(home, value) {
   writeSharedConfig(home, value);
 }
 
+/**
+ * Write the machine's account pools (`runner.llmAccounts`, `runner.providers.<p>.accounts`) as the accounts file of
+ * the global directory `globalDir` (`<globalDir>/private/accounts.yaml`, mode 0600; JSON is YAML). Account pools
+ * live only there: a config file that names them is refused.
+ */
+export function writeAccountsFile(globalDir, runner) {
+  const dir = path.join(globalDir, 'private');
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(dir, 'accounts.yaml'), `${JSON.stringify({ runner }, null, 2)}\n`, { mode: 0o600 });
+}
+
 function writeRaw(file, text) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, text);

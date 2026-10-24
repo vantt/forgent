@@ -7,7 +7,7 @@ import path from 'node:path';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
 
 // Native-agent executors carry no spawned process, so bind() accepts them for any posture without
@@ -245,7 +245,7 @@ test('a packaged workflow directory is read like a flat file', async () => {
 
 test('the committed forgentX config binds every seat of every shipped workflow', async () => {
   const root = path.resolve(import.meta.dirname, '../..');
-  const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigFromDir });
+  const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
   assert.equal(result.passed, true, result.message);
 });
 

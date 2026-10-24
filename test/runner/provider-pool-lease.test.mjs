@@ -24,16 +24,11 @@ import { configPinnedToAccount } from '../../src/runner/dispatch/provider-accoun
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { checkById } from '../setup/helpers/setup-checks-harness.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile as writeAccountsFileIn, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
-/** The machine's account pools live in the accounts file of the global directory, never in a config file (JSON is YAML). */
-function writeAccountsFile(home, runner) {
-  const file = path.join(home, '.fgos', 'private', 'accounts.yaml');
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify({ runner }));
-}
+const writeAccountsFile = (home, runner) => writeAccountsFileIn(path.join(home, '.fgos'), runner);
 
 process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-pool-state-root-'));
 

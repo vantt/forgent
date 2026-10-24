@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { invokeDispatchReconcileOperation, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
+import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 import {
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -116,9 +117,7 @@ test('dispatch reconcile provider-capacity clear-quarantine validates the machin
       },
     },
   };
-  // Account pools live in the machine's accounts file, never in the global config file.
-  fs.mkdirSync(path.join(dir, 'global', 'private'), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(path.join(dir, 'global', 'private', 'accounts.yaml'), `${JSON.stringify(runnerConfig, null, 2)}\n`, { mode: 0o600 });
+  writeAccountsFile(path.join(dir, 'global'), runnerConfig.runner);
 
   const ctx = { repoRoot: dir, actor: 'test-operator' };
   const unknown = invokeDispatchReconcileOperation({

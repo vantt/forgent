@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { replaceDurably } from '../../native/door.mjs';
+import { readMachineAccounts } from '../../config/facade.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
@@ -29,10 +30,11 @@ const CREDENTIAL_SOURCE_KEYS = Object.freeze(['kind', 'home', 'files']);
 const CREDENTIAL_SOURCE_KINDS = Object.freeze(['codex-home', 'home-files']);
 
 export class ProviderCapacityConfigError extends Error {
-  constructor(message) {
+  constructor(message, { code } = {}) {
     super(message);
     this.name = 'ProviderCapacityConfigError';
     this.category = 'validation';
+    if (code) this.code = code;
   }
 }
 
@@ -623,6 +625,13 @@ export function acquireNamedAccountLease({
   lockWaitMs,
 } = {}) {
   if (!provider || !runId) return null;
+  // A confined worker has no accounts layer, so "no accounts" would read as "provider not managed": refuse by name instead.
+  if (readMachineAccounts().state === 'unavailable-confined') {
+    throw new ProviderCapacityConfigError(
+      'config-accounts-unavailable-confined: a confined session cannot lease an account; the runner, which runs outside the sandbox, leases one and hands the worker its credential',
+      { code: 'config-accounts-unavailable-confined' },
+    );
+  }
   const accounts = providerAccountInventory(runnerConfig)[provider]?.accounts ?? {};
   if (Object.keys(accounts).length === 0) return null;
   const conflict = (detail) => ({ status: 'refused', provider, accountId: accountId ?? null, reason: LEASE_CONFLICT_REASON, detail, ...(cli ? { cli } : {}) });

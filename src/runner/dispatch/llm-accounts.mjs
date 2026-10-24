@@ -1,4 +1,4 @@
-// The machine's LLM accounts, `runner.llmAccounts.<pool>.<account>` in ~/.fgos/config.json:
+// The machine's LLM accounts, `runner.llmAccounts.<pool>.<account>` in ~/.fgos/private/accounts.yaml:
 // each account names, per agent CLI, the directory where that CLI keeps the account's login
 // (`credentialStore: { codex: "${HOME}/.codex-tetnu", pi: "..." }`), plus an optional `label` and
 // `disabled`. A pool is the service provider that bills the call; it carries the family name when

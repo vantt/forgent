@@ -4,13 +4,13 @@
 import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
 }
 
-/** Run one check with `runner` as the project runner section and `globalRunner` as the global one. */
+/** Run one check with `runner` as the project runner section and `globalRunner` as the machine's: its account pools go to the accounts file, the rest to the global config. */
 function runCheck(id, runner, globalRunner, setup) {
   const dir = mkTemp('model-pool-check-');
   const home = mkTemp('model-pool-check-home-');
@@ -29,7 +29,10 @@ function runCheck(id, runner, globalRunner, setup) {
     setup?.(dir);
     if (globalRunner) {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-      writeGlobalConfig(home, { runner: globalRunner });
+      const { llmAccounts, providers, ...rest } = globalRunner;
+      const accounts = { ...(llmAccounts ? { llmAccounts } : {}), ...(providers ? { providers } : {}) };
+      if (Object.keys(accounts).length > 0) writeAccountsFile(path.join(home, '.fgos'), accounts);
+      if (Object.keys(rest).length > 0) writeGlobalConfig(home, { runner: rest });
     }
     return withHome(home, () => checkById(id).check(dir));
   } finally {
@@ -43,7 +46,7 @@ test('executor-family-unique passes with one executor per family and names both 
   assert.equal(one.passed, true, one.message);
 
   const two = runCheck('executor-family-unique', { executors: { claude: agent('claude'), 'claude-herdr': agent('claude') } });
-  assert.equal(two.passed, false);
+  assert.equal(two.passed, false, two.message);
   assert.match(two.message, /claude \(claude, claude-herdr\)/);
 });
 
@@ -101,8 +104,8 @@ test('llm-accounts-shape passes on a valid global inventory and fails on one in 
   assert.match(ok.message, /1 accounts in 1 pools/);
 
   const inProject = runCheck('llm-accounts-shape', { llmAccounts: inventory });
-  assert.equal(inProject.passed, false);
-  assert.match(inProject.message, /machine-wide/);
+  // The config door refuses the inventory in a project file by name before this row reads it; the row reports no refusal of its own.
+  assert.match(inProject.message, /config-key-in-wrong-file .*runner\.llmAccounts/);
 
   const alias = runCheck('llm-accounts-shape', { executors: { openai: agent('openai', 'codex') } }, { llmAccounts: { codex: { a: { credentialStore: { codex: '/x' } } } } });
   assert.equal(alias.passed, false);

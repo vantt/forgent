@@ -43,7 +43,7 @@ function collectArgsAndEnv(executorEntry) {
  * invocation, or PlacementPolicy/model-calibration -- never a hard failure,
  * always named with its migration target.
  *
- * @param {object} cfg a loaded runner config (`loadRunnerConfigFromDir`'s
+ * @param {object} cfg a loaded runner config (`loadRunnerConfigForDir`'s
  *   own shape: top-level `executors`/`capabilities`, not the `{runner:
  *   {...}}` wrapper)
  * @returns {{id: string, migrateTo: string, detail: string}[]}
