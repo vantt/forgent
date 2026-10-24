@@ -14,7 +14,7 @@ Run every step from a shell whose cwd is **not** inside `/home/vantt/projects/fo
 - The last branch commit regenerates the proof baseline and then the Git one-door census. `node scripts/git-one-door-scan.mjs --check` shows exactly main's 5 `unresolved-binary` sites (`bin/fgos.mjs` ×2, `src/runner/merge.mjs` ×2, `src/runner/worktree.mjs:146`).
 - Focused checks on the merged tree: `cargo test` and `cargo clippy --all-targets -D warnings` on `fgos-git fgos-event-store fgos-identity fgos-node-addon`; Node `test/event-store test/state test/setup test/git test/cli test/githooks test/architecture.test.mjs` (results in the controller message).
 - Rehearsal on a clone of `origin/main` `28423b3fe` with the main checkout's activation, fence tombstone and a baseline made by the current release: `events migrate --check --baseline` → `parity.equal: true`, 0 differences, `cacheCompared: true`, 33,718 Work events, 82 porting entities, revision `af617cb5602a82d8c1ff844a7fc0d79b1836866cead655a7380b8d46cc4b6747` (= the baseline), 97 deletions (95 `.fgos` files, `docs/distillery/state/porting/events.jsonl` and `state.json`), writes `.gitattributes`, import action `create`. The real revision differs if events land after 14:00.
-- Release candidate built from the branch tip (digest in the controller message and in `$STAGED/manifest` of step 9). Not staged, not activated.
+- Release candidate built at 14:18 from the branch tip in a clean worktree (`$LW`, `cargo build --locked --release --workspace`, then `scripts/build-rust-distribution.mjs`): `artifactDigest` `sha256:02b270d8c7b06a8fe3a6ee88afbbd769b28cde0a476f3f92c3ad2e51b3fecd3d`, 858 files, in `$STAGED`. Not staged, not activated. The manifest holds no source commit and no `plans/` file, so a later commit that touches only `plans/` keeps this digest.
 
 ## Variables (paste once into the shell you run everything from)
 
@@ -27,11 +27,12 @@ export RELT=/home/vantt/projects/.cargo-out-land-261024-es              # releas
 export STAGED=/home/vantt/projects/.fgos-staged-261024-es               # built release tree
 export B=$M/.fgos/runtime/tmp/landing-es-cutover-261024                  # backups
 export PREV=sha256:d6d3d08224e56894becb095d69a572a3255e5272bd94b37eb6988d39f93344c0   # active release now
+export NEW=sha256:02b270d8c7b06a8fe3a6ee88afbbd769b28cde0a476f3f92c3ad2e51b3fecd3d    # candidate in $STAGED
 export TIP=<branch tip SHA from the controller message>
 cd /tmp
 ```
 
-Check: `git -C "$W" rev-parse HEAD` and `git -C "$LW" rev-parse HEAD` both print `$TIP`; `jq -r .artifactDigest $M/.fgos/installation/activation.json` prints `$PREV`.
+Check: `git -C "$W" rev-parse HEAD` and `git -C "$LW" rev-parse HEAD` both print `$TIP`; `jq -r .artifactDigest $STAGED/manifest.json` prints `$NEW`; `jq -r .artifactDigest $M/.fgos/installation/activation.json` prints `$PREV`.
 
 ## Step 1. Stop check (15:00)
 
@@ -159,7 +160,7 @@ sha256sum -c $B/hashes.txt || true
 fgctl verify; echo verify-exit $?
 EOF
 sh /tmp/es-activate.sh 2>&1 | tee "$B/activate.log"
-jq -r .artifactDigest "$M/.fgos/installation/activation.json"   # expect the new digest from the controller message
+jq -r .artifactDigest "$M/.fgos/installation/activation.json"   # expect $NEW
 grep -c AGENTKIT-OMP:START "$M/AGENTS.md"                        # expect 1
 ```
 
