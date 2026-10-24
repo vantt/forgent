@@ -21,6 +21,7 @@ import {
   fixConfinementOrphanedResourcesReaped,
   defaultConfinementTempRoots,
   credentialScanRoots,
+  effectiveSection,
 } from '../../src/setup/registrations.mjs';
 import { writeOwnershipMarker, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
@@ -213,7 +214,8 @@ test('confinement-policies-declared passes when all referenced policies are decl
 
     const res = checkConfinementPoliciesDeclared(dir);
     assert.equal(res.passed, true);
-    assert.match(res.message, /all capability confinement policies are declared/);
+    // The standard's other capabilities declare no anchor, so the message also counts those.
+    assert.match(res.message, /^all referenced capability confinement policies are declared/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -505,19 +507,17 @@ test('confinement-strict-readiness passes when all capabilities have valid polic
       },
     }));
 
+    // Strict mode needs an anchor on every capability, the standard's included.
+    const anchored = Object.fromEntries(Object.keys(effectiveSection(dir, 'runner').capabilities).map((name) => [name, { confinement: { mode: 'unconfined' } }]));
     writeProjectConfig(dir, {
       runner: {
         confinement: { strict: true },
         capabilities: {
+          ...anchored,
           'code:implement': {
             confinement: {
               mode: 'required',
               policy: 'workspace-write',
-            },
-          },
-          'advise': {
-            confinement: {
-              mode: 'unconfined',
             },
           },
         },

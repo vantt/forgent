@@ -14,15 +14,8 @@
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { writeProjectConfig, writeGlobalConfig } from '../helpers/config-fixture.mjs';
-import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FIX_REGISTRATIONS,
   addWork,
@@ -42,8 +35,6 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
-import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
@@ -54,14 +45,12 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
-      'config-not-stale',
       'convention-conformance',
       'main-checkout-hook-wired',
       'node-version-and-git',
       'shell-integration-sourced',
       'project-fgos-launcher',
       'tool-registry-configured',
-      'config-awareness',
       'provider-capacity-state',
       'lock-kernel-semantics',
       'lock-borrow-vectors',
@@ -76,22 +65,17 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'cancel-wait',
       'credential-copies-retained',
       'dependencies-installed',
-      'gate-bypass-configured',
       'root-drift',
       'leaf-notify-drift',
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'plugin-dev-skills-packaged',
       'changelog-unreleased-stale',
-      'herdr-launcher-configured',
-      'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
       'work-step-vocabulary',
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
-      'invariant-checks-configured',
-      'worktree-setup-configured',
       'writer-identity-resolvable',
       'identity-machine-id',
       'identity-machine-key',
@@ -100,7 +84,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'identity-project-id',
       'identity-ids-unique',
       'seat-binding-route',
-      'seat-binding-config',
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
@@ -108,8 +91,22 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'workflow-case-binding-sentinel',
       'workflow-case-bindings',
       'gateway-token-configured',
+      // The rows over the config files (docs/platform/config/spec.md section 11), from the config crate's contract.
+      'config-parse',
+      'config-schema',
+      'config-legacy-shadowed',
+      'config-format-legacy-json',
+      'config-doc-drift',
+      'config-comment-missing-doc',
+      'config-comment-missing-why',
+      'config-comment-migrated-why',
+      'config-unknown-key',
+      'config-redundant-value',
+      'config-key-in-wrong-file',
+      'config-global-permissions',
+      'config-secret-outside-private',
+      'config-migrate-backup-stale',
       'readme-install-tag-exists',
-      'iron-law-configured',
       'dispatch-decide-hook-wired',
       'codex-hook-wired',
       'agy-hook-wired',
@@ -119,11 +116,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agent-claims-resolve',
       'agent-type-names-unique',
       'domain-registry-compiled',
-      'advise-execute-capabilities-configured',
       'capability-serves-valid',
       'decision-index-stale',
       'instruction-projections-stale',
-      'doc-registry-enforce',
       'doc-registry-stale',
       'doc-alias-broken',
       'doc-active-duplicate',
@@ -187,7 +182,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-strict-readiness',
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
-      'runner-coordination-orgPolicy-shape',
       'runner-patterns-config',
       'runner-generated-paths',
       'shadow-binder-divergence',
@@ -857,66 +851,13 @@ test('decision-index-stale check and fix preserve committed decisions absent fro
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
-test('config-not-stale passes when the existing config already has every default key', () => {
-  const cwd = mkTemp('doctor-config-full-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, ({
-      runner: {
-        ...DEFAULT_RUNNER_CONFIG,
-        capabilities: DEFAULT_CAPABILITY_SLOTS,
-        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, openai: { nano: 'gpt-5.5' } },
-        executors: { openai: PI_EXECUTOR_DEFAULT },
-      },
-      gateBypass: { level: 'off' },
-      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
-      herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-      herdrWebDashboard: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
-      invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
-      worktreeSetup: { commands: [] },
-      workerSlots: { ceiling: null },
-      eventStore: { remote: 'origin' },
-      terminal: DEFAULT_TERMINAL_CONFIG,
-      gateway: { port: 4170, token: null },
-      ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
-      docRegistry: { enforce: false },
-      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
-    }),
-  );
-  const { passed } = checkById('config-not-stale').check(cwd);
-  assert.equal(passed, true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── gate-bypass-configured (docs/history/doctor-fix-gate-bypass/CONTEXT.md
-// D1/D3, tsk-2qz-2): the registry's first entry to register all three
-// capabilities (check + configDefault + fix). check/fix here are both
-// keyed to "is config.gateBypass.level present and a recognized LEVEL",
-// deliberately distinct from config-not-stale's generic "key present at
-// all" scan above (a malformed-but-present level is never "missing").
-
-// ─── advise-execute-capabilities-configured (tsk-2uf-3, docs/history/
-// dispatch-activation-and-handoff-redesign/CONTEXT.md D2): same
-// generic-scan/dedicated-check split as gateway/workerSlots/invariantChecks
-// above -- config-not-stale already catches runner.capabilities (or either
-// slot) being wholly ABSENT; this check catches present-but-malformed.
-
 // ─── capability-serves-valid (I19, core/skills/_shared/capability-matching.md) ───
 
-test('capability-serves-valid fails when runner.capabilities is missing entirely', () => {
-  const cwd = mkTemp('doctor-serves-absent-');
-  const { passed, message } = checkById('capability-serves-valid').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /runner\.capabilities section missing/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)', () => {
+test('capability-serves-valid passes on the standard alone (serves on every curated slot, none identical)', () => {
   const cwd = mkTemp('doctor-serves-ok-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, ({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, true, message);
-  assert.match(message, /valid "serves" attribute set, none identical, and "review" is present/);
+  assert.match(message, /valid "serves" attribute set, none identical/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -936,7 +877,7 @@ test('capability-serves-valid fails when a "serves" value has an unknown key or 
     writeProjectConfig(cwd, ({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
     const { passed, message } = checkById('capability-serves-valid').check(cwd);
     assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
-    assert.match(message, /invalid "serves"/);
+    assert.match(message, /invalid "serves"|config-schema .*runner\.capabilities\.execute\.serves/);
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });
@@ -959,49 +900,20 @@ test('capability-serves-valid fails when two entries declare the identical "serv
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('capability-serves-valid fails when the "review" slot is missing', () => {
-  const cwd = mkTemp('doctor-serves-no-review-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, ({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
-  const { passed, message } = checkById('capability-serves-valid').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /missing the "review" slot/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// ─── herdr-launcher-configured (tsk-2m5, docs/history/
-// stage-status-driving-coordination/): the herdr-launcher's own
-// auto-launch toggles. Check-only, no fix (YAGNI -- see registrations.mjs's
-// own comment on this) -- `config-not-stale` already catches the whole
-// section being MISSING; this check adds the one thing that generic
-// staleness scan cannot: a PRESENT but non-boolean toggle value.
-
-// ─── herdr-web-dashboard-configured (tsk-48w, D14 of docs/history/herdr-
-// web-dashboard-plan-realignment/CONTEXT.md): the web dashboard's static-
-// serving toggle. Same check-only shape as herdr-launcher-configured
-// above -- config-not-stale already catches the whole section missing;
-// this check adds the one thing that generic staleness scan cannot: a
-// PRESENT but non-boolean value.
-
 test('provider-capacity-state doctor check reports quarantine without clearing it', () => {
   const homeDir = mkTemp('doctor-provider-capacity-home-');
   const cwd = mkTemp('doctor-provider-capacity-cwd-');
   const fgosHome = path.join(homeDir, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  writeGlobalConfig(homeDir, ({
-    runner: {
-      providers: {
-        'openai-codex': {
-          accounts: {
-            tetnu: {
-              label: 'Tetnu',
-              credentialSource: { kind: 'codex-home', home: path.join(homeDir, 'codex-tetnu') },
-            },
-          },
-        },
-      },
-    },
-  }));
+  fs.mkdirSync(path.join(fgosHome, 'private'), { recursive: true });
+  fs.writeFileSync(path.join(fgosHome, 'private', 'accounts.yaml'), `runner:
+  providers:
+    openai-codex:
+      accounts:
+        tetnu:
+          label: Tetnu
+          credentialSource: {kind: codex-home, home: ${path.join(homeDir, 'codex-tetnu')}}
+`);
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');
@@ -1057,15 +969,9 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
 // ─── D1/D5: dead source lines are reported as a failed check ────────────────
 
 // ─── operation-capability-resolves (Unit I21 fix, round 3, MEDIUM) ────────
-function writeRunnerConfig(dir, runner) {
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  writeProjectConfig(dir, { runner });
-}
-
 test('operation-capability-resolves reports passing status for retired coordination protocols', () => {
   const dir = mkTemp('checks-operation-capability-retired-');
   try {
-    writeRunnerConfig(dir, { executor: { command: 'claude', args: ['{prompt}'] } });
     const { passed, message } = checkById('operation-capability-resolves').check(dir);
     assert.equal(passed, true, message);
     assert.match(message, /retired/);

@@ -80,26 +80,6 @@ runner:
       providerModel: z-ai
       supports:
         skills: ["ak:cook"]
-    gitnexus:
-      kind: tool
-      description: "Code-graph blast radius"
-      for: [impact-analysis]
-      scanTarget: ".gitnexus"
-      responsibility: Verification
-      invocations:
-        - via: mcp
-          command: "mcp:gitnexus"
-          tools:
-            impact-analysis: mcp__gitnexus__impact
-    herdr:
-      kind: tool
-      for: [pane-labeling]
-      responsibility: Chrome
-      description: "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
-      invocations:
-        - via: cli
-          command: herdr
-          args: []
     openai:
       kind: agent
       description: "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor."
@@ -356,7 +336,6 @@ runner:
     impact-analysis:
       description: "Code-graph blast radius"
       aliases: [impact_analysis, "Impact Analysis"]
-      prefer: gitnexus
     pane-labeling:
       description: "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
     advise:

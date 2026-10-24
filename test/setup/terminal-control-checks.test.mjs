@@ -16,13 +16,12 @@ import {
 } from '../../src/setup/terminal-control-checks.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import {
-  DEFAULT_TERMINAL_CONFIG,
   resolveTerminalConfig,
   retainFailedPaneMsOf,
   terminalRouteConfig,
 } from '../../src/terminal-control/config.mjs';
 import { READY_TIMEOUT_MS } from '../../src/runner/dispatch/herdr-deadlines.mjs';
-import { DOCTOR_CHECKS, FIX_REGISTRATIONS, ensureSharedConfigDefaults } from '../../src/setup/registrations.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/registrations.mjs';
 import { globalConfigPath as globalConfigFile, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -251,22 +250,6 @@ test('terminal-allocations says it did not scan when terminal mode is unsupporte
   assert.equal(r.passed, true);
   assert.match(r.message, /^(info|warning): /);
   assert.doesNotMatch(r.message, /need a person/);
-});
-
-// ---- setup: config default ---------------------------------------------
-
-test('setup config-merge adds terminal.* when missing and leaves a project value alone', () => {
-  const fresh = workspace('merge-fresh');
-  const { addedKeys } = ensureSharedConfigDefaults(fresh);
-  assert.ok(addedKeys.some((k) => k.startsWith('terminal')), addedKeys.join(','));
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(fresh, '.fgos', 'config.json'), 'utf8')).terminal, DEFAULT_TERMINAL_CONFIG);
-
-  const tuned = workspace('merge-tuned', { allocationGraceMs: 120000, layout: { minCols: 100 } });
-  ensureSharedConfigDefaults(tuned);
-  const after = JSON.parse(fs.readFileSync(path.join(tuned, '.fgos', 'config.json'), 'utf8')).terminal;
-  assert.equal(after.allocationGraceMs, 120000);
-  assert.equal(after.layout.minCols, 100);
-  assert.equal(after.layout.minRows, 20, 'a missing nested key is filled');
 });
 
 test('the two checks are registered and setup has no terminal directory fix', () => {

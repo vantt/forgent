@@ -2,7 +2,7 @@
 // default with the source of each value, the two rules only Node can judge and
 // the part the route accepts. The core owns its defaults, the policy registry
 // and the layout floor: callers read them from `capabilities`, the route refuses
-// a bad value. Read-only; setup writes the defaults (`registerConfigDefault`).
+// a bad value. Read-only; the standard holds the defaults.
 
 import path from 'node:path';
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';

@@ -18,6 +18,7 @@
     "domains",
     "packages/convention/contracts/convention.rules.v1.json",
     "packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
+    "packages/config/contracts/doctor-rows.v1.json",
     "packages/holder-lock/contracts/lock-registry.v1.json",
     ".agents/skills",
     "README.md",

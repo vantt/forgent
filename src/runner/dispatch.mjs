@@ -12,10 +12,7 @@
 export {
   RunnerConfigError,
   loadRunnerConfig,
-  DEFAULT_RUNNER_CONFIG, // still read by the setup registrations until they move to the config door
   loadRunnerConfigForDir,
-  loadRunnerConfigFromDir,
-  ensureRunnerConfigForDir,
   EXECUTOR_KINDS,
   EXECUTOR_CARRIES,
   CLAUDE_CLI_COMMANDS,

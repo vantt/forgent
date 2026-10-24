@@ -7,7 +7,7 @@ import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
 import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
+import { writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
 
 // Every default path of the code under test (the provider runtime directory, the global config, the backend
 // registry) is under HOME. A throwaway HOME for the whole file means a call that forgets to name its own
@@ -501,6 +501,13 @@ test('the doctor fix leaves a stranded copy in place', () => {
   } finally { w.cleanup(); }
 });
 
+// The account pools live in the machine's accounts file (JSON text is valid YAML); the global config.json holds none.
+function writeAccountsFile(home, value) {
+  const dir = path.join(home, '.fgos', 'private');
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(dir, 'accounts.yaml'), JSON.stringify(value), { mode: 0o600 });
+}
+
 function withHome(home, fn) {
   const saved = process.env.HOME;
   const cwd = process.cwd();
@@ -512,8 +519,7 @@ function withHome(home, fn) {
 test('the registered check reads the global inventory even from a directory with no project config', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
   try {
-    fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    writeGlobalConfig(home, { runner: { providers: { openai: { accounts: { acct: perCliCodexOnly } } } } });
+    writeAccountsFile(home, { runner: { providers: { openai: { accounts: { acct: perCliCodexOnly } } } } });
     // The inventory names "openai" accounts under their normalized provider family, as the runtime does.
     const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
     fs.mkdirSync(pending, { recursive: true });
@@ -534,21 +540,21 @@ test('the registered check reads the global inventory even from a directory with
 });
 
 test('the registered check fails with the reason when the global config cannot be read, and never echoes what the file says', () => {
-  for (const [label, content, wantReason] of [
-    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', /global config unreadable \(not valid JSON or not readable\)/],
-    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), /global config refused by the provider inventory validator/],
+  for (const [label, content, location, named, wantReason] of [
+    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', 'config.json', 'config.json', /machine config unreadable \(config-parse /],
+    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), 'accounts.yaml', null, /machine config refused by the provider inventory validator/],
   ]) {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
     try {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-      writeRawGlobalConfig(home, content);
+      if (location === 'accounts.yaml') writeAccountsFile(home, JSON.parse(content)); else writeRawGlobalConfig(home, content);
       const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 60 * 1000).padStart(15, '0')}-abcd`);
       fs.mkdirSync(pending, { recursive: true });
       const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
       const result = withHome(home, () => entry.check(home));
       assert.equal(result.passed, false, label);
       assert.match(result.message, wantReason, label);
-      assert.ok(result.message.includes(path.join(home, '.fgos', 'config.json')), 'the config path is named');
+      if (named) assert.ok(result.message.includes(named), `the refused file is named (${label})`);
       assert.equal(result.message.includes('LOOKS-LIKE-A-SECRET-VALUE'), false, label);
       assert.equal(/position|Expected|Unexpected|unknown key/i.test(result.message), false, `no parser or validator text (${label}): ${result.message}`);
       assert.equal(result.message.includes('a dispatch for that account applies them'), false);
