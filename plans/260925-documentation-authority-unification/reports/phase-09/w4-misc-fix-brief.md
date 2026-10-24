@@ -1,0 +1,13 @@
+# W4 misc fix: remaining review items that do not wait for the final pin (Doer brief)
+
+Status: Lead brief under L12-137. Items from `w2-review-notes.md` sections "Ledger+D7b review", "import2 review", "G2/G6 delta".
+
+Common rules: read `preflip-execution-plan.md` §1-§2, `w1-review-notes.md` and `owner-answers.md` (L13-*) in this directory, and the receipts of the wave-1 Doers that your task builds on. Never a git write in this repository (temporary test-fixture repositories under /tmp are fine), never the fgos CLI against this repo, never `.fgos/` or secrets, never `scripts/run-tests.mjs` or `npm test`. Python `python3 -B`; scratch `/tmp/fgos-work/<brief-name>/`. Single tests only: `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <file>` (`releasePath` from `/home/vantt/projects/forgentX/.fgos/installation/activation.json`); report what could not run. No pair accounting; no `owner-answers.md`/`progress.md`/`preflip-gate-status.json` writes: write `receipt.md` + `receipt.json` in your own directory. Anything outside the writable list: stop, report `needsWrites`. Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
+
+Tasks:
+1. `docs/platform/packaging-distribution/spec.md` ~829-832 ("Pointers (implementation)"): remove the false claim that the shell helper runs `git rev-parse --git-common-dir` (it reads the layout from disk; see `scripts/fgos-shell-integration.sh`); fix the block-5 adjudication count (141 checks). Rebind changed units.
+2. Row 7 of `docs/platform/packaging-distribution/spec.md` Data Dictionary (block ~90): add main's dropped clause "from the route's reconcile-scan, each with its pane id" (source `docs/specs/distribution.md` block-5 at HEAD; also in `docs/platform/terminal-control/spec.md:153`) or record a residual binding; rebind.
+3. `docs/reading-map.md` ~187-188 cite `plans/reports/` files in live text: point at the durable doc or drop the citation.
+4. G6 (`preserve-premise/`): match example/external framing against the bound line (`unit_at()`), not the bare span; the positive control uses a path-only span; re-judge f00167, f08807, f07822, f08072, f08073; remove the self-link successor proposals f07697, f08033, f08047 (L12-35(7)). Rerun `proof.py --pin <HEAD>` twice byte-identical.
+
+Writable (exact): docs/platform/packaging-distribution/spec.md, docs/reading-map.md, plans/260925-documentation-authority-unification/ledger/decisions/**, plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/**, plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/**.

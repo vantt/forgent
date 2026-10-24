@@ -1,0 +1,119 @@
+{
+  "scope": "w4-g8-archive",
+  "commit": "77db6ed2b",
+  "verdicts": [
+    {
+      "id": "G8-6 retirement specs name owning proof or 'behaviour retired'",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/audit/reader-patches--standalone-retirement-specs.json.gz#/specs",
+      "reason": "All 336 specs: owningProof null, behaviourDisposition 'behaviour retired with the plan', 0 self-referential; no path outside the plan references any retired program (git grep -F of 336 paths at e158e6726 = 0)."
+    },
+    {
+      "id": "G8-6b ten gate replayers retire-at-final-pin, tip both ways",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/audit/gate-retention.json.gz; rehearsal.json#/variants",
+      "reason": "All 10 reviewed + 8 extra Phase 09 programs carry schedule retire-at-final-pin. Pre-freeze candidate 8f7dcee (from bundle) = 13,910 files / 1,970,867,003 B, exactly bf6c4d5 + the 3,363 temporaryInputs (diff = 3,363 A, set-equal)."
+    },
+    {
+      "id": "G8-7 removal-commit pair accounting, check A green",
+      "verdict": "APPROVE",
+      "locator": "design.md 'Removal commit requires pair accounting'; audit/pair-accounting.json.gz",
+      "reason": "Re-ran the UNCHANGED full checks.mjs (not the Doer's slice) from each tree's manifest: removal ffab97382 -> A.ok false, 3,618 unaccounted (ffab97382 + 15 pre-existing commits) in both recipes; accounted bf6c4d5 -> A.ok true, 0 unaccounted, 0 working, 8,090 accounted, B ok, in both recipes."
+    },
+    {
+      "id": "G8-7b removal is not clean for the frozen H / candidate-status check",
+      "verdict": "REWORK",
+      "locator": "docs/platform/documentation/switchboard.md -> P/current-authority-map-2026-09-25.md; scripts/check-doc-candidate-status.mjs (used by check-doc-retirement.mjs:260 and recipe H)",
+      "reason": "Same unchanged checks.mjs run on bf6c4d5 reports H unresolved-link 'docs/platform/documentation/switchboard.md -> ../../../plans/.../current-authority-map-2026-09-25.md', a file this design archives (exists at pin, so the finding is new). Receipt claims A-green does not hide new failures but never ran H; retain the file or name the repoint in the removal commit."
+    },
+    {
+      "id": "G8-9 retained set = readers + navigation, small-record tranche moved",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/audit/partition.json.gz",
+      "reason": "Partition recomputed against e158e6726 ls-tree: 6,761 = 6,362 archive / 2,351,576,666 B + 399 retain / 493,743,978 B, no overlap/gap, 0 blob/size mismatch; no threshold; no 'small' reason; alias-table, vocabulary, shipped-path inventory, dropped-claims, schema carry real default-path readers (verified in scripts)."
+    },
+    {
+      "id": "G8-9b retained reasons are real",
+      "verdict": "REWORK",
+      "locator": "P/reports/phase-09/archive/audit/partition.json.gz#/retained[*].reasons",
+      "reason": "22 rows / 23,297,481 B carry false basename reasons: 8 phase-09 receipt.json 'read by packages/run-supervisor/rust/src/adopt.rs' (run-dir receipt), composition/commands.json via test/verbs/dispatch-recovery fixture name, 3 pilot READMEs via prose in case-brief.mjs, 2 seed.txt via a verify.sh tmp write, preserve-premise/proof.json 16.2 MB via a comment in check-legacy-docs-ratchet.mjs:82, doc-inventory.md/resync md/identity-carry-forward/inventory-comparison via fixture writes in generate-doc-inventory.test.mjs:704-711, review-6/10-checkpoint.md via propose-doc-decisions help text, review-pack-261013-1528 (4.9 MB) via a review-${3|6|10}-checkpoint.md fixture pattern that cannot match it."
+    },
+    {
+      "id": "G8-9c plan navigation complete",
+      "verdict": "REWORK",
+      "locator": "P/minimum-constitution.md; P/current-authority-map-2026-09-25.md; P/reports/phase-08/step-08-preflip-gates.json",
+      "reason": "Archived though navigation/live docs need them: minimum-constitution.md is a cited ruling source (11 links each from docs/platform/intent-preservation-ledger.md and the retired-engine copy); current-authority-map is linked from docs/reading-map.md:99,118, docs/specs/reading-map.md:7, docs/transitional-switchboard.md, switchboard.md; step-08-preflip-gates.json is the gate register the execution plan cites. 21 outside-plan references to archived files in total (incl. 7 platform READMEs -> phase-06/step-08-report.md); design names no repoint."
+    },
+    {
+      "id": "G8-8 tip bytes 679 MB",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/rehearsal.json#/variants/0",
+      "reason": "Own rebuild (pin tree - 6,362 records - pin archive/** + 7 main-side files at 7f1eb147f) = 10,547 files / 677,670,851 B; path set equal to Doer bf6c4d5; byte delta 1,586,203 B = accounting rows in the 2 reproduction manifests + later main-side artifact versions (git diff --stat bf6c4d5 vs rebuild touches only those 7 files)."
+    },
+    {
+      "id": "G8-10 real-disk checkout timing",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/rehearsal.json#/variants/0/runs; reviewer /tmp/fgos-work/w4-g8-archive/time.log",
+      "reason": "ext4 /dev/nvme0n1p2 (stat -f ef53), load 28-29: own rebuild 51.14 (cold) / 6.14 / 7.04 s; Doer bf6c4d5 5.16 / 6.42 / 4.09 s; full pin control 176.9 s. Warm figures reproduce ~4.6 s; cold first run is 51 s, so F must time a cold-cache run (still < 60 s, well over the 20 s target)."
+    },
+    {
+      "id": "G8-11 filesystem label",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/rehearsal.json#/filesystemStat,findmnt",
+      "reason": "Recorded from stat -f + findmnt (ext2/ext3 ef53; /dev/nvme0n1p2 ext4), not hardcoded."
+    },
+    {
+      "id": "G8-12 main manifest and archive/** slim",
+      "verdict": "APPROVE",
+      "locator": "P/reports/phase-09/archive/manifest.json; audit/",
+      "reason": "manifest.json 6,573 B header with 9 audit-asset descriptors (blob/sha/size); retained audit and records table moved to gzip archive-only assets; main-side candidate 21,745 B measured (50,060 B final, delta disclosed in final-artifact-delta)."
+    },
+    {
+      "id": "G8-5 nothing a retained test/script reads is moved",
+      "verdict": "APPROVE",
+      "locator": "test/ scripts/ src/ bin/ packages/ crates/ apps/ at e158e6726; retained plan scripts",
+      "reason": "110 plan-path literals/constructed defaults resolve to retained files; only prefix hits are reports/phase-06/ dirs joined with retained manifest names. Retained reproduction replay.py/fast.mjs/verify-readonly read archived inputs but are not run by any retained test (recipe executes only in archive checkout, per design). Exception: link-resolution reader in G8-7b."
+    },
+    {
+      "id": "pin drift",
+      "verdict": "APPROVE",
+      "locator": "partition inputCommit e158e6726 vs 77db6ed2b",
+      "reason": "Informational: at 77db6ed2b 100 new plan files (50.9 MB) are unclassified and 35 changed (incl. reproduction manifests, owner-answers, ledger shards); design already requires rebuild at F."
+    }
+  ],
+  "summary": {
+    "approve": 10,
+    "rework": 3,
+    "measuredWorktreeAdd": {
+      "filesystem": "ext4 /dev/nvme0n1p2 (stat -f: ext2/ext3 ef53 bsize 4096)",
+      "reviewerRebuildSeconds": [
+        51.14,
+        6.14,
+        7.04
+      ],
+      "doerTreeSeconds": [
+        5.16,
+        6.42,
+        4.09
+      ],
+      "pinControlSeconds": 176.89,
+      "loadAvg": "28-29",
+      "note": "first reviewer run cold-cache"
+    },
+    "tipBytes": {
+      "claimed": 679257054,
+      "reviewerRebuild": 677670851,
+      "deltaExplained": "accounting rows in 2 reproduction manifests + later main-side artifacts",
+      "preFreezeClaimed": 1970867003,
+      "preFreezeVerified": 1970867003
+    },
+    "checkA": {
+      "removalCommit": "ffab97382: A.ok false, 3618 unaccounted (both recipes)",
+      "accounted": "bf6c4d5: A.ok true, 0 unaccounted (both recipes, unchanged full checks.mjs)",
+      "newHFinding": "switchboard.md -> current-authority-map-2026-09-25.md unresolved"
+    },
+    "falseReasonRows": 22,
+    "falseReasonBytes": 23297481,
+    "g8Status": "partial: archive removal breaks a live switchboard link checked by candidate-status/H; navigation files archived; 22 false retain reasons"
+  }
+}

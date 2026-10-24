@@ -71,3 +71,19 @@
 - /bindingRefresh/475 mislabelled "Full unit content preserved" (links changed) -> relabel.
 - docs/reading-map.md:125 cites a plan report path in live text (moves at archive) -> fix; platform-foundations.md:416 verbatim carry names old docs/platform-foundations.md path (check intended).
 - Launch-note authorization for seat-binding/workflow/knowledge-registry edits came from the Lead's D7 prompt addendum -> record in L13-5.
+## Ledger+D7b review (w4-ledger-d7b-review, 17/5) -> final-pin re-join turn
+- Ledger hashes 5032 rows, 0 mismatches at HEAD; BUT gate register (step-08-preflip-gates.json changedBindings) 73/257 rows not current: 64 rebound in ledger by import2 (4b62385cb) but gate not re-joined; 8 rows drifted by main merge bc5589ed7 (architecture-manifest.json, legacy distribution.md block-5, legacy runner.md block-93) not rebound; claim_af89c4e6 stale again after D7b (s15 /bindingRefresh/5 replacement exists).
+- RULE: every turn that rebinds ledger rows must re-join the gate register (or the final-pin turn does it once). verifiers must check HEAD.
+- 2nd live copy of the false shell-helper fact: docs/platform/packaging-distribution/spec.md:829-832 ("Pointers (implementation)") -> fix.
+- Adjudication for legacy distribution.md block-5 says 143 checks; code now 141 -> fix.
+- reading-map.md:187-188 cite plans/reports files in live text (came with main merge) -> fix.
+- ledgerfix/verify.py pinned to fix commit's rows; need a HEAD-generic gate verifier.
+## import2 review (w4-import2-review, 18/2) -> final-pin re-join turn
+- SYSTEMIC: Doer records pin their own commit SHA; Lead cherry-pick rewrites SHAs (92260972c -> 5965143b4) so replays (scan --check, verify.py git show) depend on the Doer branch surviving. Fix: re-pin records to the plan-branch SHAs (map Doer->picked SHA for every picked commit) in the final-pin turn; keep plan/260925-w1-d* branches until then. Process change: ff-merge Doer branches when the plan branch has no intervening commits.
+- distribution.md block-5 -> spec.md block-90 reworded carry dropped main's "from the route's reconcile-scan, each with its pane id" (only in terminal-control/spec.md:153) -> add clause or residual/member binding; drift scanner counts reworded bindings as carried (blind spot) -> flag reworded carries for review.
+## Archive D5b review (w4-g8-archive-review, 10/3) -> D5c (at F, partition rebuilt anyway)
+- Removal breaks docs/platform/documentation/switchboard.md link to archived current-authority-map-2026-09-25.md (candidate-status + check-doc-retirement.mjs:260 link checks) -> keep file or name link change.
+- 21 outside-plan references to archived files need link changes or keep: minimum-constitution.md (11 links from docs/platform/intent-preservation-ledger.md), current-authority-map-2026-09-25.md (docs/reading-map.md, docs/specs/reading-map.md), step-08-preflip-gates.json (execution plan), phase-06/step-08-report.md (7 platform READMEs). Lead leaning: KEEP ruling/navigation files on tip (they are small), archive bulk only.
+- 22 kept files (23.3 MB) with false reader reasons (name matches, not reads): phase-09 receipt.json ×8 (adopt.rs reads run-dir receipt), preserve-premise/proof.json 16.2 MB (only a comment), test-written temp files, review-pack-261013-1528 4.9 MB (pattern can't match), READMEs in prose, seed.txt, help text -> move to archive.
+- Timing: cold first run 51 s (warm 4-7 s) on ext4 NVMe, load 28; full pin 177 s. F measurement must include a cold run.
+- Partition bound to e158e6726; rebuild at F (100 new + 35 changed plan files since).

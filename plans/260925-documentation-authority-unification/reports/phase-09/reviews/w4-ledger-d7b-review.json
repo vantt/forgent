@@ -1,0 +1,175 @@
+{
+ "scope": "w4-ledger-d7b",
+ "commit": "77db6ed2b",
+ "verdicts": [
+  {
+   "id": "LF-release-manifest-link",
+   "verdict": "APPROVE",
+   "reason": "Link now ../../host-invocation-routing/architecture/legacy-cli-transition.md; resolves to an existing file. Whole-file link check of component-boundary/reading-map and this target: 0 broken.",
+   "locator": "docs/platform/packaging-distribution/contracts/release-manifest.md:258"
+  },
+  {
+   "id": "LF-data-dictionary-row7",
+   "verdict": "APPROVE",
+   "reason": "Imported src/setup/registrations.mjs at HEAD and read DOCTOR_CHECKS: 141 unique ids (the main merge bc5589ed7 folded the Git rows, so 143 became 141). Row 7 backticked ids equal that set exactly, with 0 missing and 0 extra; the 8 loop-registered Git checks the old row omitted are now covered. Row 7b equals FIX_REGISTRATIONS 32/32.",
+   "locator": "docs/platform/packaging-distribution/spec.md:551-552"
+  },
+  {
+   "id": "LF-activation-binding-shell-helper",
+   "verdict": "APPROVE",
+   "reason": "Line 488 now says the helper reads the dot-git entry / gitdir / commondir layout from disk with no Git child and that its test uses rev-parse only as an oracle. scripts/fgos-shell-integration.sh:8-9,42-53 confirms this.",
+   "locator": "docs/platform/packaging-distribution/contracts/activation-binding.md:488"
+  },
+  {
+   "id": "LF-shell-helper-second-holder",
+   "verdict": "REWORK",
+   "reason": "The same false fact is still live in the packaging spec's 'Pointers (implementation)' section. It says the shell helper resolves the checkout root 'via git rev-parse --path-format=absolute --git-common-dir'. The helper starts no Git child (since 10416a6b0). The file is inside the brief's writable scope and was not corrected.",
+   "locator": "docs/platform/packaging-distribution/spec.md:829-832 (#pointers-implementation)"
+  },
+  {
+   "id": "LF-runner-fenced-552ef3d6",
+   "verdict": "APPROVE",
+   "reason": "Fenced lines 59-75 are byte-equal to the first 17 lines of legacy docs/specs/runner.md '## Data Dictionary' at HEAD, which is the direct section before its rigor/tier subsection. The rigorToTier/RUL102 legacy cells are restored, and the live h-02842f76ffd2 table is untouched.",
+   "locator": "docs/platform/runner/spec.md:54-76"
+  },
+  {
+   "id": "LF-adj-runner-block-9",
+   "verdict": "APPROVE",
+   "reason": "The adjudication reason now separates the verbatim historical carrier from current truth in h-02842f76ffd2. That matches the bytes.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/adjudications.json docs/specs/runner.md unheaded-block-9"
+  },
+  {
+   "id": "LF-adj-distribution-block-5",
+   "verdict": "REWORK",
+   "reason": "Low severity. The reason says rows 7/7b 'reconcile all 143 checks (135 literal IDs plus 8 loop-registered Git IDs)'. At HEAD, code and row 7 both have 141 (after bc5589ed7). The 4b62385cb import refreshed the row but not this adjudication, so the claim is false at HEAD.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/resync-a/adjudications.json docs/specs/distribution.md unheaded-block-5"
+  },
+  {
+   "id": "LF-ancestry-self-inclusive",
+   "verdict": "APPROVE",
+   "reason": "bindingHashEncoding.headingAncestry declares the self-inclusive convention. claim_4ff3a128 (s2 claims[404]) and claim_b2a51d5d (s8 claims[4]) now end with their own heading title. Recomputed self-inclusive ancestry (step-0 dual extractors, heading title appended) for all 4474 effective ledger rows: 0 ancestry mismatches. g0fix/verify.py is now wiring to ledgerfix/verify.py, which has no parents-only fallback.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#bindingHashEncoding"
+  },
+  {
+   "id": "LF-group-member-digests",
+   "verdict": "APPROVE",
+   "reason": "The recipe adds a sorted successorGroupMemberDigests list (duplicates kept). All 16 register group rows carry the 8 member digests, and their hash recomputes. Ledger group rows recompute from successorGroup.members, and every member resolves at HEAD with matching ancestry. Informational: all 16 rows share one hash (identical member set), so row identity rests on file+keys.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json registryGaps[2],[4]-[18]"
+  },
+  {
+   "id": "LF-claim_af89c4e6-current",
+   "verdict": "REWORK",
+   "reason": "Current at fd161a8c2 (e98cc059 = block-11 then), but not at HEAD. D7b dff50b64c changed block-11 (46c67ead) and added overlay s15 bindingRefresh/5 superseding s3 registryGaps/2. The 4b62385cb import moved it again (afe8743b). The register row still binds e98cc059 / e3423594 with no successor row in changedBindings, so an approval keyed on it would approve bytes that no longer exist. The gate was already stale at dff50b64c: D7b's writable list excluded the register.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json changedBindings id claim_af89c4e6; plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json /bindingRefresh/5"
+  },
+  {
+   "id": "LF-s12-native-identity-inputs",
+   "verdict": "APPROVE",
+   "reason": "All 9 s12 nativeIdentityGaps rows store a non-null targetUnitDigest and targetAncestry plus bindingInputSource (s14 bindingRefresh/464-472). The hash recomputes from the stored fields alone, and the target is current at HEAD.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json /nativeIdentityGaps/0-8"
+  },
+  {
+   "id": "LF-residual-14-flag",
+   "verdict": "APPROVE",
+   "reason": "Row 14 now has outOfScopeProposalOnly=false, A34Accepted=false and pending status; 0 of 15 rows are still flagged true. Its primaryTarget cli-io-contract unheaded-block-10 (f62415e8) is current at HEAD.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json rows[14]"
+  },
+  {
+   "id": "LF-ledger-recompute-at-fix-commit",
+   "verdict": "APPROVE",
+   "reason": "Own recompute on a git-archive snapshot of fd161a8c2: 5001 stored-hash rows with 0 hash mismatches; 4449 effective-current and 552 overlay-resolved, joined on shard+pointer+anchor+digest, with 0 stale targets; 257/257 gate rows self-hash, equal their ledger row and are current. This reproduces the receipt's 5001/4449/552 exactly.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/verification.json"
+  },
+  {
+   "id": "LF-verifier-head-claim",
+   "verdict": "APPROVE",
+   "reason": "Informational. ledgerfix/verify.py evaluates working-tree bytes, not an author pin, as required. It is frozen to the fd161a8c2 row set, though: it asserts migration rows == ledger rows and the gate equals the pin outside changedBindings. At 77db6ed2b, with s15/s16 rows added, it would fail its own assert, so it is not a reusable HEAD gate.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/ledgerfix/verify.py:61-63,155-161"
+  },
+  {
+   "id": "D7b-not-carried-banners-125-132-247",
+   "verdict": "APPROVE",
+   "reason": "Kind is now candidate-metadata-adaptation, the same as rows 36/66/89/319. The reason cites 9818f25a8 (2026-09-19), which predates 2180b4e72. sourceContent is the 9818f25a8 'Migration status' banner (git show --stat confirms +4 lines on each of the three files). The 0c23a176d 2026-10-02 transition note is a different unit. Still not carried.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json /unitCarries/125,/132,/247"
+  },
+  {
+   "id": "D7b-component-boundary-specs-links",
+   "verdict": "APPROVE",
+   "reason": "0 '../specs/' links left. Lines 69/70/72 now point to runner/spec.md, 73/74 to herdr-web-dashboard/spec.md, 75 to agent-confinement/spec.md, 81 to observe/spec.md and 281 to ../reading-map.md. All relative links in the file resolve (0 broken).",
+   "locator": "docs/platform/component-boundary.md:66-97,281"
+  },
+  {
+   "id": "D7b-bindingRefresh-475-label",
+   "verdict": "APPROVE",
+   "reason": "The reason now reads 'Changed links: ../specs/workflow.md destinations are rebound to workflow/spec.md ... not byte-identical full unit content'.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json /bindingRefresh/475"
+  },
+  {
+   "id": "D7b-reading-map-plan-report-citation",
+   "verdict": "APPROVE",
+   "reason": "Line ~124 now reads 'Merged from the retained legacy product/source map, docs/specs/reading-map.md.' and no longer cites a plan report. The review-fixes receipt records why platform-foundations.md:416 stays verbatim (literal carry). Informational: reading-map.md:187-188 (main-imported YAML/Config rows) cite plans/reports/*.md in live text, outside D7b's line scope.",
+   "locator": "docs/reading-map.md:124; docs/platform/platform-foundations.md:416"
+  },
+  {
+   "id": "D7b-ledger-rebind",
+   "verdict": "APPROVE",
+   "reason": "Recompute on a snapshot at dff50b64c: 5010 stored hashes and 4452 effective-current rows, 0 hash or target mismatches. All 6 changed units are bound in s15; its only gap is the gate register (see LF-claim_af89c4e6-current).",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json"
+  },
+  {
+   "id": "HEAD-ledger-hashes",
+   "verdict": "APPROVE",
+   "reason": "At 77db6ed2b: 5032/5032 live stored bindingSha256 recompute under the declared recipe (compact sorted UTF-8 JSON + LF, 4 keys + group member digests): 0 mismatches. 1143 supersedesBinding overlays resolve to an existing predecessor with equal anchor/digest/hash, except the intended s12/364 -> s3/2 pre-rebind link.",
+   "locator": "ledger/decisions/** + pilot/decisions/**"
+  },
+  {
+   "id": "HEAD-ledger-current-targets",
+   "verdict": "REWORK",
+   "reason": "8 effective (non-superseded) ledger rows point at units that no longer exist at HEAD. All drifted in main merge bc5589ed7 and no later commit rebound them: s3 registryGaps/0, s5-root-main-recarry registryGaps/0,1 (docs/architecture-manifest.json file-block); s3 registryGaps/6, s4-packaging-main-recarry registryGaps/0, s5-root-authorities registryGaps/2 (docs/specs/distribution.md unheaded-block-5); s9-runner-01 registryGaps/26,27 (docs/specs/runner.md unheaded-block-93). g0fix residual row 11 (primaryTarget runner block-93) is stale for the same reason.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s3/s4/s5/s9 registryGaps (listed)"
+  },
+  {
+   "id": "HEAD-gate-changedBindings",
+   "verdict": "REWORK",
+   "reason": "257/257 register rows self-hash correctly under the final recipe. However, 73/257 are not current at HEAD. 64 differ from their own ledger row: the 4b62385cb import rebound packaging spec/setup-doctor-registry/observe/h-6979005beaf7 ledger rows but left the register unchanged. 8 are the bc5589ed7 legacy-drift rows above. 1 is claim_af89c4e6 (superseded by an s15 overlay). The import2 receipt defers recomposition to the owner, so this is not a new Doer defect, but the zero-mismatch-at-HEAD criterion fails.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#changedBindings"
+  }
+ ],
+ "summary": {
+  "APPROVE": 17,
+  "REWORK": 5,
+  "sampling": "No sampling. Every item was checked exhaustively: all 5032 live ledger binding rows, 1144 overlay preimages, 257 gate rows, 15+3 residuals, 141 check ids and 32 fixes.",
+  "recomputeCounts": {
+   "head": {
+    "ledgerStoredHashes": 5032,
+    "hashMismatches": 0,
+    "effectiveCurrent": 4474,
+    "overlayResolved": 558,
+    "effectiveStale": 8,
+    "gateRows": 257,
+    "gateSelfHashMismatches": 0,
+    "gateNotCurrentOrNotJoined": 73,
+    "gateVsLedgerHashDiffer": 64,
+    "gateStaleLegacyDrift": 8,
+    "gateSuperseded": 1
+   },
+   "fd161a8c2": {
+    "ledgerStoredHashes": 5001,
+    "hashMismatches": 0,
+    "effectiveCurrent": 4449,
+    "overlayResolved": 552,
+    "gateMismatches": 0
+   },
+   "dff50b64c": {
+    "ledgerStoredHashes": 5010,
+    "hashMismatches": 0,
+    "effectiveCurrent": 4452,
+    "overlayResolved": 558,
+    "gateMismatches": 1
+   }
+  },
+  "attribution": "The two reviewed commits are clean at their own commits, except that D7b left claim_af89c4e6 stale in the register. The other HEAD mismatches come from later commits bc5589ed7 (main merge legacy drift) and 4b62385cb (import2 rebound the ledger, not the register).",
+  "method": "Ran the step-0 dual extractors embedded in g0fix/extract-units.mjs (copied with scratch redirected) on HEAD bytes and on git-archive snapshots, with self-inclusive heading ancestry. Wrote an independent Python hash recompute. Joined overlays on shard+pointer|collection/index+anchor+digest. Doctor ids came from importing registrations.mjs (DOCTOR_CHECKS/FIX_REGISTRATIONS).",
+  "scratch": "/tmp/fgos-work/w4-ledger-d7b/"
+ }
+}
