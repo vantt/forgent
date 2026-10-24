@@ -15,6 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
 import { sandboxGit } from './lib/sandbox-git.mjs';
 import { ensureGitAddon } from './git-addon.mjs';
 import { prepareStore } from '../src/event-store/index.mjs';
@@ -26,10 +27,26 @@ const FIXTURES_DIR = path.join(REPO_ROOT, 'test', 'fixtures', 'observe');
 const RUST_BIN = path.join(process.env.CARGO_TARGET_DIR ?? path.join(REPO_ROOT, 'target'), 'debug', 'fgos');
 
 const PINNED_SESSION_ID = 'golden-fixture-writer';
-const PINNED_CALLER_PID = '42000';
+const PINNED_CALLER_PID = 42000;
 const PINNED_PROJECT_NAME = 'observe-golden-fixture';
 const PINNED_GIT_HEAD_OPEN = '0123456789abcdef0123456789abcdef01234567';
 const PINNED_GIT_HEAD_CLOSE = 'fedcba9876543210fedcba9876543210fedcba98';
+
+// The native writer stamps the real clock, pid and git head; golden fixtures pin them.
+// The appended stamps must be strictly increasing first (record < resolve, open < close),
+// so pinning never hides a writer that stamps out of order. Stamping itself is owned by the
+// Rust unit tests; the fixtures prove readers and shapes.
+function pinAppended(file, fromLine, pin) {
+  const lines = fs.readFileSync(file, 'utf8').split('\n').filter(Boolean);
+  const appended = lines.slice(fromLine).map((line) => JSON.parse(line));
+  const instants = appended.map((record) => Date.parse(record.ts));
+  assert.ok(
+    instants.every((instant, i) => Number.isFinite(instant) && (i === 0 || instant > instants[i - 1])),
+    `${path.basename(file)}: appended stamps are not strictly increasing: ${appended.map((r) => r.ts).join(', ')}`,
+  );
+  const pinned = appended.map((record, i) => JSON.stringify(pin(record, i)));
+  fs.writeFileSync(file, [...lines.slice(0, fromLine), ...pinned].join('\n') + '\n', 'utf8');
+}
 
 function main() {
   // The Work seed below goes through the native Event Store door, which needs this checkout's addon.
@@ -199,11 +216,12 @@ function main() {
       path.join(frictionDir, PINNED_SESSION_ID + '.jsonl'));
 
     // 5. Generate current Observe records using the native CLI
+    const frictionShard = path.join(frictionDir, PINNED_SESSION_ID + '.jsonl');
+    const frozenFrictionLines = fs.readFileSync(frictionShard, 'utf8').split('\n').filter(Boolean).length;
     console.log('Recording friction via native Rust CLI...');
     const rustEnv = {
       ...process.env,
       FGOS_SESSION_ID: PINNED_SESSION_ID,
-      FGOS_CALLER_PID: PINNED_CALLER_PID,
       FGOS_PROJECT_NAME: PINNED_PROJECT_NAME,
     };
 
@@ -228,10 +246,7 @@ function main() {
         'Contract and fixture generator verified',
       ],
       {
-        env: {
-          ...rustEnv,
-          FGOS_NOW: '2026-09-29T10:00:00.000Z',
-        },
+        env: rustEnv,
         stdio: 'pipe',
       }
     );
@@ -252,10 +267,7 @@ function main() {
         'work',
       ],
       {
-        env: {
-          ...rustEnv,
-          FGOS_NOW: '2026-09-29T10:15:00.000Z',
-        },
+        env: rustEnv,
         stdio: 'pipe',
       }
     );
@@ -278,11 +290,7 @@ function main() {
         'Verify observe component migration and contract boundaries',
       ],
       {
-        env: {
-          ...rustEnv,
-          FGOS_NOW: '2026-09-29T08:00:00.000Z',
-          FGOS_GIT_HEAD: PINNED_GIT_HEAD_OPEN,
-        },
+        env: rustEnv,
         stdio: 'pipe',
       }
     );
@@ -307,14 +315,18 @@ function main() {
         'coord-golden-01',
       ],
       {
-        env: {
-          ...rustEnv,
-          FGOS_NOW: '2026-09-29T10:30:00.000Z',
-          FGOS_GIT_HEAD: PINNED_GIT_HEAD_CLOSE,
-        },
+        env: rustEnv,
         stdio: 'pipe',
       }
     );
+
+    const pinCaller = (record, stamp) => ({ ...record, ts: stamp, caller: { ...record.caller, pid: PINNED_CALLER_PID } });
+    pinAppended(frictionShard, frozenFrictionLines, (record, i) =>
+      pinCaller(record, ['2026-09-29T10:00:00.000Z', '2026-09-29T10:15:00.000Z'][i]));
+    pinAppended(path.join(fgosDir, 'observe/cases', PINNED_SESSION_ID + '.jsonl'), 0, (record, i) =>
+      i === 0
+        ? { ...record, ts: '2026-09-29T08:00:00.000Z', headAtOpen: PINNED_GIT_HEAD_OPEN }
+        : { ...record, ts: '2026-09-29T10:30:00.000Z', headAtClose: PINNED_GIT_HEAD_CLOSE });
 
     // 7. Write deterministic Observe snapshots shard
     const snapshotsDir = path.join(fgosDir, 'observe', 'snapshots');

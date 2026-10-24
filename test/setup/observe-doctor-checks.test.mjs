@@ -204,6 +204,22 @@ test('observe-host-resolvable verifies host binary status', () => {
   }
 });
 
+test('observe-host-resolvable fails when the host refuses to read the friction store', { skip: !process.env.FGOS_HOST_BIN }, () => {
+  const root = fs.mkdtempSync(path.join(tmpdir(), 'fgos-observe-probe-'));
+  try {
+    assert.equal(checkObserveHostResolvable(root).passed, true);
+    const frictionDir = path.join(root, '.fgos', 'observe', 'friction');
+    fs.mkdirSync(frictionDir, { recursive: true });
+    fs.writeFileSync(path.join(root, 'outside.jsonl'), '{}\n');
+    fs.symlinkSync(path.join(root, 'outside.jsonl'), path.join(frictionDir, 'planted.jsonl'));
+    const refused = checkObserveHostResolvable(root);
+    assert.equal(refused.passed, false);
+    assert.match(refused.message, /regular file/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 function coverageData(runDirsSeen, recentRuns = 0) {
   return { layoutRule: 'v2', runDirsSeen, observed: runDirsSeen, skipped: {}, recentRuns };
 }

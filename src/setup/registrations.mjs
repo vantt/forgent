@@ -5807,28 +5807,18 @@ export function checkObserveHostResolvable(cwd) {
     };
   }
 
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // A real read of the friction store, so a store the host refuses (a symlinked
+  // directory or shard, an I/O error) fails the row instead of passing on a ping.
   try {
-    const stdout = execFileSync(hostBin, ['friction', 'ping', '--dir', root], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      encoding: 'utf8',
-    });
-    const parsed = JSON.parse(stdout);
-    if (parsed && (parsed.ok || parsed.data?.ok)) {
-      return {
-        passed: true,
-        message: `host binary at ${hostBin} resolved and verified (friction supported)`,
-      };
-    }
+    invokeHost(['friction', 'rank', '--limit', '1'], { dir: cwd });
     return {
       passed: true,
-      message: `host binary at ${hostBin} resolved`,
+      message: `host binary at ${hostBin} resolved and verified (friction store readable)`,
     };
   } catch (err) {
-    const stderr = err.stderr ? err.stderr.toString('utf8').trim() : err.message;
     return {
       passed: false,
-      message: `host binary at ${hostBin} failed version check: ${stderr || err.message}`,
+      message: `host binary at ${hostBin} failed the friction read probe: ${err.message}`,
     };
   }
 }
@@ -6031,7 +6021,7 @@ registerCheck({
 
 registerCheck({
   id: 'observe-host-resolvable',
-  description: 'Rust host binary resolves and supports observe commands (friction ping)',
+  description: 'Rust host binary resolves and reads the friction store (friction rank)',
   check: (cwd) => checkObserveHostResolvable(cwd),
 });
 
