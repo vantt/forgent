@@ -1202,58 +1202,83 @@ test('landRunnerItem still refuses a non-union .fgos/ path that auto-merges clea
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean: nothing was published');
 });
 
-// A worker branch cut before the Event Store cutover still carries the legacy `.fgos/events/`
-// shards, here even a stale recorded deletion of one (an old manual `git rm --cached` recovery),
-// while main has since retired every shard, dropped their `merge=union` line and put the
-// `.fgos/events` fence FILE where the directory was. The branch must still catch up and land
-// its real work, and main's fence must survive: `resolveFgosOnlyConflict` (merge.mjs) settles
-// the `.fgos`-only file/directory and modify/delete conflicts in main's favour.
-const LEGACY_EVENTS_ATTRIBUTES = '.fgos/events/*.jsonl merge=union\n';
-const FENCE = '{"legacyRefOid":"0000000000000000000000000000000000000000"}\n';
-function seedBranchCutBeforeTheCutover(repoRoot, shardRelPath) {
+// tsk-tr9: a worker branch (`fgw/<id>`) that at some point in its history
+// recorded a DELETION of a merge=union-covered `.fgos/` shard (e.g. a
+// prior manual `git rm --cached` recovery after some earlier, unrelated
+// conflict) raises a REAL git conflict — modify/delete, never auto-
+// resolved by the `merge=union` driver, which only ever resolves
+// modify/modify text conflicts — the moment the SAME session's own
+// subsequent event-append (an ordinary return/approve/catchup elsewhere)
+// grows that exact shard on the other side. Confirmed empirically before
+// this fix: `performCatchUp` returned `outcome: 'conflict'` and
+// the old merge returned `outcome: 'conflict'` for byte-identical
+// repo states — a false conflict manufactured entirely by the calling
+// session's own writes to its own shard, not a real content dispute
+// (neither side has any legitimate claim over the OTHER's `.fgos/`
+// state — ADR0020). `resolveFgosOnlyConflict` (merge.mjs) now resolves it
+// automatically for both merge directions, so a stale branch like this
+// self-heals on its very next catch-up/approve instead of staying stuck
+// in the same manual-recovery loop every cycle.
+function seedStaleDeletedFgosBranch(repoRoot, shardRelPath) {
   fs.mkdirSync(path.join(repoRoot, '.fgos', 'events'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, shardRelPath), '{"seq":1}\n');
-  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), LEGACY_EVENTS_ATTRIBUTES);
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
   git(repoRoot, ['add', '.gitattributes', shardRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'legacy main: tracked event shard under merge=union']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and event shard']);
 
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
   git(repoRoot, ['checkout', 'fgw/demo-item']);
+
+  // An earlier merge/catch-up already pulled main's `.fgos/` state onto
+  // this branch (mirrored directly here as the end-state a prior cycle
+  // would have produced, rather than re-driving that whole cycle).
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":2}\n');
+  git(repoRoot, ['add', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'earlier merge landed main state onto the branch']);
+
+  // The established manual workaround: a session hits some unrelated
+  // fgos-write-rejected/conflict and "fixes" it by stripping `.fgos` back
+  // out of the branch, then commits that deletion.
   git(repoRoot, ['rm', '-r', '--cached', '--ignore-unmatch', '--', '.fgos']);
   fs.rmSync(path.join(repoRoot, '.fgos'), { recursive: true, force: true });
   git(repoRoot, ['commit', '-q', '-m', 'manual workaround: strip stray .fgos from worker branch']);
+
   git(repoRoot, ['checkout', 'main']);
 
-  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":2}\n');
+  // The calling session's own subsequent event-append grows the SAME
+  // shard on main — the write that reopens the divergence.
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":3}\n');
   git(repoRoot, ['add', shardRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'main grows its shard before the cutover']);
-  git(repoRoot, ['rm', '-r', '-q', '--', path.join('.fgos', 'events')]);
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events'), FENCE);
-  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), '');
-  git(repoRoot, ['add', '.gitattributes', path.join('.fgos', 'events')]);
-  git(repoRoot, ['commit', '-q', '-m', 'cutover: retire the shards and install the fence']);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows its own shard further']);
 }
 
-test('performCatchUp catches up a worker branch cut before the Event Store cutover and keeps the fence', async () => {
+test('performCatchUp resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
   const repoRoot = initRepo();
-  seedBranchCutBeforeTheCutover(repoRoot, path.join('.fgos', 'events', 'writer-a-1000.jsonl'));
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
   const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
 
   activateGitFixture(repoRoot);
   const result = await performCatchUp(repoRoot, 'demo-item', item, 'main', null);
-  assert.equal(result.outcome, 'merged', 'catch-up must settle the .fgos-only conflict, not report a real one');
+  assert.equal(result.outcome, 'merged', 'catch-up must resolve the false .fgos conflict, not report a real one');
 });
 
-test('landRunnerItem lands a worker branch cut before the Event Store cutover and keeps the fence', async () => {
+test('landRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
   const repoRoot = initRepo();
-  seedBranchCutBeforeTheCutover(repoRoot, path.join('.fgos', 'events', 'writer-a-1000.jsonl'));
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
   const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
+  const mainShardBefore = fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8');
 
   const result = await landItem(repoRoot, item);
-  assert.equal(result.outcome, 'merged', 'approve must settle the .fgos-only conflict, not report a real one');
+  assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
-  assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events'), 'utf8'), FENCE, 'main\'s fence must land unaffected by the stale branch');
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8').replaceAll('\r\n', '\n'),
+    mainShardBefore.replaceAll('\r\n', '\n'),
+    'main\'s own .fgos state must land completely unaffected by the stale branch',
+  );
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
