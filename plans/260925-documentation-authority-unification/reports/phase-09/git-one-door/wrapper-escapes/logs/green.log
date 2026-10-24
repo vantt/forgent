@@ -1,0 +1,32 @@
+✔ a staged product file whose census digest changed is refused until the regenerated census is staged (186.463392ms)
+✔ a commit that stages nothing the scan judges passes without reading the census (90.810245ms)
+✔ a staged declarations file is judged by the digest the census records for it (218.410856ms)
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (13.839278ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (4.41505ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (9.095652ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.671767ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (3.360331ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (19.330642ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✔ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.530655ms)
+  ✔ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.342113ms)
+  ✔ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.675058ms)
+  ✔ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.946899ms)
+  ✔ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.9865ms)
+  ✔ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.16916ms)
+  ✔ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (1.980353ms)
+  ✔ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (1.973274ms)
+  ✔ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (2.300393ms)
+✔ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (17.658581ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (7.696611ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (2.622516ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (5.006373ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.44403ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 543.301008

@@ -1,0 +1,40 @@
+{
+  "inputHead": "0d8068bdd12d19f552feb5c59d414443744cc13c",
+  "sites": 0,
+  "scannedFiles": 1127,
+  "classCounts": {
+    "standalone-skill-script": 3,
+    "hook-read-context": 23,
+    "configured-binary": 92,
+    "rust-test": 112,
+    "argv-runner": 13,
+    "production-sandbox-probe": 4,
+    "uncalled-wrapper": 20,
+    "git-driver": 1,
+    "declared-tooling-exemption": 19,
+    "sandbox-door": 2
+  },
+  "declarations": 25,
+  "hookAndToolingDeclarationsWithoutEscapes": 20,
+  "declarationsUnchanged": true,
+  "censusFileDigestsAndIdentitiesUnchanged": true,
+  "configuredEscapes": [
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 958,
+      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
+      "escapes": [
+        "passed to an unresolved callee (src/runner/merge.mjs:919)"
+      ]
+    }
+  ],
+  "scanSha256": [
+    "47ef2b39f416e2e93cac08c81d559e76fa9ab0899c9648b40bec5716bcd2ed72",
+    "47ef2b39f416e2e93cac08c81d559e76fa9ab0899c9648b40bec5716bcd2ed72"
+  ],
+  "censusSha256": "26110adb416a328fe279cac200ded4e64ae58fd63f1ca6addccf9afd3ad7173d",
+  "verifyCensus": {
+    "passed": true,
+    "message": "no Git writer outside the fgos-git driver (1127 files scanned, payload digest aebd9f51ee42)"
+  }
+}

@@ -1,0 +1,207 @@
+✔ a staged product file whose census digest changed is refused until the regenerated census is staged (191.304771ms)
+✔ a commit that stages nothing the scan judges passes without reading the census (91.876364ms)
+✔ a staged declarations file is judged by the digest the census records for it (201.3919ms)
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (14.145061ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (4.544151ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (9.620038ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (1.612ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (3.19558ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (18.925596ms)
+▶ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers
+  ✖ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.73453ms)
+  ✖ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.384518ms)
+  ✖ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.761797ms)
+  ✖ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.909435ms)
+  ✖ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.958977ms)
+  ✖ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.217124ms)
+  ✖ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (1.933583ms)
+  ✖ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (1.902143ms)
+  ✖ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (2.384403ms)
+✖ call, Reflect.apply and array-slot callers refuse declared pass-through wrappers (17.939943ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (7.769168ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (2.585997ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (4.953918ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.362321ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 13
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 544.978425
+
+✖ failing tests:
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ tooling wrapper: git.call(null, '.', ['reset', '--hard', 'HEAD']); (1.73453ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ tooling wrapper: Reflect.apply(git, null, ['.', ['reset', '--hard', 'HEAD']]); (1.384518ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ tooling wrapper: const tbl = [git]; tbl[0]('.', ['reset', '--hard', 'HEAD']); (1.761797ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ callback wrapper: run.call(null, 'git', ['push', '--force', 'origin', 'HEAD']); (1.909435ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ callback wrapper: Reflect.apply(run, null, ['git', ['push', '--force', 'origin', 'HEAD']]); (1.958977ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ callback wrapper: const tbl = [run]; tbl[0]('git', ['push', '--force', 'origin', 'HEAD']); (2.217124ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ cold-hook callback: git.call(null, ['update-ref', 'refs/heads/main', 'HEAD']); (1.933583ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ cold-hook callback: Reflect.apply(git, null, [['update-ref', 'refs/heads/main', 'HEAD']]); (1.902143ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:15
+✖ cold-hook callback: const tbl = [git]; tbl[0](['update-ref', 'refs/heads/main', 'HEAD']); (2.384403ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an unresolved caller cannot inherit the declaration
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:172:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at TestContext.test (node:internal/test_runner/test:382:20)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d4/test/scripts/git-one-door-declarations.test.mjs:167:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration: wrapper escapes/,
+    operator: 'throws',
+    diff: 'simple'
+  }

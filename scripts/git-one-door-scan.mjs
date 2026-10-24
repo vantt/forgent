@@ -27,8 +27,9 @@
 //   - standalone-skill-script: code of a skill whose own SKILL.md declares `metadata.oneDoor: standalone`
 //     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
 // Explicit owner declarations extend these classes by exact path + function/call digest, never by
-// line number. Pass-through argv also binds the sorted multiset of wrapper caller-call digests, so a
-// new caller cannot inherit an exemption. Hook verb claims must equal the callers' literal read verbs.
+// line number. Pass-through argv binds the sorted multiset of resolved wrapper caller-call digests;
+// unresolved caller escapes refuse the declaration, except for configured-binary provenance.
+// Hook verb claims must equal the callers' literal read verbs.
 // Tooling that cannot use an existing port has its own declared-tooling-exemption class; every
 // declaration carries its reason and retirement condition and must match exactly one raw site.
 //
@@ -2481,9 +2482,10 @@ function declaredSiteId(ctx, file, site) {
   const argv = args[1] ? file.code.slice(args[1].from, args[1].to) : '';
   const verb = declarationVerb(argv);
   if (verb) return { siteId: `${fn?.name ?? '<module>'}:${sha256(call)}`, callerVerbs: [verb] };
+  const flow = owner ? valueFlowCalls(ctx, file, owner) : { calls: [], escapes: [] };
   const callers = owner ? dedupeCalls([
     ...(owner.name ? callersOf(ctx, file, owner.name) : []),
-    ...valueFlowCalls(ctx, file, owner).calls,
+    ...flow.calls,
   ]) : [];
   const callerDigests = callers.map(c => sha256(`${c.file.name}\0${declarationCallText(c.file, c.open)}`)).sort();
   budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
@@ -2495,7 +2497,7 @@ function declaredSiteId(ctx, file, site) {
       return arg ? declarationVerb(c.file.code.slice(arg.from, arg.to)) : undefined;
     });
   });
-  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs };
+  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs, escapes: flow.escapes };
 }
 
 /** Owner declarations classify raw sites only; stale/ambiguous inputs never yield a green census. */
@@ -2525,6 +2527,8 @@ function applyDeclarations(root, sites, classes, digests, observedVerbs) {
     const found = sites.filter(s => s.path === entry.path && s.siteId === entry.siteId);
     if (found.length !== 1) throw new Error(`stale or ambiguous Git declaration: ${entry.path} ${entry.siteId} matched ${found.length} sites`);
     const [site] = found;
+    const { escapes = [] } = site;
+    if (escapes.length && entry.class !== 'configured-binary') invalid(`wrapper escapes for ${entry.path}: ${escapes[0]}`);
     const verbs = observedVerbs.get(site);
     if (entry.class === 'hook-read-context') {
       if (!entry.path.startsWith(`${HOOKS_DIR}/`) || site.binary !== 'git'
