@@ -203,7 +203,7 @@ fn project_config_request(
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
 /// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
-/// [--project] [--prune]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
+/// [--project] [--prune] [--machine <handle|id>]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
@@ -229,8 +229,8 @@ fn project_identity_request(
             &["--dir"],
         ),
         Some("list") => (
-            fgos_identity::Verb::List { project: false, prune: false },
-            &["--project", "--prune", "--dir"],
+            fgos_identity::Verb::List { project: false, prune: false, machine: None },
+            &["--project", "--prune", "--machine", "--dir"],
         ),
         Some("project") => (
             fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
@@ -285,6 +285,7 @@ fn project_identity_request(
     let mut drop_role: Option<String> = None;
     let mut by_project = false;
     let mut prune = false;
+    let mut machine_filter: Option<String> = None;
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
     let mut mint: Option<bool> = None;
     let mut handle: Option<String> = None;
@@ -383,6 +384,12 @@ fn project_identity_request(
                 }
                 fingerprint = Some(flag_value);
             }
+            "--machine" => {
+                if flag_value.is_empty() {
+                    return Err("--machine requires a machine handle or id".into());
+                }
+                machine_filter = Some(flag_value);
+            }
             "--handle" => {
                 if flag_value.is_empty() {
                     return Err("--handle requires a value".into());
@@ -419,9 +426,10 @@ fn project_identity_request(
                 *action = fgos_identity::SessionAction::Register { role, take };
             }
         }
-        fgos_identity::Verb::List { project, prune: pruned } => {
+        fgos_identity::Verb::List { project, prune: pruned, machine } => {
             *project = by_project;
             *pruned = prune;
+            *machine = machine_filter;
         }
         _ => {}
     }
@@ -631,7 +639,11 @@ mod tests {
         );
         assert_eq!(
             request(&["identity", "list", "--project", "--prune"]).unwrap().verb,
-            fgos_identity::Verb::List { project: true, prune: true }
+            fgos_identity::Verb::List { project: true, prune: true, machine: None }
+        );
+        assert_eq!(
+            request(&["identity", "list", "--machine", "bravo"]).unwrap().verb,
+            fgos_identity::Verb::List { project: false, prune: false, machine: Some("bravo".into()) }
         );
         assert!(request(&["identity", "session", "--take"]).is_err(), "--take needs --role");
         assert!(request(&["identity", "resolve"]).is_err());

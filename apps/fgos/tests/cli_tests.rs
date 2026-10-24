@@ -1554,6 +1554,11 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     assert!(remote_session["fetchedAt"].is_string());
     assert_eq!(identity_data(&run(&["resolve", "bravo-bbbbbb/sess", "--json"]))["handle"], "claude-sess@bravo");
     assert_eq!(identity_data(&run(&["resolve", "lead:WORK", "--json"]))["id"], "alpha-aaaaaa/alpha-session", "the local session is asked first");
+    let cache: serde_json::Value = serde_json::from_slice(&fs::read(alpha_root.join(".fgos/cache/identity-directory.json")).unwrap()).unwrap();
+    assert_eq!(cache["entries"][0]["machine"]["id"], "bravo-bbbbbb", "a read keeps the verified view in the cache");
+    let by_machine = identity_data(&run(&["list", "--machine", "bravo", "--json"]));
+    let ids: Vec<&str> = by_machine["sessions"].as_array().unwrap().iter().map(|s| s["id"].as_str().unwrap()).collect();
+    assert_eq!(ids, ["bravo-bbbbbb/sess"], "--machine keeps one machine's sessions");
     let _ = fs::remove_dir_all(&world);
 }
 

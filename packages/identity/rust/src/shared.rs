@@ -13,14 +13,15 @@
 use crate::current::MachineInfo;
 use crate::directory::{Listed, ROLE_PREFIX};
 use crate::machine;
-use crate::pins::PinState;
+use crate::pins::{self, PinState};
 use crate::refusal::{Candidate, Liveness, Refusal, Remote};
 use crate::signing::{self, Signature, Verified};
 use crate::text::iso_utc_now;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use sha2::{Digest, Sha256};
+use std::path::{Path, PathBuf};
 
 /// The Event Store stream the shared directory lives in.
 pub const STREAM: &str = "project:identity";
@@ -201,17 +202,96 @@ pub fn verify_payload(state_root: &Path, payload: &Value) -> Result<Verified, Re
 }
 
 /// An event dropped from the view, and whose machine it named.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Dropped {
     /// `bad-signature`, `machine-mismatch`, `key-changed`, or the refusal code of any other failure.
-    pub reason: &'static str,
+    pub reason: String,
     pub machine_id: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct RemoteEntry {
+    #[serde(flatten)]
     entry: SharedEntry,
     machine: MachineRef,
     pin: PinState,
+}
+
+const CACHE_VERSION: u32 = 1;
+const CACHE_FILE: &str = "identity-directory.json";
+
+/// The verified view as it is kept beside the clone (`.fgos/cache/identity-directory.json`
+/// of the main checkout): what a read can show without the store, and the
+/// payloads whose signature already held, so the next fold skips their
+/// `ssh-keygen`. Untracked and rebuildable: a missing or unreadable file is
+/// folded again from the store, the only truth.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Cache {
+    v: u32,
+    pub fetched_at: Option<String>,
+    entries: Vec<RemoteEntry>,
+    pub dropped: Vec<Dropped>,
+    /// SHA-256 (hex) of each payload and signature that verified.
+    verified: BTreeSet<String>,
+}
+
+/// Where the cache of the main checkout at `main_root` lives.
+pub fn cache_path(main_root: &Path) -> PathBuf {
+    main_root.join(".fgos").join("cache").join(CACHE_FILE)
+}
+
+/// The cache at `path`, or `None` when it is missing, unreadable or of another version.
+pub fn read_cache(path: &Path) -> Option<Cache> {
+    let cache: Cache = serde_json::from_slice(&std::fs::read(path).ok()?).ok()?;
+    (cache.v == CACHE_VERSION).then_some(cache)
+}
+
+/// Writes `cache` durably and atomically; a file that already says the same is left alone.
+pub fn write_cache(path: &Path, cache: &Cache) -> Result<(), Refusal> {
+    let mut bytes = serde_json::to_vec(cache).expect("Cache always serializes");
+    bytes.push(b'\n');
+    if std::fs::read(path).is_ok_and(|held| held == bytes) {
+        return Ok(());
+    }
+    let (dir, name) = (path.parent().unwrap_or(Path::new(".")), CACHE_FILE);
+    std::fs::create_dir_all(dir).map_err(|e| refuse("cache-write-failed", format!("{}: {e}", dir.display())))?;
+    fgos_durable_file::replace_durably_with_mode(dir, name, &bytes, 0o600)
+        .map(|_| ())
+        .map_err(|e| refuse("cache-write-failed", format!("{}: {e}", path.display())))
+}
+
+/// What a signature check covers: the signed bytes and the signature itself.
+fn verified_key(payload: &Value) -> Option<String> {
+    let mut unsigned = payload.clone();
+    let sig = unsigned.as_object_mut()?.remove("sig")?;
+    let signature: Signature = serde_json::from_value(sig).ok()?;
+    let mut hash = Sha256::new();
+    hash.update(signed_bytes(&unsigned).ok()?);
+    hash.update(signature.public_key.as_bytes());
+    hash.update(signature.sig.as_bytes());
+    Some(hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect())
+}
+
+/// [`verify_payload`], unless `known` already holds this payload verified and
+/// the machine is still pinned to the key that signed it (a re-keyed machine
+/// is checked again).
+fn verify_known(state_root: &Path, payload: &Value, known: Option<&Cache>, pinned: &BTreeMap<String, pins::Pin>) -> (Result<Verified, Refusal>, Option<String>) {
+    let key = verified_key(payload);
+    if let (Some(cache), Some(key)) = (known, &key) {
+        let signer = payload.pointer("/sig/machineId").and_then(Value::as_str).unwrap_or_default();
+        let signing_key = payload.pointer("/sig/publicKey").and_then(Value::as_str).unwrap_or_default();
+        if let Some(pin) = pinned.get(signer).filter(|pin| pin.public_key == signing_key) {
+            if cache.verified.contains(key) {
+                let verified = Verified { machine_id: signer.to_owned(), fingerprint: pin.fingerprint.clone(), first_seen: false, state: pin.state };
+                return (Ok(verified), Some(key.clone()));
+            }
+        }
+    }
+    let result = verify_payload(state_root, payload);
+    let key = if result.is_ok() { key } else { None };
+    (result, key)
 }
 
 /// The entries other machines published, as the fold of the log leaves them.
@@ -220,6 +300,7 @@ pub struct SharedView {
     entries: Vec<RemoteEntry>,
     fetched_at: Option<String>,
     pub dropped: Vec<Dropped>,
+    verified: BTreeSet<String>,
 }
 
 /// Folds the events of `project:identity`, in the store's order: the last
@@ -230,8 +311,16 @@ pub struct SharedView {
 /// id is verified unless it is dropped, plus the first event of each machine,
 /// which is verified first so the key a machine is pinned to is the one it
 /// published first, not the one of its newest event.
-pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>) -> SharedView {
+pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>, known: Option<&Cache>) -> SharedView {
     let own = machine::read(state_root).ok();
+    let pinned: BTreeMap<String, pins::Pin> =
+        pins::list(state_root).unwrap_or_default().into_iter().map(|pin| (pin.machine_id.clone(), pin)).collect();
+    let mut verified = BTreeSet::new();
+    let mut check = |payload: &Value| {
+        let (result, key) = verify_known(state_root, payload, known, &pinned);
+        verified.extend(key);
+        result
+    };
     let mut decided: BTreeMap<String, Option<(usize, RemoteEntry)>> = BTreeMap::new();
     let mut dropped = Vec::new();
     let mut checked: BTreeMap<usize, Result<Verified, Refusal>> = BTreeMap::new();
@@ -240,7 +329,7 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>) 
         let Some(claim) = Claim::parse(&event.event_type, &event.payload) else { continue };
         let machine_id = &claim.machine().id;
         if own.as_deref() != Some(machine_id.as_str()) && pinned_first.insert(machine_id.clone()) {
-            checked.insert(position, verify_payload(state_root, &event.payload));
+            checked.insert(position, check(&event.payload));
         }
     }
     for (position, event) in events.iter().enumerate().rev() {
@@ -249,7 +338,7 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>) 
         if decided.contains_key(&id) || own.as_deref() == Some(claim.machine().id.as_str()) {
             continue;
         }
-        let result = checked.remove(&position).unwrap_or_else(|| verify_payload(state_root, &event.payload));
+        let result = checked.remove(&position).unwrap_or_else(|| check(&event.payload));
         match result {
             Ok(verified) => {
                 let outcome = match claim {
@@ -259,7 +348,7 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>) 
                 decided.insert(id, outcome);
             }
             Err(refusal) => dropped.push(Dropped {
-                reason: if refusal.reason == "machine-key-changed" { "key-changed" } else { refusal.reason },
+                reason: if refusal.reason == "machine-key-changed" { "key-changed" } else { refusal.reason }.to_owned(),
                 machine_id: claim.machine().id.clone(),
             }),
         }
@@ -280,10 +369,21 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>) 
             remote.machine.handle = remote.machine.id.clone();
         }
     }
-    SharedView { entries, fetched_at, dropped }
+    SharedView { entries, fetched_at, dropped, verified }
 }
 
 impl SharedView {
+    /// What to keep beside the clone: this view and the payloads it verified.
+    pub fn cache(&self) -> Cache {
+        Cache {
+            v: CACHE_VERSION,
+            fetched_at: self.fetched_at.clone(),
+            entries: self.entries.clone(),
+            dropped: self.dropped.clone(),
+            verified: self.verified.clone(),
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }

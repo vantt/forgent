@@ -97,8 +97,8 @@ pub enum Verb {
     Session(SessionAction),
     /// `resolve <handle|lead:<LANE>|full id>`: the one live session it names.
     Resolve { query: String },
-    /// `list [--project] [--prune]`: the sessions the machine knows.
-    List { project: bool, prune: bool },
+    /// `list [--project] [--prune] [--machine <handle|id>]`: the sessions the machine knows.
+    List { project: bool, prune: bool, machine: Option<String> },
     /// `project [--init|--new] [--handle <h>]`.
     Project(ProjectAction),
     /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
@@ -323,11 +323,8 @@ fn publish(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Path, o
     let Some(door) = door else { return };
     let attempt = || -> Result<(), Refusal> {
         let cwd = working_directory()?;
-        let has_project = match own {
-            Some(listed) => listed.project_id.is_some(),
-            None => project::project_info(root, &cwd).is_ok(),
-        };
-        if !has_project {
+        let Ok((_, main_root)) = project::project_at(root, &cwd) else { return Ok(()) };
+        if own.is_some_and(|listed| listed.project_id.is_none()) {
             return Ok(());
         }
         let Some(log) = door.open(&cwd, &resolve_identity(request).id.to_string())? else {
@@ -335,11 +332,27 @@ fn publish(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Path, o
         };
         let machine = machine_info(root)?;
         let live = directory::list(root, None, false, &judge_here, None)?.sessions;
-        shared::publish_changes(root, log.as_ref(), &machine, own, &live).map(|_| ())
+        if shared::publish_changes(root, log.as_ref(), &machine, own, &live)? > 0 {
+            refresh(root, &main_root, log.as_ref())?;
+        }
+        Ok(())
     };
     if let Err(refusal) = attempt() {
         eprintln!("identity-publish-failed: {}: {}", refusal.reason, refusal.detail);
     }
+}
+
+/// Reads the clone's log, folds it with what the cache already verified, and
+/// keeps the result in the cache. The unfiltered view: other projects' entries
+/// stay in the cache for the doctor to name.
+fn refresh(root: &Path, main_root: &Path, log: &dyn shared::EntryLog) -> Result<SharedView, Refusal> {
+    let (events, fetched_at) = log.read()?;
+    let path = shared::cache_path(main_root);
+    let view = shared::fold(root, &events, fetched_at, shared::read_cache(&path).as_ref());
+    if let Err(refusal) = shared::write_cache(&path, &view.cache()) {
+        eprintln!("identity-cache-failed: {}: {}", refusal.reason, refusal.detail);
+    }
+    Ok(view)
 }
 
 /// The other machines' sessions of the clone's project, folded from its log;
@@ -349,12 +362,11 @@ fn remote_view(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Pat
     let door = door?;
     let attempt = || -> Result<Option<SharedView>, Refusal> {
         let cwd = working_directory()?;
-        let Ok(project) = project::project_info(root, &cwd) else { return Ok(None) };
+        let Ok((project, main_root)) = project::project_at(root, &cwd) else { return Ok(None) };
         let Some(log) = door.open(&cwd, &resolve_identity(request).id.to_string())? else {
             return Ok(None);
         };
-        let (events, fetched_at) = log.read()?;
-        let mut view = shared::fold(root, &events, fetched_at);
+        let mut view = refresh(root, &main_root, log.as_ref())?;
         view.retain_project(&project.id);
         Ok(Some(view))
     };
@@ -448,7 +460,7 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
             };
             Ok(serde_json::to_value(listed).expect("Listed always serializes"))
         }
-        Verb::List { project, prune } => {
+        Verb::List { project, prune, machine } => {
             let project_id = if *project {
                 let dir = std::env::current_dir().map_err(|e| Refusal {
                     candidates: Vec::new(),
@@ -463,6 +475,14 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
             let sessions = directory::list(&root, project_id.as_deref(), *prune, &judge_here, view.as_ref())?;
             if *prune {
                 publish(request, door, &root, None);
+            }
+            let mut sessions = sessions;
+            if let Some(wanted) = machine {
+                let own = machine_info(&root)?;
+                sessions.sessions.retain(|session| match &session.remote {
+                    Some(remote) => remote.machine.id == *wanted || remote.machine.handle == *wanted,
+                    None => own.id == *wanted || own.handle == *wanted,
+                });
             }
             Ok(serde_json::to_value(sessions).expect("Sessions always serializes"))
         }

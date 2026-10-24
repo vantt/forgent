@@ -75,9 +75,9 @@ fn a_signed_payload_verifies_and_pins_the_machine_and_a_changed_byte_does_not() 
     let mut tampered = event.payload.clone();
     tampered["entry"]["roles"] = json!(["lead:MAIL"]);
     assert_eq!(verify_payload(&viewer, &tampered).unwrap_err().reason, "bad-signature");
-    let view = fold(&viewer, &[RawEvent { event_type: SESSION_PUBLISHED.into(), payload: tampered }], None);
+    let view = fold(&viewer, &[RawEvent { event_type: SESSION_PUBLISHED.into(), payload: tampered }], None, None);
     assert!(view.is_empty());
-    assert_eq!(view.dropped.iter().map(|d| d.reason).collect::<Vec<_>>(), ["bad-signature"]);
+    assert_eq!(view.dropped.iter().map(|d| d.reason.as_str()).collect::<Vec<_>>(), ["bad-signature"]);
 }
 
 #[test]
@@ -86,9 +86,9 @@ fn an_event_that_names_another_machine_than_its_signer_is_dropped() {
     // Alpha signs an entry of beta's id, and a payload that names beta as publisher.
     let beta_session = session(BETA, "one", &[], "2026-10-24T01:00:00.000Z");
     let forged = published(&alpha, &beta_session, "beta");
-    let view = fold(&viewer, &[forged], None);
+    let view = fold(&viewer, &[forged], None, None);
     assert!(view.is_empty());
-    assert_eq!((view.dropped[0].reason, view.dropped[0].machine_id.as_str()), ("machine-mismatch", BETA));
+    assert_eq!((view.dropped[0].reason.as_str(), view.dropped[0].machine_id.as_str()), ("machine-mismatch", BETA));
 }
 
 #[test]
@@ -96,10 +96,10 @@ fn a_second_key_for_a_known_machine_is_dropped_and_counted() {
     let (alpha, impostor, viewer) = (machine(ALPHA), machine(ALPHA), machine("viewer-vvvvvv"));
     let real = published(&alpha, &session(ALPHA, "one", &[], "2026-10-24T01:00:00.000Z"), "alpha");
     let fake = published(&impostor, &session(ALPHA, "two", &[], "2026-10-24T02:00:00.000Z"), "alpha");
-    let view = fold(&viewer, &[real, fake], None);
+    let view = fold(&viewer, &[real, fake], None, None);
     assert_eq!(view.len(), 1, "the first key seen stays the machine's key");
     assert!(view.resolve("alpha-aaaaaa/one").is_ok());
-    assert_eq!((view.dropped[0].reason, view.dropped[0].machine_id.as_str()), ("key-changed", ALPHA));
+    assert_eq!((view.dropped[0].reason.as_str(), view.dropped[0].machine_id.as_str()), ("key-changed", ALPHA));
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn the_last_event_of_a_session_wins_and_an_end_removes_it() {
     let mut renamed = first.clone();
     renamed.roles = vec!["lead:MAIL".into()];
     let events = [published(&alpha, &first, "alpha"), published(&alpha, &renamed, "alpha")];
-    let view = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()));
+    let view = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()), None);
     let found = view.resolve("lead:MAIL").unwrap();
     assert_eq!((found.id.as_str(), found.liveness), ("alpha-aaaaaa/one", Liveness::Remote));
     assert_eq!(found.clone, None);
@@ -118,7 +118,7 @@ fn the_last_event_of_a_session_wins_and_an_end_removes_it() {
     assert_eq!(serde_json::to_value(&found).unwrap()["liveness"], "remote");
 
     let with_end = [events[0].clone(), events[1].clone(), ended(&alpha, "alpha-aaaaaa/one", "alpha")];
-    assert!(fold(&viewer, &with_end, None).is_empty());
+    assert!(fold(&viewer, &with_end, None, None).is_empty());
 }
 
 #[test]
@@ -126,15 +126,15 @@ fn a_role_held_on_two_machines_goes_to_the_later_event() {
     let (alpha, beta, viewer) = (machine(ALPHA), machine(BETA), machine("viewer-vvvvvv"));
     let a = published(&alpha, &session(ALPHA, "one", &["lead:MAIL"], "2026-10-24T01:00:00.000Z"), "alpha");
     let b = published(&beta, &session(BETA, "two", &["lead:MAIL"], "2026-10-24T02:00:00.000Z"), "beta");
-    assert_eq!(fold(&viewer, &[a.clone(), b.clone()], None).resolve("lead:MAIL").unwrap().id, "beta-bbbbbb/two");
-    assert_eq!(fold(&viewer, &[b, a], None).resolve("lead:MAIL").unwrap().id, "alpha-aaaaaa/one");
+    assert_eq!(fold(&viewer, &[a.clone(), b.clone()], None, None).resolve("lead:MAIL").unwrap().id, "beta-bbbbbb/two");
+    assert_eq!(fold(&viewer, &[b, a], None, None).resolve("lead:MAIL").unwrap().id, "alpha-aaaaaa/one");
 }
 
 #[test]
 fn a_live_local_holder_beats_a_remote_one_and_a_remote_full_id_resolves_through_the_view() {
     let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
     let remote = published(&alpha, &session(ALPHA, "one", &["lead:MAIL", "lead:IDENT"], "2026-10-24T01:00:00.000Z"), "alpha");
-    let view = fold(&viewer, &[remote], None);
+    let view = fold(&viewer, &[remote], None, None);
     let alive = |record: &Record| if record.pid.is_some() { Verdict::Alive } else { Verdict::Unknown };
     let local = Entry::new(
         "viewer-vvvvvv/loc".into(),
@@ -170,7 +170,7 @@ fn unknown_fields_and_unknown_event_types_are_ignored() {
     });
     payload = sign_payload(&alpha, payload).unwrap();
     let noise = RawEvent { event_type: "store.promote".into(), payload: json!({}) };
-    let view = fold(&viewer, &[noise, RawEvent { event_type: SESSION_PUBLISHED.into(), payload }], None);
+    let view = fold(&viewer, &[noise, RawEvent { event_type: SESSION_PUBLISHED.into(), payload }], None, None);
     assert_eq!(view.len(), 1);
     assert!(view.dropped.is_empty());
 }
@@ -208,4 +208,38 @@ fn publishing_happens_on_change_only_and_a_removed_session_is_ended() {
     assert_eq!(publish(None, &[]), 0);
     let types: Vec<String> = log.0.borrow().iter().map(|e| e.event_type.clone()).collect();
     assert_eq!(types, [SESSION_PUBLISHED, SESSION_PUBLISHED, SESSION_ENDED]);
+}
+
+#[test]
+fn a_cached_fold_skips_the_signature_checks_that_held_and_still_catches_a_re_keyed_machine() {
+    let (alpha, impostor, viewer) = (machine(ALPHA), machine(ALPHA), machine("viewer-vvvvvv"));
+    let events: Vec<RawEvent> = (0..12)
+        .map(|n| published(&alpha, &session(ALPHA, &format!("s{n}"), &[], "2026-10-24T01:00:00.000Z"), "alpha"))
+        .collect();
+    let started = std::time::Instant::now();
+    let cold = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()), None);
+    let cold_time = started.elapsed();
+    assert_eq!(cold.len(), 12);
+
+    let path = shared::cache_path(&viewer);
+    shared::write_cache(&path, &cold.cache()).unwrap();
+    let cache = shared::read_cache(&path).unwrap();
+    assert_eq!(cache, cold.cache(), "the file reads back as written");
+    shared::write_cache(&path, &cache).unwrap();
+
+    let started = std::time::Instant::now();
+    let warm = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()), Some(&cache));
+    let warm_time = started.elapsed();
+    assert_eq!(warm.cache(), cold.cache(), "the same view, without a check per session");
+    assert!(warm_time * 5 < cold_time, "warm {warm_time:?} against cold {cold_time:?}");
+    assert_eq!(shared::read_cache(&viewer.join("missing.json")), None);
+
+    // The machine is re-keyed on purpose: what its old key signed is no longer vouched for.
+    signing::mint_key(&impostor).unwrap();
+    fgos_identity::pins::forget(&viewer, ALPHA).unwrap();
+    let rekeyed = published(&impostor, &session(ALPHA, "new", &[], "2026-10-24T02:00:00.000Z"), "alpha");
+    verify_payload(&viewer, &rekeyed.payload).unwrap();
+    let after = fold(&viewer, &events, None, Some(&cache));
+    assert!(after.is_empty());
+    assert_eq!(after.dropped.iter().filter(|d| d.reason == "key-changed").count(), 12);
 }

@@ -1050,16 +1050,17 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity resolve claude-4f2a@fg-server --json', 'fgos identity resolve lead:MAIL'],
       },
       list: {
-        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
+        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--machine <handle|id>` keeps one machine\'s sessions; the sessions other machines published for this project follow the local ones with `liveness: remote`. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
         parameters: {
           type: 'object',
           properties: {
             project: { type: 'boolean', description: 'Only the sessions of this repository\'s project id.' },
+            machine: { type: 'string', description: 'Only the sessions of the machine with this handle or id.' },
             prune: { type: 'boolean', description: 'Remove the entries proven dead before listing (the rule of every write); an entry of unknown liveness is kept and shown.' },
           },
           required: [],
         },
-        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --prune'],
+        examples: ['fgos identity list --json', 'fgos identity list --project', 'fgos identity list --machine fg-server2', 'fgos identity list --prune'],
       },
       project: {
         description: 'This project: {id, handle, createdAt} read from the tracked file .fgos/project.json of the main checkout, so every clone, machine and linked worktree prints the same id. `--init` mints it once (main checkout only; refused when the file exists or the remote default branch already tracks it) and prints the commit command; nothing mints it automatically. `--new` mints a different id on purpose, to split a fork. Exit 65 [project-id-missing] when no id was minted yet.',
