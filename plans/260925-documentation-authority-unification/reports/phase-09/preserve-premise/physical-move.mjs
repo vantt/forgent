@@ -13,7 +13,7 @@ const root = process.cwd();
 const old = path.join(root, 'plans/260925-documentation-authority-unification/reports/phase-08');
 const [pin, tmp] = process.argv.slice(2);
 assert.match(pin, /^[0-9a-f]{40}$/);
-assert.ok(tmp.startsWith('/tmp/fgos-work/w5-misc-rework/'));
+assert.ok(tmp.startsWith('/tmp/fgos-work/w6-misc-sentence/'));
 const sha = x => crypto.createHash('sha256').update(x).digest('hex');
 const read = n => JSON.parse(fs.readFileSync(path.join(old,n), 'utf8'));
 const git = args => execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024 });

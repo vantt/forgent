@@ -24,7 +24,7 @@ def main():
     # delivered artifacts must be refreshed by their owner, not silently skipped
     # when a records-only G6 turn has a newer source pin.
     assert json.loads((CENSUS/'join.json').read_text())['sourceCommit']==pin, 'G2 delivered census pin differs; refresh census-join artifacts in their owning scope before combined G2/G6 verification'
-    scratch = pathlib.Path('/tmp/fgos-work/w5-misc-rework');scratch.mkdir(parents=True,exist_ok=True)
+    scratch = pathlib.Path('/tmp/fgos-work/w6-misc-sentence');scratch.mkdir(parents=True,exist_ok=True)
     commands, comparisons = [], []
     with tempfile.TemporaryDirectory(prefix='double-replay-',dir=scratch) as name:
         base = pathlib.Path(name)
@@ -88,9 +88,9 @@ def main():
         assert all(r['owningProofs'] for r in dynamics['rows'] if r['status']=='joined-owning-test')
         assert collections.Counter(r['stage'] for r in proof['rows']) == {'step-03':4804,'step-04':609}
         assert len({r['rowId'] for r in proof['rows']}) == 5413
-        assert len(proof['negativeDecisionProbes']) == 4 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
+        assert len(proof['negativeDecisionProbes']) == 10 and all(r['actual'].startswith('park-') and r['evidence'] is None for r in proof['negativeDecisionProbes'])
         assert all('source' in r and 'spans' in r for r in proof['negativeDecisionProbes'])
-        assert len(proof['positiveEvidenceControls'])==3 and all(r['evidence'] for r in proof['positiveEvidenceControls'])
+        assert len(proof['positiveEvidenceControls'])==5 and all(r['evidence'] for r in proof['positiveEvidenceControls'])
         rows = {r['rowId']:r for r in proof['rows']}
         review = json.loads((HERE.parent/'reviews/w2-g6-preserve-review.json').read_text())
         live_pointers = [v['id'] for v in review['verdicts'] if v['verdict']=='REWORK' and v['reason'].startswith('live pointer to')]
@@ -115,11 +115,25 @@ def main():
         assert 'e.g.' in same_unit['currentUnit'] and same_unit['bound']==[1]
         assert 'e.g.' not in same_unit['source'].splitlines()[0]
         assert same_unit['actual']=='park-unconfirmed-preserve-premise' and same_unit['evidence'] is None
+        same_line, = [p for p in proof['negativeDecisionProbes'] if p['case']=='same line marker in a different sentence']
+        assert len(same_line['source'].splitlines())==1 and 'For example' in same_line['currentUnit']
+        assert same_line['actual']=='park-unconfirmed-preserve-premise' and same_line['evidence'] is None
+        # Reuse the owning predicate, including its column binding, rather than
+        # maintain a second sentence splitter in this boundary verifier.
+        import sys
+        sys.path.insert(0,str(HERE))
+        from proof import historical_evidence
         for row in rows.values():
             if (row['evidence'] or {}).get('kind') in {'explicit-external-or-example-framing','explicit-path-placeholder'}:
-                bound_text='\n'.join(source(row['file']).splitlines()[n-1] for n in row['currentLines'])
+                raw = source(row['file'])
+                bound_text='\n'.join(raw.splitlines()[n-1] for n in row['currentLines'])
                 assert row['evidence']['text'] in bound_text
-                assert re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)',bound_text)
+                assert row['evidence']==historical_evidence(raw,row['currentLines'],row['statedReason'],row['currentUnit'],row['sourceSpans'][0])
+                if row['evidence']['kind']=='explicit-path-placeholder':
+                    assert re.search(r'<[\w-]+>',row['sourceSpans'][0]['text'])
+        assert rows['f07821']['file']=='docs/platform/runner/subcomponents/h-6979005beaf7/spec.md'
+        assert rows['f07821']['currentLines']==[67] and rows['f07821']['sourceSpans'][0]['columnStart']==939
+        assert rows['f07821']['result']=='preserve-operand-reachability-unchanged' and rows['f07821']['evidence'] is None
         assert proof['positiveEvidenceControls'][0]['span']['text']=='docs/specs/x.md'
         for id in ['f00167','f08807','f07822','f08072','f08073']:
             assert rows[id]['result']=='preserve-source-confirmed-history'
@@ -173,7 +187,7 @@ def main():
     result = dict(sourceCommit=pin,status='records-replay-passed-not-gate-acceptance',commands=commands,comparisons=comparisons,
                   scriptDigests={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in scripts},
                   counts={'G2':join['counts'],'G6':proof['counts']},wrapperReviewBatchCoverage=wrapper_coverage,
-                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=4,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=3),
+                  negativeProbes=dict(sourceBindingAndHistoricalEvidence=10,copiedL12_121HistoricalPredicate=3,positiveEvidenceControls=5),
                   followupChecks=dict(reviewedDynamicSites=132,individuallyJudgedReaderHints=13,additionalDynamicSites=len(dynamics['rows'])-132,
                                       deletedCensusSources=len(deleted),livePointersParked=29,deletedSourcePreservesParked=5,missedWrappersNowNoted=11,allEnumeratedWrapperLines=len(wrapper_lines)),
                   manualDynamicJudgmentsSourceCommit=dynamics['judgmentSourceCommit'],

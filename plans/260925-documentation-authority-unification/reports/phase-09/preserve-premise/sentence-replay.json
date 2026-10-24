@@ -1,0 +1,87 @@
+{
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--pin",
+        "4178dcc6e",
+        "--out",
+        "/tmp/fgos-work/w6-misc-sentence/replay-1"
+      ],
+      "exit": 0,
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 959, \"preserve-operand-reachability-unchanged\": 1416, \"preserve-source-confirmed-history\": 2574}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p9-w1-d1/plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--pin",
+        "4178dcc6e",
+        "--out",
+        "/tmp/fgos-work/w6-misc-sentence/replay-2"
+      ],
+      "exit": 0,
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 163, \"park-current-passage-unbound\": 137, \"park-source-absent\": 2, \"park-source-removed-by-cutover\": 162, \"park-unconfirmed-preserve-premise\": 959, \"preserve-operand-reachability-unchanged\": 1416, \"preserve-source-confirmed-history\": 2574}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n",
+      "stderr": ""
+    }
+  ],
+  "stdoutByteIdentical": true,
+  "comparisons": [
+    {
+      "path": "proof.json",
+      "sha256": "8c1f1a0f8af1ca137b29aa1db6f68ba6e04888922a1f51ffbbb4b4401e698b5a",
+      "bytes": 16212064,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "retire-with-tree.json",
+      "sha256": "b2389689addadac32646858af08734227f1a5c4d365f642d44cc6ff8b263a126",
+      "bytes": 18404,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "judgments.json",
+      "sha256": "98fda65e0f4470bdc74c8e23b7dc020d1ad3e03da270d7bf03a245b9ca681ec3",
+      "bytes": 1668963,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    },
+    {
+      "path": "history-wrapper-proposals.json",
+      "sha256": "6261d565496e3f534efbc0e1d1c010db59f5034fea78b6d5c09409f0fe76b0ad",
+      "bytes": 254302,
+      "runsByteIdentical": true,
+      "deliveredBytesEqual": true
+    }
+  ],
+  "counts": {
+    "byResult": {
+      "judgment-preserve-with-dated-note": 163,
+      "park-current-passage-unbound": 137,
+      "park-source-absent": 2,
+      "park-source-removed-by-cutover": 162,
+      "park-unconfirmed-preserve-premise": 959,
+      "preserve-operand-reachability-unchanged": 1416,
+      "preserve-source-confirmed-history": 2574
+    },
+    "byStage": {
+      "step-03": 4804,
+      "step-04": 609
+    },
+    "excludedRetireWithTree": 38,
+    "finalBatchPopulation": {
+      "step-03": 130,
+      "step-04": 33
+    },
+    "recordBatches": 136,
+    "total": 5413
+  },
+  "noReadinessClaim": true
+}

@@ -1,0 +1,1234 @@
+{
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "baselineCommit": "77bdddccbdb42fa9193088095bdeb9a143eec671",
+  "owningEvidence": "proof.json#rows[rowId]",
+  "count": 53,
+  "rows": [
+    {
+      "rowId": "f00875",
+      "file": "docs/distillery/comparison-matrix.md",
+      "currentLines": [
+        174
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 53,
+          "columnStart": 30,
+          "line": 174,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f00944",
+      "file": "docs/distillery/deep-dives/state.md",
+      "currentLines": [
+        36
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 85,
+          "columnStart": 62,
+          "line": 36,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f01106",
+      "file": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+      "currentLines": [
+        380
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 171,
+          "columnStart": 141,
+          "line": 380,
+          "text": "../herdr-worktrees/<task-slug>"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<task-slug>",
+        "text": "../herdr-worktrees/<task-slug>"
+      }
+    },
+    {
+      "rowId": "f01107",
+      "file": "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md",
+      "currentLines": [
+        383
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 43,
+          "columnStart": 18,
+          "line": 383,
+          "text": "../herdr-worktrees/<slug>"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<slug>",
+        "text": "../herdr-worktrees/<slug>"
+      }
+    },
+    {
+      "rowId": "f01186",
+      "file": "docs/distillery/sources/herdr.md",
+      "currentLines": [
+        443
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 171,
+          "columnStart": 141,
+          "line": 443,
+          "text": "../herdr-worktrees/<task-slug>"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<task-slug>",
+        "text": "../herdr-worktrees/<task-slug>"
+      }
+    },
+    {
+      "rowId": "f01187",
+      "file": "docs/distillery/sources/herdr.md",
+      "currentLines": [
+        446
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 43,
+          "columnStart": 18,
+          "line": 446,
+          "text": "../herdr-worktrees/<slug>"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<slug>",
+        "text": "../herdr-worktrees/<slug>"
+      }
+    },
+    {
+      "rowId": "f03130",
+      "file": "docs/explanation/dispatch-buildprompt-docsref-pointer.md",
+      "currentLines": [
+        17
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 32,
+          "columnStart": 2,
+          "line": 17,
+          "text": "docs/history/<feature>/plan.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/plan.md"
+      }
+    },
+    {
+      "rowId": "f03133",
+      "file": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+      "currentLines": [
+        46
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 38,
+          "columnStart": 5,
+          "line": 46,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03162",
+      "file": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+      "currentLines": [
+        127
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 51,
+          "columnStart": 19,
+          "line": 127,
+          "text": "docs/history/tsk-3ve-<n>/plan.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<n>",
+        "text": "docs/history/tsk-3ve-<n>/plan.md"
+      }
+    },
+    {
+      "rowId": "f03185",
+      "file": "docs/explanation/footprint-diff-research-md-noise.md",
+      "currentLines": [
+        2
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 114,
+          "columnStart": 80,
+          "line": 2,
+          "text": "docs/history/<feature>/RESEARCH.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/RESEARCH.md"
+      }
+    },
+    {
+      "rowId": "f03186",
+      "file": "docs/explanation/footprint-diff-research-md-noise.md",
+      "currentLines": [
+        10
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 36,
+          "columnStart": 2,
+          "line": 10,
+          "text": "docs/history/<feature>/RESEARCH.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/RESEARCH.md"
+      }
+    },
+    {
+      "rowId": "f03189",
+      "file": "docs/explanation/footprint-diff-research-md-noise.md",
+      "currentLines": [
+        33
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 58,
+          "columnStart": 20,
+          "line": 33,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f03190",
+      "file": "docs/explanation/footprint-diff-research-md-noise.md",
+      "currentLines": [
+        39
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 51,
+          "columnStart": 33,
+          "line": 39,
+          "text": "docs/history/<id>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/"
+      }
+    },
+    {
+      "rowId": "f03191",
+      "file": "docs/explanation/footprint-diff-research-md-noise.md",
+      "currentLines": [
+        40
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 37,
+          "columnStart": 14,
+          "line": 40,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f03291",
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "currentLines": [
+        11
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 52,
+          "columnStart": 14,
+          "line": 11,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f03293",
+      "file": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "currentLines": [
+        59
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 42,
+          "columnStart": 4,
+          "line": 59,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f03354",
+      "file": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "currentLines": [
+        84
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 59,
+          "columnStart": 15,
+          "line": 84,
+          "text": "./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<tag>",
+        "text": "./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz"
+      }
+    },
+    {
+      "rowId": "f03355",
+      "file": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "currentLines": [
+        136
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 74,
+          "columnStart": 22,
+          "line": 136,
+          "text": "./fgos-<new-version>-x86_64-unknown-linux-gnu.tar.gz"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<new-version>",
+        "text": "./fgos-<new-version>-x86_64-unknown-linux-gnu.tar.gz"
+      }
+    },
+    {
+      "rowId": "f03419",
+      "file": "docs/id-systems-audit.md",
+      "currentLines": [
+        57
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 145,
+          "columnStart": 112,
+          "line": 57,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-source-removed-by-cutover",
+      "afterResult": "park-source-removed-by-cutover",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03465",
+      "file": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+      "currentLines": [
+        145
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 40,
+          "columnStart": 2,
+          "line": 145,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f03597",
+      "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "currentLines": [
+        40
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 43,
+          "columnStart": 10,
+          "line": 40,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03598",
+      "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "currentLines": [
+        45
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 93,
+          "columnStart": 60,
+          "line": 45,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03599",
+      "file": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+      "currentLines": [
+        49
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 54,
+          "columnStart": 31,
+          "line": 49,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f03610",
+      "file": "docs/knowledge/gate-bypass-config/gate-bypass-config.md",
+      "currentLines": [
+        111
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 60,
+          "columnStart": 27,
+          "line": 111,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03661",
+      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "currentLines": [
+        160
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 43,
+          "columnStart": 5,
+          "line": 160,
+          "text": "docs/history/<milestone-id>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<milestone-id>",
+        "text": "docs/history/<milestone-id>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03662",
+      "file": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+      "currentLines": [
+        164
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 31,
+          "columnStart": 4,
+          "line": 164,
+          "text": "docs/history/<milestone-id>"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<milestone-id>",
+        "text": "docs/history/<milestone-id>"
+      }
+    },
+    {
+      "rowId": "f03709",
+      "file": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "currentLines": [
+        31
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 38,
+          "columnStart": 2,
+          "line": 31,
+          "text": "docs/history/<feature>/DISCUSSION.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/DISCUSSION.md"
+      }
+    },
+    {
+      "rowId": "f03710",
+      "file": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+      "currentLines": [
+        54,
+        55
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 65,
+          "columnStart": 42,
+          "line": 54,
+          "text": "docs/history/<feature>/"
+        },
+        {
+          "columnEndExclusive": 14,
+          "columnStart": 1,
+          "line": 55,
+          "text": "DISCUSSION.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f03864",
+      "file": "docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md",
+      "currentLines": [
+        23
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 53,
+          "columnStart": 30,
+          "line": 23,
+          "text": "docs/history/<docsRef>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<docsRef>",
+        "text": "docs/history/<docsRef>/"
+      }
+    },
+    {
+      "rowId": "f03881",
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "currentLines": [
+        59
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 71,
+          "columnStart": 33,
+          "line": 59,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f03940",
+      "file": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+      "currentLines": [
+        42
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 52,
+          "columnStart": 19,
+          "line": 42,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f03990",
+      "file": "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+      "currentLines": [
+        40
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 40,
+          "columnStart": 2,
+          "line": 40,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f04009",
+      "file": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+      "currentLines": [
+        73
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 68,
+          "columnStart": 34,
+          "line": 73,
+          "text": "docs/history/<feature>/RESEARCH.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/RESEARCH.md"
+      }
+    },
+    {
+      "rowId": "f04023",
+      "file": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+      "currentLines": [
+        35
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 40,
+          "columnStart": 7,
+          "line": 35,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f04094",
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "currentLines": [
+        2
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 116,
+          "columnStart": 93,
+          "line": 2,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f04095",
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "currentLines": [
+        15
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 25,
+          "columnStart": 2,
+          "line": 15,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f04098",
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "currentLines": [
+        37
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 66,
+          "columnStart": 41,
+          "line": 37,
+          "text": "docs/history/<id>/plan.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/plan.md"
+      }
+    },
+    {
+      "rowId": "f04100",
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "currentLines": [
+        50
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 24,
+          "columnStart": 1,
+          "line": 50,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f04174",
+      "file": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+      "currentLines": [
+        64
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 35,
+          "columnStart": 2,
+          "line": 64,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f04295",
+      "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "currentLines": [
+        158
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 60,
+          "columnStart": 37,
+          "line": 158,
+          "text": "docs/specs/<area>.md..."
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<area>",
+        "text": "docs/specs/<area>.md..."
+      }
+    },
+    {
+      "rowId": "f04306",
+      "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "currentLines": [
+        259
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 35,
+          "columnStart": 15,
+          "line": 259,
+          "text": "docs/specs/<area>.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<area>",
+        "text": "docs/specs/<area>.md"
+      }
+    },
+    {
+      "rowId": "f04308",
+      "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "currentLines": [
+        262
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 25,
+          "columnStart": 2,
+          "line": 262,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f04358",
+      "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+      "currentLines": [
+        68
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 40,
+          "columnStart": 2,
+          "line": 68,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f04359",
+      "file": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+      "currentLines": [
+        78
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 48,
+          "columnStart": 10,
+          "line": 78,
+          "text": "docs/history/<id>/iron-law-evidence.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f06386",
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "currentLines": [
+        125
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 55,
+          "columnStart": 1,
+          "line": 125,
+          "text": "docs/platform/agent-coordination/verification/<track>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<track>",
+        "text": "docs/platform/agent-coordination/verification/<track>/"
+      }
+    },
+    {
+      "rowId": "f06387",
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "currentLines": [
+        421
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 75,
+          "columnStart": 4,
+          "line": 421,
+          "text": "docs/platform/agent-coordination/verification/<track>/proofs/<cell-id>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<track>",
+        "text": "docs/platform/agent-coordination/verification/<track>/proofs/<cell-id>/"
+      }
+    },
+    {
+      "rowId": "f06388",
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "currentLines": [
+        474
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 80,
+          "columnStart": 9,
+          "line": 474,
+          "text": "docs/platform/agent-coordination/verification/<selected-track>/index.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<selected-track>",
+        "text": "docs/platform/agent-coordination/verification/<selected-track>/index.md"
+      }
+    },
+    {
+      "rowId": "f06389",
+      "file": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "currentLines": [
+        475
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 87,
+          "columnStart": 9,
+          "line": 475,
+          "text": "docs/platform/agent-coordination/verification/<selected-track>/current-cell.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<selected-track>",
+        "text": "docs/platform/agent-coordination/verification/<selected-track>/current-cell.md"
+      }
+    },
+    {
+      "rowId": "f06395",
+      "file": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "currentLines": [
+        159
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 67,
+          "columnStart": 12,
+          "line": 159,
+          "text": "/docs/platform/agent-coordination/verification/<TRACK>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<TRACK>",
+        "text": "/docs/platform/agent-coordination/verification/<TRACK>/"
+      }
+    },
+    {
+      "rowId": "f06419",
+      "file": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "currentLines": [
+        890
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 73,
+          "columnStart": 53,
+          "line": 890,
+          "text": "docs/history/<task>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<task>",
+        "text": "docs/history/<task>/"
+      }
+    },
+    {
+      "rowId": "f06601",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "currentLines": [
+        68
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 145,
+          "columnStart": 112,
+          "line": 68,
+          "text": "docs/history/<feature>/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/CONTEXT.md"
+      }
+    },
+    {
+      "rowId": "f07821",
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "currentLines": [
+        67
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 985,
+          "columnStart": 939,
+          "line": 67,
+          "text": "docs/history/iron-law-gate-human-ux/CONTEXT.md"
+        }
+      ],
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "ví dụ"
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f07847",
+      "file": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "currentLines": [
+        70
+      ],
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 130,
+          "columnStart": 107,
+          "line": 70,
+          "text": "docs/history/<feature>/"
+        }
+      ],
+      "beforeResult": "park-unconfirmed-preserve-premise",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": null,
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    }
+  ],
+  "noReadinessClaim": true
+}
