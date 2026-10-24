@@ -11,7 +11,9 @@
 use crate::machine::valid_machine_id;
 use crate::refusal::Refusal;
 use crate::text::iso_utc_now;
+use fgos_holder_lock::{LockScope, ScopeError, Wait};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -19,9 +21,10 @@ use std::path::{Path, PathBuf};
 /// Still 1: `state` and `confirmedAt` are additive, readers ignore unknown
 /// fields, and a file without `state` reads as `seen`.
 const VERSION: u32 = 1;
-/// Serialises [`confirm`] and [`forget`] so a confirm never resurrects a forgotten pin.
-/// Not a machine id, so [`list`] never reads it.
-const LOCK_FILE: &str = ".lock";
+/// Registry name of the lock that serialises [`confirm`] and [`forget`], so a
+/// confirm never resurrects a forgotten pin.
+const LOCK_NAME: &str = "identity-pins";
+const LOCK_WAIT_MS: u64 = 10_000;
 
 /// How far a pinned key is trusted.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -145,19 +148,14 @@ pub fn forget(state_root: &Path, machine_id: &str) -> Result<Pin, Refusal> {
     Ok(pin)
 }
 
-/// Holds the exclusive pins lock until dropped (released when the file closes).
-fn lock(state_root: &Path) -> Result<fs::File, Refusal> {
-    let dir = directory(state_root);
-    fs::create_dir_all(&dir).map_err(|e| refuse("pin-write-failed", format!("{}: {e}", dir.display())))?;
-    let path = dir.join(LOCK_FILE);
-    let file = fs::OpenOptions::new()
-        .create(true)
-        .truncate(false)
-        .write(true)
-        .open(&path)
-        .map_err(|e| refuse("pin-write-failed", format!("{}: {e}", path.display())))?;
-    file.lock().map_err(|e| refuse("pin-write-failed", format!("{}: {e}", path.display())))?;
-    Ok(file)
+/// Takes the registered `identity-pins` lock (`<state root>/locks/identity-pins.lock`) through
+/// holder-lock; it is released when the scope drops.
+fn lock(state_root: &Path) -> Result<LockScope<'static>, Refusal> {
+    let failed = |e: ScopeError| refuse("pin-write-failed", format!("cannot take the pins lock: {e}"));
+    let mut scope = LockScope::seeded(Vec::new()).map_err(failed)?;
+    let params = BTreeMap::from([("lockRoot".to_owned(), state_root.join("locks").to_string_lossy().into_owned())]);
+    scope.acquire(LOCK_NAME, &params, Wait::Ms(LOCK_WAIT_MS)).map_err(failed)?;
+    Ok(scope)
 }
 
 /// Marks the pin of `machine_id` confirmed, after the owner compared

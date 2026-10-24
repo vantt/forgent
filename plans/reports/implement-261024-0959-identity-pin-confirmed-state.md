@@ -18,7 +18,7 @@ Kept `v: 1`: `Pin` has no `deny_unknown_fields`, so an older reader ignores `sta
 - Refusals (exit 65): `pin-missing`, `fingerprint-mismatch` (detail names pinned and given fingerprints; state unchanged), `invalid-machine-id`. Missing `--fingerprint` (or `--fingerprint` without `--confirm`, or `--confirm` with `--forget`) is a flag error from the projector.
 - Own machine (signature by own id and own key, already checked equal to the own key): `Verified.state = Confirmed`; its pin is created `seen` then confirmed through `pins::confirm`, so list shows it confirmed.
 - `--forget` removes the pin; a later sighting is `seen`.
-- Race: `confirm` and `forget` both take an exclusive `File::lock` on `<pins>/.lock` (not a machine id, so `list` ignores it). `confirm` reads the pin inside the lock, then replaces durably (`replace_durably_with_mode`, 0600). A forget before it gives `pin-missing`; one after removes the confirmed file. First-sighting `record` stays create-once and needs no lock.
+- Race: `confirm` and `forget` both take an registered holder-lock mutex `identity-pins` (`<stateRoot>/locks/identity-pins.lock`, machine scope, rank 80, taken through `LockScope`). `confirm` reads the pin inside the lock, then replaces durably (`replace_durably_with_mode`, 0600). A forget before it gives `pin-missing`; one after removes the confirmed file. First-sighting `record` stays create-once and needs no lock.
 
 ## JSON shapes
 - `fgos identity pins --json` (identity.read): `{pins: [{v, machineId, publicKey, fingerprint, firstSeen, state, confirmedAt?}]}`.

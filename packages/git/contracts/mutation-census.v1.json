@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "44ef564c94502bbf3da7229911bbedb84a7d8487bea6dbff7433c6cebbe53bfc",
+  "payloadDigest": "e9a697338a32a961cce9e83fb76755cc00d1b4af242e1be926133340556fb235",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -437,7 +437,7 @@
     "packages/identity/rust/src/lib.rs": "bb2efab12e85ce7bc5b62bb703db52ec1e89affe7629b35b166a3053d3f4f996",
     "packages/identity/rust/src/machine.rs": "b0b603c2747156fc964d425e4f56324cabbb4e3306b9734bb1c25032451dbd15",
     "packages/identity/rust/src/mint.rs": "6f2ad9c0f0b2e5730a5175c524fd6efbffdc6bf358d3586e40bccb272b6ef316",
-    "packages/identity/rust/src/pins.rs": "afe87c197d56e6342da6d4ce24d9bd156fc0ebf0cbf8f839ca31978077e2a0d3",
+    "packages/identity/rust/src/pins.rs": "3b644dbafa9dceee0411a87863615b64c6c52d2da5a7aa846e3cdc21c8fc88f9",
     "packages/identity/rust/src/proc_tree.rs": "94e32e7a329989a8255e442c4947721dfca53f53ae44c82eeedd9ce5e6782266",
     "packages/identity/rust/src/project.rs": "7ecc60e334174fb38a40b9596fbe44d99a68470308f308940e6651723b924cb9",
     "packages/identity/rust/src/provider.rs": "4c480210c21cd0922d316781935eb06f0f110cef21820f4b0ff2a22b85fc96f4",
@@ -966,7 +966,7 @@
     "src/setup/git-checks.mjs": "2f84c6baab84e772487158c9364ecdd436509c6626a4221c1faa57f85605f44d",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
-    "src/setup/holder-lock-checks.mjs": "7a4676d00e63d3f47508d1d081d2941a794f30de18931dfce871ed9e396f923d",
+    "src/setup/holder-lock-checks.mjs": "7bee722d7eccd7fb9c356992f7bf8e3c58aff6fee32d9dbf5d6336e80e39d5b6",
     "src/setup/identity-checks.mjs": "9bf2ba8559595f0e17deb065f8af559daa0b8d2a254cf839cfd6b90980361795",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
