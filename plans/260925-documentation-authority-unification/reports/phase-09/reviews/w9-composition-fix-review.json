@@ -1,0 +1,120 @@
+{
+  "scope": "Delta review of 63c3db9c6 against w8-composition-review (19 REWORK) and L13-11, at HEAD 081e0362a",
+  "commit": "63c3db9c6055a2fa499ef63b0438d230753416a3",
+  "verdicts": [
+    {
+      "id": "file:docs/specs/workflow.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:hunk-park:workflow-holder",
+      "reason": "Recomposed on holder docs/platform/workflow/spec.md (3 hunks incl. :654/:691) with one target runner/decisions/h-36d872fbb0e5.md, which holds D-ADR0070, 0047-0049 and RUL84/89/94/95; legacy hunk dropped. fuzz=0 forward/rollback exact."
+    },
+    {
+      "id": "file:docs/platform/governance.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:status-units:docs/platform/governance.md",
+      "reason": "Chains on the recomposed w8:convention:area-holder-table (all 16 scopes resolve, none MISSING); fuzz=0 chain exact."
+    },
+    {
+      "id": "file:docs/enduser-docs-index.json",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/87",
+      "reason": "Command is fgos docs-index, proof is the doctor check enduser-docs-index-stale; both dropped paths recorded as carried duplicate aliases (lifecycle/tsk-2zv, rollup/doc-fgos-rollup-howto); targets exist and HEAD index already has the knowledge entries."
+    },
+    {
+      "id": "file:docs/platform/documentation/switchboard.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:status-complete:docs/platform/documentation/switchboard.md",
+      "reason": "Owner row points at both knowledge-registry section anchors (resolved); checkCandidateMetadata 0 findings, 0 missing links on the replayed file; doc-link-pass test 20/20."
+    },
+    {
+      "id": "file:docs/transitional-switchboard.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:status-complete:docs/transitional-switchboard.md",
+      "reason": "Same as the platform switchboard: owner row fixed, whole action recomposed, metadata and link checks clean on the replayed bytes."
+    },
+    {
+      "id": "file:docs/ui-spec/generated/wireframe-v2.html",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-render.json",
+      "reason": "Re-ran npm ci + interpret-wireframe.mjs: HEAD gives f06815ee (committed 77894fdd, recorded as its own step), the 12 composed step-07 sources give 50fcd138; validate.mjs passes on both."
+    },
+    {
+      "id": "supplemental:docs/platform/system-overview/spec.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:description:system-overview-complete",
+      "reason": "Base and partial recomposed at HEAD bytes (chain exact); f07928/f07929 become spec: links to the two resolved knowledge-registry sections."
+    },
+    {
+      "id": "supplemental:docs/platform/system-architecture/architecture/architecture-intent.md",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#w8:description:architecture-intent-complete",
+      "reason": "Per L13-11.1: 5 candidate-copy links and 3 labelled retired-engine history links; all 8 targets exist after the chain."
+    },
+    {
+      "id": "author-seam8-agents-decision-home-74",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-000123",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-000145",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-000151",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-000231",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-003643",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-003666",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "reference-003908",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json",
+      "reason": "Joined to the recomposed holder table plus the governance status spec; reference-003643/003666 now cite w8:repin:w2:predecessor:src/cli/command-registry.mjs (effective, exact replay), the non-effective recomposed-predecessor id is gone."
+    },
+    {
+      "id": "family-17-area-holder-table",
+      "verdict": "APPROVE",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/area-holder-table.json",
+      "reason": "seat-binding/workflow route to their specs; both end-user scopes route to knowledge-registry section anchors with work-state decisions; every holder path and anchor resolves."
+    },
+    {
+      "id": "gap05-dynamic-023895",
+      "verdict": "REWORK",
+      "locator": "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json#/bindingRefresh",
+      "reason": "REWORK. The relocation is rebased (fuzz=0 exact) and the guard is green with it applied (10/10) and red without it. The 88 heading overlays are correct (12/10/66, hashes reproduce, claim ids match). But the move also orphans 171 body-block bindings in s14-resync-b.json (162 bindingRefresh + 9 unitCarries, unheaded-block-* anchors); bindings.py effective resolution goes from 0 to 177 unresolved on component-boundary.md. Fix: add rebind overlays (supersedesBinding to each current effective row) for those 171 rows, pointing at the history file anchors that carry the same textDigest. Rerun the full effective-binding resolution against the post-move tree; the result must be 0 unresolved for the moved units. (My W8 count of 88 was headings only.)"
+    },
+    {
+      "id": "citation-drift-124",
+      "verdict": "REWORK",
+      "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json#/witnesses",
+      "reason": "REWORK. History exclusion and its negative control are correct (removing the filter brings back the 2 ADR-008 findings). The 10 branch glosses apply. The 14 F specs clear all 130 findings (130 to 0, re-checked after a skills rebuild), and the baseline is untouched. Of 30 glosses spot-checked against their source, all are true. Seven substituted lines are ungrammatical: witnesses #3 agent-protocol:101, #9 event-store:158, #15 event-store:876, #33 git:933, #86/#87 process:119/121, #96 terminal-control:206 (\"the the\", \"rule rule\", \"decision the\", \"plan the\", \"Lead the\"). Fix: reword those 7 lines in specs w8:gloss:{agent-protocol,event-store,git,process,terminal-control}, then regenerate the diffs and witnesses and replay with fuzz=0."
+    }
+  ]
+}

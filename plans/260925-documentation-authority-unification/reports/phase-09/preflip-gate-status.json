@@ -37,7 +37,8 @@
         "3 rows corrected in 6f5b9419d (claim_26b3a49a move->merge, claim_2e2bc926, claim_5ba6768e) not independently re-reviewed",
         "73/257 changedBindings rows in phase-08/step-08-preflip-gates.json not current at 77db6ed2b; register not re-joined since fd161a8c2 (w4-ledger-d7b REWORK HEAD-gate-changedBindings, LF-claim_af89c4e6-current)",
         "Earlier approvals were bound to pre-migration hashes and M1 digests; no current-digest verdict file exists",
-        "Final pin F not recorded"
+        "Final pin F not recorded",
+        "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)"
       ]
     },
     {
@@ -210,7 +211,8 @@
         "101 park actions without independent review",
         "4 park actions blocked: system-overview f07928/f07929, architecture-intent 8 Related/evidence rows, transitional-switchboard f08382-f08384, documentation/switchboard f06749-f06751",
         "124 content rebind rows plus 3 corrected rows (6f5b9419d) pending re-review",
-        "36 specs deferred to G9; approvals bound to 8a9385eca bytes"
+        "36 specs deferred to G9; approvals bound to 8a9385eca bytes",
+        "661 bindings unresolved after full patch chain; final-pin post-apply rebind required (reviews/w9-composition-fix-review.md)"
       ]
     },
     {
@@ -321,7 +323,8 @@
       "Pair-account every new plan-branch commit",
       "Run the full suite in an isolated clone at F with main-vs-branch attribution",
       "G8: rebuild the partition at F, re-enumerate readers and time a cold checkout (after G10 per W4)",
-      "Write the final status ledger and get an independent review of it"
+      "Write the final status ledger and get an independent review of it",
+      "At F, after applying every composed patch, rerun the ownership/ledger binding resolution and rebind: review w9-composition-fix found 661 bindings unresolved after the full patch chain (2 at HEAD), e.g. 339 in platform-foundations.md from block-position shifts. The final-pin rebind must cover composed patches, not only GAP-05."
     ],
     "external": [
       "WORK posts \"cutover xong\"; until then DOC launches no fgos run, pull or push (L13-9)",
