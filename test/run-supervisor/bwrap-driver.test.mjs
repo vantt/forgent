@@ -29,7 +29,14 @@ test('a direct launch has its own pid namespace as pid 1 and never dies with its
   assert.equal(args.includes('--die-with-parent'), false);
 });
 
+function withRuntimeDir(t, dir) {
+  const saved = process.env.XDG_RUNTIME_DIR;
+  process.env.XDG_RUNTIME_DIR = dir;
+  t.after(() => { if (saved === undefined) delete process.env.XDG_RUNTIME_DIR; else process.env.XDG_RUNTIME_DIR = saved; });
+}
+
 test('a terminal launch dies with its parent and binds back read-only only the GO socket its gate dials', (t) => {
+  withRuntimeDir(t, '/run/user/4242');
   const socket = '/run/user/4242/fgos/0123456789abcdef.sock';
   const { invocation } = prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] });
   const args = invocation.args;
@@ -40,6 +47,29 @@ test('a terminal launch dies with its parent and binds back read-only only the G
   // A direct attempt dials nothing: its GO channel is an inherited descriptor.
   const direct = prepare(t, { launchMode: 'direct', attemptId: 'att-d', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-fd', '5'] }).invocation.args;
   assert.equal(direct.includes(socket), false);
+});
+
+test('a GO socket outside the run supervisor\'s socket directory is refused by name, never bound back', (t) => {
+  withRuntimeDir(t, '/run/user/4242');
+  for (const socket of ['/run/user/4242/bus', '/run/user/4242/fgos/sub/x.sock', 'fgos/x.sock']) {
+    assert.throws(
+      () => prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] }),
+      (e) => e.code === 'go-socket-outside-runtime-socket-dir',
+      socket,
+    );
+  }
+});
+
+test('a gate named without a path is found on PATH inside the sandbox, never bound from beside the cwd', (t) => {
+  // From a cwd under /tmp the name would resolve to a /tmp path the driver binds back; it must not.
+  const cwd = process.cwd();
+  process.chdir(fs.realpathSync('/tmp'));
+  try {
+    const { invocation } = prepare(t, { launchMode: 'direct', attemptId: 'att-r', gateCommand: ['fgos', 'internal', 'gate'] });
+    assert.equal(invocation.args.includes(path.resolve('fgos')), false);
+  } finally {
+    process.chdir(cwd);
+  }
 });
 
 test('a supervised attempt gets a prefix ending in -- and no worker command; the digest covers prefix, gate and agent argv', (t) => {

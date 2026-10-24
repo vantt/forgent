@@ -198,6 +198,7 @@ test('R2: resolveConfinementResources resolves run-output, workspace, private-ho
       homeDir: tmp,
       claudeSocketBase: path.join(tmp, 'absent'),
       xdgRuntimeDir: null,
+      xdgConfigHome: null,
       herdrSocketPath: null,
     });
 

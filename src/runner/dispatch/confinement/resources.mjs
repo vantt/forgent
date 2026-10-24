@@ -38,16 +38,19 @@ export const SESSION_SOCKET_DIR = 'cc-socks';
  * dispatch, whatever its `hostRead` (spec section 9.3). `{home}` is the host user's home, not a
  * dispatch's private home. A listed path is a directory: the mask is `--tmpfs`. A path another
  * component owns (Config's accounts and token directory) enters here as one more entry.
- * - `{runtimeDir}`, the user runtime directory (userRuntimeDir): the systemd user manager, the
+ * - `{runtimeDir}`, the user runtime directory (runtimeDirForMask: `$XDG_RUNTIME_DIR`, else the
+ *   systemd one `/run/user/<uid>` when it is this user's own 0700 directory): the systemd user manager, the
  *   session bus (and the secret service on it), ssh-agent, gpg-agent, the keyring, audio, Claude
  *   Code's session sockets and the run supervisor's attempt sockets all listen there. A terminal
  *   attempt gets its own GO socket bound back by the driver, nothing else.
  * - `{claudeSocketBase}/cc-socks`, where Claude Code keeps one control socket per session: a write
  *   there starts a turn in that session. Under the runtime directory its mask is that one; it
  *   stands on its own when Claude Code falls back to `$CLAUDE_CODE_TMPDIR` or the temp directory.
- * - herdr's API sockets: `{home}/.config/herdr` holds the default session's socket and
- *   `sessions/<name>/` of every other (the layout the herdr terminal-control driver reads), and
- *   `{herdrSocketDir}` is the directory of the caller's own `$HERDR_SOCKET_PATH` wherever it sits.
+ * - herdr's API sockets: herdr's config directory holds the default session's socket and
+ *   `sessions/<name>/` of every other: `{home}/.config/herdr` (the layout the herdr terminal-control
+ *   driver reads) and `{xdgConfigHome}/herdr`, where herdr moves it when `$XDG_CONFIG_HOME` is set;
+ *   `{herdrSocketDir}` is the directory of the caller's own `$HERDR_SOCKET_PATH` wherever it sits,
+ *   refused when that directory is the home, the config directory, `/tmp` or one of their ancestors.
  *   A worker that reaches one can run a command or type into any pane of that session.
  */
 export const MACHINE_PRIVATE_ROOTS = Object.freeze([
@@ -55,10 +58,32 @@ export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{runtimeDir}',
   `{claudeSocketBase}/${SESSION_SOCKET_DIR}`,
   '{home}/.config/herdr',
+  '{xdgConfigHome}/herdr',
   '{herdrSocketDir}',
 ]);
 
 const absoluteOrNull = (value) => (typeof value === 'string' && path.isAbsolute(value) ? value : null);
+
+/**
+ * The user runtime directory to mask: `$XDG_RUNTIME_DIR` (userRuntimeDir, the one reader), else the
+ * directory systemd-logind keeps for this user, `<runUserBase>/<uid>`, when it is a real directory
+ * (not a symlink) of this user with mode 0700. A runner started without the variable (cron, `su`, a
+ * scrubbed service environment) still runs beside the user's bus and agents there. The fallback
+ * lives here, not in userRuntimeDir: the run supervisor's socket directory and Claude Code's socket
+ * base follow the variable alone, as the programs that bind there do.
+ */
+export function runtimeDirForMask({ env = process.env, uid = process.getuid?.(), runUserBase = '/run/user' } = {}) {
+  const xdg = userRuntimeDir({ env });
+  if (xdg) return xdg;
+  if (typeof uid !== 'number') return null;
+  const dir = path.join(runUserBase, String(uid));
+  try {
+    const st = fs.lstatSync(dir);
+    return st.isDirectory() && st.uid === uid && (st.mode & 0o777) === 0o700 ? dir : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * The directory Claude Code creates its session socket directory in, in its own order: the user
@@ -230,7 +255,7 @@ function confinementTempRootFor(backendConfig = {}) {
 
 /** Whether `target` is `root` itself or lies inside it. */
 export function isInsideRoot(target, root) {
-  return target === root || target.startsWith(root + path.sep);
+  return target === root || target.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
 }
 
 function realPathOrNull(p) {
@@ -269,19 +294,41 @@ export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {} } = {}) {
 export function resolveMachinePrivateRoots({
   homeDir = os.homedir(),
   claudeSocketBase = resolveClaudeSocketBase(),
-  xdgRuntimeDir = userRuntimeDir(),
+  xdgRuntimeDir = runtimeDirForMask(),
+  xdgConfigHome = process.env.XDG_CONFIG_HOME,
   herdrSocketPath = process.env.HERDR_SOCKET_PATH,
 } = {}) {
+  const home = path.resolve(homeDir);
   const base = path.resolve(claudeSocketBase);
   const runtime = absoluteOrNull(xdgRuntimeDir);
+  const configHome = absoluteOrNull(xdgConfigHome) && path.resolve(xdgConfigHome);
   if (!runtime || !isInsideRoot(base, path.resolve(runtime))) ensureSessionSocketDir(base);
   const roots = existingDirectories(MACHINE_PRIVATE_ROOTS, {
-    '{home}': path.resolve(homeDir),
+    '{home}': home,
     '{runtimeDir}': runtime,
     '{claudeSocketBase}': base,
-    '{herdrSocketDir}': absoluteOrNull(herdrSocketPath) && path.dirname(herdrSocketPath),
+    '{xdgConfigHome}': configHome,
+    '{herdrSocketDir}': herdrSocketDirOf(herdrSocketPath, [home, path.join(home, '.config'), configHome, '/tmp']),
   });
   return roots.filter((root) => !roots.some((other) => other !== root && isInsideRoot(root, other)));
+}
+
+/**
+ * The directory of the caller's own herdr socket, or null when it names none. A directory that is, or
+ * contains, one of `broad` (the home, the config directory, `/tmp`) is refused by name: masking it
+ * would hide far more than herdr, and a workspace under it could not run.
+ */
+function herdrSocketDirOf(socketPath, broad) {
+  if (!absoluteOrNull(socketPath)) return null;
+  const dir = path.dirname(path.resolve(socketPath));
+  const covered = broad.find((b) => b && isInsideRoot(path.resolve(b), dir));
+  if (covered) {
+    throw new ConfinementResourceError(
+      'herdr-socket-dir-too-broad',
+      `$HERDR_SOCKET_PATH "${socketPath}" lies directly in "${dir}", which holds "${covered}"; masking it would hide far more than herdr's sockets.`,
+    );
+  }
+  return dir;
 }
 
 /**
@@ -322,7 +369,8 @@ export function resolveConfinementResources({
   blind = false,
   homeDir = os.homedir(),
   claudeSocketBase = resolveClaudeSocketBase(),
-  xdgRuntimeDir = userRuntimeDir(),
+  xdgRuntimeDir = runtimeDirForMask(),
+  xdgConfigHome = process.env.XDG_CONFIG_HOME,
   herdrSocketPath = process.env.HERDR_SOCKET_PATH,
 } = {}) {
   if (!dispatchId || typeof dispatchId !== 'string') {
@@ -512,7 +560,7 @@ export function resolveConfinementResources({
     allocation: 'existing',
     ...extra,
   });
-  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase, xdgRuntimeDir, herdrSocketPath });
+  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase, xdgRuntimeDir, xdgConfigHome, herdrSocketPath });
   for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true }));
 
   // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory

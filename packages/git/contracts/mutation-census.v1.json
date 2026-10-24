@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a261e745a612bb1f4a8ceebe7e5fa7b6ad1f0bc7906c90e9d0f30f6eb33ec60e",
+  "payloadDigest": "2e6546e1d863c2c8d8f64d79221a80bb8d407911cfd73127b171b975b97fd50e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -865,11 +865,11 @@
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "0414c5c19c96bbdd2a53dfbbdefd0eae0fd69d02abd09d37e69e03981f472f62",
     "src/runner/dispatch/confinement/cleanup.mjs": "9d498d83b5eaba5f23964ce8b683cb511656de43787a52811404ad094ce36d19",
-    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "675c8e34daf3ad6486562a2323c02c2b091090443717cd2d4fcda3ae3d31ebd0",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "bcac2e4763ee08b38971eb63202ca6a6efd8c470410c626cdebcb2640b7e4454",
     "src/runner/dispatch/confinement/policies.mjs": "8d7341c02c6f3d664030347d1047315a4ddbccfb2c264c49b8bea0d9b6d9f008",
-    "src/runner/dispatch/confinement/probes/harness.mjs": "684c1586e7a987d04a0d060850de14533543a42eef034a68d12f6d1475dabf14",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "8ddb1a0fae627adb6f8df409697dec45cf6e89d22fec30b726db96755f93826a",
     "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
-    "src/runner/dispatch/confinement/resources.mjs": "538b869410b4755473d676e397dc68e88bae421195ffa60c0c4df468f7aad242",
+    "src/runner/dispatch/confinement/resources.mjs": "e08935f431ccd7cb8dd17d473785edb25837b2bf2c19241a7e1daaf3d3c1ca23",
     "src/runner/dispatch/cwd-lock.mjs": "3ea87d04c00433f2d410b02fc5b971d681acbc744de6d3587269bc20f57b2e23",
     "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
@@ -3118,7 +3118,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5549,
-      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:815",
+      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:826",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

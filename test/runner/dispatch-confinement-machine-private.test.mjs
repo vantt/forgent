@@ -22,6 +22,8 @@ import {
   ensureSessionSocketDir,
   resolveClaudeSocketBase,
   resolveMachinePrivateRoots,
+  runtimeDirForMask,
+  isInsideRoot,
 } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { BUILTIN_POLICY_IDS, resolveConfinementPolicy } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { computeProbeFingerprint, probeMachinePrivateHidden, MACHINE_PRIVATE_FALSIFIERS } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
@@ -68,10 +70,11 @@ function makeHost({ withPrivate = true, socketBase = 'absent', withHerdr = false
  * falls back to.
  */
 async function withHome(host, fn, { runtimeDir = true } = {}) {
-  const names = ['HOME', 'XDG_RUNTIME_DIR', 'CLAUDE_CODE_TMPDIR', 'HERDR_SOCKET_PATH'];
+  const names = ['HOME', 'XDG_RUNTIME_DIR', 'CLAUDE_CODE_TMPDIR', 'HERDR_SOCKET_PATH', 'XDG_CONFIG_HOME'];
   const previous = Object.fromEntries(names.map((name) => [name, process.env[name]]));
   process.env.HOME = host.home;
   delete process.env.HERDR_SOCKET_PATH;
+  delete process.env.XDG_CONFIG_HOME;
   if (runtimeDir) {
     process.env.XDG_RUNTIME_DIR = host.claudeSocketBase;
     delete process.env.CLAUDE_CODE_TMPDIR;
@@ -128,7 +131,7 @@ test('every confined launch sets the one marker variable the Config session clas
 });
 
 test('the machine-private roots are data in the contract: the private directory, the user runtime directory, the Claude Code session sockets and herdr\'s sockets', () => {
-  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{herdrSocketDir}']);
+  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}']);
   // herdr's layout is herdr's: the terminal-control herdr driver reads the same directory under the home.
   const driver = fs.readFileSync(new URL('../../packages/terminal-control/rust/src/driver/herdr.rs', import.meta.url), 'utf8');
   assert.match(driver, /\.join\("\.config"\)\.join\("herdr"\)/, 'the herdr driver and the list name the same directory');
@@ -171,7 +174,7 @@ test('the session socket directory is created owner-only in a base this user own
 
 test('a machine-private root resolves from the injected home and is skipped when absent or not a directory', () => {
   // No runtime directory and no herdr socket of the caller: the session socket directory stands on its own.
-  const roots = (host, extra = {}) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, herdrSocketPath: null, ...extra });
+  const roots = (host, extra = {}) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, ...extra });
   const host = makeHost();
   assert.deepEqual(roots(host), [host.privateDir]);
 
@@ -196,23 +199,83 @@ test('a machine-private root resolves from the injected home and is skipped when
 
 test('the user runtime directory is masked whole, and the session socket directory under it is neither created nor masked twice', () => {
   const host = makeHost({ socketBase: 'with-sockets' });
-  const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: host.claudeSocketBase, herdrSocketPath: null });
+  const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: host.claudeSocketBase, xdgConfigHome: null, herdrSocketPath: null });
   assert.deepEqual(roots, [host.privateDir, host.claudeSocketBase]);
 
   const fresh = makeHost({ withPrivate: false, socketBase: 'empty' });
-  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: fresh.home, claudeSocketBase: fresh.claudeSocketBase, xdgRuntimeDir: fresh.claudeSocketBase, herdrSocketPath: null }), [fresh.claudeSocketBase]);
+  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: fresh.home, claudeSocketBase: fresh.claudeSocketBase, xdgRuntimeDir: fresh.claudeSocketBase, xdgConfigHome: null, herdrSocketPath: null }), [fresh.claudeSocketBase]);
   assert.equal(fs.existsSync(fresh.sessionSockets), false, 'the runtime directory mask already hides a session directory made later');
 
   // A relative or absent runtime directory names nothing to mask.
   const unset = makeHost({ withPrivate: false, socketBase: 'with-sockets' });
   for (const xdgRuntimeDir of [null, 'relative/dir']) {
-    assert.deepEqual(resolveMachinePrivateRoots({ homeDir: unset.home, claudeSocketBase: unset.claudeSocketBase, xdgRuntimeDir, herdrSocketPath: null }), [unset.sessionSockets]);
+    assert.deepEqual(resolveMachinePrivateRoots({ homeDir: unset.home, claudeSocketBase: unset.claudeSocketBase, xdgRuntimeDir, xdgConfigHome: null, herdrSocketPath: null }), [unset.sessionSockets]);
   }
+});
+
+test('without $XDG_RUNTIME_DIR the runtime directory to mask is systemd\'s own for this user, only when it is a real 0700 directory of this user', () => {
+  const host = makeHost({ withPrivate: false });
+  const base = path.join(host.root, 'run-user-base');
+  const uid = process.getuid();
+  const own = path.join(base, String(uid));
+  fs.mkdirSync(own, { recursive: true, mode: 0o700 });
+  fs.chmodSync(own, 0o700);
+  assert.equal(runtimeDirForMask({ env: { XDG_RUNTIME_DIR: '/run/user/4242' }, uid, runUserBase: base }), '/run/user/4242', 'the variable wins');
+  assert.equal(runtimeDirForMask({ env: {}, uid, runUserBase: base }), own);
+  assert.equal(runtimeDirForMask({ env: { XDG_RUNTIME_DIR: 'relative' }, uid, runUserBase: base }), own, 'a relative value names nothing');
+  fs.chmodSync(own, 0o755);
+  assert.equal(runtimeDirForMask({ env: {}, uid, runUserBase: base }), null, 'not owner-only');
+  fs.chmodSync(own, 0o700);
+  assert.equal(runtimeDirForMask({ env: {}, uid: uid + 1, runUserBase: base }), null, 'another user\'s');
+  const linked = path.join(host.root, 'run-user-linked');
+  fs.mkdirSync(linked);
+  fs.symlinkSync(own, path.join(linked, String(uid)));
+  assert.equal(runtimeDirForMask({ env: {}, uid, runUserBase: linked }), null, 'a symlink');
+  assert.equal(runtimeDirForMask({ env: {}, uid, runUserBase: path.join(host.root, 'absent') }), null, 'absent');
+});
+
+test('a machine-private root of / covers everything: it is the one root kept, and a workspace under it is refused by name', async () => {
+  assert.equal(isInsideRoot('/home/u/project', '/'), true);
+  assert.equal(isInsideRoot('/', '/'), true);
+  const host = makeHost({ socketBase: 'with-sockets' });
+  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: '/', xdgConfigHome: null, herdrSocketPath: null }), ['/']);
+  const mismatches = await withHome(host, () => {
+    process.env.XDG_RUNTIME_DIR = '/';
+    return assessBwrap(requestFor(host), backendFor(host)).mismatches;
+  });
+  assert.ok(mismatches.some((m) => m.code === 'machine-private-hides-workspace'), JSON.stringify(mismatches));
+});
+
+test('a herdr socket whose directory is the home, the config directory, /tmp or an ancestor is refused by name, never masked whole', () => {
+  const host = makeHost({ withPrivate: false, withHerdr: true });
+  const configHome = path.join(host.root, 'xdg-config');
+  const roots = (herdrSocketPath) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: configHome, herdrSocketPath });
+  for (const socket of [
+    path.join(host.home, 'herdr.sock'),
+    `${host.herdrDir}/`,
+    '/herdr.sock',
+    '/tmp/herdr.sock',
+    path.join(configHome, 'herdr.sock'),
+    path.join(host.root, 'herdr.sock'),
+  ]) {
+    assert.throws(() => roots(socket), (e) => e.code === 'herdr-socket-dir-too-broad', socket);
+  }
+  const ownDir = path.join('/tmp', `fgos-herdr-own-${process.pid}`);
+  assert.doesNotThrow(() => roots(path.join(ownDir, 'herdr.sock')), 'a directory of its own under /tmp is fine');
+});
+
+test('herdr\'s directory under $XDG_CONFIG_HOME is masked too, where herdr moves its sockets when that is set', () => {
+  const host = makeHost({ withPrivate: false, withHerdr: true });
+  const configHome = path.join(host.root, 'xdg-config');
+  fs.mkdirSync(path.join(configHome, 'herdr'), { recursive: true });
+  const roots = (xdgConfigHome) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome, herdrSocketPath: null });
+  assert.deepEqual(roots(configHome), [host.herdrDir, path.join(configHome, 'herdr')]);
+  assert.deepEqual(roots('relative/config'), [host.herdrDir]);
 });
 
 test('herdr\'s whole directory under the home is masked, every session in it, and the caller\'s own socket directory wherever it sits', () => {
   const host = makeHost({ withPrivate: false, withHerdr: true });
-  const roots = (herdrSocketPath) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, herdrSocketPath });
+  const roots = (herdrSocketPath) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath });
   assert.deepEqual(roots(null), [host.herdrDir], 'the default session and sessions/<name>/ of every other');
   assert.deepEqual(roots(path.join(host.herdrDir, 'sessions', 'fgos-worker', 'herdr.sock')), [host.herdrDir], 'a session socket inside it is not masked twice');
   const elsewhere = path.join(host.root, 'herdr-elsewhere');
@@ -220,14 +283,14 @@ test('herdr\'s whole directory under the home is masked, every session in it, an
   assert.deepEqual(roots(path.join(elsewhere, 'herdr.sock')), [host.herdrDir, elsewhere]);
   assert.deepEqual(roots('relative/herdr.sock'), [host.herdrDir], 'a relative socket path names nothing');
   const without = makeHost({ withPrivate: false });
-  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: without.home, claudeSocketBase: without.claudeSocketBase, xdgRuntimeDir: null, herdrSocketPath: null }), [], 'no herdr on the host: nothing to hide');
+  assert.deepEqual(resolveMachinePrivateRoots({ homeDir: without.home, claudeSocketBase: without.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null }), [], 'no herdr on the host: nothing to hide');
 });
 
 test('the resolver yields a machine-private hidden-root for a non-blind request, and none when the host has no such directory', () => {
   const host = makeHost();
   const grants = [{ resource: 'run-output', access: 'write', scope: 'dispatch' }];
   const context = { cwd: host.project, repoRoot: host.project, runDir: host.runDir, fgosDir: host.fgosDir };
-  const resolve = (on, extra = {}) => resolveConfinementResources({ dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.tempRoot }, homeDir: on.home, claudeSocketBase: on.claudeSocketBase, xdgRuntimeDir: null, herdrSocketPath: null, ...extra });
+  const resolve = (on, extra = {}) => resolveConfinementResources({ dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.tempRoot }, homeDir: on.home, claudeSocketBase: on.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, ...extra });
 
   const hidden = resolve(host).filter((r) => r.resource === 'hidden-root');
   assert.equal(hidden.length, 1);
@@ -242,9 +305,19 @@ test('the resolver yields a machine-private hidden-root for a non-blind request,
   const without = makeHost({ withPrivate: false });
   assert.equal(resolve(without).some((r) => r.resource === 'hidden-root'), false);
 
+  // A blind root inside a machine-private root is masked by that root alone: here the temp root lies in the runtime directory.
+  const runtimeDir = path.join(host.root, 'runtime');
+  const nestedTemp = path.join(runtimeDir, 'confinement-temp');
+  fs.mkdirSync(nestedTemp, { recursive: true });
+  const nested = resolveConfinementResources({
+    dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: nestedTemp }, homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: runtimeDir, xdgConfigHome: null, herdrSocketPath: null, blind: true,
+  }).filter((r) => r.resource === 'hidden-root').map((r) => r.hostTarget);
+  assert.ok(nested.includes(runtimeDir));
+  assert.equal(nested.includes(nestedTemp), false, 'not masked a second time inside its machine-private root');
+
   // A root that blind would hide too is listed once: here the confinement temp root is the private directory.
   const blind = resolveConfinementResources({
-    dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.privateDir }, homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, herdrSocketPath: null, blind: true,
+    dispatchId: 'disp_self', context, grants, backendConfig: { tempRoot: host.privateDir }, homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, blind: true,
   }).filter((r) => r.resource === 'hidden-root' && r.hostTarget === host.privateDir);
   assert.equal(blind.length, 1);
 });

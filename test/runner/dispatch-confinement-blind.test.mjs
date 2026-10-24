@@ -138,8 +138,9 @@ function requestFor(project, { blind = true, script = 'process.exit(0)', context
  * synchronous call.
  */
 function withFixtureHome(project, fn) {
-  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR, HERDR_SOCKET_PATH: process.env.HERDR_SOCKET_PATH };
+  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR, HERDR_SOCKET_PATH: process.env.HERDR_SOCKET_PATH, XDG_CONFIG_HOME: process.env.XDG_CONFIG_HOME };
   process.env.HOME = project.home;
+  delete process.env.XDG_CONFIG_HOME;
   process.env.XDG_RUNTIME_DIR = project.claudeSocketBase;
   process.env.HERDR_SOCKET_PATH = project.socket;
   try {

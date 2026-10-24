@@ -17,6 +17,7 @@ import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-c
 import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
+import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 import { computeSha256Digest } from '../../proof-helpers.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
@@ -241,12 +242,23 @@ function machinePrivateRefusals(request, resolvedResources) {
   );
 }
 
-/** The absolute socket path a gate command dials (`--go-socket <path>`), or null. */
+/**
+ * The socket a gate command dials (`--go-socket <path>`), or null when it names none. Only a socket
+ * directly in the run supervisor's socket directory is bound back: any other path could re-expose
+ * something the masks hide, so it is refused by name.
+ */
 function gateGoSocket(gateCommand) {
   if (!Array.isArray(gateCommand)) return null;
   const at = gateCommand.indexOf('--go-socket');
-  const socket = at >= 0 ? gateCommand[at + 1] : null;
-  return typeof socket === 'string' && path.isAbsolute(socket) ? socket : null;
+  if (at < 0) return null;
+  const socket = gateCommand[at + 1];
+  const dir = resolveRuntimeSocketDir();
+  if (typeof socket !== 'string' || !path.isAbsolute(socket) || path.dirname(path.resolve(socket)) !== dir) {
+    const err = new Error(`the gate's GO socket "${socket}" is not in the run supervisor's socket directory "${dir}"; only that is bound back into the sandbox.`);
+    err.code = 'go-socket-outside-runtime-socket-dir';
+    throw err;
+  }
+  return socket;
 }
 
 /**
@@ -559,9 +571,10 @@ export function prepareBwrapSync(plan, request, backend) {
     if (terminal) bwrapArgs.push('--die-with-parent');
     const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
     // The private /tmp above hides whatever lives under the host's /tmp. The gate reads its envelope
-    // from the run directory and is itself a host binary, so each is bound back where it sits.
+    // from the run directory and is itself a host binary, so each is bound back where it sits. A gate
+    // named without a path is found on PATH inside the sandbox, never next to the cwd.
     if (attemptId) {
-      const gateBin = Array.isArray(request.gateCommand) ? request.gateCommand[0] : null;
+      const gateBin = Array.isArray(request.gateCommand) && path.isAbsolute(request.gateCommand[0] ?? '') ? request.gateCommand[0] : null;
       for (const hostPath of [request.context?.runDir, gateBin]) {
         if (typeof hostPath === 'string' && isInsideRoot(path.resolve(hostPath), '/tmp')) {
           bwrapArgs.push('--ro-bind', path.resolve(hostPath), path.resolve(hostPath));

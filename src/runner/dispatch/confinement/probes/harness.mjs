@@ -698,6 +698,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
       homeDir: stand.home,
       claudeSocketBase: stand.claudeSocketBase,
       xdgRuntimeDir: stand.runtimeDir,
+      xdgConfigHome: null,
       herdrSocketPath: stand.herdrSocketPath,
     }).filter((res) => !droppedByFalsifier(res, brokenConfig, stand));
 
@@ -734,7 +735,17 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
       // path is absolute: the driver binds a gate binary that lies under /tmp, resolved from the cwd.
       ...(terminal ? { launchMode, attemptId: `probe-${slug}`, gateCommand: ['/bin/true', 'internal', 'gate', ...(brokenConfig === 'own-socket' ? [] : ['--go-socket', stand.ownAttempt])] } : {}),
     };
-    const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
+    // The driver binds back only a GO socket in the run supervisor's socket directory, which it reads
+    // from $XDG_RUNTIME_DIR: point that at the stand-in for this synchronous call.
+    const previousRuntimeDir = process.env.XDG_RUNTIME_DIR;
+    process.env.XDG_RUNTIME_DIR = stand.runtimeDir;
+    let prepared;
+    try {
+      prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
+    } finally {
+      if (previousRuntimeDir === undefined) delete process.env.XDG_RUNTIME_DIR;
+      else process.env.XDG_RUNTIME_DIR = previousRuntimeDir;
+    }
     const args = terminal ? [...prepared.invocation.args, 'node', '-e', script] : prepared.invocation.args;
     const res = cp.spawnSync(prepared.invocation.command, args, { encoding: 'utf8' });
 
