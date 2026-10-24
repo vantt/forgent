@@ -1,9 +1,9 @@
 {
-  "pin": "8b4d778d32b5930ab7c80d9d19b2f26b95441ee1",
+  "pin": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
-  "effectiveFiles": 545,
+  "effectiveFiles": 546,
   "roundtripFiles": [
     {
       "path": ".agents/skills/_shared/ak-cook-worker-contract.md",
@@ -2838,6 +2838,12 @@
       "roundtripExact": true
     },
     {
+      "path": "packages/distribution/rust/src/workspace.rs",
+      "beforeSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+      "expectedAfterSha256": "0403e75c4515224d10470129e7a1363896bf36d67fba9df6fb2e4c2bb9250dc2",
+      "roundtripExact": true
+    },
+    {
       "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
       "beforeSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
       "expectedAfterSha256": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486",
@@ -3278,6 +3284,15 @@
   ],
   "purePinFieldsVerified": 10,
   "patchIdEquivalencesVerified": 12,
+  "parkReviews": {
+    "reviewedRows": 338,
+    "distinctFullDeltas": 4112,
+    "negativeControls": [
+      "missing exact dependency review rejected",
+      "missing named superseding record rejected",
+      "missing concrete park input rejected"
+    ]
+  },
   "negativeControls": [
     "changed passage digest rejects judgment",
     "missing row rejects judgment",

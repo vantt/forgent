@@ -20183,6 +20183,51 @@
       "-p1"
     ],
     "cwd": "/tmp/fgos-work (disposable historical subdirectory)",
+    "path": "packages/distribution/rust/src/workspace.rs",
+    "direction": "historical-step-forward",
+    "exit": 0,
+    "stdout": "patching file packages/distribution/rust/src/workspace.rs\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "patch",
+      "--batch",
+      "--fuzz=0",
+      "--reject-file=-",
+      "-p1"
+    ],
+    "cwd": "/tmp/fgos-work (disposable replay subdirectory)",
+    "path": "packages/distribution/rust/src/workspace.rs",
+    "direction": "forward",
+    "exit": 0,
+    "stdout": "patching file packages/distribution/rust/src/workspace.rs\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "patch",
+      "--batch",
+      "--fuzz=0",
+      "--reject-file=-",
+      "-p1"
+    ],
+    "cwd": "/tmp/fgos-work (disposable replay subdirectory)",
+    "path": "packages/distribution/rust/src/workspace.rs",
+    "direction": "rollback",
+    "exit": 0,
+    "stdout": "patching file packages/distribution/rust/src/workspace.rs\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "patch",
+      "--batch",
+      "--fuzz=0",
+      "--reject-file=-",
+      "-p1"
+    ],
+    "cwd": "/tmp/fgos-work (disposable historical subdirectory)",
     "path": "packages/herdr-fgos-common/rust/src/fgos.rs",
     "direction": "historical-step-forward",
     "exit": 0,

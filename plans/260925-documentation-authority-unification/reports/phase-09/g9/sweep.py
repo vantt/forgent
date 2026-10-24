@@ -333,6 +333,14 @@ def spec_chains():
             chains[s['path']].append(s)
         else:
             chains[s['path']] = [s]
+    # Authored park-review bodies use this same chain/replay door, never a
+    # parallel patch application path. They may only add an unowned path.
+    supplement = HERE / 'park-supplemental-specs.json'
+    if supplement.exists():
+        for spec in load(supplement)['patches']:
+            if spec['path'] in chains:
+                raise ValueError('park supplement duplicates a selected chain: ' + spec['path'])
+            chains[spec['path']] = [dict(spec, origin=REL(supplement))]
     return chains
 
 
@@ -442,6 +450,8 @@ def evidence_digest(passages):
 def judgment_errors(rows):
     path = HERE / 'judgments.json'
     judgments = {r['id']: r for r in load(path)['rows']} if path.exists() else {}
+    reviews_path = HERE / 'park-decisions.json'
+    reviews = {r['id']: r for r in load(reviews_path)['rows']} if reviews_path.exists() else {}
     errors = []
     for row in rows:
         j = judgments.get(row['id'])
@@ -451,8 +461,27 @@ def judgment_errors(rows):
         if (j.get('recordSha256') != row['recordSha256'] or
                 j.get('evidenceSha256') != evidence_digest(row['passages'])):
             errors.append({'id': row['id'], 'error': 'judgment evidence changed'})
-        if j.get('disposition') not in ('still-valid-as-recorded', 'needs-recomposition', 'owned-park'):
+        if j.get('disposition') not in ('still-valid-as-recorded', 'needs-recomposition', 'owned-park',
+                                         'superseded-or-retired'):
             errors.append({'id': row['id'], 'error': 'invalid disposition'})
+        review = reviews.get(row['id'])
+        if review:
+            fields = ['recordSha256', 'evidenceSha256', 'disposition', 'reason', 'supersedingRecord',
+                      'owner', 'nextAction', 'missingInput', 'patchSpecId', 'patchRef']
+            if (any(j.get(k) != review.get(k) for k in fields) or
+                    j.get('reviewRef') != 'park-decisions.json#' + row['id'] or
+                    j.get('reviewGroup') != review['group']):
+                errors.append({'id': row['id'], 'error': 'authored park review missing or altered'})
+        if j.get('disposition') == 'superseded-or-retired' and not j.get('supersedingRecord'):
+            errors.append({'id': row['id'], 'error': 'retirement lacks named successor record'})
+        changed_deps = [{'path': p['currentPath'], 'passageId': p['passageId'],
+                         'currentSha256': p['currentSha256']}
+                        for p in row['passages']
+                        if p['passageId'] in ('explicit-overlap-dependency', 'canonical-source-dependency')
+                        and p['classification'] in ('changed', 'absent')]
+        if j.get('disposition') == 'still-valid-as-recorded' and changed_deps:
+            if not review or j.get('reviewedDependencies') != changed_deps:
+                errors.append({'id': row['id'], 'error': 'changed dependency lacks exact authored review'})
         if j.get('disposition') == 'owned-park' and not (j.get('owner') and j.get('nextAction')):
             errors.append({'id': row['id'], 'error': 'park lacks owner/action'})
         if not j.get('reason'):

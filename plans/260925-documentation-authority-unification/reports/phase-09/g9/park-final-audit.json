@@ -1,0 +1,117 @@
+{
+  "pin": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "beforeCounts": {
+    "still-valid-as-recorded": 229,
+    "owned-park": 338,
+    "needs-recomposition": 7
+  },
+  "afterCounts": {
+    "still-valid-as-recorded": 517,
+    "needs-recomposition": 20,
+    "owned-park": 5,
+    "superseded-or-retired": 32
+  },
+  "formerParkAfterCounts": {
+    "still-valid-as-recorded": 288,
+    "needs-recomposition": 13,
+    "owned-park": 5,
+    "superseded-or-retired": 32
+  },
+  "reviewedRows": 338,
+  "untouchedDispositionAndEvidenceRows": 236,
+  "reviewPassageOccurrences": 14922,
+  "distinctFullChangedOrAbsentDeltas": 4112,
+  "unchangedPriorBodies": 545,
+  "priorBodyChanges": [],
+  "newBodyPaths": [
+    "packages/distribution/rust/src/workspace.rs"
+  ],
+  "remainingOwnedParkIds": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl:2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39"
+  ],
+  "needsWrites": [
+    {
+      "path": "docs/backlog.md",
+      "recordIds": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl:2",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66"
+      ],
+      "reason": "Authoritative backlog replacement claims/writer input remain owner-selected; no out-of-scope write performed."
+    }
+  ],
+  "groupCounts": {
+    "doc-navigation": 16,
+    "current-body": 13,
+    "external-input": 5,
+    "retired-consumer": 32,
+    "seat-workflow": 40,
+    "git-infrastructure": 67,
+    "process-lock-identity": 78,
+    "source-contract-data": 22,
+    "config-fixture": 65
+  },
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--quiet"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "modifiedOrNewPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-check-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-decisions.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-judge-run.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-recompose-run.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-evidence.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-run.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-scratch-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-supplemental-specs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-sweep-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-verify-run.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/parks-before-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/review-parks.py"
+  ],
+  "scopeCheck": "Every workspace mutation is within g9/**; index has no staged changes.",
+  "independentAcceptance": false,
+  "headAtExit": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "proofScriptsSha256": {
+    "review-parks.py": "aa4ca314206f89960664c53831f308d8499268eead6ba701f5ae7f0670b3df6a",
+    "judge.py": "a159f3144098a1348065175f8ce41cd4678b6817f51145a2b291671c1e360e5b",
+    "sweep.py": "0bf5f55555c9d7328ac4ea17bc73b6ec498c549a236d3de91b9d4fd6b05f6288",
+    "verify.py": "30b815f868a2701e57dbfb669d5f226dee8813a2e97260745cc508505c0752f1"
+  }
+}

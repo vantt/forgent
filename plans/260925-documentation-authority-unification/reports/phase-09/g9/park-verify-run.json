@@ -1,0 +1,26 @@
+{
+  "pin": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "status": "pass",
+  "uniqueRecords": 574,
+  "cohortMemberships": 684,
+  "effectiveFiles": 546,
+  "purePinFieldsVerified": 10,
+  "patchIdEquivalencesVerified": 12,
+  "parkReviews": {
+    "reviewedRows": 338,
+    "distinctFullDeltas": 4112,
+    "negativeControls": [
+      "missing exact dependency review rejected",
+      "missing named superseding record rejected",
+      "missing concrete park input rejected"
+    ]
+  },
+  "negativeControls": [
+    "changed passage digest rejects judgment",
+    "missing row rejects judgment",
+    "changed record body rejects judgment",
+    "same source bytes at another commit retain their content-bound judgment"
+  ],
+  "independentAcceptance": false,
+  "scope": "Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure."
+}

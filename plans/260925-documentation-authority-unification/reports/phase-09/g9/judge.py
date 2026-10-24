@@ -50,6 +50,11 @@ def main():
     recomposed = {s['path']: s for s in sweep.load(HERE / 'recomposed.json')['specs']}
     evidence, judgments, contexts = {}, [], []
     tree = sweep.git('rev-parse', pin + '^{tree}').decode().strip()
+    review_path = HERE / 'park-decisions.json'
+    review_packet = sweep.load(review_path) if review_path.exists() else {'rows': []}
+    reviews = {r['id']: r for r in review_packet['rows']}
+    assert len(reviews) == len(review_packet['rows']), 'duplicate park review'
+    assert set(reviews) <= {r['id'] for r in source}, 'park review outside record cohort'
     for row in source:
         rec = originals[row['id']]['record']
         items = {}
@@ -138,6 +143,23 @@ def main():
                                                           'endLine': len(data.splitlines()), 'sha256': sweep.sha(data),
                                                           'status': 'real current source; semantic binding not assumed'}
                         j['nextAction'] += ' Compare the actual Identity successor ' + candidate + ', without reviving the deleted Session Identity package.'
+        review = reviews.get(row['id'])
+        if review:
+            # Authored semantic review is bound to the complete record and all
+            # its passages/dependencies, not a path/name rule or a pin-only repin.
+            assert review['recordSha256'] == j['recordSha256'], row['id']
+            assert review['evidenceSha256'] == j['evidenceSha256'], row['id']
+            for key in ['owner', 'nextAction', 'unresolvedPassageIds', 'unresolvedDependencies',
+                        'patchSpecId', 'patchRef']:
+                j.pop(key, None)
+            for key in ['disposition', 'reason', 'owner', 'nextAction', 'missingInput', 'needsWrites',
+                        'patchSpecId', 'patchRef', 'supersedingRecord', 'successorEvidence', 'additionalEvidence']:
+                if key in review:
+                    j[key] = review[key]
+            j.update(reviewRef='park-decisions.json#' + row['id'], reviewGroup=review['group'])
+            if dependency_changes:
+                j['reviewedDependencies'] = [{'path': p['currentPath'], 'passageId': p['passageId'],
+                                              'currentSha256': p['currentSha256']} for p in dependency_changes]
         witnesses = []
         for p in row['passages']:
             # Share repeated co-cut/duplicate-operation text once. Locators and
@@ -159,7 +181,7 @@ def main():
     dump('source-context.json', {'sourceCommit': pin, 'memberships': memberships, 'records': contexts,
                                 'classificationCounts': dict(collections.Counter(r['classification'] for r in source))})
     dump('judgments.json', {'sourceCommit': pin, 'independentAcceptance': False,
-                            'scope': '574 physical records, 684 cohort memberships. These author dispositions include owned parks, not gate closure. Only current evidence validates this pin; source deltas reopen the matching row.',
+                            'scope': '574 physical records, 684 cohort memberships. Explicit per-row park reviews supersede the conservative fallback only at their exact record/evidence hashes. Author dispositions, not gate closure; source deltas reopen the matching row.',
                             'counts': dict(collections.Counter(r['disposition'] for r in judgments)), 'rows': judgments})
     dump('source-read-commands.json', sweep.COMMANDS)
     print(json.dumps({'records': len(judgments), 'distinctEvidenceBodies': len(evidence),
