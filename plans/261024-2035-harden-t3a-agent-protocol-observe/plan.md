@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T3 part 04a sub-plan: Agent protocol and Observe"
 description: "Implementation sub-plan for HARDEN layer T3 part 04a: land the red tests with their fixes, one hardened shard door for every Observe store and the friction fixes, blocked(usage-limit) and a bounded outbox in the agent protocol, plumbing deletions, a typed run scan, specs; Q3 gated in its own last phase; then verify and land after the Work cutover."
-status: pending
+status: in-progress (phases 01-06 landed 2026-10-24 `48a45a5f5`; phase 07 gated on owner Q3)
 priority: P1
 effort: "~5.75d work, ~4.25d lead time (P01 0.25d; P02 1.5d ∥ P03 1d; P04 1.5d; P05 0.5d; P06 0.5d; verify+land 0.5d); gated P07 +0.5d only if owner Q3 = remove"
 branch: "main (plan only; work runs on track branch harden/t3a-agent-protocol-observe, one linked worktree per phase lead)"
