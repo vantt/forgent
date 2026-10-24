@@ -4,7 +4,7 @@ Depends on 05 and 02 (shared `door.mjs`, `marshal.rs`). Suggested executor: sonn
 
 ## Context
 
-D opened the `config` namespace with `check`, `fix`, `accounts` [D-ASSUMED, `packages/git/node-addon/src/config.rs`, cap 110]; each marshals JSON in and plain data out, resolves the writer identity in the addon the way `session_identity.rs` does, and carries failure ids in the message JSON. This phase adds the entries the Node facade needs and settles four things D left: the main-checkout trusted root for `snapshot`, the session class, the cache instance, and the response size.
+D-11 (absorbed, landing B) opens the `config` namespace with `check`, `fix`, `accounts` in `packages/git/node-addon/src/config.rs` (cap 110); each marshals JSON in and plain data out, resolves the writer identity in the addon the way `session_identity.rs` does, and carries failure ids in the message JSON. This phase adds the entries the Node facade needs and settles four things D left: the main-checkout trusted root for `snapshot`, the session class, the cache instance, and the response size.
 
 ## Files it may touch
 
@@ -19,7 +19,7 @@ D opened the `config` namespace with `check`, `fix`, `accounts` [D-ASSUMED, `pac
   - `sections` (a list of top-level keys) filters `value` in Rust before it is serialised; absent means all. `origins: ['runner.capabilities']` returns provenance (layer, role, file, line, column, described) for those paths only.
   - The snapshot goes through the addon-owned cache (C5): a `Mutex<Vec<(SnapshotRequest, SnapshotCache)>>` of at most 8 entries, evicting the least recently used; each call still opens and hashes every source (`snapshot_cached`), so a hit is never stale. No other process-global state.
   - `json` is the value as JSON text; `revisions` is the per-source byte revision map; `accounts` is `present | unavailable-confined`. A refusal list becomes the failure message JSON (`ids`, each with file, line, column, path, keyword; never a value, `redact`'s display form for anything shown).
-- **`explain({ projectRoot?, globalDir, class, path })`:** D's `inspect.rs` explain [D-ASSUMED]: schema node (description, type, enum or bounds, standard value, scope, owner) and where the current value comes from, redacted (`gateway.token` is `<redacted>`, acceptance 15). One entry, no formatting.
+- **`explain({ projectRoot?, globalDir, class, path })`:** `inspect::explain`: schema node (description, type, enum or bounds, standard value, scope, owner) and where the current value comes from, redacted (`gateway.token` is `<redacted>`, acceptance 15). One entry, no formatting.
 - **`applyPatch({ projectRoot?, globalDir, class, target, expected, edits, reason, acknowledgeCommentLoss? })`:** builds `WriteRequest` (`lock_wait_ms` default of the crate), resolves the writer id in the addon (`resolve_current`), calls `commit`. `edits` are `{ set: <path text>, value }` or `{ unset: <path text> }` (D18's patch element shape, paths in YAML Document's path text form). Returns `{ writerId, newRevision, applied, notices }`. A confined `class` is `config-write-confined`; a legacy JSON target is `config-format-legacy-json` (named so a person knows the global file must be converted first, Ideas I2).
 - **`init({ projectRoot?, globalDir, class, target })`:** phase 05's `init`; `{ created, revision }`.
 - All four run inside `marshal::guarded` (a panic is `yaml-internal-error`'s sibling `config-internal-error`, nothing printed) and call `check()?` first.
