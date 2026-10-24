@@ -224,10 +224,10 @@ test('workflow Land refuses a scoped branch when the lease is acquired after adm
       acquireDocumentationCutoverLease({ repoRoot: holder });
       heldTarget = git(tmp, ['rev-parse', 'main']);
     };
-    t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+    t.mock.method(native.GitLand.prototype, 'prepare', async function(args, loans) {
       assert.equal(args.request.target, undefined, 'Workflow lets Land select the target under its slot');
       if (timing === 'before prepare') acquire();
-      const result = prepare.call(this, args, loans);
+      const result = await prepare.call(this, args, loans);
       preparedTarget = result.candidate.target;
       assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
       if (timing === 'after prepare') acquire();

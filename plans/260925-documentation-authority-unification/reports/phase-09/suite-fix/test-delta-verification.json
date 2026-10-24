@@ -1,0 +1,32 @@
+[
+  {
+    "path": "test/runner/merge-land.test.mjs",
+    "beforeSha256": "ca9abf9cda8fcc7662660cfa83239e1d03b9433e30fbf0529b6b28f652fc12de",
+    "afterSha256": "adc49e4b5050dbc6c16ba28005b67fd6cbf845a28cc329b0897c73356b0e162c",
+    "onlyChanges": [
+      "race prepare callback becomes async",
+      "await the original native prepare before reading candidate"
+    ],
+    "allAssertionsUnchanged": true,
+    "timings": [
+      "before prepare",
+      "after prepare",
+      "before publish"
+    ]
+  },
+  {
+    "path": "test/workflow/units-runner.test.mjs",
+    "beforeSha256": "0f29b78cb3216458bd51fffb6eec5df267b39bc78821f17e12b5a3a45f40ee32",
+    "afterSha256": "42266e6edae72aaf3651e2343cb7acda22d86ae65852a17b501bf3828c6cafcd",
+    "onlyChanges": [
+      "race prepare callback becomes async",
+      "await the original native prepare before reading candidate"
+    ],
+    "allAssertionsUnchanged": true,
+    "timings": [
+      "before prepare",
+      "after prepare",
+      "before publish"
+    ]
+  }
+]

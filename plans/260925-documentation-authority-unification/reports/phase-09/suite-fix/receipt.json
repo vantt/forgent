@@ -1,0 +1,272 @@
+{
+  "status": "blocked",
+  "implementationComplete": true,
+  "inputHead": "a1fae5356b18b990d554c527396fe9295ba1f53d",
+  "summary": "The two native prepare race mocks now await the real call, and the working identity registry was regenerated through the existing repo-wide carry door; liveness passes. Both native owning files still require a scope-safe staging prerequisite before behavioral verification.",
+  "needsWrites": [
+    ".fgos/runtime/git-addon/f5c96e7ee8b7c094",
+    "target"
+  ],
+  "blocker": "Native addon preflight refuses git-addon-not-shipped. The owning test helpers may stage a source addon/host under the real .fgos/runtime and build under target, both forbidden by this brief; neither native test file was launched.",
+  "impactAnalysis": "degraded/unqueried: no fgos CLI permitted; no GitNexus MCP available; no production symbol edited",
+  "changedFiles": [
+    {
+      "path": "test/runner/merge-land.test.mjs",
+      "sha256": "adc49e4b5050dbc6c16ba28005b67fd6cbf845a28cc329b0897c73356b0e162c"
+    },
+    {
+      "path": "test/workflow/units-runner.test.mjs",
+      "sha256": "42266e6edae72aaf3651e2343cb7acda22d86ae65852a17b501bf3828c6cafcd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "sha256": "ed7aae4bc6f77278798c379272e447b02efb0abc0ef9795bd1b3fc1316c151e4"
+    }
+  ],
+  "registryVerification": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/registry-verification.json",
+  "testDeltaVerification": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/test-delta-verification.json",
+  "retainedPriorPositionalClaimGap": {
+    "sourcePath": "docs/specs/runner.md",
+    "unitDigest": "55c1c25e819877a9e58061b75445d3c53dd7f64a3b419265eb83c83a0aaea357",
+    "identityFingerprint": "55c1c25e819877a9e58061b75445d3c53dd7f64a3b419265eb83c83a0aaea357",
+    "claimId": "claim_61a0b93a66cba6f9c5c26df7a71fc834",
+    "sourceAnchor": "unheaded-block-93",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fb0b0100d01cc28afe5e8d2ae3ba8d328efc1fdd898875895f80a70b211a20fc",
+    "claimKind": "decision",
+    "status": "current",
+    "origin": "added-since-1b3302680be9ba9559d431cbef4c83cacca91216",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-93 is not a stable heading anchor"
+  },
+  "installationSource": "import fs from 'node:fs';\nimport assert from 'node:assert/strict';\nimport crypto from 'node:crypto';\nimport { execFileSync } from 'node:child_process';\nimport { extractMarkdownConservationUnits } from '/home/vantt/projects/forgentX-p9-w1-d3/scripts/generate-doc-inventory.mjs';\nconst scratch = '/tmp/fgos-work/w4-suite-fix-brief/';\nconst target = 'plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json';\nconst original = fs.readFileSync(target);\nconst generated = fs.readFileSync(scratch + 'current-registry.json');\nconst old = JSON.parse(original), next = JSON.parse(generated);\nconst sha = b => crypto.createHash('sha256').update(b).digest('hex');\nconst all = r => [...r.units, ...(r.identityGaps || []), ...(r.retiredUnits || [])];\nconst oldIds = new Set(all(old).map(r => r.claimId)), nextIds = new Set(all(next).map(r => r.claimId));\nassert.equal(all(old).length, oldIds.size, 'old claim ids are unique across populations');\nassert.equal(all(next).length, nextIds.size, 'new claim ids are unique across populations');\nconst lost = [...oldIds].filter(id => !nextIds.has(id));\nassert.deepEqual(lost, [], 'carry never loses a prior claim id');\nconst source = 'docs/specs/runner.md';\nconst current = extractMarkdownConservationUnits(fs.readFileSync(source, 'utf8'));\nconst registered = next.units.filter(r => r.sourcePath === source);\nassert.deepEqual(current.map(r => [r.anchor, r.textDigest]).sort(), registered.map(r => [r.sourceAnchor, r.sourceUnitDigest]).sort());\nconst head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();\nassert.equal(next.commit, head);\nconst blob = execFileSync('git', ['rev-parse', `${head}:${source}`], { encoding: 'utf8' }).trim();\nconst doc = next.documents.find(r => r.path === source);\nassert.equal(doc.blobSha, blob);\nassert.equal(doc.sourceDigest, sha(fs.readFileSync(source)));\nconst oldMap = new Map(old.units.filter(r => r.sourcePath === source).map(r => [r.sourceAnchor, r]));\nconst changed = registered.filter(r => oldMap.get(r.sourceAnchor)?.sourceUnitDigest !== r.sourceUnitDigest).map(r => ({ anchor: r.sourceAnchor, before: oldMap.get(r.sourceAnchor) || null, after: r }));\nassert.equal(registered.find(r => r.sourceAnchor === 'business-rules').sourceUnitDigest, 'f182ae334ab9402bcb21c9a4568e96cea5a0fde149656b2722f152dcb16a45e9');\nfs.copyFileSync(scratch + 'current-registry.json', target);\nassert.deepEqual(fs.readFileSync(target), generated, 'persisted bytes equal native generator output');\nconst counts = r => Object.fromEntries(['documents', 'units', 'identityGaps', 'retiredUnits', 'retiredDocuments'].map(k => [k, (r[k] || []).length]));\nconst proof = { inputHead: head, target, generator: 'scripts/generate-doc-inventory.mjs --carry-forward-identity-registry (repo-wide)', oldCommit: old.commit, newCommit: next.commit, beforeSha256: sha(original), afterSha256: sha(generated), beforeBytes: original.length, afterBytes: generated.length, beforeCounts: counts(old), afterCounts: counts(next), carryForward: next.carryForward, oldClaimIds: oldIds.size, newClaimIds: nextIds.size, lostClaimIds: lost, uniqueClaimIds: true, persistedGeneratorByteEquality: true, runner: { source, blob, sourceDigest: doc.sourceDigest, beforeUnits: oldMap.size, afterUnits: registered.length, completeAnchorDigestEquality: true, changed } };\nfs.writeFileSync(scratch + 'registry-verification.json', JSON.stringify(proof, null, 2) + '\\n');\nconsole.log(JSON.stringify(proof, null, 2));\n",
+  "commands": [
+    {
+      "label": "liveness-before",
+      "argv": [
+        "node",
+        "--test",
+        "test/scripts/doc-runner-liveness.test.mjs"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 1,
+      "seconds": 0.689,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/liveness-before.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/liveness-before.log",
+      "logSha256": "2a290fd8a2b6dd714841bf499e4c4eaa14cdf05fcde4cdfdb6164b014ce5b00d"
+    },
+    {
+      "label": "carry-single",
+      "argv": [
+        "node",
+        "scripts/generate-doc-inventory.mjs",
+        "--carry-forward-identity-registry",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--commit",
+        "HEAD",
+        "--source-path",
+        "docs/specs/runner.md",
+        "--json-out",
+        "/tmp/fgos-work/w4-suite-fix-brief/runner-registry.json"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 1,
+      "seconds": 0.299,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/carry-single.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/carry-single.log",
+      "logSha256": "48a4a303ba32788c444f5f5fd6797baef5da82234c23c73ad2044ce19120bf71"
+    },
+    {
+      "label": "carry-repo",
+      "argv": [
+        "node",
+        "scripts/generate-doc-inventory.mjs",
+        "--carry-forward-identity-registry",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--commit",
+        "HEAD",
+        "--json-out",
+        "/tmp/fgos-work/w4-suite-fix-brief/current-registry.json"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 3.224,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/carry-repo.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/carry-repo.log",
+      "logSha256": "78ca40c0ffca3c6878878d35639797df1d1536954d012089474be3f522addb3c"
+    },
+    {
+      "label": "install-registry",
+      "argv": [
+        "node",
+        "/tmp/fgos-work/w4-suite-fix-brief/install-registry.mjs"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 0.616,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/install-registry.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/install-registry.log",
+      "logSha256": "7f7983d58cc38dac62bfa9bf3416d7e3478e636c434c35109fe389a3669ce48b"
+    },
+    {
+      "label": "liveness-after",
+      "argv": [
+        "node",
+        "--test",
+        "test/scripts/doc-runner-liveness.test.mjs"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 2.802,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/liveness-after.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/liveness-after.log",
+      "logSha256": "a374d07a487daa0adf11438a5e38e1964bd32955e25f159c350a4c354d5067c0"
+    },
+    {
+      "label": "merge-land-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "test/runner/merge-land.test.mjs"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 0.019,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/merge-land-syntax.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/merge-land-syntax.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "units-runner-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "test/workflow/units-runner.test.mjs"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 0.015,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/units-runner-syntax.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/units-runner-syntax.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "native-preflight",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import {loadNativeAddon} from './src/git/native.mjs'; try { console.log('native addon loadable:', !!loadNativeAddon().GitLand); } catch(e) { console.error(e.code, e.message); process.exitCode=1; }"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 1,
+      "seconds": 0.035,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/native-preflight.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/native-preflight.log",
+      "logSha256": "4ca90ab904dd99b7a36f6136640264ebad7462cb5fb74d285d8dffb3033690c7"
+    },
+    {
+      "label": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "environment": {
+        "unset": [
+          "CLAUDE_CODE_SESSION_ID"
+        ],
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "TMPDIR": "/tmp/fgos-work/w4-suite-fix-brief"
+      },
+      "exit": 0,
+      "seconds": 0.374,
+      "scratchLog": "/tmp/fgos-work/w4-suite-fix-brief/diff-check.log",
+      "log": "plans/260925-documentation-authority-unification/reports/phase-09/suite-fix/logs/diff-check.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notRun": [
+    {
+      "argv": [
+        "node",
+        "--test",
+        "test/runner/merge-land.test.mjs"
+      ],
+      "exit": null,
+      "reason": "Unsafe automatic native staging outside scope; see read-only preflight and staging source inspection."
+    },
+    {
+      "argv": [
+        "node",
+        "--test",
+        "test/workflow/units-runner.test.mjs"
+      ],
+      "exit": null,
+      "reason": "Unsafe automatic native staging outside scope; see read-only preflight and staging source inspection."
+    }
+  ],
+  "constraints": {
+    "repositoryGitWrites": false,
+    "fgosCli": false,
+    "npmTest": false,
+    "fullSuiteLauncher": false,
+    "cargoInvocations": false,
+    "realLeaseHeld": false,
+    "pairAccounting": false,
+    "assertionsWeakened": false,
+    "skipSwitchAdded": false,
+    "registryHashHandEdited": false,
+    "markdownPreview": "Deferred to Lead; no preview service started."
+  }
+}

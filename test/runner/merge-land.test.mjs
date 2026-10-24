@@ -114,10 +114,10 @@ test('runner Land refuses a scoped branch when the lease is acquired after admis
         acquireDocumentationCutoverLease({ repoRoot: holder });
         heldTarget = f.git('rev-parse', 'main');
       };
-      t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+      t.mock.method(native.GitLand.prototype, 'prepare', async function(args, loans) {
         assert.equal(args.request.target, undefined, 'no resolution bytes require a pre-slot target');
         if (timing === 'before prepare') acquire();
-        const result = prepare.call(this, args, loans);
+        const result = await prepare.call(this, args, loans);
         preparedTarget = result.candidate.target;
         assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
         if (timing === 'after prepare') acquire();

@@ -1,0 +1,122 @@
+{
+  "inputHead": "a1fae5356b18b990d554c527396fe9295ba1f53d",
+  "target": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+  "generator": "scripts/generate-doc-inventory.mjs --carry-forward-identity-registry (repo-wide)",
+  "oldCommit": "1bd5df87fa3367b03500c5fedf2290b77e159276",
+  "newCommit": "a1fae5356b18b990d554c527396fe9295ba1f53d",
+  "beforeSha256": "c7b0748783d709fde070b361105361bc4c4b4810c47a65dd9a2cc63c98ac49e0",
+  "afterSha256": "ed7aae4bc6f77278798c379272e447b02efb0abc0ef9795bd1b3fc1316c151e4",
+  "beforeBytes": 63421305,
+  "afterBytes": 63894546,
+  "beforeCounts": {
+    "documents": 4501,
+    "units": 93220,
+    "identityGaps": 6125,
+    "retiredUnits": 2366,
+    "retiredDocuments": 27
+  },
+  "afterCounts": {
+    "documents": 4508,
+    "units": 93887,
+    "identityGaps": 6276,
+    "retiredUnits": 2500,
+    "retiredDocuments": 27
+  },
+  "carryForward": {
+    "fromCommit": "1bd5df87fa3367b03500c5fedf2290b77e159276",
+    "toCommit": "a1fae5356b18b990d554c527396fe9295ba1f53d",
+    "oldUnits": 93220,
+    "newUnits": 93887,
+    "kept": 92426,
+    "paired": 367,
+    "moved": 2,
+    "editedKept": 140,
+    "added": 952,
+    "gaps": 151,
+    "retired": 134,
+    "retiredDocuments": 0
+  },
+  "oldClaimIds": 101711,
+  "newClaimIds": 102663,
+  "lostClaimIds": [],
+  "uniqueClaimIds": true,
+  "persistedGeneratorByteEquality": true,
+  "runner": {
+    "source": "docs/specs/runner.md",
+    "blob": "144945ba6919df51e8024122a40dff17809bab88",
+    "sourceDigest": "88d0e89522a29eed0d222da57c26c1dfd3912cd3e463e36887e211bbf74e5279",
+    "beforeUnits": 517,
+    "afterUnits": 517,
+    "completeAnchorDigestEquality": true,
+    "changed": [
+      {
+        "anchor": "business-rules",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "01b8ac6346167075053b867fbd200ff6e6852c20a3dbf8517d5758cfb02995d7",
+          "identityFingerprint": "9fecfaf406fbf3dd2a113858497d58f267af3b13ea078d70b8cf717e5d9256c3",
+          "claimId": "claim_32d366486b72925c171d9fefc84179e2",
+          "sourceAnchor": "business-rules",
+          "unitKind": "heading",
+          "sourceUnitDigest": "ebb1251fe8dcc705c0b4c744c15cf98d9f22e079cd0063af95388dece698b97c",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "1b3302680be9ba9559d431cbef4c83cacca91216",
+            "fromUnitDigest": "56bb68487ef720dabed626540be41d5feec3f9707a46d5737216958d711baf9f",
+            "toUnitDigest": "01b8ac6346167075053b867fbd200ff6e6852c20a3dbf8517d5758cfb02995d7",
+            "fromSourceUnitDigest": "ea53dcf41e96018b4bf8f15bc8822619957469612f7223e19063d8e9de2f0d01",
+            "toSourceUnitDigest": "ebb1251fe8dcc705c0b4c744c15cf98d9f22e079cd0063af95388dece698b97c"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "a6ad6b9abee3df82dcf26315a3a0a4a26088402837d6b30b55d16dac3e4c89ca",
+          "identityFingerprint": "8f43c0b4c38663cb386e82395f42969146cfee035080130a3e3961e72454507c",
+          "claimId": "claim_32d366486b72925c171d9fefc84179e2",
+          "sourceAnchor": "business-rules",
+          "unitKind": "heading",
+          "sourceUnitDigest": "f182ae334ab9402bcb21c9a4568e96cea5a0fde149656b2722f152dcb16a45e9",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "1bd5df87fa3367b03500c5fedf2290b77e159276",
+            "fromUnitDigest": "01b8ac6346167075053b867fbd200ff6e6852c20a3dbf8517d5758cfb02995d7",
+            "toUnitDigest": "a6ad6b9abee3df82dcf26315a3a0a4a26088402837d6b30b55d16dac3e4c89ca",
+            "fromSourceUnitDigest": "ebb1251fe8dcc705c0b4c744c15cf98d9f22e079cd0063af95388dece698b97c",
+            "toSourceUnitDigest": "f182ae334ab9402bcb21c9a4568e96cea5a0fde149656b2722f152dcb16a45e9"
+          }
+        }
+      },
+      {
+        "anchor": "unheaded-block-93",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "55c1c25e819877a9e58061b75445d3c53dd7f64a3b419265eb83c83a0aaea357",
+          "identityFingerprint": "55c1c25e819877a9e58061b75445d3c53dd7f64a3b419265eb83c83a0aaea357",
+          "claimId": "claim_61a0b93a66cba6f9c5c26df7a71fc834",
+          "sourceAnchor": "unheaded-block-93",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "fb0b0100d01cc28afe5e8d2ae3ba8d328efc1fdd898875895f80a70b211a20fc",
+          "claimKind": "decision",
+          "status": "current",
+          "origin": "added-since-1b3302680be9ba9559d431cbef4c83cacca91216"
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "5c15fd9947dc9cdda55562d88958a2fe277f68a043093643391aa787f1ebd413",
+          "identityFingerprint": "5c15fd9947dc9cdda55562d88958a2fe277f68a043093643391aa787f1ebd413",
+          "claimId": "claim_aced8046b189f10f7a40fc9bb892a7bb",
+          "sourceAnchor": "unheaded-block-93",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+          "claimKind": "decision",
+          "status": "current",
+          "origin": "added-since-1bd5df87fa3367b03500c5fedf2290b77e159276"
+        }
+      }
+    ]
+  }
+}
