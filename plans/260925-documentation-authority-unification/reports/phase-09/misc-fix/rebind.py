@@ -11,7 +11,7 @@ SHARD = P/'ledger/decisions/s17-misc-review-fixes.json'
 sys.path.insert(0, str(P/'reports/phase-09/ledgerfix'))
 from bindings import documents, rows, supersessions, effective, at, digest, payload, sha, KEYS, head
 PATHS = ['docs/platform/packaging-distribution/spec.md', 'docs/reading-map.md']
-SCRATCH = pathlib.Path('/tmp/fgos-work/w4-misc-fix-brief')
+SCRATCH = pathlib.Path('/tmp/fgos-work/w5-misc-rework')
 FIELDS = ['anchor','unitKind','title','textDigest','startLine','endLine','ancestry']
 
 
@@ -62,7 +62,7 @@ def generate(pin):
                            rebindReason='Scoped truth/navigation correction; complete preimage and current unit/neighbour witnesses in reports/phase-09/misc-fix/binding-refresh.json. Independent review pending; no approval inherited.')
             if loc: overlay['placement']=loc
             if file==PATHS[0] and old['anchor']=='unheaded-block-90':
-                overlay['disposition']=dict(kind='adapted-or-retired-legacy-clause',reason='Restore reconcile-scan pane-id reporting clause; current enumeration is 141 checks (133 literal plus 8 loop-registered Git IDs) and 32 fixes, not the historical 143-check adjudication.')
+                overlay['disposition']=dict(kind='adapted-or-retired-legacy-clause',reason='Restore reconcile-scan pane-id reporting clause; current enumeration is 141 checks (136 literal plus 5 loop-registered Git ids) and 32 fixes, not the historical 143-check adjudication.')
             changes.append(dict(shard=f,pointer=ptr,overlayPointer='/bindingRefresh/'+str(len(overlays)),
                                 oldBinding=payload(r),newBinding=updated,
                                 before=placement(before,old),after=placement(after,new),contentChanged=old['textDigest']!=new['textDigest']))

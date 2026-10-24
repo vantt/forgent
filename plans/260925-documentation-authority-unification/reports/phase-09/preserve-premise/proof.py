@@ -54,8 +54,9 @@ def unit_at(source, lines):
     return '\n'.join(text[start:end])
 
 
-def historical_evidence(source, line, reason, unit, span):
-    """Content + position + reason, not a role/path whitelist."""
+def historical_evidence(source, lines, reason, unit, span):
+    """Content + bound positions + reason, not a role/path whitelist."""
+    line = min(lines)
     prefix = '\n'.join(source.splitlines()[:line])
     current = source.splitlines()[line-1]
     # A file-level Purpose label cannot swallow the live wrapper above its
@@ -114,10 +115,17 @@ def historical_evidence(source, line, reason, unit, span):
     if 'Whole-source architecture carriage' in reason and re.search(r'(?m)^Writer type: Agent carriage',source[:7000]) and re.search(r'(?m)^Purpose: Preserve the complete',source[:7000]):
         return {'kind':'explicit-whole-source-carriage-header','text':'Writer type: Agent carriage; Purpose: Preserve the complete'}
     if re.search(r'(?i)(?:upstream source coordinates|external.project|literal example|illustrative|adversarial)', reason):
-        # The span often contains only a path. Inspect its bound unit, never
-        # the whole file or the record's claimed role (L12-35(1)).
-        marker = re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)', unit)
-        if marker: return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
+        # Path-only spans need their physical lines, not unit_at()'s expanded
+        # paragraph/comment: another line's example cannot frame this citation.
+        bound_text = '\n'.join(source.splitlines()[n-1] for n in lines)
+        marker = re.search(r'(?i)(?:e\.g\.|for example|ví dụ|example project|upstream source|external project)', bound_text)
+        if marker:
+            # Prefer the path's own placeholder as the citation where available
+            # (e.g. <id>), without admitting any new marker-free rows.
+            placeholder = re.search(r'<[\w-]+>', span.get('text',''))
+            if placeholder and span['text'] in bound_text:
+                return {'kind':'explicit-path-placeholder', 'text':span['text'], 'placeholder':placeholder[0]}
+            return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
     return None
 
 
@@ -136,7 +144,7 @@ def main():
     ap.add_argument('--out', type=pathlib.Path, default=HERE)
     ap.add_argument('--pin', default='HEAD', help='Commit whose tracked source blobs are proved')
     args = ap.parse_args()
-    assert args.out.resolve() == HERE or any(str(args.out.resolve()).startswith(p) for p in ['/tmp/fgos-work/w4-misc-fix-brief/', '/tmp/fgos-work/w2-d4b/'])
+    assert args.out.resolve() == HERE or any(str(args.out.resolve()).startswith(p) for p in ['/tmp/fgos-work/w5-misc-rework/'])
     args.out.mkdir(parents=True, exist_ok=True)
     pin = git('rev-parse','--verify',args.pin+'^{commit}').decode().strip()
     matrix = json.loads((OLD/'step-07-consumer-cutover-matrix.json').read_text())
@@ -167,7 +175,7 @@ def main():
         if file not in source_cache:
             source_cache[file] = git('show',pin+':'+file).decode() if tracked.get(file) in ('100644','100755') else None
         return source_cache[file]
-    base = pathlib.Path('/tmp/fgos-work/w4-misc-fix-brief');base.mkdir(parents=True,exist_ok=True)
+    base = pathlib.Path('/tmp/fgos-work/w5-misc-rework');base.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='preserve-',dir=base) as name:
         scratch = pathlib.Path(name)
         run = subprocess.run(['node',str(HERE/'physical-move.mjs'),pin,name],cwd=ROOT,capture_output=True,text=True,check=True)
@@ -227,7 +235,7 @@ def main():
             inside_snapshot = bool(snapshot and current_line and current_line > source.count('\n',0,snapshot.start())+1)
             wrapper = bool(bound and not inside_snapshot and 'docs/specs/runner.md' in current_text and
                            ('Superseded by:' in current_text or ('CoordinationSession' in current_text and re.search(r'(?i)retir|history|historical',current_text))))
-            evidence = historical_evidence(source,current_line,reason,unit,spans[0]) if bound else None
+            evidence = historical_evidence(source,bound,reason,unit,spans[0]) if bound else None
             if bound and 'frozen rename copy at 4ee0e3a3c' in reason:
                 origin = git('show','4ee0e3a3c:'+rec['file']).decode()
                 if source == origin:
@@ -295,25 +303,27 @@ def main():
         probes = []
         for case, source, line, text, reason in [
             ('live pointer with unrelated example forty lines away', 'See docs/specs/x.md\n'+'\n'*40+'e.g. unrelated example\n', 1, 'See docs/specs/x.md', 'literal example; retained native path'),
+            ('marker elsewhere in the same bound unit', 'See docs/specs/x.md\ne.g. an unrelated timeout value\n', 1, 'docs/specs/x.md', 'literal example; retained native path'),
             ('navigation row under Bee title', '# Bee\n\n| Read first | docs/specs/x.md |\n', 3, '| Read first | docs/specs/x.md |', 'external.project literal example'),
             ('historical reason with mismatching passage', '# History\n\n2026-10-23 completed docs/specs/x.md\n', 3, '2026-10-23 completed docs/specs/other.md', 'dated completed history'),
         ]:
             spans = [dict(line=line,text=text)]
             bound = bind_spans(source,spans)
-            evidence = historical_evidence(source,min(bound),reason,unit_at(source,bound),spans[0]) if bound else None
+            evidence = historical_evidence(source,bound,reason,unit_at(source,bound),spans[0]) if bound else None
             actual = premise(True,bool(bound),False,evidence,False)
-            probes.append(dict(case=case,source=source,sourceSha256=sha(source),spans=spans,reason=reason,bound=bound,evidence=evidence,actual=actual))
+            probes.append(dict(case=case,source=source,sourceSha256=sha(source),spans=spans,reason=reason,bound=bound,currentUnit=unit_at(source,bound) if bound else None,evidence=evidence,actual=actual))
         assert all(p['actual'].startswith('park-') and p['evidence'] is None for p in probes)
         positives = []
         for case, source, reason, expected in [
             ('example framing in the actual passage', 'For example docs/specs/x.md', 'literal example', 'explicit-external-or-example-framing'),
+            ('cite the bound placeholder rather than a same-line marker', 'For example docs/history/<id>/proof.md', 'illustrative convention', 'explicit-path-placeholder'),
             ('source text after explicit snapshot boundary', '# Literal Snapshot\n\ndocs/specs/x.md', 'inside literal carriage', 'literal-carriage-section'),
         ]:
             line = len(source.splitlines())
             # A real census span is path-only; a whole-line span masks this bug.
-            span = dict(line=line,text='docs/specs/x.md')
+            span = dict(line=line,text='docs/history/<id>/proof.md' if expected=='explicit-path-placeholder' else 'docs/specs/x.md')
             bound = bind_spans(source,[span])
-            evidence = historical_evidence(source,line,reason,unit_at(source,bound),span)
+            evidence = historical_evidence(source,bound,reason,unit_at(source,bound),span)
             assert evidence and evidence['kind']==expected
             positives.append(dict(case=case,source=source,span=span,reason=reason,evidence=evidence))
         counts = dict(total=len(rows),byStage=dict(collections.Counter(r['stage'] for r in rows)),byResult=dict(collections.Counter(r['result'] for r in rows)),excludedRetireWithTree=len(retired),recordBatches=len(catalog),finalBatchPopulation=batch_counts)

@@ -1,0 +1,344 @@
+{
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "beforeSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "beforeCounts": {
+    "byResult": {
+      "judgment-preserve-with-dated-note": 163,
+      "park-current-passage-unbound": 137,
+      "park-source-absent": 2,
+      "park-source-removed-by-cutover": 162,
+      "park-unconfirmed-preserve-premise": 1001,
+      "preserve-operand-reachability-unchanged": 1399,
+      "preserve-source-confirmed-history": 2549
+    },
+    "byStage": {
+      "step-03": 4804,
+      "step-04": 609
+    },
+    "excludedRetireWithTree": 38,
+    "finalBatchPopulation": {
+      "step-03": 130,
+      "step-04": 33
+    },
+    "recordBatches": 136,
+    "total": 5413
+  },
+  "afterCounts": {
+    "byResult": {
+      "judgment-preserve-with-dated-note": 163,
+      "park-current-passage-unbound": 137,
+      "park-source-absent": 2,
+      "park-source-removed-by-cutover": 162,
+      "park-unconfirmed-preserve-premise": 1010,
+      "preserve-operand-reachability-unchanged": 1415,
+      "preserve-source-confirmed-history": 2524
+    },
+    "byStage": {
+      "step-03": 4804,
+      "step-04": 609
+    },
+    "excludedRetireWithTree": 38,
+    "finalBatchPopulation": {
+      "step-03": 130,
+      "step-04": 33
+    },
+    "recordBatches": 136,
+    "total": 5413
+  },
+  "beforeExampleFramedRows": 31,
+  "afterExampleFramedRows": 6,
+  "changedRows": [
+    {
+      "rowId": "f00100",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f00166",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f00167",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f00435",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f00445",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f03953",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f07667",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "Ví dụ"
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f07668",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "Ví dụ"
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f07822",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "ví dụ"
+      },
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<id>",
+        "text": "docs/history/<id>/iron-law-evidence.md"
+      }
+    },
+    {
+      "rowId": "f08072",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-source-confirmed-history",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "ví dụ"
+      },
+      "afterEvidence": {
+        "kind": "explicit-path-placeholder",
+        "placeholder": "<feature>",
+        "text": "docs/history/<feature>/"
+      }
+    },
+    {
+      "rowId": "f08621",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08643",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08644",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08645",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08646",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08653",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08656",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08668",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08671",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08680",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08681",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08689",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08700",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08742",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08748",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08749",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08795",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "preserve-operand-reachability-unchanged",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    },
+    {
+      "rowId": "f08817",
+      "beforeResult": "preserve-source-confirmed-history",
+      "afterResult": "park-unconfirmed-preserve-premise",
+      "beforeEvidence": {
+        "kind": "explicit-external-or-example-framing",
+        "text": "e.g."
+      },
+      "afterEvidence": null
+    }
+  ]
+}

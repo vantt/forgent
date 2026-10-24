@@ -1,453 +1,91 @@
 {
-  "status": "done-scoped-independent-review-pending",
-  "sourceHead": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
-  "authority": "w4-misc-fix-brief; L12-137; L12-35(1,7); L12-121",
-  "needsWrites": [],
-  "readFirst": [
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/checks.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json"
-  ],
-  "touchedPaths": [
-    "docs/platform/packaging-distribution/spec.md",
-    "docs/reading-map.md",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/checks.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/receipt.md",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"
-  ],
-  "touchedBindings": [
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/408",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/0",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/409",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/1",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/410",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/2",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/411",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/3",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/436",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/4",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/437",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/5",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
-      "pointer": "/unitCarries/438",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/6",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/849",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/7",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/850",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/8",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/851",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/9",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/852",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/10",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/884",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/11",
-      "contentChanged": false,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/885",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/12",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
-      "pointer": "/sourceBindings/886",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/13",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
-      "pointer": "/unitCarries/557",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/14",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
-      "pointer": "/unitCarries/1",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/15",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
-      "pointer": "/sourceBindings/2",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/16",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
-      "pointer": "/sourceBindings/3",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/17",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
-      "pointer": "/sourceBindings/14",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/18",
-      "contentChanged": true,
-      "claimId": null
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
-      "pointer": "/claims/26",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/19",
-      "contentChanged": true,
-      "claimId": "claim_aa28053a8a4b2ff13690fc6a20044b9f"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
-      "pointer": "/claims/27",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/20",
-      "contentChanged": true,
-      "claimId": "claim_b5695d38282e111f8ed06656b2efa433"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
-      "pointer": "/claims/28",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/21",
-      "contentChanged": true,
-      "claimId": "claim_4eeb2f406288458e61bad21531966ab1"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
-      "pointer": "/registryGaps/0",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/22",
-      "contentChanged": true,
-      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
-      "pointer": "/registryGaps/1",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/23",
-      "contentChanged": true,
-      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
-      "pointer": "/registryGaps/2",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/24",
-      "contentChanged": true,
-      "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
-      "pointer": "/registryGaps/0",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/25",
-      "contentChanged": true,
-      "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
-      "pointer": "/registryGaps/39",
-      "successorShard": "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json",
-      "successorPointer": "/bindingRefresh/26",
-      "contentChanged": true,
-      "claimId": "claim_daaf3726036adad15b2529ad43f71d44"
-    }
-  ],
-  "bindingCounts": {
+  "status": "blocked",
+  "sourceHead": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
+  "authority": "w5-misc-rework-brief; L12-137",
+  "blocker": "The combined preserve-premise verifier requires G2 artifacts at the current pin, but the delivered census remains pinned to 3d0169f390e21c67bc3fc69081fd1bc07186599f outside this write scope. G2's old scratch-path restriction also needs owning-scope adaptation. No check was skipped to claim a passing combined verifier.",
+  "readFirst": ["receipt.md", "checks.json", "rejudgment.json", "../preserve-premise/verification.json"],
+  "registrationCounts": {"Check": 141, "Fix": 32},
+  "doctorCheckSplit": {
+    "literal": 136,
+    "loopRegistered": 5,
+    "loopIds": ["git-worktree-recovery", "git-component-compatible", "git-repository-config", "git-operation-journal", "git-native-locks"],
+    "sourceDerivedAndAsserted": true,
+    "correctedReasonCopies": 9,
+    "knownStaleHistoricalCopy": "../resync-a/adjudications.json still says 143; outside scope, untouched"
+  },
+  "bindings": {
+    "evidence": "binding-refresh.json",
+    "originalPreimagePin": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
     "effectiveBindingsChecked": 283,
-    "changedRows": 27,
-    "contentChangedRows": 21
+    "existingOverlays": 27,
+    "contentOverlays": 21,
+    "neighbourOnlyOverlays": 6,
+    "hashesAndWitnessesUnchanged": true,
+    "reasonStringsRegenerated": 8,
+    "independentReview": "pending"
   },
-  "registrationCounts": {
-    "Check": 141,
-    "Fix": 32
+  "G6Before": {
+    "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+    "sourceConfirmedHistory": 2549,
+    "operandReachabilityUnchanged": 1399,
+    "unconfirmedParks": 1001,
+    "unboundParks": 137,
+    "absentSourceParks": 2,
+    "removedSourceParks": 162,
+    "datedNoteProposals": 163,
+    "exampleFramedRows": 31
   },
-  "G6Counts": {
-    "byResult": {
-      "judgment-preserve-with-dated-note": 163,
-      "park-current-passage-unbound": 137,
-      "park-source-absent": 2,
-      "park-source-removed-by-cutover": 162,
-      "park-unconfirmed-preserve-premise": 1001,
-      "preserve-operand-reachability-unchanged": 1399,
-      "preserve-source-confirmed-history": 2549
-    },
-    "byStage": {
-      "step-03": 4804,
-      "step-04": 609
-    },
+  "G6After": {
+    "total": 5413,
+    "step3": 4804,
+    "step4": 609,
     "excludedRetireWithTree": 38,
-    "finalBatchPopulation": {
-      "step-03": 130,
-      "step-04": 33
-    },
-    "recordBatches": 136,
-    "total": 5413
+    "sourceConfirmedHistory": 2524,
+    "operandReachabilityUnchanged": 1415,
+    "unconfirmedParks": 1010,
+    "unboundParks": 137,
+    "absentSourceParks": 2,
+    "removedSourceParks": 162,
+    "datedNoteProposals": 163,
+    "exampleFramedRowsIncludingPlaceholderCitations": 6,
+    "boundedConfirmations": 3939,
+    "openJudgmentOrNoteRows": 1474,
+    "byteIdenticalArtifacts": 4,
+    "negativeSourceBindingAndEvidenceControls": 4,
+    "positiveEvidenceControls": 3
   },
-  "namedJudgments": [
-    {
-      "rowId": "f00167",
-      "file": "apps/fgos-gateway/src/gateway.rs",
-      "currentLines": [
-        840
-      ],
-      "result": "preserve-source-confirmed-history",
-      "evidence": {
-        "kind": "explicit-external-or-example-framing",
-        "text": "e.g."
-      }
-    },
-    {
-      "rowId": "f07697",
-      "file": "docs/platform/runner/contracts/routing-handoff.md",
-      "currentLines": [
-        17
-      ],
-      "result": "park-unconfirmed-preserve-premise",
-      "evidence": null,
-      "candidateSuccessors": [],
-      "excludedSelfSuccessor": "docs/platform/runner/contracts/routing-handoff.md"
-    },
-    {
-      "rowId": "f07822",
-      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-      "currentLines": [
-        67
-      ],
-      "result": "preserve-source-confirmed-history",
-      "evidence": {
-        "kind": "explicit-external-or-example-framing",
-        "text": "ví dụ"
-      }
-    },
-    {
-      "rowId": "f08033",
-      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "currentLines": [
-        15
-      ],
-      "result": "park-unconfirmed-preserve-premise",
-      "evidence": null,
-      "candidateSuccessors": [],
-      "excludedSelfSuccessor": "docs/platform/work-state/contracts/cli-io-contract.md"
-    },
-    {
-      "rowId": "f08047",
-      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "currentLines": [
-        449
-      ],
-      "result": "park-unconfirmed-preserve-premise",
-      "evidence": null,
-      "candidateSuccessors": [],
-      "excludedSelfSuccessor": "docs/platform/work-state/contracts/cli-io-contract.md"
-    },
-    {
-      "rowId": "f08072",
-      "file": "docs/platform/work-state/spec.md",
-      "currentLines": [
-        85
-      ],
-      "result": "preserve-source-confirmed-history",
-      "evidence": {
-        "kind": "explicit-external-or-example-framing",
-        "text": "ví dụ"
-      }
-    },
-    {
-      "rowId": "f08073",
-      "file": "docs/platform/work-state/spec.md",
-      "currentLines": [
-        85
-      ],
-      "result": "preserve-source-confirmed-history",
-      "evidence": {
-        "kind": "explicit-external-or-example-framing",
-        "text": "ví dụ"
-      }
-    },
-    {
-      "rowId": "f08807",
-      "file": "src/state/work.mjs",
-      "currentLines": [
-        852
-      ],
-      "result": "preserve-source-confirmed-history",
-      "evidence": {
-        "kind": "explicit-external-or-example-framing",
-        "text": "e.g."
-      }
-    }
-  ],
-  "commandsAndExits": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/checks.json#/commands",
-  "byteIdenticalArtifacts": [
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
-      "sha256": "a41a39ff5980c87a6e0ff3e8c679e8c241bcdd86654e009d1a3fb2123d3c937d",
-      "bytes": 16220488,
-      "runsByteIdentical": true,
-      "deliveredBytesEqual": true
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
-      "sha256": "abe4a50b3336b5dec57d0f0c0b3553f89dbcf2ecb31794d596720376ef5a2a9e",
-      "bytes": 18404,
-      "runsByteIdentical": true,
-      "deliveredBytesEqual": true
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
-      "sha256": "7b667b51658b3b86a4d08a036f0065fa43e1a0cc84ceeb9930e3e56509476840",
-      "bytes": 1713469,
-      "runsByteIdentical": true,
-      "deliveredBytesEqual": true
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
-      "sha256": "e11407ee58d16c5db02edddd3564fd748ebf8f62386e5ec4cfce9e84eff18e36",
-      "bytes": 254302,
-      "runsByteIdentical": true,
-      "deliveredBytesEqual": true
-    }
-  ],
-  "scriptDigests": {
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py": "62b0ab433f772f6f2836b746da74a97819f8330c6f7ca1245c60e664f9378861",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py": "ea7c35dea9730b0d087be682e0ee3f9b647c8be5d4076b23ea1b09286d2a63fa",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py": "d7b432a0da9cb4d520140f638f4dd4898505d2388741eef19264fe4c8f2b0ecb",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs": "8ad7402e2f92466c057bf70e9259b843ab0dce3acd52d8fed0e83f3fa86b4cec",
-    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py": "8c9ee89555650ab1665598b69de5189a5127d697c826a00347084d744d983824"
+  "namedRows": {
+    "returnedToPark": ["f00166", "f03953", "f07667", "f08643", "f08645", "f08668", "f08681", "f08748", "f08817"],
+    "stillLineConfirmed": ["f00167", "f08807", "f07822", "f08072", "f08073"],
+    "f07822Evidence": {"kind": "explicit-path-placeholder", "text": "docs/history/<id>/iron-law-evidence.md", "placeholder": "<id>"},
+    "realCitationsWithNoFramingEvidence": ["f00445", "f08621", "f08646", "f08700"],
+    "realCitationResult": "preserve-operand-reachability-unchanged",
+    "qualification": "These four are not parked: existing exact operands survive the physical cutover. The brief's literal parking expectation needs Lead adjudication; no semantic-history or parity claim is made.",
+    "selfSuccessorRowsRemainParked": ["f07697", "f08033", "f08047"]
   },
-  "artifactDigests": {
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/binding-refresh.json": "12187e8b0014ca33c7c603e79c034918fb95aa6a2ae822011fe1ea496e0d85cd",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/checks.json": "ae847ed46ab4c1c31f2c8842d358f301616298c4815c172f986fad9985aafd1c",
-    "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/receipt.md": "4d17d8d3eed12f7a945635745af5917189cccb74aa40b06e1782894ef18c7ecb",
-    "plans/260925-documentation-authority-unification/ledger/decisions/s17-misc-review-fixes.json": "06ad5eb8958bc9732b6a39a2b08676336d7397cedf077cb2f50cddca2ccfec28"
+  "checks": {
+    "rebindCheckExit": 0,
+    "proofAtHeadExit": 0,
+    "miscVerifierExit": 0,
+    "combinedVerifierExit": 1,
+    "diffCheckExit": 0,
+    "scopedEvidence": "checks.json",
+    "combinedEvidence": "../preserve-premise/verification.json"
   },
-  "priorArt": [
-    "10416a6b0: shell raw Git read replaced by disk-layout discovery for one-door gate",
-    "bade6b6b3: original G6 physical-move/source-premise proof",
-    "b25dadae2: pin and source-local predicate follow-up",
-    "Frozen dual Step 0 extractors and existing ledgerfix overlay identity/recipe reused"
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-dynamics.json"
   ],
-  "failedAttempts": [
-    {
-      "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/verify.py",
-      "exit": 1,
-      "cause": "Verifier development: registry-section marker included a nonexistent leading space; corrected exact section extraction and reran all checks successfully."
-    }
-  ],
-  "noReadinessClaim": true,
-  "independentReview": "pending",
+  "untouchedResiduals": ["docs/distribution-vision.md:87", "docs/explanation/iron-law-classification-recipe-path.md:45"],
+  "priorArt": ["ad94156cf", "b25dadae2", "bade6b6b3", "bc5589ed7", "existing dual extractors, overlay recipe and scoped owning-assertion replay"],
+  "scratch": "/tmp/fgos-work/w5-misc-rework/",
+  "impactAnalysis": "degraded/unqueried: CLI forbidden, no exposed GitNexus tool",
+  "notRun": ["fgos CLI/lifecycle", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "setup/doctor execution", "product tests (records-only work)", "pair accounting (Lead custody)", "markdown preview (Lead custody)"],
   "noRepositoryGitMutation": true,
-  "followup": [
-    {
-      "owner": "Final-pin Lead",
-      "action": "Join gate-register bindings through the 27 explicit overlay successors; rerun integrated-source proof at final F and independent delta reviews."
-    },
-    {
-      "owner": "Lead",
-      "action": "Pair accounting after runner commit; G2 refresh and full combined verifier, retained parks and wrapper compositions remain outside this scoped receipt."
-    }
-  ],
-  "notRun": [
-    "combined G2/G6 verify.py (requires fresh G2 artifacts and clean source bytes at final pin; outside this brief)",
-    "npm test / scripts/run-tests.mjs / cargo workspace suite (forbidden or outside scoped record work)",
-    "fgos CLI, impact query, setup/doctor, lifecycle verbs (forbidden)",
-    "gate-register rejoin and pair accounting (final-pin Lead custody)",
-    "markdown preview (Lead custody; no extra service/state writes)"
-  ],
-  "impactAnalysis": "degraded/unqueried under no-CLI and no exposed GitNexus capability"
+  "noComponentBoundaryChange": true,
+  "noReadinessClaim": true,
+  "independentReview": "pending"
 }

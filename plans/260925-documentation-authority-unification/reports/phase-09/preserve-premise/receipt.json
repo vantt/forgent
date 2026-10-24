@@ -1,90 +1,75 @@
 {
-  "sourceCommit": "3d0169f390e21c67bc3fc69081fd1bc07186599f",
-  "supersedesReceiptAtCommit": "bade6b6b3",
+  "status": "blocked",
+  "sourceCommit": "4178dcc6e3445d5d9b8ffd55963cdd02a418af73",
   "gateId": "step3-step4-preserve-premise-review",
-  "status": "followup-records-complete-owned-judgments-open",
+  "blocker": "Combined G2/G6 verification exits 1: delivered G2 census pin is stale and its refresh/plumbing are outside the exact writable list. The required both-verifiers-exit-0 condition remains unmet.",
   "independentApproval": false,
   "noReadinessClaim": true,
-  "counts": {
+  "countsBefore": {
+    "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+    "sourceConfirmedHistory": 2549,
+    "operandReachabilityUnchanged": 1399,
+    "unconfirmedParks": 1001,
+    "unboundParks": 137,
+    "absentSourceParks": 2,
+    "removedSourceParks": 162,
+    "datedNoteProposals": 163,
+    "exampleFramedRows": 31
+  },
+  "countsAfter": {
     "step3Preserves": 4804,
     "step4Preserves": 609,
     "premiseRows": 5413,
     "excludedRetireWithTree": 38,
-    "finalStep3Batches": 130,
-    "finalStep4Batches": 33,
     "matrixCatalogBatches": 136,
     "verifiedZeroEdgeBatches": 27,
-    "sourceConfirmedHistory": 2526,
-    "operandReachabilityUnchanged": 1426,
-    "boundedConfirmations": 3952,
-    "ownedUnconfirmedPremiseParks": 1019,
-    "ownedUnboundPassageParks": 115,
-    "ownedAbsentSourceParks": 2,
-    "ownedRemovedSourceParks": 162,
-    "totalParks": 1298,
-    "leadDatedNoteProposals": 163,
-    "proposalSourceFiles": 90,
-    "allWrapperLinesIndependentlyEnumerated": 163,
-    "namedReviewBatchFilesCovered": 73,
-    "namedReviewBatchFilesMissing": 0,
-    "namedLivePointersParkedWithSuccessors": 29,
-    "namedDeletedConsumerRowsParked": 5,
-    "missedWrappersNowNoted": 11,
-    "physicalOldPathsRemoved": 1039,
-    "indexBefore": 492,
-    "indexAfter": 490,
-    "negativeL12_121ControlProbes": 3,
-    "negativeSourceBindingAndEvidenceProbes": 3,
-    "positiveEvidenceControls": 2,
-    "byteIdenticalArtifactsAcrossG2AndG6": 8
+    "sourceConfirmedHistory": 2524,
+    "operandReachabilityUnchanged": 1415,
+    "boundedConfirmations": 3939,
+    "unconfirmedParks": 1010,
+    "unboundParks": 137,
+    "absentSourceParks": 2,
+    "removedSourceParks": 162,
+    "totalParks": 1311,
+    "datedNoteProposals": 163,
+    "openJudgmentOrNoteRows": 1474,
+    "exampleFramedRowsIncludingPlaceholderCitations": 6,
+    "negativeSourceBindingAndEvidenceControls": 4,
+    "positiveEvidenceControls": 3,
+    "byteIdenticalG6Artifacts": 4
   },
-  "touchedIds": {
-    "owningArtifact": "proof.json",
-    "selector": "rows[*].rowId",
-    "count": 5413,
-    "uniqueAndExhaustiveAgainstFinalRecords": true,
-    "retiringSelector": "retire-with-tree.json#rows[*].rowId",
-    "retiringCount": 38,
-    "judgmentSelector": "judgments.json#rows[*].rowId",
-    "judgmentCount": 1461,
-    "historyProposalSelector": "history-wrapper-proposals.json#rows[*].rowId",
-    "meaning": "New source/operand/reason/item-digest evidence only. Original records remain frozen; proposals require Lead co-composition and independent review."
-  },
+  "predicate": "Example markers are searched only on bound currentLines, not currentUnit. For an already line-framed path, cite its own placeholder where present; no new marker-free rows are admitted.",
+  "negativeControlAdded": "A marker on the next line within the same bound unit does not frame the span.",
   "namedFindings": {
-    "livePointers": "All 29 reviewer-named ids are owned parks with evidence=null and reachable candidate successors, individually verified by verify.py.",
-    "deletedConsumerRows": ["f00515", "f00521", "f00525", "f01225", "f08411"],
-    "missedWrapperRows": ["f05646", "f05655", "f05661", "f05671", "f05677", "f05693", "f05720", "f05730", "f05742", "f06391", "f06167"],
-    "f06167": "Before Literal Snapshot; no literal-carriage evidence; preserve-with-dated-note proposal.",
-    "f07526": {"disposition": "repoint-proposal", "successor": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md", "applied": false}
+    "returnedToParkWithNoEvidence": ["f00166", "f03953", "f07667", "f08643", "f08645", "f08668", "f08681", "f08748", "f08817"],
+    "fivePriorRowsStillConfirm": ["f00167", "f08807", "f07822", "f08072", "f08073"],
+    "f07822Evidence": {"kind": "explicit-path-placeholder", "text": "docs/history/<id>/iron-law-evidence.md", "placeholder": "<id>"},
+    "noFramingButStableOperands": ["f00445", "f08621", "f08646", "f08700"],
+    "qualification": "The four real citations lose history/example evidence but are not parked under the existing stable-operand rule. Lead must adjudicate the brief's literal parking expectation; no historical-semantics or runtime-parity claim is made.",
+    "selfSuccessorRowsStillParked": ["f07697", "f08033", "f08047"],
+    "allWrapperPositionsStillCovered": 163,
+    "namedWrapperBatchFilesCovered": 73
   },
-  "commands": [
-    {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
-      "exit": 0
-    },
-    {
-      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py", "--pin", "3d0169f390e21c67bc3fc69081fd1bc07186599f"],
-      "exit": 0,
-      "evidence": "verification.json",
-      "proof": "Two isolated G2 and G6 runs; eight artifact/stdout byte equalities, final identities, real negative/positive probes and independent wrapper-position enumeration."
-    },
-    {"argv": ["git", "diff", "--check"], "exit": 0}
+  "evidence": {
+    "owningRows": "proof.json",
+    "openRows": "judgments.json",
+    "beforeAfterDelta": "../misc-fix/rejudgment.json",
+    "doubleReplayAndOwningAssertions": "../misc-fix/checks.json",
+    "combinedFailure": "verification.json"
+  },
+  "commandExits": {"proofAtHead": 0, "miscVerifier": 0, "combinedVerifierAtHead": 1, "gitDiffCheck": 0},
+  "needsWrites": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-dynamics.json"
   ],
-  "developmentFailures": [
-    {"command": "verify.py --pin 3d0169f390e21c67bc3fc69081fd1bc07186599f (development)", "exit": 1, "reason": "Independent wrapper enumeration attempted the already-absent docs/platform/session-identity/spec.md. Fixed enumeration to scan present sources only; absent premise rows remain parked, not skipped from identity accounting."}
-  ],
-  "priorArt": {
-    "reused": ["W1 exact span binding and reason/operand/source digests", "L12-121 physical scratch move and non-overwriting destination treatment", "unchanged historicalPremise control copied from step-07-post-move-proof.mjs", "owning document/index/knowledge generators", "final Step 4 slotKey recipe and Step 3 records"],
-    "history": "Read bade6b6b3 historical_evidence introduction and L12-26/L12-35/L12-121 before edits; no removed product mechanism restored.",
-    "missingBeforeFollowup": ["real historical_evidence negative probes", "in-passage-only example evidence", "consumer survival check", "uniform source-position wrapper treatment", "explicit pin"]
-  },
-  "impactAnalysis": "degraded/unqueried under no-CLI; only scoped records scripts edited",
-  "notRun": ["product owning tests (no product behavior changed)", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F replay", "independent G6 review", "product note/repoint composition", "markdown preview (Lead custody; no out-of-scope service state)"],
-  "remainingOwners": {
-    "allParksAndNoteOrRepointComposition": "Documentation consumer-composition owner / Lead",
-    "sourceBindingAtFinalPin": "G9 source-binding reviewer / Lead",
-    "independentGateReview": "independent preserve-premise reviewer",
-    "accounting": "Lead"
-  },
-  "needsWrites": []
+  "untouchedResiduals": ["../resync-a/adjudications.json (143 historical doctor count)", "docs/distribution-vision.md:87", "docs/explanation/iron-law-classification-recipe-path.md:45"],
+  "remainingOwner": "Lead: G2 refresh and combined replay, independent review, parking expectation, final-pin replay, co-composition and post-merge accounting",
+  "scratch": "/tmp/fgos-work/w5-misc-rework/",
+  "impactAnalysis": "degraded/unqueried under no-CLI/no exposed GitNexus tool",
+  "noRepositoryGitMutation": true,
+  "noComponentBoundaryChange": true,
+  "notRun": ["fgos CLI/lifecycle", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "product tests (records-only work)", "pair accounting", "markdown preview (Lead custody)"]
 }

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Scoped W4 replay: current bindings, reused registry census, G6 double run.
+"""Scoped misc replay: current bindings, reused registry census, G6 double run.
 The combined G2/G6 verifier remains the final-pin owner's proof; this does not
 refresh census outputs, gate projections, or certify uncommitted docs at --pin.
 """
 import sys
 sys.dont_write_bytecode = True
-import hashlib, json, pathlib, subprocess, tempfile, textwrap
+import hashlib, json, pathlib, re, subprocess, tempfile, textwrap
 HERE=pathlib.Path(__file__).resolve().parent
 ROOT=HERE.parents[4]
 P=pathlib.Path('plans/260925-documentation-authority-unification')
 G6=P/'reports/phase-09/preserve-premise'
-SCRATCH=pathlib.Path('/tmp/fgos-work/w4-misc-fix-brief')
+SCRATCH=pathlib.Path('/tmp/fgos-work/w5-misc-rework')
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 
@@ -29,6 +29,17 @@ def main():
     script="import fs from 'node:fs'; import assert from 'node:assert/strict'; const read=p=>fs.readFileSync(p,'utf8');\n"+code+"\nconsole.log(JSON.stringify(registrations));"
     census=SCRATCH/'registry.mjs';census.parent.mkdir(parents=True,exist_ok=True);census.write_text(script)
     registrations=json.loads(run(['node',str(census)]))
+    code=(ROOT/'src/setup/registrations.mjs').read_text()
+    literal_ids=re.findall(r'''registerCheck\(\{\s*id:\s*['"]([^'"]+)''',code)
+    loops=re.findall(r'for \(const id of \[([^\]]+)\]\) \{\s*registerCheck\(\{ id,',code)
+    loop_ids=[id for loop in loops for id in re.findall(r'''['"]([^'"]+)['"]''',loop)]
+    assert len(re.findall(r'^\s*registerCheck\(\{',code,re.M))==len(literal_ids)+len(loops)
+    assert len(literal_ids)==len(set(literal_ids))==136
+    assert len(loops)==1 and len(loop_ids)==len(set(loop_ids))==5
+    assert all(id.startswith('git-') for id in loop_ids)
+    assert not set(literal_ids)&set(loop_ids)
+    assert len(literal_ids)+len(loop_ids)==registrations['Check']==141
+    split=dict(literal=len(literal_ids),loopRegistered=len(loop_ids),loopIds=loop_ids)
     spec=(ROOT/'docs/platform/packaging-distribution/spec.md').read_text()
     nav=(ROOT/'docs/reading-map.md').read_text()
     assert 'git rev-parse --path-format=absolute --git-common-dir' not in spec
@@ -69,17 +80,17 @@ def main():
     self_links=['f07697','f08033','f08047']
     run(['git','diff','--check'])
     result=dict(status='scoped-replay-passed-not-gate-acceptance',sourceCommit=pin,
-                sourcePinScope='G6 tracked source blobs at input HEAD; changed working-tree docs are separately authenticated by binding-refresh.json, not included in the G6 pin.',
-                commands=commands,comparisons=comparisons,counts=proof['counts'],registrations=registrations,
+                sourcePinScope='G6 tracked source blobs at input HEAD; record inputs remain working-tree inputs. Binding refresh replays its original W4 preimage pin.',
+                combinedVerifierResult=str(G6/'verification.json'),
+                commands=commands,comparisons=comparisons,counts=proof['counts'],registrations=registrations,doctorCheckSplit=split,
                 changedExampleRows=examples,selfLinkProposalsRemoved=self_links,
                 noReadinessClaim=True,independentReview='pending',
-                notRun=['combined G2/G6 verify.py (requires fresh G2 artifacts and clean source bytes at final pin; outside this brief)',
-                        'npm test / scripts/run-tests.mjs / cargo workspace suite (forbidden or outside scoped record work)',
+                notRun=['npm test / scripts/run-tests.mjs / cargo workspace suite (forbidden or outside scoped record work)',
                         'fgos CLI, impact query, setup/doctor, lifecycle verbs (forbidden)',
                         'gate-register rejoin and pair accounting (final-pin Lead custody)',
                         'markdown preview (Lead custody; no extra service/state writes)'])
     (HERE/'checks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-    print(json.dumps(dict(status=result['status'],byteIdenticalArtifacts=len(comparisons),counts=proof['counts'],registrations=registrations),sort_keys=True))
+    print(json.dumps(dict(status=result['status'],byteIdenticalArtifacts=len(comparisons),counts=proof['counts'],registrations=registrations,doctorCheckSplit=split),sort_keys=True))
 
 
 if __name__=='__main__':main()
