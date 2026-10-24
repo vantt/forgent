@@ -152,6 +152,6 @@ Rerun (median ms; worst in the scratch log):
 **Recommendation.** C. The gateway and every doctor row without a project use the machine view, and the main checkout is the common case.
 **Scope of the answer.** Parks phase 09 onward only; the five landing B commits plus these four stand.
 
-Gates after the four commits: `cargo test -p fgos-config -p fgos-node-addon`, clippy `-D warnings`, `cargo fmt -p fgos-config --check` clean; suite-staged `config-door`, `facade`, `native-load`, `yaml`, `architecture`, `release-tree`, `native-addon`, `terminal-control-checks`: 102 pass, 0 fail, 1 skipped (pre-existing). Rust added vs baseline now about +700 of the 870 ceiling (re-count before phase 16).
+Gates after the four commits: `cargo test -p fgos-config -p fgos-node-addon`, clippy `-D warnings`, `cargo fmt -p fgos-config --check` clean; suite-staged `config-door`, `facade`, `native-load`, `yaml`, `architecture`, `release-tree`, `native-addon`, `terminal-control-checks`: 102 pass, 0 fail, 1 skipped (pre-existing). Rust added vs baseline now +739 of the 870 ceiling (re-count before phase 16).
 
 Status: DONE_WITH_CONCERNS. Decisions 1 to 3 and 5 are implemented; two bounds still fail (first read, machine view) and are stopped on round 2 above.
