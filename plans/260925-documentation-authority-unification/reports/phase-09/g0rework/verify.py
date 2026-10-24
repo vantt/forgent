@@ -158,7 +158,14 @@ def main():
         extract = rebind['extract']
         paths = {r['targetOwner'] for _, r in touched}
         parity = json.loads((P / 'reports/phase-09/carries/source-parity.json').read_text())
-        parity_old = json.loads(subprocess.check_output(['git', 'show', 'HEAD:' + str(P / 'reports/phase-09/carries/source-parity.json')], text=True))
+        # Compare with the version before the commit that appended these rows, so the
+        # check holds after the authoring is committed (HEAD already contains them).
+        parity_path = str(P / 'reports/phase-09/carries/source-parity.json')
+        if subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--', parity_path]).returncode:
+            parity_base = 'HEAD'  # uncommitted authoring: HEAD is still the base
+        else:
+            parity_base = subprocess.check_output(['git', 'log', '-1', '--format=%H', '--', parity_path], text=True).strip() + '^'
+        parity_old = json.loads(subprocess.check_output(['git', 'show', parity_base + ':' + parity_path], text=True))
         assert parity[:len(parity_old)] == parity_old
         appended = parity[len(parity_old):]
         assert len(appended) == 21
