@@ -1,0 +1,77 @@
+{
+  "verdict": "REWORK",
+  "commit": "928f5cc14",
+  "summary": "9 APPROVE, 1 REWORK (low, one gloss line). All brief acceptance criteria reproduce.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "Scope: all 17 changed paths under composition/** or ledger/decisions/**.",
+      "evidence": "git show --name-only 928f5cc14"
+    },
+    {
+      "id": "F2",
+      "severity": "high",
+      "verdict": "APPROVE",
+      "summary": "GAP-05: 0 moved units unresolved; 171 origin assertions = 90 s14 terminals + 81 s6 claims superseding into 81 of them; 90 overlays is honest.",
+      "evidence": "bindings.py on replayed tree: without body shard 177 CB unresolved (162+9 s14 + 6 table-edit); with it 6 (4 distinct). All 90 overlays: hash, supersedesBinding hash, payload==live s14 row, unique anchor+digest, text byte-equal to old block, ancestry match. 171/171 coverage joins resolve via effective()."
+    },
+    {
+      "id": "F3",
+      "severity": "low",
+      "verdict": "APPROVE",
+      "summary": "44 lookup rows moved to SNAPSHOTS key alreadySupersededHistoricalBindings; rows() yields 44; 88-record multiset preserved. Note: file-level counts still sums 88.",
+      "evidence": "canonical-JSON multiset of parent bindingRefresh (88) == new bindingRefresh (44) + alreadySupersededHistoricalBindings (44); no external /bindingRefresh/N pointer into this file."
+    },
+    {
+      "id": "F4",
+      "severity": "medium",
+      "verdict": "APPROVE",
+      "summary": "Seven witnesses (3,9,15,33,86,87,96) reworded; grammatical and true; #86/#87 identical wording keeps the by-name cross-reference.",
+      "evidence": "Only those 7 indices differ from parent; after-lines read against replayed bytes."
+    },
+    {
+      "id": "F5",
+      "severity": "high",
+      "verdict": "APPROVE",
+      "summary": "patch --fuzz=0 replay forward/rollback byte-exact: 106 applications (79+14+13 predecessors), 74 files; 104 witness after-lines match replayed bytes.",
+      "evidence": "Own replay script, per-step before/after hash + rollback exact + reapply."
+    },
+    {
+      "id": "F6",
+      "severity": "high",
+      "verdict": "APPROVE",
+      "summary": "Citation drift scan after F: exit 0 'no findings'; without F: exit 1, 130 findings; baseline unchanged.",
+      "evidence": "build-skill-wrappers exit 0 both; baseline sha256 ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff."
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "verdict": "APPROVE",
+      "summary": "Residual drift 556 assertions / 407 distinct reproduced and truthfully disclosed as Lead-owned. Split: 46 pre-existing at pin, 361 newly broken by the composed chain.",
+      "evidence": "Same resolver on unpatched pin tree (history file excluded): 46 distinct unresolved, all still present after chain; new by shard: s14 166, s11 95, s4 23, s5 22."
+    },
+    {
+      "id": "F8",
+      "severity": "medium",
+      "verdict": "APPROVE",
+      "summary": "actions/4 path == effectivePath == spec path docs/platform/workflow/spec.md; before/current/after hashes match holder and replay; legacy source labelled.",
+      "evidence": "actions.json#/actions/4 vs patch-specs w8:hunk-park:workflow-holder and replayed holder bytes."
+    },
+    {
+      "id": "F9",
+      "severity": "medium",
+      "verdict": "APPROVE",
+      "summary": "Receipt counts and exits reproduce: 2211 cmds (2207 exit 0, 4 exit 1 = 1 extractor + 3 pre-F negatives), 424 patch invocations = 106x4, 106/74, 130->0, 177->6, 556/407.",
+      "evidence": "w9-commands.json recount + own reproduction."
+    },
+    {
+      "id": "F10",
+      "severity": "low",
+      "verdict": "REWORK",
+      "summary": "Witness #16 (event-store:1138) still reads broken: '(plan porting uses `project:porting`, Work keeps `project`)' -- same class as the seven, missed by W9 review.",
+      "evidence": "w8-citation-glosses.json witnesses[16]; suggested 'in the plan, porting uses ...'; regenerate spec diff/witness, replay, rescan."
+    }
+  ]
+}
