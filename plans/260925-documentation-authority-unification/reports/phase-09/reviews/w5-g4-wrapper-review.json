@@ -1,0 +1,48 @@
+{
+  "scope": "Git one-door declarations (2e57b8bc1) and pass-through wrapper caller binding plus censusDrift declarations digest (db4b7de4d), reviewed at plan HEAD 1975d4403",
+  "commit": "1975d4403",
+  "verdicts": [
+    {
+      "id": "wrapper-escape-callers",
+      "verdict": "REWORK",
+      "locator": "scripts/git-one-door-scan.mjs declaredSiteId (~L2484) and applyDeclarations; test/scripts/git-one-door-declarations.test.mjs WRAPPERS; docs/platform/git/spec.md owner-declared sites paragraph",
+      "reason": "declaredSiteId keeps valueFlowCalls().calls and drops .escapes. As a result git.call(null, ['update-ref',...]) in guardCommit (cold hook), run.call/Reflect.apply(run, ...) with push --force in verifyForbiddenPhase02Diff, and git.call/Reflect.apply/array-stored git in check-evidence-relocation all scan as 0 sites on a HEAD copy. The general scanner flags the same escapes as unresolved-binary. Fix: return flow.escapes from declaredSiteId and refuse non-configured-binary declarations whose wrapper escapes; add .call/Reflect.apply/array-stored callers to the WRAPPERS test; amend the spec sentence."
+    },
+    {
+      "id": "wrapper-ordinary-callers-bound",
+      "verdict": "APPROVE",
+      "locator": "scripts/git-one-door-scan.mjs declaredSiteId",
+      "reason": "On the real files, these new callers each make the scan throw 'stale or ambiguous Git declaration': direct, local alias, higher-order pass, bind, cross-file named import, namespace import, hook write verb, and same-function run('git', push)."
+    },
+    {
+      "id": "census-zero-reproducible",
+      "verdict": "APPROVE",
+      "locator": "packages/git/contracts/mutation-census.v1.json; node scripts/git-one-door-scan.mjs --json",
+      "reason": "0 undeclared sites, exit 0. Two --json runs are byte-identical (27688108...). In-memory census(scan()) equals the committed census twice (aa5f73d0...). verifyCensus passes on 1127 files."
+    },
+    {
+      "id": "census-drift-declarations-digest",
+      "verdict": "APPROVE",
+      "locator": "scripts/git-one-door-scan.mjs censusDrift; test/githooks/census-drift.test.mjs",
+      "reason": "The added clause covers one exact path; every other file still goes through kindOf, so an edited source cannot pass. The recorded digest f115aa3b... equals the file's sha256. The test passes 3/3 in W; with the clause reverted in the /tmp copy only the new test fails (drift on the declarations file)."
+    },
+    {
+      "id": "declarations-literal-and-configured",
+      "verdict": "APPROVE",
+      "locator": "scripts/lib/git-one-door-declarations.v1.json (17 literal-verb sites, 5 configured-binary)",
+      "reason": "Each one binds the enclosing function plus the exact call text. Reasons and retireWhen are unchanged from the w4-approved text. The configured-binary binaries come from parsed config."
+    },
+    {
+      "id": "declarations-passthrough-and-hook",
+      "verdict": "APPROVE",
+      "locator": "check-evidence-relocation.mjs:34, generate-doc-inventory.mjs:166, verify-phase-02.mjs:127, .githooks/pre-commit:538",
+      "reason": "The reasons are true and each site is bound to its exact caller multiset; generate-doc-inventory.mjs:166 is over-bound only because of a pathspec spread, which is harmless. The hook's 9 claimed verbs equal the observed caller verbs. Binding completeness for escaping callers is tracked in wrapper-escape-callers."
+    },
+    {
+      "id": "style-and-ids",
+      "verdict": "APPROVE",
+      "locator": "scripts/git-one-door-scan.mjs, test/scripts/git-one-door-declarations.test.mjs, test/githooks/census-drift.test.mjs",
+      "reason": "Matches the local idioms (budget reset, comment style). No plan ids in code comments or test titles. Owner record ids appear only in declaration data and the spec."
+    }
+  ]
+}

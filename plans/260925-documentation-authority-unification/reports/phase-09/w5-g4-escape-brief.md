@@ -1,0 +1,18 @@
+# Git declarations: refuse wrapper callers the scanner cannot follow (Doer brief, code slice)
+
+Status: Lead brief under L12-137 / L13-6 (declare all 25 sites reproducibly, no Git component extension). Follows review `reviews/w5-g4-wrapper-review.{md,json}` (6 APPROVE / 1 REWORK, High) of commits 2e57b8bc1 and db4b7de4d. Read the review first.
+
+Defect: a declared wrapper still lets a write through when the caller reaches it by a shape the value-flow pass cannot resolve: `fn.call(...)`, `Reflect.apply(fn, ...)`, or a call through an array slot (`const tbl = [git]; tbl[0](...)`). Seen in the shipped pre-commit path (`git.call(null, ['update-ref', ...])` inside `guardCommit` in `src/runner/documentation-cutover-lease-hook.mjs`), in `scripts/verify-phase-02.mjs` and in `scripts/check-evidence-relocation.mjs`. The scanner already marks these shapes as unresolved escapes, but `declaredSiteId` (`scripts/git-one-door-scan.mjs`, around line 2484) throws the escape list away.
+
+Do (write the test first, red, then the fix):
+1. Add `.call`, `Reflect.apply` and array-slot callers to the `WRAPPERS` cases in `test/scripts/git-one-door-declarations.test.mjs`. Each must make the declaration refuse.
+2. In `declaredSiteId`, compute the value flow once (`owner ? valueFlowCalls(ctx, file, owner) : { calls: [], escapes: [] }`), use its `calls` for the callers, and return its `escapes`.
+3. In `applyDeclarations`, refuse a declaration whose wrapper has escapes: ``invalid(`wrapper escapes for ${entry.path}: ${escapes[0]}`)``. The exception is class `configured-binary`, whose program comes from parsed config, not from the caller (that keeps `src/runner/merge.mjs:992` matching). Confirm that no hook or tooling declaration has an escape at HEAD.
+4. Change the sentence in `docs/platform/git/spec.md` that says a new caller cannot inherit an exemption, so that it is true: callers the scanner cannot follow refuse the declaration. Fix the code comment that says the same.
+5. Regenerate the census only through the scanner's own build flag (`--write-census`). Prove `node scripts/git-one-door-scan.mjs --json` exits 0 with 0 undeclared sites, and that two runs are byte-identical.
+6. Update `git-one-door/git-owner-review-request.md` with this change. Also add the review's separate pre-existing finding as an open item for the Git owner: an exported wrapper whose program is a parameter under another name (`export { runner as r2 }`) gives 0 sites even without declarations. Do not fix that finding here.
+7. Tests, as single files: `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test test/scripts/git-one-door-declarations.test.mjs test/githooks/census-drift.test.mjs` (releasePath = the `releasePath` field in /home/vantt/projects/forgentX/.fgos/installation/activation.json). Show the new cases are red before the fix and green after. Record the commands and their exit codes in `git-one-door/wrapper-escapes/receipt.md`.
+
+Writable (exact): scripts/git-one-door-scan.mjs, test/scripts/git-one-door-declarations.test.mjs, docs/platform/git/spec.md, packages/git/contracts/mutation-census.v1.json, scripts/lib/git-one-door-declarations.v1.json, CHANGELOG.md, plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/**. Do not account pairs (the Lead does it after the merge). Never a git write (the runner commits), never the fgos CLI, never .fgos/ or secrets, never scripts/run-tests.mjs or npm test. Scratch /tmp/fgos-work/w5-g4-escape/ only.
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
