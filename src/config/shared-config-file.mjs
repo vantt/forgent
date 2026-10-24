@@ -80,22 +80,6 @@ export function readInvariantCheckCommands(dir) {
   return readCommandList(dir, 'invariantChecks');
 }
 
-// Project-specific commands every runner-created worktree runs after its
-// dependency install, before anything verifies in it -- e.g. building a
-// compiled binary the test suite needs, which a fresh checkout never has
-// (git only checks out tracked files). Empty by default: a project that
-// declares nothing keeps exactly today's behavior.
-export const DEFAULT_WORKTREE_SETUP_COMMANDS = [];
-
-/**
- * The worktree setup commands configured at `dir` (`worktreeSetup.commands`),
- * as a list of non-empty command strings. `[]` for an absent or malformed
- * section, like `readInvariantCheckCommands`.
- */
-export function readWorktreeSetupCommands(dir) {
-  return readCommandList(dir, 'worktreeSetup');
-}
-
 /**
  * Write `config` to the shared config file at `dir`, creating `.fgos/` if
  * needed. The only write path in this module -- callers decide WHEN to
@@ -106,27 +90,4 @@ export function writeSharedConfig(dir, config) {
   const sharedPath = sharedConfigFilePath(dir);
   fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
   fs.writeFileSync(sharedPath, `${JSON.stringify(config, null, 2)}\n`);
-}
-
-/**
- * `readSharedConfig` that degrades to `{}` instead of throwing on a file that
- * is present but not valid JSON.
- *
- * The shared config is explicitly an edit-the-file-by-hand surface, so a
- * half-typed edit is an ordinary state, not an exceptional one. A reader that
- * only wants one optional setting should behave the way it behaves when the
- * setting is absent — `readGateBypassLevel` has wrapped this call in exactly
- * this try/catch since it was written, for exactly this reason.
- *
- * Use this for an OPTIONAL setting whose absence is already meaningful. Do NOT
- * use it where the caller's whole job is to report on the file's health:
- * `fgos doctor`'s own checks must see the parse failure, not a tidy empty
- * object, or the one command that exists to name the problem would hide it.
- */
-export function readSharedConfigOrEmpty(dir) {
-  try {
-    return readSharedConfig(dir);
-  } catch {
-    return {};
-  }
 }

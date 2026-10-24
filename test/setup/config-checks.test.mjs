@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 import { CONFIG_CHECKS } from '../../src/setup/config-checks.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
+import { writeRawProjectConfig, projectConfigPath } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const contract = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/config/contracts/doctor-rows.v1.json'), 'utf8'));
@@ -52,12 +53,12 @@ test('every row of the config crate contract is a registered check and every fix
 
 test('a warn finding passes with a warning prefix, a fail finding fails and names file, line, column and row', () => {
   withMachine(({ project }) => {
-    fs.writeFileSync(path.join(project, '.fgos/config.json'), '{}\n');
+    writeRawProjectConfig(project, '{}\n');
     const legacy = run(project)['config-format-legacy-json'];
     assert.equal(legacy.passed, true);
     assert.match(legacy.message, /^warning: .*config\.json:\d+:\d+ config-format-legacy-json/);
 
-    fs.rmSync(path.join(project, '.fgos/config.json'));
+    fs.rmSync(projectConfigPath(project));
     fs.writeFileSync(path.join(project, '.fgos/config.yaml'), '# @fgos:v1\nrunner: [\n');
     const broken = run(project)['config-parse'];
     assert.equal(broken.passed, false);
@@ -67,7 +68,7 @@ test('a warn finding passes with a warning prefix, a fail finding fails and name
 
 test('no row message carries a value of a config file', () => {
   withMachine(({ project }) => {
-    fs.writeFileSync(path.join(project, '.fgos/config.json'), JSON.stringify({ gateway: { token: SECRET }, unknownKey: SECRET }));
+    writeRawProjectConfig(project, JSON.stringify({ gateway: { token: SECRET }, unknownKey: SECRET }));
     const results = Object.values(run(project));
     assert.ok(results.some((result) => result.passed === false), 'the fixture must trip a failing row');
     assert.equal(JSON.stringify(results).includes(SECRET), false);
