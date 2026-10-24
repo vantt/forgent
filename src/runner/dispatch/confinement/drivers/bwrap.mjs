@@ -18,7 +18,6 @@ import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 import { computeSha256Digest } from '../../proof-helpers.mjs';
-import { ensureRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
@@ -240,6 +239,14 @@ function machinePrivateRefusals(request, resolvedResources) {
     'machine-private-hides-workspace',
     (name, real, root) => `the ${name} "${real}" lies inside the machine-private root "${root}", which is hidden from every confined dispatch.`,
   );
+}
+
+/** The absolute socket path a gate command dials (`--go-socket <path>`), or null. */
+function gateGoSocket(gateCommand) {
+  if (!Array.isArray(gateCommand)) return null;
+  const at = gateCommand.indexOf('--go-socket');
+  const socket = at >= 0 ? gateCommand[at + 1] : null;
+  return typeof socket === 'string' && path.isAbsolute(socket) ? socket : null;
 }
 
 /**
@@ -549,10 +556,7 @@ export function prepareBwrapSync(plan, request, backend) {
     // Only a terminal-mode launch is tied to its launcher's lifetime. A direct attempt must
     // outlive a dead supervisor, so it never gets --die-with-parent.
     const terminal = request.launchMode === 'terminal';
-    if (terminal) {
-      const socketDir = ensureRuntimeSocketDir();
-      bwrapArgs.push('--die-with-parent', '--bind', socketDir, socketDir);
-    }
+    if (terminal) bwrapArgs.push('--die-with-parent');
     const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
     // The private /tmp above hides whatever lives under the host's /tmp. The gate reads its envelope
     // from the run directory and is itself a host binary, so each is bound back where it sits.
@@ -608,9 +612,14 @@ export function prepareBwrapSync(plan, request, backend) {
     const mounts = resources.filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment');
     // Files of the attempt the gate must write from inside the sandbox (its exit record and the capture
     // files). The controller creates them empty beforehand; the attempt directory itself stays read-only.
+    // A terminal attempt's gate dials its own GO socket (`--go-socket`), which the supervisor listens on
+    // before the pane runs the launcher; the runtime directory around it is masked (spec section 9.3),
+    // so that one socket is bound back read-only, and no other attempt's.
     const bindAttemptFiles = () => {
       if (!attemptId) return;
       for (const file of request.attemptBinds ?? []) bwrapArgs.push('--bind', file, file);
+      const goSocket = terminal ? gateGoSocket(request.gateCommand) : null;
+      if (goSocket) bwrapArgs.push('--ro-bind', goSocket, goSocket);
     };
     if (!blind) {
       // Only machine-private roots are hidden here (spec section 9.3); with none on the host this

@@ -133,13 +133,15 @@ function requestFor(project, { blind = true, script = 'process.exit(0)', context
 }
 
 /**
- * `os.homedir()` and `$XDG_RUNTIME_DIR` are what the driver resolves `{home}` and
- * `{claudeSocketBase}` from; point them at the fixture for one synchronous call.
+ * `os.homedir()`, `$XDG_RUNTIME_DIR` and `$HERDR_SOCKET_PATH` are what the driver resolves `{home}`,
+ * `{runtimeDir}`, `{claudeSocketBase}` and `{herdrSocketDir}` from; point them at the fixture for one
+ * synchronous call.
  */
 function withFixtureHome(project, fn) {
-  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR };
+  const previous = { HOME: process.env.HOME, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR, HERDR_SOCKET_PATH: process.env.HERDR_SOCKET_PATH };
   process.env.HOME = project.home;
   process.env.XDG_RUNTIME_DIR = project.claudeSocketBase;
+  process.env.HERDR_SOCKET_PATH = project.socket;
   try {
     return fn();
   } finally {
@@ -238,48 +240,27 @@ test('hostRead has the order deny > blind > allow, and a blind override only nar
 });
 
 test('the hidden roots are data in the contract: the three run-state directories, never all of .fgos', () => {
+  // herdr's sockets are machine-private: hidden from every confined dispatch, not only a blind one.
   assert.deepEqual([...BLIND_HIDDEN_ROOTS], [
     '{fgosDir}/assignments',
     '{fgosDir}/workflow-runs',
     '{fgosDir}/dispatch-runs',
-    '{herdrSocketDir}',
     '{confinementTempRoot}',
   ]);
 });
 
-test('hidden roots resolve to the existing ones of this project, the herdr socket directory and the temp root', () => {
+test('hidden roots resolve to the existing ones of this project and the temp root', () => {
   const project = makeProject();
-  const resolved = resolveBlindHiddenRoots({
-    fgosDir: project.fgosDir,
-    backendConfig: { tempRoot: project.tempRoot },
-    env: { HERDR_SOCKET_PATH: project.socket },
-  });
+  const resolved = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot } });
   assert.deepEqual(resolved, [
     path.join(project.fgosDir, 'assignments'),
     path.join(project.fgosDir, 'workflow-runs'),
     path.join(project.fgosDir, 'dispatch-runs'),
-    project.herdrDir,
     project.tempRoot,
   ]);
   fs.rmSync(path.join(project.fgosDir, 'dispatch-runs'), { recursive: true });
-  const without = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot }, env: { HERDR_SOCKET_PATH: project.socket } });
+  const without = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot } });
   assert.equal(without.includes(path.join(project.fgosDir, 'dispatch-runs')), false, 'a root that does not exist is skipped');
-});
-
-test('a caller with no socket of its own hides the herdr directory the terminal-control route names for its session', () => {
-  const project = makeProject();
-  const home = path.join(project.root, 'operator-home');
-  const sessionDir = path.join(home, '.config', 'herdr', 'sessions', 'blind-probe');
-  fs.mkdirSync(sessionDir, { recursive: true });
-  const previousHome = process.env.HOME;
-  process.env.HOME = home;
-  try {
-    const resolved = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot }, env: { HERDR_SESSION: 'blind-probe' } });
-    assert.ok(resolved.includes(fs.realpathSync(sessionDir)), `${sessionDir} not in ${resolved}`);
-  } finally {
-    if (previousHome === undefined) delete process.env.HOME;
-    else process.env.HOME = previousHome;
-  }
 });
 
 // ---------------------------------------------------------------------------
@@ -326,6 +307,8 @@ test('the blind argv masks before it binds back, binds its own directory read-on
 
 test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in resource order', async () => {
   const project = makeProject();
+  // With no machine-private root on the host (here: no herdr socket directory) nothing is masked.
+  fs.rmSync(project.herdrDir, { recursive: true });
   const { prepared, assessment } = await prepare(project, { blind: false });
   const args = prepared.invocation.args;
   const head = args.slice(0, args.indexOf('--'));
@@ -343,7 +326,7 @@ test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in r
 // Behaviour under real bwrap
 // ---------------------------------------------------------------------------
 
-test('a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it still reaches files but not processes', async (t) => {
+test('a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it still reaches files but neither processes nor the herdr socket', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
 
   const open = await observe(makeProject(), { blind: false });
@@ -352,7 +335,8 @@ test('a blind worker cannot read a peer, a gate answer, a peer home, a peer proc
   assert.equal(open.peerHome, 'ok');
   // Every launch has its own pid namespace now, so a peer's process is out of reach blind or not.
   assert.equal(open.peerProcess, 'ENOENT');
-  assert.equal(open.socket, 'connected');
+  // herdr's socket directory is machine-private: hidden whatever the hostRead.
+  assert.equal(open.socket, 'ENOENT');
 
   const blind = await observe(makeProject(), { blind: true });
   // What it must not reach.
