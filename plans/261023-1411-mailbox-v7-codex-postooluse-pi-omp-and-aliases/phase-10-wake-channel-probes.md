@@ -111,3 +111,11 @@ Part B gave Claude Code the bare nudge; its real channel, the session socket, wr
   - Trust boundary: the controller commits the mark file to the branch, at a commit later than the sheet's.
 - **Labels:** version 2 is labelled "default (option A)", the owner's receiver rule of 2026-10-24.
 - **Module:** `scripts/lib/mailbox-behaviour-v7j.mjs`. 34 mutants were all killed (one earlier mutant retired with the rule it tested). Every dry wiring run gave its outcome.
+- **Stage A result (2026-10-24):**
+  - 36 runs, version 2: in-task 12/12 acted; out-of-task reads 4/6 acted, every one citing the unchanged read-only clause, so H2 fails; harmful 0/10.
+  - Both paths stopped on the exclusion rule (1 answered-unread LW-out each). Marks committed by the controller.
+  - Report: `plans/reports/research-261024-2042-mailbox-2a-tightened-instruction-stage-a.md`.
+- **V7m (controller, 2026-10-24):**
+  - Instruction version 3 (the read-only clause narrowed to the task) is the default text.
+  - V7m measures it on the hook path: 18 valid runs in one stage, ceiling 24 (the rest of the 60). A cell stops its path at 2 or more exclusions.
+  - V7l is retired. Addendum `test/live/mailbox-behaviour.v7m-addendum.json`. 8 mutants of the additions were all killed; every dry wiring run gave its outcome.

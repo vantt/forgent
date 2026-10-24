@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`; the tightened instruction: `v7j`, `v7k`, `v7l`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`; the tightened instruction: `v7j`, `v7k` (version 2) and `v7m` (version 3; `v7l` retired)) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -222,13 +222,13 @@ const MEASURES = {
     report: ({ results, compares, addendum, stage }) => v7i.report({ results, addendum, stage, compare: Object.fromEntries(['v7e', 'v7h', 'v7c'].map((k) => [k, compares[k] ? runs.readResults(compares[k]) : []])) }),
     sample: 'sample-v7i',
   },
-  // Owner 2A: instruction version 2 on the bare nudge (v7j), the socket frame (v7k) and V6's hook path (v7l).
+  // Owner 2A: instruction version 2 on the bare nudge (v7j) and the socket frame (v7k); version 3 on V6's hook path (v7m).
   ...Object.fromEntries(Object.entries(v7j.MEASURES).map(([name, m]) => [name, {
     clis: m.clis,
     build: m.build,
     cells: m.cells,
     baselines: m.baselines,
-    instructionFile: v7j.INSTRUCTION_FILE,
+    instructionFile: m.instructionFile,
     taskOf: v7j.taskOf,
     measured: () => ({
       models: score.MODELS,
@@ -960,7 +960,7 @@ const WIRING_V7G = [
 const WIRING_2A = {
   v7j: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
   v7k: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
-  v7l: [['LR-out', 'act', 'acted'], ['LW-out', 'ignore', 'not-acted'], ['LR-out', 'fail', 'error']],
+  v7m: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
 };
 
 async function cmdCheckAddendum() {
@@ -998,7 +998,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (['v7f', 'v7g', 'v7h', 'v7i', 'v7j', 'v7k', 'v7l'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g', 'v7h', 'v7i', 'v7j', 'v7k', 'v7m'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1672,7 +1672,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7l] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7l] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
