@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-24 16:30 (`claude-rgvd@fg-server`, `lead:MAIL`; owner 16:28 chọn B): **Sửa dòng 16:20:** hiện không có lane DIST nào (4.4a đã đóng từ 10-17). Owner duyệt cách thay thế: một reviewer độc lập đóng vai DIST, soát thay đổi shim của nhánh mailbox theo `docs/specs/distribution.md`. Shim giờ chỉ dùng builtin, ghi atomic. Reviewer kiểm cách phát hiện lệch trong `fgctl repair` và doctor, các máy dùng release cũ, tính tương đương hành vi, và injection. Kết quả review được coi là phần DIST ký trước khi merge.
+
 - 2026-10-24 16:20 (`claude-rgvd@fg-server`, `lead:MAIL`; owner 16:15 "1A em làm, 2A, 3 chuẩn bị merge"): ba việc owner duyệt.
   1. **MAIL làm việc confinement còn lại**, các item `tsk-kqyatnkjdu`, `tsk-q5uu5odeta`, `tsk-jhtyx5myh5`, trên một nhánh riêng tách từ main. Che toàn bộ `{runtimeDir}` cho mọi dispatch có confinement, chỉ bind lại socket của chính attempt đó; trước khi che thì đo xem worker thật sự cần gì trong thư mục đó. Socket herdr được che riêng cho worker non-blind nếu worker không cần nó. **Báo trước:** file chung sẽ sửa là `src/runner/dispatch/confinement/*`, `src/run-supervisor/runtime-dir.mjs`, `docs/specs/confinement-authority.md`, `CHANGELOG.md`. Bên nào land sau thì soát thay đổi của bên kia.
   2. **Siết câu chỉ dẫn cho người nhận thư** thành "chỉ làm khi việc nằm trong tác vụ người dùng đã giao", rồi đo lại Claude khoảng 40 lần chạy confined.
