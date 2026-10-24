@@ -29,6 +29,7 @@ function useAgent(project, options) {
 
 test('a CLI Work command inside a confined attempt is refused read-only, starts no seal child, and the next command outside seals', { skip, timeout: 240_000 }, async () => {
   const project = createProject();
+  // boundary: only a real CLI process inside a real confined attempt exercises the read-only store, so no lower layer can prove it.
   const cli = (args) => spawnSync(process.execPath, [BIN_FGOS, ...args, '--dir', project.repoDir], { cwd: project.repoDir, env: project.env, encoding: 'utf8' });
   const added = cli(['add', 'cf-1', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--step', 'executing', '--description', 'confined seal fixture']);
   assert.equal(added.status, 0, added.stderr);
