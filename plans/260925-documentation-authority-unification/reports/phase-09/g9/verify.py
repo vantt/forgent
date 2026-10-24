@@ -23,9 +23,18 @@ def verify_park_reviews(pin, rows, commands):
     evidence = sweep.load(HERE / 'park-review-evidence.json')
     decisions = {r['id']: r for r in packet['rows']}
     reviews = {r['id']: r for r in evidence['rows']}
-    assert len(decisions) == len(packet['rows']) == 338
+    # Original 338 park reviews plus the explicitly re-reviewed CLI help row.
+    assert len(decisions) == len(packet['rows']) == 339
     assert set(decisions) == set(reviews)
     originals, _ = sweep.scope()
+    carried = [r for r in rows if originals[r['id']]['record'].get('parked')]
+    assert len(carried) == 15
+    byid = {j['id']: j for j in sweep.load(HERE / 'judgments.json')['rows']}
+    for row in carried:
+        judgment = byid[row['id']]
+        assert judgment['carriedBlocker']['record'] == row['id']
+        assert judgment['carriedBlocker']['pointer'] == '/parked'
+        assert judgment['carriedBlocker']['status'] == 'open'
     for row in rows:
         if row['id'] not in decisions:
             continue
@@ -67,9 +76,18 @@ def verify_park_reviews(pin, rows, commands):
                 data = sweep.blob(pin, site['path'])
                 text = b''.join(data.splitlines(True)[site['startLine'] - 1:site['endLine']])
                 assert sweep.sha(text) == site['sha256']
-        if decision['disposition'] != 'superseded-or-retired':
+        if decision.get('retiredPassageIds'):
+            retired = set(decision['retiredPassageIds'])
+            assert retired <= {p['passageId'] for p in row['passages']}
+            assert all(p['classification'] in ('changed', 'absent')
+                       for p in row['passages'] if p['passageId'] in retired)
+            assert all(p['classification'] in ('unchanged', 'moved')
+                       for p in row['passages'] if p['passageId'] not in retired)
+            successor = decision['retirementRecord']
+        elif decision['disposition'] == 'superseded-or-retired':
+            successor = decision['supersedingRecord']
+        else:
             continue
-        successor = decision['supersedingRecord']
         path = successor['path']
         if successor['kind'] == 'git-change':
             commit = successor['commit']
@@ -98,7 +116,9 @@ def verify_park_reviews(pin, rows, commands):
     # Exercise the real owning validator against falsified author output.
     judgments = sweep.load(HERE / 'judgments.json')
     original_load = sweep.load
-    for field, disposition in [('reviewedDependencies', 'still-valid-as-recorded'),
+    for field, disposition in [('carriedBlocker', 'still-valid-as-recorded'),
+                                ('retirementRecord', 'still-valid-as-recorded'),
+                                ('reviewedDependencies', 'still-valid-as-recorded'),
                                 ('supersedingRecord', 'superseded-or-retired'),
                                 ('missingInput', 'owned-park')]:
         altered = copy.deepcopy(judgments)
@@ -110,8 +130,11 @@ def verify_park_reviews(pin, rows, commands):
             assert any(e['id'] == target['id'] for e in sweep.judgment_errors(rows)), field
         finally:
             sweep.load = original_load
-    return {'reviewedRows': len(decisions), 'distinctFullDeltas': len(evidence['deltas']),
-            'negativeControls': ['missing exact dependency review rejected',
+    return {'reviewedRows': len(decisions), 'carriedPhase08Blockers': len(carried),
+            'distinctFullDeltas': len(evidence['deltas']),
+            'negativeControls': ['missing carried phase-08 blocker rejected',
+                                 'missing partial retirement record rejected',
+                                 'missing exact dependency review rejected',
                                  'missing named superseding record rejected',
                                  'missing concrete park input rejected']}
 

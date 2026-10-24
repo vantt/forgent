@@ -1,0 +1,29 @@
+{
+  "pin": "72077976bbc6ffb64ba9478553258bedc2d0050d",
+  "status": "pass",
+  "uniqueRecords": 574,
+  "cohortMemberships": 684,
+  "effectiveFiles": 546,
+  "purePinFieldsVerified": 10,
+  "patchIdEquivalencesVerified": 12,
+  "parkReviews": {
+    "reviewedRows": 339,
+    "carriedPhase08Blockers": 15,
+    "distinctFullDeltas": 4113,
+    "negativeControls": [
+      "missing carried phase-08 blocker rejected",
+      "missing partial retirement record rejected",
+      "missing exact dependency review rejected",
+      "missing named superseding record rejected",
+      "missing concrete park input rejected"
+    ]
+  },
+  "negativeControls": [
+    "changed passage digest rejects judgment",
+    "missing row rejects judgment",
+    "changed record body rejects judgment",
+    "same source bytes at another commit retain their content-bound judgment"
+  ],
+  "independentAcceptance": false,
+  "scope": "Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure."
+}

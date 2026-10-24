@@ -13,7 +13,7 @@
       "explanation": "The current-byte successor, not the stale authored passage, owns the edit. Replay the existing G9 chain and its byte-exact inverse; retain source dependencies for independent semantic review."
     },
     "external-input": {
-      "explanation": "The repository supplies the reader algorithm, but not the persisted Work/knowledge rows or the owner-selected replacement claim. The row remains parked only for that named missing input."
+      "explanation": "Only an undecidable source-drift question is a G9 park. The remaining backlog drift needs an owner-selected replacement claim. Persisted Work/knowledge and other pre-existing phase-08 blockers stay open at carriedBlocker, independently of the G9 verdict."
     },
     "retired-consumer": {
       "explanation": "The old source consumer or per-edge patch is historical. A named later deletion, rename or composition/accounting record owns it; retirement of this record is not authority promotion or proof of successor behavior."
@@ -32,6 +32,9 @@
     },
     "source-contract-data": {
       "explanation": "Cargo coordinates, protocol/golden vectors, native YAML parsing and source metrics are code/runtime contract data. A lexical path or removed scalar is not a maintained document consumer."
+    },
+    "protected-co-cuts": {
+      "explanation": "Shared review for the complete changed AGENTS.md and transitional-switchboard.json co-cuts, joined separately to each member's exact evidence hash. AGENTS changes narrow program-board reading to lane events, refuse checkout process/lock/identity verbs in favor of fgos:dev, rename local writer attribution to Identity, and add Identity minting doctrine. The switchboard adds candidate-only authoring/index successors into knowledge-registry, carries Seat Binding and Workflow while preserving legacy-current routes, and renames Session Identity to Identity section 7a without promotion. These are routing/doctrine deltas, not reader-root moves, persisted exports, or parity approval; each primary reason states the independent operation being retained, retired or parked."
     }
   },
   "rows": [
@@ -88,7 +91,7 @@
       "reason": "The js-yaml advisory PBI disappears, while STR70a and STR62 still cite historical work-state line ordinals; the source-binding decision for those two measured precedents needs the backlog owner's intended replacement claim, not a guessed section.",
       "owner": "Backlog owner / documentation-unification plan owner",
       "missingInput": "An owner-selected replacement for STR70a and STR62 measured work-state precedents in the authoritative backlog; the removed js-yaml advisory is not a remaining request.",
-      "nextAction": "Through the owning backlog writer, reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with the current WORK contract, replace their stale numeric citations and regenerate docs/backlog.md. Retire the removed js-yaml advisory binding; return the writer input and resulting exact row identities before final cutover.",
+      "nextAction": "The owning backlog writer edits docs/backlog.md directly (it is no longer generated): reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with WORK, then replace the stale numeric citations. Retire the removed js-yaml advisory binding; return the exact edited row identities and check the owning identity-ids-unique doctor row before final cutover.",
       "needsWrites": [
         "docs/backlog.md"
       ]
@@ -168,10 +171,11 @@
       "path": "src/verbs/merge/approve.mjs",
       "recordSha256": "ca07c082e53c325457267273c2f535b474a77d5d1fdb6e444f1febaa39a274f2",
       "evidenceSha256": "7cc198dd285eaa28d3e6dd308190d713d5a7276e9489fe092e06acb42c1a79ff",
-      "disposition": "superseded-or-retired",
-      "group": "retired-consumer",
-      "reason": "Land replaces the ephemeral branch-force mechanism and removes both history comments; do not preserve two absent comment consumers as live citations.",
-      "supersedingRecord": {
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "Land removes only class6-l-000484 and class6-l-000485 via e71381aba. Preserve class6-l-000481 (tsk-3bn history, current lines 267-268), class6-l-000482 (leaf-merge history, 308-309) and class6-l-000483 (decision 0032, 362): their five physical passage witnesses are moved byte-equal. The removal record retires just the other two edges, not this whole record.",
+      "retiredPassageIds": ["class6-l-000484", "class6-l-000485"],
+      "retirementRecord": {
         "kind": "git-change",
         "commit": "e71381aba3e5ed7a2facf1c82e392d886e376a41",
         "path": "src/verbs/merge/approve.mjs",
@@ -222,7 +226,7 @@
       "evidenceSha256": "22690b186dcbbd333aefd34b01f7a4e52f5d1d882cdae525f32c81d084509905",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "The canonical source changes raw git worktree remove to fgos worktree remove with --delivered-to; the two rejected agent/task metadata strings remain metadata and the render is still derived from that source."
+      "reason": "The canonical source changes raw git worktree remove to fgos worktree remove with --delivered-to; the two rejected agent/task metadata strings remain metadata and the render is still derived from that source. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change this source/render join."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:58",
@@ -232,7 +236,7 @@
       "evidenceSha256": "299838e36ef87d09aa08945b854de87b996945e0865e692b07154822b95b04c5",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "A CLONES_DIR containment guard now precedes pull; the witnessed .git existence probe remains clone infrastructure and does not acquire a document consumer role."
+      "reason": "A CLONES_DIR containment guard now precedes pull; the witnessed .git existence probe remains clone infrastructure and does not acquire a document consumer role. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change clone containment."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
@@ -242,10 +246,10 @@
       "evidenceSha256": "9bea4f5790234faf291370d165ed7dd6cf52c50bf66219ed9fec3a0af384d662",
       "disposition": "owned-park",
       "group": "external-input",
-      "reason": "The js-yaml advisory row was removed, but the surviving STR70a measured-line claim still needs a backlog-owner replacement, shared with the earlier backlog revision.",
+      "reason": "The js-yaml advisory row was removed, but the surviving STR70a measured-line claim still needs a backlog-owner replacement, shared with the earlier backlog revision. This source-drift question is distinct from the original /parked entries, which stay open there. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not choose the missing backlog claim.",
       "owner": "Backlog owner / documentation-unification plan owner",
       "missingInput": "An owner-selected replacement for STR70a and STR62 measured work-state precedents in the authoritative backlog; the removed js-yaml advisory is not a remaining request.",
-      "nextAction": "Through the owning backlog writer, reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with the current WORK contract, replace their stale numeric citations and regenerate docs/backlog.md. Retire the removed js-yaml advisory binding; return the writer input and resulting exact row identities before final cutover.",
+      "nextAction": "The owning backlog writer edits docs/backlog.md directly (it is no longer generated): reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with WORK, then replace the stale numeric citations. Retire the removed js-yaml advisory binding; return the exact edited row identities and check the owning identity-ids-unique doctor row before final cutover.",
       "needsWrites": [
         "docs/backlog.md"
       ]
@@ -258,7 +262,7 @@
       "evidenceSha256": "40516fadaeccf8509a90038eeaae6cc82e5deb70764e249102ba9aed8c443f8e",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "Only the anecdote's manual git mv wording becomes moving by hand; the history-home conventions and docsRef registration described by this zero-edge record are unchanged."
+      "reason": "Only the anecdote's manual git mv wording becomes moving by hand; the history-home conventions and docsRef registration described by this zero-edge record are unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes neither relocate this history home nor export docsRef values."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:96",
@@ -268,7 +272,7 @@
       "evidenceSha256": "90918b1ad0a0529a3023fc1d054361b6d911765ef52ee8b5a1862d538ee1a0b5",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "The canonical source changes raw worktree removal to guarded fgos removal; the plugin's two metadata classifications and source/render relationship remain unchanged."
+      "reason": "The canonical source changes raw worktree removal to guarded fgos removal; the plugin's two metadata classifications and source/render relationship remain unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not alter this render join."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:109",
@@ -278,7 +282,7 @@
       "evidenceSha256": "52aad756e405d5333ca7d28084c21a765ac490341a20124157d949233bc61cc3",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "The split destructive-reset history path is joined and the unsafe status-first exception is removed; the preserved citation still names the same historical CONTEXT, not current authority."
+      "reason": "The split destructive-reset history path is joined and the unsafe status-first exception is removed; the preserved citation still names the same historical CONTEXT, not current authority. See groups.protected-co-cuts: AGENTS narrows board reading, refuses checkout native verbs, renames writer attribution and adds mint doctrine; switchboard successor routes remain candidate-only. None relocates or promotes this historical citation."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:161",
@@ -288,7 +292,7 @@
       "evidenceSha256": "40a9ddf8498370a0f2ad187b7d0ca3d41b7650da5cd02ceccbc60cc96a741c3f",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Release source enumeration changes from a Git child to Inspect and stages the addon first; srcFull still joins resolvedRepo and rel for the same declared package payload, while removed diagnostic expressions are historical non-document scalars."
+      "reason": "Release source enumeration changes from a Git child to Inspect and stages the addon first; srcFull still joins resolvedRepo and rel for the same declared package payload, while removed diagnostic expressions are historical non-document scalars. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change the package payload selector."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:189",
@@ -298,7 +302,7 @@
       "evidenceSha256": "fc18bb2ab0ed6a4fbe15539c44a529c846048a46be080254c619a90f0e46826e",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Both shell helpers replace rev-parse with .git/gitdir/commondir discovery; these remain repository-root operations and the two navigation references retain their destinations."
+      "reason": "Both shell helpers replace rev-parse with .git/gitdir/commondir discovery; these remain repository-root operations and the two navigation references retain their destinations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not relocate those destinations."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:192",
@@ -308,7 +312,7 @@
       "evidenceSha256": "11924baa90910cb6ce5dc27f01c0649b9d76dff9ad161220b1a14f1403a562ce",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Benchmark addon staging now carries a dev-host manifest and one physical addon; benchmark directories and log strings remain infrastructure rather than documentation read roots."
+      "reason": "Benchmark addon staging now carries a dev-host manifest and one physical addon; benchmark directories and log strings remain infrastructure rather than documentation read roots. See groups.protected-co-cuts: AGENTS documents host-only native doors and minting; the switchboard changes candidate navigation, not benchmark inputs."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:195",
@@ -318,7 +322,7 @@
       "evidenceSha256": "0f579b90a0a363f178f2ef7de3bbdd5371a8a508163e7ea012580cdab6e18aac",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "RepositoryConfig refusal is now printed as code/cause and exitCode is set; the installation root and provenance comment have not become document operands."
+      "reason": "RepositoryConfig refusal is now printed as code/cause and exitCode is set; the installation root and provenance comment have not become document operands. See groups.protected-co-cuts: AGENTS changes board-read timing, checkout-native refusals and Identity attribution/minting; switchboard adds candidate-only registry/Seat/Workflow routes and renames Identity. None changes this installation-root operand or promotes its provenance."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:198",
@@ -328,7 +332,7 @@
       "evidenceSha256": "ce26b3548a55e7c8b3c88deccac5d0ffb1421e248f953ba34bf80a6b8c1211fa",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "The canary's git add/commit calls move behind sandboxGit; the fixed docPath and its existing document-output classification survive in the same sandbox, with no root migration."
+      "reason": "The canary's git add/commit calls move behind sandboxGit; the fixed docPath and its existing document-output classification survive in the same sandbox, with no root migration. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not move the sandbox docPath."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
@@ -336,12 +340,9 @@
       "path": "scripts/knowledge-migration.mjs",
       "recordSha256": "8e0cd7d5f1cf921e3d69f637287a14a1c6a02eead2690dc41700ed828216dfdf",
       "evidenceSha256": "c8cf17f02be7903d9c7e20cd17d51a7e1449bd51e0d4df23f40f3441d273ebbf",
-      "disposition": "owned-park",
-      "group": "external-input",
-      "reason": "ScopedCommit replaces raw staging, but targetPath still depends on persisted topicId/role/purposeSlug and registry currentPath; source alone cannot identify which real documents those rows denote.",
-      "owner": "Knowledge registry owner / documentation-unification plan owner",
-      "missingInput": "Persisted topics/docs registry and migration inventory rows (topicId, role, purposeSlug, oldPath, currentPath), not present in the source tree.",
-      "nextAction": "Export the authorized folded topics/docs plus inventory oldPath rows used by knowledge-migration; join each topicId/role to purposeSlug/currentPath and prepare exactly one source/target identity per migrated document. Re-review the 22 parked registry-dependent operations using that export before applying any move."
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "The only changed ADMIT passage, dynamic-008175, replaces git add with ScopedCommit for the same oldPath-to-newPath move. No document identity or selector changes; the 22 inventory/registry operations remain blocked at the original /parked pointer, not by G9 drift. Protected AGENTS.md and switchboard changes are reviewed in groups.protected-co-cuts: host/mint doctrine and candidate-only routing do not change this move's inputs."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:201",
@@ -351,7 +352,7 @@
       "evidenceSha256": "645b03b6d0329c7f14b82c8c35f4244031a88f8793238aa2bbcc991dca1f1dc9",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Holder formatting changes from holders.pids to holders.holders.map(h=>h.pid); queue directories and the display string remain lock diagnostics."
+      "reason": "Holder formatting changes from holders.pids to holders.holders.map(h=>h.pid); queue directories and the display string remain lock diagnostics. See groups.protected-co-cuts: AGENTS host/native-door doctrine explains invocation constraints; candidate-only switchboard routes do not change these lock artifacts."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:204",
@@ -361,7 +362,7 @@
       "evidenceSha256": "22a4c780a151794a790aedf0b9093fae6185b6161c2e317bf0b0aa83f8b4376e",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Config protection now discovers commonDir from repositoryDirs rather than rev-parse; the compared value is repository identity, not a maintained document path."
+      "reason": "Config protection now discovers commonDir from repositoryDirs rather than rev-parse; the compared value is repository identity, not a maintained document path. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not turn commonDir into a document root."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:206",
@@ -371,7 +372,7 @@
       "evidenceSha256": "846eba20d50617b8e8ded01985e17ef7c9df4b8bb097c8cda13cb75a532a55d2",
       "disposition": "still-valid-as-recorded",
       "group": "source-contract-data",
-      "reason": "A comment explains why this standalone script retains stableStringify; the serialized measurement data and scratch directories remain non-document operations."
+      "reason": "A comment explains why this standalone script retains stableStringify; the serialized measurement data and scratch directories remain non-document operations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not alter that serialization or scratch purpose."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:208",
@@ -381,7 +382,7 @@
       "evidenceSha256": "8367e2bb36297d08e77ef1aaea3cdc7dac1091bced2ab1baeaf946de19f09741",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Main-root discovery moves to Inspect's trustedMainRoot and the local helper disappears; events.jsonl remains runtime measurement input, not a retiring docs-tree read."
+      "reason": "Main-root discovery moves to Inspect's trustedMainRoot and the local helper disappears; events.jsonl remains runtime measurement input, not a retiring docs-tree read. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not move the measured event population."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:214",
@@ -391,7 +392,7 @@
       "evidenceSha256": "8e86bd26d9aeb2b306ce01e252b301151a6428036c976cf7d44c3f21c87af542",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Release cleanliness now uses Inspect statusEntries and Cargo updates use rustVersionUpdates; version files and their diagnostics retain the existing release-metadata classification."
+      "reason": "Release cleanliness now uses Inspect statusEntries and Cargo updates use rustVersionUpdates; version files and their diagnostics retain the existing release-metadata classification. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change these version-file inputs."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:215",
@@ -401,7 +402,7 @@
       "evidenceSha256": "91920079b237beb33963cb5a2bcf21205ac3284587eb1ea1fd7f026e67c2fd2b",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "The default event-log root now comes from mainCheckoutRoot instead of a raw Git helper; reportPath is still caller-selected and the retained history pointer is unchanged."
+      "reason": "The default event-log root now comes from mainCheckoutRoot instead of a raw Git helper; reportPath is still caller-selected and the retained history pointer is unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not select a different report or historical target."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:216",
@@ -411,7 +412,7 @@
       "evidenceSha256": "d5dc0b5e87805b498dc5105f0cb7c1e3d03f27d115efd08b80ed471b76e1a210",
       "disposition": "still-valid-as-recorded",
       "group": "seat-workflow",
-      "reason": "The adapter no longer embeds a model or reads rigorToTier, and projectAgentMarkdown loses its models argument; generated agent source/target paths remain the same agent projections, not area-doc authority."
+      "reason": "The adapter no longer embeds a model or reads rigorToTier, and projectAgentMarkdown loses its models argument; generated agent source/target paths remain the same agent projections, not area-doc authority. See groups.protected-co-cuts: AGENTS host/mint instructions and candidate-only Seat/Workflow/registry routes do not change those projection paths."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:219",
@@ -421,7 +422,7 @@
       "evidenceSha256": "59f8df51d1821101b2baf204c10f6ba82da12804f8ec2d53557eb4b7e4bedc04",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Dev-host manifest construction and environment forwarding are extracted to shared helpers; bin/fgos.mjs, addon and binary entries remain runtime payload metadata, even where a former local expression disappears."
+      "reason": "Dev-host manifest construction and environment forwarding are extracted to shared helpers; bin/fgos.mjs, addon and binary entries remain runtime payload metadata, even where a former local expression disappears. See groups.protected-co-cuts: AGENTS now documents host-only checkout native verbs; candidate-only switchboard routes do not change payload entries."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:221",
@@ -431,7 +432,7 @@
       "evidenceSha256": "650d36d26cc1d8a0f9db83b56fbfb04032465d01cb0056020413d2d9e5d306fd",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Host/addon staging is extracted out of run-tests.mjs and spawn admission is strengthened; the removed staging expressions and remaining suite logs concern build infrastructure, not documentation migration."
+      "reason": "Host/addon staging is extracted out of run-tests.mjs and spawn admission is strengthened; the removed staging expressions and remaining suite logs concern build infrastructure, not documentation migration. See groups.protected-co-cuts: AGENTS narrows board reads, requires the host for native checkout verbs and adds Identity minting; switchboard adds candidate-only routes and renames Identity. These are invocation/navigation changes, not suite document-reader changes."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:227",
@@ -441,7 +442,7 @@
       "evidenceSha256": "66be0079cb84c52e4d6a2eefaf54c8b82e44e6ba1d4c6c9b70e63f6c1cb0fc79",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Mutation worktrees are created through checkouts.create and links are removed before guarded cleanup; baseline/mutant directories remain disposable source checkouts."
+      "reason": "Mutation worktrees are created through checkouts.create and links are removed before guarded cleanup; baseline/mutant directories remain disposable source checkouts. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change the mutation checkout population."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:231",
@@ -451,7 +452,7 @@
       "evidenceSha256": "61797786a30691f1a201453c9d2f64f192d649a9be54e46173558ef15c7c9a54",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Changed-path collection moves from Git subprocess parsing to Inspect with both rename sides kept; paths here are code-selection inputs and no document read is inferred from that list."
+      "reason": "Changed-path collection moves from Git subprocess parsing to Inspect with both rename sides kept; paths here are code-selection inputs and no document read is inferred from that list. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not redefine code selection."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:232",
@@ -461,7 +462,7 @@
       "evidenceSha256": "31dd02fa6d6052573c179d37a73e531b6fd8c9697f7d5d90fb35e99f235d3f60",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "defaultTimedSpawn drops timeBinary and uses its current timing path; stdout logs remain timing artifacts rather than maintained documentation."
+      "reason": "defaultTimedSpawn drops timeBinary and uses its current timing path; stdout logs remain timing artifacts rather than maintained documentation. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not turn timing output into documentation."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:233",
@@ -471,7 +472,7 @@
       "evidenceSha256": "005cfe150b8d24b9b2c9254c36bb711297aab0c617cf8cacd3d25b9e61ed92a4",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Overlap verification now uses mainCheckoutRoot/Inspect instead of a local rev-parse helper; it still reads the shared Work view for overlap measurement."
+      "reason": "Overlap verification now uses mainCheckoutRoot/Inspect instead of a local rev-parse helper; it still reads the shared Work view for overlap measurement. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not supply or move that Work view."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:14",
@@ -676,7 +677,7 @@
       "evidenceSha256": "00d0b1a1faca2decb1e11f385bd92d43cdfc435f6cc0b42267b1b4c32f3891cb",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "generateId/hashSuffixSource are removed after Work ids move to Identity minting; the surviving classify operation and historical id diagnostics remain scalar classification, not documents."
+      "reason": "All four bound passages (dynamic-009606 through 009609) are absent: hashSuffixSource/generateId and both exhaustion diagnostics were removed for Identity minting. Each was REJECT non-document id formatting, so the historical non-document classification stays true with no live ADMIT edge or patch obligation to retire. Still-valid preserves that bounded rejection only; it does not assert that any bound operation survives. Unlike a deleted document consumer, there is no document claim to transfer to a successor."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:6",
@@ -942,12 +943,9 @@
       "path": "src/runner/loop.mjs",
       "recordSha256": "880d6b5ad8e53557b3c73f25fbe546c648188d92b0b76748e03f99d9e34e32dd",
       "evidenceSha256": "c8131bb06a6d702f654f6e30609f304f8b548ba1ccf2cfbf691372e363931841",
-      "disposition": "owned-park",
-      "group": "external-input",
-      "reason": "The changed branch-settlement code does not resolve real item.docsRef/contentRoot values used by the separate ready-validation plan reader; a claimed Work/content export is still required to judge document identity.",
-      "owner": "WORK lane owner",
-      "missingInput": "Claimed ready-validation Work rows and each selected content worktree, including item.docsRef/contentRoot and plan.md bytes.",
-      "nextAction": "Export the ready-validation candidates and their claimed content roots; for each item bind item.docsRef to the actual plan.md, record the READY/non-READY verdict, and demonstrate the same item and verdict after its planned document move without mutating Work on non-READY."
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "Changed dynamic-012803/012854/012870/012871/012892/012903 are REJECT non-document branch refs, compareCommits, addOutcome, logging and runner-config plumbing. ADMIT docsRef readers dynamic-012848/012849 are moved byte-equal; their existing Work/content export blocker stays open at phase 08 /parked, without making source drift undecidable."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:37",
@@ -965,12 +963,9 @@
       "path": "src/runner/operation-choice.mjs",
       "recordSha256": "345a15bab4e07029a2360e453bbd26b1fc29e626e22df3dd7a2ce8950447f4e8",
       "evidenceSha256": "e4303ab5e013b752173805485fee07f3ca92678868fac8d8e89a2a12b1ff372c",
-      "disposition": "owned-park",
-      "group": "external-input",
-      "reason": "compareCommits replaces rev-list for branch existence, but operation-specific docsRef/contentRoot reads depend on selected persisted work/stage inputs that the repository does not contain.",
-      "owner": "WORK lane owner",
-      "missingInput": "Selected persisted Work/stage inputs for each distinct operation-choice docsRef/contentRoot lookup, including the final branch.",
-      "nextAction": "Export the selected claimed item/stage and content root for every operation-choice plan lookup; bind each plan.md independently and compare branch eligibility/operation before and after its move. Do not reuse the earlier planner branch as evidence for the final lookup."
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "Changed dynamic-013100/013102/013141 are REJECT non-document branch comparison/config plumbing (rev-list becomes compareCommits). All ADMIT operation-specific docsRef witnesses, including 013081/013113/013132, are moved byte-equal. Their phase-08 Work/stage export dependency stays open at /parked; drift does not alter any selected plan identity."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:3",
@@ -1260,7 +1255,7 @@
       "evidenceSha256": "60f727e10c1dcbde9e3d6cea21d2a9cc4e3a0b19f193e87a2ee9783b5a44bbf4",
       "disposition": "still-valid-as-recorded",
       "group": "seat-workflow",
-      "reason": "Panel role expansion is replaced by declared seats; synthesized seat/task strings remain runtime output rather than maintained documentation identity."
+      "reason": "The sole bound passage dynamic-012462 is absent: synthesized baseRole-index labels were removed in favor of declared seats. Its REJECT non-document runtime-label classification remains true historically; there is no live ADMIT document edge or patch obligation needing a superseding owner. Still-valid does not claim the removed label builder survives, nor infer the new seat contract from its old bytes."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:148",
@@ -1319,7 +1314,7 @@
       "evidenceSha256": "6d25e8331f740cb14f2f8b3185594161b300abedce1450d3cb1e71defba8afa0",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Git diagnostics load the addon before state-root resolution and return structured detail; message/root operands remain infrastructure diagnostics."
+      "reason": "Git diagnostics load the addon before state-root resolution and return structured detail; message/root operands remain infrastructure diagnostics. See groups.protected-co-cuts: AGENTS now describes checkout native-door refusals and Identity minting, with narrower board reads; switchboard successor routes remain candidate-only. Neither changes these diagnostic root identities."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:15",
@@ -1329,7 +1324,7 @@
       "evidenceSha256": "f4a8c2516b7085ca07a1f15cf3b8cb47b35cfcb0b99f5788bf4ac6bb2c023743",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Lock doctor probes move to the in-process door and combine holder/domain facts; removed helper paths remain lock-probe artifacts, not docs."
+      "reason": "Lock doctor probes move to the in-process door and combine holder/domain facts; removed helper paths remain lock-probe artifacts, not docs. See groups.protected-co-cuts: AGENTS changes board-read timing, host/native-door instructions and Identity minting; switchboard adds candidate-only registry/Seat/Workflow successors and renames Identity. Those deltas do not relocate lock-probe artifacts."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:18",
@@ -1339,7 +1334,7 @@
       "evidenceSha256": "58f72f8ead352d08ceb2637497f3cfdbb6766f1bef927760c4a861fd8d8fc793",
       "disposition": "superseded-or-retired",
       "group": "retired-consumer",
-      "reason": "lock-record-checks is deleted when lock doctor rows are consolidated; its record-diagnostic operands no longer have consumers at this path.",
+      "reason": "lock-record-checks is deleted when lock doctor rows are consolidated; its record-diagnostic operands no longer have consumers at this path. See groups.protected-co-cuts: AGENTS host/mint doctrine and candidate-only switchboard routes do not revive the removed consumer.",
       "supersedingRecord": {
         "kind": "git-change",
         "commit": "c125931bf3f81f373dd93a6e948e06550b58c167",
@@ -1358,7 +1353,7 @@
       "evidenceSha256": "f3833ac2512b4f101d7adc8810af15e82fdbd655423a591c7bbbfa2798675a41",
       "disposition": "still-valid-as-recorded",
       "group": "seat-workflow",
-      "reason": "Model-pool messages admit object cells and old tier-ceiling checks disappear; pool names/config paths remain runtime configuration, not document reads."
+      "reason": "Model-pool messages admit object cells and old tier-ceiling checks disappear; pool names/config paths remain runtime configuration, not document reads. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only Seat/Workflow/registry routes do not turn pool configuration into documentation authority."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
@@ -1368,7 +1363,7 @@
       "evidenceSha256": "66fa4b66094ea32bfce0eb17bc1a96a088d6e0f173b4bca8a6c5969cbb85d421",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Containment diagnostics now explain mount refusal and new generation grace sources; these remain supervisor runtime checks, not docs pointers."
+      "reason": "Containment diagnostics now explain mount refusal and new generation grace sources; these remain supervisor runtime checks, not docs pointers. See groups.protected-co-cuts: AGENTS changes board-read timing, host/native-door instructions and Identity attribution/minting; switchboard routes remain candidate-only after registry/Seat/Workflow additions and Identity rename. None changes containment inputs."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:25",
@@ -1378,7 +1373,7 @@
       "evidenceSha256": "4b0f3b57a02138c86b4fd2f33d36330160e57c7084d6fd51ac17f0fdd4bce8c6",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Terminal checks name paneId and remove redundant terminal-dir creation; allocation/state-directory diagnostics remain non-document operations."
+      "reason": "Terminal checks name paneId and remove redundant terminal-dir creation; allocation/state-directory diagnostics remain non-document operations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change terminal allocation roots."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:26",
@@ -1388,7 +1383,7 @@
       "evidenceSha256": "6dd029de4916a8ddeec2f3e596c341538d6b4ae59701fe2522f1e5f9a13ad906",
       "disposition": "superseded-or-retired",
       "group": "retired-consumer",
-      "reason": "The workflow-pool-independence implementation is removed in favor of dry-bind diagnostics; its old row/message consumers are retired.",
+      "reason": "The workflow-pool-independence implementation is removed in favor of dry-bind diagnostics; its old row/message consumers are retired. See groups.protected-co-cuts: AGENTS host/mint doctrine and candidate-only Workflow/Seat/registry routes neither revive those consumers nor promote successor behavior.",
       "supersedingRecord": {
         "kind": "git-change",
         "commit": "720891630cbae2bd25f43d9969b5e429d04fee73",
@@ -1711,11 +1706,9 @@
       "path": "test/runner/dead-vocabulary-guard.test.mjs",
       "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53",
       "evidenceSha256": "f97778052b1e42bbc5881e7256985e3877916db2a7a1058a239a384bed0dbffe",
-      "disposition": "needs-recomposition",
-      "group": "current-body",
-      "reason": "The vocabulary scan has a prepared current-body migration; config helper changes do not justify approving the old retiring-tree scan roots unchanged.",
-      "patchSpecId": "g9:test/runner/dead-vocabulary-guard.test.mjs",
-      "patchRef": "recomposed.json#g9:test/runner/dead-vocabulary-guard.test.mjs"
+      "disposition": "still-valid-as-recorded",
+      "group": "config-fixture",
+      "reason": "Changed dynamic-023841/023843/023905 only add projectConfigPath/writeProjectConfig and remove resolveTierModel from temporary config fixtures. The complete file delta leaves document scan roots unchanged; the planned collectPlatformSpecs migration predates this drift and is not a drift-required edit. The 15 original read-set/root blockers stay open at /parked."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
@@ -1805,7 +1798,7 @@
       "evidenceSha256": "08c6c158a602285606c099973c9a264a2e0f2a747bdd8bd7fd4f743699a9ce73",
       "disposition": "still-valid-as-recorded",
       "group": "git-infrastructure",
-      "reason": "Runner-loop fixtures move to schema config helpers and updated Unit commit expectations; RESEARCH.md/doc-history comparisons remain synthetic fixture paths, not live repo documentation."
+      "reason": "Runner-loop fixtures move to schema config helpers and updated Unit commit expectations. The bound RESEARCH.md and doc-history comparisons were removed (absent), not retained; their old synthetic-fixture classification does not become a live document consumer. The unrelated docs/history comparison at current line 269 does not replace those removed passages."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:26",
@@ -2606,7 +2599,7 @@
       "recordSha256": "6f158710dd7b0ba3a781afb79a9e151f7bb2d2023f4822555ae93304f922ebc7",
       "evidenceSha256": "a979bf0b8b7037ac3d69b47be74d694c332c7b0026db61913b1e9abf3ed21f07",
       "disposition": "still-valid-as-recorded",
-      "group": "git-infrastructure",
+      "group": "seat-workflow",
       "reason": "Failover tests change provider pools, Seat Binding account selection and workspace helpers; worker scripts and capacity snapshots remain runtime fixtures despite removed old inline setup."
     },
     {
@@ -3528,11 +3521,9 @@
       "path": "apps/fgos-gateway/src/mcp.rs",
       "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
       "evidenceSha256": "6b7558b5fa5bdef0d17b88979aed02285344660d38d32176609eb2169ace1b00",
-      "disposition": "needs-recomposition",
-      "group": "current-body",
-      "reason": "The contract reader still reads the gateway API schema while YAML parsing moves to yaml-doc; apply its prepared current-body reader rebind, not a no-change assertion.",
-      "patchSpecId": "g9:apps/fgos-gateway/src/mcp.rs",
-      "patchRef": "recomposed.json#g9:apps/fgos-gateway/src/mcp.rs"
+      "disposition": "still-valid-as-recorded",
+      "group": "source-contract-data",
+      "reason": "The whole-file overlap changes YAML parsing to yaml-doc, not the gateway schema path or its reader/output identity; all bound primary passages are byte-equal. Its existing contract-path migration and three /parked entries remain phase-08 obligations, not drift-required edits. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts and do not relocate the schema."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:155",
@@ -3542,7 +3533,7 @@
       "evidenceSha256": "14a79f51abad87c5f057086819d6bb61ed39a5a2f2153f402fe0a7b59ea405b5",
       "disposition": "still-valid-as-recorded",
       "group": "doc-navigation",
-      "reason": "Terminal rename removes native agent session-id labels and builds structured id/title/session display; remaining recorded references are historical navigation, and the removed a.ssid comment no longer asserts an open question."
+      "reason": "Terminal rename removes native agent session-id labels and builds structured id/title/session display; remaining recorded references are historical navigation, and the removed a.ssid comment no longer asserts an open question. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not promote that navigation or revive the removed label."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:156",
@@ -3552,7 +3543,7 @@
       "evidenceSha256": "4415c24c4965a2a373642233cfab69f60a0afaaf53ee8aabb34e601466f35d37",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "terminal-port.sh uses the activated host for writer id instead of importing checkout identity code; shell/node/native lookup operands remain terminal/runtime configuration."
+      "reason": "terminal-port.sh uses the activated host for writer id instead of importing checkout identity code; shell/node/native lookup operands remain terminal/runtime configuration. See groups.protected-co-cuts: AGENTS explicitly changes host/native-door and Identity attribution/minting instructions; switchboard Identity routes remain candidate-only. Those changes describe invocation, not a new document read."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:3",
@@ -3572,11 +3563,9 @@
       "path": "bin/fgos.mjs",
       "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
       "evidenceSha256": "e5cae3cb7e682d9b91a1cc96b0f49ec77fd2725900a4821048e08fabe2416464",
-      "disposition": "needs-recomposition",
-      "group": "current-body",
-      "reason": "The CLI replaces generated ids with mintWorkId and moves seat/config behavior; its many document writers/readers already have a guarded composed body and must not be approved by an unchanged surrounding scalar.",
-      "patchSpecId": "g9:bin/fgos.mjs",
-      "patchRef": "recomposed.json#g9:bin/fgos.mjs"
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "Identity minting removes the old generateId explanation and its reference-000249 historical citation; it needs no replacement document claim. The other changed primary passages are REJECT scalar/config/store or Git plumbing, including the removed reference-000264 cat-file probe. The complete overlap leaves surviving document operands unchanged; the pre-existing three-hunk migration is owned by other revisions, not required by this drift. All 44 phase-08 /parked entries stay open."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl:17",
@@ -3686,7 +3675,7 @@
       "evidenceSha256": "7391546416931ef9a290868f3dd42680d9ce699e8ce29ec9b1efddfdac517b3f",
       "disposition": "still-valid-as-recorded",
       "group": "process-lock-identity",
-      "reason": "Event-store setup replaces mintEventStoreMachineId/hostname plumbing with Identity mintMachineId; stateRoot/machine-id is runtime identity, not docs."
+      "reason": "Event-store setup replaces mintEventStoreMachineId/hostname plumbing with Identity mintMachineId; stateRoot/machine-id is runtime identity, not docs. See groups.protected-co-cuts: AGENTS adds Identity mint doctrine and host-only checkout native verbs; candidate-only switchboard routes do not relocate the machine-id file."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
@@ -3694,11 +3683,9 @@
       "path": "src/setup/registrations.mjs",
       "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
       "evidenceSha256": "9b2adf64d610c60ff5fcac3506bb4580b50a0700d7a5e94949587bbdee06dd51",
-      "disposition": "needs-recomposition",
-      "group": "current-body",
-      "reason": "Registration code loses old lock/policy checks and changes source assumptions; use its already prepared current body for document-reader/message/default rebindings.",
-      "patchSpecId": "g9:src/setup/registrations.mjs",
-      "patchRef": "recomposed.json#g9:src/setup/registrations.mjs"
+      "disposition": "still-valid-as-recorded",
+      "group": "git-infrastructure",
+      "reason": "ADMIT dynamic-014425/014426 replace cat-file with pathExistsAt for the same live doc.currentPath at HEAD; reference-003844 only loses an adjacent lock-fences registration, retaining its history comment. Other changed passages are REJECT diagnostics, config, assignment and Git plumbing. The whole-file delta does not relocate document operands or require the existing seven-hunk migration; all 45 phase-08 /parked entries stay open. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts, not treated as authority promotion."
     },
     {
       "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl:50",
@@ -3889,7 +3876,7 @@
       "recordSha256": "2ec528e548524013cf50acc51e346df04a8a32eb857907e84125c330959ed5dc",
       "evidenceSha256": "ed0509228e6f0ebac8b8a152f76844ab405785221d99039139ca40ea8d2b9a02",
       "disposition": "still-valid-as-recorded",
-      "group": "process-lock-identity",
+      "group": "doc-navigation",
       "reason": "The maintained distribution source is explicitly retired with its tree; npm init refusal and package allowlist changes do not revive its per-edge consumer patches or change that recorded retirement intent."
     },
     {
@@ -3942,6 +3929,16 @@
         "sha256": "2ec528e548524013cf50acc51e346df04a8a32eb857907e84125c330959ed5dc",
         "requiredField": "retiresWithTree"
       }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "reviewOrdinal": 338,
+      "path": "src/cli/command-registry.mjs",
+      "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "evidenceSha256": "3df723c2238e7a0784ff5231dcdacfa747213fc5ae13395e3bcf7965726bf307",
+      "disposition": "still-valid-as-recorded",
+      "group": "doc-navigation",
+      "reason": "Every bound help/citation passage is byte-equal. The complete command-registry overlap changes executor/seat and capability help, but does not change the three old document operands targeted by its pre-existing migration. That migration remains owned by step04-011:1; drift itself requires no new doc edit. All 12 phase-08 /parked entries stay open. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts and do not change these help destinations."
     }
   ],
   "independentAcceptance": false

@@ -1,6 +1,155 @@
 # G9 per-record source-binding review
 
-## Current park review
+## Current drift-only park correction
+
+Check pin: **`72077976bbc6ffb64ba9478553258bedc2d0050d`**, resolved at turn start.
+This is not final pin F or independent acceptance. The sections below are
+historical receipts at their own pins, not current counts or instructions.
+Read first: `../w15-g9-park-rule-brief.md` and
+`../reviews/w15-g9-parks-review.{md,json}`. Only `g9/**` was written.
+
+G9 now answers **whether source drift breaks the recorded claim**. A missing
+phase-08 export, inventory or retention decision is not itself G9 drift.
+`judge.py` carries every nonempty record-level `/parked` list as
+`carriedBlocker`; `sweep.py` rejects its omission, incorrect record/hash/pointer
+or closed status. The original record remains unchanged and keeps its owner.
+This also applies to the retired assignment-policy row: G9 retirement does not
+silently close the earlier blocker.
+
+### Counts before and after this correction
+
+| Disposition | All before | All after | Original 338 parks before | Original 338 parks after |
+| --- | ---: | ---: | ---: | ---: |
+| still-valid-as-recorded | 517 | 526 | 288 | 296 |
+| needs-recomposition | 20 | 15 | 13 | 9 |
+| superseded-or-retired | 32 | 31 | 32 | 31 |
+| owned-park | 5 | 2 | 5 | 2 |
+| **Total physical records** | **574** | **574** | **338** | **338** |
+
+The 15 blocker-bearing records move from **5 valid / 5 recomposition / 1
+superseded / 4 parks** to **13 valid / 0 recomposition / 1 superseded / 1 park**.
+The existing evidence cohort remains 574 physical records, with revisions
+separate; no pair accounting. `cli-help-messages:3` was outside the original
+338 review rows, so it receives one additional explicit review, not a changed
+population denominator: **339 authored reviews**, **4,113 full deltas**, and
+**14,969 passage occurrences read**. `park-rule-audit.json` retains every
+before disposition; `park-rule-commands.json` records the proof sequence.
+
+### All 15 carriedBlockers
+
+Let `R=plans/260925-documentation-authority-unification/reports/phase-08/`.
+For **each** table entry, the actual field in `judgments.json` is
+`carriedBlocker={record: R+record, pointer: "/parked", recordSha256: <that
+physical row's SHA-256>, status: "open", reason: "The phase-08 blocker stays
+open at this record and pointer under its existing owner; the G9 disposition
+judges source drift only."}`. Thus each pointer below denotes the original
+record's JSON body, not a claim that a G9 park was cleared by an export.
+
+| Record after `R` | G9 disposition | carriedBlocker location and retained dependency |
+| --- | --- | --- |
+| `step-05-records/generators-skills-and-support.jsonl:66` | owned-park | Same record `#/parked`, **open**: 2 inherited backlog blockers. The separate drift question still needs the backlog owner's intended replacement claim. |
+| `step-05-records/generators-skills-and-support.jsonl:200` | still-valid | Same record `#/parked`, **open**: 22 inventory/registry operations; ScopedCommit changes staging, not document identity. |
+| `step-05-records/runtime-external-parks.jsonl:2` | still-valid | Same record `#/parked`, **open**: authorized bounded inventory export; no wholesale inventory load. |
+| `step-05-records/runtime-judgment-part-26.jsonl:24` | superseded | Same record `#/parked`, **open**: inherited dead-link owner join; module retirement does not close it. |
+| `step-05-records/runtime-judgment-part-27.jsonl:35` | still-valid | Same record `#/parked`, **open**: 2 Work.docsRef/content-root operations, owned by WORK; their ADMIT passages are moved byte-equal. |
+| `step-05-records/runtime-judgment-part-27.jsonl:39` | still-valid | Same record `#/parked`, **open**: 14 operation-specific Work/stage exports, owned by WORK; ADMIT plan readers remain byte-equal. |
+| `step-05-records/runtime-judgment-part-28.jsonl:6` | still-valid | Same record `#/parked`, **open**: 6 dispatch docsRef/content-root operations. |
+| `step-05-records/runtime-judgment-part-28.jsonl:32` | still-valid | Same record `#/parked`, **open**: Work.acceptance evidence-token export. |
+| `step-05-records/tests-judgment-batch4.jsonl:1` | still-valid | Same record `#/parked`, **open**: 15 scan-root/read-set obligations; drift only changes config fixtures. |
+| `step-05-records/tests-judgment-batch4.jsonl:2` | still-valid | Same record `#/parked`, **open**: architecture-manifest retention/move decision. |
+| `step-05-records/tests-judgment-batch6.jsonl:1` | still-valid | Same record `#/parked`, **open**: docs-index output retention/move decision. |
+| `step-05-records/cli-help-messages.jsonl:3` | still-valid | Same record `#/parked`, **open**: 12 help/writer/retention obligations; current help overlap does not change the bound doc operands. |
+| `step-05-records/gateway-contract.jsonl:2` | still-valid | Same record `#/parked`, **open**: 3 gateway schema obligations; YAML parser drift does not relocate the reader. |
+| `step-05-records/runtime-judgment-part-22.jsonl:13` | still-valid | Same record `#/parked`, **open**: all 44 Work/registry/narrative blockers; changed id commentary and non-document plumbing do not demand a new doc edit. |
+| `step-05-records/setup-doctor-roots.jsonl:21` | still-valid | Same record `#/parked`, **open**: all 45 registration/registry blockers; pathExistsAt probes the same live currentPath at HEAD. |
+
+### Other corrected judgments and patch ownership
+
+- `step04-029:1` is **still-valid** for live edges `class6-l-000481`,
+  `000482`, `000483` (current lines 267-268, 308-309, 362). Only `000484`
+  and `000485` are retired, via `retiredPassageIds` and the existing hashed
+  `e71381aba` removal record. Verify authenticates that record through the
+  same successor-proof door used for whole-record retirements and checks that
+  the retained witnesses are moved/unchanged.
+- Both backlog parks now ask the owning writer to **edit `docs/backlog.md`
+  directly**, return exact row identities, and check `identity-ids-unique`;
+  neither asks for regeneration. These are future owner actions, not commands
+  run in this slice. The two G9 parks remain `batch-126:2` and generators `:66`.
+- `tests-judgment-batch5:25` now says the RESEARCH.md/doc-history comparisons
+  were **removed**, not retained. The unrelated line-269 comparison is not
+  substituted for them.
+- `part-26:2` and `runtime-r20:147` explicitly explain the all-absent result:
+  all their bound operands were REJECT non-document ids/labels. The historical
+  rejection remains true, but no old operation is claimed to survive and no
+  ADMIT document obligation is transferred. This is not the rule for a deleted
+  document consumer.
+- Every reviewed row with changed AGENTS/switchboard co-cuts now names the
+  shared `groups.protected-co-cuts` explanation: board-read timing,
+  host/native-door refusals, Identity attribution/minting, candidate-only
+  registry/Seat/Workflow routes and the Identity rename. Each reason ties
+  those bytes to its primary operation; candidate metadata is not promotion.
+- `batch-040:4` is now in doc-navigation, and failover test `batch7:150` in
+  seat-workflow. Their dispositions are unchanged.
+
+The five rows leaving needs-recomposition lose their **drift patch references**.
+No prepared body is deleted: all **546 bodies remain byte-identical** because
+other selected rows still own their patches. CLI registry, MCP and bin bodies
+are also referenced by other G9 revisions. The vocabulary body is owned by
+composition rows `scan:successor-dead-vocabulary` and
+`w2:scan:live-successor-specs`; registrations by
+`w8:repin:w2:predecessor:src/setup/registrations.mjs`, all in
+`../composition/patch-specs.json`. Their planned migration does not turn
+fixture/Git drift into a new doc change. No new patch was introduced or applied.
+
+### Commands and proof
+
+Let `G=plans/260925-documentation-authority-unification/reports/phase-09/g9`,
+`A=0763c2259ee3bf1801f4dc9621cbfa7955a156b6`, and
+`P=72077976bbc6ffb64ba9478553258bedc2d0050d`.
+Authored evidence is materialized at A to avoid retrieval-pin-only churn;
+**both required proofs run at P**, validating all source bytes and record
+hashes there, rather than assuming the old pin is fresh.
+
+| Command | Exit |
+| --- | ---: |
+| `python3 -B "$G/review-parks.py" --pin "$A"` | 0 |
+| `python3 -B "$G/judge.py" --pin "$A"` | 0 |
+| `python3 -B "$G/sweep.py" --check --pin "$P"` | 0 |
+| `python3 -B "$G/verify.py" --pin "$P"` | 0 |
+| `git diff --check` | 0 |
+
+Exact expanded commands, exits and stdout hashes are in
+`park-rule-commands.json`; stdout is in `park-rule-{review,judge,sweep,verify}.json`.
+Subcommands retain their individual exit codes in the sweep output and
+`verification-commands.json` (including expected exit-128 absent-path reads,
+not misreported as successful commands). Final sweep/verify/whitespace reruns
+also exit 0. The inline `python3 -B -c` scope/blocker audit first exited 1 on
+a wrapper syntax typo (an extra bracket), then exited 0 after correcting that
+wrapper; both exact commands/exits are retained in the same log, with the
+successful result in `park-rule-final-audit.json`. No production check or
+assertion was skipped.
+
+Sweep: **546 bodies; zero drift, chain mismatch, replay mismatch, unknown
+paths, unresolved recompositions or judgment errors**. Verify: all body
+roundtrips, all **15 open carried blockers**, partial retirement, **339**
+explicit reviews, **10** pure-pin fields, **12** patch-id equivalences and the
+existing controls pass. Two added negative controls reject a missing carried
+blocker and a missing partial-retirement record; existing dependency,
+supersession, park-input and evidence controls are retained.
+
+Prior art reused: the existing judge publication, exact evidence hashes,
+phase-08 `/parked` ownership, complete delta materializer, successor proof and
+GNU-patch replay. No parallel mechanism. **impact-analysis: degraded** under
+the explicit no-fgOS-CLI grant and unavailable MCP; direct callers of changed
+record-tooling symbols are G9 judge/sweep/verify only, not product execution.
+No locked law, product/runtime contract, install defaults or user-visible
+product behavior changes. No product suite, native addon, Git write, lifecycle
+verb, preview service, live document or ledger edits. Scratch stays in the
+existing unique tempfile workspaces below `/tmp/fgos-work/`, removed on exit;
+the final audit records an empty base. `needsWrites=[]` for this records-only
+correction; the remaining backlog parks are owner work, not a requested grant.
+
+## Historical park review
 
 Turn-start pin: **`0763c2259ee3bf1801f4dc9621cbfa7955a156b6`**, resolved with
 `git rev-parse HEAD` before reading the records. This is a check pin, **not final

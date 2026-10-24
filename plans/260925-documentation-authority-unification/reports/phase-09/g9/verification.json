@@ -1,5 +1,5 @@
 {
-  "pin": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "pin": "72077976bbc6ffb64ba9478553258bedc2d0050d",
   "status": "pass",
   "uniqueRecords": 574,
   "cohortMemberships": 684,
@@ -3285,9 +3285,12 @@
   "purePinFieldsVerified": 10,
   "patchIdEquivalencesVerified": 12,
   "parkReviews": {
-    "reviewedRows": 338,
-    "distinctFullDeltas": 4112,
+    "reviewedRows": 339,
+    "carriedPhase08Blockers": 15,
+    "distinctFullDeltas": 4113,
     "negativeControls": [
+      "missing carried phase-08 blocker rejected",
+      "missing partial retirement record rejected",
       "missing exact dependency review rejected",
       "missing named superseding record rejected",
       "missing concrete park input rejected"

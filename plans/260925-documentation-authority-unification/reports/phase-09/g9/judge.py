@@ -94,6 +94,11 @@ def main():
         j = {k: row[k] for k in ['id', 'recordFile', 'recordLine', 'recordSha256', 'memberships',
                                  'path', 'classification', 'currentFileSha256']}
         j.update(evidenceSha256=sweep.evidence_digest(row['passages']), retainedNonDocumentOperands=retained)
+        if rec.get('parked'):
+            j['carriedBlocker'] = {
+                'record': row['id'], 'pointer': '/parked',
+                'recordSha256': row['recordSha256'], 'status': 'open',
+                'reason': 'The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only.'}
         if dependency_changes:
             j['unresolvedDependencies'] = [{'path': p['currentPath'], 'passageId': p['passageId'],
                                             'currentSha256': p['currentSha256']}
@@ -153,7 +158,8 @@ def main():
                         'patchSpecId', 'patchRef']:
                 j.pop(key, None)
             for key in ['disposition', 'reason', 'owner', 'nextAction', 'missingInput', 'needsWrites',
-                        'patchSpecId', 'patchRef', 'supersedingRecord', 'successorEvidence', 'additionalEvidence']:
+                        'patchSpecId', 'patchRef', 'supersedingRecord', 'successorEvidence', 'additionalEvidence',
+                        'retiredPassageIds', 'retirementRecord']:
                 if key in review:
                     j[key] = review[key]
             j.update(reviewRef='park-decisions.json#' + row['id'], reviewGroup=review['group'])

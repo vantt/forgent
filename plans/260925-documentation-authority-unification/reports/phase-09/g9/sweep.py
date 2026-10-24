@@ -453,6 +453,7 @@ def judgment_errors(rows):
     reviews_path = HERE / 'park-decisions.json'
     reviews = {r['id']: r for r in load(reviews_path)['rows']} if reviews_path.exists() else {}
     errors = []
+    originals, _ = scope()
     for row in rows:
         j = judgments.get(row['id'])
         if not j:
@@ -467,11 +468,21 @@ def judgment_errors(rows):
         review = reviews.get(row['id'])
         if review:
             fields = ['recordSha256', 'evidenceSha256', 'disposition', 'reason', 'supersedingRecord',
-                      'owner', 'nextAction', 'missingInput', 'patchSpecId', 'patchRef']
+                      'owner', 'nextAction', 'missingInput', 'patchSpecId', 'patchRef',
+                      'retiredPassageIds', 'retirementRecord']
             if (any(j.get(k) != review.get(k) for k in fields) or
                     j.get('reviewRef') != 'park-decisions.json#' + row['id'] or
                     j.get('reviewGroup') != review['group']):
                 errors.append({'id': row['id'], 'error': 'authored park review missing or altered'})
+        parked = originals.get(row['id'], {}).get('record', {}).get('parked')
+        carried = j.get('carriedBlocker')
+        if parked:
+            if (not carried or carried.get('record') != row['id'] or
+                    carried.get('pointer') != '/parked' or carried.get('status') != 'open' or
+                    carried.get('recordSha256') != row['recordSha256'] or not carried.get('reason')):
+                errors.append({'id': row['id'], 'error': 'phase-08 blocker missing or no longer open at its owning record'})
+        elif carried:
+            errors.append({'id': row['id'], 'error': 'carried blocker has no phase-08 record pointer'})
         if j.get('disposition') == 'superseded-or-retired' and not j.get('supersedingRecord'):
             errors.append({'id': row['id'], 'error': 'retirement lacks named successor record'})
         changed_deps = [{'path': p['currentPath'], 'passageId': p['passageId'],

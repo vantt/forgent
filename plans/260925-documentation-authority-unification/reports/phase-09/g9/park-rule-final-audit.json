@@ -1,0 +1,254 @@
+{
+  "status": "pass",
+  "pin": "72077976bbc6ffb64ba9478553258bedc2d0050d",
+  "afterCounts": {
+    "still-valid-as-recorded": 526,
+    "needs-recomposition": 15,
+    "owned-park": 2,
+    "superseded-or-retired": 31
+  },
+  "dispositionChanges": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl:1",
+      "before": "superseded-or-retired",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
+      "before": "owned-park",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+      "before": "owned-park",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+      "before": "owned-park",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+      "before": "needs-recomposition",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "before": "needs-recomposition",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "before": "needs-recomposition",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "before": "needs-recomposition",
+      "after": "still-valid-as-recorded"
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "before": "needs-recomposition",
+      "after": "still-valid-as-recorded"
+    }
+  ],
+  "carriedBlockers": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
+        "pointer": "/parked",
+        "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
+        "pointer": "/parked",
+        "recordSha256": "8e0cd7d5f1cf921e3d69f637287a14a1c6a02eead2690dc41700ed828216dfdf",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl:2",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "bc296c564506788775874673208cee39cb9148100af515b96e27311354207cbe",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:24",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:24",
+        "pointer": "/parked",
+        "recordSha256": "202983591b8838323fe461c3eccb9dfcdeed2b57113d0cce56727637d4881c48",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+        "pointer": "/parked",
+        "recordSha256": "880d6b5ad8e53557b3c73f25fbe546c648188d92b0b76748e03f99d9e34e32dd",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+        "pointer": "/parked",
+        "recordSha256": "345a15bab4e07029a2360e453bbd26b1fc29e626e22df3dd7a2ce8950447f4e8",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:6",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:6",
+        "pointer": "/parked",
+        "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:32",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:32",
+        "pointer": "/parked",
+        "recordSha256": "06ba376a2006ea3bbb8a9d4f0de7e43afcf8dbb9f3ddfa587a6792f61836db2e",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+        "pointer": "/parked",
+        "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:1",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:1",
+        "pointer": "/parked",
+        "recordSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+        "pointer": "/parked",
+        "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+        "pointer": "/parked",
+        "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    },
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+        "pointer": "/parked",
+        "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      }
+    }
+  ],
+  "reviewedCoCutRows": 38,
+  "bodyPacketUnchanged": true,
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-decisions.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-review-evidence.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-commands.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-judge.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-review.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-sweep.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-verify.json",
+    "plans/260925-documentation-authority-unification/reports/phase-09/g9/park-rule-whitespace.json"
+  ],
+  "stagedPaths": [],
+  "scratchResidue": [],
+  "auditSubcommands": [
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0
+    }
+  ],
+  "independentAcceptance": false
+}

@@ -3,10 +3,10 @@
   "independentAcceptance": false,
   "scope": "574 physical records, 684 cohort memberships. Explicit per-row park reviews supersede the conservative fallback only at their exact record/evidence hashes. Author dispositions, not gate closure; source deltas reopen the matching row.",
   "counts": {
-    "still-valid-as-recorded": 517,
-    "needs-recomposition": 20,
-    "owned-park": 5,
-    "superseded-or-retired": 32
+    "still-valid-as-recorded": 526,
+    "needs-recomposition": 15,
+    "owned-park": 2,
+    "superseded-or-retired": 31
   },
   "rows": [
     {
@@ -1611,7 +1611,7 @@
       "disposition": "owned-park",
       "reason": "The js-yaml advisory PBI disappears, while STR70a and STR62 still cite historical work-state line ordinals; the source-binding decision for those two measured precedents needs the backlog owner's intended replacement claim, not a guessed section.",
       "owner": "Backlog owner / documentation-unification plan owner",
-      "nextAction": "Through the owning backlog writer, reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with the current WORK contract, replace their stale numeric citations and regenerate docs/backlog.md. Retire the removed js-yaml advisory binding; return the writer input and resulting exact row identities before final cutover.",
+      "nextAction": "The owning backlog writer edits docs/backlog.md directly (it is no longer generated): reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with WORK, then replace the stale numeric citations. Retire the removed js-yaml advisory binding; return the exact edited row identities and check the owning identity-ids-unique doctor row before final cutover.",
       "missingInput": "An owner-selected replacement for STR70a and STR62 measured work-state precedents in the authoritative backlog; the removed js-yaml advisory is not a remaining request.",
       "needsWrites": [
         "docs/backlog.md"
@@ -3847,9 +3847,13 @@
       "currentFileSha256": "94dd1e718616edf49034cbdb3790931652f8585e5ed8a141511622a853a1e8bd",
       "evidenceSha256": "7cc198dd285eaa28d3e6dd308190d713d5a7276e9489fe092e06acb42c1a79ff",
       "retainedNonDocumentOperands": [],
-      "disposition": "superseded-or-retired",
-      "reason": "Land replaces the ephemeral branch-force mechanism and removes both history comments; do not preserve two absent comment consumers as live citations.",
-      "supersedingRecord": {
+      "disposition": "still-valid-as-recorded",
+      "reason": "Land removes only class6-l-000484 and class6-l-000485 via e71381aba. Preserve class6-l-000481 (tsk-3bn history, current lines 267-268), class6-l-000482 (leaf-merge history, 308-309) and class6-l-000483 (decision 0032, 362): their five physical passage witnesses are moved byte-equal. The removal record retires just the other two edges, not this whole record.",
+      "retiredPassageIds": [
+        "class6-l-000484",
+        "class6-l-000485"
+      ],
+      "retirementRecord": {
         "kind": "git-change",
         "commit": "e71381aba3e5ed7a2facf1c82e392d886e376a41",
         "path": "src/verbs/merge/approve.mjs",
@@ -3859,7 +3863,7 @@
         "gitDiffSha256": "dc4cfdbcab49a9f340a8aa66de786216bb78d4ccd11b0ba820f04291ce2515ef"
       },
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl:1",
-      "reviewGroup": "retired-consumer",
+      "reviewGroup": "git-infrastructure",
       "evidence": [
         {
           "passageId": "class6-l-000481",
@@ -4926,7 +4930,7 @@
       "evidenceSha256": "22690b186dcbbd333aefd34b01f7a4e52f5d1d882cdae525f32c81d084509905",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "The canonical source changes raw git worktree remove to fgos worktree remove with --delivered-to; the two rejected agent/task metadata strings remain metadata and the render is still derived from that source.",
+      "reason": "The canonical source changes raw git worktree remove to fgos worktree remove with --delivered-to; the two rejected agent/task metadata strings remain metadata and the render is still derived from that source. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change this source/render join.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:3",
       "reviewGroup": "doc-navigation",
       "reviewedDependencies": [
@@ -5240,7 +5244,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "A CLONES_DIR containment guard now precedes pull; the witnessed .git existence probe remains clone infrastructure and does not acquire a document consumer role.",
+      "reason": "A CLONES_DIR containment guard now precedes pull; the witnessed .git existence probe remains clone infrastructure and does not acquire a document consumer role. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change clone containment.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:58",
       "reviewGroup": "doc-navigation",
       "evidence": [
@@ -7907,10 +7911,17 @@
       "currentFileSha256": "d0fb356de66a0bdfffac2f9835678bd4001d68779003c381e34a4f2bc9e49306",
       "evidenceSha256": "9bea4f5790234faf291370d165ed7dd6cf52c50bf66219ed9fec3a0af384d662",
       "retainedNonDocumentOperands": [],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:66",
+        "pointer": "/parked",
+        "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "owned-park",
-      "reason": "The js-yaml advisory row was removed, but the surviving STR70a measured-line claim still needs a backlog-owner replacement, shared with the earlier backlog revision.",
+      "reason": "The js-yaml advisory row was removed, but the surviving STR70a measured-line claim still needs a backlog-owner replacement, shared with the earlier backlog revision. This source-drift question is distinct from the original /parked entries, which stay open there. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not choose the missing backlog claim.",
       "owner": "Backlog owner / documentation-unification plan owner",
-      "nextAction": "Through the owning backlog writer, reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with the current WORK contract, replace their stale numeric citations and regenerate docs/backlog.md. Retire the removed js-yaml advisory binding; return the writer input and resulting exact row identities before final cutover.",
+      "nextAction": "The owning backlog writer edits docs/backlog.md directly (it is no longer generated): reconcile STR70a decision/outcome precedent (old work-state.md:647-675) and STR62 parent/deps/blocks/sibling claim (old :864) with WORK, then replace the stale numeric citations. Retire the removed js-yaml advisory binding; return the exact edited row identities and check the owning identity-ids-unique doctor row before final cutover.",
       "missingInput": "An owner-selected replacement for STR70a and STR62 measured work-state precedents in the authoritative backlog; the removed js-yaml advisory is not a remaining request.",
       "needsWrites": [
         "docs/backlog.md"
@@ -8589,7 +8600,7 @@
       "evidenceSha256": "40516fadaeccf8509a90038eeaae6cc82e5deb70764e249102ba9aed8c443f8e",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "Only the anecdote's manual git mv wording becomes moving by hand; the history-home conventions and docsRef registration described by this zero-edge record are unchanged.",
+      "reason": "Only the anecdote's manual git mv wording becomes moving by hand; the history-home conventions and docsRef registration described by this zero-edge record are unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes neither relocate this history home nor export docsRef values.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:82",
       "reviewGroup": "doc-navigation",
       "evidence": [
@@ -8705,7 +8716,7 @@
       "evidenceSha256": "90918b1ad0a0529a3023fc1d054361b6d911765ef52ee8b5a1862d538ee1a0b5",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "The canonical source changes raw worktree removal to guarded fgos removal; the plugin's two metadata classifications and source/render relationship remain unchanged.",
+      "reason": "The canonical source changes raw worktree removal to guarded fgos removal; the plugin's two metadata classifications and source/render relationship remain unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not alter this render join.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:96",
       "reviewGroup": "doc-navigation",
       "reviewedDependencies": [
@@ -8876,7 +8887,7 @@
       "evidenceSha256": "52aad756e405d5333ca7d28084c21a765ac490341a20124157d949233bc61cc3",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "The split destructive-reset history path is joined and the unsafe status-first exception is removed; the preserved citation still names the same historical CONTEXT, not current authority.",
+      "reason": "The split destructive-reset history path is joined and the unsafe status-first exception is removed; the preserved citation still names the same historical CONTEXT, not current authority. See groups.protected-co-cuts: AGENTS narrows board reading, refuses checkout native verbs, renames writer attribution and adds mint doctrine; switchboard successor routes remain candidate-only. None relocates or promotes this historical citation.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:109",
       "reviewGroup": "doc-navigation",
       "evidence": [
@@ -9183,7 +9194,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Release source enumeration changes from a Git child to Inspect and stages the addon first; srcFull still joins resolvedRepo and rel for the same declared package payload, while removed diagnostic expressions are historical non-document scalars.",
+      "reason": "Release source enumeration changes from a Git child to Inspect and stages the addon first; srcFull still joins resolvedRepo and rel for the same declared package payload, while removed diagnostic expressions are historical non-document scalars. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change the package payload selector.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:161",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -11372,7 +11383,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Both shell helpers replace rev-parse with .git/gitdir/commondir discovery; these remain repository-root operations and the two navigation references retain their destinations.",
+      "reason": "Both shell helpers replace rev-parse with .git/gitdir/commondir discovery; these remain repository-root operations and the two navigation references retain their destinations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not relocate those destinations.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:189",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -11757,7 +11768,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Benchmark addon staging now carries a dev-host manifest and one physical addon; benchmark directories and log strings remain infrastructure rather than documentation read roots.",
+      "reason": "Benchmark addon staging now carries a dev-host manifest and one physical addon; benchmark directories and log strings remain infrastructure rather than documentation read roots. See groups.protected-co-cuts: AGENTS documents host-only native doors and minting; the switchboard changes candidate navigation, not benchmark inputs.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:192",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -13258,7 +13269,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "RepositoryConfig refusal is now printed as code/cause and exitCode is set; the installation root and provenance comment have not become document operands.",
+      "reason": "RepositoryConfig refusal is now printed as code/cause and exitCode is set; the installation root and provenance comment have not become document operands. See groups.protected-co-cuts: AGENTS changes board-read timing, checkout-native refusals and Identity attribution/minting; switchboard adds candidate-only registry/Seat/Workflow routes and renames Identity. None changes this installation-root operand or promotes its provenance.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:195",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -13427,7 +13438,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "The canary's git add/commit calls move behind sandboxGit; the fixed docPath and its existing document-output classification survive in the same sandbox, with no root migration.",
+      "reason": "The canary's git add/commit calls move behind sandboxGit; the fixed docPath and its existing document-output classification survive in the same sandbox, with no root migration. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not move the sandbox docPath.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:198",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -13710,13 +13721,17 @@
       "currentFileSha256": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
       "evidenceSha256": "c8cf17f02be7903d9c7e20cd17d51a7e1449bd51e0d4df23f40f3441d273ebbf",
       "retainedNonDocumentOperands": [],
-      "disposition": "owned-park",
-      "reason": "ScopedCommit replaces raw staging, but targetPath still depends on persisted topicId/role/purposeSlug and registry currentPath; source alone cannot identify which real documents those rows denote.",
-      "owner": "Knowledge registry owner / documentation-unification plan owner",
-      "nextAction": "Export the authorized folded topics/docs plus inventory oldPath rows used by knowledge-migration; join each topicId/role to purposeSlug/currentPath and prepare exactly one source/target identity per migrated document. Re-review the 22 parked registry-dependent operations using that export before applying any move.",
-      "missingInput": "Persisted topics/docs registry and migration inventory rows (topicId, role, purposeSlug, oldPath, currentPath), not present in the source tree.",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
+        "pointer": "/parked",
+        "recordSha256": "8e0cd7d5f1cf921e3d69f637287a14a1c6a02eead2690dc41700ed828216dfdf",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "The only changed ADMIT passage, dynamic-008175, replaces git add with ScopedCommit for the same oldPath-to-newPath move. No document identity or selector changes; the 22 inventory/registry operations remain blocked at the original /parked pointer, not by G9 drift. Protected AGENTS.md and switchboard changes are reviewed in groups.protected-co-cuts: host/mint doctrine and candidate-only routing do not change this move's inputs.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:200",
-      "reviewGroup": "external-input",
+      "reviewGroup": "git-infrastructure",
       "evidence": [
         {
           "passageId": "reference-003610",
@@ -14343,7 +14358,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Holder formatting changes from holders.pids to holders.holders.map(h=>h.pid); queue directories and the display string remain lock diagnostics.",
+      "reason": "Holder formatting changes from holders.pids to holders.holders.map(h=>h.pid); queue directories and the display string remain lock diagnostics. See groups.protected-co-cuts: AGENTS host/native-door doctrine explains invocation constraints; candidate-only switchboard routes do not change these lock artifacts.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:201",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -14600,7 +14615,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Config protection now discovers commonDir from repositoryDirs rather than rev-parse; the compared value is repository identity, not a maintained document path.",
+      "reason": "Config protection now discovers commonDir from repositoryDirs rather than rev-parse; the compared value is repository identity, not a maintained document path. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not turn commonDir into a document root.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:204",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -15040,7 +15055,7 @@
       "evidenceSha256": "846eba20d50617b8e8ded01985e17ef7c9df4b8bb097c8cda13cb75a532a55d2",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "A comment explains why this standalone script retains stableStringify; the serialized measurement data and scratch directories remain non-document operations.",
+      "reason": "A comment explains why this standalone script retains stableStringify; the serialized measurement data and scratch directories remain non-document operations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not alter that serialization or scratch purpose.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:206",
       "reviewGroup": "source-contract-data",
       "evidence": [
@@ -15813,7 +15828,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Main-root discovery moves to Inspect's trustedMainRoot and the local helper disappears; events.jsonl remains runtime measurement input, not a retiring docs-tree read.",
+      "reason": "Main-root discovery moves to Inspect's trustedMainRoot and the local helper disappears; events.jsonl remains runtime measurement input, not a retiring docs-tree read. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not move the measured event population.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:208",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -17123,7 +17138,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Release cleanliness now uses Inspect statusEntries and Cargo updates use rustVersionUpdates; version files and their diagnostics retain the existing release-metadata classification.",
+      "reason": "Release cleanliness now uses Inspect statusEntries and Cargo updates use rustVersionUpdates; version files and their diagnostics retain the existing release-metadata classification. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change these version-file inputs.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:214",
       "reviewGroup": "git-infrastructure",
       "reviewedDependencies": [
@@ -17771,7 +17786,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "The default event-log root now comes from mainCheckoutRoot instead of a raw Git helper; reportPath is still caller-selected and the retained history pointer is unchanged.",
+      "reason": "The default event-log root now comes from mainCheckoutRoot instead of a raw Git helper; reportPath is still caller-selected and the retained history pointer is unchanged. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not select a different report or historical target.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:215",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -18200,7 +18215,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "The adapter no longer embeds a model or reads rigorToTier, and projectAgentMarkdown loses its models argument; generated agent source/target paths remain the same agent projections, not area-doc authority.",
+      "reason": "The adapter no longer embeds a model or reads rigorToTier, and projectAgentMarkdown loses its models argument; generated agent source/target paths remain the same agent projections, not area-doc authority. See groups.protected-co-cuts: AGENTS host/mint instructions and candidate-only Seat/Workflow/registry routes do not change those projection paths.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:216",
       "reviewGroup": "seat-workflow",
       "evidence": [
@@ -19364,7 +19379,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Dev-host manifest construction and environment forwarding are extracted to shared helpers; bin/fgos.mjs, addon and binary entries remain runtime payload metadata, even where a former local expression disappears.",
+      "reason": "Dev-host manifest construction and environment forwarding are extracted to shared helpers; bin/fgos.mjs, addon and binary entries remain runtime payload metadata, even where a former local expression disappears. See groups.protected-co-cuts: AGENTS now documents host-only checkout native verbs; candidate-only switchboard routes do not change payload entries.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:219",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -19941,7 +19956,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Host/addon staging is extracted out of run-tests.mjs and spawn admission is strengthened; the removed staging expressions and remaining suite logs concern build infrastructure, not documentation migration.",
+      "reason": "Host/addon staging is extracted out of run-tests.mjs and spawn admission is strengthened; the removed staging expressions and remaining suite logs concern build infrastructure, not documentation migration. See groups.protected-co-cuts: AGENTS narrows board reads, requires the host for native checkout verbs and adds Identity minting; switchboard adds candidate-only routes and renames Identity. These are invocation/navigation changes, not suite document-reader changes.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:221",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -22455,7 +22470,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Mutation worktrees are created through checkouts.create and links are removed before guarded cleanup; baseline/mutant directories remain disposable source checkouts.",
+      "reason": "Mutation worktrees are created through checkouts.create and links are removed before guarded cleanup; baseline/mutant directories remain disposable source checkouts. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change the mutation checkout population.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:227",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -23314,7 +23329,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Changed-path collection moves from Git subprocess parsing to Inspect with both rename sides kept; paths here are code-selection inputs and no document read is inferred from that list.",
+      "reason": "Changed-path collection moves from Git subprocess parsing to Inspect with both rename sides kept; paths here are code-selection inputs and no document read is inferred from that list. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not redefine code selection.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:231",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -24219,7 +24234,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "defaultTimedSpawn drops timeBinary and uses its current timing path; stdout logs remain timing artifacts rather than maintained documentation.",
+      "reason": "defaultTimedSpawn drops timeBinary and uses its current timing path; stdout logs remain timing artifacts rather than maintained documentation. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not turn timing output into documentation.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:232",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -24764,7 +24779,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Overlap verification now uses mainCheckoutRoot/Inspect instead of a local rev-parse helper; it still reads the shared Work view for overlap measurement.",
+      "reason": "Overlap verification now uses mainCheckoutRoot/Inspect instead of a local rev-parse helper; it still reads the shared Work view for overlap measurement. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not supply or move that Work view.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:233",
       "reviewGroup": "git-infrastructure",
       "evidence": [
@@ -25725,6 +25740,13 @@
       "currentFileSha256": "2555189c4d792e53fc8f058e9cad4cc7e6e7628f7c2cc41d190c3594aa04c588",
       "evidenceSha256": "39f1203581181cd527d3266ebc45b154af9541746821a51a821d6140055fd0b7",
       "retainedNonDocumentOperands": [],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "bc296c564506788775874673208cee39cb9148100af515b96e27311354207cbe",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "still-valid-as-recorded",
       "reason": "Every bound primary consumer passage is byte-equal at the current locator (including moved passages). Retain only its existing operand/retirement decision; protected co-cuts remain explicitly witnessed at current hashes. This does not assert whole-file parity, no new consumers, or final-pin acceptance.",
       "evidence": [
@@ -35931,7 +35953,7 @@
       "evidenceSha256": "00d0b1a1faca2decb1e11f385bd92d43cdfc435f6cc0b42267b1b4c32f3891cb",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "generateId/hashSuffixSource are removed after Work ids move to Identity minting; the surviving classify operation and historical id diagnostics remain scalar classification, not documents.",
+      "reason": "All four bound passages (dynamic-009606 through 009609) are absent: hashSuffixSource/generateId and both exhaustion diagnostics were removed for Identity minting. Each was REJECT non-document id formatting, so the historical non-document classification stays true with no live ADMIT edge or patch obligation to retire. Still-valid preserves that bounded rejection only; it does not assert that any bound operation survives. Unlike a deleted document consumer, there is no document claim to transfer to a successor.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:2",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -37874,6 +37896,13 @@
       "currentFileSha256": null,
       "evidenceSha256": "78db98610af290e325aad7b647d5c021064959769237aa0bb8f10fe9575bbfdb",
       "retainedNonDocumentOperands": [],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:24",
+        "pointer": "/parked",
+        "recordSha256": "202983591b8838323fe461c3eccb9dfcdeed2b57113d0cce56727637d4881c48",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "superseded-or-retired",
       "reason": "The deleted assignment-policy module's runtime scalars and historical edge-case link are superseded by the Seat Binding cutover record.",
       "absenceEvidence": {
@@ -54551,13 +54580,17 @@
           "currentSha256": "d75551056dee75a7ca5065c6a89cbe2daec5332b56e36cf0237096e972956431"
         }
       ],
-      "disposition": "owned-park",
-      "reason": "The changed branch-settlement code does not resolve real item.docsRef/contentRoot values used by the separate ready-validation plan reader; a claimed Work/content export is still required to judge document identity.",
-      "owner": "WORK lane owner",
-      "nextAction": "Export the ready-validation candidates and their claimed content roots; for each item bind item.docsRef to the actual plan.md, record the READY/non-READY verdict, and demonstrate the same item and verdict after its planned document move without mutating Work on non-READY.",
-      "missingInput": "Claimed ready-validation Work rows and each selected content worktree, including item.docsRef/contentRoot and plan.md bytes.",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+        "pointer": "/parked",
+        "recordSha256": "880d6b5ad8e53557b3c73f25fbe546c648188d92b0b76748e03f99d9e34e32dd",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "Changed dynamic-012803/012854/012870/012871/012892/012903 are REJECT non-document branch refs, compareCommits, addOutcome, logging and runner-config plumbing. ADMIT docsRef readers dynamic-012848/012849 are moved byte-equal; their existing Work/content export blocker stays open at phase 08 /parked, without making source drift undecidable.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
-      "reviewGroup": "external-input",
+      "reviewGroup": "git-infrastructure",
       "evidence": [
         {
           "passageId": "reference-003744",
@@ -55835,13 +55868,17 @@
           "currentSha256": "383005515dfe34bdafcec00c7b2dff14c99c1948225fa80da3b10c4e0263ab2f"
         }
       ],
-      "disposition": "owned-park",
-      "reason": "compareCommits replaces rev-list for branch existence, but operation-specific docsRef/contentRoot reads depend on selected persisted work/stage inputs that the repository does not contain.",
-      "owner": "WORK lane owner",
-      "nextAction": "Export the selected claimed item/stage and content root for every operation-choice plan lookup; bind each plan.md independently and compare branch eligibility/operation before and after its move. Do not reuse the earlier planner branch as evidence for the final lookup.",
-      "missingInput": "Selected persisted Work/stage inputs for each distinct operation-choice docsRef/contentRoot lookup, including the final branch.",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+        "pointer": "/parked",
+        "recordSha256": "345a15bab4e07029a2360e453bbd26b1fc29e626e22df3dd7a2ce8950447f4e8",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "Changed dynamic-013100/013102/013141 are REJECT non-document branch comparison/config plumbing (rev-list becomes compareCommits). All ADMIT operation-specific docsRef witnesses, including 013081/013113/013132, are moved byte-equal. Their phase-08 Work/stage export dependency stays open at /parked; drift does not alter any selected plan identity.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
-      "reviewGroup": "external-input",
+      "reviewGroup": "git-infrastructure",
       "evidence": [
         {
           "passageId": "dynamic-013027",
@@ -57864,6 +57901,13 @@
       "currentFileSha256": "d210e4b0974bf6fb02ccd95f9ee69d67c2d2e9b489968b82009831f8df4429f9",
       "evidenceSha256": "f5ab446fdac05f4205952655132d9b405c23431b1077d355a63447edd72942fc",
       "retainedNonDocumentOperands": [],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:6",
+        "pointer": "/parked",
+        "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "still-valid-as-recorded",
       "reason": "Every bound primary consumer passage is byte-equal at the current locator (including moved passages). Retain only its existing operand/retirement decision; protected co-cuts remain explicitly witnessed at current hashes. This does not assert whole-file parity, no new consumers, or final-pin acceptance.",
       "evidence": [
@@ -58631,6 +58675,13 @@
       "currentFileSha256": "535588939d89f54956150430d6ebe3be9538799d636281b0c740835ea188fa9e",
       "evidenceSha256": "fa0fb776b8ff2a05b1642273e7047df373b1e041fc311438d4bf5268ae9bbce3",
       "retainedNonDocumentOperands": [],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl:32",
+        "pointer": "/parked",
+        "recordSha256": "06ba376a2006ea3bbb8a9d4f0de7e43afcf8dbb9f3ddfa587a6792f61836db2e",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "still-valid-as-recorded",
       "reason": "Every bound primary consumer passage is byte-equal at the current locator (including moved passages). Retain only its existing operand/retirement decision; protected co-cuts remain explicitly witnessed at current hashes. This does not assert whole-file parity, no new consumers, or final-pin acceptance.",
       "evidence": [
@@ -68822,7 +68873,7 @@
       "evidenceSha256": "60f727e10c1dcbde9e3d6cea21d2a9cc4e3a0b19f193e87a2ee9783b5a44bbf4",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "Panel role expansion is replaced by declared seats; synthesized seat/task strings remain runtime output rather than maintained documentation identity.",
+      "reason": "The sole bound passage dynamic-012462 is absent: synthesized baseRole-index labels were removed in favor of declared seats. Its REJECT non-document runtime-label classification remains true historically; there is no live ADMIT document edge or patch obligation needing a superseding owner. Still-valid does not claim the removed label builder survives, nor infer the new seat contract from its old bytes.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl:147",
       "reviewGroup": "seat-workflow",
       "evidence": [
@@ -71271,7 +71322,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Git diagnostics load the addon before state-root resolution and return structured detail; message/root operands remain infrastructure diagnostics.",
+      "reason": "Git diagnostics load the addon before state-root resolution and return structured detail; message/root operands remain infrastructure diagnostics. See groups.protected-co-cuts: AGENTS now describes checkout native-door refusals and Identity minting, with narrower board reads; switchboard successor routes remain candidate-only. Neither changes these diagnostic root identities.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:13",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -71640,7 +71691,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Lock doctor probes move to the in-process door and combine holder/domain facts; removed helper paths remain lock-probe artifacts, not docs.",
+      "reason": "Lock doctor probes move to the in-process door and combine holder/domain facts; removed helper paths remain lock-probe artifacts, not docs. See groups.protected-co-cuts: AGENTS changes board-read timing, host/native-door instructions and Identity minting; switchboard adds candidate-only registry/Seat/Workflow successors and renames Identity. Those deltas do not relocate lock-probe artifacts.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:15",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -73436,7 +73487,7 @@
       "evidenceSha256": "58f72f8ead352d08ceb2637497f3cfdbb6766f1bef927760c4a861fd8d8fc793",
       "retainedNonDocumentOperands": [],
       "disposition": "superseded-or-retired",
-      "reason": "lock-record-checks is deleted when lock doctor rows are consolidated; its record-diagnostic operands no longer have consumers at this path.",
+      "reason": "lock-record-checks is deleted when lock doctor rows are consolidated; its record-diagnostic operands no longer have consumers at this path. See groups.protected-co-cuts: AGENTS host/mint doctrine and candidate-only switchboard routes do not revive the removed consumer.",
       "absenceEvidence": {
         "treeObjectId": "1361cfe599ecb65c4d232b29e35489bedc91b831",
         "pathListingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -73651,7 +73702,7 @@
       "evidenceSha256": "f3833ac2512b4f101d7adc8810af15e82fdbd655423a591c7bbbfa2798675a41",
       "retainedNonDocumentOperands": [],
       "disposition": "still-valid-as-recorded",
-      "reason": "Model-pool messages admit object cells and old tier-ceiling checks disappear; pool names/config paths remain runtime configuration, not document reads.",
+      "reason": "Model-pool messages admit object cells and old tier-ceiling checks disappear; pool names/config paths remain runtime configuration, not document reads. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only Seat/Workflow/registry routes do not turn pool configuration into documentation authority.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:19",
       "reviewGroup": "seat-workflow",
       "evidence": [
@@ -74048,7 +74099,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Containment diagnostics now explain mount refusal and new generation grace sources; these remain supervisor runtime checks, not docs pointers.",
+      "reason": "Containment diagnostics now explain mount refusal and new generation grace sources; these remain supervisor runtime checks, not docs pointers. See groups.protected-co-cuts: AGENTS changes board-read timing, host/native-door instructions and Identity attribution/minting; switchboard routes remain candidate-only after registry/Seat/Workflow additions and Identity rename. None changes containment inputs.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -75161,7 +75212,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Terminal checks name paneId and remove redundant terminal-dir creation; allocation/state-directory diagnostics remain non-document operations.",
+      "reason": "Terminal checks name paneId and remove redundant terminal-dir creation; allocation/state-directory diagnostics remain non-document operations. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not change terminal allocation roots.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:25",
       "reviewGroup": "process-lock-identity",
       "evidence": [
@@ -75637,7 +75688,7 @@
       "evidenceSha256": "6dd029de4916a8ddeec2f3e596c341538d6b4ae59701fe2522f1e5f9a13ad906",
       "retainedNonDocumentOperands": [],
       "disposition": "superseded-or-retired",
-      "reason": "The workflow-pool-independence implementation is removed in favor of dry-bind diagnostics; its old row/message consumers are retired.",
+      "reason": "The workflow-pool-independence implementation is removed in favor of dry-bind diagnostics; its old row/message consumers are retired. See groups.protected-co-cuts: AGENTS host/mint doctrine and candidate-only Workflow/Seat/registry routes neither revive those consumers nor promote successor behavior.",
       "absenceEvidence": {
         "treeObjectId": "1361cfe599ecb65c4d232b29e35489bedc91b831",
         "pathListingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -87747,12 +87798,17 @@
           "currentSha256": "ba847b2f3c9d32de13161ddcc09ad3df3a3e15775ffc0bd7202b56b91e85f16d"
         }
       ],
-      "disposition": "needs-recomposition",
-      "reason": "The vocabulary scan has a prepared current-body migration; config helper changes do not justify approving the old retiring-tree scan roots unchanged.",
-      "patchSpecId": "g9:test/runner/dead-vocabulary-guard.test.mjs",
-      "patchRef": "recomposed.json#g9:test/runner/dead-vocabulary-guard.test.mjs",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+        "pointer": "/parked",
+        "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "Changed dynamic-023841/023843/023905 only add projectConfigPath/writeProjectConfig and remove resolveTierModel from temporary config fixtures. The complete file delta leaves document scan roots unchanged; the planned collectPlatformSpecs migration predates this drift and is not a drift-required edit. The 15 original read-set/root blockers stay open at /parked.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
-      "reviewGroup": "current-body",
+      "reviewGroup": "config-fixture",
       "reviewedDependencies": [
         {
           "path": "test/runner/dead-vocabulary-guard.test.mjs",
@@ -88714,6 +88770,13 @@
           "currentSha256": "040528c1a3506b723ba55c77e8226a759cd6c733a355faee23da4860eb5b5cd1"
         }
       ],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "still-valid-as-recorded",
       "reason": "Vendored YAML parser signature checks are removed for the native parser, but the architecture-manifest reader remains fixed and the successor manifest is the current authority; only its module roster changes, not that reader's identity.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:2",
@@ -95378,7 +95441,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Runner-loop fixtures move to schema config helpers and updated Unit commit expectations; RESEARCH.md/doc-history comparisons remain synthetic fixture paths, not live repo documentation.",
+      "reason": "Runner-loop fixtures move to schema config helpers and updated Unit commit expectations. The bound RESEARCH.md and doc-history comparisons were removed (absent), not retained; their old synthetic-fixture classification does not become a live document consumer. The unrelated docs/history comparison at current line 269 does not replace those removed passages.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:25",
       "reviewGroup": "git-infrastructure",
       "reviewedDependencies": [
@@ -116800,6 +116863,13 @@
           "currentSha256": "c7f4470f13acb1e9535f53cc6f952e4283c41036cc858c6b6055445f7b342a5c"
         }
       ],
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:1",
+        "pointer": "/parked",
+        "recordSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
       "disposition": "still-valid-as-recorded",
       "reason": "docsIndexManifestPath still returns docs/enduser-docs-index.json and its read/exists comparisons remain product-output checks; repo/config fixture initialization changes do not relocate that fixed output.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:1",
@@ -192613,7 +192683,7 @@
       "disposition": "still-valid-as-recorded",
       "reason": "Failover tests change provider pools, Seat Binding account selection and workspace helpers; worker scripts and capacity snapshots remain runtime fixtures despite removed old inline setup.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:150",
-      "reviewGroup": "git-infrastructure",
+      "reviewGroup": "seat-workflow",
       "evidence": [
         {
           "passageId": "dynamic-026597",
@@ -246076,17 +246146,24 @@
       "currentFileSha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3",
       "evidenceSha256": "3df723c2238e7a0784ff5231dcdacfa747213fc5ae13395e3bcf7965726bf307",
       "retainedNonDocumentOperands": [],
-      "unresolvedDependencies": [
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+        "pointer": "/parked",
+        "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "Every bound help/citation passage is byte-equal. The complete command-registry overlap changes executor/seat and capability help, but does not change the three old document operands targeted by its pre-existing migration. That migration remains owned by step04-011:1; drift itself requires no new doc edit. All 12 phase-08 /parked entries stay open. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts and do not change these help destinations.",
+      "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl:3",
+      "reviewGroup": "doc-navigation",
+      "reviewedDependencies": [
         {
           "path": "src/cli/command-registry.mjs",
           "passageId": "explicit-overlap-dependency",
           "currentSha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3"
         }
       ],
-      "disposition": "needs-recomposition",
-      "patchSpecId": "g9:src/cli/command-registry.mjs",
-      "patchRef": "recomposed.json#g9:src/cli/command-registry.mjs",
-      "reason": "The authored consumer patch must be rebound to this current whole-file preimage; the G9 body and its historical predecessor chain are prepared and fuzz=0 replayed forward/rollback byte-exact. Current non-document operands are retained only where separately listed; semantic/parity acceptance still belongs to independent review. Changed dependencies remain unresolved and must be reviewed with the prepared body: src/cli/command-registry.mjs. This is pending recomposition/review, not a still-valid judgment.",
       "evidence": [
         {
           "passageId": "reference-003641",
@@ -246667,12 +246744,17 @@
       "currentFileSha256": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
       "evidenceSha256": "6b7558b5fa5bdef0d17b88979aed02285344660d38d32176609eb2169ace1b00",
       "retainedNonDocumentOperands": [],
-      "disposition": "needs-recomposition",
-      "reason": "The contract reader still reads the gateway API schema while YAML parsing moves to yaml-doc; apply its prepared current-body reader rebind, not a no-change assertion.",
-      "patchSpecId": "g9:apps/fgos-gateway/src/mcp.rs",
-      "patchRef": "recomposed.json#g9:apps/fgos-gateway/src/mcp.rs",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+        "pointer": "/parked",
+        "recordSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "The whole-file overlap changes YAML parsing to yaml-doc, not the gateway schema path or its reader/output identity; all bound primary passages are byte-equal. Its existing contract-path migration and three /parked entries remain phase-08 obligations, not drift-required edits. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts and do not relocate the schema.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
-      "reviewGroup": "current-body",
+      "reviewGroup": "source-contract-data",
       "reviewedDependencies": [
         {
           "path": "apps/fgos-gateway/src/mcp.rs",
@@ -247114,7 +247196,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Terminal rename removes native agent session-id labels and builds structured id/title/session display; remaining recorded references are historical navigation, and the removed a.ssid comment no longer asserts an open question.",
+      "reason": "Terminal rename removes native agent session-id labels and builds structured id/title/session display; remaining recorded references are historical navigation, and the removed a.ssid comment no longer asserts an open question. See groups.protected-co-cuts: changed AGENTS host/mint doctrine and candidate-only switchboard routes do not promote that navigation or revive the removed label.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:155",
       "reviewGroup": "doc-navigation",
       "reviewedDependencies": [
@@ -247306,7 +247388,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "terminal-port.sh uses the activated host for writer id instead of importing checkout identity code; shell/node/native lookup operands remain terminal/runtime configuration.",
+      "reason": "terminal-port.sh uses the activated host for writer id instead of importing checkout identity code; shell/node/native lookup operands remain terminal/runtime configuration. See groups.protected-co-cuts: AGENTS explicitly changes host/native-door and Identity attribution/minting instructions; switchboard Identity routes remain candidate-only. Those changes describe invocation, not a new document read.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl:156",
       "reviewGroup": "process-lock-identity",
       "reviewedDependencies": [
@@ -247774,12 +247856,17 @@
           "currentSha256": "bb9dba2c973a0e3343b8ceea4b312832487a0632245ed1d31af77056ecfc49ad"
         }
       ],
-      "disposition": "needs-recomposition",
-      "reason": "The CLI replaces generated ids with mintWorkId and moves seat/config behavior; its many document writers/readers already have a guarded composed body and must not be approved by an unchanged surrounding scalar.",
-      "patchSpecId": "g9:bin/fgos.mjs",
-      "patchRef": "recomposed.json#g9:bin/fgos.mjs",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+        "pointer": "/parked",
+        "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "Identity minting removes the old generateId explanation and its reference-000249 historical citation; it needs no replacement document claim. The other changed primary passages are REJECT scalar/config/store or Git plumbing, including the removed reference-000264 cat-file probe. The complete overlap leaves surviving document operands unchanged; the pre-existing three-hunk migration is owned by other revisions, not required by this drift. All 44 phase-08 /parked entries stay open.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
-      "reviewGroup": "current-body",
+      "reviewGroup": "git-infrastructure",
       "reviewedDependencies": [
         {
           "path": "bin/fgos.mjs",
@@ -254496,7 +254583,7 @@
         }
       ],
       "disposition": "still-valid-as-recorded",
-      "reason": "Event-store setup replaces mintEventStoreMachineId/hostname plumbing with Identity mintMachineId; stateRoot/machine-id is runtime identity, not docs.",
+      "reason": "Event-store setup replaces mintEventStoreMachineId/hostname plumbing with Identity mintMachineId; stateRoot/machine-id is runtime identity, not docs. See groups.protected-co-cuts: AGENTS adds Identity mint doctrine and host-only checkout native verbs; candidate-only switchboard routes do not relocate the machine-id file.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:10",
       "reviewGroup": "process-lock-identity",
       "reviewedDependencies": [
@@ -254759,12 +254846,17 @@
           "currentSha256": "0bcba59308108afcc9571d44480793c0984ec5a4e52a16dbf7da785d3eca0db0"
         }
       ],
-      "disposition": "needs-recomposition",
-      "reason": "Registration code loses old lock/policy checks and changes source assumptions; use its already prepared current body for document-reader/message/default rebindings.",
-      "patchSpecId": "g9:src/setup/registrations.mjs",
-      "patchRef": "recomposed.json#g9:src/setup/registrations.mjs",
+      "carriedBlocker": {
+        "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+        "pointer": "/parked",
+        "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+        "status": "open",
+        "reason": "The phase-08 blocker stays open at this record and pointer under its existing owner; the G9 disposition judges source drift only."
+      },
+      "disposition": "still-valid-as-recorded",
+      "reason": "ADMIT dynamic-014425/014426 replace cat-file with pathExistsAt for the same live doc.currentPath at HEAD; reference-003844 only loses an adjacent lock-fences registration, retaining its history comment. Other changed passages are REJECT diagnostics, config, assignment and Git plumbing. The whole-file delta does not relocate document operands or require the existing seven-hunk migration; all 45 phase-08 /parked entries stay open. Protected AGENTS.md/switchboard host/mint doctrine and candidate-only routes are reviewed in groups.protected-co-cuts, not treated as authority promotion.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
-      "reviewGroup": "current-body",
+      "reviewGroup": "git-infrastructure",
       "reviewedDependencies": [
         {
           "path": "src/setup/registrations.mjs",
@@ -282671,7 +282763,7 @@
       "disposition": "still-valid-as-recorded",
       "reason": "The maintained distribution source is explicitly retired with its tree; npm init refusal and package allowlist changes do not revive its per-edge consumer patches or change that recorded retirement intent.",
       "reviewRef": "park-decisions.json#plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl:4",
-      "reviewGroup": "process-lock-identity",
+      "reviewGroup": "doc-navigation",
       "reviewedDependencies": [
         {
           "path": "docs/specs/distribution.md",

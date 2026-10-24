@@ -1,0 +1,128 @@
+[
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/review-parks.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "8c4098270126a0a7339756514809b7522e7b24d302fd3f6dcaa3bbae7c775b01",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+      "--pin",
+      "0763c2259ee3bf1801f4dc9621cbfa7955a156b6"
+    ],
+    "exit": 0,
+    "stdoutSha256": "34dc6bf56622ebba663ab3aa7ebf2b55281560558629cc2b2a185c5df98e36c0",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+      "--check",
+      "--pin",
+      "72077976bbc6ffb64ba9478553258bedc2d0050d"
+    ],
+    "exit": 0,
+    "stdoutSha256": "74bf3fc822d0f06a91d1429cfec5629123c529b1cfa22a6501900949f0fe7dad",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+      "--pin",
+      "72077976bbc6ffb64ba9478553258bedc2d0050d"
+    ],
+    "exit": 0,
+    "stdoutSha256": "0d40a9309c94fbe50bf33a331533da5f9a4f9ea934b098626e8b617cfae10c07",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+      "--check",
+      "--pin",
+      "72077976bbc6ffb64ba9478553258bedc2d0050d"
+    ],
+    "exit": 0,
+    "stdoutSha256": "74bf3fc822d0f06a91d1429cfec5629123c529b1cfa22a6501900949f0fe7dad",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+      "--pin",
+      "72077976bbc6ffb64ba9478553258bedc2d0050d"
+    ],
+    "exit": 0,
+    "stdoutSha256": "c7df0cfe0b94bcf5649a888e89131c54a48380987d0dfd42880936c547a49cd9",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "-c",
+      "import collections,hashlib,json,pathlib,subprocess\nG=pathlib.Path(\"plans/260925-documentation-authority-unification/reports/phase-09/g9\")\na=json.loads((G/\"park-rule-audit.json\").read_text()); j=json.loads((G/\"judgments.json\").read_text());d=json.loads((G/\"park-decisions.json\").read_text()); ev=json.loads((G/\"park-review-evidence.json\").read_text()); cache={}; blockers=set()\nfor r in j[\"rows\"]:\n f,n=r[\"id\"].rsplit(\":\",1)\n if f not in cache:cache[f]=pathlib.Path(f).read_text().splitlines()\n rec=json.loads(cache[f][int(n)-1])\n if rec.get(\"parked\"):blockers.add(r[\"id\"])\nassert {r[\"id\"] for r in j[\"rows\"] if r.get(\"carriedBlocker\")}==blockers and len(blockers)==15\nassert j[\"counts\"]==dict(collections.Counter(r[\"disposition\"] for r in j[\"rows\"]))==a[\"afterCounts\"]\nassert hashlib.sha256((G/\"recomposed.json\").read_bytes()).hexdigest()==a[\"recomposedBeforeSha256\"]\nchanges=[{\"id\":r[\"id\"],\"before\":a[\"beforeRows\"][r[\"id\"]],\"after\":r[\"disposition\"]} for r in j[\"rows\"] if a[\"beforeRows\"][r[\"id\"]]!=r[\"disposition\"]]\nassert len(changes)==9\nassert len(d[\"rows\"])==339 and len(ev[\"deltas\"])==4113 and sum(r[\"passagesRead\"] for r in ev[\"rows\"])==14969\ncoCutRows={r[\"id\"] for r in ev[\"rows\"] if any(e[\"passageId\"]==\"protected-co-cut\" and ev[\"deltas\"][e[\"deltaRef\"].split(\"#\")[1]]][\"path\"] in [\"AGENTS.md\",\"plans/260925-documentation-authority-unification/transitional-switchboard.json\"] for e in r[\"passages\"])}\nassert all(\"protected-co-cuts\" in r[\"reason\"] for r in d[\"rows\"] if r[\"id\"] in coCutRows)\ncp=subprocess.run([\"git\",\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"],capture_output=True,text=True);assert cp.returncode==0\nchanged=[s[3:] for s in cp.stdout.split(\"\\0\") if s];assert changed and all(p.startswith(str(G)+\"/\") for p in changed)\nstaged=subprocess.run([\"git\",\"diff\",\"--cached\",\"--name-only\"],capture_output=True,text=True);assert staged.returncode==0 and not staged.stdout\nscratch=pathlib.Path(\"/tmp/fgos-work\"); residue=sorted(p.name for p in scratch.iterdir()) if scratch.exists() else [];assert not residue\nprint(json.dumps({\"status\":\"pass\",\"pin\":a[\"pin\"],\"afterCounts\":j[\"counts\"],\"dispositionChanges\":changes,\"carriedBlockers\":[{\"id\":r[\"id\"],\"carriedBlocker\":r[\"carriedBlocker\"]} for r in j[\"rows\"] if r.get(\"carriedBlocker\")],\"reviewedCoCutRows\":len(coCutRows),\"bodyPacketUnchanged\":True,\"changedPaths\":changed,\"stagedPaths\":[],\"scratchResidue\":residue,\"auditSubcommands\":[{\"argv\":[\"git\",\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"],\"exit\":cp.returncode},{\"argv\":[\"git\",\"diff\",\"--cached\",\"--name-only\"],\"exit\":staged.returncode}],\"independentAcceptance\":False},indent=2))"
+    ],
+    "exit": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "  File \"<string>\", line 15\n    coCutRows={r[\"id\"] for r in ev[\"rows\"] if any(e[\"passageId\"]==\"protected-co-cut\" and ev[\"deltas\"][e[\"deltaRef\"].split(\"#\")[1]]][\"path\"] in [\"AGENTS.md\",\"plans/260925-documentation-authority-unification/transitional-switchboard.json\"] for e in r[\"passages\"])}\n                                                                                                                                  ^\nSyntaxError: closing parenthesis ']' does not match opening parenthesis '('\n"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "-c",
+      "import collections,hashlib,json,pathlib,subprocess\nG=pathlib.Path(\"plans/260925-documentation-authority-unification/reports/phase-09/g9\")\na=json.loads((G/\"park-rule-audit.json\").read_text()); j=json.loads((G/\"judgments.json\").read_text());d=json.loads((G/\"park-decisions.json\").read_text()); ev=json.loads((G/\"park-review-evidence.json\").read_text()); cache={}; blockers=set()\nfor r in j[\"rows\"]:\n f,n=r[\"id\"].rsplit(\":\",1)\n if f not in cache:cache[f]=pathlib.Path(f).read_text().splitlines()\n rec=json.loads(cache[f][int(n)-1])\n if rec.get(\"parked\"):blockers.add(r[\"id\"])\nassert {r[\"id\"] for r in j[\"rows\"] if r.get(\"carriedBlocker\")}==blockers and len(blockers)==15\nassert j[\"counts\"]==dict(collections.Counter(r[\"disposition\"] for r in j[\"rows\"]))==a[\"afterCounts\"]\nassert hashlib.sha256((G/\"recomposed.json\").read_bytes()).hexdigest()==a[\"recomposedBeforeSha256\"]\nchanges=[{\"id\":r[\"id\"],\"before\":a[\"beforeRows\"][r[\"id\"]],\"after\":r[\"disposition\"]} for r in j[\"rows\"] if a[\"beforeRows\"][r[\"id\"]]!=r[\"disposition\"]]\nassert len(changes)==9\nassert len(d[\"rows\"])==339 and len(ev[\"deltas\"])==4113 and sum(r[\"passagesRead\"] for r in ev[\"rows\"])==14969\ncoCutRows={r[\"id\"] for r in ev[\"rows\"] if any(e[\"passageId\"]==\"protected-co-cut\" and ev[\"deltas\"][e[\"deltaRef\"].split(\"#\")[1]][\"path\"] in [\"AGENTS.md\",\"plans/260925-documentation-authority-unification/transitional-switchboard.json\"] for e in r[\"passages\"])}\nassert all(\"protected-co-cuts\" in r[\"reason\"] for r in d[\"rows\"] if r[\"id\"] in coCutRows)\ncp=subprocess.run([\"git\",\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"],capture_output=True,text=True);assert cp.returncode==0\nchanged=[s[3:] for s in cp.stdout.split(\"\\0\") if s];assert changed and all(p.startswith(str(G)+\"/\") for p in changed)\nstaged=subprocess.run([\"git\",\"diff\",\"--cached\",\"--name-only\"],capture_output=True,text=True);assert staged.returncode==0 and not staged.stdout\nscratch=pathlib.Path(\"/tmp/fgos-work\"); residue=sorted(p.name for p in scratch.iterdir()) if scratch.exists() else [];assert not residue\nprint(json.dumps({\"status\":\"pass\",\"pin\":a[\"pin\"],\"afterCounts\":j[\"counts\"],\"dispositionChanges\":changes,\"carriedBlockers\":[{\"id\":r[\"id\"],\"carriedBlocker\":r[\"carriedBlocker\"]} for r in j[\"rows\"] if r.get(\"carriedBlocker\")],\"reviewedCoCutRows\":len(coCutRows),\"bodyPacketUnchanged\":True,\"changedPaths\":changed,\"stagedPaths\":[],\"scratchResidue\":residue,\"auditSubcommands\":[{\"argv\":[\"git\",\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"],\"exit\":cp.returncode},{\"argv\":[\"git\",\"diff\",\"--cached\",\"--name-only\"],\"exit\":staged.returncode}],\"independentAcceptance\":False},indent=2))"
+    ],
+    "exit": 0,
+    "stdoutSha256": "816b0981ce977db732edb13a1f532add4c2b8677746a454981fb9a7d808548c5",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": ""
+  }
+]
