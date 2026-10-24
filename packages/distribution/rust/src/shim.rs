@@ -651,8 +651,11 @@ mod tests {
         let (root, shim) = shim_scene("unreadable", PRETTY);
         let activation = root.join("installation").join("activation.json");
         std::fs::set_permissions(&activation, std::fs::Permissions::from_mode(0o000)).unwrap();
-        // Root reads a mode-000 file anyway; the refusal is then not reachable.
-        if std::fs::read(&activation).is_err() {
+        // Root reads a mode-000 file anyway; the refusal is then not reachable, and the
+        // test says so instead of passing silently.
+        if std::fs::read(&activation).is_ok() {
+            eprintln!("skipped: running as root, a mode-000 activation.json is still readable");
+        } else {
             let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(5))
                 .expect("the shim returned");
             assert_eq!(out.status.code(), Some(3), "{out:?}");
@@ -668,19 +671,43 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn a_sh_shim_stops_reading_once_it_has_both_keys() {
-        // Both keys first, then a tail of about 33 MB, which sh takes some 5 s to read
-        // line by line: the shim returns long before, without reading it.
+        // Both keys first, then a long tail. The same shim without its early stop is the
+        // yardstick, run on the same file in the same place: the shim must take a small
+        // fraction of its time, whatever the machine's speed.
         let pad = "x".repeat(200);
-        let tail: String = (0..150_000)
+        let tail: String = (0..60_000)
             .map(|i| format!("  \"pad{i}\": \"{pad}\",\n"))
             .collect();
         let (root, shim) = shim_scene(
             "long-tail",
             &format!("{{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\",\n{tail}}}\n"),
         );
-        let out = run_shim_within(&shim, &[], std::time::Duration::from_secs(2))
-            .expect("the shim returned within 2 s");
-        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        let stop = "  [ -z \"$_fgos_found_status\" ] || [ -z \"$_fgos_found_path\" ] || break\n";
+        let body = std::fs::read_to_string(&shim).unwrap();
+        assert!(body.contains(stop));
+        let yardstick = shim.with_file_name("fgos-without-early-stop");
+        let written = std::process::Command::new("sh")
+            .arg("-c")
+            .arg("printf '%s' \"$2\" > \"$1\" && chmod 755 \"$1\"")
+            .arg("sh")
+            .arg(&yardstick)
+            .arg(body.replace(stop, ""))
+            .status()
+            .unwrap();
+        assert!(written.success());
+        let timed = |file: &Path| {
+            let start = std::time::Instant::now();
+            let out =
+                run_shim_within(file, &[], std::time::Duration::from_secs(120)).expect("returned");
+            assert_eq!(out.status.code(), Some(0), "{out:?}");
+            start.elapsed()
+        };
+        let without = timed(&yardstick);
+        let with = timed(&shim);
+        assert!(
+            with * 5 < without,
+            "with the early stop {with:?}, without it {without:?}"
+        );
         let _ = std::fs::remove_dir_all(&root);
     }
 
