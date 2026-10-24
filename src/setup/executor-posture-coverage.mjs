@@ -2,7 +2,7 @@
 // Architecture guard: Runs completely dry (no processes spawned, no files written).
 // Evaluates bindings through dry bind().
 
-import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { bind } from '../runner/execution/bind.mjs';
 import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { detectHerdrPresent } from '../runner/execution/run.mjs';
@@ -24,7 +24,7 @@ export async function checkExecutorPostureCoverage(cwd, options = {}) {
   let runnerConfig;
   try {
     runnerConfig = options.runnerConfig
-      ?? (options.loadRunnerConfig ? options.loadRunnerConfig(cwd) : loadRunnerConfigFromDir(cwd));
+      ?? (options.loadRunnerConfig ? options.loadRunnerConfig(cwd) : loadRunnerConfigForDir(cwd));
   } catch (err) {
     return {
       passed: true,

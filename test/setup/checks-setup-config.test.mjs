@@ -4,14 +4,10 @@
 // trong 120s của file gốc, nên gom theo chủ đề sẽ đẻ ra nhóm vượt ngưỡng 30s.
 import '../helpers/process-tmp-root.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { test } from 'node:test';
 import {
-  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
-  DEFAULT_CLEANUP_TTL_DAYS,
-  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
-  DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
-  DEFAULT_RUNNER_CONFIG,
   DOCTOR_CHECKS,
   FGOS,
   FIX_REGISTRATIONS,
@@ -38,14 +34,6 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
-
-const EXPECTED_RUNNER_DEFAULT = {
-  ...DEFAULT_RUNNER_CONFIG,
-  capabilities: DEFAULT_CAPABILITY_SLOTS,
-  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, openai: { nano: 'gpt-5.5' } },
-  executors: { openai: PI_EXECUTOR_DEFAULT },
-};
 
 
 test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks path, and reports hooksWired: true', () => {
@@ -63,23 +51,38 @@ test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks pat
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {
+test('fgos setup creates a header-only config.yaml for the project and for the machine, holding no standard value', () => {
   const cwd = mkTemp('setup-cli-global-config-');
   const homeDir = mkTemp('setup-cli-global-config-home-');
+  initFixtureRepo(cwd);
   const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  const expectedGlobalPath = path.join(homeDir, '.fgos', 'config.json');
-  assert.equal(envelope.data.globalConfigPath, expectedGlobalPath);
-  assert.equal(envelope.data.globalConfigCreated, true);
-  assert.ok(fs.existsSync(expectedGlobalPath));
-  const written = JSON.parse(fs.readFileSync(expectedGlobalPath, 'utf8'));
-  // tsk-2uf-3: the registered "runner" config-default now layers the
-  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (never
-  // changing that constant itself, src/setup/registrations.mjs's own
-  // `DEFAULT_CAPABILITY_SLOTS` composition) -- written.runner is no longer
-  // byte-identical to DEFAULT_RUNNER_CONFIG alone.
-  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
+  const { data } = JSON.parse(result.stdout);
+  const expected = { project: path.join(cwd, '.fgos', 'config.yaml'), global: path.join(homeDir, '.fgos', 'config.yaml') };
+  assert.equal(data.configPath, expected.project);
+  assert.equal(data.configCreated, true);
+  assert.equal(data.globalConfigPath, expected.global);
+  assert.equal(data.globalConfigCreated, true);
+  for (const file of Object.values(expected)) {
+    const body = fs.readFileSync(file, 'utf8').split('\n').filter((line) => line.trim() !== '' && !line.startsWith('#'));
+    assert.deepEqual(body, [], `${file} must hold the header only`);
+  }
+  assert.equal('configAddedKeys' in data || 'globalConfigAddedKeys' in data || 'tierLadderComment' in data, false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup leaves an existing legacy config.json alone and creates no config.yaml beside it', () => {
+  const cwd = mkTemp('setup-cli-legacy-config-');
+  const homeDir = mkTemp('setup-cli-legacy-config-home-');
+  initFixtureRepo(cwd);
+  writeRawProjectConfig(cwd, '{}\n');
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const { data } = JSON.parse(result.stdout);
+  assert.equal(data.configPath, path.join(cwd, '.fgos', 'config.json'));
+  assert.equal(data.configCreated, false);
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'config.yaml')), false);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

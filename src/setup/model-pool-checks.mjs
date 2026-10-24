@@ -4,11 +4,10 @@
 // a model (`model@pool`) or list several; runner.llmAccounts is the machine's account inventory,
 // read beside the provider account inventory the lease still uses. These checks only read.
 
-import { loadRunnerConfigFromDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,7 +15,7 @@ import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 function loadOrExplain(cwd) {
   try {
-    return { runnerConfig: loadRunnerConfigFromDir(cwd) };
+    return { runnerConfig: loadRunnerConfigForDir(cwd) };
   } catch (err) {
     return { skip: { passed: true, message: `runner config not loadable here, not evaluated: ${err.message}` } };
   }
@@ -138,7 +137,7 @@ export function checkModelPolicyPools(cwd) {
 export function checkLlmAccountsShape(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
   if (skip) return skip;
-  const { pools, problems } = readLlmAccounts(runnerConfig, { projectConfig: readSharedConfigOrEmpty(cwd) });
+  const { pools, problems } = readLlmAccounts(runnerConfig);
   if (problems.length > 0) {
     return { passed: false, message: problems.map((p) => `${p.at}: ${p.detail}`).join('; ') };
   }

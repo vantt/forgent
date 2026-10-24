@@ -195,15 +195,11 @@ export function loadRunnerConfig(configPath) {
   return cfg;
 }
 
-// Until the setup, doctor and bin callers move to loadRunnerConfigForDir, the two old names resolve to it.
-export const loadRunnerConfigFromDir = loadRunnerConfigForDir;
-export const ensureRunnerConfigForDir = loadRunnerConfigForDir;
-
 /** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
 const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 'personas', 'seats']);
 
 /** The one value of `runner.patterns.seatBinding.schema` this release reads. */
-export const SEAT_BINDING_SCHEMA_VERSION = 1;
+const SEAT_BINDING_SCHEMA_VERSION = 1;
 
 /**
  * D1's baked-in default runner payload — mirrors this repo's own tracked
@@ -211,7 +207,7 @@ export const SEAT_BINDING_SCHEMA_VERSION = 1;
  * default is provably identical to what already works in this repo's own
  * dogfood loop.
  */
-export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
+const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
 
 export const DEFAULT_RUNNER_CONFIG = {
   coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
