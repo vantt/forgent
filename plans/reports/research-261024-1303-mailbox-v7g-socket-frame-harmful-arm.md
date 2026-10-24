@@ -100,7 +100,8 @@ This was a read-only account check: names, providers and model lists only; the o
   - `google-antigravity` on the omp profile `gemini-tetcu72`.
   - `thehive` lists only deepseek and glm models.
 - I reported this before any run. The owner dropped item 2.
-- **The model-versus-CLI question stays open:**
+- **Later (13:05):** the owner approved the `openrouter` route; the arm ran as V7h (`research-261024-1744-mailbox-v7h-pi-with-claude-through-openrouter.md`), which answers the question below.
+- **The model-versus-CLI question, as it stood at this report:**
   - Codex, pi and omp with `gpt-6.1-sol` all declined legitimate requests (V7c, V7e).
   - Claude Code `haiku` under the same instruction acted (V6).
   - Nothing measured so far separates the model from the CLI, because no approved account serves a non-OpenAI model to pi.
