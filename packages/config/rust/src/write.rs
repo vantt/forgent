@@ -85,13 +85,16 @@ pub(crate) fn io_error(error: impl ToString) -> SnapshotError {
 }
 
 /// Where the target lives: the root it is opened beneath, its directory and its file name.
-fn place(req: &WriteRequest) -> Result<(PathBuf, PathBuf, &'static str), SnapshotError> {
-    let global = &req.roots.global_dir;
+fn place(
+    roots: &SnapshotRequest,
+    target: SourceKind,
+) -> Result<(PathBuf, PathBuf, &'static str), SnapshotError> {
+    let global = &roots.global_dir;
     let (Some(parent), Some(dir)) = (global.parent(), global.file_name()) else {
         return Err(ConfigRefusal::new("config-path-symlink").into());
     };
-    Ok(match req.target {
-        SourceKind::Project => (req.roots.project_root.clone(), ".fgos".into(), YAML_NAME),
+    Ok(match target {
+        SourceKind::Project => (roots.project_root.clone(), ".fgos".into(), YAML_NAME),
         SourceKind::Global => (parent.into(), dir.into(), YAML_NAME),
         SourceKind::Accounts => (
             parent.into(),
@@ -101,23 +104,40 @@ fn place(req: &WriteRequest) -> Result<(PathBuf, PathBuf, &'static str), Snapsho
     })
 }
 
-/// The file now, from one open descriptor, compared with the revision the edits were made against.
-fn current(
-    req: &WriteRequest,
+/// The target file from one open descriptor; none when it does not exist. A legacy JSON file is
+/// `config-format-legacy-json`: it is migrated, never edited.
+fn read_target(
+    target: SourceKind,
     (root, dir, name): &(PathBuf, PathBuf, &str),
-    compare: bool,
 ) -> Result<Option<LoadedFile>, SnapshotError> {
     let max = Profile::StrictConfig.limits().input_bytes;
-    let file = match req.target {
-        SourceKind::Accounts => read_beneath(root, &dir.join(name), max)?,
+    match target {
+        SourceKind::Accounts => Ok(read_beneath(root, &dir.join(name), max)?),
         _ => match select_source(root, dir, max)? {
-            Source::Absent => None,
-            Source::Yaml(file) => Some(file),
-            Source::LegacyJson(_) => {
-                return Err(ConfigRefusal::new("config-format-legacy-json").into())
-            }
+            Source::Absent => Ok(None),
+            Source::Yaml(file) => Ok(Some(file)),
+            Source::LegacyJson(_) => Err(ConfigRefusal::new("config-format-legacy-json").into()),
         },
-    };
+    }
+}
+
+/// The revision of the file a write to `target` is computed against, to pass back as
+/// [`WriteRequest::expected`]; none when the file does not exist.
+pub fn target_revision(
+    roots: &SnapshotRequest,
+    target: SourceKind,
+) -> Result<Option<String>, SnapshotError> {
+    let file = read_target(target, &place(roots, target)?)?;
+    Ok(file.map(|f| f.revision))
+}
+
+/// The file now, compared with the revision the edits were made against when `compare`.
+fn current(
+    req: &WriteRequest,
+    at: &(PathBuf, PathBuf, &str),
+    compare: bool,
+) -> Result<Option<LoadedFile>, SnapshotError> {
+    let file = read_target(req.target, at)?;
     match compare && file.as_ref().map(|f| &f.revision) != req.expected.as_ref() {
         true => Err(conflict("revision-changed")),
         false => Ok(file),
@@ -157,7 +177,7 @@ pub fn commit_observed(
         return Err(ConfigRefusal::new("config-write-confined").into());
     }
     let actor = Actor::from_writer(writer);
-    let at = place(req)?;
+    let at = place(&req.roots, req.target)?;
     let seen = current(req, &at, false)?;
     let refreshing = req.edits.iter().any(|edit| matches!(edit, Edit::Docs));
     if refreshing && req.edits.len() > 1 {

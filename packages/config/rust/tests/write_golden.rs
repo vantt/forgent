@@ -11,8 +11,9 @@ use std::path::Path;
 
 use common::text;
 use fgos_config::detect::NoDetectors;
+use fgos_config::scope::SourceKind;
 use fgos_config::snapshot::{Context, SnapshotError};
-use fgos_config::write::commit;
+use fgos_config::write::{commit, target_revision};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
@@ -167,4 +168,36 @@ fn write_cases() {
         }
         let _ = fs::remove_dir_all(&dir);
     }
+}
+
+/// Each target's file is the one the write compares against: the revision is the digest of its
+/// bytes, none for a file that is not there, and legacy JSON is refused rather than read as YAML.
+#[test]
+fn target_revision_is_the_digest_of_the_file_a_write_to_the_target_edits() {
+    let dir = common::temp("write", "target-revision");
+    let files = serde_json::json!({ "files": {
+        "project/.fgos/config.yaml": ["gateBypass:", "  level: light"],
+        "home/.fgos/private/accounts.yaml": ["runner:", "  llmAccounts: {}"],
+    }});
+    let roots = common::lay_out(&dir, &files);
+    let digest = |rel: &str| format!("{:x}", Sha256::digest(fs::read(dir.join(rel)).unwrap()));
+    let revision = |target| target_revision(&roots, target).unwrap();
+    assert_eq!(
+        revision(SourceKind::Project),
+        Some(digest("project/.fgos/config.yaml"))
+    );
+    assert_eq!(
+        revision(SourceKind::Accounts),
+        Some(digest("home/.fgos/private/accounts.yaml"))
+    );
+    assert_eq!(revision(SourceKind::Global), None);
+    fs::create_dir_all(dir.join("home/.fgos")).unwrap();
+    fs::write(dir.join("home/.fgos/config.json"), "{}").unwrap();
+    match target_revision(&roots, SourceKind::Global) {
+        Err(SnapshotError::Refused(found)) => {
+            assert_eq!(found[0].code, "config-format-legacy-json")
+        }
+        other => panic!("legacy JSON must be refused, got {other:?}"),
+    }
+    let _ = fs::remove_dir_all(&dir);
 }

@@ -8,7 +8,7 @@ use std::fs;
 use std::time::{Duration, Instant};
 
 use fgos_config::detect::NoDetectors;
-use fgos_config::machine::{accounts, ensure_private_dir, fix_modes, modes, token};
+use fgos_config::machine::{accounts, ensure_private_dir, fix_modes, modes, token, unready};
 use fgos_config::snapshot::{snapshot, AccountsState, Context, SnapshotError};
 use fgos_durable_file::Installed;
 use serde_json::{json, Value};
@@ -167,4 +167,29 @@ fn machine_file_cases() {
         }
         let _ = fs::remove_dir_all(&dir);
     }
+}
+
+/// The one machine-files fact the findings engine and `config check` share: a keyword for what is
+/// missing or wrong, none once the private directory and a valid token file are both there.
+#[test]
+fn unready_names_what_the_machine_files_lack_and_nothing_once_they_are_in_order() {
+    let dir = common::temp("machine", "unready");
+    let req = lay(&dir, &json!({}));
+    let global = req.global_dir.clone();
+    assert_eq!(unready(&global).as_deref(), Some("private-missing"));
+    ensure_private_dir(&global).unwrap();
+    assert_eq!(unready(&global).as_deref(), Some("token-missing"));
+    let locks = dir.join("locks");
+    token::ensure(&global, &locks, 2000, || Ok("a".repeat(8))).unwrap();
+    assert_eq!(unready(&global), None);
+    fs::set_permissions(
+        global.join("private/gateway-token"),
+        std::os::unix::fs::PermissionsExt::from_mode(0o644),
+    )
+    .unwrap();
+    assert_eq!(
+        unready(&global).as_deref(),
+        Some("config-token-invalid mode")
+    );
+    let _ = fs::remove_dir_all(&dir);
 }
