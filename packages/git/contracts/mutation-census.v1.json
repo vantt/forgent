@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5d7cab416542080773bde7c687898ffb179cd7b9b6371db2d95571606512e8dd",
+  "payloadDigest": "0bcdf0b9ddad2c854eedfb4dc66e980799ef00f5ea98fbf9aa9221bad1441c3e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -210,7 +210,7 @@
     "packages/config/rust/src/schema.rs": "6b59f16ae0294232c4f01bf22f0fc6480a9c51c844da4c088917f3530e5b1925",
     "packages/config/rust/src/scope.rs": "5c40aee1fb110eae90510d68e143db0a5de28c6e9703e33f5d7a8dc8284641d4",
     "packages/config/rust/src/session.rs": "47efd4cd09cdccbba2bdcae03a79c1d0697fadcecd525705fda2aa491a76127f",
-    "packages/config/rust/src/snapshot.rs": "93fd04e07221525445e685b2a2c3f286b6ba70a650c0b47c56744166a2d94982",
+    "packages/config/rust/src/snapshot.rs": "c4ae5c9fd9ca57ddeb65438a366b24b9af3dfe1f10bb70733143bd595bd845ab",
     "packages/config/rust/src/standard.rs": "e405af1f13d3c71d2a9bf05e5a4812a20ffb9cb51b211f55d019f493c167b456",
     "packages/config/rust/src/validate.rs": "f7a91667121b94e1c781750b8e582992fdecb30195ff1cf26c90719fb151e5c2",
     "packages/config/rust/src/write.rs": "a8de94655cce53401067a1ab1de219aea92584e2fdeb5d2b52128e72360a6cac",
@@ -859,7 +859,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "95c9e5ba54705cdcc129234a23096cc033b776010ce351959a15b6628c22e1a9",
-    "src/runner/dispatch/config.mjs": "9e8c5cc9b124f86a28ab7ab18f122ef80e789812696202136f42ec97455f4d77",
+    "src/runner/dispatch/config.mjs": "eb6fd56c33931fba67d89be9ce7c2b2a6bfedc674f8cfe14b167e88f7582279f",
     "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",

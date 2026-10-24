@@ -287,6 +287,19 @@ type Loaded = (
     Vec<(&'static str, String)>,
 );
 
+/// A not-yet-migrated JSON file may hold `$comment` keys at any depth: they are notes (migration turns
+/// them into doc lines), never values, so the file's meaning leaves them out.
+fn strip_comments(json: &mut Value) {
+    match json {
+        Value::Object(map) => {
+            map.remove("$comment");
+            map.values_mut().for_each(strip_comments);
+        }
+        Value::Array(items) => items.iter_mut().for_each(strip_comments),
+        _ => {}
+    }
+}
+
 /// Parses every source and judges it against its scope; each refusal is listed.
 fn load_sources(ctx: &Context, srcs: &[Src], token: bool) -> Loaded {
     let (mut docs, mut errors, mut notices) = (BTreeMap::new(), Vec::new(), Vec::new());
@@ -300,6 +313,9 @@ fn load_sources(ctx: &Context, srcs: &[Src], token: bool) -> Loaded {
                 continue;
             }
         };
+        if src.name.ends_with(".json") && matches!(src.role, "project" | "global") {
+            strip_comments(&mut json);
+        }
         if src.role == "global" {
             let held = accounts.as_ref().map(|(_, json)| json);
             json = without_held(ctx, json, held, token, &mut notices);
