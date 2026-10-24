@@ -1,0 +1,249 @@
+{
+  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
+  "merge": "571a996f59f3ae20e28e7f9df86867c4a2ab50ae",
+  "extractors": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "lib": "step10-sync287-lib.mjs",
+      "sha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "lib": "lib.mjs",
+      "sha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41"
+    }
+  ],
+  "candidateChecks": [
+    {
+      "path": "docs/platform/config/spec.md",
+      "currentSha256": "99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3",
+      "completeUnitCount": 95,
+      "effectiveDirectBindingsAtInput": 0,
+      "failingBindings": 0,
+      "status": "Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations."
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "currentSha256": "63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e",
+      "completeUnitCount": 297,
+      "effectiveDirectBindingsAtInput": 0,
+      "failingBindings": 0,
+      "status": "Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations."
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "currentSha256": "b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f",
+      "completeUnitCount": 138,
+      "effectiveDirectBindingsAtInput": 1,
+      "failingBindings": 0,
+      "status": "Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations."
+    },
+    {
+      "path": "docs/platform/secrets/spec.md",
+      "currentSha256": "652ba5e8797bf2376e61f6bd5a5e76d8de20f5ae89f033ea1a20ae5e2cd38227",
+      "completeUnitCount": 78,
+      "effectiveDirectBindingsAtInput": 0,
+      "failingBindings": 0,
+      "status": "Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations."
+    }
+  ],
+  "checkedEffectiveDirectBindings": 1,
+  "failingBindings": 0,
+  "historicalOverlayPredecessorsNotRewritten": 0,
+  "checks": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "pointer": "/registryGaps/0",
+      "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+      "target": {
+        "targetOwner": "docs/platform/holder-lock/spec.md",
+        "targetAnchor": "unheaded-block-1",
+        "targetUnitDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+        "targetAncestry": [
+          "Holder-lock Component Specification"
+        ]
+      },
+      "bindingHashValid": true,
+      "currentUnitValid": true,
+      "firstParentPreimage": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 23,
+          "textDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+          "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+          "identityFingerprint": "7f493bd153be4854ffb612dc17aeba04bc740f575b3ef0949c4e72d31f8efaed",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        }
+      ],
+      "currentMatches": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 23,
+          "textDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+          "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+          "identityFingerprint": "7f493bd153be4854ffb612dc17aeba04bc740f575b3ef0949c4e72d31f8efaed",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        }
+      ],
+      "completeDigestMatchesElsewhere": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 23,
+          "textDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+          "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+          "identityFingerprint": "7f493bd153be4854ffb612dc17aeba04bc740f575b3ef0949c4e72d31f8efaed",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        }
+      ],
+      "currentPlacementWitnesses": [
+        {
+          "selected": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-1",
+            "githubAnchor": "unheaded-block-1",
+            "stableAnchor": "unheaded-block-1",
+            "title": "Unheaded block 1",
+            "startLine": 3,
+            "endLine": 23,
+            "textDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+            "identityFingerprint": "7f493bd153be4854ffb612dc17aeba04bc740f575b3ef0949c4e72d31f8efaed",
+            "ancestry": [
+              "Holder-lock Component Specification"
+            ],
+            "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          "previous": {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Holder-lock Component Specification",
+            "anchor": "holder-lock-component-specification",
+            "githubAnchor": "holder-lock-component-specification",
+            "stableAnchor": "h-0d9734634b5a",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "dae383f93522f706c9a09f1d28117e8e9e08006702cabda53df5edaf6973a3e0",
+            "sample": "Holder-lock Component Specification",
+            "sectionPayloadDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "followingBlockDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "identityFingerprint": "5f4ae885fad7b475862c79d2bcf4d2450b3cd51cfbba86e583583da7da1bae42",
+            "ancestry": [
+              "Holder-lock Component Specification"
+            ],
+            "text": "# Holder-lock Component Specification",
+            "sectionText": "# Holder-lock Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          "next": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "1. Purpose",
+            "anchor": "1-purpose",
+            "githubAnchor": "1-purpose",
+            "stableAnchor": "h-74247b760be3",
+            "startLine": 25,
+            "endLine": 25,
+            "textDigest": "49173a978f4b96f50b7bd009d30f24b6fbc25e7b803df8d14547dfc3e0a8a6ef",
+            "sample": "1. Purpose",
+            "sectionPayloadDigest": "e58bfb49ad38fa2e1a6adc402cdc54de28fa8949c892d0dc2ff74afa31c8f804",
+            "followingBlockDigest": "9290f9b1124b0c7a8aa9a822860257698b6e1c0a0a4ccb18b855caf1e3c7aa56",
+            "identityFingerprint": "817d427e815c8558e253d1ae198473ac784938c00a465a9627c5c34d21535b48",
+            "ancestry": [
+              "Holder-lock Component Specification",
+              "1. Purpose"
+            ],
+            "text": "## 1. Purpose",
+            "sectionText": "## 1. Purpose\n\nHolder-lock answers one question for every cold lock in fgOS: who holds this resource right now, as the kernel sees it. A lock is a kernel lock on an open file description. The kernel releases it when every process holding a copy of that description has died, so no decision anywhere in the component is derived from a pid, a TTL, a start time or an mtime. The one pid the component reads is the locker identity the kernel itself stamps on a lock record (`flock` stores the calling process's pid on the description's lock); it is compared only against this live process's own pid, never used to infer liveness or ownership of a record.\n\nEvery caller (the Node facade, a Rust crate, a git hook) goes through one port with one set of operations. Each operating system has one driver behind the port, and the port reports the guarantee level that driver gives on the filesystem the lock files live on. Nothing in the public interface is POSIX-only: a caller never sees a file descriptor or a handle of the operating system.\n\nThe component owns the cold locks, the main checkout mutex, the merge slot and `worktree-admin` (sections 14 and 16). The state store's hot mutex (`state`, `porting-events`) is built on the same facade for its cleanup lock but is implemented by the state store, not by this component (section 15)."
+          }
+        }
+      ],
+      "firstParentPlacementWitnesses": [
+        {
+          "selected": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-1",
+            "githubAnchor": "unheaded-block-1",
+            "stableAnchor": "unheaded-block-1",
+            "title": "Unheaded block 1",
+            "startLine": 3,
+            "endLine": 23,
+            "textDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+            "identityFingerprint": "7f493bd153be4854ffb612dc17aeba04bc740f575b3ef0949c4e72d31f8efaed",
+            "ancestry": [
+              "Holder-lock Component Specification"
+            ],
+            "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          "previous": {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Holder-lock Component Specification",
+            "anchor": "holder-lock-component-specification",
+            "githubAnchor": "holder-lock-component-specification",
+            "stableAnchor": "h-0d9734634b5a",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "dae383f93522f706c9a09f1d28117e8e9e08006702cabda53df5edaf6973a3e0",
+            "sample": "Holder-lock Component Specification",
+            "sectionPayloadDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "followingBlockDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+            "identityFingerprint": "5f4ae885fad7b475862c79d2bcf4d2450b3cd51cfbba86e583583da7da1bae42",
+            "ancestry": [
+              "Holder-lock Component Specification"
+            ],
+            "text": "# Holder-lock Component Specification",
+            "sectionText": "# Holder-lock Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          "next": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "1. Purpose",
+            "anchor": "1-purpose",
+            "githubAnchor": "1-purpose",
+            "stableAnchor": "h-74247b760be3",
+            "startLine": 25,
+            "endLine": 25,
+            "textDigest": "49173a978f4b96f50b7bd009d30f24b6fbc25e7b803df8d14547dfc3e0a8a6ef",
+            "sample": "1. Purpose",
+            "sectionPayloadDigest": "e58bfb49ad38fa2e1a6adc402cdc54de28fa8949c892d0dc2ff74afa31c8f804",
+            "followingBlockDigest": "9290f9b1124b0c7a8aa9a822860257698b6e1c0a0a4ccb18b855caf1e3c7aa56",
+            "identityFingerprint": "817d427e815c8558e253d1ae198473ac784938c00a465a9627c5c34d21535b48",
+            "ancestry": [
+              "Holder-lock Component Specification",
+              "1. Purpose"
+            ],
+            "text": "## 1. Purpose",
+            "sectionText": "## 1. Purpose\n\nHolder-lock answers one question for every cold lock in fgOS: who holds this resource right now, as the kernel sees it. A lock is a kernel lock on an open file description. The kernel releases it when every process holding a copy of that description has died, so no decision anywhere in the component is derived from a pid, a TTL, a start time or an mtime. The one pid the component reads is the locker identity the kernel itself stamps on a lock record (`flock` stores the calling process's pid on the description's lock); it is compared only against this live process's own pid, never used to infer liveness or ownership of a record.\n\nEvery caller (the Node facade, a Rust crate, a git hook) goes through one port with one set of operations. Each operating system has one driver behind the port, and the port reports the guarantee level that driver gives on the filesystem the lock files live on. Nothing in the public interface is POSIX-only: a caller never sees a file descriptor or a handle of the operating system.\n\nThe component owns the cold locks, the main checkout mutex, the merge slot and `worktree-admin` (sections 14 and 16). The state store's hot mutex (`state`, `porting-events`) is built on the same facade for its cleanup lock but is implemented by the state store, not by this component (section 15)."
+          }
+        }
+      ],
+      "status": "current binding matches"
+    }
+  ],
+  "changedRows": 0,
+  "status": "read-only Step 0 check; rebindings not applied because the turn stopped on its exact writable boundary"
+}

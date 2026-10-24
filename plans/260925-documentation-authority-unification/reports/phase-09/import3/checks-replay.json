@@ -1,0 +1,130 @@
+{
+  "inputHEAD": "0e8c6c15b444f420db25cbbdd2a4864f2763f473",
+  "checks": [
+    {
+      "name": "accounting",
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import3/account.py"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:17:32.769744+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"inputHEAD\": \"0e8c6c15b444f420db25cbbdd2a4864f2763f473\",\n  \"commits\": 69,\n  \"changedPaths\": 119,\n  \"changedDocumentation\": 8,\n  \"candidateChecks\": [\n    {\n      \"path\": \"docs/platform/config/spec.md\",\n      \"currentSha256\": \"99a0e0b2dcf4c231b424761e94f9c2f32e951834acc8e576505ae528307e9be3\",\n      \"completeUnitCount\": 95,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/git/spec.md\",\n      \"currentSha256\": \"63856aff2b0d80be616388cd3059ccfbebcd096d9e55ec83b19cd3ec4a748d9e\",\n      \"completeUnitCount\": 297,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/holder-lock/spec.md\",\n      \"currentSha256\": \"b3b06ff39ad72d33773a888b5c42cae601de120bab6699ed4a912823a7a1543f\",\n      \"completeUnitCount\": 138,\n      \"effectiveDirectBindingsAtInput\": 1,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    },\n    {\n      \"path\": \"docs/platform/secrets/spec.md\",\n      \"currentSha256\": \"652ba5e8797bf2376e61f6bd5a5e76d8de20f5ae89f033ea1a20ae5e2cd38227\",\n      \"completeUnitCount\": 78,\n      \"effectiveDirectBindingsAtInput\": 0,\n      \"failingBindings\": 0,\n      \"status\": \"Both frozen extractors agree on every complete unit; current effective bindings checked. Zero-bind documents retain incoming obligations.\"\n    }\n  ],\n  \"checkedBindings\": 1,\n  \"failingBindings\": 0,\n  \"unprovenUnits\": {\n    \"docs/specs/confinement-authority.md\": 18,\n    \"docs/specs/reading-map.md\": 2,\n    \"docs/specs/seat-binding.md\": 4\n  },\n  \"needsWrites\": [\n    \"docs/reading-map.md\"\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "legacy-drift-at-head",
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:17:34.611502+00:00",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "node:fs:441\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open '/home/vantt/projects/forgentX-p9-w1-d3/docs/platform/system-architecture/history/component-boundary-source-carriage.md'\n    at Object.readFileSync (node:fs:441:20)\n    at read (file:///home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs:13:18)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs:81:360\n    at Array.map (<anonymous>)\n    at file:///home/vantt/projects/forgentX-p9-w1-d3/plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs:81:333\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '/home/vantt/projects/forgentX-p9-w1-d3/docs/platform/system-architecture/history/component-boundary-source-carriage.md'\n}\n\nNode.js v24.18.0\n"
+    },
+    {
+      "name": "rebind-check",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,sys; from pathlib import Path; m=runpy.run_path(sys.argv[1]); m['main'].__globals__['SCRATCH']=Path('/tmp/fgos-work/w10-import3/rebind'); sys.argv=sys.argv[1:]; raise SystemExit(m['main']())",
+        "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rebind.py",
+        "--check"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:17:35.602234+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"drift\": 0,\n  \"rows\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ownership-audit",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import runpy,tempfile,sys; original=tempfile.mkdtemp; tempfile.mkdtemp=lambda *a,**k: original(*a,**dict(k,dir='/tmp/fgos-work/w10-import3')); runpy.run_path(sys.argv[1],run_name='__main__')",
+        "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:17:36.955443+00:00",
+      "exit": 1,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/import3/ownership-audit-replay.stdout.json.gz",
+      "stdoutSha256": "23f972b64535f54437d342ebf053e767acfc83da367cdfcc8b9eceb336ce420b",
+      "stdoutEncoding": "gzip UTF-8; decompress to recover exact stdout"
+    },
+    {
+      "name": "ratchet",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:18:21.579979+00:00",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "check-legacy-docs-ratchet: 3 violation(s) found under legacy roots:\n  - [unaccounted-edit] docs/specs/confinement-authority.md: modified maintained file has exception but digest mismatch (expected 7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e, got f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564)\n  - [unaccounted-edit] docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b, got 46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e)\n  - [unaccounted-edit] docs/specs/seat-binding.md: new maintained file has exception but digest mismatch (expected d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13, got be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be)\n"
+    },
+    {
+      "name": "ratchet-owning-test",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/check-legacy-docs-ratchet.test.mjs"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w10-import3/state",
+        "TMPDIR": "/tmp/fgos-work/w10-import3"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T18:18:21.671584+00:00",
+      "exit": 1,
+      "stdout": "✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (1.878184ms)\n✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.116623ms)\n✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.026334ms)\n✔ accounted edit: file modified with valid reviewed exception passes (0.544349ms)\n✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.420323ms)\n✔ unexpected deletion: baselined file missing without exception is refused (0.317533ms)\n✔ malformed baseline: schema validator rejects invalid baseline structures (0.352204ms)\n✔ malformed exception: schema validator rejects invalid exception objects (0.640166ms)\n✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.185779ms)\n✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.492766ms)\n✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (3.204994ms)\n✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.435175ms)\n✔ symlink target: retargeting a symlink to another file of equal bytes is refused (3.797274ms)\n✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.429316ms)\n✔ classification: includes curated generated projections alongside maintained authority (0.073317ms)\n✔ CLI: exits 0 on clean tree and exits 1 on finding (79.398334ms)\n✖ live self-check: repository baseline and ratchet verify cleanly (64.643626ms)\n✔ policy-aware: permits edited and new generated projections without exception (0.786853ms)\n✔ policy-aware: permits new and edited history-evidence payloads without exception (0.444376ms)\n✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.318893ms)\n✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.397941ms)\n✔ safety: detects and refuses class spoofing attempts in baseline (0.322512ms)\n✔ messages: ensure messages do not call non-authority payloads maintained authority (0.251507ms)\n✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.274435ms)\n✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.313985ms)\n✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.264881ms)\n✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.287117ms)\n✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.372079ms)\nℹ tests 28\nℹ suites 0\nℹ pass 27\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 208.795221\n\n✖ failing tests:\n\ntest at test/scripts/check-legacy-docs-ratchet.test.mjs:736:1\n✖ live self-check: repository baseline and ratchet verify cleanly (64.643626ms)\n  AssertionError [ERR_ASSERTION]: Live check failed: check-legacy-docs-ratchet: 3 violation(s) found under legacy roots:\n    - [unaccounted-edit] docs/specs/confinement-authority.md: modified maintained file has exception but digest mismatch (expected 7b37adb1c1bf751cd9e87d9d17c748343012738cc860f8dba74d950069afb34e, got f13fc58b938d464fb8a0db4fe651720d7566ea02d5a003f4a581717defba0564)\n    - [unaccounted-edit] docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b, got 46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e)\n    - [unaccounted-edit] docs/specs/seat-binding.md: new maintained file has exception but digest mismatch (expected d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13, got be53fb710688f798fe9dd488466e21e5dd539e27550dfa7910522ac0056a20be)\n  \n  \n  \n  1 !== 0\n  \n      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/scripts/check-legacy-docs-ratchet.test.mjs:748:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1325:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)\n      at Test.postRun (node:internal/test_runner/test:1465:19)\n      at Test.run (node:internal/test_runner/test:1390:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 1,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": ""
+    }
+  ],
+  "allPassed": false,
+  "qualification": "Diagnostic blocked run, not completed resync or gate acceptance."
+}
