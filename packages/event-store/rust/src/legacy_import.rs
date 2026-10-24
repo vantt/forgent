@@ -45,14 +45,10 @@ fn consumer_inventory(
     port: &dyn Inspect,
     repo: &RepoHandle,
     head: &HeadFact,
+    legacy_refs: &[RefEntry],
 ) -> Result<Inventory, Error> {
     let from_commit = committed_head(head)?;
-    let refs = crate::refs::list(
-        port,
-        repo,
-        &[RefPrefix::parse("refs/fgos/legacy").map_err(|e| invalid(e.to_string()))?],
-    )?;
-    let hint = refs.iter().find_map(|r| {
+    let hint = legacy_refs.iter().find_map(|r| {
         if r.name.as_str() == "refs/fgos/legacy" {
             if let RefValue::Direct(oid) = &r.value {
                 return Some(oid);
@@ -677,12 +673,19 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
 pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> Result<(), Error> {
     let authority = crate::fence::authority(driver, repo)?;
     let repo = &authority;
-    // One HEAD observation answers the whole admission.
-    let head = driver.resolve_head(repo).map_err(git_error)?;
+    // One listing answers the whole admission: the legacy refs and, for an attached HEAD within the
+    // listing, HEAD itself; otherwise HEAD is observed separately.
+    let prefix = |p| RefPrefix::parse(p).map_err(|e| invalid(e.to_string()));
+    let prefixes = [prefix("refs/fgos/legacy")?, prefix("refs/fgos/remotes/")?];
+    let (listed, listed_head) = crate::refs::list_with_head(driver, repo, &prefixes)?;
+    let head = match listed_head {
+        Some(head) => head,
+        None => driver.resolve_head(repo).map_err(git_error)?,
+    };
     if matches!(head, HeadFact::Unborn { .. }) {
         return Ok(());
     }
-    let inv = consumer_inventory(driver, repo, &head)?;
+    let inv = consumer_inventory(driver, repo, &head, &listed)?;
     if !inv.migrated {
         if inv.files.keys().any(|p| retired_path(p)) {
             return Err(Error::new(
@@ -700,9 +703,7 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
             )
         })?
         .ok_or_else(|| invalid("fence missing"))?;
-    let prefixes = [RefPrefix::parse("refs/fgos/").map_err(|e| invalid(e.to_string()))?];
-    let refs = crate::refs::list(driver, repo, &prefixes)?;
-    let refs: Vec<_> = refs
+    let refs: Vec<_> = listed
         .iter()
         .filter(|e| {
             e.name.as_str() == "refs/fgos/legacy"
