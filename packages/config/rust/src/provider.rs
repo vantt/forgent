@@ -313,8 +313,8 @@ fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
 /// prints it. `None` when no layer sets it. For host code that needs one
 /// setting in process, so none reads the config files itself.
 pub fn effective_value(root: &Path, path: &str) -> Result<Option<Value>, Refusal> {
-    let (bundle, roots) = (Bundle::load()?, roots(root)?);
-    let shown = read(&bundle, &roots, &Verb::Show { path: Some(path.to_owned()) })?.data;
+    let request = ConfigRequest { root: root.to_owned(), verb: Verb::Show { path: Some(path.to_owned()) } };
+    let shown = answer(&request)?.data;
     Ok(shown["present"].as_bool().filter(|present| *present).and_then(|_| shown.get("value").cloned()).filter(|value| !value.is_null()))
 }
 
