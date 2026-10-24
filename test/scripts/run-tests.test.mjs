@@ -208,7 +208,7 @@ test('runTests forwards extra runner args without letting them replace the full 
 test('runTests propagates a real child exit status', () => {
   const root = tmpFixtureRoot();
   write(root, 'x.test.mjs');
-  const result = runTests({ root, spawn: () => ({ status: 7 }) });
+  const result = runTests({ root, cwd: root, spawn: () => ({ status: 7 }) });
   assert.equal(result.status, 7);
 });
 
