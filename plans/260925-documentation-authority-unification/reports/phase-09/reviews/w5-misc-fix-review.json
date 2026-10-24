@@ -1,0 +1,73 @@
+{
+  "scope": "w5-misc-fix",
+  "commit": "ad94156cf",
+  "verdicts": [
+    {
+      "id": "M1 shell-helper pointer corrected",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/packaging-distribution/spec.md#pointers-implementation; docs/reading-map.md scripts/fgos-shell-integration.sh entry",
+      "reason": "Both now say the helper reads the dot-git / gitdir / commondir layout from disk with no Git child, and a linked worktree resolves the main checkout; matches scripts/fgos-shell-integration.sh:57-90 (walk up to .git, follow gitdir:/commondir, root = dirname(common_dir)). No rev-parse/show-toplevel text left in either file."
+    },
+    {
+      "id": "M1 block-5 adjudication count",
+      "verdict": "REWORK",
+      "locator": "ledger/decisions/s13-resync-a.json docs/specs/distribution.md unheaded-block-5 reason; s17-misc-review-fixes.json 8 block-90 overlay dispositions; misc-fix/rebind.py; misc-fix/receipt.md",
+      "reason": "Total 141 checks / 32 fixes is right (DOCTOR_CHECKS 141 unique, FIX_REGISTRATIONS 32 at ad94156cf and 23f6eaccf), but the split '133 literal plus 8 loop-registered Git IDs' is false: src/setup/registrations.mjs has 136 literal registerCheck({ id: '...' }) calls plus one loop (line 6340) registering 5 Git ids (bc5589ed7 shrank that loop from 8). The reused enumerator prints only totals. Fix: write '136 literal plus 5 loop-registered Git IDs' everywhere, update rebind.py's reason so --check stays green, assert the split in verify.py. resync-a/adjudications.json still says 143 (outside writable list): record it as a stale historical copy."
+    },
+    {
+      "id": "M2 row 7 reconcile-scan pane-id clause",
+      "verdict": "APPROVE",
+      "locator": "docs/platform/packaging-distribution/spec.md:551 (unheaded-block-90)",
+      "reason": "Clause present, byte-equal to legacy docs/specs/distribution.md:77; true against src/setup/terminal-control-checks.mjs:92-131 (reconcileScan, '(pane <id>)' when the finding has one, nothing closed) and terminal-control/spec.md:153. Unit rebound."
+    },
+    {
+      "id": "M3 reading-map plans/reports citations",
+      "verdict": "APPROVE",
+      "locator": "docs/reading-map.md YAML Document / Config entries",
+      "reason": "0 'plans/reports/' occurrences; replacements point to yaml-document/spec.md section 9 (parser spike evidence) - 10 and config/spec.md section 2 (ownership) and 13 (migration), all present. Transitional Note section and fgos-coding-knowledge count unchanged (asserted by verify.py, rerun green)."
+    },
+    {
+      "id": "M4 example predicate scope",
+      "verdict": "REWORK",
+      "locator": "preserve-premise/proof.py:117-119 historical_evidence; preserve-premise/verify.py currentUnit assertion",
+      "reason": "The marker is searched in the whole unit_at() unit (multi-line comments/paragraphs up to 4 KB), not the bound line. 31 rows are now example-framed (0 before); 25 have no marker on their currentLines; 9 moved park -> preserve-source-confirmed-history without real framing: f00166, f03953, f07667, f08643, f08645, f08668, f08681, f08748, f08817 (e.g. f08817 is a real pointer to retired docs/decisions/0032; f00445 is confirmed by 'e.g. 90m' in a --timeout error string). Real citations (f08621 merge-next SKILL.md, f08646, f08700) are now labelled example framing. Fix: restrict the search to the span's physical line(s) (currentLines) or its containing sentence/table cell, add a negative control with the marker elsewhere in the same unit, rerun and re-judge."
+    },
+    {
+      "id": "M4 five named rows re-judged",
+      "verdict": "APPROVE",
+      "locator": "preserve-premise/proof.json rows f00167 f08807 f07822 f08072 f08073",
+      "reason": "All five are preserve-source-confirmed-history and correct: f00167 'e.g. `docs/history/<feature>/`', f08807 'e.g. \"docs/history/foo/CONTEXT.md\"', f08072/f08073 docsRef row 'ví dụ `docs/history/p50-workflow-induct/`'. f07822's cited 'ví dụ' is 2,450 chars away and refers to `evolve --submit`; its outcome is right only via the `<id>` placeholder, so re-cite it when the predicate is fixed."
+    },
+    {
+      "id": "M4 self-link successor proposals removed",
+      "verdict": "APPROVE",
+      "locator": "proof.json / judgments.json rows f07697 f08033 f08047",
+      "reason": "candidateSuccessors [] and excludedSelfSuccessor == own file; still park-unconfirmed-preserve-premise with the self-link blocker. No row in proof.json lists its own file as a candidate or successor."
+    },
+    {
+      "id": "M4 positive control path-only span",
+      "verdict": "APPROVE",
+      "locator": "proof.json#/positiveEvidenceControls/0/span",
+      "reason": "span.text == 'docs/specs/x.md' (path-only). It does not cover the marker-elsewhere-in-unit negative case (see M4 example predicate scope)."
+    },
+    {
+      "id": "M4 27 rebound rows binding hashes",
+      "verdict": "APPROVE",
+      "locator": "ledger/decisions/s17-misc-review-fixes.json#/bindingRefresh; misc-fix/binding-refresh.json",
+      "reason": "27 overlays (24 spec.md, 3 reading-map.md; 21 content, 6 neighbour-only; 283 checked): sha256 of sorted-key compact JSON + LF of {targetOwner,targetAnchor,targetUnitDigest,targetAncestry} = stored bindingSha256, 0 mismatches; 27/27 supersedesBinding predecessors resolve with equal anchor/digest/hash; all pending. rebind.py --check green in replay."
+    },
+    {
+      "id": "M4 G6 double run byte-identical",
+      "verdict": "APPROVE",
+      "locator": "misc-fix/verify.py replay in /tmp/fgos-work/w5-misc-review/clone (only scratch paths patched, pin 23f6eaccf)",
+      "reason": "Exit 0 in 1m57s: two proof.py --pin runs, stdout equal; proof.json, retire-with-tree.json, judgments.json, history-wrapper-proposals.json byte-identical and equal to delivered; owning G6 assertions passed; counts reproduce the receipt (5,413; 2,549 / 1,399 / 1,001 / 137 / 2 / 162 / 163)."
+    },
+    {
+      "id": "M5 write scope",
+      "verdict": "APPROVE",
+      "locator": "git show --stat ad94156cf",
+      "reason": "18 files, all under docs/platform/packaging-distribution/spec.md, docs/reading-map.md, ledger/decisions/**, phase-09/preserve-premise/**, phase-09/misc-fix/**. No new false claim in changed doc lines; the only new false fact is in records (M1 block-5 adjudication count)."
+    }
+  ],
+  "summary": "9 APPROVE / 2 REWORK. Doc truth fixes, rebinds and the byte-identical G6 replay reproduce; the new 133+8 registry split is false (136+5) and the widened example predicate confirms 9 parked rows from markers off the bound line."
+}
