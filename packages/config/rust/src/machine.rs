@@ -14,10 +14,9 @@ use crate::ConfigRefusal;
 #[cfg(unix)]
 use {
     crate::files::{check_mode, ModeFinding, PRIVATE_DIR_MODE},
-    crate::locks::{scope_params, GLOBAL_CONFIG},
+    crate::locks::{hold, GLOBAL_CONFIG},
     fgos_durable_file::{ensure_dir_beneath, install_once_with_mode, open_beneath},
     fgos_durable_file::{open_dir_beneath, BeneathError, DirIdentity, Installed},
-    fgos_holder_lock::{Acquire, LockScope, ScopeError, Wait},
 };
 
 /// The tokens' file below the global directory, and the longest line it may hold.
@@ -46,26 +45,6 @@ pub fn ensure_private_dir(global_dir: &Path) -> Result<DirIdentity, SnapshotErro
     ensure_dir_beneath(parent, &dir.join("private"), PRIVATE_DIR_MODE)
         .and_then(|made| made.identity())
         .map_err(beneath)
-}
-
-/// Holds `global-config` until dropped; the lock is held or timed out as `config-write-conflict`.
-#[cfg(unix)]
-pub(crate) fn hold_global(
-    lock_root: &Path,
-    wait_ms: u64,
-) -> Result<LockScope<'static>, SnapshotError> {
-    let other = |e: &dyn ToString| io::Error::other(e.to_string());
-    let mut scope = LockScope::seeded(Vec::new()).map_err(|e| other(&e))?;
-    let params = scope_params(Path::new(""), lock_root);
-    match scope.acquire(GLOBAL_CONFIG, &params, Wait::Ms(wait_ms)) {
-        Ok(_) => Ok(scope),
-        Err(ScopeError::Acquire(why))
-            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
-        {
-            Err(refused("config-write-conflict", "", Some("lock-held")))
-        }
-        Err(e) => Err(other(&e).into()),
-    }
 }
 
 /// A token or other secret value carried in process: no `Display`, and `Debug` shows none of it.
@@ -137,7 +116,7 @@ pub mod token {
         text: impl FnOnce() -> Result<String, SnapshotError>,
     ) -> Result<Installed, SnapshotError> {
         let held = ensure_private_dir(global_dir)?;
-        let _lock = hold_global(lock_root, lock_wait_ms)?;
+        let _lock = hold(GLOBAL_CONFIG, Path::new(""), lock_root, lock_wait_ms)?;
         if ensure_private_dir(global_dir)? != held {
             return Err(refused(
                 "config-write-conflict",

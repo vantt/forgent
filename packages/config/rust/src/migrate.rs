@@ -18,11 +18,11 @@ use serde_json::Value;
 use crate::files::{is_tombstone, read_beneath, LoadedFile};
 use crate::files::{JSON_NAME, TOMBSTONE, YAML_NAME};
 use crate::grammar::{doc_lines, is_grammar_line, Actor, Reason};
-use crate::locks::PROJECT_CONFIG;
+use crate::locks::{hold, PROJECT_CONFIG};
 use crate::schema::{json_at, json_put};
 use crate::scope::{judge, SourceKind};
 use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
-use crate::write::{conflict, dir_identity, hold, io_error, produce};
+use crate::write::{conflict, dir_identity, io_error, produce};
 use crate::write::{snapshot_with, without_project, Edit};
 use crate::ConfigRefusal;
 

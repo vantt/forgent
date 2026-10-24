@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 
 use fgos_durable_file::{ensure_dir_beneath, install_once_with_mode, replace_durably_with_mode};
 use fgos_durable_file::{BeneathError, DirIdentity, Installed};
-use fgos_holder_lock::{Acquire, LockScope, ScopeError, Wait};
 use fgos_identity::WriterIdentity;
 use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment, Value as Doc};
@@ -18,7 +17,7 @@ use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
 use crate::grammar::{block_for_changed_key, block_for_new_key, doc_lines, header_lines};
 use crate::grammar::{Actor, Reason};
-use crate::locks::{scope_params, GLOBAL_CONFIG, PROJECT_CONFIG};
+use crate::locks::{hold, GLOBAL_CONFIG, PROJECT_CONFIG};
 use crate::schema::{json_at, json_put};
 use crate::scope::{judge, SourceKind};
 use crate::snapshot::{build, read_sources, Context, SessionClass, Snapshot};
@@ -135,25 +134,6 @@ pub(crate) fn dir_identity(
         Err(BeneathError::Refused(_)) => Err(ConfigRefusal::new("config-path-symlink").into()),
         Err(BeneathError::Io(error)) => Err(error.into()),
         Ok(identity) => Ok(identity),
-    }
-}
-
-/// Takes `lock` for the caller's scope; a lock that stays held is a conflict, the loser writes nothing.
-pub(crate) fn hold(
-    lock: &str,
-    fgos_dir: &Path,
-    lock_root: &Path,
-    wait_ms: u64,
-) -> Result<LockScope<'static>, SnapshotError> {
-    let mut scope = LockScope::seeded(Vec::new()).map_err(io_error)?;
-    match scope.acquire(lock, &scope_params(fgos_dir, lock_root), Wait::Ms(wait_ms)) {
-        Ok(_) => Ok(scope),
-        Err(ScopeError::Acquire(why))
-            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
-        {
-            Err(conflict("lock-held"))
-        }
-        Err(other) => Err(io_error(other)),
     }
 }
 
