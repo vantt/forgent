@@ -1,0 +1,20 @@
+{
+  "scope": "Delta review of the G6 fix commit against w8-g6-fix-brief.md items 1-7, answering w8-g6-parks-review, w8-g6-judgments-review and ruling L13-10. Read-only; proof/verifiers rerun in scratch clone at branch HEAD 081e0362a; G6 source pin 4178dcc6e3445d5d9b8ffd55963cdd02a418af73.",
+  "commit": "db023f06536c7654870a81140ab0d9aa2184fb40",
+  "verdicts": [
+    {"id": "item-1-operand-normalization", "verdict": "APPROVE", "locator": "preserve-premise/proof.py normalize_operand, after_presence; proof.json#operandControls", "reason": "20 rows gain a stable operand (15 class A + f00420, f07646, f07715, f08493, f08561). Every normalized path is a blob or tree at the pin, sits on the bound line and is untouched by the move. The move set has no source outside docs/. Each of the 4 rules has a real positive and negative control. f00587/f00588/f00591 lose stability to a wildcard expansion but keep their sentence evidence."},
+    {"id": "item-2-class-b-actions", "verdict": "APPROVE", "locator": "proof.json rows f08209..f08288, f08335 (recheckHolder, actionReason, blocker)", "reason": "All 25 rows name an existing holder (docs/reading-map.md or docs/platform/workflow/spec.md), pinned by sha, plus the row id and operand. No blocker in 5413 rows has an empty successor list. The actionReason is one template, filled in with each row's operand."},
+    {"id": "item-3-file-level-framing", "verdict": "APPROVE", "locator": "preserve-premise/proof.py file_evidence; proof.json#fileEvidenceControls; fix-delta.json#fileRules", "reason": "Unconfirmed parks 959 -> 623. Rule (b): 182 parks + 3 stable rows. Rule (a): 137 parks + 32 stable rows. All markers are real header text. 6 of the 10 controls are negative. The live docs/history/<feature> conventions (f08463, f08472, f08489, f00475, f08803) stay parked. Spot-check of 56 rows is clean apart from one evidence-kind mismatch (f01182, low)."},
+    {"id": "item-4-live-link-repoints", "verdict": "APPROVE", "locator": "proof.json rows f08113, f08071, f06985", "reason": "Each is a repoint-proposal to the successor its earlier blocker or candidate list named. For f06985, the successor is the Promoted-from holder under L12-26(1)."},
+    {"id": "item-5-f07526-patch", "verdict": "APPROVE", "locator": "preserve-premise/prepared-patches.json#patches[0]; rows f07526-f07528", "reason": "The patch changes lines 22/29/33/37 exactly as the brief specifies and is prepared-not-applied. The doc is byte-unchanged from the pin to HEAD and the commit touches no docs/ file. f07527/f07528 are reclassified as repoint-proposal and linked to the patch."},
+    {"id": "item-6-determinism-and-verifiers", "verdict": "APPROVE", "locator": "proof.py double run; misc-fix/verify.py; preserve-premise/verify.py --pin HEAD", "reason": "The two runs give byte-identical stdout and 5 artifacts, all equal to the committed bytes. misc-fix/verify.py exits 0 in the clone. The combined verifier stops only at the G2 census pin (3d0169f39) when run at HEAD. Committed checks.json came from a disclosed scratch adapter; the committed script reproduces the same content."},
+    {"id": "item-7-receipts-and-scope", "verdict": "APPROVE", "locator": "misc-fix/receipt.md; preserve-premise/receipt.{md,json}; git show --stat db023f065", "reason": "Counts are conserved (4320 + 924 + 163 + 6 = 5413) and match an independent diff. All 14 changed files are on the brief's writable list."}
+  ],
+  "lowNotes": [
+    "f01182 is confirmed via file-external-repository-header although its sentence names fgOS's own docs/specs/; outcome matches its L12-38(7) preserve reason, evidence kind does not (L12-26(9)).",
+    "distill-bee-inventory-2026-07-28-group-c.md mid-line 'Source root:' marker is missed; its 5 rows stay parked (safe false negative).",
+    "Punctuation/'>' stripping and consumer-relative resolution have no negative control.",
+    "misc-fix/checks.json argv cites /tmp/fgos-work/w8-g6-fix/rebind-adapter.py at eb744281d rather than the committed rebind.py.",
+    "Receipt calls the class-B reason per-row; it is one template filled in with each row's operand."
+  ]
+}
