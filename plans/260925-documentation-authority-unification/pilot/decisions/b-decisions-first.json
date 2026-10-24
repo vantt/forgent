@@ -10,15 +10,18 @@
       "sourceUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "1-provenance-of-retired-decisions",
+      "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#1-provenance-of-retired-decisions -> docs/platform/work-state/decisions/retired-decision-history.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+      "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "Retired Decision History: Work State",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "bindingSha256": "8ed68d39476f25c95aec324e42ab272fe4c4dcc090c3507615d1fd47089383d1",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
@@ -41,15 +44,19 @@
       "sourceUnitDigest": "cb78249b3b34c872441f503e5969695e0b15abd05195c856493d6227ff5bbb23",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "2-adr-0002-flat-work-model",
+      "targetAnchor": "0002-mô-hình-việc-phẳng",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#2-adr-0002-flat-work-model -> docs/platform/work-state/decisions/retired-decision-history.md#0002-mô-hình-việc-phẳng; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+      "targetUnitDigest": "a3d4ece5365538ec63b6118c5e987d586a79657c93e901ffb27e5df4921a0515",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "Retired Decision History: Work State",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0002 — Mô hình việc phẳng"
+      ],
+      "bindingSha256": "9518bbfd727a6a4c1cbeed37291dbd341012282c8dd58087a6f7e5f9f0e6d268",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_0201a1d648765d578fb8fd96673da674",
@@ -59,44 +66,51 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-3 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-3; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+      "targetUnitDigest": "a20dd4c563d0c0c1cb323327b7453d8d66beb661f3ceec7f30eb13a916a96071",
       "targetAncestry": [
         "Retired Decision History: Work State",
-        "2. ADR 0002 Flat Work Model"
-      ]
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0002 — Mô hình việc phẳng"
+      ],
+      "bindingSha256": "992d6faf2d0f37a77f80022038dbf62de8fe03450194427ff417ee45c7b11864",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
       "sourceUnitDigest": "a05e96aa58d47c2d93aba8822f9e8c38f89b39b979d8c8b8fad842328f65c489",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "2-adr-0002-flat-work-model",
+      "targetAnchor": "0002-mô-hình-việc-phẳng-1",
       "claimKind": "decision",
-      "disposition": "merge",
-      "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "disposition": "move",
+      "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#2-adr-0002-flat-work-model -> docs/platform/work-state/decisions/retired-decision-history.md#0002-mô-hình-việc-phẳng-1; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+      "targetUnitDigest": "a05e96aa58d47c2d93aba8822f9e8c38f89b39b979d8c8b8fad842328f65c489",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng"
+      ],
+      "bindingSha256": "3a248eb849b1c453717592d009f56aacdc5f25e706409a84e7c06b5f387ac54a",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
       "sourceUnitDigest": "f014a166cf0c8f3dc0e0998cbb8b08c1927000c5e341fcc78ea8f052cf420b1d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0002-context",
+      "targetAnchor": "bối-cảnh",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0002-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+      "targetUnitDigest": "f014a166cf0c8f3dc0e0998cbb8b08c1927000c5e341fcc78ea8f052cf420b1d",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "2. ADR 0002 Flat Work Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "7894afc6b9f1e07042da3367e2d70cf6787dfab1cb215006f23f7f2a87de068a",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
@@ -120,16 +134,18 @@
       "sourceUnitDigest": "d6043b1481fba899bd107a3f203d0eb91b3510c392303fba688d5d8dcd74ea9b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0002-decision",
+      "targetAnchor": "quyết-định",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0002-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+      "targetUnitDigest": "d6043b1481fba899bd107a3f203d0eb91b3510c392303fba688d5d8dcd74ea9b",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "2. ADR 0002 Flat Work Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "Quyết định"
+      ],
+      "bindingSha256": "fd69a6fca75d0cb2f237553569599a5632d0c5a4b5f957136127e9bbd8255845",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
@@ -153,16 +169,18 @@
       "sourceUnitDigest": "e91bbb5ae8fcb8f80cfc0e7d96edacde4801d6b55c38e7d7effdc6e66668fe3d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0002-consequences",
+      "targetAnchor": "hệ-quả",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0002-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+      "targetUnitDigest": "e91bbb5ae8fcb8f80cfc0e7d96edacde4801d6b55c38e7d7effdc6e66668fe3d",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "2. ADR 0002 Flat Work Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "Hệ quả"
+      ],
+      "bindingSha256": "7a4cf2d8bec70f9413c0ddd2e6b7bafd1359529c7f198c3c3a3b08b50bd9bc4b",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
@@ -203,31 +221,37 @@
       "sourceUnitDigest": "c0dc9acc17db42831047d749d50611b840aa11185c806d786510a00e63aa5cd0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "3-adr-0003-naming-and-data-layout",
+      "targetAnchor": "0003-đặt-tên-bố-cục-dữ-liệu",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#3-adr-0003-naming-and-data-layout -> docs/platform/work-state/decisions/retired-decision-history.md#0003-đặt-tên-bố-cục-dữ-liệu; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+      "targetUnitDigest": "c0dc9acc17db42831047d749d50611b840aa11185c806d786510a00e63aa5cd0",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu"
+      ],
+      "bindingSha256": "54686a9b365ec6c1a3484ec3e62aac7878ce8e1456f54b35aec4a161f126c9fe",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
       "sourceUnitDigest": "203f9cd3142f933c7ed8ebb33a25e956689e857e4cc3d5f54031a06a9a8faa2c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0003-context",
+      "targetAnchor": "bối-cảnh-1",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0003-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-1; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+      "targetUnitDigest": "203f9cd3142f933c7ed8ebb33a25e956689e857e4cc3d5f54031a06a9a8faa2c",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "3. ADR 0003 Naming And Data Layout"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "f446acac500326d62507142885a627b42c07b53059a0b7db9d759d15d75668b1",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
@@ -251,16 +275,19 @@
       "sourceUnitDigest": "798c507e268c8c148014c86c19d3e9ba38434eefe0623a8b6606737629e5ae32",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0003-decision",
+      "targetAnchor": "quyết-định-1",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0003-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-1; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+      "targetUnitDigest": "798c507e268c8c148014c86c19d3e9ba38434eefe0623a8b6606737629e5ae32",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "3. ADR 0003 Naming And Data Layout"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Quyết định"
+      ],
+      "bindingSha256": "43ef54883097530f1375e7ea16a0f4cc1ab2ba18eb2391b070266d33b4f62963",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
@@ -284,16 +311,19 @@
       "sourceUnitDigest": "055bb7583cd585802e14c9c9a6472e7c19df9cce141ecf2b1f8ebcd152343e06",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0003-consequences",
+      "targetAnchor": "hệ-quả-1",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0003-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-1; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+      "targetUnitDigest": "055bb7583cd585802e14c9c9a6472e7c19df9cce141ecf2b1f8ebcd152343e06",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "3. ADR 0003 Naming And Data Layout"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Hệ quả"
+      ],
+      "bindingSha256": "1062eb4d9bc3bfc8944abf9d01399f321c1762a93ab76c53178c4fb29d84ee54",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
@@ -334,31 +364,37 @@
       "sourceUnitDigest": "a0ff252fe4a05fd8e693c461f92fec4d11953243fbd4743612353acb3d2aec72",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "4-adr-0004-scope-and-non-goals",
+      "targetAnchor": "0004-phạm-vi-non-goal",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals -> docs/platform/work-state/decisions/retired-decision-history.md#0004-phạm-vi-non-goal; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+      "targetUnitDigest": "a0ff252fe4a05fd8e693c461f92fec4d11953243fbd4743612353acb3d2aec72",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal"
+      ],
+      "bindingSha256": "6fae077908a7000269968c00d51dad3af09be95116514693f2f8e73744a83fa2",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
       "sourceUnitDigest": "f27931862e682c2f65d58afcf2b0e652f898219a48d79f6ddb16de0d9b4af6fc",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0004-context",
+      "targetAnchor": "bối-cảnh-2",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0004-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-2; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+      "targetUnitDigest": "f27931862e682c2f65d58afcf2b0e652f898219a48d79f6ddb16de0d9b4af6fc",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "4. ADR 0004 Scope And Non-Goals"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "9a9f1f0fba14d984e561a9f7b11830ed0c8fc6906cbe27ffdc413ae5b3ebe6fa",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
@@ -399,16 +435,19 @@
       "sourceUnitDigest": "b72bf8ee1aea6db60efc87e527428e2ea30208408c6d507cb22e94d1aeaa5fef",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0004-decision",
+      "targetAnchor": "quyết-định-2",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0004-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-2; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+      "targetUnitDigest": "b72bf8ee1aea6db60efc87e527428e2ea30208408c6d507cb22e94d1aeaa5fef",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "4. ADR 0004 Scope And Non-Goals"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Quyết định"
+      ],
+      "bindingSha256": "36dec2f5d002297e68fb5d590c923628b14dfda080fc604358f9c47f9d55a745",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
@@ -432,16 +471,19 @@
       "sourceUnitDigest": "e44f9991b9931d7cb611894760d23de0ccecacc3e6d22456433e9ba8c115f937",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0004-consequences",
+      "targetAnchor": "hệ-quả-2",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0004-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-2; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+      "targetUnitDigest": "e44f9991b9931d7cb611894760d23de0ccecacc3e6d22456433e9ba8c115f937",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "4. ADR 0004 Scope And Non-Goals"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Hệ quả"
+      ],
+      "bindingSha256": "b25d689a9ac71c156357d9886661b2853c19cbed9d6ae4bd47a975f75ec1ba3a",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
@@ -482,31 +524,37 @@
       "sourceUnitDigest": "2ff34201c3aa91d6669a84ed0af602479d1834bc8906cf8447aca5ca588ebac8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "5-adr-0006-proposed-status",
+      "targetAnchor": "0006-trạng-thái-proposed",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#5-adr-0006-proposed-status -> docs/platform/work-state/decisions/retired-decision-history.md#0006-trạng-thái-proposed; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+      "targetUnitDigest": "2ff34201c3aa91d6669a84ed0af602479d1834bc8906cf8447aca5ca588ebac8",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`"
+      ],
+      "bindingSha256": "81ce3edf2d3cc4599375a002c4d43dedc855b0b0a75a6168025ca11cb53fb455",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
       "sourceUnitDigest": "9c8485790cf86a6a2235f130eeb8eac8443d0d9c3c6a400e3b969405245ccadf",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0006-context",
+      "targetAnchor": "bối-cảnh-3",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0006-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-3; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+      "targetUnitDigest": "9c8485790cf86a6a2235f130eeb8eac8443d0d9c3c6a400e3b969405245ccadf",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "5. ADR 0006 Proposed Status"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "20c9a4ce0fa5174c3d5be5fadaa39fddce3e44ea346e3bdf273c60d1b190fe2c",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_423abdded73e62ffd62a773173555583",
@@ -547,16 +595,19 @@
       "sourceUnitDigest": "965caf0a033210097211032405753f3000abd6e872fb43f53017528db996c151",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0006-decision",
+      "targetAnchor": "quyết-định-3",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0006-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-3; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+      "targetUnitDigest": "965caf0a033210097211032405753f3000abd6e872fb43f53017528db996c151",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "5. ADR 0006 Proposed Status"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Quyết định"
+      ],
+      "bindingSha256": "c026b75831020f7713d010b98262c90cd9779123b19862e3aa5209e3ef99dbfb",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
@@ -614,16 +665,19 @@
       "sourceUnitDigest": "899175d57462b10345fc181dc2f7dbe36dc232d277f38a317cf156247aa4dcb9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0006-consequences",
+      "targetAnchor": "hệ-quả-3",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0006-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-3; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+      "targetUnitDigest": "899175d57462b10345fc181dc2f7dbe36dc232d277f38a317cf156247aa4dcb9",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "5. ADR 0006 Proposed Status"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "bc42f82c253e3b40a85d94ec0d934b48449899bdc0f3e8460e3dfed565f35969",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
@@ -664,31 +718,37 @@
       "sourceUnitDigest": "0652eaa390a60c98405d46d2e62b3aac80aa32d00a54006debdda70257a3ffbf",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "6-adr-0007-schema-and-event-evolution",
+      "targetAnchor": "0007-tiến-hoá-schema-event",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution -> docs/platform/work-state/decisions/retired-decision-history.md#0007-tiến-hoá-schema-event; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+      "targetUnitDigest": "0652eaa390a60c98405d46d2e62b3aac80aa32d00a54006debdda70257a3ffbf",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event"
+      ],
+      "bindingSha256": "7a2e3becc23715b0f01a15492782069f448a0ab4f7420e1719ec3bbc9688ae73",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
       "sourceUnitDigest": "5483e14a0ec0d67c7dc61a0c49e438a7274617176e5f82086ea2d136bae2ad43",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0007-context",
+      "targetAnchor": "bối-cảnh-4",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0007-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-4; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+      "targetUnitDigest": "5483e14a0ec0d67c7dc61a0c49e438a7274617176e5f82086ea2d136bae2ad43",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "6. ADR 0007 Schema And Event Evolution"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "12d0f2f2a70daceea80b8e9a0957fc641bcbfa0a37a2fd26c5d3f51fb22b680e",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
@@ -712,16 +772,19 @@
       "sourceUnitDigest": "eb9a345fe658f7c42e45f2cde5666e0946a8e55f948b709a4afb87d07719356d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0007-decision",
+      "targetAnchor": "quyết-định-4",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0007-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-4; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+      "targetUnitDigest": "eb9a345fe658f7c42e45f2cde5666e0946a8e55f948b709a4afb87d07719356d",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "6. ADR 0007 Schema And Event Evolution"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Quyết định"
+      ],
+      "bindingSha256": "3dd9bd8581ee5b68aa5e585b80d2de9f866c77897244b538404906a4bcaac57f",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
@@ -762,16 +825,19 @@
       "sourceUnitDigest": "e5123dd05236e7c96e5998728159ce6f1528786e13cd7838a3bfc723563abbdb",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0007-consequences",
+      "targetAnchor": "hệ-quả-4",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0007-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-4; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+      "targetUnitDigest": "44c6ea0c59515693582cc122b04f0d3b92fd0dfccc8e422b22c630f52ee016d6",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "6. ADR 0007 Schema And Event Evolution"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Hệ quả"
+      ],
+      "bindingSha256": "82cb7fe34f10d793a0826b43e95d0b18c210a660acb06b164ff2d746ff23fe4c",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
@@ -812,841 +878,934 @@
       "sourceUnitDigest": "520a09658b9497557f245c1299a8da65c50068afe1381b53d2f790f1437b025b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
+      "targetAnchor": "0011-version-tường-minh-cho-mọi-contract",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract -> docs/platform/work-state/decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+      "targetUnitDigest": "520a09658b9497557f245c1299a8da65c50068afe1381b53d2f790f1437b025b",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract"
+      ],
+      "bindingSha256": "1ceb6a2b40e17ed8609e72e5b930ef18b85288efbebfced9e083bf18556b6db8",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
       "sourceUnitDigest": "f0e519e3d177081f8c87798e69a8bfd6ec2a3721d617d8b81a188532ac67d006",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0011-context",
+      "targetAnchor": "bối-cảnh-5",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0011-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-5; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+      "targetUnitDigest": "f0e519e3d177081f8c87798e69a8bfd6ec2a3721d617d8b81a188532ac67d006",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "58e06fdb5f6362ac548e13393ed98668f43faf038a1309d76dcc4299935d0650",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
       "sourceUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-29",
+      "targetAnchor": "unheaded-block-30",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1539-1545, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0011 (source lines 1539-1545, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-29 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-30; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "1bd79ea27aed3b86668a012aa4065279573deb3501f4c56a9a6c86b44de98bc1"
     },
     {
       "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
       "sourceUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-30",
+      "targetAnchor": "unheaded-block-31",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1547-1554, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0011 (source lines 1547-1554, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-30 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-31; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "633d84ccc012e82676a32f2490b93933c4b0b6661b6ce6a547fab08ec6e2d088"
     },
     {
       "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
       "sourceUnitDigest": "03f45ad00ec7a12c5133d79a3941f5911abce8372d7271c75988bda7ee94c3ec",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0011-decision",
+      "targetAnchor": "quyết-định-5",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0011-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-5; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+      "targetUnitDigest": "03f45ad00ec7a12c5133d79a3941f5911abce8372d7271c75988bda7ee94c3ec",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Quyết định"
+      ],
+      "bindingSha256": "b91819ef113c0520d8c3374675360896095590789b23152348776b9d8cfadab8",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
       "sourceUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-31",
+      "targetAnchor": "unheaded-block-32",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1558-1561, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0011 (source lines 1558-1561, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-31 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-32; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Quyết định"
+      ],
+      "bindingSha256": "6f1d8183ac3adccf0616c96dd823524758f5bd2e7ff98c06190534e6172e46b8"
     },
     {
       "claimId": "claim_6346dec77f2dff715949806586e100d3",
       "sourceUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-32",
+      "targetAnchor": "unheaded-block-33",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1563-1575, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0011 (source lines 1563-1575, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-32 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-33; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Quyết định"
+      ],
+      "bindingSha256": "786d9493cd73f645a008f85aa372d6792fb1c89a3c226e5c2d42cff2c27c0cfb"
     },
     {
       "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
       "sourceUnitDigest": "3bd6300879f149e85115d60fc55891e1f240d8e61447c372cda1982ea85ff3fe",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0011-consequences",
+      "targetAnchor": "hệ-quả-5",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0011-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-5; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+      "targetUnitDigest": "b0f4d04ac734632bcddc6d3be5dd9c984c033c9840edc4aeacfff83f9fe2b690",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "bindingSha256": "01d7e6812a335c5fba4eae40f2c31e423ec575500a86ab283df8e5e922d7d41a",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
       "sourceUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-33",
+      "targetAnchor": "unheaded-block-34",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1579-1585, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0011 (source lines 1579-1585, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-33 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-34; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "bindingSha256": "28091a823b3cc0da196facea336e95a25ce5b1c6e2cd7fdda16fc1181b61c11d"
     },
     {
       "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-34",
+      "targetAnchor": "unheaded-block-35",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-34 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-35; repeated complete digest disambiguated by immediate neighbours; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "7. ADR 0011 Explicit Version For Every Contract",
-        "0011 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "bindingSha256": "17e50bc2a70931f54d4824c62d6dec64f407952615c1bf1b2bcb18ac51800c79"
     },
     {
       "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
       "sourceUnitDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+      "targetAnchor": "0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model -> docs/platform/work-state/decisions/retired-decision-history.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+      "targetUnitDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời"
+      ],
+      "bindingSha256": "12d19736bc6c7539ac3791eb29bd991b3c548120029f2441f7c64f009ce2d7ff",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
       "sourceUnitDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0012-context",
+      "targetAnchor": "bối-cảnh-6",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0012-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-6; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+      "targetUnitDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "fda32b1030a9f6008271769a4f5186a941d6f44917dbb38d6cd3119cdfac9ecb",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
       "sourceUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-35",
+      "targetAnchor": "unheaded-block-37",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1593-1598, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0012 (source lines 1593-1598, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-35 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-37; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "0883376fb43f608946cf746333b27693c67535e7bfee9580fb9725b093fb82e9"
     },
     {
       "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
       "sourceUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-36",
+      "targetAnchor": "unheaded-block-38",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1600-1606, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0012 (source lines 1600-1606, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-36 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-38; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "49933befa1f4ecfdee38269add1f524daff0fe102b51abbecf100ae6d6f3f89b"
     },
     {
       "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
       "sourceUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-37",
+      "targetAnchor": "unheaded-block-39",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1608-1612, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0012 (source lines 1608-1612, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-37 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-39; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "9a388b1bda22dba78c79699278f4976f67105b4ef46c671f4bb45873b4ff644b"
     },
     {
       "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
       "sourceUnitDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0012-decision",
+      "targetAnchor": "quyết-định-6",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0012-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-6; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+      "targetUnitDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Quyết định"
+      ],
+      "bindingSha256": "05e66dab2fb05d5b34edf34825aed1735fd419c9d04d96a5919da146be2769ac",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
       "sourceUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-38",
+      "targetAnchor": "unheaded-block-40",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1616-1651, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0012 (source lines 1616-1651, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-38 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-40; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Quyết định"
+      ],
+      "bindingSha256": "a65a15a594e3e2088d791918d0ef04e31058e3521912e5f3865e98978095c609"
     },
     {
       "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
       "sourceUnitDigest": "f35473b9295a35aff0204ba97ea33eb6d3e19a99c6f25796258beb4e73e0e9b2",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0012-consequences",
+      "targetAnchor": "hệ-quả-6",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0012-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-6; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+      "targetUnitDigest": "8a7417ab625a5dc520e04a13f9d0c9b3edb4635ed01d3aa81e0debb33293d120",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "bindingSha256": "c2b301dd4abee72a70e207a2f309a6221bd0b1ce7cef4113bc39dd478e431980",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
       "sourceUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-39",
+      "targetAnchor": "unheaded-block-41",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1655-1662, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0012 (source lines 1655-1662, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-39 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-41; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "bindingSha256": "69a513dae20035ce41785ab6de684b82dcf2f010827f32e14a713819e715b46c"
     },
     {
       "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-40",
+      "targetAnchor": "unheaded-block-42",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-40 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-42; repeated complete digest disambiguated by immediate neighbours; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "8. ADR 0012 Unified Typed-Edge Graph Model",
-        "0012 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "bindingSha256": "3a98d0b8f866d212c0571896b84fb638d91d56503f3059eb681aae06ec9d43ba"
     },
     {
       "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
       "sourceUnitDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+      "targetAnchor": "0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from -> docs/platform/work-state/decisions/retired-decision-history.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+      "targetUnitDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "bindingSha256": "9d8e75695092d63591318b1e3feac160eee25aaa53c513f35250fc41fbb41d60",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
       "sourceUnitDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-context",
+      "targetAnchor": "bối-cảnh-7",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-7; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+      "targetUnitDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "5a2d621f850faace62c68d2617ec05c393c4edd6ad6a4d741329553771593443",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
       "sourceUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-41",
+      "targetAnchor": "unheaded-block-44",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1670-1674, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1670-1674, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-41 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-44; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "d74da79ec18e78bb8243fdb98a5f5555212fc41a4138ef6d3631ce92aad86f7d"
     },
     {
       "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
       "sourceUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-42",
+      "targetAnchor": "unheaded-block-45",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1676-1681, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1676-1681, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-42 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-45; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "a0b3e00fb359e123f6b63aa3db85e395f2d93c68263af30e88d720a4da9e0556"
     },
     {
       "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
       "sourceUnitDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-decision",
+      "targetAnchor": "quyết-định-7",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-7; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+      "targetUnitDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "8291f1d879ea6d9a92f9c3082e15a5a8cde8ca7539e736c194e8972799069518",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
       "sourceUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-43",
+      "targetAnchor": "unheaded-block-46",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1685-1686, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1685-1686, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-43 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-46; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "6220607dc1688f1578f1b1e4e4b07190dad381767a67372cdc3175851c1cb200"
     },
     {
       "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
       "sourceUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-44",
+      "targetAnchor": "unheaded-block-47",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1688-1692, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1688-1692, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-44 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-47; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "046706d004bffce54d50ce26ab52408591e828c2380928344163ea68fa4a99e0"
     },
     {
       "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
       "sourceUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-45",
+      "targetAnchor": "unheaded-block-48",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1694-1699, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1694-1699, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-45 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-48; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "d321771eaf4020496ec16bbac62cf4748f990a3b172402ee84be8a7bc2bbe2e6"
     },
     {
       "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
       "sourceUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-46",
+      "targetAnchor": "unheaded-block-49",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1701-1704, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1701-1704, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-46 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-49; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "4bf65129331aa60af5888bf2e5ef11425d7328321c38ceb8c343a8f6eb2151bf"
     },
     {
       "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
       "sourceUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-47",
+      "targetAnchor": "unheaded-block-50",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1706-1713, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1706-1713, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-47 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-50; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "bindingSha256": "261695d878bdb3635c8f68435c74da01893e79e908d131261e57275fe5c8fa8b"
     },
     {
       "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
       "sourceUnitDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-consequences",
+      "targetAnchor": "hệ-quả-7",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-7; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+      "targetUnitDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "c0973b304af249c1caf189ae259b110ca5b65f5c5d2ce3ad82e3907c4b7aee0e",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_b8d85d30862c55869062b5418f430f69",
       "sourceUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-48",
+      "targetAnchor": "unheaded-block-51",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1717-1724, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1717-1724, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-48 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-51; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "988bcd54afdad568f471baf18fdd9657e7002be01c7f2ebe80f9f3bfca5067c5"
     },
     {
       "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
       "sourceUnitDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-trust-boundary",
+      "targetAnchor": "ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-trust-boundary -> docs/platform/work-state/decisions/retired-decision-history.md#ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+      "targetUnitDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "bindingSha256": "cede87e677a9aaca7d79b55d1e2f85da9c0b06afa69630787ba3b24d48008534",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
       "sourceUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-49",
+      "targetAnchor": "unheaded-block-52",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1728-1740, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1728-1740, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-49 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-52; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Trust Boundary"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "bindingSha256": "6c5d88501f6d61d71cfc3d3eaf4c5b95fd92efc12f94ea53dbe9a85e4261df6e"
     },
     {
       "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
       "sourceUnitDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-delivery-guarantee",
+      "targetAnchor": "bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-delivery-guarantee -> docs/platform/work-state/decisions/retired-decision-history.md#bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+      "targetUnitDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "bindingSha256": "d3c53135a8dae2056612adfa25a1cd0292a6ccacdb4353308b97c6f21d1e0921",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
       "sourceUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-50",
+      "targetAnchor": "unheaded-block-53",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1744-1748, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1744-1748, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-50 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-53; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Delivery Guarantee"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "bindingSha256": "4bb60e77e4938662e3bb6499b608922f2c6c8fa916d2b19d4456bd482741bd4d"
     },
     {
       "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
       "sourceUnitDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0013-alternatives-considered",
+      "targetAnchor": "phương-án-đã-cân-nhắc-và-bỏ",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0013-alternatives-considered -> docs/platform/work-state/decisions/retired-decision-history.md#phương-án-đã-cân-nhắc-và-bỏ; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+      "targetUnitDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Phương án đã cân nhắc và bỏ"
+      ],
+      "bindingSha256": "9fcd0edc4c137e09c23553334d5ca2ec42b5c93a179b4e16757c9553e749f22e",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
       "sourceUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-51",
+      "targetAnchor": "unheaded-block-54",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1752-1757, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0013 (source lines 1752-1757, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-51 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-54; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
-        "0013 Alternatives Considered"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Phương án đã cân nhắc và bỏ"
+      ],
+      "bindingSha256": "87c2f3ba0b624a7696ac2ef025e611d9057b9dab56aeecf881f4dcbf0e10046a"
     },
     {
       "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
       "sourceUnitDigest": "74fba64154edbbc6e201729f4e343a8732f9093280165fc98ea24e9b24a6042c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule",
+      "targetAnchor": "0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule -> docs/platform/work-state/decisions/retired-decision-history.md#0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1774f5eb9c16d0e6ced80024d7d410c8f",
+      "targetUnitDigest": "74fba64154edbbc6e201729f4e343a8732f9093280165fc98ea24e9b24a6042c",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)"
+      ],
+      "bindingSha256": "12d0a493609c8c2d471608d8d6712f65bec67d6ac430580287a9303a96628484",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
       "sourceUnitDigest": "15548911bb940170cbac8c68e3685eeeb62471bdd37e175cf02b309002d32522",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0019-context",
+      "targetAnchor": "bối-cảnh-8",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0019-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-8; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "b589b460ed77e03ef37631a2f2e387529c52965ea0cb49f198e4e67d4c368d04",
+      "targetUnitDigest": "15548911bb940170cbac8c68e3685eeeb62471bdd37e175cf02b309002d32522",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "072617a06281e7665dd80bdfc0f0394e882dc3a1b1437f75f6c1814a7b6c7293",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_b87e27dca1c9e551eb4d296c858d0f08",
       "sourceUnitDigest": "5a365fcd8c5b99f79d1a6f32be9ae4363651d14b79a300edbe4f57e8b0827fe3",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-52",
+      "targetAnchor": "unheaded-block-55",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1763-1766, starting \"`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1763-1766, starting \"`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-52 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-55; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "5a365fcd8c5b99f79d1a6f32be9ae4363651d14b79a300edbe4f57e8b0827fe3",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "a1f804bcda730d611eecb7e34374578b4063519eb7cf2d19cac70daaad66e4b0"
     },
     {
       "claimId": "claim_5770fe5a53057464d4c4795b24abb38a",
       "sourceUnitDigest": "04c1c4fb64c70d916b094a4a20866c3519994021038cee2d7a78f7701119ebf2",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-53",
+      "targetAnchor": "unheaded-block-56",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1768-1773, starting \"STR46 đổi tên trường `actor` (và các trường phái sinh: `claimActor`, k\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1768-1773, starting \"STR46 đổi tên trường `actor` (và các trường phái sinh: `claimActor`, k\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-53 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-56; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "04c1c4fb64c70d916b094a4a20866c3519994021038cee2d7a78f7701119ebf2",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "1f0f1ec173d2ee10f171c961b8644a9205be127743a290c47f2fd2cf6a700142"
     },
     {
       "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
       "sourceUnitDigest": "1eb8c8df3524d600863bacba004507acd1f84bdcab79cdf00e1ddc726c24b575",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0019-decision",
+      "targetAnchor": "quyết-định-8",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0019-decision -> docs/platform/work-state/decisions/retired-decision-history.md#quyết-định-8; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7699d73164ee8bc8bf071b6dfff526187",
+      "targetUnitDigest": "1eb8c8df3524d600863bacba004507acd1f84bdcab79cdf00e1ddc726c24b575",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Quyết định"
+      ],
+      "bindingSha256": "7fd855c7947edc00c40e4f3fd275a3708f54f2384e5db800c2aa80de40fb8cb4",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
       "sourceUnitDigest": "8dc8ecc4dc88503fd629b00fef6a1841c76a30a42340b9255a3c1f53300fd2c3",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-54",
+      "targetAnchor": "unheaded-block-57",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1777-1780, starting \"Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: t\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1777-1780, starting \"Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: t\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-54 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-57; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "8dc8ecc4dc88503fd629b00fef6a1841c76a30a42340b9255a3c1f53300fd2c3",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Quyết định"
+      ],
+      "bindingSha256": "12f6f6099447a8cc726e8778d367d5011808c52d6007677d19d02d1752aec4e6"
     },
     {
       "claimId": "claim_16901b7106220f70f44d600ba4dbb40f",
       "sourceUnitDigest": "98bb7f4e04652171ceed757c50de5df4b645a5a6b96aa900b80b6ae114c6391f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-55",
+      "targetAnchor": "unheaded-block-58",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1782-1804, starting \"- **Phạm vi (coverage).** Miễn trừ bao trùm cả BA kho `.fgos` liệt ở t\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1782-1804, starting \"- **Phạm vi (coverage).** Miễn trừ bao trùm cả BA kho `.fgos` liệt ở t\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-55 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-58; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "98bb7f4e04652171ceed757c50de5df4b645a5a6b96aa900b80b6ae114c6391f",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Quyết định"
+      ],
+      "bindingSha256": "9e6ad19f76d5e9c6fd1282beabadba7d2f833cb0bb34cba67dd4d3291de45bb4"
     },
     {
       "claimId": "claim_6ce44d19e0f7b99b1c363579bf6eb68e",
       "sourceUnitDigest": "2f6e935eb95f8af8bd54cd1a01fc3f7cbba7eea9b5346b6b6f2458dc94555724",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-56",
+      "targetAnchor": "unheaded-block-59",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1806-1810, starting \"Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1806-1810, starting \"Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-56 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-59; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "2f6e935eb95f8af8bd54cd1a01fc3f7cbba7eea9b5346b6b6f2458dc94555724",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Decision"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Quyết định"
+      ],
+      "bindingSha256": "0b8c4544252169cc1b8ad3be075052deb2a24bab05020d4cac91839aa9e1de17"
     },
     {
       "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
       "sourceUnitDigest": "8ae8c5f37b83bcd7d940c00aa9528304f337f9e72990b5207415fc7ed62c9af4",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0019-consequences",
+      "targetAnchor": "hệ-quả-8",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0019-consequences -> docs/platform/work-state/decisions/retired-decision-history.md#hệ-quả-8; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e6e232f8b46e0f0fb46efcd42f5dda549",
+      "targetUnitDigest": "8ae8c5f37b83bcd7d940c00aa9528304f337f9e72990b5207415fc7ed62c9af4",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Hệ quả"
+      ],
+      "bindingSha256": "29fa0111eb3a425ecccfdb8f1ff933a8d2d6adff399d3df2c8f5fe6ba85ec8ee",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_38fc27aadc8aecf157c5db30cda1862b",
       "sourceUnitDigest": "03dc0e5f689c7e6c592f7134944ef404913e3d53ba2d2f02d7812e330a6bd60d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-57",
+      "targetAnchor": "unheaded-block-60",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1814-1820, starting \"- **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0019 (source lines 1814-1820, starting \"- **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-57 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-60; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "03dc0e5f689c7e6c592f7134944ef404913e3d53ba2d2f02d7812e330a6bd60d",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
-        "0019 Consequences"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
+        "Hệ quả"
+      ],
+      "bindingSha256": "67e841919c8dbf48f82d66b0eea952d85944ab008a8895a308a370cda4565dda"
     },
     {
       "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
       "sourceUnitDigest": "c71c9558d2d278e6a0d2696cbbe222c2eb60f32c7b907fc07231437c0c2d97f0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "11-adr-0024-rename-proposed-status-to-awaiting-approval",
+      "targetAnchor": "0024-đổi-tên-status-proposed-thành-awaiting-approval",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#11-adr-0024-rename-proposed-status-to-awaiting-approval -> docs/platform/work-state/decisions/retired-decision-history.md#0024-đổi-tên-status-proposed-thành-awaiting-approval; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942102ce13d868c9cd7ae034e513c1da91a",
+      "targetUnitDigest": "c71c9558d2d278e6a0d2696cbbe222c2eb60f32c7b907fc07231437c0c2d97f0",
       "targetAncestry": [
-        "Retired Decision History: Work State"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`"
+      ],
+      "bindingSha256": "3bc3f83000ed5878223c09588f06f8112a36546a36ce5018a21cba6651077c63",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
       "sourceUnitDigest": "a70886dacf6f54f199f048c84403caa52e6fcf99c65dbea9169c71ec2202bae9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "0024-context",
+      "targetAnchor": "bối-cảnh-9",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#0024-context -> docs/platform/work-state/decisions/retired-decision-history.md#bối-cảnh-9; replacement bounded by unchanged complete units; exact native-source heading digest; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b1ba61e5d3580913aaa17db28483b9bd9",
+      "targetUnitDigest": "a70886dacf6f54f199f048c84403caa52e6fcf99c65dbea9169c71ec2202bae9",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "b4be574b4a9c2581f31013d416cf5f5cf53c315e9f540d8f4a180b14b7b95aff",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",
       "sourceUnitDigest": "7ef891c3b1ad980c1d7b4816db14927cbe0113c300984e0fa772aab39f164989",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "pending",
-      "targetAnchor": "unheaded-block-58",
+      "targetAnchor": "unheaded-block-61",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0024 (source lines 1826-1831, starting \"`0006` đặt tên status `proposed` cho trạng thái \"goal-check đạt, đề xu\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Body of ADR 0024 (source lines 1826-1831, starting \"`0006` đặt tên status `proposed` cho trạng thái \"goal-check đạt, đề xu\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-58 -> docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-61; unique complete digest; neighbouring units retained in witnesses; complete digest preserved.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "7ef891c3b1ad980c1d7b4816db14927cbe0113c300984e0fa772aab39f164989",
       "targetAncestry": [
-        "Retired Decision History: Work State",
-        "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
-        "0024 Context"
-      ]
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "e0dc5fdf6d5193acc9012c47b1c9104d6e99cbeb96bef1e0227c0be1fb9936fd"
     }
   ],
   "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",

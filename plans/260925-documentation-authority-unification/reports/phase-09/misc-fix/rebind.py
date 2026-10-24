@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Scoped overlays, using the existing frozen dual extractors and binding recipe.
-Author once; --check replays current bytes and authenticated HEAD preimages.
+Author once; --check replays current bytes and preimages from the recorded pin.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -11,7 +11,7 @@ SHARD = P/'ledger/decisions/s17-misc-review-fixes.json'
 sys.path.insert(0, str(P/'reports/phase-09/ledgerfix'))
 from bindings import documents, rows, supersessions, effective, at, digest, payload, sha, KEYS, head
 PATHS = ['docs/platform/packaging-distribution/spec.md', 'docs/reading-map.md']
-SCRATCH = pathlib.Path('/tmp/fgos-work/w5-misc-rework')
+SCRATCH = pathlib.Path('/tmp/fgos-work/w5-rebind-apply/misc')
 FIELDS = ['anchor','unitKind','title','textDigest','startLine','endLine','ancestry']
 
 
@@ -35,10 +35,19 @@ def placement(us, u):
                 next=w(us[i+1]) if i+1<len(us) else None,content=u['text'])
 
 
+def preimages(pin):
+    # These records authenticated the original overlay inputs. Current direct
+    # rows may be rebound; that must not rewrite the historical preimage proof.
+    paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', pin, '--',
+        str(P/'ledger/decisions'), str(P/'pilot/decisions')], text=True).splitlines()
+    return {f: json.loads(subprocess.check_output(['git', 'show', pin+':'+f], text=True))
+            for f in paths if pathlib.PurePosixPath(f).suffix == '.json'}
+
+
 def generate(pin):
     virtual=[dict(path='before-'+str(i)+'.md', content=subprocess.check_output(['git','show',pin+':'+f]).decode()) for i,f in enumerate(PATHS)]
     data=extract(dict(paths=PATHS,virtual=virtual)); cat=data['catalog']
-    docs=documents(); docs.pop(str(SHARD),None); links=supersessions(docs)
+    docs=preimages(pin); docs.pop(str(SHARD),None); links=supersessions(docs)
     overlays=[]; changes=[]; checked=0
     for f,d in docs.items():
         for ptr,r in rows(d):
@@ -77,22 +86,29 @@ def generate(pin):
     return shard,record
 
 
+def check(pin, docs=None):
+    shard,record=generate(pin)
+    assert json.loads(SHARD.read_text())==shard
+    assert json.loads((O/'binding-refresh.json').read_text())==record
+    docs=documents() if docs is None else docs
+    links=supersessions(docs);before=preimages(pin)
+    for c in record['changes']:
+        old=at(before[c['shard']],c['pointer'])
+        f,ptr,r=effective(c['shard'],c['pointer'],old,docs,links)
+        assert (f,ptr)==(str(SHARD),c['overlayPointer'])
+        assert payload(r)==c['newBinding'] and r['bindingSha256']==digest(r)
+        assert r['reviewStatus']=='pending'
+    return record
+
+
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--check',action='store_true');args=ap.parse_args()
     pin=json.loads((O/'binding-refresh.json').read_text())['sourceHead'] if args.check else head()
-    shard,record=generate(pin)
     if args.check:
-        assert json.loads(SHARD.read_text())==shard
-        assert json.loads((O/'binding-refresh.json').read_text())==record
-        docs=documents();links=supersessions(docs)
-        for c in record['changes']:
-            old=at(docs[c['shard']],c['pointer'])
-            f,ptr,r=effective(c['shard'],c['pointer'],old,docs,links)
-            assert (f,ptr)==(str(SHARD),c['overlayPointer'])
-            assert payload(r)==c['newBinding'] and r['bindingSha256']==digest(r)
-            assert r['reviewStatus']=='pending'
+        record=check(pin)
     else:
         assert not SHARD.exists() and not (O/'binding-refresh.json').exists(), 'one-shot authoring; use --check'
+        shard,record=generate(pin)
         for f,value in [(SHARD,shard),(O/'binding-refresh.json',record)]:
             f.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({k:record[k] for k in ['sourceHead','effectiveBindingsChecked','changedRows','contentChangedRows']},sort_keys=True))

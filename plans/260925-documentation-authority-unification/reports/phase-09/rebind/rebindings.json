@@ -1,6 +1,6 @@
 {
-  "inputHead": "dbf8ad715f44bee2199c0fe199427e5cecdfef18",
-  "status": "blocked",
+  "inputHead": "8cab0204d0c5399390a12121b6e663ec35248a8e",
+  "status": "applied",
   "extractors": [
     {
       "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
@@ -19,16 +19,9 @@
       "content": 124,
       "anchor-only": 93
     },
-    "applied": 0
+    "applied": 217
   },
-  "blockers": [
-    {
-      "kind": "required-proof-preimage-conflict",
-      "proof": "plans/260925-documentation-authority-unification/reports/phase-09/misc-fix/rebind.py",
-      "error": "('stale preimage', 'plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json', '/claims/26')",
-      "noRepositoryRowsChanged": true
-    }
-  ],
+  "blockers": [],
   "ownershipComparison": [
     {
       "baseline": "step10-sync287-target-ownership.json",
@@ -725,7 +718,7 @@
       },
       "bindingSha256": "4629c6be74cb063c7cb1ba6c23771cfc7a15ef2a4ac215bf196b726382872aa6",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -741,7 +734,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
@@ -881,7 +874,7 @@
       },
       "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -896,7 +889,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
@@ -1036,7 +1029,7 @@
       },
       "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -1051,7 +1044,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
@@ -1191,7 +1184,7 @@
       },
       "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -1206,7 +1199,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
@@ -1346,7 +1339,7 @@
       },
       "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -1361,7 +1354,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
@@ -1433,7 +1426,7 @@
           "targetAncestry": []
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
@@ -1578,7 +1571,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
@@ -1719,7 +1712,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
@@ -1888,7 +1881,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
@@ -2021,7 +2014,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
@@ -2190,7 +2183,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
@@ -2349,7 +2342,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
@@ -2501,7 +2494,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
@@ -2642,7 +2635,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
@@ -2801,7 +2794,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
@@ -2960,7 +2953,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
@@ -3119,7 +3112,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
@@ -3271,7 +3264,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
@@ -3412,7 +3405,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
@@ -3571,7 +3564,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
@@ -3643,7 +3636,7 @@
           "targetAncestry": []
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
@@ -3715,7 +3708,7 @@
           "targetAncestry": []
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
@@ -3885,7 +3878,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
@@ -4050,7 +4043,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
@@ -4188,7 +4181,7 @@
       },
       "bindingSha256": "a3dccdde968c398c5c2d4d06c7cec054414a98e898471a5ac70b2f18a8a53beb",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4203,7 +4196,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
@@ -4334,7 +4327,7 @@
       },
       "bindingSha256": "5e3a2e52bb642332d08a4d8209366df68048bab1a899443af68e70fa71e37f9e",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4349,7 +4342,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
@@ -4480,7 +4473,7 @@
       },
       "bindingSha256": "5e3a2e52bb642332d08a4d8209366df68048bab1a899443af68e70fa71e37f9e",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4495,7 +4488,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -4645,7 +4638,7 @@
       },
       "bindingSha256": "5d3468b98fa105374ccadccd65304a3a4a8923cdb48849f059d9a65fb221bbdc",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4661,7 +4654,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -4804,7 +4797,7 @@
       },
       "bindingSha256": "25bb81b6c1bc64701373a0f9fabeb8df676e7f17bf589e4c3cd728d5c6344150",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4820,7 +4813,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -4968,7 +4961,7 @@
       },
       "bindingSha256": "06b5761bcc8a1fe3c84f60415f54f1cf6d04b4ccfbb29e7da05a3268808ac0d3",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -4984,7 +4977,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5125,7 +5118,7 @@
       },
       "bindingSha256": "b2b4c6ff61d10172e9cf60c79748e3cd93122e1e0aeaee6fa4ed3f3b39e907cc",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5141,7 +5134,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5289,7 +5282,7 @@
       },
       "bindingSha256": "7594940b48f5b8752a1f4f94bbe150bb058cbd9ad9a78280bb7950377affe28f",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5305,7 +5298,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5444,7 +5437,7 @@
       },
       "bindingSha256": "48329fb2208db0f4ef22e6ffd6a6233125fe8c51b02084ac04e9a7c303197489",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5460,7 +5453,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5608,7 +5601,7 @@
       },
       "bindingSha256": "73626128fdae3348bc58e3dba61c3e145a3310a745fcf2fded08c402838a98fc",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5624,7 +5617,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5765,7 +5758,7 @@
       },
       "bindingSha256": "7b7191dbdce40d09c4c1740db3e69539adfb4336278967b62f3f3927773085ab",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5781,7 +5774,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -5924,7 +5917,7 @@
       },
       "bindingSha256": "29767e982c75bcf35f675b02d08fa6bc448d7855573bf0c2c6b2c79449e349ed",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -5940,7 +5933,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6083,7 +6076,7 @@
       },
       "bindingSha256": "4629c6be74cb063c7cb1ba6c23771cfc7a15ef2a4ac215bf196b726382872aa6",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -6099,7 +6092,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6242,7 +6235,7 @@
       },
       "bindingSha256": "48953c5c948ef3770c5530c9318fbe8423a6d09ef824eb378568df8d06af3b0e",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -6258,7 +6251,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6415,7 +6408,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6568,7 +6561,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6716,7 +6709,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -6866,7 +6859,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7016,7 +7009,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7166,7 +7159,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7323,7 +7316,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7480,7 +7473,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7637,7 +7630,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7796,7 +7789,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -7955,7 +7948,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8114,7 +8107,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8269,7 +8262,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8424,7 +8417,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8579,7 +8572,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8736,7 +8729,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -8895,7 +8888,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9052,7 +9045,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9207,7 +9200,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9360,7 +9353,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9515,7 +9508,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9666,7 +9659,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9819,7 +9812,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -9972,7 +9965,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10111,7 +10104,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10268,7 +10261,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10425,7 +10418,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10571,7 +10564,7 @@
       },
       "bindingSha256": "ad39c69907088c543ee711ed128759808416e0e411f113b049c19e9df6bd21b3",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -10587,7 +10580,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10728,7 +10721,7 @@
       },
       "bindingSha256": "056ada7010bf34159f8a5496b0f53f84e93d52b965af9f152b5b4a941306ec52",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -10744,7 +10737,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -10897,7 +10890,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -11039,7 +11032,7 @@
       },
       "bindingSha256": "722e554ef5e7f65be3992c8264018e173d60a3cee169a0c5f276197a9601c780",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -11054,7 +11047,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
@@ -11163,7 +11156,7 @@
       },
       "bindingSha256": "69d85eb5eb412c845fed5896554ed1b7506c6c658345b933c73a97ff733faf95",
       "reviewStatusBefore": "reviewed",
-      "reviewStatusAfter": "reviewed",
+      "reviewStatusAfter": "pending",
       "proposedReviewStatus": "pending",
       "effectiveBinding": {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
@@ -11178,7 +11171,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -11321,7 +11314,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
@@ -11464,7 +11457,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
@@ -11621,7 +11614,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
@@ -11772,7 +11765,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
@@ -11929,7 +11922,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
@@ -12078,7 +12071,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
@@ -12226,7 +12219,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
@@ -12366,7 +12359,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -12514,7 +12507,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -12667,7 +12660,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -12811,7 +12804,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -12958,7 +12951,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13109,7 +13102,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13264,7 +13257,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13419,7 +13412,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13570,7 +13563,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13725,7 +13718,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -13884,7 +13877,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14043,7 +14036,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14195,7 +14188,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14350,7 +14343,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14509,7 +14502,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14668,7 +14661,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14820,7 +14813,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -14975,7 +14968,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15134,7 +15127,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15293,7 +15286,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15445,7 +15438,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15600,7 +15593,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15759,7 +15752,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -15918,7 +15911,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16070,7 +16063,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16225,7 +16218,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16376,7 +16369,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16527,7 +16520,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16686,7 +16679,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16837,7 +16830,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -16988,7 +16981,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17147,7 +17140,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17298,7 +17291,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17449,7 +17442,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17601,7 +17594,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17756,7 +17749,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -17907,7 +17900,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18060,7 +18053,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18211,7 +18204,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18370,7 +18363,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18519,7 +18512,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18678,7 +18671,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18829,7 +18822,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -18980,7 +18973,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19132,7 +19125,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19287,7 +19280,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19438,7 +19431,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19589,7 +19582,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19748,7 +19741,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -19899,7 +19892,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20052,7 +20045,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20205,7 +20198,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20358,7 +20351,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20509,7 +20502,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20668,7 +20661,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20817,7 +20810,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -20976,7 +20969,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21125,7 +21118,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21284,7 +21277,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21433,7 +21426,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21592,7 +21585,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21739,7 +21732,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -21891,7 +21884,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22046,7 +22039,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22197,7 +22190,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22348,7 +22341,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22507,7 +22500,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22658,7 +22651,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22811,7 +22804,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -22962,7 +22955,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -23121,7 +23114,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -23268,7 +23261,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -23420,7 +23413,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -23575,7 +23568,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
@@ -23726,7 +23719,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -23879,7 +23872,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24030,7 +24023,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24189,7 +24182,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24340,7 +24333,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24491,7 +24484,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24650,7 +24643,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24801,7 +24794,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -24950,7 +24943,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25102,7 +25095,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25257,7 +25250,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25408,7 +25401,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25561,7 +25554,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25712,7 +25705,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -25871,7 +25864,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26022,7 +26015,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26175,7 +26168,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26328,7 +26321,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26481,7 +26474,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26634,7 +26627,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26787,7 +26780,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -26938,7 +26931,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27097,7 +27090,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27248,7 +27241,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27414,7 +27407,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27572,7 +27565,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27740,7 +27733,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -27900,7 +27893,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28060,7 +28053,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28228,7 +28221,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28386,7 +28379,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28554,7 +28547,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28712,7 +28705,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -28880,7 +28873,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29038,7 +29031,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29206,7 +29199,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29362,7 +29355,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29523,7 +29516,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29670,7 +29663,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29822,7 +29815,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -29964,7 +29957,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30122,7 +30115,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30273,7 +30266,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30432,7 +30425,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30583,7 +30576,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30742,7 +30735,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -30893,7 +30886,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31052,7 +31045,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31205,7 +31198,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31360,7 +31353,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31513,7 +31506,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31672,7 +31665,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31825,7 +31818,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -31980,7 +31973,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -32133,7 +32126,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -32292,7 +32285,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
@@ -32442,7 +32435,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -32590,7 +32583,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -32730,7 +32723,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -32878,7 +32871,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33026,7 +33019,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33166,7 +33159,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33314,7 +33307,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33456,7 +33449,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33604,7 +33597,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     },
     {
       "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
@@ -33744,7 +33737,7 @@
           ]
         }
       },
-      "applied": false
+      "applied": true
     }
   ]
 }

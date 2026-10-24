@@ -60,12 +60,15 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#2-entry-points-and-triggers. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#2-entry-points-and-triggers. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#2-entry-points-and-triggers -> docs/platform/work-state/spec.md#2-entry-points-and-triggers; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "03a0e8994292975079c7a2b309b047eb29e3fa5afa1dcaa5f89c47dab1b44538",
+      "targetUnitDigest": "3f174b8615bf045066a928535372876d274f5fae4f5535422a7e7aaf32b42218",
       "targetAncestry": [
-        "Work State Specification"
-      ]
+        "Work State Specification",
+        "2. Entry Points And Triggers"
+      ],
+      "bindingSha256": "272b9f182c2b37e38c323773037548ead91fdba3ae5a73c9e4e61305c64a65bd",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
@@ -75,13 +78,15 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-3. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-3. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-3 -> docs/platform/work-state/spec.md#unheaded-block-3; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
+      "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
-      ]
+      ],
+      "bindingSha256": "354ac8ae048aadeef0ca07f002e5c1c8dbd59c533c252c01bd9091af919c7dbb",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_949f208343809a8ca04870aea74402de",
@@ -122,12 +127,15 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry. Package rebind at 8b2ee4dd9: native source content changed, target content/context rebind, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#11-business-rules -> docs/platform/work-state/spec.md#11-business-rules; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "a376ca9c6e4f2c6364dbe85f22c97450cc68b4110f553ec3d617388722068090",
+      "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
       "targetAncestry": [
-        "Work State Specification"
-      ]
+        "Work State Specification",
+        "11. Business Rules"
+      ],
+      "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",
@@ -137,12 +145,15 @@
       "claimKind": "specification",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Source heading \"Edge Cases Settled\" is represented by frozen heading \"12. Edge Cases Settled\"; only the numbering prefix differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source heading \"Edge Cases Settled\" is represented by frozen heading \"12. Edge Cases Settled\"; only the numbering prefix differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#12-edge-cases-settled -> docs/platform/work-state/spec.md#12-edge-cases-settled; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "bbea0adadc95834d9a32460e3b4abeaad6183b5dfb1ae6989a29e1a65ae7e864",
+      "targetUnitDigest": "25bd82e326539e2825faded551f28ddccf770980218ec8db3e8eb0940e26c9b7",
       "targetAncestry": [
-        "Work State Specification"
-      ]
+        "Work State Specification",
+        "12. Edge Cases Settled"
+      ],
+      "bindingSha256": "368d281d1f90fd15da96b5372318ffec14cfa8365b8e1ee0a1c73b0e1644c9b0",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
@@ -152,13 +163,15 @@
       "claimKind": "specification",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "The 66-line settled edge-case list is identical in the candidate (diff clean), kept whole as one unit (map section 11 item 9). A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The 66-line settled edge-case list is identical in the candidate (diff clean), kept whole as one unit (map section 11 item 9). A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-94 -> docs/platform/work-state/spec.md#unheaded-block-94; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "dbace0a231a15099a8ff774d2c937cdbeaa8ea0eee650a1262c913f28cadc1ab",
+      "targetUnitDigest": "455e526db6b50651587515887f32b481e6b88e73d5a96c9ee253d0b2d8a8b42e",
       "targetAncestry": [
         "Work State Specification",
         "12. Edge Cases Settled"
-      ]
+      ],
+      "bindingSha256": "77b84f414a807f394f80f55bb37ede7b4711a074b843f7ceec07773f7478bf64",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_d011d26d0e584f25caa838e02c59b613",
@@ -168,12 +181,15 @@
       "claimKind": "specification",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Source heading \"Open Gaps\" is represented by frozen heading \"13. Known Gaps And Deferred Work\"; the title differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source heading \"Open Gaps\" is represented by frozen heading \"13. Known Gaps And Deferred Work\"; the title differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#13-known-gaps-and-deferred-work -> docs/platform/work-state/spec.md#13-known-gaps-and-deferred-work; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "a2f7b6b14e08d0b250b4cdb0674d45e52b50616d53521f5c166a568ec80e83b3",
+      "targetUnitDigest": "1232b3662bcff71e8d51bd5b228d760a986e8a35c5e58191b2503530e4b27174",
       "targetAncestry": [
-        "Work State Specification"
-      ]
+        "Work State Specification",
+        "13. Known Gaps And Deferred Work"
+      ],
+      "bindingSha256": "e1f2093b2ce15e3cd57536bd7dedcd493f8b26fa57d7e61372eab9e81279006a",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
@@ -183,13 +199,15 @@
       "claimKind": "intent",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Open-gaps bullets list work deliberately deferred or not yet decided (typed gates only when a real consumer needs them, no timeout/reminder, no multi-user permissions, fleet orchestrator, rollup view) with revisit conditions, which matches the vocabulary intent kind (design intent, must-not-preclude constraints, revisit triggers); text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice followed the map and is corrected after review. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Open-gaps bullets list work deliberately deferred or not yet decided (typed gates only when a real consumer needs them, no timeout/reminder, no multi-user permissions, fleet orchestrator, rollup view) with revisit conditions, which matches the vocabulary intent kind (design intent, must-not-preclude constraints, revisit triggers); text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice followed the map and is corrected after review. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/spec.md#unheaded-block-95 -> docs/platform/work-state/spec.md#unheaded-block-95; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "5ad9c97f20aa0e6f61669617556fca877509f5f250d714cd0ce1527588631ed1",
+      "targetUnitDigest": "a80dd7a82a27ef60c23d8cc8f118ffe1d1e36e8509a3feb322cd22dc88208abc",
       "targetAncestry": [
         "Work State Specification",
         "13. Known Gaps And Deferred Work"
-      ]
+      ],
+      "bindingSha256": "c877bbd34fb56df4944c0b1752c1648acf4d7b6fb523234d9d2e0d8243bf65db",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_294491cc27c7f037d7b904b6cfb2eddb",
@@ -246,12 +264,15 @@
       "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "Source heading \"Pointers (implementation)\" is represented by frozen heading \"2. Implementation Pointers\" in the implementation-pointers document; the title differs and the owner moves out of spec.md. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "Source heading \"Pointers (implementation)\" is represented by frozen heading \"2. Implementation Pointers\" in the implementation-pointers document; the title differs and the owner moves out of spec.md. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/architecture/implementation-pointers.md#2-implementation-pointers -> docs/platform/work-state/architecture/implementation-pointers.md#2-implementation-pointers; replacement bounded by unchanged complete units; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "648524a55f28a05fe49ed3cd1f7ed91790c0322afc3adb7e1b57b7dbaa255e21",
+      "targetUnitDigest": "95755365a6442ae706535107cf4b6e944e42c9b65f447faed82f829bc7a37b0b",
       "targetAncestry": [
-        "Work State Implementation Pointers"
-      ]
+        "Work State Implementation Pointers",
+        "2. Implementation Pointers"
+      ],
+      "bindingSha256": "9a00c02001f8cdf3e4d48197e10399133bc0bd7805a6909d109a6f103a752446",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     },
     {
       "claimId": "claim_2e2bc9264b289319dfae5c6487978f99",
@@ -261,13 +282,15 @@
       "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
-      "rationale": "The 24-bullet module-pointer list is identical in implementation-pointers.md (diff clean); architecture because the bullets state module responsibilities (map section 11 item 5), and its file names may be stale. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.",
+      "rationale": "The 24-bullet module-pointer list is identical in implementation-pointers.md (diff clean); architecture because the bullets state module responsibilities (map section 11 item 5), and its file names may be stale. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending.\nL12-137 binding correction: docs/platform/work-state/architecture/implementation-pointers.md#unheaded-block-3 -> docs/platform/work-state/architecture/implementation-pointers.md#unheaded-block-3; replacement bounded by unchanged complete units; unique full-content correspondence inside bracket; content changed; prior approval does not carry.",
       "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
-      "targetUnitDigest": "7542cfb4d64398d37bafa7ce4cb4bc918bd7243c7cc8e2a4a82794055785b0c3",
+      "targetUnitDigest": "ec1eb7909db893f33157fcca041c08994b0e2339b3374da79620915ee902610e",
       "targetAncestry": [
         "Work State Implementation Pointers",
         "2. Implementation Pointers"
-      ]
+      ],
+      "bindingSha256": "59d421e230b662f2ff346bc4d49bc09b3ad5bc0d16cc27209c4265d138eced75",
+      "reviewNote": "Independent re-review required for changed content; no approval carried."
     }
   ],
   "authorSession": "codex-session:21@2026-10-14",
