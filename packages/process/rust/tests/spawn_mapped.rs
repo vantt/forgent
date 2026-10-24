@@ -1,6 +1,7 @@
 //! `spawn_mapped` gives a real child exactly its slot and stdio, nothing else
-//! that lacks close-on-exec, its own process group when asked, the requested
-//! environment and directory, and refuses a program that cannot run.
+//! that lacks close-on-exec, its own process group or session when asked, the
+//! requested environment and directory, reports its exit without blocking,
+//! and refuses a program that cannot run.
 #![cfg(target_os = "linux")]
 
 use std::fs::{self, File};
@@ -9,7 +10,7 @@ use std::os::fd::AsRawFd;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
-use fgos_process::mapped::{spawn_mapped, MappedSpawn, MappedStdio};
+use fgos_process::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
 use fgos_process::FdSlot;
 
 fn temp_dir(tag: &str) -> PathBuf {
@@ -19,13 +20,13 @@ fn temp_dir(tag: &str) -> PathBuf {
     fs::canonicalize(dir).unwrap()
 }
 
-fn request(script: &str) -> MappedSpawn {
+fn request(script: &str) -> MappedSpawn<'static> {
     MappedSpawn {
         argv: vec!["sh".into(), "-c".into(), script.into()],
         env: vec![("PATH".into(), "/usr/bin:/bin".into()), ("MAPPED_PROBE".into(), "yes".into())],
         clear_env: true,
         cwd: None,
-        process_group: false,
+        lead: MappedLead::Caller,
         stdio: [MappedStdio::Null, MappedStdio::Piped, MappedStdio::Piped],
     }
 }
@@ -64,16 +65,54 @@ fn the_slot_holds_the_mapped_file_and_no_other_descriptor_survives() {
 }
 
 #[test]
-fn environment_directory_and_process_group_follow_the_request() {
+fn environment_directory_process_group_and_session_follow_the_request() {
     let dir = temp_dir("env");
-    let mut req = request("echo \"$MAPPED_PROBE:${HOME:-none}:$(pwd)\"; ps -o pgid= -p $$ | tr -d ' '; echo $$");
+    let mut req = request("echo \"$MAPPED_PROBE:${HOME:-none}:$(pwd)\"; ps -o pgid= -p $$ | tr -d ' '; ps -o sid= -p $$ | tr -d ' '; echo $$");
     req.cwd = Some(dir.clone());
-    req.process_group = true;
-    let (out, code) = output(req, &[]);
+    req.lead = MappedLead::Group;
+    let (out, code) = output(req.clone(), &[]);
     assert_eq!(code, 0);
     let lines: Vec<&str> = out.lines().collect();
     assert_eq!(lines[0], format!("yes:none:{}", dir.display()));
-    assert_eq!(lines[1], lines[2], "the child leads its own process group");
+    assert_eq!(lines[1], lines[3], "the child leads its own process group");
+    assert_ne!(lines[2], lines[3], "but stays in the caller's session");
+    req.lead = MappedLead::Session;
+    let (out, code) = output(req, &[]);
+    assert_eq!(code, 0);
+    let lines: Vec<&str> = out.lines().collect();
+    assert_eq!((lines[1], lines[2]), (lines[3], lines[3]), "the child leads its own session and process group");
+    fs::remove_dir_all(dir).ok();
+}
+
+#[test]
+fn given_files_are_the_childs_stdio_and_try_wait_reports_the_exit_once_it_happens() {
+    let dir = temp_dir("given");
+    fs::write(dir.join("in"), "hello\n").unwrap();
+    let stdin = File::open(dir.join("in")).unwrap();
+    let stdout = File::create(dir.join("out")).unwrap();
+    let stderr = File::create(dir.join("err")).unwrap();
+    let mut req = request("read line; echo \"got $line\"; echo oops >&2; while [ ! -e go ]; do sleep 0.01; done; exit 5");
+    req.cwd = Some(dir.clone());
+    req.stdio = [MappedStdio::File(&stdin), MappedStdio::File(&stdout), MappedStdio::File(&stderr)];
+    let mut child = spawn_mapped(&req, &[]).expect("spawn");
+    assert!(child.stdin.is_none() && child.stdout.is_none() && child.stderr.is_none(), "a given file leaves no parent end");
+    assert!(child.try_wait().unwrap().is_none(), "the child waits for its go file");
+    fs::write(dir.join("go"), "").unwrap();
+    let start = std::time::Instant::now();
+    let status = loop {
+        if let Some(status) = child.try_wait().unwrap() {
+            break status;
+        }
+        assert!(start.elapsed() < std::time::Duration::from_secs(10), "the child never exited");
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    };
+    assert_eq!(status.code(), Some(5));
+    assert_eq!(child.try_wait().unwrap().and_then(|s| s.code()), Some(5), "a reaped child keeps its status");
+    assert_eq!(child.wait().unwrap().code(), Some(5));
+    assert_eq!(fs::read_to_string(dir.join("out")).unwrap(), "got hello\n");
+    assert_eq!(fs::read_to_string(dir.join("err")).unwrap(), "oops\n");
+    // SAFETY: reads the flags of a descriptor this test owns.
+    assert_ne!(unsafe { libc::fcntl(stdout.as_raw_fd(), libc::F_GETFD) } & libc::FD_CLOEXEC, 0, "the caller's file keeps close-on-exec");
     fs::remove_dir_all(dir).ok();
 }
 

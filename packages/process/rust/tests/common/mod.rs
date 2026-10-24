@@ -173,6 +173,7 @@ pub fn run_helper_role() {
             loop { std::thread::sleep(Duration::from_secs(3600)); }
         }
         "supervisor" => {
+            use fgos_process::containment::ContainmentDriver;
             let driver = fgos_process::containment::WindowsJobDriver;
             let mut domain = driver.create("attempt-supervisor").unwrap();
             let job = fgos_process::containment::WindowsJobDriver::job_name(&domain).unwrap().to_string();

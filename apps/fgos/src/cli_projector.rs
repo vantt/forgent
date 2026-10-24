@@ -228,7 +228,7 @@ fn project_config_request(
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
 /// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
-/// [--project] [--prune]`, `fgos identity pins [--forget <machine-id>]`, `fgos identity mint <kind> [--release <number>]
+/// [--project] [--prune]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
@@ -266,8 +266,8 @@ fn project_identity_request(
             &["--release", "--dir"],
         ),
         Some("pins") => (
-            fgos_identity::Verb::Pins { forget: None },
-            &["--forget", "--dir"],
+            fgos_identity::Verb::Pins(fgos_identity::PinsAction::List),
+            &["--forget", "--confirm", "--fingerprint", "--dir"],
         ),
         Some(other) => {
             return Err(format!(
@@ -313,6 +313,9 @@ fn project_identity_request(
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
     let mut mint: Option<bool> = None;
     let mut handle: Option<String> = None;
+    let mut forget: Option<String> = None;
+    let mut confirm: Option<String> = None;
+    let mut fingerprint: Option<String> = None;
     while index < args.len() {
         let value = args[index].to_string_lossy().into_owned();
         index += 1;
@@ -391,7 +394,19 @@ fn project_identity_request(
                 if flag_value.is_empty() {
                     return Err("--forget requires a machine id".into());
                 }
-                request.verb = fgos_identity::Verb::Pins { forget: Some(flag_value) };
+                forget = Some(flag_value);
+            }
+            "--confirm" => {
+                if flag_value.is_empty() {
+                    return Err("--confirm requires a machine id".into());
+                }
+                confirm = Some(flag_value);
+            }
+            "--fingerprint" => {
+                if flag_value.is_empty() {
+                    return Err("--fingerprint requires a value".into());
+                }
+                fingerprint = Some(flag_value);
             }
             "--handle" => {
                 if flag_value.is_empty() {
@@ -434,6 +449,17 @@ fn project_identity_request(
             *pruned = prune;
         }
         _ => {}
+    }
+    if matches!(request.verb, fgos_identity::Verb::Pins(_)) {
+        request.verb = fgos_identity::Verb::Pins(match (forget, confirm, fingerprint) {
+            (None, None, None) => fgos_identity::PinsAction::List,
+            (Some(machine_id), None, None) => fgos_identity::PinsAction::Forget { machine_id },
+            (Some(_), Some(_), _) => return Err("--forget and --confirm are exclusive".into()),
+            (Some(_), None, Some(_)) => return Err("--fingerprint goes with --confirm".into()),
+            (None, None, Some(_)) => return Err("--fingerprint needs --confirm".into()),
+            (None, Some(_), None) => return Err("--confirm requires --fingerprint <SHA256:...>, the fingerprint you compared".into()),
+            (None, Some(machine_id), Some(fingerprint)) => fgos_identity::PinsAction::Confirm { machine_id, fingerprint },
+        });
     }
     if matches!(request.verb, fgos_identity::Verb::Project(_)) {
         request.verb = fgos_identity::Verb::Project(match (mint, handle) {

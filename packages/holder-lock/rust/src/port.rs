@@ -22,7 +22,7 @@ use fgos_process::facts::ProcTuple;
 #[cfg(unix)]
 use fgos_process::FdSlot;
 #[cfg(unix)]
-use fgos_process::mapped::{spawn_mapped, MappedChild, MappedSpawn, MappedStdio};
+use fgos_process::mapped::{spawn_mapped, MappedChild, MappedLead, MappedSpawn, MappedStdio};
 use fgos_process::{Domain, WatchTrace};
 use serde_json::{json, Value};
 
@@ -930,7 +930,7 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
 /// The borrowing child's request: the argv `borrowed_argv` shapes, the
 /// spec's environment plus the slot annotation, its stdio.
 #[cfg(unix)]
-fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn, BorrowError> {
+fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn<'static>, BorrowError> {
     validate(handle)?;
     let drv = driver::current();
     if !drv.supported() {
@@ -955,7 +955,7 @@ fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn, B
         env,
         clear_env: spec.clear_env,
         cwd: spec.cwd.clone(),
-        process_group: false,
+        lead: MappedLead::Caller,
         stdio,
     })
 }
@@ -1577,7 +1577,7 @@ mod proof_tests {
     fn settling_a_released_node_lock_ends_a_copy_that_escaped_to_a_child() {
         let (path, resource, file, mut lock) = node_lock("escaped");
         // Hand the description to a child the way a spawn with the descriptor mapped does, then lose track of it.
-        let request = MappedSpawn { argv: vec!["sleep".into(), "30".into()], env: vec![], clear_env: false, cwd: None, process_group: false, stdio: [MappedStdio::Null; 3] };
+        let request = MappedSpawn { argv: vec!["sleep".into(), "30".into()], env: vec![], clear_env: false, cwd: None, lead: MappedLead::Caller, stdio: [MappedStdio::Null; 3] };
         let mut escaped = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &file)]).unwrap();
         drop(file);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);

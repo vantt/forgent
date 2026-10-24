@@ -12,7 +12,7 @@
 //! never read, printed or logged here, and the ssh agent is never consulted.
 
 use crate::machine;
-use crate::pins::{self, Pin, Recorded};
+use crate::pins::{self, Pin, PinState, Recorded};
 use crate::refusal::Refusal;
 use crate::text::{iso_utc_now, random_hex128};
 use serde::{Deserialize, Serialize};
@@ -53,6 +53,9 @@ pub struct Verified {
     pub fingerprint: String,
     /// True when this call pinned the key because the machine was unknown.
     pub first_seen: bool,
+    /// `Seen` for a key the owner has not confirmed; `Confirmed` once
+    /// confirmed, and always for this machine's own key.
+    pub state: PinState,
 }
 
 fn refuse(reason: &'static str, detail: impl Into<String>) -> Refusal {
@@ -311,9 +314,9 @@ pub fn verify(state_root: &Path, bytes: &[u8], signature: &Signature) -> Result<
         return Err(refuse("bad-signature", format!("the signature does not hold for these bytes under {}: {}", signature.public_key, text(&output.stderr))));
     }
     let pin = Pin::new(&signature.machine_id, &signature.public_key, &fingerprint, &iso_utc_now());
-    let first_seen = match pins::record(state_root, &pin)? {
-        Recorded::Created => true,
-        Recorded::Same => false,
+    let (first_seen, state) = match pins::record(state_root, &pin)? {
+        Recorded::Created => (true, PinState::Seen),
+        Recorded::Same(existing) => (false, existing.state),
         Recorded::Different(pinned) => {
             return Err(refuse(
                 "machine-key-changed",
@@ -324,5 +327,11 @@ pub fn verify(state_root: &Path, bytes: &[u8], signature: &Signature) -> Result<
             ))
         }
     };
-    Ok(Verified { machine_id: signature.machine_id.clone(), fingerprint, first_seen })
+    // A machine trusts itself: its own key was compared with the signature above, so its pin is confirmed.
+    let state = if state == PinState::Seen && machine::read(state_root).is_ok_and(|own| own == signature.machine_id) {
+        pins::confirm(state_root, &signature.machine_id, &fingerprint)?.state
+    } else {
+        state
+    };
+    Ok(Verified { machine_id: signature.machine_id.clone(), fingerprint, first_seen, state })
 }

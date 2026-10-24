@@ -401,9 +401,7 @@ impl GitDriver {
                     }
                     if row.cwd.is_none()
                         && row.unreadable.iter().any(|s| s.starts_with("cwd:"))
-                        && cwd_owner_requires_judgment(row.effective_uid, unsafe {
-                            libc::geteuid()
-                        })
+                        && cwd_owner_requires_judgment(row.effective_uid, current_euid())
                     {
                         use fgos_process::facts::{observe, Observed};
                         if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie)
@@ -1601,18 +1599,34 @@ fn existing<F: wal::FileSystem>(wal: &Wal<F>, id: &str) -> Result<Option<wal::Ch
     }
 }
 
-fn cwd_owner_requires_judgment(owner: Option<u32>, current: u32) -> bool {
-    owner.is_none_or(|uid| uid == current)
+/// An unreadable cwd is outside this check's scope only when both owners are known and
+/// differ. An unknown owner, or no uid notion at all (Windows), is conservative: it needs
+/// judgment, so the warning is raised rather than dropped.
+fn cwd_owner_requires_judgment(owner: Option<u32>, current: Option<u32>) -> bool {
+    match (owner, current) {
+        (Some(owner), Some(current)) => owner == current,
+        _ => true,
+    }
+}
+#[cfg(unix)]
+fn current_euid() -> Option<u32> {
+    // SAFETY: geteuid has no preconditions and cannot fail.
+    Some(unsafe { libc::geteuid() })
+}
+#[cfg(not(unix))]
+fn current_euid() -> Option<u32> {
+    None
 }
 #[cfg(test)]
 mod review_tests {
     use super::*;
     #[test]
     fn unreadable_foreign_cwd_is_outside_scope_but_unknown_and_own_are_not() {
-        assert!(!cwd_owner_requires_judgment(Some(0), 1000));
-        assert!(!cwd_owner_requires_judgment(Some(1001), 1000));
-        assert!(cwd_owner_requires_judgment(Some(1000), 1000));
-        assert!(cwd_owner_requires_judgment(None, 1000));
+        assert!(!cwd_owner_requires_judgment(Some(0), Some(1000)));
+        assert!(!cwd_owner_requires_judgment(Some(1001), Some(1000)));
+        assert!(cwd_owner_requires_judgment(Some(1000), Some(1000)));
+        assert!(cwd_owner_requires_judgment(None, Some(1000)));
+        assert!(cwd_owner_requires_judgment(Some(1000), None));
     }
 }
 

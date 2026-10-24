@@ -7,7 +7,6 @@ use std::fmt;
 use std::fs::File;
 use std::io;
 use std::path::PathBuf;
-use std::process::Child;
 
 use crate::facts::ProcTuple;
 use crate::{Domain, DomainState, FdSlot, KillOutcome};
@@ -79,11 +78,18 @@ pub struct SpawnSpec {
 /// already reaped. It is never passed to process signalling.
 pub(crate) const EXITED_GATE: &str = "exited-before-identity";
 
+/// The child `spawn_in` starts: on unix through [`crate::mapped::spawn_mapped`],
+/// so the caller is never forked.
+#[cfg(unix)]
+pub type GateChild = crate::mapped::MappedChild;
+#[cfg(not(unix))]
+pub type GateChild = std::process::Child;
+
 /// The root process of a domain, started by `spawn_in`.
 pub struct Spawned {
     /// The process the supervisor waits on. For `bwrap-pidns` this is the
     /// bwrap monitor; the gate is `root`.
-    pub child: Child,
+    pub child: GateChild,
     /// The gate as the host sees it; a reaped Linux namespace init has
     /// start_time `exited-before-identity` (an empty-domain tombstone).
     pub root: ProcTuple,

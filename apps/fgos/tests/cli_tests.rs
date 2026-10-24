@@ -1456,11 +1456,11 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     let _ = fs::remove_dir_all(&state);
 }
 
-/// `fgos identity pins`: the wiring of the read and of `--forget` (read versus
+/// `fgos identity pins`: the wiring of the read, `--confirm` and `--forget` (read versus
 /// write operation, flag validation, exit code of a refusal). What a pin is and
 /// when it is made is owned by the identity crate's signing tests.
 #[test]
-fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
+fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
     let state = std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(state.join("identity/pins")).unwrap();
@@ -1473,7 +1473,32 @@ fn identity_pins_lists_the_pinned_machines_and_forgets_one_by_id() {
         identity_command(&[&["pins"], args].concat()).env("FGOS_STATE_ROOT", &state).output().unwrap()
     };
 
-    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [pin] }));
+    // A pin file written without `state` lists as `seen`.
+    let seen = serde_json::json!({
+        "v": 1, "machineId": pin["machineId"], "publicKey": pin["publicKey"], "fingerprint": pin["fingerprint"],
+        "firstSeen": pin["firstSeen"], "state": "seen"
+    });
+    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [seen] }));
+    let fingerprint = pin["fingerprint"].as_str().unwrap();
+    for refused in [
+        pins(&["--confirm", "peer-abc234"]),
+        pins(&["--fingerprint", fingerprint]),
+        pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint, "--forget", "peer-abc234"]),
+    ] {
+        assert_ne!(refused.status.code(), Some(0), "--confirm needs --fingerprint and excludes --forget");
+    }
+    let absent = pins(&["--confirm", "other-abc234", "--fingerprint", fingerprint]);
+    assert_eq!(absent.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&absent.stderr).contains("[pin-missing]"));
+    let wrong = pins(&["--confirm", "peer-abc234", "--fingerprint", "SHA256:other"]);
+    assert_eq!(wrong.status.code(), Some(65));
+    let stderr = String::from_utf8_lossy(&wrong.stderr);
+    assert!(stderr.contains("[fingerprint-mismatch]") && stderr.contains(fingerprint) && stderr.contains("SHA256:other"), "{stderr}");
+    let confirmed = identity_data(&pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint]));
+    assert_eq!(confirmed["confirmed"]["state"], "confirmed");
+    assert!(confirmed["confirmed"]["confirmedAt"].is_string());
+    assert_eq!(identity_data(&pins(&["--json"]))["pins"][0], confirmed["confirmed"]);
+    let pin = confirmed["confirmed"].clone();
     let missing = pins(&["--forget", "other-abc234"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[pin-not-found]"));
