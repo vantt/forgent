@@ -349,7 +349,7 @@ fn has_borrowed_copy(_dev: u64, _ino: u64, _pid: u32) -> bool {
 /// from a later acquirer's fresh description, without taking a probe lock.
 #[cfg(target_os = "linux")]
 pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Release {
-    use fgos_process::facts::{file_key, locked_fds, lock_table_entries, own_lock_token, proc_self_pid};
+    use fgos_process::facts::{file_key, locked_fds, own_lock_token, proc_self_pid};
     use crate::port::Release;
     let key = file_key(&file);
     let token = own_lock_token(&file);
@@ -366,22 +366,17 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
     let result = cleanup_loop(kill_wait, |cleanup, deadline| {
         let stuck = |pids| Leftovers { killed: cleanup.killed, pids, foreign: false };
         let (Ok((dev, ino)), Ok(me)) = (&key, &me) else { return Err(stuck(Vec::new())); };
-        let tagged = match (&token, lock_table_entries()) {
-            (Ok(token), Ok(entries)) => Some(entries.iter().any(|entry| entry.kind == "FLOCK" && entry.pid == i64::from(*me) && entry.token == *token)),
-            _ => None,
-        };
-        if tagged == Some(false) {
-            // The table is read to EOF but is not an atomic snapshot.
-            // Absence is only a reason to probe, never a release proof.
-            if let Some(file) = &probe {
-                if matches!(FlockDriver.try_lock(file, Mode::Sh), Ok(TryLock::Locked)) {
-                    // The probe description is private to this call, so it
-                    // may be unlocked; a child forked from another thread
-                    // before the close would otherwise keep its Sh lock.
-                    FlockDriver.unlock_private(file);
-                    drop(probe.take());
-                    return Ok(true);
-                }
+        // A granted Sh probe on the independent description proves the old Ex
+        // description gone (Ex and Sh from different descriptions conflict), so
+        // the cold lock-table read is needed only once the probe is refused.
+        if let Some(file) = &probe {
+            if matches!(FlockDriver.try_lock(file, Mode::Sh), Ok(TryLock::Locked)) {
+                // The probe description is private to this call, so it
+                // may be unlocked; a child forked from another thread
+                // before the close would otherwise keep its Sh lock.
+                FlockDriver.unlock_private(file);
+                drop(probe.take());
+                return Ok(true);
             }
         }
         let mine = locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).map_err(|_| stuck(Vec::new()))?;
