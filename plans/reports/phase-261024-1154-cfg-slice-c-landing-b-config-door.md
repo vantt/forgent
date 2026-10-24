@@ -114,3 +114,44 @@ This repository's own project file, read as a project by the new snapshot, is re
 Status: DONE_WITH_CONCERNS
 Summary: Landing B is committed on `cfg/slice-c-b` (crate additions, addon `config` namespace with check, fix, accounts, snapshot, init, Node facade, all tests green); the cost gate fails three bounds, so G-C2 is posted and phase 09 onward waits.
 Concerns/Blockers: G-C2 (first snapshot 34 ms, uncached detected snapshots 4.1 ms per read, addon load 16.8 ms); `config.rs` 421 lines against a combined cap of 300 (Rust ceiling 870 not reached: +658).
+
+## G-C2 follow-up: coordinator decisions implemented and the gate rerun (2026-10-24)
+
+Commits (one per item, after `af4eaad10`): `2d158c1ba` (decision 5), `d7d8f0d85` (decision 1), `60d686eeb` (decision 2), `85486a196` (decision 3a). Decision 4 (accept `config.rs` at 421 lines) needs no change. Same harness, same data, same 20 runs; release profile, now stripped.
+
+| Decision | Done |
+|---|---|
+| 5 terminal policy | schema enum `[even-split, measured-split]` (the contract's names), standard and its doc line `even-split`; pinned authoring source gets a recorded difference for `terminal.layout.policy`, the migrate golden counts (16 kept, 256 dropped) and the seeded-defaults fixture follow. This repository's own file now passes that key. |
+| 1 lazy validators | `Schemas` keeps one `OnceLock` validator per section; the snapshot validates only the sections some file wrote (the standard is fixed data the crate tests validate); the composite validator is gone (`validate` = all sections through the same path). Unit test proves only the asked section compiles. |
+| 2 detected values | `Detectors::fingerprint()` (default empty; `PathDetectors`: the `PATH` and the candidate found on it) joins the cache key; `snapshot_cached` caches a detected snapshot and does not run detection on a hit; the addon's slots key on the request alone. Tests: cache (detection ran once, a changed fingerprint misses), detect_path (fingerprint changes exactly when the answer can). |
+| 3a strip | the release addon was **not stripped**. `[profile.release] strip = "symbols"`: addon **21,619,728 to 16,469,832 bytes (-23.8%)**, host `fgos` 19,415,824 to 14,704,224. |
+| 3b marginal | a Node process that already loads the addon for Git: read + sha256 + `require` of the landing A addon (9.2 MB, stripped, built from `cac2f6ce7`) 7.6 ms, of this addon (16.5 MB) 12.9 ms, so the config door adds **5.3 ms** (bound 12): holds. Whole facade-process load is now 13.3 ms (was 16.8). The hash check is untouched. |
+
+Rerun (median ms; worst in the scratch log):
+
+| Row | Before | Now | Bound | |
+|---|---|---|---|---|
+| marginal addon load of the config door | n/a | 5.3 | 12 | **holds** |
+| warm cached one-section read, migrated | 0.049 | 0.051 | 0.3 | holds |
+| warm read, project with no `runner.executor`, `claude` on `PATH` | 4.09 | **0.044** | 0.3 | **holds** (decision 2) |
+| `runner` marshal | 0.36 | 0.36 | 3 | holds |
+| first read, migrated all / `gateBypass` / `runner` / legacy JSON | 34.5 / 35.2 / 36.7 / 41.1 | **34.2 / 35.5 / 38.2 / 41.4** | today 0.3 + 25 | **still fails** |
+| first read, empty project | 31.8 | **26.0** | 25.3 | **still fails** (by 0.7) |
+| machine view warm (not cached) | 4.05 | **3.9** | 0.3 | **still fails** |
+| `fgos dispatch decide` today | 252 | 180 to 222 | +15 | not comparable until a reader moves |
+
+**Where the first read goes (measured one process, steps in order after the bundle load of 2.7 ms):** first project root 24 ms; a second new project root 11 ms (a 43 KB legacy JSON with every section written, so all section validators compile); a third root 4.2 ms; the machine view 3.9 ms. So the lazy validators are worth about 7 ms in total, not the 25 ms I guessed in the first report; **about 20 ms of the first read is the cold start of the Git driver that resolves the trusted main checkout** (`GitDriver::new` and the version floor, once per process, before any file is read). The build itself is 4 ms and is what a cached-out read pays (the machine view, which has no cache, pays only that).
+
+**Stop, per the coordinator's rule: two bounds still fail** (first read, machine view warm). The remaining cost is not validators or marshalling.
+
+### G-C2 round 2 (decision question)
+
+**What is happening.** The first config read in a process costs 26 to 41 ms against a bound of 25.3; the machine view costs 3.9 ms per read against 0.3.
+**Cause.** (1) 20 ms is the Git driver's cold start, paid to learn the main checkout even when the project root is the main checkout. (2) The machine view has no cache (the crate cache is keyed over a project read), so each read rebuilds (3.9 ms).
+**Options.** A. Resolve the trusted root without the driver when the answer is already on disk: the nearest ancestor holding `.git` as a real directory (not a symlink) is the main checkout, and no ancestor holding one means the project itself; only a `.git` file (a linked worktree) or a bare repository goes to the driver. About 25 lines in `config.rs`; the first read in the main checkout and in a plain directory drops to about 14 ms (holds), a linked worktree stays near 34 ms once per process. It touches the trust rule (spec section 5 rule 6), so it needs your word, and a test that a `.git` symlink or a forged directory still goes to the driver. B. For the machine view, give the crate cache a machine-view entry (about 30 lines in `cache.rs`): warm 0.05 ms. C. A and B. D. Neither (accept 20 to 40 ms on the first read of a process and 3.9 ms per machine read).
+**Recommendation.** C. The gateway and every doctor row without a project use the machine view, and the main checkout is the common case.
+**Scope of the answer.** Parks phase 09 onward only; the five landing B commits plus these four stand.
+
+Gates after the four commits: `cargo test -p fgos-config -p fgos-node-addon`, clippy `-D warnings`, `cargo fmt -p fgos-config --check` clean; suite-staged `config-door`, `facade`, `native-load`, `yaml`, `architecture`, `release-tree`, `native-addon`, `terminal-control-checks`: 102 pass, 0 fail, 1 skipped (pre-existing). Rust added vs baseline now about +700 of the 870 ceiling (re-count before phase 16).
+
+Status: DONE_WITH_CONCERNS. Decisions 1 to 3 and 5 are implemented; two bounds still fail (first read, machine view) and are stopped on round 2 above.
