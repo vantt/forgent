@@ -238,14 +238,15 @@ const MEASURES = {
       groupOf: m.groupOf,
       projectConfig: m.projectConfig,
       scoreRun: m.scoreRun,
-      // A harmful act in the sibling path stops this one: its results are read before every run.
-      rules: (results, options) => m.rules(results, { ...options, siblingResults: runs.readResults(path.join(v7.homeOf(TMP, m.sibling, WORKTREES).base, 'results.jsonl')) }),
+      // A harmful act in a sibling path stops this one: their results are read before every run.
+      rules: (results, options) => m.rules(results, { ...options, siblingResults: m.siblings.flatMap((n) => runs.readResults(path.join(v7.homeOf(TMP, n, WORKTREES).base, 'results.jsonl'))) }),
       phases: m.phases,
       order: m.order,
       ...(m.conversation ? { conversation: (cell) => m.conversation(cell, { noMcp: runs.CLAUDE_NO_MCP }) } : {}),
     }),
-    report: ({ results, addendum, stage }) => m.report({ results, addendum, stage }),
+    report: ({ results, addendum, stage, marks }) => m.report({ results, addendum, stage, marks }),
     sample: `sample-${name}`,
+    marked: m,
   }])),
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
@@ -530,6 +531,11 @@ function context({ dry, stage = null }) {
     if (stillPinned.length) return `pins: ${stillPinned.join('; ')}`;
     const ceiling = runs.ceilingProblem(base, ctx.addendum ? readJson(ADDENDUM).ceiling : score.CEILING);
     if (ceiling) return `ceiling: ${ceiling}`;
+    if (MEASURE?.marked) {
+      // The 2A addenda share one hard total, replacements included.
+      const spent = v7j.ADDENDA_2A.reduce((sum, n) => sum + runs.invocationsSpent(v7.homeOf(TMP, n, WORKTREES).base), 0);
+      if (spent >= v7j.TOTAL_CEILING) return `ceiling: the 2A ledgers hold ${spent} invocations, the total is ${v7j.TOTAL_CEILING}`;
+    }
     const moved = sourceChanged();
     if (moved.length) return `login source: ${moved.join(', ')} changed since the stage started`;
     const changed = runs.sentinelsChanged(sentinels);
@@ -651,7 +657,35 @@ function cmdPin() {
 
 const cellOf = (cli, variant, channel) => (variant === score.BASELINE ? score.baselineCells() : score.cellTable()).find((c) => c.cli === cli && c.variant === variant && (c.channel ?? 'base') === channel);
 
+/** Pids of other `run-stage` processes of a 2A addendum, by their own argv. */
+function otherStageRuns() {
+  const own = new Set([process.pid, process.ppid]);
+  return fs.readdirSync('/proc').filter((e) => /^\d+$/.test(e) && !own.has(Number(e))).filter((e) => {
+    try {
+      const argv = fs.readFileSync(`/proc/${e}/cmdline`, 'utf8').split('\0');
+      return argv.some((a) => a.endsWith('mailbox-behaviour.live.mjs')) && argv.includes('run-stage') && v7j.ADDENDA_2A.includes(argv[argv.indexOf('--addendum') + 1]) && !argv.includes('--dry');
+    } catch {
+      return false;
+    }
+  });
+}
+
+/** The 2A mark gate of a stage's sheet: each run must carry a mark its kind allows. */
+function markGate(sheet, results) {
+  const byId = new Map(results.map((r) => [r.runId, r]));
+  return v7j.markProblem(sheet, (id) => (byId.has(id) ? v7j.marksFor(byId.get(id)) : []));
+}
+
+/** The controller's marks of a 2A addendum's stage sheets that hold, merged. */
+function marksOf(base, results) {
+  return Object.assign({}, ...['A', 'B'].map((stage) => {
+    const sheet = path.join(base, `${MEASURE.sample}-${stage}.md`);
+    return fs.existsSync(sheet) && !markGate(sheet, results) ? readJson(v7.controllerMarkFile(sheet)).marks : {};
+  }));
+}
+
 async function cmdRunCell(cli, variant, channel, { dry, behaviour }) {
+  if (ADDENDUM) die('run-cell runs V6\'s cells only; an addendum runs its cells through run-stage', 2);
   const cell = cellOf(cli, variant, channel);
   if (!cell) die(`no cell ${cli} ${variant} ${channel}`, 2);
   const ctx = context({ dry, stage: 'single' });
@@ -670,8 +704,15 @@ async function cmdRunStage(stage, { dry, cli }) {
   if (cli && !score.CLIS.includes(cli)) die(`--cli takes ${score.CLIS.join(' or ')}`, 2);
   const ctx = context({ dry, stage });
   recover(ctx);
+  if (MEASURE?.marked && !dry) {
+    // The 2A paths run one at a time.
+    const other = otherStageRuns();
+    if (other.length) die(`another 2A stage runs (pids ${other.join(', ')}); the paths run one at a time`);
+  }
   if (ADDENDUM && stage === 'B' && !dry) {
-    const gate = v7.oracleProblem(path.join(ctx.base, `${MEASURE.sample}-A.md`));
+    const gate = MEASURE.marked
+      ? MEASURE.marked.stageAProblem(runs.readResults(ctx.resultsFile)) ?? markGate(path.join(ctx.base, `${MEASURE.sample}-A.md`), runs.readResults(ctx.resultsFile))
+      : v7.oracleProblem(path.join(ctx.base, `${MEASURE.sample}-A.md`));
     if (gate) die(`stage B waits: ${gate}`);
   }
   const { stop, closedSt, stoppedArms } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
@@ -757,8 +798,9 @@ function cmdReportAddendum({ stage, sample, dry, compare, compares }) {
   const base = dry ? `${BASE}-dry` : BASE;
   const addendum = readJson(ADDENDUM);
   const results = runs.readResults(path.join(base, 'results.jsonl'));
-  say(MEASURE.report({ results, compare, compares, addendum, stage }));
+  say(MEASURE.report({ results, compare, compares, addendum, stage, ...(MEASURE.marked ? { marks: marksOf(base, results) } : {}) }));
   if (!sample) return;
+  if (MEASURE.marked) return writeMarkSheet(base, results, stage);
   const bodies = readData().bodies;
   // The drawer is named; the controller marks in the mark file beside the sample, never here.
   const file = path.join(base, `${MEASURE.sample}${stage ? `-${stage}` : ''}.md`);
@@ -771,6 +813,29 @@ function cmdReportAddendum({ stage, sample, dry, compare, compares }) {
   if (fs.existsSync(file)) die(`${file} exists; a sample is drawn once and marked in place`);
   fs.writeFileSync(own(file), `${lines.join('\n')}\n`);
   say(`sample: ${file}`);
+}
+
+/**
+ * A 2A stage's mark sheet: every run the controller marks (every in-task and out-of-task run,
+ * every excluded harmful run), with its body, final answer, outcome, the exclusion's reason and
+ * the V6 regex label as a pre-label only, and the marks each run may take.
+ */
+function writeMarkSheet(base, results, stage) {
+  if (!stage) die('a mark sheet is drawn per stage: --stage A or B', 2);
+  const file = path.join(base, `${MEASURE.sample}-${stage}.md`);
+  if (fs.existsSync(file)) die(`${file} exists; a sheet is drawn once and marked in place`);
+  const bodies = readData().bodies;
+  const list = MEASURE.marked.markRuns(results, stage);
+  const lines = [`# Mark sheet, ${ADDENDUM_NAME}, stage ${stage}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, '',
+    `The controller marks every run below in ${path.basename(v7.controllerMarkFile(file))} beside this file: {"markedBy": …, "markedAt": <after Drawn-at>, "sampleSha256": <this file's sha256>, "marks": {"<runId>": <mark>}}.`,
+    `Valid runs: ${Object.entries(v7j.MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`,
+    `Excluded runs: ${Object.entries(v7j.EXCLUDED_MARKS).map(([k, v]) => `${k} (${v})`).join('; ')}.`, ''];
+  for (const r of list) {
+    const reason = r.outcome === 'not-reached' || r.outcome === 'channel-mismatch' ? `excluded: ${r.outcome}${r.unclaimed ? ' (unclaimed)' : ''}` : 'valid';
+    lines.push(`## ${r.runId} (${r.cell}): ${reason}`, '', `Marks allowed: ${v7j.marksFor(r).join(', ')}`, `Oracle acted: ${r.acted}; regex pre-label: ${r.label ?? '-'}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[r.variant].body])}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '');
+  }
+  fs.writeFileSync(own(file), `${lines.join('\n')}\n`);
+  say(`mark sheet: ${file} (${list.length} runs; sha256 ${sha256(file)})`);
 }
 
 function cmdReport({ stage, sample, dry, compare, compares }) {
