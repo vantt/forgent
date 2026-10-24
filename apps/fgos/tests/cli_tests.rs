@@ -1529,7 +1529,15 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     };
     let payload = published_payload(&bravo_state, &listed, &MachineRef { id: "bravo-bbbbbb".into(), handle: "bravo".into() }).unwrap();
     let mut registry = Registry::default();
-    registry.register(serde_json::from_str::<ConsumerContract>(include_str!("../../../packages/identity/contracts/identity-event-streams.v1.json")).unwrap()).unwrap();
+    let contract = include_str!("../../../packages/identity/contracts/identity-event-streams.v1.json");
+    let sealed: Vec<bool> = serde_json::from_str::<serde_json::Value>(contract).unwrap()["types"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["sealOnWrite"].as_bool().unwrap())
+        .collect();
+    assert_eq!(sealed, [false, false], "the host appends and never seals, so the contract says so");
+    registry.register(serde_json::from_str::<ConsumerContract>(contract).unwrap()).unwrap();
     append(
         &bravo_layout,
         &registry,
@@ -1559,6 +1567,24 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     let by_machine = identity_data(&run(&["list", "--machine", "bravo", "--json"]));
     let ids: Vec<&str> = by_machine["sessions"].as_array().unwrap().iter().map(|s| s["id"].as_str().unwrap()).collect();
     assert_eq!(ids, ["bravo-bbbbbb/sess"], "--machine keeps one machine's sessions");
+
+    // A clone that still tracks a retired event file is refused by the Event Store's write admission:
+    // the local registration succeeds, the refusal is one stderr line, and nothing is appended.
+    let (legacy_root, _, legacy_layout) = clone("legacy", "alpha-aaaaaa");
+    fs::write(legacy_root.join(".fgos/events.jsonl"), "").unwrap();
+    git(&legacy_root, &["add", "-f", ".fgos/events.jsonl"]);
+    git(&legacy_root, &["-c", "user.name=t", "-c", "user.email=t@example.test", "commit", "-qm", "legacy events"]);
+    let refused = identity_command(&["session", "--register", "--role", "lead:OTHER", "--json"])
+        .env("FGOS_STATE_ROOT", &alpha_state)
+        .env("FGOS_SESSION_ID", "alpha-session")
+        .current_dir(&legacy_root)
+        .output()
+        .unwrap();
+    identity_data(&refused);
+    let stderr = String::from_utf8_lossy(&refused.stderr);
+    assert!(stderr.contains("identity-publish-failed: event-store-write-refused"), "{stderr}");
+    let active = legacy_layout.stream(&StreamId::parse("project:identity").unwrap()).active();
+    assert!(!active.exists(), "a refused admission appends nothing");
     let _ = fs::remove_dir_all(&world);
 }
 

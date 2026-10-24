@@ -7,6 +7,7 @@
 use fgos_event_store::{
     append::{append, AppendRequest, EventInput},
     identity::{machine_id, StoreIdentity},
+    legacy_import::write_readiness,
     layout::{Layout, StreamId},
     read::{read, ReadRequest},
     registry::{ConsumerContract, Registry},
@@ -17,7 +18,7 @@ use fgos_identity::shared::{self, EntryLog, LogDoor, RawEvent};
 use fgos_identity::text::{iso_utc, iso_utc_now};
 use fgos_identity::Refusal;
 use serde_json::Value;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 const CONTRACT: &str = include_str!("../../../../packages/identity/contracts/identity-event-streams.v1.json");
 
@@ -36,6 +37,8 @@ struct StoreLog {
     stream: StreamId,
     machine: String,
     writer: String,
+    /// Where the log was opened: the project whose `eventStore.remote` the write admission asks about.
+    dir: PathBuf,
 }
 
 impl LogDoor for StoreLogDoor {
@@ -59,11 +62,26 @@ impl LogDoor for StoreLogDoor {
         let mut registry = Registry::default();
         registry.register(contract).map_err(|e| fault(&e))?;
         let stream = StreamId::parse(shared::STREAM).map_err(|e| fault(&e))?;
-        Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned() })))
+        Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() })))
     }
 }
 
 impl StoreLog {
+    /// The write admission every writer of the Event Store passes before it appends: a clone that
+    /// still has retired event files, or whose pinned legacy ref or fetch mapping is missing, is refused.
+    fn admit_write(&self) -> Result<(), Refusal> {
+        let remote = fgos_config::provider::effective_value(&self.dir, "eventStore.remote")?;
+        let remote = match &remote {
+            Some(value) => value.as_str().ok_or_else(|| store_fault("event-store-config", "eventStore.remote is not text"))?,
+            None => "origin",
+        };
+        write_readiness(&self.driver, &self.repo, remote).map_err(|e| Refusal {
+            reason: "event-store-write-refused",
+            detail: e.to_string(),
+            candidates: Vec::new(),
+        })
+    }
+
     /// The stream as the store orders it, and this store's own origin id.
     fn read_stream(&self) -> Result<(fgos_event_store::read::ReadResult, String), Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-read-failed", e);
@@ -90,6 +108,7 @@ impl StoreLog {
 
 impl EntryLog for StoreLog {
     fn append(&self, event_type: &str, payload: Value) -> Result<(), Refusal> {
+        self.admit_write()?;
         // The event says it was written after everything this clone has folded (its `seen`),
         // so a later take on this machine orders after the entries it replaces.
         let (read, origin) = self.read_stream()?;

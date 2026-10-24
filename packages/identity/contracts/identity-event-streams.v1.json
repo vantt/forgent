@@ -6,14 +6,14 @@
       "domain": "identity",
       "schemaVersion": 1,
       "scope": "project",
-      "sealOnWrite": true
+      "sealOnWrite": false
     },
     {
       "type": "identity.session-ended",
       "domain": "identity",
       "schemaVersion": 1,
       "scope": "project",
-      "sealOnWrite": true
+      "sealOnWrite": false
     }
   ]
 }

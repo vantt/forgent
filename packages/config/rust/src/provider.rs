@@ -308,6 +308,16 @@ fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
     }
 }
 
+/// The effective value at `path` (text form, e.g. `eventStore.remote`) for the
+/// project at `root`: project over global over the standard, as `config show`
+/// prints it. `None` when no layer sets it. For host code that needs one
+/// setting in process, so none reads the config files itself.
+pub fn effective_value(root: &Path, path: &str) -> Result<Option<Value>, Refusal> {
+    let (bundle, roots) = (Bundle::load()?, roots(root)?);
+    let shown = read(&bundle, &roots, &Verb::Show { path: Some(path.to_owned()) })?.data;
+    Ok(shown["present"].as_bool().filter(|present| *present).and_then(|_| shown.get("value").cloned()).filter(|value| !value.is_null()))
+}
+
 #[derive(Debug, Clone)]
 pub struct ConfigProvider {
     descriptor: ProviderDescriptor,
