@@ -8,15 +8,12 @@ import { spawnSync } from 'node:child_process';
 import { landRunnerItem } from '../../src/runner/merge.mjs';
 import { retargetMember, resolveIntegrationBranch } from '../../src/runner/promote-engine.mjs';
 import { withMainCheckout } from '../../src/runner/repo-locks.mjs';
-import { checkpointMainFgos } from '../../src/runner/main-fgos-checkpoint.mjs';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { git, mkTempDir, initRepo, installHook, sessionEnv, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The land step of a root-into-main merge and everything that can touch the
-// main checkout around it, on real git in disposable repos. Every test here
-// runs with no checkpoint adapter attached to the lock core: the checkpoint
-// is only attached where a test names it.
+// main checkout around it, on real git in disposable repos.
 
 const skip = HOOK_TEST_SKIP;
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
@@ -62,38 +59,27 @@ test('two lands into one target exclude each other under the slot, and the secon
   assert.equal(probe('main-checkout', { fgosDir: path.join(repoRoot, '.fgos') }).result, 'free');
 });
 
-test('a checkpoint that holds main while a land waits for it finishes first; the land then merges onto the moved trunk and loses nothing', { skip }, async () => {
+test('a land that waits while another holder has main merges once main is released, and loses nothing', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n{"seq":2}\n');
   activateGitFixture(repoRoot);
-  const tipBefore = mainTip(repoRoot);
 
-  const saved = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
-  try {
-    let land;
-    await withMainCheckout(createLockScope('checkpointer'), 'checkpoint', async (mainHandle) => {
-      land = landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000 });
-      // Long enough for the land to finish its merge and verify and start waiting for main.
-      await sleep(1500);
-      checkpointMainFgos(mainHandle, fgosDir, repoRoot);
-    }, { fgosDir });
+  let land;
+  await withMainCheckout(createLockScope('holder'), 'hold', async () => {
+    land = landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000 });
+    // Long enough for the land to finish its merge and verify and start waiting for main.
+    await sleep(1500);
+  }, { fgosDir });
 
-    const result = await land;
-    assert.equal(result.outcome, 'merged', JSON.stringify(result));
-    assert.equal(result.receipt.localEffect.publishedOid, mainTip(repoRoot), 'the land published onto the trunk the checkpoint moved');
-    assert.match(git(repoRoot, ['show', 'main:a.txt']), /^a$/m, 'the branch content landed');
-    assert.match(git(repoRoot, ['log', '--format=%s', `${tipBefore}..main`]), /chore\(\.fgos\): fallback events checkpoint/);
-    assert.equal(git(repoRoot, ['status', '--porcelain', '--untracked-files=no']).trim(), '', 'the index and tree are consistent, nothing half-applied');
-    assert.equal(fs.existsSync(path.join(repoRoot, '.git', 'index.lock')), false);
-  } finally {
-    if (saved !== undefined) process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = saved;
-  }
+  const result = await land;
+  assert.equal(result.outcome, 'merged', JSON.stringify(result));
+  assert.equal(result.receipt.localEffect.publishedOid, mainTip(repoRoot), 'the land published onto the trunk');
+  assert.match(git(repoRoot, ['show', 'main:a.txt']), /^a$/m, 'the branch content landed');
+  assert.equal(git(repoRoot, ['status', '--porcelain', '--untracked-files=no']).trim(), '', 'the index and tree are consistent, nothing half-applied');
+  assert.equal(fs.existsSync(path.join(repoRoot, '.git', 'index.lock')), false);
 });
 
 test('with the hook, the land\'s ref update runs no repository hook, a manual commit attempted while main is held is refused, and the land completes with no manual commit', { skip }, async () => {

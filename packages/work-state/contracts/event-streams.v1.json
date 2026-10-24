@@ -1,0 +1,201 @@
+{
+  "v": 1,
+  "types": [
+    {
+      "type": "decision",
+      "domain": "decisions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "doc.attest",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.demote",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.mark-rendered",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.path-move",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.promote",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.register",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.reserve",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.retire",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "doc.supersede",
+      "domain": "doc",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "executor.dispatch",
+      "domain": "executor",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "goal.focus",
+      "domain": "goal",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "topic.merge",
+      "domain": "topic",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "topic.register",
+      "domain": "topic",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "topic.rename",
+      "domain": "topic",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "topic.retire",
+      "domain": "topic",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "topic.split",
+      "domain": "topic",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.add",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.attempt",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.call-summary",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.discovery",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.edit",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.gate-approve",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "work.handoff",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.move",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "work.outcome",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "work.resolve-park-reason",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "work.step",
+      "domain": "work",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    }
+  ]
+}

@@ -4,22 +4,26 @@
  *
  * Generates golden fixtures for Observe and owner crates under test/fixtures/observe/.
  * - friction/ and cases/ shards are generated using the native Rust CLI.
- * - owner stores (.fgos/events.jsonl, assignments/, coordination/) are generated
+ * - owner stores (Event Store, assignments/, coordination/) are generated
  *   using Node CLI / standard deterministic store structure in a temporary directory.
  * - All timestamps, IDs, PIDs, and git hashes are pinned so that running this script
  *   multiple times produces ZERO git diff.
  */
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { sandboxGit } from './lib/sandbox-git.mjs';
+import { ensureGitAddon } from './git-addon.mjs';
+import { prepareStore } from '../src/event-store/index.mjs';
+import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const FIXTURES_DIR = path.join(REPO_ROOT, 'test', 'fixtures', 'observe');
-const RUST_BIN = path.join(REPO_ROOT, 'target', 'debug', 'fgos');
+const RUST_BIN = path.join(process.env.CARGO_TARGET_DIR ?? path.join(REPO_ROOT, 'target'), 'debug', 'fgos');
 
 const PINNED_SESSION_ID = 'golden-fixture-writer';
 const PINNED_CALLER_PID = '42000';
@@ -28,20 +32,24 @@ const PINNED_GIT_HEAD_OPEN = '0123456789abcdef0123456789abcdef01234567';
 const PINNED_GIT_HEAD_CLOSE = 'fedcba9876543210fedcba9876543210fedcba98';
 
 function main() {
+  // The Work seed below goes through the native Event Store door, which needs this checkout's addon.
+  ensureGitAddon();
   console.log('Building fgos binary if needed...');
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd: REPO_ROOT,
     stdio: 'inherit',
   });
 
-  const tmpDir = fs.mkdtempSync(path.join(REPO_ROOT, 'target', 'observe-fixture-'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'observe-fixture-'));
   const fgosDir = path.join(tmpDir, '.fgos');
 
   try {
     console.log(`Setting up temporary store at ${tmpDir}...`);
     const git = sandboxGit(tmpDir);
     git(['init', tmpDir]);
+    git(['-C', tmpDir, 'config', 'fgos.machineId', PINNED_SESSION_ID]);
     git(['commit', '--allow-empty', '-m', 'init'], { cwd: tmpDir });
+    fixEventStoreLockDirs(tmpDir, { trustedMain: tmpDir });
 
     // 1. Initialize store with Node CLI
     execFileSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'fgos.mjs'), 'init'], {
@@ -49,7 +57,7 @@ function main() {
       stdio: 'pipe',
     });
 
-    // 2. Setup deterministic Work store (.fgos/events.jsonl)
+    // 2. Seed Work through the real store; its events live outside the worktree.
     const workEvents = [
       {
         seq: 1,
@@ -67,22 +75,6 @@ function main() {
       },
       {
         seq: 2,
-        ts: '2026-09-29T08:05:00.000Z',
-        type: 'work.friction',
-        payload: {
-          id: 'tsk-golden-1',
-          layer: 'verification',
-          errorClass: 'verify-miss',
-          disposition: 'advisory',
-          detail: 'Contract schema validation failed for observe.observation',
-          attempts: 1,
-          docType: null,
-          producer: 'runner.loop',
-        },
-        v: 2,
-      },
-      {
-        seq: 3,
         ts: '2026-09-29T08:10:00.000Z',
         type: 'work.move',
         payload: {
@@ -95,17 +87,10 @@ function main() {
       },
     ];
 
-    fs.writeFileSync(
-      path.join(fgosDir, 'events.jsonl'),
-      workEvents.map((e) => JSON.stringify(e)).join('\n') + '\n',
-      'utf8'
-    );
-
-    // Remove any per-process event shards in .fgos/events/ to keep events.jsonl baseline pure
-    const eventsSubdir = path.join(fgosDir, 'events');
-    if (fs.existsSync(eventsSubdir)) {
-      fs.rmSync(eventsSubdir, { recursive: true, force: true });
-    }
+    const workStore = prepareStore(tmpDir, { trustedMain: tmpDir });
+    workStore.append('project', workEvents.map(e => ({
+      eventType: e.type, schemaVersion: 1, payload: e.payload, ts: e.ts,
+    })), {}, PINNED_SESSION_ID, []);
 
     // 3. Setup deterministic RunResult store (.fgos/assignments/)
     const asgnDir = path.join(fgosDir, 'assignments', 'asgn-golden-01');
@@ -205,7 +190,15 @@ function main() {
       'utf8'
     );
 
-    // 5. Generate Observe friction shard using Rust CLI (triggers lazy migration + records friction)
+    // Retain the frozen Observe migration snapshot. Its retired work.friction type cannot be appended to a
+    // current Work registry, so the legacy journal comes from a committed fixture; new records below still use
+    // the native writer on top of these real existing journal bytes.
+    const frictionDir = path.join(fgosDir, 'observe/friction');
+    fs.mkdirSync(frictionDir, { recursive: true });
+    fs.copyFileSync(path.join(REPO_ROOT, 'test/fixtures/observe-legacy-friction.jsonl'),
+      path.join(frictionDir, PINNED_SESSION_ID + '.jsonl'));
+
+    // 5. Generate current Observe records using the native CLI
     console.log('Recording friction via native Rust CLI...');
     const rustEnv = {
       ...process.env,
@@ -359,8 +352,13 @@ function main() {
     fs.rmSync(FIXTURES_DIR, { recursive: true, force: true });
     fs.mkdirSync(FIXTURES_DIR, { recursive: true });
 
-    // Copy .fgos directory
-    fs.cpSync(fgosDir, path.join(FIXTURES_DIR, '.fgos'), { recursive: true });
+    // Copy only owner snapshots: native identity, cursors and locks are runtime state.
+    for (const name of ['assignments', 'coordination', 'observe']) {
+      fs.cpSync(path.join(fgosDir, name), path.join(FIXTURES_DIR, '.fgos', name), { recursive: true });
+    }
+    const history = workStore.read({ streams: ['project'] }, []).sequence;
+    const snapshot = history.map(({ seq, ts, type, payload }) => ({ seq, ts, type, payload, v: 2 }));
+    fs.writeFileSync(path.join(FIXTURES_DIR, 'work-events.jsonl'), snapshot.map(e => JSON.stringify(e)).join('\n') + '\n');
 
     console.log('Golden fixtures regenerated successfully.');
   } finally {

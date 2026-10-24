@@ -16,6 +16,10 @@ pub type WalResult<T> = Result<T, WalError>;
 pub enum WalError {
     Io(io::Error),
     Corrupt(String),
+    /// An intent would exceed the per-record byte bound. Raised by `begin`
+    /// before the operation directory or any record exists, so nothing was
+    /// recorded.
+    RecordTooLarge,
     Untrusted,
     OperationIdConflict,
     PublicationBorrowUnavailable,
@@ -35,6 +39,7 @@ impl WalError {
         match self {
             Self::Io(_) => "git-wal-io",
             Self::Corrupt(_) => "git-wal-corrupt",
+            Self::RecordTooLarge => "wal-record-too-large",
             Self::Untrusted => "repository-identity-changed",
             Self::OperationIdConflict => "operation-id-conflict",
             Self::PublicationBorrowUnavailable => "publication-borrow-unavailable",
@@ -104,9 +109,89 @@ pub struct ScopedCommitIntent {
     pub worktree: String,
     pub baseline: String,
     pub request: String,
-    pub paths: Vec<String>,
+    pub paths: PathSet,
     pub tree: String,
-    pub cutover_grant: Option<crate::CutoverGrant>,
+    pub cutover_grant: Option<CutoverGrantRecord>,
+}
+/// A set of literal repository paths as a record holds it. New records keep
+/// only a digest, so a record stays bounded however many paths an operation
+/// selects; records written earlier list the paths and still read.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum PathSet {
+    Listed(Vec<String>),
+    Digest(PathDigest),
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct PathDigest {
+    pub count: usize,
+    pub sha256: String,
+}
+impl From<Vec<String>> for PathSet {
+    fn from(paths: Vec<String>) -> Self {
+        Self::Listed(paths)
+    }
+}
+impl PathSet {
+    /// An empty selection stays an empty list; any other is recorded as digest.
+    pub fn of(paths: &[String]) -> WalResult<Self> {
+        if paths.is_empty() {
+            return Ok(Self::Listed(vec![]));
+        }
+        let set = Self::sorted(paths);
+        Ok(Self::Digest(PathDigest { count: set.len(), sha256: canonical_digest(&set)? }))
+    }
+    fn sorted(paths: &[String]) -> Vec<&String> {
+        let mut set: Vec<_> = paths.iter().collect();
+        set.sort();
+        set.dedup();
+        set
+    }
+    pub fn is_empty(&self) -> bool {
+        matches!(self, Self::Listed(paths) if paths.is_empty())
+    }
+    /// Whether `actual` is exactly this set, whatever its order.
+    pub fn matches(&self, actual: &[String]) -> WalResult<bool> {
+        let set = Self::sorted(actual);
+        Ok(match self {
+            Self::Listed(paths) => Self::sorted(paths) == set,
+            Self::Digest(d) => d.count == set.len() && d.sha256 == canonical_digest(&set)?,
+        })
+    }
+    fn validate(&self) -> WalResult<()> {
+        match self {
+            Self::Listed(paths) => {
+                for path in paths {
+                    if crate::literal_repo_path(path).is_err() {
+                        return Err(corrupt("scoped commit path"));
+                    }
+                }
+            }
+            Self::Digest(d) if d.count == 0 || !digest_valid(&d.sha256) => {
+                return Err(corrupt("scoped commit path digest"));
+            }
+            Self::Digest(_) => {}
+        }
+        Ok(())
+    }
+}
+/// The cutover grant as a record holds it: the exact deletions as a [`PathSet`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CutoverGrantRecord {
+    pub exact_paths: PathSet,
+    pub legacy_ref_oid: String,
+    pub seal_digest: String,
+}
+impl CutoverGrantRecord {
+    pub fn of(grant: &crate::CutoverGrant) -> WalResult<Self> {
+        Ok(Self {
+            exact_paths: PathSet::of(&grant.exact_paths)?,
+            legacy_ref_oid: grant.legacy_ref_oid.clone(),
+            seal_digest: grant.seal_digest.clone(),
+        })
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
@@ -451,11 +536,7 @@ impl Intent {
             {
                 return Err(corrupt("scoped commit binding"));
             }
-            for path in paths {
-                if crate::literal_repo_path(path).is_err() {
-                    return Err(corrupt("scoped commit path"));
-                }
-            }
+            paths.validate()?;
             Oid::parse(tree, self.object_format).map_err(|_| corrupt("commit tree"))?;
             validate_tip(&self.expected, self.object_format)?;
             return validate_tip(&self.next, self.object_format);
@@ -1355,6 +1436,10 @@ impl<F: FileSystem> Wal<F> {
             }
             return Ok(Begin::Compacted(c));
         }
+        // Refuse an oversized intent before the operation directory exists, so
+        // the refusal leaves nothing behind that could block a later attempt.
+        let r = make_record(id, 0, None, Phase::Intent(intent.clone()))?;
+        check_record_bound(&r)?;
         let dir = self.operation(id, true)?;
         if let Some(c) = self.compacted(id)? {
             if !c.matches(&intent)? {
@@ -1379,7 +1464,6 @@ impl<F: FileSystem> Wal<F> {
                 found => found,
             };
         }
-        let r = make_record(id, 0, None, Phase::Intent(intent.clone()))?;
         let installed = self.install(&dir, &record_name(0), &r, true)?;
         // A concurrent compactor may have removed record zero after our first
         // ledger read. Its durable binding wins even if we installed a name
@@ -1674,6 +1758,13 @@ fn repository_identity(dir: &Directory) -> WalResult<String> {
         let _ = dir;
         Err(WalError::Unsupported)
     }
+}
+fn check_record_bound(r: &Record) -> WalResult<()> {
+    let bytes = serde_json::to_vec(r).map_err(|_| corrupt("serialize"))?;
+    if bytes.len() as u64 > MAX_RECORD {
+        return Err(WalError::RecordTooLarge);
+    }
+    Ok(())
 }
 fn make_record(
     id: &str,
@@ -2291,7 +2382,9 @@ impl<F: FileSystem> Wal<F> {
             .modified()
             .ok()
     }
-    pub(crate) fn known_id(&self, id: &str) -> WalResult<bool> {
+    /// Whether `id` names a compacted receipt or a directory holding record
+    /// zero; a directory without one is an abandoned shell and names nothing.
+    pub fn known_id(&self, id: &str) -> WalResult<bool> {
         if self.compacted(id)?.is_some() {
             return Ok(true);
         }
@@ -2370,6 +2463,11 @@ impl<F: FileSystem> Wal<F> {
                 let entry = entry?;
                 let id = entry.file_name().to_string_lossy().into_owned();
                 if is_durable_temporary(&id) {
+                    continue;
+                }
+                // A directory whose record zero was never installed bound no
+                // operation; listing it would send every reader to inspect it.
+                if !ledger && matches!(self.known_id(&id), Ok(false)) {
                     continue;
                 }
                 if seen == bound {
@@ -2809,6 +2907,36 @@ mod tests {
     }
 
     #[test]
+    fn oversized_intent_is_refused_before_an_operation_directory_exists() {
+        let t = Temp::new();
+        let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let mut huge = intent(&w);
+        huge.writer_identity = "w".repeat(MAX_RECORD as usize);
+        assert!(matches!(
+            w.begin("too-large", huge, &Authority),
+            Err(WalError::RecordTooLarge)
+        ));
+        assert!(!t.0.join("too-large").exists(), "refusal must not leave a directory");
+        assert!(matches!(w.known_id("too-large"), Ok(false)));
+        assert!(matches!(
+            w.begin("too-large", intent(&w), &Authority).unwrap(),
+            Begin::Created(_)
+        ));
+    }
+    #[test]
+    fn path_set_digest_matches_the_same_paths_in_any_order_and_listed_records_still_read() {
+        let paths: Vec<String> = ["b/2", "a/1", "c/3"].map(String::from).to_vec();
+        let digest = PathSet::of(&paths).unwrap();
+        assert!(matches!(digest, PathSet::Digest(_)));
+        assert!(digest.matches(&["c/3".into(), "a/1".into(), "b/2".into()]).unwrap());
+        assert!(!digest.matches(&["a/1".into(), "b/2".into()]).unwrap());
+        assert!(!digest.matches(&["a/1".into(), "b/2".into(), "c/4".into()]).unwrap());
+        assert!(PathSet::of(&[]).unwrap().is_empty());
+        let listed: PathSet = serde_json::from_str(r#"["a/1","b/2","c/3"]"#).unwrap();
+        assert!(listed.matches(&paths).unwrap());
+        assert_eq!(serde_json::from_str::<PathSet>(&serde_json::to_string(&digest).unwrap()).unwrap(), digest);
+    }
+    #[test]
     fn scan_ignores_compaction_temporaries_before_counting_the_bound() {
         let t = Temp::new();
         let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
@@ -2860,6 +2988,21 @@ mod tests {
             other => refused.push(format!("a scan over both directories: {other:?}")),
         }
         assert!(refused.is_empty(), "{refused:#?}");
+    }
+
+    #[test]
+    fn scan_lists_only_operations_whose_intent_was_recorded_so_every_entry_can_be_inspected() {
+        // A refused or interrupted begin can leave an empty operation directory.
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        attempted(&wal, "begun");
+        wal.operation("not-begun", true).unwrap();
+        let scan = wal.scan(10).unwrap();
+        let ids: Vec<_> = scan.entries.iter().map(|e| e.operation_id.as_str()).collect();
+        assert_eq!(ids, ["begun"]);
+        for entry in &scan.entries {
+            wal.inspect(&entry.operation_id).unwrap();
+        }
     }
 
     #[test]

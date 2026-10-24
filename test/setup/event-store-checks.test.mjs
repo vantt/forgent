@@ -6,6 +6,8 @@ import path from 'node:path';
 import { fixture, append } from '../event-store/phase07-fixture.mjs';
 import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/registrations.mjs';
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
   const f = fixture(t); append(f.store, [{}]);
@@ -106,6 +108,47 @@ test('one doctor invocation reuses its status snapshot; a new invocation observe
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved' }));
   assert.equal(check('event-store-integrity').passed, true);
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-integrity').passed, false);
+});
+
+test('a doctor run remembers a failed setup context instead of retrying it per row, and doctor reports an unreadable shared config', t => {
+  const f = fixture(t);
+  writeRawProjectConfig(f.repo, '{ eventStore: half-written');
+  const check = eventStoreDoctor(f.repo, f.ctx);
+  const first = check('event-store-git-version');
+  assert.equal(first.passed, false);
+  assert.match(first.message, /event-store-config: cannot parse shared config/, 'doctor sees the parse failure, never the defaults');
+  writeProjectConfig(f.repo, {});
+  assert.deepEqual(check('event-store-open-root'), { passed: false, message: first.message }, 'every row of the run reports the one remembered failure');
+  assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
+});
+
+test('doctor reports a malformed seal coalescing window on every row, and a repaired value passes', t => {
+  const f = fixture(t);
+  for (const bad of [0, -5, 2.5, '30', null]) {
+    writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: bad } } });
+    const row = eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed');
+    assert.equal(row.passed, false, `coalesceSec ${JSON.stringify(bad)}`);
+    assert.match(row.message, /event-store-config: invalid seal\.coalesceSec/);
+  }
+  writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: 5 } } });
+  assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed').passed, true);
+  assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 5);
+  writeProjectConfig(f.repo, {});
+  assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 30, 'the default is 30 seconds');
+});
+
+test('the ten Event Store rows and three fixes are registered and every row of a run shares one doctor', t => {
+  const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
+  assert.deepEqual(rows.map(({ id }) => id).sort(), ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`).sort());
+  assert.deepEqual(FIX_REGISTRATIONS.filter(({ id }) => id.startsWith('event-store-')).map(({ id }) => id).sort(), ['event-store-lock-dirs', 'event-store-machine-id', 'event-store-refspec']);
+  const f = fixture(t);
+  const run = createDoctorRun();
+  const keys = [];
+  const once = run.once;
+  run.once = (key, compute) => { keys.push(key); return once(key, compute); };
+  for (const row of rows) assert.equal(typeof row.check(f.repo, run).passed, 'boolean', row.id);
+  assert.deepEqual([...new Set(keys)], [`event-store-doctor:${f.repo}`], 'one eventStoreDoctor per run');
+  assert.equal(keys.length, rows.length);
 });
 
 test('sync warns for real unpublished project events', t => {

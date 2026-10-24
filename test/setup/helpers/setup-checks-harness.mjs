@@ -30,7 +30,8 @@ import {
 } from '../../../src/setup/registrations.mjs';
 import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
+import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
 
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -106,14 +107,7 @@ function withHome(homeDir, fn) {
 // ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
 
 function initRepo(prefix) {
-  const dir = mkTemp(prefix);
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
-  return dir;
+  return initFixtureRepo(mkTemp(prefix), { branch: 'main' });
 }
 export {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,

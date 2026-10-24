@@ -1,10 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture, initFixtureRepo } from '../helpers/git-fixture.mjs';
 // fgos-return.test.mjs -- phần "return, reject" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { activateGitFixture, initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
@@ -277,37 +277,23 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
 });
 
-// tsk-3tp-1 (D2): the fallback checkpoint's own sidecar mark
-// (events-jsonl.truncation-guard.json) and warnings log
-// (main-checkout-guard-warnings.jsonl) are the same kind of no-item-owns-it
-// noise as events.jsonl itself -- an item bundling either one alongside its
-// own real work (a concurrent fallback firing mid-session, same as
-// events.jsonl above) must never be flagged either. Also covers tsk-vim's
-// own narrower regression (a .gitignore predating that project's own
-// exclusion could still commit this file alongside real work) via the same
-// force-add.
-test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-guard-warnings.jsonl changes bundled into the item\'s own commit are exempt from footprintDiffHits, same as events.jsonl (tsk-3tp-1, tsk-vim)', () => {
+// A diagnostic log under the `.fgos/logs/` bucket (invocation-faults.jsonl) is the same kind of
+// no-item-owns-it noise as events.jsonl itself -- an item bundling it alongside
+// its own real work must never be flagged either. The test force-adds it
+// because the fixture's .gitignore excludes the .fgos/logs/ bucket: a plain
+// `git add -A` would never stage it, and the test would pass without ever
+// exercising FGOS_NOISE_ONLY_PATHS. A checkout whose .gitignore predates the
+// exclusion can still commit the file alongside real work.
+test('return: a .fgos/logs/invocation-faults.jsonl change bundled into the item\'s own commit is exempt from footprintDiffHits, same as events.jsonl', () => {
   const cwd = initGitCwdFast();
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
-  const id = 'pull-return-guard-files-exempt';
+  const id = 'pull-return-logs-exempt';
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
-  fs.writeFileSync(path.join(cwd, '.fgos', 'events-jsonl.truncation-guard.json'), JSON.stringify({ seq: 1, hash: 'abc' }));
   fs.mkdirSync(path.join(cwd, '.fgos', 'logs'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
-  // -f: both files sit under paths this fixture's own .gitignore (initGitCwdFast)
-  // now excludes -- events-jsonl.truncation-guard.json individually, and
-  // main-checkout-guard-warnings.jsonl since phase-01
-  // (plans/260825-0842-fgos-logs-dir-bucketing) moved it under the
-  // gitignored .fgos/logs/ bucket -- so a plain `git add -A` would never
-  // even stage either, which would make this test pass trivially without
-  // ever exercising FGOS_NOISE_ONLY_PATHS at all. Force-adding both here
-  // reproduces the one real scenario where the regex still matters: a
-  // branch/checkout whose .gitignore predates these exclusions (or another
-  // fgOS-adopting project that never added them) can still end up with
-  // these files committed alongside real work.
-  execFileSync('git', ['add', '-f', '.fgos/events-jsonl.truncation-guard.json', '.fgos/logs/main-checkout-guard-warnings.jsonl'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'invocation-faults.jsonl'), '{"kind":"probe"}\n');
+  execFileSync('git', ['add', '-f', '.fgos/logs/invocation-faults.jsonl'], { cwd });
   commitFile(cwd, 'proof.txt');
 
   const result = run(cwd, ['return', id]);
@@ -317,7 +303,7 @@ test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-g
   assert.deepEqual(
     data.footprintDiffHits,
     [],
-    'the truncation-guard sidecar and warnings-log files must never be flagged, same as events.jsonl',
+    'a diagnostic log file must never be flagged, same as events.jsonl',
   );
 });
 
@@ -1228,7 +1214,7 @@ test('tsk-34o5: return halts and parks item blocked when attestation diverges', 
   execFileSync('git', ['commit', '-q', '-m', 'work commit'], { cwd: pickData.worktree.path });
 
   const baseCommit = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
-  appendEvent(path.join(cwd, '.fgos', 'events.jsonl'), {
+  appendWorkEvent(path.join(cwd, '.fgos'), {
     type: 'executor.dispatch',
     payload: { id: 'return-attest-diverged', executorId: 'cli', baseCommit, headRef: 'main' },
   });

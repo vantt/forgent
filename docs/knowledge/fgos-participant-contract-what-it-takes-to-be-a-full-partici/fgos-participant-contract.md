@@ -4,6 +4,9 @@ mode: reference
 ---
 # fgOS participant contract — what it takes to be a full participant in any language
 
+**Superseded in part (Event Store cutover, 2026-10):** after `fgos events migrate`, a repository has no `.fgos/events.jsonl`, no `.fgos/events/` shards and no `.fgos/events.lock`. Events are envelope v4 records in open logs under the Git common directory, sealed into `refs/fgos/events/<machine-id>`; the write door is the state mutex and the Event Store gate, not a file lock. The rule below stands and is now stricter: a participant never writes an event store file directly, in any language, and reads Work state through the `fgos` read verbs (`list`, `show`, `ready`, ...) rather than parsing a log. Sections that describe the raw log, its `seq` as a global ordinal or `.fgos/events.lock` describe the retired layout; for the current one read `docs/specs/work-state.md` ("Bố cục dữ liệu, thứ tự và xung đột") and `docs/platform/event-store/spec.md`.
+
+
 Hand-authored reference, verified 2026-08-09 by reading the real source
 (not generated via `fgos-coding-compounding`/`fgos-indexing` — no captured work
 item backs this doc, so it carries no `docType`/`docPath` linkage). Scope:

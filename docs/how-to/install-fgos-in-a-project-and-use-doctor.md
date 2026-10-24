@@ -304,6 +304,8 @@ manual step.
 
 Mostly relevant after the project has real work items.
 
+This table is selective for the Event Store: it lists the two rows a project owner acts on (`event-store-refspec`, `event-store-legacy-layout`). The ten `event-store-*` rows and what each one checks are in `docs/platform/event-store/spec.md` section 21.
+
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
 | `coordination-protocol-dead-vocabulary` | Coordination protocols and workflows do not use retired `minTier` / `minRigor` | names the file | you | Edit the named definition |
@@ -313,13 +315,13 @@ Mostly relevant after the project has real work items.
 | `agent-type-names-unique` | Agent type names are globally unique | names the duplicate | you | Rename one |
 | `work-classification-vocabulary` | Open items' risk and kind match their domain's vocabulary | `N open item(s) outside their domain's classification` | you | Re-classify the named items |
 | `work-step-vocabulary` | No open item is stranded on a retired step | `2 open item(s) at a step their domain no longer registers` | you | Drain the named items; no verb relabels a live item's step |
+| `work-recorded-conflicts` | The Work view holds no recorded cross-machine conflicts | `warning: 1 recorded cross-machine conflict(s) on 1 item(s): build-cli` | you | Never fails. Run `fgos show <id>` to list the conflicts of an item: each is a change acknowledged on one machine that another machine's concurrent change kept from applying. Nothing resolves it automatically |
 | `domain-workflow-operations-coverage` | Every Workflow step operation resolves to valid task specs, roles, skills and legal edges | `15 workflow step operation problem(s): ...` | you | Same root as `task-specs-resolve` (the fgOS install, not the project); a failure means the installed release is inconsistent |
 | `root-drift` | No `fgw/<root>` branch is ahead of its target | `drifted root branch(es) need syncing: ... -- run fgos sync-root <root-id>` | you | `fgos sync-root <root-id>` |
 | `leaf-notify-drift` | No live session branch has post-land drift | names the branch | you | Rebase or resync the named branch |
 | `delivered-not-on-trunk` | Every handed-over item's branch is reachable from the trunk | names the item | you | Merge or catch up the named item |
-| `events-jsonl-not-truncated` | `.fgos/events.jsonl` was not silently reverted by a stash, checkout, reset or clean | `truncation detected in events.jsonl, ...` | you | No fix is registered: stop writing to the store, restore the log from backup and find what reverted it |
-| `events-compaction-verified` | Past `.fgos/events/` compactions still match their archives | names the compaction | you | Report it; do not delete archives |
-| `main-checkout-guard-warnings` | The main-checkout guard log has no recorded regressions | `1300 main checkout guard warning(s) recorded` | info | Read the log named in the message; clear only after review |
+| `event-store-refspec` | The remote has the Event Store fetch mappings and no push mapping that names `refs/fgos/*` | `event-store-refspec-missing; run setup` | tool | `fgos doctor --fix` installs the mappings |
+| `event-store-legacy-layout` | No tracked event file (`.fgos/events.jsonl`, `.fgos/events/`) is left in the main checkout | `event-store-migration-required: run fgos events migrate in the main checkout with writers stopped` | you | `fgos events migrate --check`, then `fgos events migrate`, with every writer stopped |
 | `no-stuck-merge-abort` | The main checkout has no lingering `MERGE_HEAD` | `merge in progress or stuck (MERGE_HEAD=...) -- run fgos main-checkout-reset ...` | you | `--fix` never acts here by design. Review `git status`, then `fgos main-checkout-reset --sha <sha> --confirm` |
 | `runner-coordination-orgPolicy-shape` | `runner.coordination.orgPolicy.dischargeOn` is an array of strings | `... dischargeOn must be an array of strings` | tool | `fgos doctor --fix` resets it to the default |
 | `coordination-protocol-fixtures-valid` | Coordination protocol definitions validate | `coordination protocol fixtures retired` | info | none |

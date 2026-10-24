@@ -1,8 +1,8 @@
+import '../helpers/process-tmp-root.mjs';
 // The state transaction: confined paths, revocation, async refusal, reentry,
 // and the record the fast path writes. Real files in a temp .fgos; no host
 // binary is needed because nothing here has to clean a dead holder.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -11,7 +11,6 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, clearHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
 import { observe, selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
-import { readEvents } from '../../src/state/events.mjs';
 
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-hot-tx-'));
@@ -41,26 +40,18 @@ test('the record is the full process tuple while held, and the file is gone afte
   }
 });
 
-test('append through the transaction writes the event; a stale tx writes nothing', async () => {
+test('bare transactions refuse appends without a consumer and revoke every write after release', async () => {
   const f = fixture();
   try {
-    const log = path.join(f.fgosDir, 'events.jsonl');
     let kept;
-    withStateTx(f.fgosDir, (tx) => {
-      tx.append(log, { type: 'first', payload: { n: 1 } });
+    withStateTx(f.fgosDir, tx => {
+      assert.throws(() => tx.append({ type: 'work.add' }), { code: 'state-tx-consumer-required' });
       kept = tx;
     }, { prefetched: writer });
-    assert.equal(readEvents(log).length, 1);
-
-    // The continuation runs after the lock was released and may not write.
-    await new Promise((resolve) => setTimeout(resolve, 5));
-    assert.throws(() => kept.append(log, { type: 'late' }), (err) => err.code === 'state-tx-revoked');
-    assert.throws(() => kept.writeJson(path.join(f.fgosDir, 'late.json'), {}), (err) => err.code === 'state-tx-revoked');
-    assert.equal(readEvents(log).length, 1);
+    assert.throws(() => kept.append({ type: 'work.add' }), { code: 'state-tx-revoked' });
+    assert.throws(() => kept.writeJson(path.join(f.fgosDir, 'late.json'), {}), { code: 'state-tx-revoked' });
     assert.equal(fs.existsSync(path.join(f.fgosDir, 'late.json')), false);
-  } finally {
-    f.cleanup();
-  }
+  } finally { f.cleanup(); }
 });
 
 test('the transaction refuses paths outside its .fgos and passes prefetched facts through', () => {
@@ -132,6 +123,69 @@ test('a thrown callback releases the lock and rethrows its own error', () => {
   } finally {
     f.cleanup();
   }
+});
+
+test('prefetched read roots allow gated reference reads without granting writes', () => {
+  const f = fixture();
+  const refs = path.join(f.dir, 'refs');
+  fs.mkdirSync(refs);
+  const head = path.join(refs, 'head');
+  fs.writeFileSync(head, 'branch-tip');
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal(tx.readText(head), 'branch-tip');
+      assert.throws(() => tx.writeText(head, 'changed'), { code: 'state-tx-path-outside' });
+      assert.throws(() => tx.unlink(head), { code: 'state-tx-path-outside' });
+    }, { prefetched: { readRoots: [refs] } });
+  } finally { fs.rmSync(f.dir, { recursive: true, force: true }); }
+});
+
+test('a transaction exposes no door to the event store, so only the consumer gate acknowledges events', () => {
+  const f = fixture();
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal('eventStore' in tx, false);
+    }, { prefetched: { ...writer, eventStore: { append() { throw new Error('must stay unreachable'); } } } });
+  } finally { f.cleanup(); }
+});
+
+test('in-transaction exists and list read granted read roots, and list names files only like a read without a transaction', () => {
+  const f = fixture();
+  const refs = path.join(f.dir, 'refs');
+  const heads = path.join(refs, 'heads');
+  fs.mkdirSync(path.join(heads, 'nested'), { recursive: true });
+  fs.writeFileSync(path.join(heads, 'one.json'), '{}');
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal(tx.exists(path.join(heads, 'one.json')), true);
+      assert.deepEqual(tx.list(heads), ['one.json']);
+      assert.throws(() => tx.list(path.join(f.dir, 'elsewhere')), { code: 'state-tx-path-outside' });
+      const claims = path.join(f.fgosDir, 'claims');
+      fs.mkdirSync(path.join(claims, 'subdir'), { recursive: true });
+      tx.writeText(path.join(claims, 'a.json'), '{}');
+      assert.deepEqual(tx.list(claims), ['a.json']);
+    }, { prefetched: { ...writer, readRoots: [refs] } });
+  } finally { f.cleanup(); }
+});
+
+test('a record that cannot be released never replaces the callback result or its error', () => {
+  const f = fixture();
+  const { record } = hotPaths(f.fgosDir);
+  // A directory in place of the record file makes the final unlink fail with a non-retryable error.
+  const breakRelease = () => { fs.unlinkSync(record); fs.mkdirSync(record); };
+  try {
+    const warnings = [];
+    const write = process.stderr.write;
+    process.stderr.write = chunk => { warnings.push(String(chunk)); return true; };
+    try {
+      assert.equal(withStateTx(f.fgosDir, () => { breakRelease(); return 'committed'; }, { prefetched: writer }), 'committed');
+    } finally { process.stderr.write = write; }
+    // The warning names the error the unlink really raised, not the retry-exhausted code.
+    assert.match(warnings.join(''), /warning: (EISDIR|EPERM) state: the record at/);
+    fs.rmSync(record, { recursive: true });
+    const boom = new RangeError('callback failed');
+    assert.throws(() => withStateTx(f.fgosDir, () => { breakRelease(); throw boom; }, { prefetched: writer }), error => error === boom && !!error.releaseFailure);
+  } finally { f.cleanup(); }
 });
 
 // The record functions the state transaction cleans with. Each takes the

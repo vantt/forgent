@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -156,7 +157,7 @@ test('docLifecycle rejects draft', () => {
 });
 
 test('concurrent registerDocStore enforces lock serialization', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'concurrent-test' });
@@ -185,7 +186,7 @@ test('concurrent registerDocStore enforces lock serialization', () => {
 });
 
 test('doc slot cardinality - a second non-retired/non-superseded doc for the same (topicId, role) is refused even below active', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'slot-test' });
@@ -213,7 +214,7 @@ test('doc slot cardinality - a second non-retired/non-superseded doc for the sam
 });
 
 test('doc.reserve is create-only - reserving an existing docId again is refused', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'reserve-test' });
@@ -228,7 +229,7 @@ test('doc.reserve is create-only - reserving an existing docId again is refused'
 });
 
 test('topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-test' });
@@ -242,7 +243,7 @@ test('topic.register is create-only - re-registering an existing topicId is refu
 });
 
 test('topic.merge refuses a role collision atomically -- nothing mutates when it throws', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
@@ -266,7 +267,7 @@ test('topic.merge refuses a role collision atomically -- nothing mutates when it
 });
 
 test('topic.merge succeeds when the colliding source doc is already superseded', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
@@ -286,7 +287,7 @@ test('topic.merge succeeds when the colliding source doc is already superseded',
 });
 
 test('a retired topic refuses new doc writes (reserve, register, mark-rendered, promote)', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'dead-topic' });
@@ -314,7 +315,7 @@ test('a retired topic refuses new doc writes (reserve, register, mark-rendered, 
 });
 
 test('resolveDocId finds a doc by (topicId, role) after topic.split moved its topicId without renaming its docId', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'worktree-all' });
@@ -343,7 +344,7 @@ test('resolveDocId finds a doc by (topicId, role) after topic.split moved its to
 });
 
 test('framework/mode/role vocabulary - unknown framework, unknown mode, and role-vs-mode collisions are refused', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'vocab-test' });
@@ -372,7 +373,7 @@ test('framework/mode/role vocabulary - unknown framework, unknown mode, and role
 });
 
 test('topic.split refuses a self-referencing successor, a duplicate successor id, and an existing topicId -- atomically', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'source-topic' });
@@ -420,7 +421,7 @@ test('topic.split refuses a self-referencing successor, a duplicate successor id
 });
 
 test('topic.merge refuses a self-merge, a missing source, and a duplicate source -- atomically', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
@@ -457,7 +458,7 @@ test('topic.merge refuses a self-merge, a missing source, and a duplicate source
 });
 
 test('doc.register refuses to change an existing docId\'s topicId, role, or currentPath', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 'topic-a', purposeSlug: 'topic-a' });
@@ -491,7 +492,7 @@ test('doc.register refuses to change an existing docId\'s topicId, role, or curr
 });
 
 test('doc.supersede and doc.retire fail closed (throw) when the doc does not exist, instead of silently no-oping', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
 
@@ -517,7 +518,7 @@ test('doc.attest rejects a retired doc and a doc under a retired topic -- enforc
   // resolveDocPath-based pre-check already excludes these, but any caller
   // using the write facade directly (attestDocStore) must be refused here
   // too, or that pre-check is just a CLI-only suggestion.
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -541,7 +542,7 @@ test('doc.attest rejects a retired doc and a doc under a retired topic -- enforc
 });
 
 test('doc.register never moves lifecycle on an existing docId except the reserved -> provisional bridge', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -584,7 +585,7 @@ test('doc.register never moves lifecycle on an existing docId except the reserve
 });
 
 test('doc.attest rejects a superseded doc the same way it rejects a retired one', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -600,7 +601,7 @@ test('doc.attest rejects a superseded doc the same way it rejects a retired one'
 });
 
 test('topic.merge refuses a non-active target; topic.split refuses a non-active source', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 'source', purposeSlug: 'source-topic' });
@@ -626,7 +627,7 @@ test('topic.merge refuses a non-active target; topic.split refuses a non-active 
 });
 
 test('topic.retire fails closed on a nonexistent topicId instead of a silent no-op', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     assert.throws(() => {
@@ -638,7 +639,7 @@ test('topic.retire fails closed on a nonexistent topicId instead of a silent no-
 });
 
 test('doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -681,7 +682,7 @@ test('doc.supersede refuses a supersededBy target whose doc lifecycle is live bu
   // would still never be resolvable by any reader, the same "write
   // something no reader can use" shape assertTopicWritable already
   // closes elsewhere in this reducer.
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -704,7 +705,7 @@ test('doc.supersede refuses a supersededBy target whose doc lifecycle is live bu
 });
 
 test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -722,7 +723,7 @@ test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a
 });
 
 test('doc.demote moves an active doc back to provisional; refuses any other lifecycle', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -747,7 +748,7 @@ test('doc.demote moves an active doc back to provisional; refuses any other life
 });
 
 test('doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'dead-topic' });
@@ -769,7 +770,7 @@ test('doc.demote refuses under a retired topic, same as reserve/register/mark-re
 });
 
 test('topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
 
@@ -804,7 +805,7 @@ test('topic.register/rename/split refuse a path-traversal or multi-segment purpo
 });
 
 test('doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
@@ -835,7 +836,7 @@ test('doc.reserve/register/path-move refuse a path-traversal, absolute, or out-o
 });
 
 test('topic.split refuses a live doc left unassigned by every successor\'s rolesToMove, and a role duplicated across successors', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
   try {
     initStore(tmpDir);
     registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'source-topic' });

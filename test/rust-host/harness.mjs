@@ -36,6 +36,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { activateGitFixture } from "../helpers/git-fixture.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, "../..");
@@ -829,8 +830,12 @@ export function writeTimingReport(caseResults, reportPath = null) {
  * Builds the complete coverage floor case set (R5) using command-routes.json.
  */
 export function generateCoverageFloorCases(options = {}) {
-  const repoRoot = options.repoRoot ?? REPO_ROOT;
   const routesPath = options.routesPath ?? ROUTES_PATH;
+  // Work reads open the Event Store of the repository they run in, which must have been set up for it. The
+  // checkout under test is not such a repository, so the read cases run against a prepared scratch one.
+  const readRepo = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-harness-read-"));
+  execFileSync("git", ["init", "-q", "-b", "main"], { cwd: readRepo });
+  activateGitFixture(readRepo);
   const routes = JSON.parse(fs.readFileSync(routesPath, "utf8"));
   const selectors = Object.keys(routes).sort();
 
@@ -880,6 +885,7 @@ export function generateCoverageFloorCases(options = {}) {
   cases.push({
     id: "coverage-read-ready",
     args: ["ready"],
+    cwd: readRepo,
     modes: ["semantic-json"],
     expectedExitCode: 0,
     ignoreChildren: true,
@@ -916,7 +922,7 @@ export function generateCoverageFloorCases(options = {}) {
   // 8. --dir flag override
   cases.push({
     id: "coverage-dir-flag-override",
-    args: ["ready", "--dir", repoRoot],
+    args: ["ready", "--dir", readRepo],
     modes: ["semantic-json"],
     expectedExitCode: 0,
     ignoreChildren: true,

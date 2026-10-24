@@ -6,8 +6,8 @@
 // children's `doing` windows genuinely overlap in wall-clock time, both
 // reached `awaiting-approval`, and neither child was ever itself parked on
 // a person (`awaiting-human`) along the way — only the parent/root's own
-// gate is ever allowed to ask. Reads the real `.fgos/events.jsonl` (never
-// synthetic data) plus the live work view for parent/footprint linkage.
+// gate is ever allowed to ask. Reads the real Work history through the
+// Event Store facade (never synthetic data) plus the live work view for parent/footprint linkage.
 //
 // Exit 0 + a PASS line naming the real pair and the real overlap duration
 // when found; exit 1 + a FAIL line explaining why when no such pair exists
@@ -32,11 +32,7 @@ const repoRoot = process.argv[2] ?? mainCheckoutRoot();
 const dotFgosDir = path.join(repoRoot, '.fgos');
 
 const view = listWork(dotFgosDir);
-// Tầng A (TA-D2/TA-D12): new work.move events land under `.fgos/events/`,
-// not the frozen baseline `events.jsonl` alone — readRawEvents(dir) is the
-// one door that reads both, merged/deduped, matching what `view` above
-// already sees (a raw single-file read here would silently miss every
-// move recorded after the cutover).
+// readRawEvents(dir) is the one door that reads the whole Work history, matching what `view` above already sees.
 const rawEvents = readRawEvents(dotFgosDir);
 
 // id -> ordered list of its own work.move events ({ from, to, ts })
@@ -128,7 +124,7 @@ for (const [parentId, children] of childrenByParent) {
 
 if (!found) {
   console.error(
-    'FAIL: no real fan-out overlap found in .fgos/events.jsonl -- no parent has >=2 disjoint-footprint '
+    'FAIL: no real fan-out overlap found in the Work history -- no parent has >=2 disjoint-footprint '
       + 'children whose `doing` windows genuinely overlap in wall-clock time, both reaching '
       + 'awaiting-approval, with neither ever parked on a person.',
   );

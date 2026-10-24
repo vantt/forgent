@@ -77,7 +77,7 @@ test('disconnected-worktree guard: refuses a MUTATING_ONLY_VERBS verb from an ad
   try {
     // sanity: this is genuinely the bug shape, not the already-handled
     // ADR0020-stripped ENOENT case.
-    assert.ok(fs.existsSync(path.join(wt, '.fgos', 'events.jsonl')), 'ad-hoc worktree really carries a checked-out .fgos copy');
+    assert.ok(fs.existsSync(path.join(wt, '.fgos', 'coexistence.json')), 'ad-hoc worktree really carries a checked-out .fgos copy');
     assert.equal(fs.lstatSync(path.join(wt, '.fgos')).isSymbolicLink(), false, 'not a session symlink either');
 
     const result = run(wt, ['submit', 'a task from a disconnected worktree', '--async']);
@@ -221,6 +221,25 @@ test('disconnected-worktree guard: "knowledge attest" is refused, "knowledge sta
 
     const statusResult = run(wt, ['knowledge', 'status']);
     assert.equal(statusResult.status, 0, statusResult.stderr);
+  } finally {
+    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
+  }
+});
+
+test('disconnected-worktree guard: "events sync"/"events migrate" and "rebuild" are refused, "events status"/"events export" are unaffected', () => {
+  const main = initGitCwdMainWithCommittedFgos();
+  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-events');
+  try {
+    for (const args of [['events', 'sync'], ['events', 'migrate'], ['rebuild']]) {
+      const result = run(wt, args);
+      assert.equal(result.status, 4, `${args.join(' ')}: ${result.stderr}`);
+      assert.match(result.stderr, /disconnected snapshot/);
+    }
+    // The read verbs reach their own handlers, which answer for their own reasons (here: a store that is not
+    // set up for the Event Store), never this guard's message.
+    for (const args of [['events', 'status'], ['events', 'export', '--out', 'export-dir']]) {
+      assert.doesNotMatch(run(wt, args).stderr, /disconnected snapshot/, args.join(' '));
+    }
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
   }

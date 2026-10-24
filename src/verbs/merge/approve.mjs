@@ -29,13 +29,13 @@ import {
   StoreError,
   categoryOf,
 } from '../../state/store.mjs';
-import { EventLogError } from '../../state/events.mjs';
 import { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';
 import { driftStatus } from '../../state/drift-status.mjs';
 import {
   classifySource,
   landRunnerItem,
   acknowledgeLand,
+  landAcknowledgement,
   isAlreadyMerged,
   performCatchUp,
   buildOwnFileSet,
@@ -60,46 +60,40 @@ import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
 import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
 import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 
-// tsk-480: approve's own success paths (merge landed, or verify-only
-// passed) call `moveWork(...to:'delivered'...)` as their very last
-// step. That write can throw on state-lock contention even though
-// the precondition it's recording already succeeded permanently —
-// without a guard, the exception would propagate uncaught, and (per
-// `invocation-fault-log.mjs`'s own documented scope) a fault raised
-// this deep inside a verb's handler is deliberately never recorded by
-// that mechanism either, so nothing at all would be left to explain
-// why a real merge landed while the item stayed `awaiting-approval`
-// forever (CONTEXT.md D1). This wraps exactly that one call: on
-// success, returns the real event; on failure, records a diagnostic
-// through `approve-fault-log.mjs` (D2 — no shared lock with
-// `events.jsonl`) and returns `event: null` instead of throwing, so
-// every call site can still finish its own cleanup and return a
-// truthful envelope.
-function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto, landSettlement } = {}) {
+// Approve's own success paths call `moveWork(...to:'delivered'...)` as their very last step. That
+// write can fail on state-mutex contention or a lost catch-up race even though the merge it records
+// already happened permanently. Left uncaught, the exception would leave a landed merge with the item
+// still `awaiting-approval` and nothing to explain why. This wraps exactly that one call: on success it
+// returns the real event; on a write failure it records a diagnostic through `approve-fault-log.mjs`
+// (no shared lock with the event store) and returns `event: null`, so every call site can finish its
+// own cleanup and return a truthful envelope.
+
+// What the state gate raises when the write itself cannot happen, with nothing appended: mutex timeout,
+// a lost catch-up or sequence-recovery race, and the I/O codes of a full or unwritable disk. A
+// `StoreError` refusal (a precondition, a missing-evidence clause) is a legitimate answer and is not here.
+const WRITE_FAULT_CODES = new Set([
+  'hot-lock-timeout', 'event-store-catch-up-busy', 'event-store-seq-recovery-conflict',
+  'ENOSPC', 'EIO', 'EROFS', 'EACCES', 'EMFILE',
+]);
+
+/** Whether `err` is a failed write of the status move (nothing appended), as opposed to a refusal. */
+export function isStatusWriteFault(err) {
+  return err instanceof Error && WRITE_FAULT_CODES.has(err.code);
+}
+
+function moveDeliveredOrRecordFault(dir, id, phase, { mergedSha, mergedInto, landSettlement } = {}) {
   try {
     recordApprovePostSuccessFault(dir, { id, phase, mergedSha, mergedInto });
-    // Test-only failure seam (tsk-480 D3), same shape as
-    // FGOS_GH_COMMAND: the env var itself is read by the CLI adapter and
-    // arrives here as `testForceLockTimeoutId` (a use case never reads
-    // process.env), scoped to the exact item id so it can never affect
-    // any other item in the same process, inert unless a test
-    // explicitly sets it. Production code never sets that variable.
-    if (testForceLockTimeoutId === id) {
-      throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
-    }
     const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto, landSettlement });
     return { event, error: null, diagnosticLog: null };
   } catch (err) {
-    // Only an EventLogError (the write itself failing — e.g.
-    // 'lock-timeout', src/state/events.mjs) is the class of failure
-    // this guard exists for. A StoreError from transitionWork's own
-    // precondition/CAS check (e.g. a missing-evidence acceptance
-    // clause) is a legitimate refusal that must keep propagating
-    // exactly as before — swallowing it here would silently accept an
-    // item transitionWork correctly refused.
-    if (!(err instanceof EventLogError)) {
-      throw err;
+    // The batch was acknowledged and only a later effect or cache write failed: the delivery is durable,
+    // so it is a success carrying the acknowledged event, never a fault to reconcile.
+    if (err?.code === 'event-store-acked-effects-incomplete') {
+      const event = err.ackedEvents?.find(acked => acked.type === 'work.move');
+      if (event) return { event, error: null, diagnosticLog: null };
     }
+    if (!isStatusWriteFault(err)) throw err;
     const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message, mergedSha, mergedInto });
     process.stderr.write(
       `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
@@ -123,8 +117,8 @@ function releaseLand(repoRoot, id, landSettlement, acknowledgement, state) {
 
 function moveBlockedOrConflict(dir, { id, reason, role = 'system' }, { repoRoot, landSettlement } = {}) {
   try {
-    const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
-    releaseLand(repoRoot, id, landSettlement, `work-blocked:${id}:${event.seq}`, 'blocked');
+    const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role, ...(landSettlement ? { landOperationIds: [landSettlement.operationId] } : {}) });
+    releaseLand(repoRoot, id, landSettlement, landAcknowledgement(event), 'blocked');
     return null;
   } catch (err) {
     if (categoryOf(err) === 'conflict') {
@@ -186,12 +180,11 @@ function landOperationFor(dir, repoRoot, view, id, destination) {
  *   verb's own `--trust-dir` policy, resolved by the adapter.
  * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},
  *   github: boolean, prNumber: string|undefined, ghCommand: string,
- *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean,
- *   testForceLockTimeoutId: string|null}} options
+ *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean}} options
  */
 export async function approveUseCase(
   { dir, repoRoot },
-  { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },
+  { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift },
 ) {
   // Both resolved first, before any guard, and in this order — the exact
   // positions `case 'approve'` resolved them in before the use-case split,
@@ -647,7 +640,7 @@ export async function approveUseCase(
         // The receipt names the commit Land published; an already-merged
         // re-approve published nothing, and the root branch's tip is it.
         const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, rootBranch);
-        const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', testForceLockTimeoutId, { mergedSha, mergedInto: rootBranch, landSettlement: result.landSettlement });
+        const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', { mergedSha, mergedInto: rootBranch, landSettlement: result.landSettlement });
         if (!moveResult.event) {
           return {
             id,
@@ -660,9 +653,10 @@ export async function approveUseCase(
             error: moveResult.error.message,
             diagnosticLog: moveResult.diagnosticLog,
             postLand: result.postLand,
+            promotion: result.promotion,
           };
         }
-        releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
+        releaseLand(repoRoot, id, result.landSettlement, landAcknowledgement(moveResult.event), 'delivered');
         return {
           id,
           mode: 'merge',
@@ -672,6 +666,7 @@ export async function approveUseCase(
           seq: moveResult.event.seq,
           output: result.check.output,
           postLand: result.postLand,
+          promotion: result.promotion,
         };
       }
     }
@@ -841,7 +836,7 @@ export async function approveUseCase(
     // Same as the leaf-into-root path above: the receipt's published
     // commit, or the trunk's tip for an already-merged re-approve.
     const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, detectTrunk(repoRoot));
-    const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', testForceLockTimeoutId, { mergedSha, mergedInto: 'main', landSettlement: result.landSettlement });
+    const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', { mergedSha, mergedInto: 'main', landSettlement: result.landSettlement });
     if (!moveResult.event) {
       return {
         id,
@@ -855,9 +850,10 @@ export async function approveUseCase(
         error: moveResult.error.message,
         diagnosticLog: moveResult.diagnosticLog,
         postLand: result.postLand,
+        promotion: result.promotion,
       };
     }
-    releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
+    releaseLand(repoRoot, id, result.landSettlement, landAcknowledgement(moveResult.event), 'delivered');
     return {
       id,
       mode: 'merge',
@@ -867,6 +863,7 @@ export async function approveUseCase(
       seq: moveResult.event.seq,
       output: result.check.output,
       postLand: result.postLand,
+      promotion: result.promotion,
     };
   }
 
@@ -896,7 +893,7 @@ export async function approveUseCase(
   // hiding a permanent mutation — still guarded for consistency with
   // the two merge paths above (CONTEXT.md D1: all three success
   // paths share the same silent-throw shape).
-  const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only', testForceLockTimeoutId);
+  const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only');
   if (!moveResult.event) {
     return {
       id,

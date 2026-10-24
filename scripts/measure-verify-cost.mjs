@@ -2,7 +2,7 @@
 // measure-verify-cost.mjs — tsk-vms: chi phí verify thực đo từ event log,
 // không phải suy đoán (docs/history/tsk-vms-verify-cost-audit/CONTEXT.md).
 //
-// Đọc trực tiếp `.fgos/events.jsonl` qua `readEvents` (nguồn thật per D3),
+// Đọc trực tiếp lịch sử Work qua cửa Event Store (`readRawEvents`, nguồn thật per D3),
 // tính 4 câu hỏi item yêu cầu, ghi báo cáo Markdown ra
 // `plans/reports/verify-cost-empirical-260807-1540-pick-return-approve-audit-report.md`.
 // Đọc-chỉ (read-only), không bao giờ ghi vào `.fgos/`.
@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { mainCheckoutRoot } from './lib/git-ports.mjs';
-import { readEvents } from '../src/state/events.mjs';
+import { readRawEvents } from '../src/state/store.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 function mean(nums) {
@@ -254,7 +254,7 @@ function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify
   const lines = [];
   lines.push('# Chi phí verify thực đo — pick/return/approve (tsk-vms)');
   lines.push('');
-  lines.push(`Nguồn: \`.fgos/events.jsonl\` (${totalEvents} dòng tại thời điểm chạy). Số liệu thật, không suy đoán — xem \`docs/history/tsk-vms-verify-cost-audit/\` cho phương pháp đầy đủ.`);
+  lines.push(`Nguồn: lịch sử Work qua Event Store (${totalEvents} sự kiện tại thời điểm chạy). Số liệu thật, không suy đoán — xem \`docs/history/tsk-vms-verify-cost-audit/\` cho phương pháp đầy đủ.`);
   lines.push('');
 
   lines.push('## (1) Số vòng pick trên một item, tới khi delivered');
@@ -312,11 +312,8 @@ function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify
   return lines.join('\n');
 }
 
-function assertInvariants({ totalEvents, causes, returns, wcLCount }) {
+function assertInvariants({ totalEvents, causes, returns }) {
   if (totalEvents <= 0) throw new Error('measure-verify-cost: totalEvents phải > 0 — log rỗng hay đường dẫn sai?');
-  if (totalEvents !== wcLCount) {
-    throw new Error(`measure-verify-cost: readEvents trả ${totalEvents} sự kiện nhưng file có ${wcLCount} dòng — lệch, dừng lại thay vì báo cáo số sai.`);
-  }
   const sumByErrorClass = Object.values(causes.byErrorClass).reduce((a, b) => a + b, 0);
   if (sumByErrorClass !== causes.totalFriction) {
     throw new Error(`measure-verify-cost: tổng errorClass (${sumByErrorClass}) khác totalFriction (${causes.totalFriction}) — có bản ghi bị rơi khi group-by.`);
@@ -333,7 +330,7 @@ function assertInvariants({ totalEvents, causes, returns, wcLCount }) {
 }
 
 function main() {
-  // Đọc `.fgos/events.jsonl` LUÔN từ main checkout (state thật, chia sẻ,
+  // Đọc lịch sử Work LUÔN từ main checkout (state thật, chia sẻ,
   // không tồn tại riêng trong worktree — ADR0020). Nhưng GHI báo cáo (sản
   // phẩm của item này) vào `process.cwd()` — đây là checkout của CHÍNH
   // branch `fgw/<id>` (worktree hiện tại, hoặc ephemeral checkout mà
@@ -343,9 +340,7 @@ function main() {
   // `trustedMainRoot` (CONTEXT.md D10), từ bất kỳ checkout nào.
   const checkoutRoot = mainCheckoutRoot();
   const outputRoot = process.argv[2] ?? process.cwd();
-  const logPath = path.join(checkoutRoot, '.fgos', 'events.jsonl');
-  const rawEvents = readEvents(logPath);
-  const wcLCount = fs.readFileSync(logPath, 'utf8').split('\n').filter((l) => l !== '').length;
+  const rawEvents = readRawEvents(path.join(checkoutRoot, '.fgos'));
 
   const { movesById, frictionById } = groupById(rawEvents);
   const picks = measurePicks(movesById);
@@ -354,7 +349,7 @@ function main() {
   const causes = measureFailureCauses(frictionById);
   const fullVerify = measureFullVerifyRuns(returns, approves);
 
-  assertInvariants({ totalEvents: rawEvents.length, causes, returns, wcLCount });
+  assertInvariants({ totalEvents: rawEvents.length, causes, returns });
 
   const report = buildReport({ totalEvents: rawEvents.length, picks, returns, approves, causes, fullVerify });
   const reportPath = path.join(

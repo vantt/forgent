@@ -66,21 +66,8 @@ impl GitDriver {
             }
             let mut staged = self.hook_deletions(repo, index)?;
             staged.sort();
-            // WORK-lane deletion: temporary event-layout authority uses this
-            // same durable ScopedCommit intent and main-50 borrower check.
-            if payload.cutover_grant.is_none() {
-                let request: CommitRequest = serde_json::from_str(&payload.request).map_err(failure)?;
-                let layout = request.legacy_events.ok_or_else(|| failure("cutover-grant-missing"))?;
-                layout.validate_paths(repo)?;
-                if staged.is_empty() || staged.iter().any(|p| !layout.exact_paths.contains(p) || !payload.paths.contains(p)) {
-                    return Err(failure("legacy-event-deletions-mismatch"));
-                }
-                return Ok(());
-            }
             let grant = payload.cutover_grant.as_ref().ok_or_else(||failure("cutover-grant-missing"))?;
-            let mut exact = grant.exact_paths.clone();
-            exact.sort();
-            if staged.is_empty() || staged != exact {
+            if staged.is_empty() || !grant.exact_paths.matches(&staged)? {
                 return Err(failure("cutover-exact-paths-mismatch"));
             }
             // Read-only calls scrub hook GIT_*; only the index query keeps validated authority.

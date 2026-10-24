@@ -2,9 +2,8 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import fs from 'node:fs';
 import { tmpCwdFast } from '../cli/helpers/fgos-cli-harness.mjs';
-import { addWork, listWork, editWork, StoreError } from '../../src/state/store.mjs';
+import { addWork, listWork, editWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
 import { WorkValidationError } from '../../src/state/work.mjs';
 import {
   editUseCase,
@@ -29,19 +28,9 @@ function addTestWork(dir, id, extra = {}) {
   });
 }
 
+// Every recorded Work event, as JSON lines, in the store's order: an edit that must not write shows as an unchanged count.
 function eventLines(dir) {
-  const lines = [];
-  const baseline = path.join(dir, 'events.jsonl');
-  if (fs.existsSync(baseline)) {
-    lines.push(...fs.readFileSync(baseline, 'utf8').split('\n').filter(Boolean));
-  }
-  const eventsDir = path.join(dir, 'events');
-  if (fs.existsSync(eventsDir)) {
-    for (const name of fs.readdirSync(eventsDir).filter((n) => n.endsWith('.jsonl'))) {
-      lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
-    }
-  }
-  return lines;
+  return readRawEvents(dir).map((event) => JSON.stringify(event));
 }
 
 test('edit use case changes only the targeted field, every other field unchanged', () => {

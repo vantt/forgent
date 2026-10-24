@@ -1,15 +1,14 @@
 // attestation-guard.mjs — worktree dispatch attestation level 2 guard (tsk-34o5)
 //
 // Reads the persisted `executor.dispatch` event for a work item from
-// `.fgos/events.jsonl` and compares the recorded `baseCommit` and `headRef`
+// the Event Store facade and compares the recorded `baseCommit` and `headRef`
 // against the actual git branch state before reap, return, or approve.
 //
 // Posture: Halt on divergence (recorded headRef != branch or branch tip is not
 // a descendant of baseCommit). Never halt on missing event or null attestation
 // (in-session dispatch path).
 
-import path from 'node:path';
-import { readEvents } from '../state/event-log.mjs';
+import { readRawEvents } from '../state/store.mjs';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 /**
@@ -22,8 +21,8 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
  * @returns {{ ok: boolean, skipped?: boolean, reason?: string, detail?: string, baseCommit?: string, headRef?: string }}
  */
 export function checkDispatchAttestation(dir, repoRoot, id, branch) {
-  const logPath = path.join(dir, 'events.jsonl');
-  const events = readEvents(logPath);
+  // A guard that halts on divergence must not pass on a history it could not fully read.
+  const events = readRawEvents(dir, { requireComplete: true });
 
   // Pick the LAST matching executor.dispatch event by id (handling retries)
   let lastDispatch = null;

@@ -11,19 +11,21 @@ import path from 'node:path';
 
 import { mintWorkId } from '../../src/util/identity-mint.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const needsHost = { skip: HOST_BIN ? false : 'FGOS_HOST_BIN is not set' };
 
 test('a minted work id comes through the native door, is accepted by the store and differs from the next one', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mint-door-'));
+  // Work lives in the repository's Event Store, so the fixture is a real repository.
+  const hot = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mint-door-')));
   const [first, second] = [mintWorkId(), mintWorkId()];
   assert.match(first, /^tsk-[a-z2-7]{10}$/);
   assert.notEqual(first, second);
-  addWork(path.join(dir, '.fgos'), {
+  addWork(hot, {
     id: first, title: 'minted', description: 'minted', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true',
   });
-  assert.equal(listWork(path.join(dir, '.fgos')).work[first].title, 'minted');
+  assert.equal(listWork(hot).work[first].title, 'minted');
 });
 
 test('the verb claims consecutive D-ADR numbers on a repository without a remote', needsHost, () => {

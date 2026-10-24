@@ -91,7 +91,7 @@ import {
 
 // tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
 // state-write verb no longer silently auto-vivifies `.fgos/` via
-// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+// creating a store itself when it's missing; it refuses instead.
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
 //
@@ -321,18 +321,12 @@ test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim):
 
   const askResult = run(cwd, ['ask', 'gated-legacy-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
-  // seq 1 = moveToDurableDoingForTest's raw work.move in the writer log that
-  // this fixture path counts; addOk bootstraps the item through the CLI's own
-  // physical writer path and is not part of this item's subsequent ask/answer
-  // writer-log sequence.
-  //
-  // The deterministic values in this current runner are seq:2/3, verified in
-  // isolation and during the packaging-distribution whole-track suite.
-  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 2 });
+  // One Event Store stream numbers every event: add = 1, the raw move = 2, ask = 3, answer = 4.
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
 
   const answerResult = run(cwd, ['answer', 'gated-legacy-doing-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
-  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 3 });
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 4 });
   assert.equal(stateView(cwd).work['gated-legacy-doing-item'].status, 'todo');
 });
 

@@ -10,7 +10,7 @@ import { benchmarkStore, seedStore } from '../../scripts/event-store/store-incre
 
 test('maintenance reads local age and push receipts without ref or legacy verification',t=>{
   const f=fixture(t);
-  assert.deepEqual(f.store.maintenance([]),{streams:[],lastPush:null});
+  assert.deepEqual(f.store.maintenance([]),{streams:[],lastPush:null,lastAttempt:null});
   append(f.store,[{ts:'2020-01-01T00:00:00.000Z'}]);
   // A malformed event ref would make a full store read fail.
   const ref=path.join(f.repo,'.git/refs/fgos/events/invalid');

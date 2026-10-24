@@ -153,7 +153,7 @@ test('runTests refuses with a non-zero status and an actionable message when zer
   assert.match(result.message, new RegExp(emptyRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('runTests spawns node --test with the discovered files as argv elements and FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 merged into env, preserving other env vars (R2/R3)', () => {
+test('runTests spawns node --test with the discovered files as argv elements and the caller env passed through, preserving other env vars (R2/R3)', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'x.test.mjs');
   let captured = null;
@@ -173,7 +173,6 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
   assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
-  assert.equal(captured.opts.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
 });
@@ -348,7 +347,6 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   const env = buildTestEnv({ PATH: '/usr/bin', NODE_TEST_CONTEXT: 'child-v8', KEEP: 'yes' });
   assert.equal('NODE_TEST_CONTEXT' in env, false);
   assert.equal(env.KEEP, 'yes');
-  assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
 test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {
@@ -500,6 +498,27 @@ console.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;
   assert.equal(tmpdir, root);
   assert.equal(path.dirname(root), fs.realpathSync(base));
   assert.deepEqual(fs.readdirSync(base), [], 'nothing survives the process, including the dir the script never removed');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a test process waits at exit for a detached seal child that names its private root or a watched fixture dir', { skip: process.platform === 'win32' }, () => {
+  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));
+  const base = tempBase();
+  const fixture = fs.mkdtempSync(path.join(base, 'fixture-'));
+  const marker = (name) => path.join(base, name);
+  // The parent ends at once; each child is a real process whose command line names a directory and ` events seal `,
+  // and which writes its marker only after the parent's exit hook has had to wait for it (the watched one outlives the other, so it cannot be covered by waiting for the first).
+  const script = `import { PROCESS_TEMP_ROOT, watchSealChildrenOf } from ${JSON.stringify(helper)};
+import { spawn } from 'node:child_process';
+import path from 'node:path';
+watchSealChildrenOf(${JSON.stringify(fixture)});
+const child = (named, file, ms) => spawn(process.execPath, ['-e', 'setTimeout(() => require("node:fs").writeFileSync(process.argv[1], "done"), ' + ms + ')', file, 'events', 'seal', path.join(named, 'repo')], { detached: true, stdio: 'ignore' }).unref();
+child(PROCESS_TEMP_ROOT, ${JSON.stringify(marker('own'))}, 100);
+child(${JSON.stringify(fixture)}, ${JSON.stringify(marker('watched'))}, 1200);`;
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });
+  assert.equal(run.status, 0, run.stderr);
+  assert.equal(fs.readFileSync(marker('own'), 'utf8'), 'done', 'the exit hook waited for the child naming the private root');
+  assert.equal(fs.readFileSync(marker('watched'), 'utf8'), 'done', 'and for the child naming a watched fixture dir');
   fs.rmSync(base, { recursive: true, force: true });
 });
 

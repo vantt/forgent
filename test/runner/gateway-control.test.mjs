@@ -7,6 +7,8 @@ import path from 'node:path';
 import http from 'node:http';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
 import { observe } from '../../src/runner/dispatch/process-identity.mjs';
 import { startGateway, stopGateway, gatewayStatus, acquireGatewayLock, GatewayControlError } from '../../src/runner/gateway-control.mjs';
 
@@ -179,6 +181,39 @@ test('stopGateway: no registry reports alreadyStopped:true, not an error', () =>
   const { repoRoot, fgosDir } = mkFgosDir();
   try {
     assert.deepEqual(stopGateway(fgosDir), { alreadyStopped: true });
+  } finally {
+    cleanup(repoRoot);
+  }
+});
+
+test('stopGateway seals the Work events still open, after it released the gateway lock', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gateway-test-store-'));
+  try {
+    const fgosDir = initializeWorkRepository(repoRoot);
+    const openAgeSec = leaveOpenWorkEvent(repoRoot);
+    assert.ok(openAgeSec() >= 3599, 'the event is open before the stop');
+    stopGateway(fgosDir);
+    assert.equal(openAgeSec(), 0, 'a clean shutdown leaves nothing unsealed');
+  } finally {
+    cleanup(repoRoot);
+  }
+});
+
+test('stopGateway run from a linked worktree seals the main checkout\'s open Work events', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gateway-test-linked-'));
+  try {
+    const mainRoot = path.join(repoRoot, 'main');
+    initializeWorkRepository(mainRoot);
+    const git = (...args) => execFileSync('git', ['-C', mainRoot, ...args], { stdio: 'pipe' });
+    git('commit', '--allow-empty', '-qm', 'initial');
+    const linked = path.join(repoRoot, 'linked');
+    git('worktree', 'add', '-qb', 'linked', linked);
+    const openAgeSec = leaveOpenWorkEvent(mainRoot);
+    assert.ok(openAgeSec() >= 3599, 'the event is open before the stop');
+    const linkedFgos = path.join(linked, '.fgos');
+    fs.mkdirSync(linkedFgos, { recursive: true });
+    stopGateway(linkedFgos);
+    assert.equal(openAgeSec(), 0, 'the shutdown seal reached the main checkout\'s store, not the caller\'s directory');
   } finally {
     cleanup(repoRoot);
   }

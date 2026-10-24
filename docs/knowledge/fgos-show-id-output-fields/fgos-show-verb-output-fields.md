@@ -29,6 +29,7 @@ single task in one call.
 | `friction` | `collectFrictionData(rawView, id)` | `{ count, byLayer, recent }` | `null` |
 | `settlement` | `collectSettlementData(rawView, id)` | settlement record | `null` |
 | `learning` | `collectLearningData(rawView, id)` | learning record | `null` |
+| `conflicts` | `rawView.conflicts` filtered to this id | array of `{ h, id, origin, reason, against }`: events acknowledged on one machine that the fold recorded as a conflict instead of applying, because a concurrent event it had not seen made their precondition false | `[]` |
 
 `show` reuses `check`'s own per-item collectors
 (`collectOutcomeEntry`/`collectFrictionData`/`collectSettlementData`/

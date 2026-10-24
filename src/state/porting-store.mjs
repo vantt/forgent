@@ -1,39 +1,36 @@
-// porting-store.mjs — the single write door onto `<dir>/porting/` (per
-// distillery-state-consumer D1(D5)/D2).
+// porting-store.mjs — the single write door for porting records. Porting owns the
+// `project:porting` stream and its view; Work's `project` stream is never touched.
 //
-// SIBLING store, never the existing work-item store: `initStore`/`rebuild`
-// here never touch `<dir>/events.jsonl` or `<dir>/state.json` at the root of
-// `dir` — every path this module resolves is nested one level deeper, under
-// `<dir>/porting/`. `events.mjs` (`appendEvent`/`readEvents`) is reused
-// unchanged; `porting.mjs`'s `transitionPorting` decides transition legality
-// — this module only wires "some directory" to the two files that live in
-// its `porting/` subdir: `events.jsonl` (truth) and `state.json` (view).
+// Events go through the same consumer gate Work uses (`withConsumerState`, resource
+// `porting-events`). `dir` only names the clone the records belong to: the view and its
+// cursor live in the untracked `.fgos` cache the consumer registry declares, never in a
+// tracked file, so a porting mutation leaves the working tree clean.
 //
-// Write order, always: append the event to the log FIRST, then rebuild and
-// overwrite the view SECOND — same crash-safety discipline as store.mjs. If
-// a crash lands between the two, the log already has the event; the view is
-// merely stale, and `rebuild()` below is the recovery path.
-//
-// The fold from events to view is this module's own small function, not a
-// share of replay.mjs's `foldEvents` (which destructures work-item fields
-// only) — a new domain's fold is that domain's own responsibility.
+// The fold is this module's own small function, not a share of replay.mjs's `foldEvents`
+// (which destructures work-item fields only) — a new domain's fold is its own concern.
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { readEvents } from './events.mjs';
-import { withStateTx } from './hot-lock.mjs';
 import { transitionPorting, PortingError } from './porting.mjs';
+import { readEventStoreConfig } from '../event-store/index.mjs';
+import { prepareWorkStore } from './work-event-store.mjs';
+import { withConsumerState } from './consumer-event-gate.mjs';
+import { getMainFgosDir } from './runtime-coordination.mjs';
+import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { hotLockDepth, HotLockError } from './hot-lock.mjs';
+import path from 'node:path';
 
-function paths(dir) {
-  const base = path.join(dir, 'porting');
-  return { base, logPath: path.join(base, 'events.jsonl'), viewPath: path.join(base, 'state.json') };
-}
+const STREAM = 'project:porting';
+
+const refusal = code => Object.assign(new Error(code), { code });
 
 function applyEvent(view, event) {
   switch (event.type) {
     case 'porting.add': {
       const item = event.payload;
-      if (item && typeof item === 'object' && typeof item.id === 'string') {
+      // The first add of an id stands: addPorting refuses a known id, so a second add reaches the log only when two
+      // clones added the same id before seeing each other. It must not replace the record or reset a status the
+      // first one already moved, and every clone orders the union the same way, so every clone keeps the same one.
+      if (item && typeof item === 'object' && typeof item.id === 'string' && !view.porting[item.id]) {
         view.porting[item.id] = { ...item };
       }
       break;
@@ -53,135 +50,96 @@ function applyEvent(view, event) {
   }
 }
 
-// Fold an ordered array of porting events into a state view. Deterministic:
-// folding the same log twice always yields deep-equal views.
-function fold(events) {
-  const view = { porting: {} };
-  for (const event of events) {
-    applyEvent(view, event);
-  }
-  return view;
-}
-
-function rebuildViewFromLog(logPath) {
-  return fold(readEvents(logPath));
-}
-
-function writeView(viewPath, view, tx = null) {
-  if (tx) {
-    tx.writeJson(viewPath, view);
-    return;
-  }
-  fs.mkdirSync(path.dirname(viewPath), { recursive: true });
-  fs.writeFileSync(viewPath, `${JSON.stringify(view, null, 2)}\n`, 'utf8');
-}
-
-// Shared tail of every mutation: rebuild the view fresh from the (now
-// updated) log and overwrite state.json. Always called AFTER the event that
-// caused the change has already been appended — never before.
-function refreshView(dir, tx = null) {
-  const { logPath, viewPath } = paths(dir);
-  const view = rebuildViewFromLog(logPath);
-  writeView(viewPath, view, tx);
-  return view;
-}
-
-// tsk-1q5: same fix as store.mjs's sibling helper — fold `refreshView` into
-// the SAME held `withStateTx` scope as the append, instead of running it
-// as a separate, unlocked critical section afterward. Closes the same
-// lost-update window (two processes' unlocked `refreshView` calls racing to
-// overwrite `state.json`, staler-write-wins) for this store too.
-function withStateAndRefresh(dir, fn) {
-  let view;
-  const event = withStateTx(dir, (tx) => {
-    const result = fn(tx);
-    view = refreshView(dir, tx);
-    return result;
-  }, { resource: 'porting-events' });
-  return { event, view };
-}
-
 /**
- * Create `<dir>/porting/` if missing, ensure the event log file exists, and
- * (re)write the view from it. Safe to call on an already-initialized dir —
- * idempotent.
+ * Fold an ordered array of porting events into a view, optionally continuing from `seed`.
+ * Deterministic: folding the same events twice always yields deep-equal views.
  */
-export function initStore(dir) {
-  const { base, logPath } = paths(dir);
-  fs.mkdirSync(base, { recursive: true });
-  if (!fs.existsSync(logPath)) {
-    fs.writeFileSync(logPath, '', 'utf8');
-  }
-  return refreshView(dir);
+export function foldPortingEvents(events, seed) {
+  const view = seed ? structuredClone(seed) : { porting: {} };
+  for (const event of events) applyEvent(view, event);
+  return view;
 }
 
+// Full history is read outside the mutex. An incomplete history (a deferred or missing
+// foreign event) refuses rather than folding a partial view.
+function readState(store, { heldRanks = [] } = {}) {
+  if (hotLockDepth() > 0) throw refusal('event-store-full-read-under-state');
+  const read = store.read({ streams: [STREAM] }, heldRanks);
+  if (read.deferred.length || read.missing.length) throw refusal('event-store-incomplete-history');
+  return { view: foldPortingEvents([...read.legacy.map(record => record.event), ...read.sequence]), cursor: read.cursor };
+}
+
+function transact(dir, fn, options = {}) {
+  if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Porting cannot open a nested state transaction');
+  const main = getMainFgosDir(dir);
+  // The writer identity may need a child process, so it is resolved before the mutex.
+  const writer = String(resolveWriterIdentity(main).id);
+  const prepared = options.store ? options : { ...prepareWorkStore(dir, main), ...options };
+  const cache = resolveFgosFile(main, FGOS_FILE.PORTING_STATE);
+  // Every porting effect lands in the main `.fgos` cache, so the caller's directory is granted no write access.
+  return withConsumerState(dir, main, writer, fn, { ...prepared, extraRoots: [], policy: {
+    stream: STREAM, resource: 'porting-events', readState,
+    fold: foldPortingEvents, lifecycle: new Set(),
+    persist: tx => tx.writeJson(cache, { ...tx.view, cursor: tx.cursor }),
+  } });
+}
+
+function withStateAndRefresh(dir, fn) {
+  let tx;
+  const event = transact(dir, current => { tx = current; return fn(current); });
+  return { event, view: tx.view };
+}
+
+/** Write the view cache from the recorded history. Safe to call repeatedly. */
+export function initStore(dir) { return rebuild(dir); }
+
 /**
- * Seed a new candidate porting record. `status` is always forced to
- * `'candidate'` regardless of what the caller supplies — `candidate` is the
- * only legal entry point per porting.mjs's TRANSITIONS table. Validates
- * against the log's own current ids (read fresh, never off a possibly-stale
- * view) BEFORE writing anything — a duplicate id never reaches the log.
- *
- * The existence check through the append is one held porting-events critical
- * section (`withStateTx`/`tx.append`, not bare `appendEvent`),
- * mirroring store.mjs's addWork dup-id guard (tsk-1jp): two processes racing
- * `addPorting` on the same id can no longer both read "id not present yet"
- * and both append a `porting.add` — the second to acquire the lock re-reads
- * with the first's event already in the log, so its own existence check now
- * correctly fails.
+ * Seed a new candidate porting record. `status` is always forced to `'candidate'` — the
+ * only legal entry point per porting.mjs's TRANSITIONS table. The duplicate check reads
+ * the view the gate just caught up, inside the held `porting-events` section, so two
+ * processes racing the same id cannot both append a `porting.add`.
  */
 export function addPorting(dir, entry) {
-  const { logPath } = paths(dir);
   if (!entry || typeof entry.id !== 'string' || !entry.id.trim()) {
     throw new PortingError('validation', 'addPorting: entry requires a non-empty "id".');
   }
-
-  return withStateAndRefresh(dir, (tx) => {
-    const before = rebuildViewFromLog(logPath);
-    if (before.porting[entry.id]) {
-      throw new PortingError('validation', `porting "${entry.id}" already exists.`);
-    }
-
-    const item = { ...entry, status: 'candidate' };
-    return tx.append(logPath, { type: 'porting.add', payload: item });
+  return withStateAndRefresh(dir, tx => {
+    if (tx.view.porting[entry.id]) throw new PortingError('validation', `porting "${entry.id}" already exists.`);
+    return tx.append({ type: 'porting.add', payload: { ...entry, status: 'candidate' } });
   });
 }
 
 /**
- * Move a porting record to a new status. Looks the record up fresh from the
- * log, delegates the precondition/CAS decision to porting.mjs (pure — never
- * writes), and only then appends the event it returns.
- *
- * Same one held porting-events critical section as `addPorting` above
- * (tsk-1jp): the lookup, the CAS decision, and the append all happen inside
- * one `withStateTx` scope, so a stale `expectedStatus` read can no longer
- * slip past the check before a racing write lands.
+ * Move a porting record to a new status. The lookup, the compare-and-set decision
+ * (delegated to porting.mjs, which never writes) and the append share one held section,
+ * so a stale `expectedStatus` cannot slip past the check before a racing write lands.
  */
 export function movePorting(dir, { id, to, expectedStatus } = {}) {
-  const { logPath } = paths(dir);
-  return withStateAndRefresh(dir, (tx) => {
-    const before = rebuildViewFromLog(logPath);
-    const porting = before.porting[id];
-    if (!porting) {
-      throw new PortingError('validation', `porting "${id}" not found.`);
-    }
-
-    const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
-    return tx.append(logPath, rawEvent);
+  return withStateAndRefresh(dir, tx => {
+    const porting = tx.view.porting[id];
+    if (!porting) throw new PortingError('validation', `porting "${id}" not found.`);
+    return tx.append(transitionPorting({ porting, to, expectedStatus })); // PortingError: precondition | conflict
   });
 }
 
-/** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
+/** Read-only: the current view, folded from the full history (never off the cache file). */
 export function listPorting(dir) {
-  const { logPath } = paths(dir);
-  return rebuildViewFromLog(logPath);
+  return readState(prepareWorkStore(dir, getMainFgosDir(dir)).store).view;
 }
 
-/**
- * Rebuild `<dir>/porting/state.json` from the log alone — the recovery path
- * for a missing, deleted, or stale view (the view is always derivable from
- * zero, and never itself the truth).
- */
+/** Rebuild the view cache from the recorded history alone. */
 export function rebuild(dir) {
-  return refreshView(dir);
+  let tx;
+  transact(dir, current => { tx = current; }, { rebuild: true });
+  return tx.view;
+}
+
+/** The consumer registry's rebuild port, using the store the caller already prepared. */
+export function rebuildFromStore({ cwd, repoRoot, store, maxAttempts, heldRanks = [], globalConfigPath }) {
+  const dir = getMainFgosDir(path.join(cwd ?? repoRoot, '.fgos'));
+  const config = readEventStoreConfig(path.dirname(dir), globalConfigPath);
+  if (maxAttempts !== undefined) config.rebuild.maxAttempts = maxAttempts;
+  let tx;
+  transact(dir, current => { tx = current; }, { config, store, heldRanks, rebuild: true });
+  return tx.view;
 }

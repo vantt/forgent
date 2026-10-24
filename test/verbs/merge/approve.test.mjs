@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
+import { isStatusWriteFault } from '../../../src/verbs/merge/approve.mjs';
 import {
   commitPendingBeforeApprove,
   envelopeData,
@@ -79,25 +80,14 @@ test('approve (--github): is explicitly forbidden for trunk merges', () => {
   assert.match(result.stderr, /approve --github is explicitly forbidden/);
 });
 
-test('approve (failure path on lock-timeout): fires fault record carrying detail, mergedSha, and mergedInto', () => {
-  const cwd = initGitCwdMain();
-  makeRunnerProposedItem(cwd, 'diag-fault-item', { verify: 'true' });
-
-  const result = run(cwd, ['approve', 'diag-fault-item'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'diag-fault-item' });
-  assert.equal(result.status, 0, result.stderr);
-
-  const data = envelopeData(result.stdout);
-  assert.equal(data.deliveryUnrecorded, true);
-  assert.ok(data.diagnosticLog);
-
-  const lines = fs.readFileSync(data.diagnosticLog, 'utf8').trim().split('\n');
-  const records = lines.map((line) => JSON.parse(line));
-  const faultRecord = records.find((r) => r.id === 'diag-fault-item' && r.detail);
-
-  assert.ok(faultRecord, 'failure fault record must exist');
-  assert.equal(faultRecord.phase, 'root-into-main merge');
-  assert.match(faultRecord.detail, /lock-timeout/);
-  assert.equal(typeof faultRecord.mergedSha, 'string');
-  assert.ok(faultRecord.mergedSha.length > 0);
-  assert.equal(faultRecord.mergedInto, 'main');
+test('a status write the gate could not make is a recorded fault, and a store refusal is not', () => {
+  const lockTimeout = Object.assign(new Error('timed out acquiring state'), { code: 'hot-lock-timeout' });
+  const lostRace = Object.assign(new Error('catch-up busy'), { code: 'event-store-catch-up-busy' });
+  const diskFull = Object.assign(new Error('no space'), { code: 'ENOSPC' });
+  for (const err of [lockTimeout, lostRace, diskFull]) assert.equal(isStatusWriteFault(err), true, err.code);
+  // A precondition refusal and an unknown failure keep propagating: swallowing them would accept an item the store refused.
+  const refusal = Object.assign(new Error('not awaiting-approval'), { code: 'precondition', category: 'precondition' });
+  assert.equal(isStatusWriteFault(refusal), false);
+  assert.equal(isStatusWriteFault(new TypeError('bug')), false);
+  assert.equal(isStatusWriteFault(null), false);
 });
