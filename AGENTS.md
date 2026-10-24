@@ -82,8 +82,10 @@ Keep draft scripts, logs, patches and dumps out of the repository root. Use
 files outside it, including linked worktrees. Legitimate root additions require
 an allowlist change in a separate commit, landed on main before the addition.
 The hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks
-that wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root
-guard, never existing data-loss guards.
+that wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips the root
+guard, and the `.fgos` deletion and worker guards accept only a staged entry
+equal to the merge parent's where that parent changed it since the merge base;
+no other data-loss guard is skipped.
 
 ## Legacy-Node CLI Ownership Boundary
 
