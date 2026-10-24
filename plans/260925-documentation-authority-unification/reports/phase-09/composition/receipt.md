@@ -1,90 +1,43 @@
-# Composition receipt — continuation, blocked on four exact holder actions
+# Composition receipt — prepared records complete
 
-docs(composition): complete available park compositions and verify replay guards
+Source pin: `eb744281deba853f201cda15dcb4876300a1d638`. Authority: **L13-11**. These are prepared patches and replay evidence, **not applied documentation, authority promotion, independent approval or gate closure**. Earlier attempts, their red proofs and disclosed incidents remain in `receipt.json.previousAttempt` and the historical `w2-*` records.
 
-## Latest result (W2 D2b)
+## Delivered
 
-Source pin: `cffe725b948f5a695728c8da08f114e7e97075d6`. **11 of the 15 unfinished entries now have complete conditional compositions; four remain partial/blocked. No gate is closed.** These are records, not applied product edits or authority acceptance.
+- **101 park identities retained; no unfinished composition.** Both supplemental description groups now have complete chains. `actions.json` identifies the executable records; historical partial actions are not executable alternatives.
+- **Workflow:** drop the retiring legacy-file hunk; the holder `docs/platform/workflow/spec.md` uses the single runner decision record for its supersession/history references.
+- **Family 17:** seat-binding/workflow route to their new specs; both end-user scopes route to their exact knowledge-registry sections, with narratives under work-state. The two command-registry members now resolve the current re-pin of `w2:predecessor:src/cli/command-registry.mjs`, not the non-effective historical predecessor. Narrative write homes are declared destinations, not assertions that empty directories already exist.
+- **Switchboards:** complete whole-action patches include both end-user owners. `checkCandidateMetadata` and `planLinkPass` run on the replayed files; **zero findings, unresolved links or remaining link edits**. The root switchboard's governance link and Related path are corrected too. It is checked before its separate retirement; no fixture Git write is needed.
+- **System overview:** current-byte base and partial chain preserve HEAD's existing holder links, then complete f07928/f07929. **Architecture intent:** five candidate design/evidence routes and three explicitly retired-engine history routes, under L13-11.1.
+- **GAP-05:** both complete carriage units move verbatim into literal Markdown history, with a live pointer. **88 binding coverage records / 22 heading anchors**: readme 12, layout 10, resync-b 66. There are **44 terminal supersession edges**, 22 already-superseded lookups and 22 immutable-preimage lookups. Keeping those roles distinct avoids competing supersession edges or rewriting history. All binding hashes and heading digests verify; **G0 review remains pending**.
+- **Re-pinning:** all **11** drifted effective files covered: **9** old chains still apply with fuzz=0; component-boundary and the system-overview base are recomposed. Three additional citation-base predecessors are refreshed rather than silently skipped.
 
-- `patch-specs.json` preserves all 38 earlier entries and appends 31: 29 effective records plus two GAP-05 proposal records. Use `effectiveSpecIds` in order; historical duplicate predecessor IDs are not executable alternatives.
-- `actions.json` preserves all 101 park identities and the previous attempt; its `continuationResolutions` addresses all 15 unfinished entries, including the three supplemental description groups outside that 101-action set.
-- `w2-independent-verification.json`: **62 effective specs / 58 files**, 146 real `patch --batch --fuzz=0 -p1` invocations, forward and complete reverse byte equality against this checkout. Named same-file predecessor hashes are checked; all 38 earlier JSON entries are conserved. This verifies bytes, not semantic approval.
-- `w2-predecessor-recomposition.json`: all **19** prior deferrals resolved mechanically: eight recomposed at current bytes; eleven already equal their approved original before bytes at this pin. Twelve current-byte predecessor replacements overall include four additional changed paths. Historical approval does not transfer; G9 delta review remains required.
-- `w2-skill-regeneration.json`: canonical source composition plus scratch `npm run build:skills`, exit 0; all 33 generated-output changes captured. Never hand-apply render diffs.
+## Citation corrections — baseline unchanged
 
-## Remaining blockers — do not apply these partial actions
+The widened reader excludes `history` path segments; its existing default-reader proof now includes negative history-spec and history-decision controls while retaining live nested-spec/narrative assertions. Removing only that filter makes the owning test red, as expected.
 
-| Consumer | Exact unresolved duty |
+**10 branch sites** have prepared patches; work-state reuses its legacy source's two exact glosses. **130 main-owned sites** have **14 deferred patch specs**, executable only at final pin F under the docs lease after checking current bytes. Local decision labels are replaced by their stated content; existing meaningful glosses remain unchanged. No baseline key, count or byte changes. See `w8-citation-glosses.json` for per-line before/after witnesses and the two execution lists in `patch-specs.json`.
+
+**Post-generator regression caught and fixed:** regenerating all parked skills exposed two additional bare `RUL45` findings, from one canonical researching-skill line whose retarget changed its baseline key. One prepared canonical-source gloss fixes both; the real generator, not a render edit, produces the correction. The final focused proofs below run **after this regeneration**, not against stale generated surfaces. The initial 31/32 result is retained in `w8-post-regeneration-citation-initial.log`.
+
+## Generated outputs
+
+- **End-user index:** cutover door **`fgos docs-index`**; proof **`fgos doctor` passes `enduser-docs-index-stale`**. Neither CLI ran here. The bounded export replay is **492 → 490**: both dropped old paths are duplicate aliases, not lost documents. Lifecycle is carried to `docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md` with capture `tsk-2zv`; rollup is carried to `docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md` with capture `doc-fgos-rollup-howto`. Both generated entries retain their old aliases.
+- **UI:** `(cd .claude/skills/ui-spec/tools && npm ci) && node .claude/skills/ui-spec/tools/interpret-wireframe.mjs --root docs/ui-spec`; proof `node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec`. Separate generator evidence captures stale committed **`77894fdd` → `f06815ee`**, then composed-source **`50fcd138`**. Both validations exit 0. **Ordering matters:** compile/validate after source composition but before physically moving `docs/ui-spec/spec.config.yaml` and its inputs. The mandated old-root command cannot run after that move. Generated diffs are evidence, never a hand-application door.
+- **Skills:** real generator exit 0; **69/69 parked renders** match current evidence, including the two outputs updated by that canonical gloss. Their prior expected hashes remain recorded; historical `skill-regeneration.json` is explicitly superseded.
+
+## Proof and reproduction
+
+| Owning proof | Result |
 |---|---|
-| `docs/platform/system-overview/spec.md` | `f07928/f07929`: no complete accepted live holders for `enduser-docs-authoring.md` and `enduser-docs-index.md`. D1's maintained registry contract covers identity/lifecycle/role/attestation, not those entire write/read-side contracts. Four sibling descriptions are composed. |
-| `docs/platform/system-architecture/architecture/architecture-intent.md` | Eight live Related/evidence rows still need accepted holders for system vision, Step 09/10, component authority map, intent ledger and coordination-session/flow-definition. A carriage/history mirror or conditional metadata packet is not acceptance. Self-related navigation is composed separately. |
-| `docs/transitional-switchboard.md` | `f08382–f08384`: end-user complete-owner row depends on the same missing full carry. Other complete rows and resolution algorithm are composed, but the whole action must remain parked. |
-| `docs/platform/documentation/switchboard.md` | `f06749–f06751`: same complete-owner row blocker; do not apply the partial switchboard. |
+| Independent GNU patch replay | **79 effective + 14 final-pin specs, 74 files, 221 patch invocations; exact forward and full rollback bytes** |
+| `test/runner/dead-vocabulary-guard.test.mjs` | **10/10**, exit 0 with move applied; injected live retired-symbol control exits 1 |
+| `test/scripts/check-decision-citation-drift.test.mjs` | **32/32**, exit 0 with all prepared glosses in scratch; history-filter regression control exits 1 |
+| `test/scripts/doc-link-pass.test.mjs` | **20/20**, exit 0 |
+| UI validation, HEAD and composed sources | Both exit 0 |
+| Switchboard metadata/link planning | Both APIs exit 0; no unresolved destinations |
+| Overlay graph/hash check | Exit 0; no ambiguous supersession edges |
 
-D1's **complete decision 0014 section** was verified verbatim in `docs/platform/platform-foundations.md`; the Participant locator now composes on the approved same-file output, not the retained root law or an obsolete line range. All other newly completed whole-status units are conditional on independent source/truth acceptance and separately approved atomic cutover. Locked root laws and D1's carried rules/narratives are not rewritten.
+`w8-replay-recipes.json` embeds the standalone independent verifier: extract it under `/tmp/fgos-work/w8-comp-fix/`, then run `python3 -B …/independent-replay.py` from the repository root. It consumes the published JSON, not the authoring helper. `w8-commands.json` retains proof argv/exits, expected negative controls, failed old-chain applications and corrected authoring attempts. Final test logs and artifact hashes are alongside this receipt.
 
-## Owning replay
-
-| Proof | Latest result |
-|---|---|
-| `test/scripts/generate-shipped-path-inventory.test.mjs` | **11 pass / 0 fail**, complete unchanged owning file |
-| `test/runner/dead-vocabulary-guard.test.mjs` | **9 pass / 1 fail**; only the nine GAP-05 retired-name occurrences in the two complete component-boundary carriage units |
-| GAP-05 placement control, same complete owning file | **10 pass / 0 fail**; proposal applied only temporarily in scratch, then restored; Lead approval remains pending |
-| Live successor negative probe | Nonzero as required: both Phase 1–3 and P5 reject injected retired symbols in a nested live scratch spec; probe removed |
-| `test/scripts/check-decision-citation-drift.test.mjs` | **31 pass / 1 fail**; nested default-reader case passes; real-repo baseline case reports **124** new findings. Baseline bytes unchanged; this remains a separate open parity gap. |
-
-The earlier P5 red was not GAP-05: successor enumeration incorrectly included history snapshots, and three live-spec negative qualifications named retired schemas outside decision history. The continuation keeps all original roots/assertions, makes the added read set live-spec-only, and conserves the three qualifications verbatim under decision history. No historical symbols are renamed. `w2-gap05-verification.json` binds every remaining occurrence to the complete carriage units and records control/negative replay.
-
-The inventory failure had two fixture causes: the first scratch had no committed inventory input; this pin additionally uses the real native Git port and initially lacked its shipped addon. A disposable `/tmp` repository now supplies a committed pre-move snapshot; the worktree is then composed/moved without committing. The inventory proof reads that **immutable historical commit**, not moved live documentation. D1's existing shipped `native-addon.json` fixture was reused with real digest/ABI/path checks, isolated HOME/state root, and the host read from authorized activation metadata. This does not certify Rust working-tree freshness. The initial six addon/setup failures and commands are retained as `initial-w2-*`; final tests are `w2-*.test.log`.
-
-## Reproduce and boundaries
-
-```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/complete-parks.py
-python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/verify-effective.py
-```
-
-The composer reads this source pin, writes only composition records, and stages executable bytes in `/tmp/fgos-work/w2-d2b-brief/`. Single tests use the exact brief-prescribed `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <file>` door. Temporary fixture Git writes are authorized by the continuation brief; **no Git write in this repository**, fgOS CLI, live state/secrets access, source application, baseline rewrite, full suite, pair accounting or Lead record mutation occurred. `impact-analysis: degraded` under the no-CLI boundary; no production symbol was edited. Rust owning replay for the MCP path recomposition and final-pin whole-suite parity remain unrun. No browser service was launched under this constrained records turn.
-
-`receipt.json` carries this attempt and the complete earlier receipt under `previousAttempt`; command argv/exits/logs, touched IDs and digests are linked there. `needsWrites=[]`: no out-of-scope mutation is needed to deliver these records; missing accepted holder placements remain explicit Lead/holder-owner work, not invented paths. **Status: blocked, not complete.**
-
----
-
-# Earlier W1 receipt (historical; superseded only by the continuation above)
-
-docs: compose migration records and disclose unresolved replay gaps
-
-## Read first
-
-- `member-joins.json`: 48/16/8 exact current-passage joins (not independent acceptance).
-- `actions.json`: all 101 parks accounted for; **15 unfinished**. Twelve whole-row units still need authored complete diffs, and three require exact live-holder/carriage decisions. Merely indexing a park is not composition.
-- `patch-specs.json`: 38 specs; 37 changed-byte fuzz=0 forward/inverse roundtrips and one explicit no-byte-change result. Immediate hash chains are checked in `chain-verification.json`; recomposed historical predecessors still require G9 delta review.
-- `area-holder-table.json`: aliases/free-text scope semantics retained. Missing live holders: enduser-docs-authoring, enduser-docs-index, seat-binding, workflow. Repo narrative placement is proposed, not established; root binding laws remain root authority.
-- `gap05-placement-proposal.json`: move both complete source-carriage sections into literal history; Lead placement approval required. No guard exemption or historical renaming.
-
-## Authored/replayed
-
-Both review reworks, verbatim credential-store §13.1 carriage, recursive citation reader + owning nested fixture, canonical citation convention, scope table/consumer records, exact current hunk reconstruction and nine conditional whole-status-unit packets are composed. Credential carriage still needs Lead/G9 rebind of `claim_15308eb4`.
-
-Scratch `npm run build:skills`: **exit 0**, 12 canonical inputs, 69 parked renders (24 changed, 45 unchanged). All 33 generated-output changes are captured, including nine outside the parked render set. Generated diffs are evidence only, never a hand-application path.
-
-Scratch post-move replay: 1,039 physical moves, 19 unrelated approved predecessors deferred for source drift. This is **not final-pin parity**.
-
-| Proof | Result |
-|---|---|
-| Citation owning file | exit 1; 31 pass / 1 fail; nested reader case passes, real-repo baseline case finds 126 new findings |
-| Dead-vocabulary owning file | exit 1; 8 pass / 2 fail; 18 successor/history P5 occurrences plus nine live carriage names |
-| Format-only additive read set | 17→68 files, 0→124 findings; no retained-source omission; unchanged baseline; not whole-guard closure |
-| Bounded exported end-user index | 492→490; lifecycle and rollup content-carriage gaps remain; no live store read |
-| Production near-duplicate check | current and scratch post-move pass; registry wiring test is not falsely called an owning behavior proof |
-| Pure shipped classifier | seven before/after cases identical; full-file proof unavailable under no-Git-write rule |
-
-## Constraint incident — do not omit
-
-The first inventory whole-file test created temporary committed Git fixtures through its existing fixture helper. This **violated “never a git write”**. Source-worktree Git was not staged or committed. Details and original failing log are retained in `constraint-incident.json`, `commands-first-replay.json`, and `generate-shipped-path-inventory.test.log`. That complete test was removed from subsequent replay; this receipt does not conceal the violation or count its result as a pass.
-
-## Scope and handoff
-
-Only composition records were written in the repository. No product/source application, Lead record edit, pair accounting, fgos CLI, live state/secrets, full test suite, or baseline rewrite. Activation metadata was read only for the required host path. Final tracked worktree and staged diffs are empty; only this composition directory is untracked.
-
-Commands/exits, touched member/row/spec ids, artifact digests, precise unfinished entries and limitations are in `receipt.json`, `commands.json`, and `commands-first-replay.json`. No additional repository write permission is requested: `needsWrites=[]`. Lead/D1 acceptance and remaining independent authoring/review are still necessary. **No G1/G7/G9 gate is claimed closed.**
+Only allowed composition/ledger records were written. No live `docs/`, product code/tests, baseline, `.fgos` state, secrets, pair accounting, Git write, fgOS CLI, full suite or preview service was touched. The required focused test uses the existing real-addon fixture and disposable synthetic config fixtures only under the allowed scratch root; no production guard bypass. `impact-analysis: degraded` under the no-CLI, records-only boundary. Original Step 7 specs outside the grant remain immutable; their replacements are selected through the existing composition `effectiveSpecIds` door, so no phase-07/08 write is needed. **`needsWrites=[]`.** Final-pin lease work, independent G0/G7/G9 review, actual index regeneration/doctor and full-suite cutover parity remain separate Lead-owned gates.

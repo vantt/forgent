@@ -1,0 +1,71 @@
+Traceback (most recent call last):
+  File "/tmp/fgos-work/w8-comp-fix/clarify-glosses.py", line 38, in <module>
+    assert r.returncode==0,r.stdout+r.stderr
+AssertionError: ✔ ADR<n> form is recognized (1.379823ms)
+✔ bare NNNN form is recognized only when known (0.181963ms)
+✔ a bare id inside an ADR<id> match is not double-counted (0.109211ms)
+✔ multiple distinct ids on one line (0.156849ms)
+✔ a superseded id cited with no acknowledgement reports a dead-framing finding (0.229856ms)
+✔ citing both the superseded id and its superseding id on the same line reports zero (0.111889ms)
+✔ citing a decision that was never superseded reports zero findings (0.695193ms)
+✔ CLI run over a fixture reports the dead-framing finding and exits 1 (29.536198ms)
+✔ CLI run over a fixture with no drift exits 0 (31.963678ms)
+✔ a paren with real prose is a gloss (0.23578ms)
+✔ a paren with only other id tokens is not a gloss (0.117232ms)
+✔ an empty paren is not a gloss (0.062647ms)
+✔ no paren at all is not a gloss (0.05578ms)
+✔ a bare ADR citation with no gloss reports bare-citation (0.391662ms)
+✔ an ADR citation with a real gloss reports nothing (0.097474ms)
+✔ a RUL citation with only the old area-suffix, no real gloss, still reports bare-citation (0.07455ms)
+✔ a D-local id cited outside its own CONTEXT.md reports d-local-outside-home, gloss or not (0.057365ms)
+✔ a D-local id cited inside its OWN CONTEXT.md reports nothing (0.054083ms)
+✔ a comma-list of D-local ids each report their own finding (0.072277ms)
+✔ a slash-separated D-local list reports each id separately (0.046865ms)
+✔ a heading-parenthetical D-local citation still reports (0.035635ms)
+✔ a citation inside a fenced code block is skipped (0.03449ms)
+✔ a baselined finding does not report as new, a genuinely new one does (0.156917ms)
+✔ a shifted line number alone does not make a baselined finding report as new (tsk-3x8 F1: content-keyed, not line-keyed) (0.059674ms)
+✔ two citations of the same id on different lines/text stay distinct (0.043483ms)
+✔ a genuinely new Nth occurrence of an already-duplicated key is not silently absorbed (tsk-6at: count consumption, not membership) (0.075029ms)
+✔ findNewFindings/baselineFromFindings do not throw on a "__proto__" file (tsk-1pf: Object.create(null) hardening) (0.057917ms)
+✔ --write-baseline snapshots current findings, and a bare re-run against the SAME tree exits 0 (53.340387ms)
+✔ a NEW finding appended after --write-baseline still fails (52.108367ms)
+✔ a line inserted BEFORE a baselined finding does not make it report as new (tsk-3x8 F1: the exact hand-verified repro, CLI level) (52.799884ms)
+✖ CLI run against the real repo root, with the checked-in baseline, exits 0 (79.584524ms)
+✔ default citation scan includes nested area rules and decision narratives without losing legacy specs (29.867006ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 31
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 390.034667
+
+✖ failing tests:
+
+test at test/scripts/check-decision-citation-drift.test.mjs:759:1
+✖ CLI run against the real repo root, with the checked-in baseline, exits 0 (79.584524ms)
+  AssertionError [ERR_ASSERTION]: expected 0 new findings against the checked-in baseline, got:
+  check-decision-citation-drift: 2 finding(s):
+    - .agents/skills/fgos-researching/SKILL.md:91: cites RUL45 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - plugins/fgOS/skills/fgos-researching/SKILL.md:91: cites RUL45 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w8-comp-fix/candidate/test/scripts/check-decision-citation-drift.test.mjs:772:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+

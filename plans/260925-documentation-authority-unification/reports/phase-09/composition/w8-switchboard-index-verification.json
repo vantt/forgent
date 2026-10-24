@@ -1,0 +1,93 @@
+{
+  "checkDocCandidateStatus": {
+    "exit": 0,
+    "invocation": "checkCandidateMetadata on explicit two-file list; no Git enumeration or test Git fixtures",
+    "findings": [],
+    "counts": {
+      "files": 2,
+      "byStatus": {
+        "promoted": 0,
+        "candidate": 1,
+        "legacy-current": 1,
+        "non-authority": 0,
+        "unrouted": 0
+      },
+      "exemptUnrouted": 0,
+      "checked": 1,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "docLinkPass": {
+    "exit": 0,
+    "invocation": "planLinkPass plus independent relative/Related resolution on both replayed switchboards",
+    "files": [
+      {
+        "file": "docs/transitional-switchboard.md",
+        "editCount": 0,
+        "classifiedCount": 0,
+        "unresolved": [],
+        "related": [],
+        "ownerRow": "| End-user authoring, index, and knowledge registry | promoted | maintained-authority + retained-source | `docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring` (write-side); `docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index` (read-side); `docs/platform/work-state/contracts/knowledge-registry.md` (registry) | Retained end-user roots and `docs/knowledge/**`; original source spellings are lineage only | Work-state owns the two complete carried contracts and registry identity/lifecycle/attestation. Index code truth: `src/report/enduser-index-generate.mjs`; cutover regeneration: `fgos docs-index`, verified by `fgos doctor` check `enduser-docs-index-stale`. |"
+      },
+      {
+        "file": "docs/platform/documentation/switchboard.md",
+        "editCount": 0,
+        "classifiedCount": 0,
+        "unresolved": [],
+        "related": [],
+        "ownerRow": "| End-user authoring, index, and knowledge registry | promoted | maintained-authority + retained-source | `docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring` (write-side); `docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index` (read-side); `docs/platform/work-state/contracts/knowledge-registry.md` (registry) | Retained end-user roots and `docs/knowledge/**`; original source spellings are lineage only | Work-state owns the two complete carried contracts and registry identity/lifecycle/attestation. Index code truth: `src/report/enduser-index-generate.mjs`; cutover regeneration: `fgos docs-index`, verified by `fgos doctor` check `enduser-docs-index-stale`. |"
+      }
+    ]
+  },
+  "enduser": {
+    "before": 492,
+    "after": 490,
+    "removedPaths": [
+      "docs/explanation/work-item-lifecycle-and-domain-model.md",
+      "docs/how-to/check-rollup-progress.md"
+    ],
+    "carries": [
+      {
+        "oldPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
+        "target": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+        "capture": "tsk-2zv",
+        "disposition": "carried; obsolete duplicate index path retired as an alias, not content deletion",
+        "generatedEntry": {
+          "quadrant": "explanation",
+          "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+          "audience": "A user seeking understanding of the design, not a task to complete.",
+          "docPath": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+          "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+          "sourceCaptureId": "tsk-2zv",
+          "aliases": [
+            "docs/explanation/work-item-lifecycle-and-domain-model.md"
+          ]
+        }
+      },
+      {
+        "oldPath": "docs/how-to/check-rollup-progress.md",
+        "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "capture": "doc-fgos-rollup-howto",
+        "disposition": "carried; obsolete duplicate index path retired as an alias, not content deletion",
+        "generatedEntry": {
+          "quadrant": "how-to",
+          "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+          "audience": "A user who already knows the system and wants a concrete recipe.",
+          "docPath": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "title": "How to check a root item's progress with `fgos rollup`",
+          "sourceCaptureId": "doc-fgos-rollup-howto",
+          "aliases": [
+            "docs/how-to/check-rollup-progress.md",
+            "docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+          ]
+        }
+      }
+    ],
+    "cutoverCommand": "fgos docs-index",
+    "cutoverProof": "fgos doctor: enduser-docs-index-stale passes",
+    "cliExecuted": false,
+    "switchboardOrdering": "Both whole actions are checked after replay; root switchboard is then retired by its separate move action",
+    "stateInput": "step-07-state-path-export-v2.json (bounded export; no live state read)"
+  }
+}

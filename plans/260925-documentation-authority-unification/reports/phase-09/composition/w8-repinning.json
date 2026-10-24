@@ -1,0 +1,82 @@
+{
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "files": [
+    {
+      "path": "bin/fgos.mjs",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "oldChainFuzzZeroExit": 1,
+      "disposition": "recompose at HEAD; refreshed chain independently verified",
+      "failure": "('docs/platform/component-boundary.md', 'patching file docs/platform/component-boundary.md\\nHunk #1 FAILED at 73.\\n1 out of 1 hunk FAILED -- saving rejects to file docs/platform/component-boundary.md.rej\\n', '')"
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/identity/spec.md",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "oldChainFuzzZeroExit": 1,
+      "disposition": "recompose at HEAD; refreshed chain independently verified",
+      "failure": "('docs/platform/system-overview/spec.md', 'patching file docs/platform/system-overview/spec.md\\nHunk #1 FAILED at 40.\\nHunk #2 succeeded at 76 (offset 1 line).\\nHunk #3 succeeded at 88 (offset 1 line).\\n1 out of 3 hunks FAILED -- saving rejects to file docs/platform/system-overview/spec.md.rej\\n', '')"
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "oldChainFuzzZeroExit": 0,
+      "disposition": "re-pin unchanged authored hunks at HEAD; refreshed guards independently verified"
+    }
+  ],
+  "cleanRepins": 9,
+  "recompositions": 2,
+  "independentProof": "w8-independent-verification.json",
+  "additionalCitationBaseRecompositions": [
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "specId": "w8:base:docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "kind": "recomposed-step07-base"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "specId": "w8:base:docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "kind": "recomposed-step07-base"
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "specId": "w8:base:docs/platform/terminal-control/spec.md",
+      "kind": "recomposed-step07-base"
+    }
+  ]
+}

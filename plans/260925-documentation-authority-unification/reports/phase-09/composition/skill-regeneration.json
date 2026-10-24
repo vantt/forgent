@@ -1,5 +1,7 @@
 {
   "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "status": "historical generator evidence; two researching renders superseded by the current canonical RUL45 gloss correction",
+  "currentEvidenceRef": "w8-skill-regeneration.json",
   "canonicalInputs": [
     {
       "path": "core/skills/_shared/catchup-self-recovery.md",

@@ -2,5 +2,10 @@
   "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
   "specId": "proof:recursive-platform-citation-scan",
   "requirement": "Nested default area/subcomponent spec and decisions reader set, with retained legacy and explicit override fixtures.",
-  "status": "composed; full-file replay result is in post-move-replay.json; real-repo baseline case remains red"
+  "status": "current scratch replay: 32/32, exit 0 with all prepared glosses; main-owned corrections remain deferred to final pin F",
+  "historyExclusionSpecId": "w8:proof:history-exclusion-negative-control",
+  "proofRef": "w8-owning-proofs.json",
+  "regressionControlRef": "w8-history-negative-control.json",
+  "baselineUnchanged": true,
+  "applicationCondition": "No product edit in this turn; apply 130 main-owned citation corrections only under the docs lease at final pin F"
 }

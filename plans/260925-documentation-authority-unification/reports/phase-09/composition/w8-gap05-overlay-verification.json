@@ -1,0 +1,189 @@
+{
+  "exit": 0,
+  "bindingRecords": 88,
+  "headingAnchors": 22,
+  "executableTerminalEdges": 44,
+  "alreadySupersededLookups": 22,
+  "immutableSnapshotLookups": 22,
+  "ambiguousSupersessions": 0,
+  "digestFailures": 0,
+  "edges": [
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/453",
+      "overlayPointer": "/bindingRefresh/22"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/455",
+      "overlayPointer": "/bindingRefresh/23"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/457",
+      "overlayPointer": "/bindingRefresh/24"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/458",
+      "overlayPointer": "/bindingRefresh/25"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/461",
+      "overlayPointer": "/bindingRefresh/26"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/463",
+      "overlayPointer": "/bindingRefresh/27"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/465",
+      "overlayPointer": "/bindingRefresh/28"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/467",
+      "overlayPointer": "/bindingRefresh/29"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/468",
+      "overlayPointer": "/bindingRefresh/30"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/469",
+      "overlayPointer": "/bindingRefresh/31"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/470",
+      "overlayPointer": "/bindingRefresh/32"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/472",
+      "overlayPointer": "/bindingRefresh/33"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/501",
+      "overlayPointer": "/bindingRefresh/34"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/502",
+      "overlayPointer": "/bindingRefresh/35"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/503",
+      "overlayPointer": "/bindingRefresh/36"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/504",
+      "overlayPointer": "/bindingRefresh/37"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/505",
+      "overlayPointer": "/bindingRefresh/38"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/506",
+      "overlayPointer": "/bindingRefresh/39"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/507",
+      "overlayPointer": "/bindingRefresh/40"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/508",
+      "overlayPointer": "/bindingRefresh/41"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/509",
+      "overlayPointer": "/bindingRefresh/42"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/unitCarries/510",
+      "overlayPointer": "/bindingRefresh/43"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/713",
+      "overlayPointer": "/bindingRefresh/44"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/718",
+      "overlayPointer": "/bindingRefresh/46"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/732",
+      "overlayPointer": "/bindingRefresh/48"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/733",
+      "overlayPointer": "/bindingRefresh/50"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/739",
+      "overlayPointer": "/bindingRefresh/52"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/744",
+      "overlayPointer": "/bindingRefresh/54"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/748",
+      "overlayPointer": "/bindingRefresh/56"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/752",
+      "overlayPointer": "/bindingRefresh/58"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/756",
+      "overlayPointer": "/bindingRefresh/60"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/759",
+      "overlayPointer": "/bindingRefresh/62"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/761",
+      "overlayPointer": "/bindingRefresh/64"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/763",
+      "overlayPointer": "/bindingRefresh/66"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/765",
+      "overlayPointer": "/bindingRefresh/68"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/769",
+      "overlayPointer": "/bindingRefresh/70"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/773",
+      "overlayPointer": "/bindingRefresh/72"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/778",
+      "overlayPointer": "/bindingRefresh/74"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/787",
+      "overlayPointer": "/bindingRefresh/76"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/790",
+      "overlayPointer": "/bindingRefresh/78"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/796",
+      "overlayPointer": "/bindingRefresh/80"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/806",
+      "overlayPointer": "/bindingRefresh/82"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/810",
+      "overlayPointer": "/bindingRefresh/84"
+    },
+    {
+      "source": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json#/bindingRefresh/814",
+      "overlayPointer": "/bindingRefresh/86"
+    }
+  ],
+  "independentG0Review": "pending"
+}

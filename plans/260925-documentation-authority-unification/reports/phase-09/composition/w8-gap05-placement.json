@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "sourceUnitsSha256": "cc606c74e8c1ba605e254441229835334ed9002e7397dc8cd4cee15aa513d4ce",
+  "patchSpecIds": [
+    "w8:gap05:relocation",
+    "w8:gap05:history"
+  ],
+  "counts": {
+    "s6-whole-system-component-readme.json": 12,
+    "s6-whole-system-component-repo-layout-vision.json": 10,
+    "s14-resync-b.json": 66
+  },
+  "bindingOverlays": 88,
+  "movedHeadings": 22,
+  "operativeOverlayCount": 44,
+  "alreadySupersededLookupCount": 22,
+  "historicalPreimageLookupCount": 22,
+  "historyPolicy": "Unfenced literal Markdown preserves extractable heading anchors/digests; no symbols renamed; history is outside live read set",
+  "leadApproval": "L13-11.2; G0 overlay review pending"
+}
