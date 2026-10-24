@@ -116,3 +116,15 @@ Brief: `w8-g6-fix-brief.md`. It is launched after WORK's "cutover xong" line, be
    - The 130 sites in docs that main owns are glossed by DOC at final pin F, under the docs lease. The baseline is not widened, because the scan policy forbids a rebaseline. Glossing at F under the lease avoids conflicts with lanes that are still editing those docs.
 
 Brief: `w8-composition-fix-brief.md`, launched after WORK's "cutover xong".
+
+## L13-12 — Review branch push, corrected (owner, 2026-10-24 21:2x)
+
+Correction to L13-9: option A as written could not be done. A review branch that carries only a few commits cannot keep their SHAs without their ancestry. A cherry-pick onto main breaks the tree-wide git census and the git spec on main's base.
+
+Measured cost: the plan history origin does not yet have is 363 MB (16,363 objects). The earlier "~2 GB" figure for option B was wrong; that was the tracked tree size.
+
+**Owner chose A':** push `review/doc-git-one-door` pointing at the plan branch HEAD, with full history and SHAs kept, for HARDEN's G4 and §7 review. The board line goes through SEAT.
+
+Scope: a non-main branch only. No main landing, no documentation cutover, no deletes.
+
+Work cutover: WORK reported "cutover xong" on fg-server2 at 21:00. design-lap is not cut over and must not pull main. Before resuming, DOC checked that `fgos run` writes no Work events: turns 688 and 689 created no `.fgos/events` file, only assignment and runtime state.
