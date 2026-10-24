@@ -143,15 +143,16 @@
     {
       "gateId": "retention-L11-23-L11-25",
       "g": "G5",
-      "status": "met-local",
+      "status": "partial",
       "evidence": [
         "g5/check.py",
-        "g5/check-01e64719d.json"
+        "g5/check-b726d44ed.json",
+        "reviews/w8-lead-fixes-review.json"
       ],
       "commit": "b726d44ed",
       "pin": null,
-      "note": "All 10 recorded spans (holder-lock spec line 8; reading-map banner lines 3-9 and lines 34, 37) are found at their recorded lines on the working tree at 01e64719d; the checker verifies the recorded digest recipe first.",
-      "remaining": "Rerun g5/check.py at F (python3 -B g5/check.py --pin F); every span must still be found.",
+      "note": "All 10 recorded spans are found in the legacy docs/specs/reading-map.md and holder-lock spec (run labelled working-tree@b726d44ed); the surviving reading-map clause is not yet checked.",
+      "remaining": "Extend g5/check.py to the surviving docs/reading-map.md: banner lines 3-9 are restated in English in §3, line 34 survives only with a Truth correction suffix (line 156), line 37 is exact (line 159); the restatement and suffix need owner acceptance (cutover packet), then rerun at F.",
       "blockers": []
     },
     {

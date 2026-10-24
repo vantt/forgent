@@ -120,3 +120,5 @@ The tables above show the line-scope wave and are superseded for counts. At `afb
 The jump from 6 to 57 comes from the general illustrative-placeholder rule: a span whose path holds a `<placeholder>` cannot point at a real file. That rule moved 51 rows from parked to confirmed, and every one is listed in `../preserve-premise/sentence-delta.json`. Lead accepted it under L13-9.
 
 `verify.py` now replays the G6 artifacts and runs the owning G6 assertions at `proof.json`'s `sourceCommit` (recorded as `g6SourceCommit`). The registry, navigation and rebind checks run at HEAD.
+
+Totals at `afb5bb35c`: **3,990 confirmations** (2,574 + 1,416) and **1,423 open rows** (1,260 parks + 163 dated notes). `verify.py` exits 0 (see `checks.json`), and the G6 replay runs `proof.py --pin 4178dcc6e`. This section supersedes the earlier statements that `verify.py` exits 1 and the exit-0 request is unmet (§ at the top), the "3,939 + 1,474" totals and the `--pin HEAD` replay description.

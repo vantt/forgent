@@ -1,5 +1,7 @@
 # Direct-link archive rework receipt
 
+> Superseded status: the Lead's unconfined run (5c3b57347, section "Lead run outside the sandbox" below) completed the rehearsal and verifier; the BLOCKED line below is historical.
+
 **BLOCKED on external real-disk scratch permission, not on retention budget.** A42 (`../w5-d5e-brief.md`) replaces the rejected transitive rule. Source pin: `d3efc70c5879d6b3a599cd9998615a46a73a82bd`. The direct-link partition and custody checks pass structurally; no new rehearsal, Check A/link-finding parity, cold timing, cutover or G8/F acceptance is claimed.
 
 ## Exact retention result
