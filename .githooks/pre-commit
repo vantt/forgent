@@ -463,6 +463,9 @@ async function censusDriftRefusal(committingToplevel) {
   if (!scanPath) return null;
   try {
     const { MUTATION_CENSUS_PATH, censusDrift, declaredProduct } = await import(pathToFileURL(scanPath).href);
+    // A branch older than this rule ships a scanner without censusDrift: it predates the check, and its drift
+    // is still caught when it merges into a tree that has the rule.
+    if (typeof censusDrift !== 'function') return null;
     if (!git(['ls-files', '--stage', '--', MUTATION_CENSUS_PATH]).trim()) return null;
     const product = declaredProduct(committingToplevel);
     const staged = git(['diff', '--cached', '--name-only', '--no-renames', '-z']).split('\0')

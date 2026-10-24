@@ -69,3 +69,16 @@ test('the hook judges with the committing checkout\'s own scanner, not the one b
   const result = hook();
   assert.equal(result.status, 0, result.stderr);
 });
+
+test('a committing checkout whose scanner predates the census check is not refused', (t) => {
+  const { git, write, hook } = fixture(t);
+  write('scripts/git-one-door-scan.mjs', [
+    `export const MUTATION_CENSUS_PATH = ${JSON.stringify(MUTATION_CENSUS_PATH)};`,
+    'export const declaredProduct = () => (name) => name.startsWith(\'src/\');',
+    '',
+  ].join('\n'));
+  write('src/door.mjs', 'export const a = 4;\n');
+  git('add', 'src/door.mjs');
+  const result = hook();
+  assert.equal(result.status, 0, result.stderr);
+});
