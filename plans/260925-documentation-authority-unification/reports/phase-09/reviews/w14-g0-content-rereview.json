@@ -1,0 +1,1259 @@
+{
+  "pin": "0763c2259ee3bf1801f4dc9621cbfa7955a156b6",
+  "reviewedInputs": {
+    "rereviewList": "plans/260925-documentation-authority-unification/reports/phase-09/rebind/rereview-claim-ids.json",
+    "rebindApply": "8e7c6ee93",
+    "leadCorrection": "6f5b9419d"
+  },
+  "verdict": "REWORK",
+  "counts": {
+    "APPROVE": 121,
+    "REWORK": 3,
+    "total": 124
+  },
+  "rows": [
+    {
+      "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+      "pointer": "/claims/0",
+      "bindingSha256": "4629c6be74cb063c7cb1ba6c23771cfc7a15ef2a4ac215bf196b726382872aa6",
+      "targetUnitDigest": "a42e58185c9dac1907439001b99aeae8a24d83200112199a9e834a7b94d85ee0",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-112 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. The recorded 2026-10-15 binding rule was replaced in both files by the 2026-10-18 attempt rule, which names the rule it replaces. Only move owner of block-45; claim_26b3a49a is the merge contributor. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_d35eecbfe4319ad1033c7a373bbc4adb",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/29",
+      "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+      "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede of the Accepted Decisions section: same title; the whole section is carried in truth-corrected form (V-013, ADR-008..010 moved to a historical list, ADR-011 added, Step 07/08 status corrected after retirement 2180b4e72). The original text survives in history/retired-engine/files/decisions/README.md. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/261",
+      "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+      "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the vision sentence is carried in the bound section in corrected form (V-001..V-013, retired-engine qualifier); the legacy now also says V-013. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/262",
+      "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+      "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the ADR list is carried in the bound section; ADR-001..007 kept (ADR-002 title updated), ADR-008..010 kept as historical links, ADR-011 added. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a8914714b51091a9f0a487f739172da2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "pointer": "/claims/263",
+      "bindingSha256": "c72b9605931ad469828f07c424dc5aba690d9f9cb7dab485a2734719c012a827",
+      "targetUnitDigest": "0c252ad79c4b8ab417a4bea6e955b307aa20340ab25da0fe19bf4bcbac79902a",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the Step 07/08 status paragraph is replaced by an explicit correction that the engine was retired in 2180b4e72; the historical paragraph survives in the retired-engine decisions README. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+      "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/architecture-manifest.json); the whole current file is the successor of this earlier file version, so supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/2",
+      "bindingSha256": "2c48bb9d4d9424ac0a3633701df88efee6794dad4ca0f9d340daeb06f6e79ca0",
+      "targetUnitDigest": "afe8743b9a9643e0b93ed4fed196aa476a500be2ddd7303cf1c963185f51ae96",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/platform/component-boundary.md#unheaded-block-11); the component table is the current successor (Workflow row renamed, foundation rows added), whole unit present. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "pointer": "/registryGaps/6",
+      "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+      "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/specs/distribution.md#unheaded-block-5); every source table row id is still present (rows 5g/5h/7c..7j added), changes are code-truth updates; supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_aa28053a8a4b2ff13690fc6a20044b9f",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "pointer": "/claims/26",
+      "bindingSha256": "40237c29b91ec002a0336fb5efbfc33bd7b1095083f9a283fd4ef26858d10a23",
+      "targetUnitDigest": "69a415f020853dcf82a0db0e5d6f93a3223436771bc39d27c1d9b24d8741d906",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Heading \"Pointers (implementation)\" carried with the same section scope (depth ## to ####). The changed payload clause is judged on claim_b5695d38. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_b5695d38282e111f8ed06656b2efa433",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "pointer": "/claims/27",
+      "bindingSha256": "b614859c5d9ec2c4111a94133eef0f8d37d91c16731af31bedbdf2dd1a8a2972",
+      "targetUnitDigest": "eb95a58af38313457ad6b2291a30070ab9931c046294b2a22b428c3ec126fcaa",
+      "disposition": "move",
+      "verdict": "REWORK",
+      "reason": "Disposition move claims a minimal structural rewrite, but the target replaced a substantive clause: the legacy unit (docs/specs/distribution.md:439, unchanged at HEAD) says the shell functions resolve the checkout root via `git rev-parse --path-format=absolute --git-common-dir` (never `--show-toplevel`, which resolves wrong inside a linked worktree); the target says it reads the .git/gitdir/commondir layout on disk without a Git child. The rationale still says \"complete unit digest equal\", which is false. Fix: re-decide as supersede with a labelled correction naming this clause, or resync the legacy line first. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "pointer": "/claims/28",
+      "bindingSha256": "7d87444d1571790837b61299f29d8ad8c02efc847d63adfcc33af7a290c19ec6",
+      "targetUnitDigest": "2dc0a292149077bef0543e606ba23bb513348daa7b676f3abc27a99035b995a9",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede of the Data Dictionary heading: same title (depth ## to ####), same section scope; every table row id kept, value updates are truth corrections. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+      "targetUnitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: every source data-dictionary row id is present in the target table; changed values are code-truth updates (no lock config key, holder-lock locks, terminal dir created by the allocation store, new doctor checks); whole unit replaced in reworded form. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+      "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/specs/distribution.md#unheaded-block-5); every source table row id is still present (rows 5g/5h/7c..7j added), changes are code-truth updates; supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "pointer": "/registryGaps/1",
+      "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+      "targetUnitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: every source data-dictionary row id is present in the target table; changed values are code-truth updates (no lock config key, holder-lock locks, terminal dir created by the allocation store, new doctor checks); whole unit replaced in reworded form. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "pointer": "/registryGaps/2",
+      "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+      "targetUnitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: every source data-dictionary row id is present in the target table; changed values are code-truth updates (no lock config key, holder-lock locks, terminal dir created by the allocation store, new doctor checks); whole unit replaced in reworded form. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+      "targetUnitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (packaging-distribution/spec.md, block-85 renumbered to block-90); every table row id present, values updated in place; supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "pointer": "/registryGaps/2",
+      "bindingSha256": "1158065fed4a00fe06d9b1dd1e81ef5da613fc56014523c937709f58b0b9382a",
+      "targetUnitDigest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/specs/distribution.md#unheaded-block-5); every source table row id is still present (rows 5g/5h/7c..7j added), changes are code-truth updates; supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "pointer": "/registryGaps/39",
+      "bindingSha256": "c2ae4340653456227d585b55aa21b3888819dacb962f1c03bb4a92b0153d9201",
+      "targetUnitDigest": "9beb13029f354e3841ec8984af7be4fdd63a04ac96dec86607fa268a5284739b",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: every source data-dictionary row id is present in the target table; changed values are code-truth updates (no lock config key, holder-lock locks, terminal dir created by the allocation store, new doctor checks); whole unit replaced in reworded form. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+      "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/architecture-manifest.json); the whole current file is the successor of this earlier file version, so supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "pointer": "/registryGaps/1",
+      "bindingSha256": "75d99fa8c0c719d070815bfd88ceab00d1952b0dbc4ef6eec548bf989e8a78e4",
+      "targetUnitDigest": "f78d54ead8d80296ca851d4883b44b4403a1fe20a4caa4e3be9ec035445d4174",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Source and target are the same live file (docs/architecture-manifest.json); the whole current file is the successor of this earlier file version, so supersede is truthful. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/27",
+      "bindingSha256": "4c43c2fb546005229ad28e9b6881ac1737afee4c90a7ca5f4afd51b91ff7adf4",
+      "targetUnitDigest": "539e4336c8f12cd426751dbf3dd0fba533a0767d7f654edc1881aed4a559ea26",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Only link destinations changed (legacy ../../specs/* paths to platform paths, enduser specs to knowledge-registry anchors); every register row, role and boundary text is unchanged; heading depth ## to ####. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "pointer": "/claims/30",
+      "bindingSha256": "38de637ff86cdcabe8f4c90c65e27557ec6bf5056508758ac961ec9f7d6137aa",
+      "targetUnitDigest": "5f4a17570b16c371d6e0e17c52b6f72acdd363faa4ed92c9c3fc125c446915ba",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Only link destinations changed in the authority register table; every row, role and boundary text is unchanged. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_3f292fa3beda7ba097f734f4c1dc1860",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "pointer": "/claims/3",
+      "bindingSha256": "a3dccdde968c398c5c2d4d06c7cec054414a98e898471a5ac70b2f18a8a53beb",
+      "targetUnitDigest": "674a691bf19fd5a9f9f07572b8ef93cd83369ccfa584d6322a7901f2032f20ed",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Area Map heading and section carried; only spec links changed to candidate-holder links and a workflow bullet was added. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_49dc8dc05b31bcfc5cfd0d7c44c8395e",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "pointer": "/claims/4",
+      "bindingSha256": "5e3a2e52bb642332d08a4d8209366df68048bab1a899443af68e70fa71e37f9e",
+      "targetUnitDigest": "d9fd8ccb31e5d5e9d27261a84305ee26e372fcfa22336346f63f348de89b602e",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Area map bullets carried; only spec links changed to candidate-holder links and a workflow bullet was added. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0cc5fd490ce0087ed51f38bca9d8c96e",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "pointer": "/registryGaps/0",
+      "bindingSha256": "5e3a2e52bb642332d08a4d8209366df68048bab1a899443af68e70fa71e37f9e",
+      "targetUnitDigest": "d9fd8ccb31e5d5e9d27261a84305ee26e372fcfa22336346f63f348de89b602e",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the earlier area-map version is carried in full by the current list (links retargeted, workflow and convention bullets added). Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_cac60d0f1164309f87ede7041b9f1895",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/82",
+      "bindingSha256": "5d3468b98fa105374ccadccd65304a3a4a8923cdb48849f059d9a65fb221bbdc",
+      "targetUnitDigest": "72f093595d525174c341571c7c6b2ba780f6865fbf4b897c68f446e3152cc330",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#63-confinementrequest byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_401c62c07a0647b8a318471d2de204d5",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/84",
+      "bindingSha256": "25bb81b6c1bc64701373a0f9fabeb8df676e7f17bf589e4c3cd728d5c6344150",
+      "targetUnitDigest": "b9cd3c2a8b12d39371ea0530bcee8ebfe91b503ed4eba9a7b163277746524c5c",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-68 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f6c28a9097619631e3c748472cb73eac",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/97",
+      "bindingSha256": "06b5761bcc8a1fe3c84f60415f54f1cf6d04b4ccfbb29e7da05a3268808ac0d3",
+      "targetUnitDigest": "e677af6cabda5ca88740aa698ea1f1c5742bcddab52c9c83946cd08a1de590a7",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#65-backend-port byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_6785a5f3a9f65744e05e4aaa247dd527",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/103",
+      "bindingSha256": "b2b4c6ff61d10172e9cf60c79748e3cd93122e1e0aeaee6fa4ed3f3b39e907cc",
+      "targetUnitDigest": "c314eefe918518a0ee39527d6f6eded3afd69107670c4461e71454e9dc6bce8e",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-85 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_8ee6a4ccd4df0de275866de0f669ae7e",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/138",
+      "bindingSha256": "7594940b48f5b8752a1f4f94bbe150bb058cbd9ad9a78280bb7950377affe28f",
+      "targetUnitDigest": "a7082c7d23b038c3f14fd79a9968928a741c679480367de2a6e7e88b17175cf4",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#85-adapter-mới byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0117008e3dfef395f044eb1556ad0fca",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/139",
+      "bindingSha256": "48329fb2208db0f4ef22e6ffd6a6233125fe8c51b02084ac04e9a7c303197489",
+      "targetUnitDigest": "bce3911b4488e5ca5d39877c50f4dcb6714f03550482056b2e2115c446f84bf6",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-109 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/140",
+      "bindingSha256": "73626128fdae3348bc58e3dba61c3e145a3310a745fcf2fded08c402838a98fc",
+      "targetUnitDigest": "7debb525fd36f827b0d9a1e411cc305525f7ea75da7265b619246d868855c98e",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#86-crash-và-cleanup byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c0cd54862f6365e2da2856925bef04c1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/141",
+      "bindingSha256": "7b7191dbdce40d09c4c1740db3e69539adfb4336278967b62f3f3927773085ab",
+      "targetUnitDigest": "93852e4d09a5ec1d7848c86eec02a6939b1fa84e02388a551de7ead00cfa9c69",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-110 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_2cfa54b977cf929a5f73250095379bd2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/142",
+      "bindingSha256": "29767e982c75bcf35f675b02d08fa6bc448d7855573bf0c2c6b2c79449e349ed",
+      "targetUnitDigest": "ebede7f3ba78e14fecdd381a23a6388c7f08e6455a90e500c6d8b3b851eee651",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-111 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_26b3a49adef572e1be2ed219e292c8b0",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/143",
+      "bindingSha256": "4629c6be74cb063c7cb1ba6c23771cfc7a15ef2a4ac215bf196b726382872aa6",
+      "targetUnitDigest": "a42e58185c9dac1907439001b99aeae8a24d83200112199a9e834a7b94d85ee0",
+      "disposition": "merge",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-112 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Lead correction 6f5b9419d holds: the reaper/herdr-session paragraph and the binding paragraph collapsed into this one legacy paragraph, and the target retires both (no herdrSession field, no herdr-launch-command file). merge is consistent with claim_d572bb9d owning the block. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD.",
+      "leadCorrected6f5b9419d": true
+    },
+    {
+      "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/144",
+      "bindingSha256": "48953c5c948ef3770c5530c9318fbe8423a6d09ef824eb378568df8d06af3b0e",
+      "targetUnitDigest": "adfc04bdefdb7502474c9f8d18b05369969c5ec4c4765fec1992a3c280788190",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-113 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/183",
+      "bindingSha256": "c54f292cc9d0c76ae48eac90e9ceb88120fa8390e714f7713a4942c0ece6384a",
+      "targetUnitDigest": "55c3d38b168124ab69c748ade84ea7917101a80d957e3ec9f68ab55e8750a51c",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/185",
+      "bindingSha256": "493b46b961114840912b5f765bea0e7cb99f7cd289d3e399d585804b238907b4",
+      "targetUnitDigest": "5364ce635c7447bf5578e2a94fb8b859afb5feaaaff95442dd3ae45f06668cf1",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-143 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/186",
+      "bindingSha256": "48e9f04e2b9ba6cd123f5ba639940e7281fe68f51f52b60a21d2be351248c861",
+      "targetUnitDigest": "2e1a28aca234be8f41d683203eafd8c5ca4cb7157c82fbe91828c0c6b2aaf70b",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-144 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/191",
+      "bindingSha256": "ad39c69907088c543ee711ed128759808416e0e411f113b049c19e9df6bd21b3",
+      "targetUnitDigest": "0dfcf749eeb70647271fe1556d86a614a2d58974e87ac020e700e617719f5df9",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#133-pane-codex-chạy---no-daemon-sandbox-riêng-của-codex-phải-tắt-suốt-phiên byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/192",
+      "bindingSha256": "056ada7010bf34159f8a5496b0f53f84e93d52b965af9f152b5b4a941306ec52",
+      "targetUnitDigest": "26d0809d9d56fa76380750acb999f59113e72ba4cc671bc7d424334679f5c4fd",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-148 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/198",
+      "bindingSha256": "722e554ef5e7f65be3992c8264018e173d60a3cee169a0c5f276197a9601c780",
+      "targetUnitDigest": "61e0baf3fef42f7f150b8ae9fb8e8a7b93afa8f8e6ac6130f4a8246255cd84de",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#14-pointers-hiện-tại byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "pointer": "/claims/199",
+      "bindingSha256": "74a23facaa894da50437319f4a66bf20e15ef4266413d2ab7409b3e393758fcb",
+      "targetUnitDigest": "aaace5d56024615612947a17eead7e0798207c8fba429614196666f08b311a00",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/confinement-authority.md#unheaded-block-153 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/26",
+      "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+      "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Same live file (docs/specs/runner.md#unheaded-block-93). All 20 source rule ids are present; 5 of 26 lines were reworded in place as code-truth updates (account lock item 1, RUL80, RUL86, RUL91, RUL96), so supersede (whole unit, reworded) is truthful. Note: the rationale sentence \"All 26 historical lines remain in order\" is stale and false. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "pointer": "/registryGaps/27",
+      "bindingSha256": "5aaed018777863e022c765e96ca77e633dce304b488f15eb8f9b0ad1a11d3017",
+      "targetUnitDigest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208",
+      "disposition": "partial-carry",
+      "verdict": "APPROVE",
+      "reason": "Partial-carry: the carried lines are present verbatim, and all 5 source lines missing from the target at HEAD (account lock, RUL80, RUL86, RUL90, RUL91) are in the named residual (g0fix/partial-carry-residuals.json rows/11). It blocks cutover by definition. The remainder text still cites an older primary-target digest (fb0b0100); current is 797c7185. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "pointer": "/claims/3",
+      "bindingSha256": "2b66a21b25668a91a9e2db317146bf15bed151b6c1b661aa6547fb0514f75f3b",
+      "targetUnitDigest": "f74252e08dee1df2d5cf579cc8d7810918b383049620ac4077e4681ba6acfb02",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the rationale names the corrected clauses. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "pointer": "/claims/4",
+      "bindingSha256": "13d847e34e6877cadb3066d5aeb17b6358224970d8245edd2f4b0c19b2bed432",
+      "targetUnitDigest": "d6004980f8bdb50003e28eaa386059d97c51d1b635823d8af58aee6acc0caa2f",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the add-verb text is carried whole, with the required-field and id clauses corrected to code (required flags, optional --id, identity mint door); the rationale names the corrected clauses. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_bf41e5090dd12c430e3a55206ea11658",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "pointer": "/claims/6",
+      "bindingSha256": "4b567388ccb717451cde08aa5ca968d2af7d3ff040134bbec7e66540d7d9e053",
+      "targetUnitDigest": "9174cce69c473d51d4216e173317d45361ba8d5f9e3b1c7f448150ce21a61a64",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the submit text is carried whole, with id generation corrected to the identity mint door and tier renamed to size plus optional --rigor; every other clause is unchanged. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "pointer": "/claims/7",
+      "bindingSha256": "a0a2ee9846a5bae3683586bca9c4d24f29c70b10342adae2d82d498941105eed",
+      "targetUnitDigest": "f8282cd8a7e103ee85953aeec2c8f24ab69c3d7c7581de2ab86357d599b32a03",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: the submit text is carried whole, with id generation corrected to the identity mint door and tier renamed to size plus optional --rigor; every other clause is unchanged. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_4333c7a8ff0e32c7b69dc10ed113f25b",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/0",
+      "bindingSha256": "ed3bfd0a1cba90117b030fe20af8347e01aa86dd92082d0969e51c5919863537",
+      "targetUnitDigest": "c55decfdc9e65edbc13ac63733fb9b90b9f1874f93f912b57209840cb9d1f59c",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Heading \"Data Dictionary\" carried as \"3. Work Item Data Dictionary\" with the same section; the changed payload clauses are judged on claim_5ba6768e. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "pointer": "/claims/1",
+      "bindingSha256": "f8487c8c7365f91f4e87c415067b4f97973c4d26365f9534d6a498c2d8b71412",
+      "targetUnitDigest": "fa35b5b981fe83decc37afba4753148470c3e43c8e6925c722f4e9cdd9769c53",
+      "disposition": "promote",
+      "verdict": "REWORK",
+      "reason": "Still undecided after Lead correction 6f5b9419d. Disposition promote implies the content is carried, but two clauses were replaced while the legacy docs/specs/work-state.md data dictionary still has the old ones: the id clause (\"fixed tsk- prefix + short anti-collision suffix\" became \"tsk-<10 base32> from the Identity mint door\"), and rigor (\"leads to the model via runner.rigorToTier\" became \"decides checker count and seat independence, not tier\"). Fix: re-decide as supersede, or as a labelled correction naming both clauses, or resync the legacy clauses first. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD.",
+      "leadCorrected6f5b9419d": true
+    },
+    {
+      "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/0",
+      "bindingSha256": "8ed68d39476f25c95aec324e42ab272fe4c4dcc090c3507615d1fd47089383d1",
+      "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/2",
+      "bindingSha256": "9518bbfd727a6a4c1cbeed37291dbd341012282c8dd58087a6f7e5f9f0e6d268",
+      "targetUnitDigest": "a3d4ece5365538ec63b6118c5e987d586a79657c93e901ffb27e5df4921a0515",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "ADR 0002 H3 carried; only the 0012 link was retargeted to the in-file anchor. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0201a1d648765d578fb8fd96673da674",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/3",
+      "bindingSha256": "992d6faf2d0f37a77f80022038dbf62de8fe03450194427ff417ee45c7b11864",
+      "targetUnitDigest": "a20dd4c563d0c0c1cb323327b7453d8d66beb661f3ceec7f30eb13a916a96071",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Blockquote carried; only the 0012 link was retargeted to the in-file anchor. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/4",
+      "bindingSha256": "3a248eb849b1c453717592d009f56aacdc5f25e706409a84e7c06b5f387ac54a",
+      "targetUnitDigest": "a05e96aa58d47c2d93aba8822f9e8c38f89b39b979d8c8b8fad842328f65c489",
+      "disposition": "move",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/5",
+      "bindingSha256": "7894afc6b9f1e07042da3367e2d70cf6787dfab1cb215006f23f7f2a87de068a",
+      "targetUnitDigest": "f014a166cf0c8f3dc0e0998cbb8b08c1927000c5e341fcc78ea8f052cf420b1d",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/7",
+      "bindingSha256": "fd69a6fca75d0cb2f237553569599a5632d0c5a4b5f957136127e9bbd8255845",
+      "targetUnitDigest": "d6043b1481fba899bd107a3f203d0eb91b3510c392303fba688d5d8dcd74ea9b",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/9",
+      "bindingSha256": "7a4cf2d8bec70f9413c0ddd2e6b7bafd1359529c7f198c3c3a3b08b50bd9bc4b",
+      "targetUnitDigest": "e91bbb5ae8fcb8f80cfc0e7d96edacde4801d6b55c38e7d7effdc6e66668fe3d",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/12",
+      "bindingSha256": "54686a9b365ec6c1a3484ec3e62aac7878ce8e1456f54b35aec4a161f126c9fe",
+      "targetUnitDigest": "c0dc9acc17db42831047d749d50611b840aa11185c806d786510a00e63aa5cd0",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/13",
+      "bindingSha256": "f446acac500326d62507142885a627b42c07b53059a0b7db9d759d15d75668b1",
+      "targetUnitDigest": "203f9cd3142f933c7ed8ebb33a25e956689e857e4cc3d5f54031a06a9a8faa2c",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/15",
+      "bindingSha256": "43ef54883097530f1375e7ea16a0f4cc1ab2ba18eb2391b070266d33b4f62963",
+      "targetUnitDigest": "798c507e268c8c148014c86c19d3e9ba38434eefe0623a8b6606737629e5ae32",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/17",
+      "bindingSha256": "1062eb4d9bc3bfc8944abf9d01399f321c1762a93ab76c53178c4fb29d84ee54",
+      "targetUnitDigest": "055bb7583cd585802e14c9c9a6472e7c19df9cce141ecf2b1f8ebcd152343e06",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/20",
+      "bindingSha256": "6fae077908a7000269968c00d51dad3af09be95116514693f2f8e73744a83fa2",
+      "targetUnitDigest": "a0ff252fe4a05fd8e693c461f92fec4d11953243fbd4743612353acb3d2aec72",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/21",
+      "bindingSha256": "9a9f1f0fba14d984e561a9f7b11830ed0c8fc6906cbe27ffdc413ae5b3ebe6fa",
+      "targetUnitDigest": "f27931862e682c2f65d58afcf2b0e652f898219a48d79f6ddb16de0d9b4af6fc",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/24",
+      "bindingSha256": "36dec2f5d002297e68fb5d590c923628b14dfda080fc604358f9c47f9d55a745",
+      "targetUnitDigest": "b72bf8ee1aea6db60efc87e527428e2ea30208408c6d507cb22e94d1aeaa5fef",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/26",
+      "bindingSha256": "b25d689a9ac71c156357d9886661b2853c19cbed9d6ae4bd47a975f75ec1ba3a",
+      "targetUnitDigest": "e44f9991b9931d7cb611894760d23de0ccecacc3e6d22456433e9ba8c115f937",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/29",
+      "bindingSha256": "81ce3edf2d3cc4599375a002c4d43dedc855b0b0a75a6168025ca11cb53fb455",
+      "targetUnitDigest": "2ff34201c3aa91d6669a84ed0af602479d1834bc8906cf8447aca5ca588ebac8",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/30",
+      "bindingSha256": "20c9a4ce0fa5174c3d5be5fadaa39fddce3e44ea346e3bdf273c60d1b190fe2c",
+      "targetUnitDigest": "9c8485790cf86a6a2235f130eeb8eac8443d0d9c3c6a400e3b969405245ccadf",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/33",
+      "bindingSha256": "c026b75831020f7713d010b98262c90cd9779123b19862e3aa5209e3ef99dbfb",
+      "targetUnitDigest": "965caf0a033210097211032405753f3000abd6e872fb43f53017528db996c151",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/37",
+      "bindingSha256": "bc42f82c253e3b40a85d94ec0d934b48449899bdc0f3e8460e3dfed565f35969",
+      "targetUnitDigest": "899175d57462b10345fc181dc2f7dbe36dc232d277f38a317cf156247aa4dcb9",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/40",
+      "bindingSha256": "7a2e3becc23715b0f01a15492782069f448a0ab4f7420e1719ec3bbc9688ae73",
+      "targetUnitDigest": "0652eaa390a60c98405d46d2e62b3aac80aa32d00a54006debdda70257a3ffbf",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/41",
+      "bindingSha256": "12d0f2f2a70daceea80b8e9a0957fc641bcbfa0a37a2fd26c5d3f51fb22b680e",
+      "targetUnitDigest": "5483e14a0ec0d67c7dc61a0c49e438a7274617176e5f82086ea2d136bae2ad43",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/43",
+      "bindingSha256": "3dd9bd8581ee5b68aa5e585b80d2de9f866c77897244b538404906a4bcaac57f",
+      "targetUnitDigest": "eb9a345fe658f7c42e45f2cde5666e0946a8e55f948b709a4afb87d07719356d",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/46",
+      "bindingSha256": "82cb7fe34f10d793a0826b43e95d0b18c210a660acb06b164ff2d746ff23fe4c",
+      "targetUnitDigest": "44c6ea0c59515693582cc122b04f0d3b92fd0dfccc8e422b22c630f52ee016d6",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The complete source section text is contained in the target section; only heading-composite context differs. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e375b70390617716823280eb03a82a87",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/49",
+      "bindingSha256": "1ceb6a2b40e17ed8609e72e5b930ef18b85288efbebfced9e083bf18556b6db8",
+      "targetUnitDigest": "520a09658b9497557f245c1299a8da65c50068afe1381b53d2f790f1437b025b",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/50",
+      "bindingSha256": "58e06fdb5f6362ac548e13393ed98668f43faf038a1309d76dcc4299935d0650",
+      "targetUnitDigest": "f0e519e3d177081f8c87798e69a8bfd6ec2a3721d617d8b81a188532ac67d006",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/53",
+      "bindingSha256": "b91819ef113c0520d8c3374675360896095590789b23152348776b9d8cfadab8",
+      "targetUnitDigest": "03f45ad00ec7a12c5133d79a3941f5911abce8372d7271c75988bda7ee94c3ec",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/56",
+      "bindingSha256": "01d7e6812a335c5fba4eae40f2c31e423ec575500a86ab283df8e5e922d7d41a",
+      "targetUnitDigest": "b0f4d04ac734632bcddc6d3be5dd9c984c033c9840edc4aeacfff83f9fe2b690",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The complete source section text is contained in the target section; only heading-composite context differs. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/59",
+      "bindingSha256": "12d19736bc6c7539ac3791eb29bd991b3c548120029f2441f7c64f009ce2d7ff",
+      "targetUnitDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/60",
+      "bindingSha256": "fda32b1030a9f6008271769a4f5186a941d6f44917dbb38d6cd3119cdfac9ecb",
+      "targetUnitDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/64",
+      "bindingSha256": "05e66dab2fb05d5b34edf34825aed1735fd419c9d04d96a5919da146be2769ac",
+      "targetUnitDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/66",
+      "bindingSha256": "c2b301dd4abee72a70e207a2f309a6221bd0b1ce7cef4113bc39dd478e431980",
+      "targetUnitDigest": "8a7417ab625a5dc520e04a13f9d0c9b3edb4635ed01d3aa81e0debb33293d120",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The complete source section text is contained in the target section; only heading-composite context differs. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/69",
+      "bindingSha256": "9d8e75695092d63591318b1e3feac160eee25aaa53c513f35250fc41fbb41d60",
+      "targetUnitDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/70",
+      "bindingSha256": "5a2d621f850faace62c68d2617ec05c393c4edd6ad6a4d741329553771593443",
+      "targetUnitDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/73",
+      "bindingSha256": "8291f1d879ea6d9a92f9c3082e15a5a8cde8ca7539e736c194e8972799069518",
+      "targetUnitDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/79",
+      "bindingSha256": "c0973b304af249c1caf189ae259b110ca5b65f5c5d2ce3ad82e3907c4b7aee0e",
+      "targetUnitDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/81",
+      "bindingSha256": "cede87e677a9aaca7d79b55d1e2f85da9c0b06afa69630787ba3b24d48008534",
+      "targetUnitDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/83",
+      "bindingSha256": "d3c53135a8dae2056612adfa25a1cd0292a6ccacdb4353308b97c6f21d1e0921",
+      "targetUnitDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/85",
+      "bindingSha256": "9fcd0edc4c137e09c23553334d5ca2ec42b5c93a179b4e16757c9553e749f22e",
+      "targetUnitDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/87",
+      "bindingSha256": "12d0a493609c8c2d471608d8d6712f65bec67d6ac430580287a9303a96628484",
+      "targetUnitDigest": "74fba64154edbbc6e201729f4e343a8732f9093280165fc98ea24e9b24a6042c",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/88",
+      "bindingSha256": "072617a06281e7665dd80bdfc0f0394e882dc3a1b1437f75f6c1814a7b6c7293",
+      "targetUnitDigest": "15548911bb940170cbac8c68e3685eeeb62471bdd37e175cf02b309002d32522",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/91",
+      "bindingSha256": "7fd855c7947edc00c40e4f3fd275a3708f54f2384e5db800c2aa80de40fb8cb4",
+      "targetUnitDigest": "1eb8c8df3524d600863bacba004507acd1f84bdcab79cdf00e1ddc726c24b575",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/95",
+      "bindingSha256": "29fa0111eb3a425ecccfdb8f1ff933a8d2d6adff399d3df2c8f5fe6ba85ec8ee",
+      "targetUnitDigest": "8ae8c5f37b83bcd7d940c00aa9528304f337f9e72990b5207415fc7ed62c9af4",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/97",
+      "bindingSha256": "3bc3f83000ed5878223c09588f06f8112a36546a36ce5018a21cba6651077c63",
+      "targetUnitDigest": "c71c9558d2d278e6a0d2696cbbe222c2eb60f32c7b907fc07231437c0c2d97f0",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "pointer": "/claims/98",
+      "bindingSha256": "b4be574b4a9c2581f31013d416cf5f5cf53c315e9f540d8f4a180b14b7b95aff",
+      "targetUnitDigest": "a70886dacf6f54f199f048c84403caa52e6fcf99c65dbea9169c71ec2202bae9",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/2",
+      "bindingSha256": "5a489398d3c43d610cba45aa856c44fbc6a4a2da7350fb702eac9ac5ca673646",
+      "targetUnitDigest": "1c78b8c81620de3db87b5014b8eb841f44817b8e0fffb595a008ae70b1bcca69",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/5",
+      "bindingSha256": "befc446dfbb8b5e8f0c313f382c717ddb420f065cd01554101d1b900a02bf27d",
+      "targetUnitDigest": "6b827c7b203c054cb640d2f707bed0f02545eee40a3085f6a9f37fd107bff94d",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/8",
+      "bindingSha256": "a4e5610c92ff3fadc4b7b3afa0fee3d809db5a983b38d7aace52adb41adfc9db",
+      "targetUnitDigest": "8a864bfaf25cf07832117f7c05ee8ae61b7abb202998b3e7ad816bb10111da8c",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_818a58278988ed797931b14ca91614e2",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/9",
+      "bindingSha256": "d2de80fc0670c8283f80392af534bf9aaaa467789e4b4e2a4767e413d2596fcc",
+      "targetUnitDigest": "a06a29884a79a4ebab4677e90c1c1a1e9b2a4f8378e0ef8b769c2a78a9c1a701",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/13",
+      "bindingSha256": "35ff871241b77208e38a39ebb4b3fa5532c98140d9df19148e2a1575ac940335",
+      "targetUnitDigest": "d76f5cf17475a3fbfcac8752ebf9fd616795b1b9d810e23235f38a8322acffa4",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/21",
+      "bindingSha256": "d059dcdfe02921eddd70ae12befca09f3bbd18a35575c587bb5e1e3908c165bf",
+      "targetUnitDigest": "7dae6b0f1c8a4ba4b700b6a8723d516664ceb3697f8860c66ee5ee50ff0cf1e9",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/23",
+      "bindingSha256": "7ab3b0ea2b0c0af89f94ddfd6c3a917258546af052cfb03b74aee983ce21822d",
+      "targetUnitDigest": "cfb28f2fabec3889394f7a2c06ee84aab57810dada3902eddbaabc23c4c3fca5",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/25",
+      "bindingSha256": "b2d5a1e0ad0124bea84beb7d60860bc6aa5a745720884d4bd74167540e46b796",
+      "targetUnitDigest": "517a80cc0c3f64d3de66ea1c720d3d3d3d581f8e33c2160727bcb78d8cfea3ac",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/28",
+      "bindingSha256": "d5b49f6f4adadb1814dd355b4d4463e0efa028823d23f257c7ddd5e960ee37eb",
+      "targetUnitDigest": "8590e597d5f07589aa636ec12500101275449755ae201796444dc84e81a70538",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/30",
+      "bindingSha256": "0b25e5b129d3f754bf90680541b3db6fdb49298f7f137cd4a92bbab839f029f3",
+      "targetUnitDigest": "96096e1e5dd0a59ceb0881cddb307462283daac13759672f41a1890a346e6f98",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f1507b5008c678f9474202706e018774",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/32",
+      "bindingSha256": "1e23afec2146f1e14e4ca95cd49da07f4b1ab2d4373107fa339cf532d31929cb",
+      "targetUnitDigest": "80901672ceab8f8cd67de403bda21b3525f9f208c1e723ebcb6fbac040c47bec",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/34",
+      "bindingSha256": "97f7ab4b5ee539a14c3ed4edfeff8537a70c5aa1d9d5a71e22888001951d6271",
+      "targetUnitDigest": "a2754368a8483a13afd1ca546a21025987ca1532c56e60f9c1d2634630716325",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/36",
+      "bindingSha256": "8bfbbf1f7916eec0a5471421143fb6b9f8e4ca3f0c82450c069fadd8c4496720",
+      "targetUnitDigest": "d35b961952abd6b36b76ada556f74a2030bcfe670cbe03c89c6005d0ca313a2c",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/38",
+      "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+      "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/42",
+      "bindingSha256": "18e185fa981f90506a8581a5472db7544e297676bfcf905a392dbc75f87d835d",
+      "targetUnitDigest": "18b3552e741e5967638a6d0f6fb9d1fad995dba304c5da7b97064c41da301ab7",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/44",
+      "bindingSha256": "bf2535f3daf0009dfa3e583aa19307aae83748d3306f4a2e3b2c652c26bdd423",
+      "targetUnitDigest": "bade02e702bb44fecb5168e34ecf4a5dfa1fa0c37d8af333ae496d147be72054",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_45840c035132a9c46aa748567ae37648",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/46",
+      "bindingSha256": "f5c229d4314146530781865ae31b1b49307dc9250c88545c647200c684b5b85c",
+      "targetUnitDigest": "fe8801065e62f36ed531f0954d2c07dbc7dfe367c30b7bc5c0f0835e17515efc",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/48",
+      "bindingSha256": "e36fabd049df78f844c5aaa76a26295bdf87e80e1a2e69fa84d38973b6b56cd2",
+      "targetUnitDigest": "58d933902652fcbf9670c78092b0d222429d51933968062e729a6534b5ea3b40",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/52",
+      "bindingSha256": "266b66ab51ec92cb7fdfb8f355c4c97f90b0f3296afc136574322b4be298c051",
+      "targetUnitDigest": "7d8d4de935f8bf823aac021f09fd624fb3d0ddbf230d363a630e5d9aa2532274",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "pointer": "/claims/56",
+      "bindingSha256": "fee2744f5092b5bb5115a8bd17f31937c101129b0de38537f59df7dad1183cf9",
+      "targetUnitDigest": "6c186518993aba9c2fe311251b119425dfca052b2b34cb6dde932afad6c42da5",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "The target unit digest equals the recorded source unit digest: the complete composite heading unit (title plus section payload) is carried verbatim. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_8f6ab9b2c2de71369769d27719a09b8e",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/3",
+      "bindingSha256": "272b9f182c2b37e38c323773037548ead91fdba3ae5a73c9e4e61305c64a65bd",
+      "targetUnitDigest": "3f174b8615bf045066a928535372876d274f5fae4f5535422a7e7aaf32b42218",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: all 24 entry-point bullets are carried; tier became size, events.lock became the state hot mutex, and the cleanup TTL clause was corrected per item. These are code-truth corrections of the whole unit. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/4",
+      "bindingSha256": "354ac8ae048aadeef0ca07f002e5c1c8dbd59c533c252c01bd9091af919c7dbb",
+      "targetUnitDigest": "eb57f42ea9bddbdb72969c05a14d8f43b6a305874975de8990fddfb34b0f3644",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: all 24 entry-point bullets are carried; tier became size, events.lock became the state hot mutex, and the cleanup TTL clause was corrected per item. These are code-truth corrections of the whole unit. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/7",
+      "bindingSha256": "a7fc34fed5186df1fbbae1e7545b66eb1cb69b61f60adb2aa5194c93f809e70f",
+      "targetUnitDigest": "6780225cbdd14ec55a63b136771f0a605d9432a4e9b4dbe26db86f2ee957f5dc",
+      "disposition": "supersede",
+      "verdict": "APPROVE",
+      "reason": "Supersede: all 54 business-rule bullets are carried, with no rule id dropped and one RUL10 note added. Edits are code-truth corrections (moveStep, size, dep-open states, claim overlay, priority and intent). Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/8",
+      "bindingSha256": "368d281d1f90fd15da96b5372318ffec14cfa8365b8e1ee0a1c73b0e1644c9b0",
+      "targetUnitDigest": "25bd82e326539e2825faded551f28ddccf770980218ec8db3e8eb0940e26c9b7",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Heading \"Edge Cases Settled\" carried as \"12. Edge Cases Settled\" with the same section; its payload equals the resynced legacy unit (claim_b64e4bcb). Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/9",
+      "bindingSha256": "77b84f414a807f394f80f55bb37ede7b4711a074b843f7ceec07773f7478bf64",
+      "targetUnitDigest": "455e526db6b50651587515887f32b481e6b88e73d5a96c9ee253d0b2d8a8b42e",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/work-state.md#unheaded-block-107 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_d011d26d0e584f25caa838e02c59b613",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/10",
+      "bindingSha256": "e1f2093b2ce15e3cd57536bd7dedcd493f8b26fa57d7e61372eab9e81279006a",
+      "targetUnitDigest": "1232b3662bcff71e8d51bd5b228d760a986e8a35c5e58191b2503530e4b27174",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Heading \"Open Gaps\" carried as \"13. Known Gaps And Deferred Work\" with the same section; its payload equals the resynced legacy unit (claim_a27bf300). Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/11",
+      "bindingSha256": "c877bbd34fb56df4944c0b1752c1648acf4d7b6fb523234d9d2e0d8243bf65db",
+      "targetUnitDigest": "a80dd7a82a27ef60c23d8cc8f118ffe1d1e36e8509a3feb322cd22dc88208abc",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Target equals the current legacy unit docs/specs/work-state.md#unheaded-block-108 byte for byte; the legacy source was resynced after the recorded source digest, so nothing in the source to be retired is lost. The recorded sourceUnitDigest is the historical identity and the older rationale sentences describe that historical text. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_40f7857c31724be3b7ca7a6de1097818",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/15",
+      "bindingSha256": "9a00c02001f8cdf3e4d48197e10399133bc0bd7805a6909d109a6f103a752446",
+      "targetUnitDigest": "95755365a6442ae706535107cf4b6e944e42c9b65f447faed82f829bc7a37b0b",
+      "disposition": "promote",
+      "verdict": "APPROVE",
+      "reason": "Heading \"Pointers (implementation)\" carried as \"2. Implementation Pointers\" with the same section; the changed payload clauses are judged on claim_2e2bc926. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD."
+    },
+    {
+      "claimId": "claim_2e2bc9264b289319dfae5c6487978f99",
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "pointer": "/claims/16",
+      "bindingSha256": "59d421e230b662f2ff346bc4d49bc09b3ad5bc0d16cc27209c4265d138eced75",
+      "targetUnitDigest": "ec1eb7909db893f33157fcca041c08994b0e2339b3374da79620915ee902610e",
+      "disposition": "promote",
+      "verdict": "REWORK",
+      "reason": "Still undecided after Lead correction 6f5b9419d. Disposition promote implies a carry, but the target drops or replaces these clauses while the legacy unit at docs/specs/work-state.md still holds them: withEventsLock/appendEventLocked, .fgos/events.lock, the acquireSessionsLock mirror, 2s/10ms, EventLogError('lock-timeout'), and the hash-suffix generateId. They became withStateTx/tx.append, a 5s hot-lock wait, hot-lock-timeout, and the mint-door id. Fix: re-decide as supersede, or as a labelled correction naming those clauses, or resync the legacy unit first. Checks: bindingSha256 recomputed (compact sorted JSON + LF, four keys, self-inclusive heading ancestry); target digest and ancestry match HEAD.",
+      "leadCorrected6f5b9419d": true
+    }
+  ]
+}
