@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2e6546e1d863c2c8d8f64d79221a80bb8d407911cfd73127b171b975b97fd50e",
+  "payloadDigest": "92c462e6b1ca0ab841f0665ce27992f9ebe09ad2fe6a0fe171498f776e9a248f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -362,24 +362,24 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "5f4830fad569a76c9e7c67f3a815bc4510eca8cd67575ce4ac2fc4521849f2d5",
-    "packages/git/rust/src/grant.rs": "1a96595205c5deea732fd37208802e07a44409201ca4e591b89b687e798044b5",
+    "packages/git/rust/src/driver.rs": "561bf48bec83dfed179e296f12ad13f72c4f36a005ea4aa1afdfc3ef40256d0b",
+    "packages/git/rust/src/grant.rs": "7ba413ee3de758d54e8463bc7d4060d21e9197db02a7f63ab8c2b4f6f4a80968",
     "packages/git/rust/src/inspect.rs": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
     "packages/git/rust/src/lib.rs": "b7b07d0c351d816339c6310bf03490ae25e4210fae9f120270b529148dbc5e56",
-    "packages/git/rust/src/native_lock.rs": "94ea0e46e34acdec4de3f40552b33a6cd8f2c4656d524dd9b1539a6cd2d55abb",
-    "packages/git/rust/src/objects.rs": "ba519abbf01327819f9f2fb5cf42f05633e108cc6741e26e00b289f54b064b9c",
+    "packages/git/rust/src/native_lock.rs": "080e481d7766c524df885fcf5c15ed5fbab6ad022378866685daa0a34b722da8",
+    "packages/git/rust/src/objects.rs": "442613ec49655723224d1b662099b08fede39c29caccf001a22c03aad6e3d1e7",
     "packages/git/rust/src/publication.rs": "5c4d03b39a165ff82c025814cbb057076bdb4d8ffc1a3e01377a09c78936987d",
     "packages/git/rust/src/recovery.rs": "a8245f0cf573ccb51cac4373e2ee3566c1d48bafb6142fadc5c5302efe18f073",
     "packages/git/rust/src/refs.rs": "b998c94f5e2ba1e00f83496d80366733d548164ffe7832d37735c4748ac2d83f",
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
-    "packages/git/rust/src/restore.rs": "8ebe818730acbc307af3cf3e4a2c7476876eae026a7ea2216d4b4a4a08e1e525",
-    "packages/git/rust/src/scoped_commit.rs": "47582ad7f03b509d30259328ca77575e9959014b31352fcc291959358498d315",
+    "packages/git/rust/src/restore.rs": "ff5136c2fea5dac67f8ad9b3a8236a8077bf7694c896f5eb930b1a14d5b6636d",
+    "packages/git/rust/src/scoped_commit.rs": "87a43dce52581f2c8c8c33ceedab905c1e798ea470328763e971906351615484",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
-    "packages/git/rust/src/sync.rs": "0fd36afdf42dc99246386d3ed9b87c2086c88edab260f99bbd9f2327c9a85cca",
-    "packages/git/rust/src/wal.rs": "33586aaf9d687ef5b9e846d688f40d80895f4798988b54ef5dddf6acce514f9d",
-    "packages/git/rust/src/worktree.rs": "31245ed04c6d1b915f5452d78dd6849432b36a1c79dd4bd52cb38bedcae6ab6f",
+    "packages/git/rust/src/sync.rs": "f12262c43a02ac35a6910071ff4c73fc5f5f78a34d03d6205b8e7e96d3fc9e52",
+    "packages/git/rust/src/wal.rs": "0bc9d97611ffc734805915978375f75e22a46f460a26933d2938fdd2535769ef",
+    "packages/git/rust/src/worktree.rs": "1448b50a2fbe3bda3cb0738195f86d029f076321f9d91d255af1ab11f55c8123",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "91acedb270a60ee727e10dd823c817d4a914062dead0a8fd6f319f381d4fb2b1",
     "packages/git/rust/tests/head_in_listing.rs": "38bb44e8ec5631cc406aef2946ac5ac653bdae4457f3f210705434da53e2053b",
@@ -2000,28 +2000,28 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1214,
+      "line": 1215,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2684,
+      "line": 2685,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2871,
+      "line": 2872,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/objects.rs",
-      "line": 168,
+      "line": 171,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2035,7 +2035,7 @@
     },
     {
       "path": "packages/git/rust/src/worktree.rs",
-      "line": 1643,
+      "line": 1648,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

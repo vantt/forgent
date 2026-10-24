@@ -293,6 +293,7 @@ impl GitDriver {
     }
 
     /// Only the grant-check host calls this after proving its inherited borrower.
+    #[cfg(unix)]
     pub(crate) fn hook_deletions(&self, repo: &RepoHandle, index: &Path) -> Result<Vec<String>> {
         let out = self.invoke_context(
             Some(repo),
@@ -3319,9 +3320,11 @@ mod tests {
     }
     /// Delegates to the machine's driver but can never empty a domain, as when
     /// a member is stuck in uninterruptible I/O.
+    #[cfg(unix)]
     struct UnemptiedDriver {
         inner: Box<dyn ContainmentDriver>,
     }
+    #[cfg(unix)]
     impl ContainmentDriver for UnemptiedDriver {
         fn name(&self) -> &'static str {
             self.inner.name()

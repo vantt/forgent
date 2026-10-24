@@ -1,9 +1,6 @@
 //! Read-only host check for the cutover guard. A selector conveys no authority.
-use crate::{
-    wal::{self, OperationKind, Phase},
-    *,
-};
-use std::{fs, path::Path};
+use crate::*;
+use std::path::Path;
 impl GitDriver {
     pub fn check_cutover_grant(
         &self,
@@ -13,7 +10,8 @@ impl GitDriver {
     ) -> Result<()> {
         #[cfg(unix)]
         {
-            use std::os::{fd::BorrowedFd, unix::fs::MetadataExt};
+            use crate::wal::{self, OperationKind, Phase};
+            use std::{fs, os::{fd::BorrowedFd, unix::fs::MetadataExt}};
             // The host route seals slot 3 before entering this check; duplicate it for validation.
             let inherited = unsafe { BorrowedFd::borrow_raw(3) };
             let owned = inherited.try_clone_to_owned().map_err(failure)?;
