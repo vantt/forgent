@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use common::{files, refs};
-use fgos_config::cache::{snapshot_cached, SnapshotCache};
+use fgos_config::cache::{machine_cached, snapshot_cached, SnapshotCache};
 use fgos_config::detect::{Detectors, NoDetectors};
 use fgos_config::schema::Schemas;
 use fgos_config::snapshot::{Context, SessionClass, SnapshotRequest};
@@ -210,4 +210,33 @@ fn a_change_to_the_token_file_alone_misses() {
     fs::remove_file(token.join("gateway-token")).unwrap();
     assert!(snapshot_cached(&mut cache, &ctx, &req).is_err());
     assert_eq!((cache.stats.hits, cache.stats.misses), (0, 1));
+}
+
+#[test]
+fn the_machine_view_is_reused_until_a_machine_file_changes_and_never_serves_a_project_read() {
+    let bed = Bed::new("machine");
+    let ctx = Context {
+        schemas: &bed.schemas,
+        standard: &bed.standard,
+        digest: "d",
+        detectors: &NoDetectors,
+    };
+    let req = bed.request(SessionClass::Unconfined);
+    let mut cache = SnapshotCache::default();
+    let machine = |cache: &mut SnapshotCache| {
+        machine_cached(cache, &ctx, &req.global_dir, SessionClass::Unconfined)
+            .map(|s| s.value["s"]["a"].clone())
+            .unwrap()
+    };
+    assert_eq!(machine(&mut cache), 1);
+    assert_eq!(machine(&mut cache), 1);
+    assert_eq!((cache.stats.hits, cache.stats.misses), (1, 1));
+    fs::create_dir_all(req.global_dir.clone()).unwrap();
+    fs::write(req.global_dir.join("config.yaml"), "s:\n  a: 5\n").unwrap();
+    assert_eq!(machine(&mut cache), 5, "a changed machine file misses");
+    // A project read is another key: it misses even though the machine view is held.
+    bed.write("s:\n  a: 9\n");
+    let got = snapshot_cached(&mut cache, &ctx, &req).unwrap();
+    assert_eq!(got.value["s"]["a"], 9);
+    assert_eq!((cache.stats.hits, cache.stats.misses), (1, 3));
 }

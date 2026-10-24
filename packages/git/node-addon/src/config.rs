@@ -10,7 +10,7 @@
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Mutex, PoisonError};
 
-use fgos_config::cache::{snapshot_cached, SnapshotCache};
+use fgos_config::cache::{machine_cached, snapshot_cached, SnapshotCache};
 use fgos_config::detect::{Detectors, NoDetectors, PathDetectors};
 use fgos_config::machine::{self, accounts};
 use fgos_config::snapshot::{AccountsState, Context, SessionClass, Snapshot};
@@ -266,23 +266,30 @@ fn render(snapshot: &Snapshot, a: &Request) -> Res<Value> {
     Ok(out)
 }
 
-type Slot = (SnapshotRequest, SnapshotCache);
+type Slot = ((SnapshotRequest, bool), SnapshotCache);
 
-/// The snapshot of `req` through the door's cache, the least recently used slot out first. A slot is one
-/// request; the cache itself keys on what the files and the detectors read, so a hit is never stale.
-fn cached(req: &SnapshotRequest, ctx: &Context, a: &Request) -> Res<Value> {
+/// The snapshot of `req` (or, with `machine`, of the machine view of its global directory) through the door's
+/// cache, the least recently used slot out first. A slot is one request; the cache itself keys on what the
+/// files and the detectors read, so a hit is never stale.
+fn cached(req: &SnapshotRequest, machine: bool, ctx: &Context, a: &Request) -> Res<Value> {
     static CACHE: Mutex<Vec<Slot>> = Mutex::new(Vec::new());
     let mut slots = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
-    let slot = match slots.iter().position(|(held, _)| held == req) {
+    let key = (req.clone(), machine);
+    let slot = match slots.iter().position(|(held, _)| *held == key) {
         Some(at) => slots.remove(at),
-        None => (req.clone(), SnapshotCache::default()),
+        None => (key, SnapshotCache::default()),
     };
     slots.push(slot);
     if slots.len() > CACHE_SLOTS {
         slots.remove(0);
     }
     let (_, cache) = slots.last_mut().ok_or_else(|| invalid("cache"))?;
-    render(snapshot_cached(cache, ctx, req).map_err(Failure::from)?, a)
+    let held = if machine {
+        machine_cached(cache, ctx, &req.global_dir, req.class)
+    } else {
+        snapshot_cached(cache, ctx, req)
+    };
+    render(held.map_err(Failure::from)?, a)
 }
 
 /// The effective value now. With a project root: project over global over standard (accounts when
@@ -294,13 +301,7 @@ pub fn snapshot_entry(args: Value) -> Result<String> {
         let detectors = on_path();
         let ctx = context(&detectors)?;
         let roots = a.roots(true)?;
-        if a.project_root.is_some() {
-            return cached(&roots, &ctx, &a);
-        }
-        render(
-            &machine::snapshot(&ctx, &roots.global_dir, roots.class)?,
-            &a,
-        )
+        cached(&roots, a.project_root.is_none(), &ctx, &a)
     })
 }
 

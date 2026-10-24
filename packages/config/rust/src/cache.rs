@@ -1,6 +1,6 @@
 //! Cache by content (spec section 5): a snapshot is reused while every source's size and sha256,
 //! the token file, the bundle digest and the request are unchanged. The cache is a value the caller owns.
-use crate::snapshot::{build, read_sources, token_revision};
+use crate::snapshot::{build, machine_sources, read_sources, token_revision, Src};
 use crate::snapshot::{Context, Snapshot, SnapshotError, SnapshotRequest};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -25,7 +25,33 @@ pub fn snapshot_cached<'c>(
     ctx: &Context,
     req: &SnapshotRequest,
 ) -> Result<&'c Snapshot, SnapshotError> {
-    let srcs = read_sources(req)?;
+    cached(cache, ctx, req, read_sources(req)?)
+}
+
+/// [`snapshot_cached`] for the machine view (`machine::snapshot`): the same key over the machine's
+/// own sources, so it can neither hit nor evict a project read held by the same cache.
+pub fn machine_cached<'c>(
+    cache: &'c mut SnapshotCache,
+    ctx: &Context,
+    global_dir: &std::path::Path,
+    class: crate::snapshot::SessionClass,
+) -> Result<&'c Snapshot, SnapshotError> {
+    let none = std::path::PathBuf::new();
+    let req = SnapshotRequest {
+        project_root: none.clone(),
+        trusted_root: none,
+        global_dir: global_dir.into(),
+        class,
+    };
+    cached(cache, ctx, &req, machine_sources(&req)?)
+}
+
+fn cached<'c>(
+    cache: &'c mut SnapshotCache,
+    ctx: &Context,
+    req: &SnapshotRequest,
+    srcs: Vec<Src>,
+) -> Result<&'c Snapshot, SnapshotError> {
     let sums = srcs
         .iter()
         .map(|s| s.file.as_ref().map(|f| (f.bytes.len(), f.revision.clone())));
