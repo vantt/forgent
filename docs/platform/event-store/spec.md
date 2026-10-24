@@ -39,7 +39,7 @@ Run `wf-run-1792220971594-ec5449e2` wrote version 2 from the draft that council 
 
 ## 1. Purpose
 
-Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow.
+Event Store owns one decision: how an event of any fgOS domain becomes durable on the machine that wrote it, how it is sealed into immutable git objects on that machine's own ref, how those refs are shared between machines, and how the union of all of it is read back in one deterministic order. Work is the first consumer; porting, observe and decisions follow, and identity (the shared directory of agent sessions across machines, stream `project:identity`, docs/platform/identity/spec.md section 5) is a registered consumer in `packages/event-store/contracts/consumers.v1.json`, whose rebuild only drops its cache because its fold lives in the Rust identity crate.
 
 Event truth stops being files in the git work tree. An event is appended to an open log outside the work tree and acknowledged after `fsync`; it is then sealed, on a cadence, into a commit on `refs/fgos/events/<machine-id>` through git plumbing that touches no index, no work tree, no HEAD and no hook-running porcelain. Machines exchange events by pushing their own ref and fetching the others; the read side is the union by event hash. Views are caches owned by consumers and are rebuildable.
 
