@@ -70,7 +70,7 @@
     },
     "containment": {
       "preferred": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
-      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`. Terminal mode: the launcher script that terminal-control starts in the pane execs bwrap with --die-with-parent and a --bind of the socket directory, then `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-socket <terminal.socketPath>`"
+      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`. Terminal mode: the launcher script that terminal-control starts in the pane execs bwrap with --die-with-parent and a --ro-bind of its own terminal.socketPath (the user runtime directory around it is masked), then `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-socket <terminal.socketPath>`"
     },
     "deadlines": {
       "softAt": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds; null when no soft deadline" },
