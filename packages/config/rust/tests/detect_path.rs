@@ -122,3 +122,23 @@ fn a_snapshot_names_the_detected_layer_for_an_executor_no_file_sets() {
         .find(|o| o.path == [key("runner"), key("executor"), key("command")]);
     assert_eq!(origin.map(|o| o.provenance.layer), Some("detected"));
 }
+
+#[test]
+fn the_fingerprint_changes_exactly_when_the_answer_can() {
+    let dir = common::temp("detect", "fingerprint");
+    let bin = dir.join("bin");
+    let print = |path: Option<OsString>| PathDetectors { path }.fingerprint();
+    let (empty, same) = (print(path_of(&[&bin])), print(path_of(&[&bin])));
+    assert_eq!(empty, same);
+    program(&bin, "claude", 0o755);
+    assert_ne!(
+        print(path_of(&[&bin])),
+        empty,
+        "the program appearing on the same PATH"
+    );
+    assert_ne!(
+        print(path_of(&[&dir])),
+        print(path_of(&[&bin])),
+        "another PATH"
+    );
+}

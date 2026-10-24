@@ -10,13 +10,12 @@ pub struct CacheStats {
 }
 
 type Sum = Option<(usize, String)>;
-/// The request, the bundle digest, each source's sum and the token file's.
-type Key = (SnapshotRequest, String, Vec<Sum>, Sum);
+/// The request, the bundle digest, the detectors' fingerprint, each source's sum and the token file's.
+type Key = (SnapshotRequest, String, String, Vec<Sum>, Sum);
 
 #[derive(Default)]
 pub struct SnapshotCache {
-    /// The key is `None` for a snapshot with a detected value: `PATH` is not a hashed source.
-    held: Option<(Option<Key>, Snapshot)>,
+    held: Option<(Key, Snapshot)>,
     pub stats: CacheStats,
 }
 
@@ -31,16 +30,17 @@ pub fn snapshot_cached<'c>(
         .iter()
         .map(|s| s.file.as_ref().map(|f| (f.bytes.len(), f.revision.clone())));
     let token = token_revision(&req.global_dir);
-    let key: Key = (req.clone(), ctx.digest.to_string(), sums.collect(), token);
-    if matches!(&cache.held, Some((Some(held), _)) if *held == key) {
+    let key: Key = (
+        req.clone(),
+        ctx.digest.to_string(),
+        ctx.detectors.fingerprint(),
+        sums.collect(),
+        token,
+    );
+    if matches!(&cache.held, Some((held, _)) if *held == key) {
         cache.stats.hits += 1;
     } else {
-        let snapshot = build(ctx, req, &srcs)?;
-        let detected = snapshot
-            .origins
-            .iter()
-            .any(|o| o.provenance.layer == "detected");
-        cache.held = Some(((!detected).then_some(key), snapshot));
+        cache.held = Some((key, build(ctx, req, &srcs)?));
         cache.stats.misses += 1;
     }
     cache

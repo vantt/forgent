@@ -15,14 +15,6 @@ use fgos_config::standard::Standard;
 use fgos_yaml_doc::{Segment, Value as Doc};
 use serde_json::json;
 
-struct Always;
-
-impl Detectors for Always {
-    fn detect(&self, _: &[Segment]) -> Option<Doc> {
-        Some(Doc::Str("found".into()))
-    }
-}
-
 struct Bed {
     dir: PathBuf,
     schemas: Schemas,
@@ -130,26 +122,44 @@ fn a_new_bundle_digest_a_new_class_or_a_new_root_misses() {
     assert_eq!((cache.stats.hits, cache.stats.misses), (1, 4));
 }
 
+/// Finds a value, and says what it read: the text changes when the answer would.
+struct Reads(std::cell::Cell<u32>, std::cell::RefCell<String>);
+
+impl Detectors for Reads {
+    fn detect(&self, _: &[Segment]) -> Option<Doc> {
+        self.0.set(self.0.get() + 1);
+        Some(Doc::Str(self.1.borrow().clone()))
+    }
+
+    fn fingerprint(&self) -> String {
+        self.1.borrow().clone()
+    }
+}
+
 #[test]
-fn a_snapshot_holding_a_detected_value_is_never_reused() {
+fn a_snapshot_holding_a_detected_value_is_reused_until_what_detection_reads_changes() {
     let bed = Bed::new("detected");
+    let detectors = Reads(Default::default(), std::cell::RefCell::new("one".into()));
     let ctx = Context {
         schemas: &bed.schemas,
         standard: &bed.standard,
         digest: "d",
-        detectors: &Always,
+        detectors: &detectors,
     };
     let (req, mut cache) = (
         bed.request(SessionClass::Unconfined),
         SnapshotCache::default(),
     );
-    for _ in 0..2 {
-        assert_eq!(
-            snapshot_cached(&mut cache, &ctx, &req).unwrap().value["s"]["e"],
-            "found"
-        );
+    for _ in 0..3 {
+        let got = snapshot_cached(&mut cache, &ctx, &req).unwrap();
+        assert_eq!(got.value["s"]["e"], "one");
     }
-    assert_eq!((cache.stats.hits, cache.stats.misses), (0, 2));
+    assert_eq!((cache.stats.hits, cache.stats.misses), (2, 1));
+    assert_eq!(detectors.0.get(), 1, "detection ran once, not on a hit");
+    *detectors.1.borrow_mut() = "two".into();
+    let got = snapshot_cached(&mut cache, &ctx, &req).unwrap();
+    assert_eq!(got.value["s"]["e"], "two");
+    assert_eq!((cache.stats.hits, cache.stats.misses), (2, 2));
 }
 
 #[test]

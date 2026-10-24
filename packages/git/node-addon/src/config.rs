@@ -7,7 +7,6 @@
 //! `config-request-invalid` (the request breaks the entry's contract; the keyword names the field),
 //! `config-trusted-root-unresolved` (the main checkout could not be established; the keyword is the cause)
 //! and `config-internal-error` (a panic, caught at the boundary, nothing printed).
-use std::ffi::OsString;
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Mutex, PoisonError};
 
@@ -267,17 +266,16 @@ fn render(snapshot: &Snapshot, a: &Request) -> Res<Value> {
     Ok(out)
 }
 
-type Slot = ((SnapshotRequest, Option<OsString>), SnapshotCache);
+type Slot = (SnapshotRequest, SnapshotCache);
 
-/// The snapshot of `req` through the door's cache, the least recently used slot out first. A slot is keyed by
-/// the request and the `PATH` that decides a detected value.
-fn cached(req: &SnapshotRequest, path: Option<OsString>, ctx: &Context, a: &Request) -> Res<Value> {
+/// The snapshot of `req` through the door's cache, the least recently used slot out first. A slot is one
+/// request; the cache itself keys on what the files and the detectors read, so a hit is never stale.
+fn cached(req: &SnapshotRequest, ctx: &Context, a: &Request) -> Res<Value> {
     static CACHE: Mutex<Vec<Slot>> = Mutex::new(Vec::new());
     let mut slots = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
-    let key = (req.clone(), path);
-    let slot = match slots.iter().position(|(held, _)| *held == key) {
+    let slot = match slots.iter().position(|(held, _)| held == req) {
         Some(at) => slots.remove(at),
-        None => (key, SnapshotCache::default()),
+        None => (req.clone(), SnapshotCache::default()),
     };
     slots.push(slot);
     if slots.len() > CACHE_SLOTS {
@@ -297,7 +295,7 @@ pub fn snapshot_entry(args: Value) -> Result<String> {
         let ctx = context(&detectors)?;
         let roots = a.roots(true)?;
         if a.project_root.is_some() {
-            return cached(&roots, detectors.path.clone(), &ctx, &a);
+            return cached(&roots, &ctx, &a);
         }
         render(
             &machine::snapshot(&ctx, &roots.global_dir, roots.class)?,
