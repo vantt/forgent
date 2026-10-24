@@ -98,3 +98,21 @@ Brief: `w8-g6-fix-brief.md`. It is launched after WORK's "cutover xong" line, be
 **Lead-fix review** (`reviews/w8-lead-fixes-review`): 8 APPROVE / 4 REWORK, all fixed in 25e8842d3.
 - The misc, rebind and archive receipts are now current.
 - G5 is lowered to `partial`: `docs/reading-map.md` restates the L11-25 banner in English and keeps line 34 only with a Truth-correction suffix. Accepting that restatement goes to the owner in the cutover packet.
+
+## L13-11 — Composition review rulings (Lead, 2026-10-24 21:05)
+
+`reviews/w8-composition-review`: 164 APPROVE / 19 REWORK.
+- **Resolved:** both recomposed G7 specs (c5, c7) replay byte-exact.
+- **Park actions:** 95 of 101 pass.
+- **Members:** all 115 are joined.
+- **Rework:** most of it comes from records written before the D6 holders landed in e5af4c501.
+
+**Rulings (A42):**
+1. **architecture-intent, 8 rows.** Five links point at the existing candidate copies: proposals step-09, step-10 and component-authority-boundary-map, the system-vision file and team-communication-protocol-v1. The links to the intent ledger, coordination-session and flow-definition are labelled as history of the retired engine. Reason: those three exist only as history, and the other five have live copies.
+2. **GAP-05 `dynamic-023895`.** The placement is approved. It is rebased on HEAD with 88 binding overlays, and G0 reviews the overlays.
+3. **Citation drift, 142 findings at HEAD.**
+   - Exclude `*/history/*` (2 findings).
+   - Gloss the 10 branch-only sites on the branch.
+   - The 130 sites in docs that main owns are glossed by DOC at final pin F, under the docs lease. The baseline is not widened, because the scan policy forbids a rebaseline. Glossing at F under the lease avoids conflicts with lanes that are still editing those docs.
+
+Brief: `w8-composition-fix-brief.md`, launched after WORK's "cutover xong".

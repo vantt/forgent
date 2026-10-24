@@ -1,0 +1,1105 @@
+{
+ "scope": "Independent review of composition records: 2 recomposed G7 REWORK specs, 101 park actions + 2 supplemental blocked groups, G1 families 8/13/17 member joins (72) and the 115-member join, GAP-05 placement, citation-drift parity gap. Replayed in /tmp/fgos-work/w8-comp-review (deleted).",
+ "commit": "f2162d9ff",
+ "recordPin": "cffe725b948f5a695728c8da08f114e7e97075d6",
+ "verdicts": [
+  {
+   "id": "rework:test/cli/fgos-merge.test.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#rework:test/cli/fgos-merge.test.mjs",
+   "reason": "g7-c5 REWORK resolved: stray added blank line dropped (hunk -922,8 +922,7), single-line retarget kept; target docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md exists. patch --fuzz=0 forward exit 0 -> 158da868, rollback exit 0 -> e6ecac95 == beforeSha256; HEAD f2162d9ff bytes == beforeSha256."
+  },
+  {
+   "id": "rework:docs/how-to/fix-bare-citation-findings.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#rework:docs/how-to/fix-bare-citation-findings.md",
+   "reason": "g7-c7 REWORK resolved: example now names docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules (## Business Rules at line 25, holds the runner RULs). fuzz=0 forward -> a32b04a8, rollback -> 11d8cb55 == beforeSha256; HEAD bytes == beforeSha256."
+  },
+  {
+   "id": "file:bin/fgos.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/0",
+   "reason": "Composed hunks replayed fuzz=0 forward/rollback byte-equal at record bytes; targets checked (anchors exist). File changed after cffe725b9 (byte guard will refuse); chain still applies fuzz=0 to HEAD bytes, re-pin at F under G9."
+  },
+  {
+   "id": "file:docs/platform/process/spec.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/1",
+   "reason": "Composed hunks replayed fuzz=0 forward/rollback byte-equal at record bytes; targets checked (anchors exist)."
+  },
+  {
+   "id": "file:docs/platform/session-identity/spec.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/2",
+   "reason": "Successor spec hunk-park:identity-successor replays; session-identity/spec.md not recreated."
+  },
+  {
+   "id": "file:docs/specs/reading-map.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/3",
+   "reason": "Exact cutover step; doc-link-pass test exists; successor anchor docs/reading-map.md \"## 5. Detailed Product And Source Map\" exists. beforeSha256 drifted (docs/specs/reading-map.md changed in 4 commits after cffe725b9): re-pin at F with G5 span check."
+  },
+  {
+   "id": "file:docs/specs/workflow.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/4",
+   "reason": "Diverges from the D6 holder that landed after this record (e5af4c501): docs/platform/workflow/spec.md:654 and :691 point the same sentences at ../runner/spec.md, this park points docs/specs/workflow.md at runner/decisions/h-36d872fbb0e5.md, and docs/specs/workflow.md is now a retiring source with a candidate successor. Fix: recompose the park against docs/platform/workflow/spec.md at current bytes, choose one target (the decision record h-36d872fbb0e5.md, since the sentence names the decision history), and drop or mirror the legacy-file hunk so legacy and holder do not disagree."
+  },
+  {
+   "id": "file:packages/herdr-fgos-common/rust/src/fgos.rs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/5",
+   "reason": "Composed hunks replayed fuzz=0 forward/rollback byte-equal at record bytes; targets checked (anchors exist). Comment correction is accurate: the knowledge doc lists goalTier but states no absent-sorts-last rule."
+  },
+  {
+   "id": "file:src/runner/merge.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/6",
+   "reason": "Composed hunks replayed fuzz=0 forward/rollback byte-equal at record bytes; targets checked (anchors exist). File changed after cffe725b9 (byte guard will refuse); chain still applies fuzz=0 to HEAD bytes, re-pin at F under G9."
+  },
+  {
+   "id": "file:src/setup/git-hooks.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/7",
+   "reason": "No-byte-change park: HEAD file has no docs/specs reference left (mechanism retired in 44abfcfa5); nothing to apply."
+  },
+  {
+   "id": "file:test/runner/merge.test.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/8",
+   "reason": "Composed hunks replayed fuzz=0 forward/rollback byte-equal at record bytes; targets checked (anchors exist)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/ak-cook-worker-contract.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/9",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/capability-catalog.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/10",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/catchup-self-recovery.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/11",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/citation-format.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/12",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/coding-worker-contract.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/13",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/executor-dispatch-fallback.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/14",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/_shared/planning-capability-awareness.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/15",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/16",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/references/consult-protocol.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/17",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/references/deep-dive-protocol.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/18",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/references/extract-rules.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/19",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/scripts/distill.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/20",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/21",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-clarifying/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/22",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-discovering/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/23",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-exploring/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/24",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/25",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/26",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/27",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-implement/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/28",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/29",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/30",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-knowledge/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/31",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-planning/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/32",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/33",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/34",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-shaping/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/35",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-validating/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/36",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/37",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/38",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-indexing/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/39",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.agents/skills/fgos-researching/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/40",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/distill/scripts/distill.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/41",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/42",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/43",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/44",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/45",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/46",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/47",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/48",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-shaping/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/49",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/50",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/51",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/52",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/capability-catalog.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/53",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/54",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/citation-format.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/55",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/coding-worker-contract.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/56",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/57",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/58",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/59",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/60",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/61",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/62",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/63",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/64",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/65",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/66",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/67",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/68",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/69",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/70",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/71",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/72",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/73",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/74",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/75",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-indexing/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/76",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:plugins/fgOS/skills/fgos-researching/SKILL.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/77",
+   "reason": "build:skills render: scratch export of HEAD + 12 canonical inputs at their composed sha, `node scripts/build-skill-wrappers.mjs` exit 0; this path equals expectedAfterSha256 (all 69 renders and all 33 changed outputs byte-equal, no extra changes)."
+  },
+  {
+   "id": "file:docs/doc-governance.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/78",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/governance.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/79",
+   "reason": "Chains on convention:area-holder-table, whose table still says MISSING for enduser-docs-authoring, enduser-docs-index, seat-binding and workflow; all four holders landed in e5af4c501 (enduser-contract-carry APPROVE in w2-late-areas). Fix: recompose convention:area-holder-table and this status unit with the four rows filled (see family-17 verdict)."
+  },
+  {
+   "id": "file:docs/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/80",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/documentation/operations/portals/docs-portal.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/81",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/host-invocation-routing/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/82",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/user/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/83",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/migration-authoring-rules.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/84",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/85",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/proposals/documentation-system-unification.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/86",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/enduser-docs-index.json",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/87",
+   "reason": "Command is a JS call, not a runnable replay. The real door is `fgos docs-index` (generateEnduserDocsIndex; doctor check/fix enduser-docs-index-stale in src/setup/registrations.mjs). No expectedAfterSha256; bounded replay shows 492->490 with two docs dropped (docs/explanation/work-item-lifecycle-and-domain-model.md, docs/how-to/check-rollup-progress.md). Fix: command = `fgos docs-index` on the cutover checkout after moves, then `fgos doctor` must report enduser-docs-index-stale passed; record the two dropped docs as carried or retired before the step."
+  },
+  {
+   "id": "file:docs/platform/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/88",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/documentation/switchboard.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/89",
+   "reason": "Same blocker and same fix as docs/transitional-switchboard.md for rows f06749-f06751: point the end-user authoring/index owner at the two knowledge-registry.md sections, recompose the whole action at current bytes, replay."
+  },
+  {
+   "id": "file:docs/platform/packaging-distribution/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/90",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/platform-foundations.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/91",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md). File changed in d9bedf229; spec still applies fuzz=0 to HEAD bytes; re-pin at F."
+  },
+  {
+   "id": "file:docs/platform/system-architecture/architecture/roadmap.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/92",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/93",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/94",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/95",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/system-architecture/architecture/workspace-topology.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/96",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/vision.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/97",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/platform/work-state/README.md",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/98",
+   "reason": "Composed status/row units replay fuzz=0 forward/rollback byte-equal; claims spot-checked against tree (e.g. docs/tutorials/.gitkeep, docs/reading-map.md)."
+  },
+  {
+   "id": "file:docs/transitional-switchboard.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/99",
+   "reason": "Blocked on f08382-f08384 (end-user complete-owner row). Holders now exist: docs/platform/work-state/contracts/knowledge-registry.md sections \"Spec: Soạn & nuôi tài liệu người-dùng-cuối (enduser-docs-authoring)\" and \"Spec: Chỉ mục đọc-theo-tag ... (enduser-docs-index)\", approved as enduser-contract-carry. Fix: recompose w2:status-partial:docs/transitional-switchboard.md at current bytes (e5af4c501 also edited transitional-switchboard.json) with the row owners set to those two anchors, docs/doc-registry.{md,json} kept as generated projection; then replay fuzz=0 and check-doc-candidate-status + doc-link-pass."
+  },
+  {
+   "id": "file:docs/ui-spec/generated/wireframe-v2.html",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/actions/100",
+   "reason": "Recorded command is wrong: interpret.mjs writes generated/wireframe.html and has no --out flag (replayed: it wrote wireframe.html). wireframe-v2.html comes from interpret-wireframe.mjs, which needs the tools package deps. Also the committed render is already stale: regenerating from HEAD sources gives f06815ee..., not beforeSha256 77894fdd (about 40 diff lines, e.g. action A-S02-012). Fix: command `(cd .claude/skills/ui-spec/tools && npm ci) && node .claude/skills/ui-spec/tools/interpret-wireframe.mjs --root docs/ui-spec` with xdg-open unavailable, record the stale-render baseline delta separately, then validate with `node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec`."
+  },
+  {
+   "id": "supplemental:docs/platform/system-overview/spec.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/unresolved/0",
+   "reason": "Outside the 101; f07928/f07929 blocked on end-user holders. HEAD lines 44-45 already link \"candidate holder\" to the two knowledge-registry.md sections (d9bedf229), and the step-07 base spec for this file no longer applies fuzz=0 at HEAD. Fix: recompose base + w2:description:system-overview-partial at current bytes and add f07928/f07929 pointing to the two knowledge-registry.md anchors."
+  },
+  {
+   "id": "supplemental:docs/platform/system-architecture/architecture/architecture-intent.md",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json#/unresolved/1",
+   "reason": "Outside the 101; D6 did not touch this. Eight live Related/evidence rows (lines 42-47, 790-796) still point at docs/architect/**. Candidate copies exist for five (docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md, docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md, docs/platform/proposals/step-09-..., step-10-..., component-authority-boundary-map.md); intent-preservation-ledger, coordination-session and flow-definition exist only under agent-coordination/history/retired-engine. Needs a Lead placement ruling: retarget the five to the candidates, label the three as retired-engine history links, then compose and replay."
+  },
+  {
+   "id": "reference-002441",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/0",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.baseline.json at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#findNewFindings, spec(s) scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002442",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/1",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.baseline.json at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#findNewFindings, spec(s) scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002443",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/2",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.baseline.json at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#findNewFindings, spec(s) scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002444",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/3",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.baseline.json at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#findNewFindings, spec(s) scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-003579",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/4",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003580",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/5",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003581",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/6",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003587",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/7",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003588",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/8",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003591",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/9",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003592",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/10",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003595",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/11",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003596",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/12",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003598",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/13",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003599",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/14",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003600",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/15",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003601",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/16",
+   "reason": "Joined: verbatim passage found in scripts/generate-shipped-path-inventory.mjs at its recorded sha, live holder scripts/generate-shipped-path-inventory.mjs#classifyContractScope, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-003634",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/17",
+   "reason": "Joined: verbatim passage found in scripts/test-proof-inventory.mjs at its recorded sha, live holder scripts/test-proof-inventory.mjs, spec(s) scan:proof-inventory-comment effective and replayed."
+  },
+  {
+   "id": "reference-003640",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/18",
+   "reason": "Joined: verbatim passage found in scripts/verify-phase-01.mjs at its recorded sha, live holder scripts/verify-phase-01.mjs, preserve disposition with owning proof None. No owning proof (policy says so); file changed after the pin but the forbidden-edit predicate is still present (lines 384-386); re-anchor at F."
+  },
+  {
+   "id": "dynamic-014397",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/19",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-014398",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/20",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-014399",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/21",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-014400",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/22",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-014401",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/23",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-014402",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/24",
+   "reason": "Joined: verbatim passage found in src/setup/registrations.mjs at its recorded sha, live holder src/setup/registrations.mjs#checkDocNearDuplicate, preserve disposition with owning proof test/setup/knowledge-doctor.test.mjs."
+  },
+  {
+   "id": "dynamic-021577",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/25",
+   "reason": "Joined: verbatim passage found in test/report/helpers/docs-index-state-fixture.mjs at its recorded sha, live holder docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md, preserve disposition with owning proof test/report/enduser-index.test.mjs."
+  },
+  {
+   "id": "reference-004353",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/26",
+   "reason": "Joined: verbatim passage found in test/report/helpers/docs-index-state-fixture.mjs at its recorded sha, live holder docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md, preserve disposition with owning proof test/report/enduser-index.test.mjs."
+  },
+  {
+   "id": "dynamic-023835",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/27",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023836",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/28",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023873",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/29",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023874",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/30",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023890",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/31",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023891",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/32",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023892",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/33",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023893",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/34",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023895",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/35",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023896",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/36",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023901",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/37",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023902",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/38",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-023903",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/39",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "reference-004371",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/40",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "reference-004373",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/41",
+   "reason": "Joined: verbatim passage found in test/runner/dead-vocabulary-guard.test.mjs at its recorded sha, live holder test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs, spec(s) scan:successor-dead-vocabulary effective and replayed."
+  },
+  {
+   "id": "dynamic-033375",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/42",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "dynamic-033376",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/43",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "dynamic-033383",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/44",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "dynamic-033384",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/45",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-005064",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/46",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-005072",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/47",
+   "reason": "Joined: verbatim passage found in test/scripts/generate-shipped-path-inventory.test.mjs at its recorded sha, live holder test/scripts/generate-shipped-path-inventory.test.mjs, preserve disposition with owning proof test/scripts/generate-shipped-path-inventory.test.mjs."
+  },
+  {
+   "id": "reference-000004",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/48",
+   "reason": "Joined: verbatim passage found in .agents/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-000012",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/49",
+   "reason": "Joined: verbatim passage found in .agents/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-000013",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/50",
+   "reason": "Joined: verbatim passage found in .agents/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "author-s67-citation-core-4-51",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/51",
+   "reason": "Joined: verbatim passage found in core/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "author-s67-citation-core-6-2",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/52",
+   "reason": "Joined: verbatim passage found in core/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "author-s67-citation-core-96-44",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/53",
+   "reason": "Joined: verbatim passage found in core/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002308",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/54",
+   "reason": "Joined: verbatim passage found in plugins/fgOS/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002316",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/55",
+   "reason": "Joined: verbatim passage found in plugins/fgOS/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002317",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/56",
+   "reason": "Joined: verbatim passage found in plugins/fgOS/skills/_shared/citation-format.md at its recorded sha, live holder core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "dynamic-006494",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/57",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "dynamic-006495",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/58",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "dynamic-006511",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/59",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "dynamic-006516",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/60",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002467",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/61",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002469",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/62",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "reference-002471",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/63",
+   "reason": "Joined: verbatim passage found in scripts/check-decision-citation-drift.mjs at its recorded sha, live holder scripts/check-decision-citation-drift.mjs#loadSourceFiles, spec(s) convention:citation-homes, scan:recursive-platform-citations effective and replayed."
+  },
+  {
+   "id": "author-seam8-agents-decision-home-74",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/64",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "reference-000123",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/65",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "reference-000145",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/66",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "reference-000151",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/67",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "reference-000231",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/68",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "reference-003643",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/69",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md. Also cites non-effective recomposed-predecessor:src/cli/command-registry.mjs; replace with w2:predecessor:src/cli/command-registry.mjs."
+  },
+  {
+   "id": "reference-003666",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/70",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md. Also cites non-effective recomposed-predecessor:src/cli/command-registry.mjs; replace with w2:predecessor:src/cli/command-registry.mjs."
+  },
+  {
+   "id": "reference-003908",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json#/rows/71",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md."
+  },
+  {
+   "id": "family-8-successor-scan",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json; plans/260925-documentation-authority-unification/reports/phase-09/composition/scan-replay.json",
+   "reason": "48/48 members joined. Composed scans replay; at HEAD the composed dead-vocabulary test plus w2:guard:retired-schema-qualification plus GAP-05 relocation gives 10/10; old citation findings all still found (exactCoverageSuperset true, baseline unchanged)."
+  },
+  {
+   "id": "family-13-convention-citation-scan",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json#scan:recursive-platform-citations",
+   "reason": "16/16 joined. Convention text and recursive read set are correct; the red real-repo case is real content debt, tracked under citation-drift-124 below, not a scan defect."
+  },
+  {
+   "id": "family-17-area-holder-table",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/area-holder-table.json",
+   "reason": "Area-holder table (convention:area-holder-table) still lists enduser-docs-authoring, enduser-docs-index, seat-binding and workflow as MISSING; e5af4c501 landed docs/platform/seat-binding/spec.md, docs/platform/workflow/spec.md and the two end-user sections in work-state/contracts/knowledge-registry.md. Fix: fill readFirst/fact holders (seat-binding -> docs/platform/seat-binding/spec.md, workflow -> docs/platform/workflow/spec.md, both end-user scopes -> the knowledge-registry.md sections with decision write home docs/platform/work-state/decisions/), recompose convention:area-holder-table and status-units:docs/platform/governance.md, rerun the replay. Also note 10 decisionWriteHome directories and docs/platform/decisions/ do not exist yet; say they are created on first write."
+  },
+  {
+   "id": "member-join-115",
+   "verdict": "APPROVE",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#/l12_96Composition",
+   "reason": "115/115 integrationParkMembers joined: 72 families 8/13/17 in member-joins.json, 43 families 14/15/16/18 in carries/claim-carries.json. Per-member independent APPROVE now exists for the 72 (this file); the 43 carried members rely on w2-g1-carries review."
+  },
+  {
+   "id": "gap05-dynamic-023895",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-gap05-verification.json#/proposalPatches",
+   "reason": "Placement is right: approve moving both whole carriage units to docs/platform/system-architecture/history/component-boundary-source-carriage.md with a live pointer; no renames, no guard exemption. The test reads docs/platform/component-boundary.md by name, so nothing else makes it green. Record cannot be applied as is: its predecessor w2:predecessor:docs/platform/component-boundary.md fails fuzz=0 at HEAD (e5af4c501 edited lines ~69-122), and 88 ledger bindings (s6-whole-system-component-readme 12, s6-...-repo-layout-vision 10, s14-resync-b 66) target the 22 moved headings. Fix: rebase on HEAD bytes (the relocation hunk itself applies fuzz=0 to HEAD; replay gave 10/10), write 88 supersedesBinding overlays to the history file, get Lead approval and G0 review."
+  },
+  {
+   "id": "citation-drift-124",
+   "verdict": "REWORK",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/composition/w2-check-decision-citation-drift.test.log",
+   "reason": "Real gap, not baseline drift: baseline (208 entries) is byte-unchanged and no finding text matches any baseline entry. At HEAD the same scan reports 142: 130 in docs/platform specs that already exist on main and were never scanned (git 47, holder-lock 24, platform-foundations 15, ...), 10 in branch-only candidates (work-state/spec.md:1048 lost the glosses its legacy source already has), 2 in a retired-engine history ADR. Fix: drop */history/* from the added read set, gloss the 10 branch sites (re-carry the glossed legacy text for work-state), and have the Lead pick for the 130 main-owned sites: add exactly those keys to the baseline as an additive change (existing entries unchanged), or have the owning lanes gloss them."
+  }
+ ]
+}
