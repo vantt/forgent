@@ -135,11 +135,14 @@ impl Pane {
     pub fn open_tty(&self) -> File {
         use std::os::fd::AsRawFd;
         use std::os::unix::fs::OpenOptionsExt;
-        let mut name = [0 as libc::c_char; 128];
-        // SAFETY: ptsname_r writes a NUL-terminated name into the buffer of the given length.
-        assert_eq!(unsafe { libc::ptsname_r(self.master.as_raw_fd(), name.as_mut_ptr(), name.len()) }, 0, "ptsname_r");
-        // SAFETY: the buffer now holds a NUL-terminated path.
-        let path = unsafe { std::ffi::CStr::from_ptr(name.as_ptr()) }.to_string_lossy().into_owned();
+        // SAFETY: ptsname returns a pointer to a NUL-terminated name owned by libc (or null on
+        // failure); it is copied immediately, and only this thread asks for a pane name at a time.
+        // ptsname is used rather than ptsname_r because macOS does not provide the latter.
+        let path = unsafe {
+            let name = libc::ptsname(self.master.as_raw_fd());
+            assert!(!name.is_null(), "ptsname");
+            std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned()
+        };
         OpenOptions::new().read(true).write(true).custom_flags(libc::O_NOCTTY).open(path).unwrap()
     }
 }
