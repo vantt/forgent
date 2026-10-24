@@ -466,12 +466,13 @@ async function censusDriftRefusal(committingToplevel) {
     if (staged.length === 0) return null;
     const changes = new Map(staged.map((name) => {
       let source = null;
+      // Decoded as utf8, the very input the scan hashes (readFileSync(..., 'utf8')): bytes would diverge on invalid sequences.
       try { source = git(['cat-file', 'blob', `:${name}`]); } catch { /* deleted from the index */ }
       return [name, source];
     }));
     const drift = censusDrift(JSON.parse(git(['show', `:${MUTATION_CENSUS_PATH}`])), committingToplevel, changes);
     return drift.length === 0 ? null
-      : `commit refused: the Git one-door census does not match the staged files (${drift.slice(0, 5).join(', ')}${drift.length > 5 ? `, and ${drift.length - 5} more` : ''}). Run "node scripts/git-one-door-scan.mjs --write-census" and stage ${MUTATION_CENSUS_PATH}.`;
+      : `commit refused: the Git one-door census does not match the staged files (${drift.slice(0, 5).join(', ')}${drift.length > 5 ? `, and ${drift.length - 5} more` : ''}). Run "node scripts/git-one-door-scan.mjs --write-census" and stage ${MUTATION_CENSUS_PATH} (a merge needs a regenerated census, not either side's).`;
   } catch (error) {
     return `commit refused: could not check the Git one-door census against the staged files (${error.message}). Repair the index or the census and retry.`;
   }
