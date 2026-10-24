@@ -1,0 +1,99 @@
+{
+  "scope": "w4-g4-declare",
+  "commit": "77db6ed2b",
+  "verdicts": [
+    {
+      "id": "declarations-match-proposal",
+      "verdict": "APPROVE",
+      "reason": "25 entries, 25 unique (path,siteId); classes 1 hook-read-context / 19 declared-tooling-exemption / 5 configured-binary; per-path counts equal proposal (S1 1; pinned 7+3; tooling 3+1+1+2+2; configured 4+1).",
+      "locator": "scripts/lib/git-one-door-declarations.v1.json"
+    },
+    {
+      "id": "reason-retireWhen-present",
+      "verdict": "APPROVE",
+      "reason": "Every entry has non-empty reason and retireWhen; scanner rejects empty/whitespace values (applyDeclarations validation, test 'declarations reject ...').",
+      "locator": "scripts/git-one-door-scan.mjs:2449-2460"
+    },
+    {
+      "id": "census-reproducible",
+      "verdict": "APPROVE",
+      "reason": "Two independent census(scan()) runs via Inspect at 77db6ed2b: byte-identical, sha256 5a7af356... equal to committed census; 0 sites; verifyCensus passed (1108 files, payloadDigest 063f8b56413e). 25 classes rows carry siteId.",
+      "locator": "packages/git/contracts/mutation-census.v1.json"
+    },
+    {
+      "id": "siteId-line-shift",
+      "verdict": "APPROVE",
+      "reason": "Scratch probe on real check-evidence-relocation.mjs and doc-alias-resolver.mjs: inserted preceding lines keep the declaration matched (line 34->37, 147->149), 0 sites.",
+      "locator": "/tmp/fgos-work/w4-g4-declare/probe-out.json lineShift/aliasLineShift"
+    },
+    {
+      "id": "siteId-changed-or-removed-call",
+      "verdict": "APPROVE",
+      "reason": "Probe: editing the declared call's argv or removing the spawn throws 'stale or ambiguous Git declaration ... matched 0 sites'.",
+      "locator": "/tmp/fgos-work/w4-g4-declare/probe-out.json editCall/removeSite"
+    },
+    {
+      "id": "siteId-binds-call-not-argv-set",
+      "verdict": "REWORK",
+      "reason": "HIGH, fail-open: for argv-passthrough sites the declaration exempts the wrapper, so any NEW caller is silently exempt. Probe: adding git(r,['reset','--hard','HEAD']) to check-evidence-relocation.mjs, or run('git',['push','--force','origin','HEAD']) in verifyForbiddenPhase02Diff, yields 0 sites. Pre-declaration both were red. Same shape for .githooks/pre-commit leaseGitRead (verbs field is an unchecked claim; accurate today). Contradicts owner-note claim 'a new call in the same path remains undeclared'. Fix: bind passthrough declarations to the caller set (fold sorted caller call digests into siteId, or declare the caller sites), or refuse declarations on unresolved-argv wrappers.",
+      "locator": "scripts/git-one-door-scan.mjs:2430-2436 (declaredSiteId); scripts/check-evidence-relocation.mjs:33; scripts/verify-phase-02.mjs:127"
+    },
+    {
+      "id": "stale-declaration-guard",
+      "verdict": "APPROVE",
+      "reason": "found.length!==1 throws for vanished/ambiguous; duplicate key rejected; missing or edited declaration file fails verifyCensus via file digest (test 6 + own replay). Deleting the file makes the scan emit 25 sites, so it fails closed.",
+      "locator": "scripts/git-one-door-scan.mjs:2461-2463"
+    },
+    {
+      "id": "new-class-justified",
+      "verdict": "APPROVE",
+      "reason": "configured-binary needs consumer-config data (guarded: family must be unresolved-binary); argv-runner is Rust-primitive specific; standalone-skill-script is keyed to SKILL.md metadata; none fits fixed raw evidence readers. All 19 tooling sites use literal read verbs except the two passthrough wrappers (see siteId-binds-call-not-argv-set).",
+      "locator": "plans/.../phase-09/git-one-door/exemption-proposal.md"
+    },
+    {
+      "id": "git-spec-not-updated",
+      "verdict": "REWORK",
+      "reason": "MEDIUM, routed to Lead/Git owner (spec was outside the Doer's writable list): docs/platform/git/spec.md section 12 enumerates the named classes and the census contract but has neither declared-tooling-exemption nor the declaration input; a settled spec fact belongs in the area spec.",
+      "locator": "docs/platform/git/spec.md:634-666"
+    },
+    {
+      "id": "hook-verb-widening",
+      "verdict": "APPROVE",
+      "reason": "READ_VERBS diff adds exactly 'show-ref' and 'diff-tree' (both have no write mode); test proves update-ref and symbolic-ref write remain sites. The widening is global to automatic hook classification too, which is harmless for these two verbs.",
+      "locator": "scripts/git-one-door-scan.mjs:56"
+    },
+    {
+      "id": "doctor-verifyCensus",
+      "verdict": "APPROVE",
+      "reason": "test/setup/git-mutation-census.test.mjs passes (checkMutationOneDoor deepEquals verifyCensus, passed=true); src/setup/git-checks.mjs unchanged by the commit; own verifyCensus replay passed.",
+      "locator": "test/setup/git-mutation-census.test.mjs"
+    },
+    {
+      "id": "pinned-blobs-unchanged",
+      "verdict": "APPROVE",
+      "reason": "HEAD:scripts/generate-doc-inventory.mjs = a52981ff2862..., HEAD:scripts/generate-shipped-path-inventory.mjs = 0f1cd7e1cee3...; neither file is in 2e57b8bc1 or 5069820ca.",
+      "locator": "scripts/generate-doc-inventory.mjs; scripts/generate-shipped-path-inventory.mjs"
+    },
+    {
+      "id": "d3c-verifier-cleanup",
+      "verdict": "APPROVE",
+      "reason": "installedPaths is recorded before npm runs (so partial installs are covered), only for paths absent beforehand; phase-01 target symlink is removed with rmSync, which does not follow the link; reclaim happens in finally before the guarded removeWorktree; no force fallback. verify-phase-02.test.mjs 16/16 here; no fgos-verify worktree registered and no /tmp/fgos-verify-phase0* left after the run. Residual (documented): phase-01 uses 'npm install', which can rewrite package-lock.json; full-suite outputs can also leave ignored bytes. Either keeps a registered worktree, with the existing warning.",
+      "locator": "scripts/verify-phase-01.mjs:193-224,455-460; scripts/verify-phase-02.mjs:181-197,308-312,348-352"
+    },
+    {
+      "id": "tests-run-singly",
+      "verdict": "APPROVE",
+      "reason": "git-one-door-declarations 6/6, git-mutation-census 1/1, doc-git-reads 3/3, verify-phase-02 16/16. test/git/one-door.test.mjs 4/6: both failures are holder-lock lock-driver-unavailable / git-addon-not-shipped from listFiles->gitPortOptions in this worktree, an environment limit (same 4/6 the Doer reported).",
+      "locator": "/tmp/fgos-work/w4-g4-declare/*.test.mjs.log"
+    }
+  ],
+  "summary": {
+    "approve": 12,
+    "rework": 2,
+    "top": [
+      "HIGH: passthrough-wrapper declarations exempt future callers (reset --hard / push --force probes stayed green)",
+      "MEDIUM: Git spec section 12 lacks declared-tooling-exemption and the declaration input"
+    ],
+    "environment": "The first scanner run built the git addon via cargo into the review worktree's pre-existing ignored target/ (no tracked change). I read releasePath only from main .fgos/installation/activation.json, as the brief directs Doers. one-door.test.mjs addon failures are an environment limit."
+  }
+}
