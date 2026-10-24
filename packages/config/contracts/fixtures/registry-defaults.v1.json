@@ -109,7 +109,6 @@
   }
  ],
  "schema-only": [
-  "secrets",
-  "bin"
+  "secrets"
  ]
 }

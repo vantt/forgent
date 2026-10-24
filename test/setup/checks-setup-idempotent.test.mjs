@@ -39,21 +39,23 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 
 
-test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {
+test('fgos setup run twice does not rewrite the config.yaml of the machine or of the project', () => {
   const cwd = mkTemp('setup-cli-global-config-repeat-');
   const homeDir = mkTemp('setup-cli-global-config-repeat-home-');
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
   const first = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
   assert.equal(first.status, 0, first.stderr);
-  const globalPath = JSON.parse(first.stdout).data.globalConfigPath;
+  const { globalConfigPath: globalPath, configPath: projectPath } = JSON.parse(first.stdout).data;
   const mtimeBefore = fs.statSync(globalPath).mtimeMs;
+  const projectMtimeBefore = fs.statSync(projectPath).mtimeMs;
 
   const second = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
   assert.equal(second.status, 0, second.stderr);
   const envelope = JSON.parse(second.stdout);
   assert.equal(envelope.data.globalConfigCreated, false);
-  assert.deepEqual(envelope.data.globalConfigAddedKeys, []);
-  assert.equal(fs.statSync(globalPath).mtimeMs, mtimeBefore, 'must not rewrite a file that already has every default key');
+  assert.equal(envelope.data.configCreated, false);
+  assert.equal(fs.statSync(globalPath).mtimeMs, mtimeBefore, 'must not rewrite a config file that already exists');
+  assert.equal(fs.statSync(projectPath).mtimeMs, projectMtimeBefore, 'must not rewrite a config file that already exists');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

@@ -270,45 +270,23 @@ test('discover with no id is rejected as validation, exit 4', () => {
 });
 
 
-// str76-runner-bootstrap-e3: a fresh cwd with no runner config used to
-// crash `discover` with RunnerConfigError/ENOENT (the bug this feature
-// fixes) — it now bootstraps the D1 default config instead, BEFORE
-// resolveDiscovery is ever called (bin/fgos.mjs's own `discover` case reads
-// `cfg` first). tsk-1x3 D1/D9/D16: the config bootstrap still happens
-// unconditionally, but resolveDiscovery itself no longer spawns a judge
-// against it for a bare (no --verdict) session-role call — it refuses
-// loudly instead. PATH is still neutralized here to prove the bootstrap
-// path is exercised the same way (no live agent invoked either way).
-test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT, then still refuses without --verdict (D16)', () => {
+// A fresh cwd with no runner config and no assistant CLI on PATH: the loader refuses by name and says how
+// to set an executor; `discover` writes no config file and never touches the item.
+test('discover on a fresh cwd with no runner config and no assistant CLI refuses naming the fix and writes no config', () => {
   const cwd = tmpCwdFromTemplate();
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  assert.equal(fs.existsSync(configPath), false);
-
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
 
   const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
-  assert.equal(result.status, 4, `expected the D16 refusal, not a RunnerConfigError/ENOENT crash: ${result.stderr}`);
-  assert.match(result.stderr, /no committed CONTEXT.md and no --verdict was given/);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /fgos config set runner\.executor/);
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json BEFORE refusing');
-
+  for (const name of ['config.yaml', 'config.json']) {
+    assert.equal(fs.existsSync(path.join(cwd, '.fgos', name)), false, `discover must not write .fgos/${name}`);
+  }
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
   assert.equal(view.work[id].workflowStep, 'discovery');
 });
-
-
-test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with an explicit missing config']).stdout).data.id;
-  const missingConfigPath = path.join(cwd, 'no-such-runner-config.json');
-
-  const result = run(cwd, ['discover', id, '--config', missingConfigPath]);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /cannot read runner config/);
-  assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
-});
-
 
 // --- caller-supplied verdict (tsk-27y D1/D2): `--verdict` on `discover`/
 // `decompose` lets a live caller skip the judge subprocess entirely for one

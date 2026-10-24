@@ -141,7 +141,7 @@ import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
-import { checkSeatBindingConfig, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
+import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
@@ -6314,12 +6314,6 @@ registerCheck({
   id: 'seat-binding-route',
   description: 'the host Seat Binding runs answers the internal seat-binding route at protocol 1',
   check: (cwd) => checkSeatBindingRoute(cwd),
-});
-
-registerCheck({
-  id: 'seat-binding-config',
-  description: 'the project runner config\'s tier ladder comment, when it has one, matches the tier ladder',
-  check: (cwd) => checkSeatBindingConfig(cwd),
 });
 
 registerCheck({

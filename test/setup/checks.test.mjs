@@ -100,7 +100,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'identity-project-id',
       'identity-ids-unique',
       'seat-binding-route',
-      'seat-binding-config',
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
