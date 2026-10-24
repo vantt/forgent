@@ -12,13 +12,14 @@ provider = ["directory", "dep:fgos-host-runtime"]
 # The in-process doors over the local session directory (register the current
 # session, resolve a handle or role) need the Convention rules and the git
 # driver (project id), never the host runtime.
-directory = ["dep:fgos-convention", "dep:fgos-git", "dep:fgos-holder-lock"]
+directory = ["dep:fgos-canonical-json", "dep:fgos-convention", "dep:fgos-git", "dep:fgos-holder-lock"]
 
 [dependencies]
 fgos-durable-file = { path = "../../durable-file/rust" }
 # The process-tree adapter reads `/proc` through the L0 process crate, so it is not optional.
 fgos-process = { path = "../../process/rust" }
 fgos-host-runtime = { path = "../../host-runtime/rust", optional = true }
+fgos-canonical-json = { path = "../../canonical-json/rust", optional = true }
 fgos-holder-lock = { path = "../../holder-lock/rust", optional = true }
 fgos-convention = { path = "../../convention/rust", optional = true }
 fgos-git = { path = "../../git/rust", optional = true }

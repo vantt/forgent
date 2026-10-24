@@ -27,6 +27,8 @@ pub mod refusal;
 pub mod resolve;
 pub mod session;
 #[cfg(feature = "directory")]
+pub mod shared;
+#[cfg(feature = "directory")]
 pub mod signing;
 pub mod text;
 

@@ -366,6 +366,7 @@ dependencies = [
 name = "fgos-identity"
 version = "0.2.0"
 dependencies = [
+ "fgos-canonical-json",
  "fgos-convention",
  "fgos-durable-file",
  "fgos-git",

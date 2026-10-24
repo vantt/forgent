@@ -369,7 +369,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             }
         },
         Verb::Resolve { query } => {
-            let listed = directory::resolve(&root, query, &judge_here)?;
+            let listed = directory::resolve(&root, query, &judge_here, None)?;
             Ok(serde_json::to_value(listed).expect("Listed always serializes"))
         }
         Verb::List { project, prune } => {
@@ -383,7 +383,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             } else {
                 None
             };
-            let sessions = directory::list(&root, project_id.as_deref(), *prune, &judge_here)?;
+            let sessions = directory::list(&root, project_id.as_deref(), *prune, &judge_here, None)?;
             Ok(serde_json::to_value(sessions).expect("Sessions always serializes"))
         }
     }
