@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
   "counts": {
     "8": 48,
     "13": 16,
@@ -19,7 +19,8 @@
         "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 4,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
       "composedSpecIds": [
@@ -43,7 +44,8 @@
         "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 4,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
       "composedSpecIds": [
@@ -67,7 +69,8 @@
         "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 4,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
       "composedSpecIds": [
@@ -91,7 +94,8 @@
         "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 4,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
       "composedSpecIds": [
@@ -115,7 +119,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -137,7 +142,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -159,7 +165,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -181,7 +188,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -203,7 +211,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -225,7 +234,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -247,7 +257,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -269,7 +280,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -291,7 +303,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -313,7 +326,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -335,7 +349,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -357,7 +372,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -379,7 +395,8 @@
         "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 191,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
       "composedSpecIds": [],
@@ -401,7 +418,8 @@
         "originalSourceSha256": "44b222ef7b565cbaf6c1caf0ca683a2dec793eb5b8f34376c60f0e1a0a9a65f7",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 224,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/test-proof-inventory.mjs",
       "composedSpecIds": [
@@ -425,7 +443,9 @@
         "originalSourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
         "record": "step-05-records/generators-skills-and-support.jsonl",
         "recordLine": 234,
-        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+        "currentSha256": "9cf5685899f1fc7c848e6654b5fbbcf16d4661c7a53218115bbfd40a5a7bc60a",
+        "requiresFinalPinReanchor": true
       },
       "liveHolder": "scripts/verify-phase-01.mjs",
       "composedSpecIds": [],
@@ -440,14 +460,16 @@
       "memberId": "dynamic-014397",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "function checkDocNearDuplicate(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const docsDir = path.join(root, 'docs');\n  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };\n  const candidates = [];",
         "verbatimPassageSha256": "935d5715e7c2a810a9c858c6eea3a88837d776b413238e8d4647a4bc8ac99756",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -462,14 +484,16 @@
       "memberId": "dynamic-014398",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "function checkDocNearDuplicate(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const docsDir = path.join(root, 'docs');\n  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };\n  const candidates = [];",
         "verbatimPassageSha256": "935d5715e7c2a810a9c858c6eea3a88837d776b413238e8d4647a4bc8ac99756",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -484,14 +508,16 @@
       "memberId": "dynamic-014399",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "  for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {\n    if (!relPath.endsWith('.md')) continue;\n    const absPath = path.join(docsDir, relPath);\n    if (!fs.statSync(absPath).isFile()) continue;\n    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));",
         "verbatimPassageSha256": "1d013ee4c1407c79c77e1666bf9eee9c6a07ab15976cdac63c30f1546cf922fd",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -506,14 +532,16 @@
       "memberId": "dynamic-014400",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "  for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {\n    if (!relPath.endsWith('.md')) continue;\n    const absPath = path.join(docsDir, relPath);\n    if (!fs.statSync(absPath).isFile()) continue;\n    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));",
         "verbatimPassageSha256": "1d013ee4c1407c79c77e1666bf9eee9c6a07ab15976cdac63c30f1546cf922fd",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -528,14 +556,16 @@
       "memberId": "dynamic-014401",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "    const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;\n    if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {\n      candidates.push({ path: path.join('docs', relPath), authoritativeFor });\n    }\n  }",
         "verbatimPassageSha256": "bc07bd6e85c5e42b8ffdc47fbd7e24ad62f0210e73d26e352f408938ec4b0720",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -550,14 +580,16 @@
       "memberId": "dynamic-014402",
       "source": {
         "file": "src/setup/registrations.mjs",
-        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "sha256": "35543aa7da42e23561ced3b49ca87cdf3f02249cc2aca356b48a72d7578d9d5c",
         "verbatimPassage": "    const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;\n    if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {\n      candidates.push({ path: path.join('docs', relPath), authoritativeFor });\n    }\n  }",
         "verbatimPassageSha256": "bc07bd6e85c5e42b8ffdc47fbd7e24ad62f0210e73d26e352f408938ec4b0720",
         "passageStillExact": true,
         "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
         "record": "step-05-records/setup-doctor-roots.jsonl",
         "recordLine": 21,
-        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+        "priorSha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
       "composedSpecIds": [],
@@ -579,7 +611,8 @@
         "originalSourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 11,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md",
       "composedSpecIds": [],
@@ -601,7 +634,8 @@
         "originalSourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 11,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md",
       "composedSpecIds": [],
@@ -623,7 +657,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -647,7 +682,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -671,7 +707,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -695,7 +732,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -719,7 +757,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -743,7 +782,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -767,7 +807,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -791,7 +832,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -815,7 +857,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -839,7 +882,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -863,7 +907,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -887,7 +932,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -911,7 +957,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -935,7 +982,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -959,7 +1007,8 @@
         "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
         "record": "step-05-records/tests-judgment-batch4.jsonl",
         "recordLine": 1,
-        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
       "composedSpecIds": [
@@ -983,7 +1032,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1005,7 +1055,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1027,7 +1078,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1049,7 +1101,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1071,7 +1124,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1093,7 +1147,8 @@
         "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
         "record": "step-05-records/tests-judgment-batch6.jsonl",
         "recordLine": 29,
-        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "composedSpecIds": [],
@@ -1115,7 +1170,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 1,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1140,7 +1196,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 1,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1165,7 +1222,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 1,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1190,7 +1248,8 @@
         "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 2,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1215,7 +1274,8 @@
         "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 2,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1240,7 +1300,8 @@
         "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 2,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1265,7 +1326,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 3,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1290,7 +1352,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 3,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1315,7 +1378,8 @@
         "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 3,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
       "composedSpecIds": [
@@ -1340,7 +1404,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1365,7 +1430,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1390,7 +1456,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1415,7 +1482,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1440,7 +1508,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1465,7 +1534,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1490,7 +1560,8 @@
         "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
         "record": "step-05-records/citation-ratchet-roots.jsonl",
         "recordLine": 5,
-        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
       "composedSpecIds": [
@@ -1515,17 +1586,18 @@
         "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
         "record": "step-05-records/runtime-judgment-part-22.jsonl",
         "recordLine": 2,
-        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
         "scope-consumer:AGENTS.md",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1541,17 +1613,18 @@
         "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
         "record": "step-05-records/runtime-judgment-part-22.jsonl",
         "recordLine": 2,
-        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
         "scope-consumer:AGENTS.md",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1567,17 +1640,18 @@
         "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
         "record": "step-05-records/runtime-judgment-part-22.jsonl",
         "recordLine": 2,
-        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
         "scope-consumer:AGENTS.md",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1593,17 +1667,18 @@
         "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
         "record": "step-05-records/runtime-judgment-part-22.jsonl",
         "recordLine": 2,
-        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
         "scope-consumer:AGENTS.md",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1612,25 +1687,27 @@
       "memberId": "reference-000231",
       "source": {
         "file": "bin/fgos.mjs",
-        "sha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+        "sha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
         "verbatimPassage": "      const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');\n      const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');\n      // tsk-1lv-2 D4: a platform/repo-wide decision (no --id) carries\n      // --scope <area-slug> (e.g. \"repo\" for the whole codebase, or an\n      // area name matching docs/specs/<area>.md) so `fgos decision-index`\n      // can project it into docs/decisions/index.md. Purely optional and\n      // additive -- an item-scoped decision (--id set) has no use for it,\n      // and omitting it entirely is unaffected (same posture as\n      // --alternatives/--source above).",
         "verbatimPassageSha256": "77f8297be1850916dd435551b2c04cb7dadbc61b34bf38feba44fa3d12415b16",
         "passageStillExact": true,
         "originalSourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
         "record": "step-05-records/runtime-judgment-part-22.jsonl",
         "recordLine": 13,
-        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+        "priorSha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
-        "hunk-park:bin/fgos.mjs",
-        "scope-consumer:bin/fgos.mjs",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:repin:hunk-park:bin/fgos.mjs",
+        "w8:repin:scope-consumer:bin/fgos.mjs",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1639,25 +1716,27 @@
       "memberId": "reference-003643",
       "source": {
         "file": "src/cli/command-registry.mjs",
-        "sha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "sha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3",
         "verbatimPassage": "        id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },\n        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },\n        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },\n      },\n      positional: ['text'],",
         "verbatimPassageSha256": "edf3360d6fc02a00eb98d57672960c009958bea7b2d5ed18b4b8cb21a12d6500",
         "passageStillExact": true,
         "originalSourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
         "record": "step-05-records/cli-help-messages.jsonl",
         "recordLine": 3,
-        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67"
+        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67",
+        "priorSha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
-        "recomposed-predecessor:src/cli/command-registry.mjs",
-        "scope-consumer:src/cli/command-registry.mjs",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:repin:scope-consumer:src/cli/command-registry.mjs",
+        "w8:repin:w2:predecessor:src/cli/command-registry.mjs",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1666,25 +1745,27 @@
       "memberId": "reference-003666",
       "source": {
         "file": "src/cli/command-registry.mjs",
-        "sha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "sha256": "43fccafb0c1e5f75ae8104c5ac035b93aa5d2c03089fc571c6f5bb8b2b2f6ea3",
         "verbatimPassage": "        id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },\n        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },\n        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },\n      },\n      positional: ['text'],",
         "verbatimPassageSha256": "edf3360d6fc02a00eb98d57672960c009958bea7b2d5ed18b4b8cb21a12d6500",
         "passageStillExact": true,
         "originalSourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
         "record": "step-05-records/cli-help-messages.jsonl",
         "recordLine": 3,
-        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67"
+        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67",
+        "priorSha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
-        "recomposed-predecessor:src/cli/command-registry.mjs",
-        "scope-consumer:src/cli/command-registry.mjs",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:repin:scope-consumer:src/cli/command-registry.mjs",
+        "w8:repin:w2:predecessor:src/cli/command-registry.mjs",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     },
     {
@@ -1700,19 +1781,21 @@
         "originalSourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
         "record": "step-05-records/runtime-judgment-part-28.jsonl",
         "recordLine": 30,
-        "recordSha256": "5dfc39c71630b882fe11d4de1f78a01d9139de7b795442d5e31ab403214f533a"
+        "recordSha256": "5dfc39c71630b882fe11d4de1f78a01d9139de7b795442d5e31ab403214f533a",
+        "verifiedAtSourceCommit": "eb744281deba853f201cda15dcb4876300a1d638"
       },
       "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
       "composedSpecIds": [
-        "convention:area-holder-table",
         "scope-consumer:src/state/store.mjs",
-        "status-units:docs/platform/governance.md"
+        "w8:convention:area-holder-table",
+        "w8:status-units:docs/platform/governance.md"
       ],
       "policyRef": null,
       "owningProof": "area-holder-table.json",
-      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "disposition": "Complete holder table: seat-binding and workflow specs; end-user sections owned by work-state; candidate placement not cutover acceptance",
       "independentVerdict": "pending"
     }
   ],
-  "independentAcceptance": false
+  "independentAcceptance": false,
+  "fixAuthority": "L13-11; exact new binding review still required"
 }

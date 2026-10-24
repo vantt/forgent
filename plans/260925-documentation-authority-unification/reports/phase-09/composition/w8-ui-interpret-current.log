@@ -1,0 +1,18 @@
+ui-spec wireframe v2 — reading spec from: /tmp/fgos-work/w8-comp-fix/current/docs/ui-spec
+  Found 12 surface(s)
+  Wireframe v2 written: /tmp/fgos-work/w8-comp-fix/current/docs/ui-spec/generated/wireframe-v2.html
+  Opening in browser...
+Could not open browser automatically: Command failed: xdg-open "file:////tmp/fgos-work/w8-comp-fix/current/docs/ui-spec/generated/wireframe-v2.html"
+Couldn't find a suitable web browser!
+
+Set the BROWSER environment variable to your desired browser.
+
+Warning: program returned non-zero exit code #256
+/usr/bin/xdg-open: 882: www-browser: not found
+/usr/bin/xdg-open: 882: links2: not found
+/usr/bin/xdg-open: 882: elinks: not found
+/usr/bin/xdg-open: 882: links: not found
+/usr/bin/xdg-open: 882: lynx: not found
+/usr/bin/xdg-open: 882: w3m: not found
+xdg-open: no method available for opening 'file:////tmp/fgos-work/w8-comp-fix/current/docs/ui-spec/generated/wireframe-v2.html'
+

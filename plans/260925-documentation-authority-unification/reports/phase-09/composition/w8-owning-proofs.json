@@ -1,0 +1,59 @@
+{
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "tests": [
+    {
+      "file": "test/runner/dead-vocabulary-guard.test.mjs",
+      "exit": 0,
+      "log": "w8-dead-vocabulary-guard.test.log",
+      "passCount": [
+        "10"
+      ],
+      "failCount": [
+        "0"
+      ]
+    },
+    {
+      "file": "test/scripts/check-decision-citation-drift.test.mjs",
+      "exit": 0,
+      "log": "w8-check-decision-citation-drift.test.log",
+      "passCount": [
+        "32"
+      ],
+      "failCount": [
+        "0"
+      ]
+    },
+    {
+      "file": "test/scripts/doc-link-pass.test.mjs",
+      "exit": 0,
+      "log": "w8-doc-link-pass.test.log",
+      "passCount": [
+        "20"
+      ],
+      "failCount": [
+        "0"
+      ]
+    },
+    {
+      "file": ".claude/skills/ui-spec/tools/validate.mjs",
+      "tree": "current",
+      "exit": 0,
+      "log": "w8-ui-validate-current.log"
+    },
+    {
+      "file": ".claude/skills/ui-spec/tools/validate.mjs",
+      "tree": "ui-composed-before-moves",
+      "exit": 0,
+      "log": "w8-ui-validate-ui-composed-before-moves.log"
+    }
+  ],
+  "negative": {
+    "exit": 1,
+    "liveProbeRejected": true,
+    "log": "w8-dead-vocabulary-negative.log"
+  },
+  "host": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+  "noGitWrites": true,
+  "noLiveStateRead": true,
+  "verificationContext": "Complete scratch output after the canonical RUL45 gloss correction and real skill regeneration, plus all deferred final-pin main glosses"
+}

@@ -1,7 +1,12 @@
 {
   "memberId": "dynamic-023895",
   "rowId": "r28621",
-  "status": "proposal-only; Lead placement approval required",
+  "status": "historical proposal superseded by current-byte w8 placement records; do not execute these historical patches",
+  "leadApproval": "L13-11.2",
+  "currentPlacementRef": "w8-gap05-placement.json",
+  "currentOverlayProofRef": "w8-gap05-overlay-verification.json",
+  "currentPatchSpecIds": ["w8:gap05:relocation", "w8:gap05:history"],
+  "priorStatus": "proposal-only; Lead placement approval required",
   "recommendation": "Relocate BOTH complete source-carriage sections into a literal historical snapshot, retaining a live pointer; never rename quoted historical names or exempt the guard.",
   "sourceUnitSha256": "cc606c74e8c1ba605e254441229835334ed9002e7397dc8cd4cee15aa513d4ce",
   "sourceUnits": [

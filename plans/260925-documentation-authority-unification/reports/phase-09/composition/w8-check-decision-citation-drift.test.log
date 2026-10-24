@@ -1,0 +1,40 @@
+✔ ADR<n> form is recognized (1.333064ms)
+✔ bare NNNN form is recognized only when known (0.186197ms)
+✔ a bare id inside an ADR<id> match is not double-counted (0.120205ms)
+✔ multiple distinct ids on one line (0.097912ms)
+✔ a superseded id cited with no acknowledgement reports a dead-framing finding (0.224785ms)
+✔ citing both the superseded id and its superseding id on the same line reports zero (0.745301ms)
+✔ citing a decision that was never superseded reports zero findings (0.214308ms)
+✔ CLI run over a fixture reports the dead-framing finding and exits 1 (28.3675ms)
+✔ CLI run over a fixture with no drift exits 0 (28.226622ms)
+✔ a paren with real prose is a gloss (0.242792ms)
+✔ a paren with only other id tokens is not a gloss (0.130261ms)
+✔ an empty paren is not a gloss (0.065869ms)
+✔ no paren at all is not a gloss (0.053769ms)
+✔ a bare ADR citation with no gloss reports bare-citation (0.398781ms)
+✔ an ADR citation with a real gloss reports nothing (0.113477ms)
+✔ a RUL citation with only the old area-suffix, no real gloss, still reports bare-citation (0.078959ms)
+✔ a D-local id cited outside its own CONTEXT.md reports d-local-outside-home, gloss or not (0.063643ms)
+✔ a D-local id cited inside its OWN CONTEXT.md reports nothing (0.051288ms)
+✔ a comma-list of D-local ids each report their own finding (0.078606ms)
+✔ a slash-separated D-local list reports each id separately (0.069938ms)
+✔ a heading-parenthetical D-local citation still reports (0.038736ms)
+✔ a citation inside a fenced code block is skipped (0.037307ms)
+✔ a baselined finding does not report as new, a genuinely new one does (0.155439ms)
+✔ a shifted line number alone does not make a baselined finding report as new (tsk-3x8 F1: content-keyed, not line-keyed) (0.062471ms)
+✔ two citations of the same id on different lines/text stay distinct (0.045863ms)
+✔ a genuinely new Nth occurrence of an already-duplicated key is not silently absorbed (tsk-6at: count consumption, not membership) (0.074019ms)
+✔ findNewFindings/baselineFromFindings do not throw on a "__proto__" file (tsk-1pf: Object.create(null) hardening) (0.061199ms)
+✔ --write-baseline snapshots current findings, and a bare re-run against the SAME tree exits 0 (57.453331ms)
+✔ a NEW finding appended after --write-baseline still fails (49.842265ms)
+✔ a line inserted BEFORE a baselined finding does not make it report as new (tsk-3x8 F1: the exact hand-verified repro, CLI level) (53.065771ms)
+✔ CLI run against the real repo root, with the checked-in baseline, exits 0 (78.799678ms)
+✔ default citation scan includes nested area rules and decision narratives without losing legacy specs (28.538779ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 382.613108

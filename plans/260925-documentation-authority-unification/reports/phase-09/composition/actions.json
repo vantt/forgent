@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
   "previousAttempt": {
     "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
     "actions": [
@@ -5860,10 +5860,12 @@
         "f00434",
         "f00457"
       ],
-      "patchRef": "patch-specs.json#hunk-park:bin/fgos.mjs",
-      "beforeSha256": "4e7412ebfafada1bb7c4971fb454f1741fbb871336194830b7d34f89bdc84c76",
-      "expectedAfterSha256": "96778598cdbbb484c1ee4b356ac83a745ed370951bddcd575f76b104c766ed3b",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "patchRef": "patch-specs.json#w8:repin:hunk-park:bin/fgos.mjs",
+      "beforeSha256": "a17ab00649c9c3a84ab93b36a0433e3f3e924659e2bea882d6c4d993e72fedd3",
+      "expectedAfterSha256": "1756414ad9721b55f54b6587dbd108336b37cec88e86cd363cf9398b1df2e666",
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "1c50f5643c3bdaa2ac28b04d3e6efe1d67ffe86bab3aa33b949ba943d1eb3c1e",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/process/spec.md",
@@ -5876,7 +5878,9 @@
       "patchRef": "patch-specs.json#hunk-park:docs/platform/process/spec.md",
       "beforeSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
       "expectedAfterSha256": "2f64f7e783fba8fb1a59203781ed6176e65ec79c1489ea1af7b0ec0628d1b290",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/session-identity/spec.md",
@@ -5886,8 +5890,11 @@
         "f07853"
       ],
       "successor": "docs/platform/identity/spec.md",
-      "patchRef": "patch-specs.json#hunk-park:identity-successor",
-      "command": "apply identified successor spec with beforeSha256 guard; never recreate session-identity/spec.md"
+      "patchRef": "patch-specs.json#w8:repin:hunk-park:identity-successor",
+      "command": "apply identified successor spec with beforeSha256 guard; never recreate session-identity/spec.md",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "beforeSha256": "c84d037198f648ff713e2d5e998a9b6f4a2b98ded36f84102ed7d9bfa8624fd0",
+      "expectedAfterSha256": "8e33c74552c02e966f23c651b5ce6dadd5d57e04ac678cab351f4dacd94dbb44"
     },
     {
       "id": "file:docs/specs/reading-map.md",
@@ -5929,11 +5936,13 @@
         "f08284",
         "f08289"
       ],
-      "beforeSha256": "7bc9fa4adcda6f1ce9a88c8f411109f729a003830a69a50a84fb648cde3861bd",
+      "beforeSha256": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e",
       "successor": "docs/reading-map.md#5-detailed-product-and-source-map",
       "command": "node --test test/scripts/doc-link-pass.test.mjs",
-      "requires": "G5 retained L11-25 banner and both compounding→knowledge lines; current reading-map union/G9 accepted first",
-      "status": "exact retirement step; current source not patched because it is removed at cutover"
+      "requires": "Retirement guard refreshed at HEAD; G5 L11-25 owner acceptance remains separate",
+      "status": "exact retirement step; current source not patched because it is removed at cutover",
+      "currentSourceSha256": "46c52e950dab2606b1ca5e6fb0c76d310c3316b065855e77c00e3834bd2d7e8e",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/specs/workflow.md",
@@ -5943,10 +5952,16 @@
         "f08330",
         "f08334"
       ],
-      "patchRef": "patch-specs.json#hunk-park:docs/specs/workflow.md",
-      "beforeSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
-      "expectedAfterSha256": "25c4316ef7a5c6a619b866cf553f23c2964c1f32935fbb2b399eefd865ff9116",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "patchRef": "patch-specs.json#w8:hunk-park:workflow-holder",
+      "beforeSha256": "0ce96d282b026df85d96aa20c42b3e934b3b3f739a13edcf0aee6905465e1d7c",
+      "expectedAfterSha256": "6f9b26430c16fa5f489c127d766a3bfc59ad28aef768094af18a355254a940ef",
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "successor": "docs/platform/workflow/spec.md",
+      "effectivePath": "docs/platform/workflow/spec.md",
+      "composedSpecId": "w8:hunk-park:workflow-holder",
+      "legacyDisposition": "Retire legacy source; never apply its historical park hunk"
     },
     {
       "id": "file:packages/herdr-fgos-common/rust/src/fgos.rs",
@@ -5961,7 +5976,9 @@
       "patchRef": "patch-specs.json#hunk-park:packages/herdr-fgos-common/rust/src/fgos.rs",
       "beforeSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
       "expectedAfterSha256": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:src/runner/merge.mjs",
@@ -5978,10 +5995,12 @@
         "f08715",
         "f08718"
       ],
-      "patchRef": "patch-specs.json#hunk-park:src/runner/merge.mjs",
-      "beforeSha256": "41c298ef178b52390d324f7cd4991db5eb5cb25b4437711c809e02e1d0107913",
-      "expectedAfterSha256": "ab22fb17e162101c2d594b280ec0480cfd3e3f20da4319d55f5abf2608f41e6f",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "patchRef": "patch-specs.json#w8:repin:hunk-park:src/runner/merge.mjs",
+      "beforeSha256": "6a84574a194e8ec9c05b9e59d228417e884f28a718ecfe2a8986a170107e58da",
+      "expectedAfterSha256": "03184762a6e2320ce627176cd2a53c8e33356a5178ecb9c1b53af4d04c9759b4",
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "6a84574a194e8ec9c05b9e59d228417e884f28a718ecfe2a8986a170107e58da",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:src/setup/git-hooks.mjs",
@@ -5993,7 +6012,9 @@
       "patchRef": "patch-specs.json#hunk-park:src/setup/git-hooks.mjs",
       "beforeSha256": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
       "expectedAfterSha256": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "status": "fuzz-zero roundtrip; independent review pending",
+      "currentSourceSha256": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:test/runner/merge.test.mjs",
@@ -6009,7 +6030,9 @@
       "patchRef": "patch-specs.json#hunk-park:test/runner/merge.test.mjs",
       "beforeSha256": "44e8822ee9addea2722d2921cddcfb5d2fa25f8f1a16cbd35dd81bdfce948308",
       "expectedAfterSha256": "1f0d6a3df0595b28d255e8e6b08ae8603680b76b0ab7c59f64f822ced8bc43fb",
-      "status": "fuzz-zero roundtrip; independent review pending"
+      "status": "fuzz-zero roundtrip at HEAD; independent semantic review pending",
+      "currentSourceSha256": "44e8822ee9addea2722d2921cddcfb5d2fa25f8f1a16cbd35dd81bdfce948308",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/ak-cook-worker-contract.md",
@@ -6022,8 +6045,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
       "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/ak-cook-worker-contract.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/capability-catalog.md",
@@ -6038,8 +6063,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
       "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/capability-catalog.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/catchup-self-recovery.md",
@@ -6052,8 +6079,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
       "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/catchup-self-recovery.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/citation-format.md",
@@ -6082,8 +6111,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
       "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/citation-format.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/coding-worker-contract.md",
@@ -6105,8 +6136,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
       "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/coding-worker-contract.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/executor-dispatch-fallback.md",
@@ -6134,8 +6167,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
       "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/executor-dispatch-fallback.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/_shared/planning-capability-awareness.md",
@@ -6150,8 +6185,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
       "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/_shared/planning-capability-awareness.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/SKILL.md",
@@ -6165,8 +6202,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
       "expectedAfterSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/references/consult-protocol.md",
@@ -6180,8 +6219,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
       "expectedAfterSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/references/consult-protocol.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/references/deep-dive-protocol.md",
@@ -6195,8 +6236,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
       "expectedAfterSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/references/deep-dive-protocol.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/references/extract-rules.md",
@@ -6209,8 +6252,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
       "expectedAfterSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/references/extract-rules.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/scripts/distill.mjs",
@@ -6265,8 +6310,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
       "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/scripts/distill.mjs",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
@@ -6285,8 +6332,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
       "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-clarifying/SKILL.md",
@@ -6301,8 +6350,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
       "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-clarifying/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-discovering/SKILL.md",
@@ -6322,8 +6373,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
       "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-discovering/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-exploring/SKILL.md",
@@ -6341,8 +6394,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
       "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-exploring/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
@@ -6358,8 +6413,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
       "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
@@ -6375,8 +6432,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
       "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
@@ -6389,8 +6448,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
       "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-implement/SKILL.md",
@@ -6406,8 +6467,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
       "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-implement/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
@@ -6423,8 +6486,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
       "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
@@ -6438,8 +6503,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
       "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-knowledge/SKILL.md",
@@ -6452,8 +6519,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
       "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-knowledge/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-planning/SKILL.md",
@@ -6471,8 +6540,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
       "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-planning/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
@@ -6490,8 +6561,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
       "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -6512,8 +6585,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-shaping/SKILL.md",
@@ -6539,8 +6614,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
       "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-shaping/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-validating/SKILL.md",
@@ -6555,8 +6632,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
       "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-validating/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
@@ -6570,8 +6649,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
       "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
@@ -6591,8 +6672,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
       "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-indexing/SKILL.md",
@@ -6616,8 +6699,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
       "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-indexing/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.agents/skills/fgos-researching/SKILL.md",
@@ -6632,9 +6717,11 @@
       "command": "npm run build:skills",
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
-      "expectedAfterSha256": "689fa1aaf4efe3f96efd2063c8fec75030e68ff2fba40851c17154f37bac17f4",
-      "evidenceRef": "skill-regeneration.json#render:.agents/skills/fgos-researching/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/distill/scripts/distill.mjs",
@@ -6689,8 +6776,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
       "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/distill/scripts/distill.mjs",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
@@ -6709,8 +6798,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
       "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
@@ -6724,8 +6815,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
       "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
@@ -6739,8 +6832,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
       "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
@@ -6754,8 +6849,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
       "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
@@ -6768,8 +6865,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
       "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
@@ -6784,8 +6883,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
       "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -6801,8 +6902,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-shaping/SKILL.md",
@@ -6815,8 +6918,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
       "expectedAfterSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-shaping/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
@@ -6829,8 +6934,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
       "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
@@ -6845,8 +6952,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
       "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
-      "evidenceRef": "skill-regeneration.json#render:.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
@@ -6859,8 +6968,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
       "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/capability-catalog.md",
@@ -6875,8 +6986,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
       "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/capability-catalog.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/catchup-self-recovery.md",
@@ -6889,8 +7002,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
       "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/catchup-self-recovery.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/citation-format.md",
@@ -6919,8 +7034,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
       "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/citation-format.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/coding-worker-contract.md",
@@ -6942,8 +7059,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
       "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/coding-worker-contract.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
@@ -6971,8 +7090,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
       "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "be25f15a828a2558ef5ffa931f10002760133dca0db77399eb489a63ebde40c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/_shared/planning-capability-awareness.md",
@@ -6987,8 +7108,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
       "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/_shared/planning-capability-awareness.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
@@ -7003,8 +7126,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
       "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
@@ -7024,8 +7149,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
       "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
@@ -7043,8 +7170,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
       "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
@@ -7060,8 +7189,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
       "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
@@ -7077,8 +7208,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
       "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
@@ -7091,8 +7224,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
       "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
@@ -7108,8 +7243,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
       "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
@@ -7125,8 +7262,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
       "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
@@ -7140,8 +7279,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
       "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
@@ -7154,8 +7295,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
       "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
@@ -7173,8 +7316,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
       "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
@@ -7192,8 +7337,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
       "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
@@ -7214,8 +7361,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
       "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
@@ -7241,8 +7390,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
       "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
@@ -7257,8 +7408,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
       "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
@@ -7272,8 +7425,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
       "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
@@ -7293,8 +7448,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
       "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-indexing/SKILL.md",
@@ -7318,8 +7475,10 @@
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
       "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-indexing/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:plugins/fgOS/skills/fgos-researching/SKILL.md",
@@ -7334,9 +7493,11 @@
       "command": "npm run build:skills",
       "replayCwd": "/tmp/fgos-work/w1-d2-brief/skills",
       "beforeSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
-      "expectedAfterSha256": "689fa1aaf4efe3f96efd2063c8fec75030e68ff2fba40851c17154f37bac17f4",
-      "evidenceRef": "skill-regeneration.json#render:plugins/fgOS/skills/fgos-researching/SKILL.md",
-      "status": "scratch-replayed; independent review pending"
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "evidenceRef": "w8-skill-regeneration.json",
+      "status": "scratch-replayed; independent review pending",
+      "currentSourceSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/doc-governance.md",
@@ -7349,7 +7510,9 @@
       "composedSpecId": "status-units:docs/doc-governance.md",
       "beforeSha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
       "expectedAfterSha256": "4e4de787f1ccc55d0cb4496ccc71b796002e6e52417add5ebd3ab50df8b40c01",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "a2b0df6a5910c3d5e12ce7f9cd5db3f587095ff3c57f4d1978f933d308d2bfc7",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/governance.md",
@@ -7359,10 +7522,12 @@
         "f06796",
         "f06797"
       ],
-      "composedSpecId": "status-units:docs/platform/governance.md",
-      "beforeSha256": "824c8c1c39fa6c8a3b53c6c85d72e35749c9e7f788c78787968069f02be37355",
-      "expectedAfterSha256": "08b360a4fb10fbf32046ec87f43943e9df231a8683825c59e68375b70f5b8000",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "composedSpecId": "w8:status-units:docs/platform/governance.md",
+      "beforeSha256": "92ffb2e466ad94217ea939b4dd7d9453d778053c6fa464a0899f6750e7fa774b",
+      "expectedAfterSha256": "c57fb9a788e9b4ad00fe588d83a9a41e91dda463d27e700188fb7c7565496ee2",
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/README.md",
@@ -7381,7 +7546,9 @@
       "composedSpecId": "status-units:docs/README.md",
       "beforeSha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
       "expectedAfterSha256": "c029726690503fe1a59d976eb2b9117b811126b3f2ae011cef300120cfabfad4",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "d8af6a844d56e11a1b54832dcb54b3ce84f915ee74b81c98386cc88f818eaa98",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/documentation/operations/portals/docs-portal.md",
@@ -7397,7 +7564,9 @@
       "composedSpecId": "status-units:docs/platform/documentation/operations/portals/docs-portal.md",
       "beforeSha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
       "expectedAfterSha256": "d9481a0f3c9ad754864de88604e203ad2404498eaf7d59024d96421d134ba5b4",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/host-invocation-routing/README.md",
@@ -7409,7 +7578,9 @@
       "composedSpecId": "status-units:docs/platform/host-invocation-routing/README.md",
       "beforeSha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
       "expectedAfterSha256": "df3c2ae49a5827ef1a35dd7d3c7ebae87fc30616e5ee180e63160e84049186ae",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "0deb88fe1bba0846da7a3d76aa626964f33ac0f3da278790b255cad49b4c1621",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/user/README.md",
@@ -7424,7 +7595,9 @@
       "composedSpecId": "status-units:docs/user/README.md",
       "beforeSha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
       "expectedAfterSha256": "489c9cad33bdff8c5c9b5d8ae3372b9f304e4746e8007e350622bc94c0ff6481",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "29ea4aab53013f1f5f474ace8d2ec35566fc41c36a0d12b9f642e69320e3e8d6",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/migration-authoring-rules.md",
@@ -7439,7 +7612,9 @@
       "composedSpecId": "status-units:docs/platform/migration-authoring-rules.md",
       "beforeSha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
       "expectedAfterSha256": "315e25fd29cb76c123f18fe03d2edd682253de770e497ace746f1d72e0ddebe2",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
@@ -7451,7 +7626,9 @@
       "composedSpecId": "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "beforeSha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
       "expectedAfterSha256": "df2d949b90a0e56bd7385cb32becfe8d22034d916e39fa0b7e7c268d32337837",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/proposals/documentation-system-unification.md",
@@ -7466,7 +7643,9 @@
       "composedSpecId": "status-units:docs/platform/proposals/documentation-system-unification.md",
       "beforeSha256": "4fd8ed58e3b9e1267eb571a8dc5ede23b79324af0a1022634424da46f22b1197",
       "expectedAfterSha256": "9c0996a829f277d01857fee49a82790489eed2b619ee7b5e41221664a749c7a4",
-      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates."
+      "applicationCondition": "Only in the approved atomic cutover after exact carriage/truth/conservation gates; this record does not certify those gates.",
+      "currentSourceSha256": "4fd8ed58e3b9e1267eb571a8dc5ede23b79324af0a1022634424da46f22b1197",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/enduser-docs-index.json",
@@ -7479,10 +7658,51 @@
         "r03900"
       ],
       "beforeSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
-      "command": "generateEnduserDocsIndex(repoRoot, fgosDir) at cutover; bounded exported-input replay via replay-scans.mjs now",
+      "command": "fgos docs-index",
       "requires": "Lead final-pin export and post-move document tree; never hand-edit generated manifest",
-      "status": "bounded replay pending",
-      "owningProof": "test/report/enduser-index.test.mjs"
+      "status": "bounded carry/index replay passed; actual CLI regeneration and doctor proof deferred to cutover",
+      "owningProof": "fgos doctor: enduser-docs-index-stale passes",
+      "currentSourceSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "evidenceRef": "w8-switchboard-index-verification.json#enduser",
+      "droppedDocs": [
+        {
+          "oldPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
+          "target": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+          "capture": "tsk-2zv",
+          "disposition": "carried; obsolete duplicate index path retired as an alias, not content deletion",
+          "generatedEntry": {
+            "quadrant": "explanation",
+            "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+            "audience": "A user seeking understanding of the design, not a task to complete.",
+            "docPath": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+            "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+            "sourceCaptureId": "tsk-2zv",
+            "aliases": [
+              "docs/explanation/work-item-lifecycle-and-domain-model.md"
+            ]
+          }
+        },
+        {
+          "oldPath": "docs/how-to/check-rollup-progress.md",
+          "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "capture": "doc-fgos-rollup-howto",
+          "disposition": "carried; obsolete duplicate index path retired as an alias, not content deletion",
+          "generatedEntry": {
+            "quadrant": "how-to",
+            "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+            "audience": "A user who already knows the system and wants a concrete recipe.",
+            "docPath": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "title": "How to check a root item's progress with `fgos rollup`",
+            "sourceCaptureId": "doc-fgos-rollup-howto",
+            "aliases": [
+              "docs/how-to/check-rollup-progress.md",
+              "docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+            ]
+          }
+        }
+      ],
+      "cliExecuted": false
     },
     {
       "id": "file:docs/platform/README.md",
@@ -8195,7 +8415,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/README.md",
       "expectedAfterSha256": "9ca32e20e043beb272269e36aedfe2ea9e243a2dd2d326ab00e729d7920fe01f",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "1ced7aa146e2669d4ac346edba862422b5b4ee0af3fb86bbe4fea9b636d60ac0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/documentation/switchboard.md",
@@ -9442,7 +9664,7 @@
           "dependency": "Phase 9 atomic authority flip after reader cutover, carry, independent review and conservation; no early consumer edit."
         }
       ],
-      "status": "partial-blocked",
+      "status": "composed-conditional",
       "requires": "Exact post-flip authority rows accepted; no generic prefix substitution and no early authority change",
       "previousAttempt": {
         "id": "file:docs/platform/documentation/switchboard.md",
@@ -10692,14 +10914,12 @@
         "status": "pending-whole-row-composition",
         "requires": "Exact post-flip authority rows accepted; no generic prefix substitution and no early authority change"
       },
-      "composedSpecId": "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "unresolvedRowIds": [
-        "f06749",
-        "f06750",
-        "f06751"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable.",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "composedSpecId": "w8:status-complete:docs/platform/documentation/switchboard.md",
+      "applicationCondition": "Whole action only, with independently approved atomic cutover; root switchboard is replayed before its separate retirement",
+      "currentSourceSha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "evidenceRef": "w8-switchboard-index-verification.json",
+      "expectedAfterSha256": "089bd2ab3aa1337216cb7604899ddf71b8efa8f70fdba4d0add21b1022c9e0c1"
     },
     {
       "id": "file:docs/platform/packaging-distribution/README.md",
@@ -10956,7 +11176,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/packaging-distribution/README.md",
       "expectedAfterSha256": "2fb3c8e6e5488f660d4adaa0a541e287bfb44134ffd241e196c61021d4bd04c0",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "de511be6b465433d260a468633f29c6849756cc68f0998749145cf3864a0b525",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/platform-foundations.md",
@@ -10979,7 +11201,7 @@
         "f07396",
         "f07397"
       ],
-      "beforeSha256": "dadfff52aa1925ab33c1b0f0c6cc1ac404c8a94eba518d4f7713170758321dcc",
+      "beforeSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0",
       "command": "At separately approved cutover: compose each exact owning record unit below, then node --test test/scripts/check-doc-candidate-status.test.mjs and node --test test/scripts/doc-link-pass.test.mjs",
       "units": [
         {
@@ -11553,9 +11775,11 @@
         "status": "pending-whole-row-composition",
         "requires": "Exact post-flip authority rows accepted; no generic prefix substitution and no early authority change"
       },
-      "composedSpecId": "w2:status:docs/platform/platform-foundations.md",
-      "expectedAfterSha256": "cab29f26eea1c1cd2c5d237763a985126a2509df42eaa9120d6f733923e64e52",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "composedSpecId": "w8:repin:w2:status:docs/platform/platform-foundations.md",
+      "expectedAfterSha256": "2995b529eb84877e7d79763c0a757ea07e885496ded9e1510429fb49ee04b7ea",
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/system-architecture/architecture/roadmap.md",
@@ -11622,7 +11846,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/system-architecture/architecture/roadmap.md",
       "expectedAfterSha256": "30fcf044fbd7489c4d4f6504a76b6caf5378889bd59112e465ae28f546b9e33b",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
@@ -11689,7 +11915,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
       "expectedAfterSha256": "513b529445112a817d0b14bcbc9bbe70a1f8bccbc6fdba06fd17285f0a44726c",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "50099b7a34e0f160bb9d5a8bb56527531ef747a31cca021302eae981d9e05a99",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
@@ -11756,7 +11984,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
       "expectedAfterSha256": "ddb23e0d7a71cd447fb42a8a1fa466056516ce71a17ad81fe2d34b0b996f1a09",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
@@ -11823,7 +12053,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
       "expectedAfterSha256": "57f8efcf8b197ada08a831398c4072a56973dd9d182f35a681f9e33b88fdc9f4",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/system-architecture/architecture/workspace-topology.md",
@@ -11890,7 +12122,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
       "expectedAfterSha256": "744679068b71590aaa87c5c47e93ba943df11639df2b58def6111f95d3a6d75a",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/vision.md",
@@ -11957,7 +12191,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/vision.md",
       "expectedAfterSha256": "dda0552476f7952311b4f55a245d037e805818e26de8019d060c8ee381cdf31e",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/platform/work-state/README.md",
@@ -12290,7 +12526,9 @@
       },
       "composedSpecId": "w2:status:docs/platform/work-state/README.md",
       "expectedAfterSha256": "859c7fdbb1c9b52adaca5f1a8bbe5129114d68fbf78129cbafe2fb350e33b400",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion.",
+      "currentSourceSha256": "8d9967f96128ef6705ede2e3e74b617ad5884c7798c2a4e2f0214a1c00fdc22f",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638"
     },
     {
       "id": "file:docs/transitional-switchboard.md",
@@ -13537,7 +13775,7 @@
           "dependency": "Phase 9 owner approval; accepted Step 3; Step 5 parity; P8-DOC-GAP-01/02/03 and workflow carry; switchboard/reading-map coordinated flip"
         }
       ],
-      "status": "partial-blocked",
+      "status": "composed-conditional",
       "requires": "Exact post-flip authority rows accepted; no generic prefix substitution and no early authority change",
       "previousAttempt": {
         "id": "file:docs/transitional-switchboard.md",
@@ -14787,14 +15025,12 @@
         "status": "pending-whole-row-composition",
         "requires": "Exact post-flip authority rows accepted; no generic prefix substitution and no early authority change"
       },
-      "composedSpecId": "w2:status-partial:docs/transitional-switchboard.md",
-      "unresolvedRowIds": [
-        "f08382",
-        "f08383",
-        "f08384"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable.",
-      "applicationCondition": "Records only. Apply only during separately owner-approved atomic cutover, after exact source conservation, truth/parity and independent review at final pin F. This record is not authority promotion."
+      "composedSpecId": "w8:status-complete:docs/transitional-switchboard.md",
+      "applicationCondition": "Whole action only, with independently approved atomic cutover; root switchboard is replayed before its separate retirement",
+      "currentSourceSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "evidenceRef": "w8-switchboard-index-verification.json",
+      "expectedAfterSha256": "adb51802d2432ff699650b55f32efdd4974e1c8b6c9b8d4f0a4dea06737661e0"
     },
     {
       "id": "file:docs/ui-spec/generated/wireframe-v2.html",
@@ -14814,10 +15050,18 @@
         "r04410"
       ],
       "beforeSha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
-      "command": "node .claude/skills/ui-spec/tools/interpret.mjs --root docs/ui-spec --out docs/ui-spec/generated/wireframe-v2.html",
+      "command": "(cd .claude/skills/ui-spec/tools && npm ci) && node .claude/skills/ui-spec/tools/interpret-wireframe.mjs --root docs/ui-spec",
       "requires": "Apply accepted ui-spec source specs first; retain compiler diagnostics and output-mode checks",
-      "status": "not-replayed; exact compiler argv needs confirmation",
-      "owningProof": "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec"
+      "status": "real compiler + validation replayed before input physical moves; generator diffs are evidence only",
+      "owningProof": "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+      "currentSourceSha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "recordPin": "eb744281deba853f201cda15dcb4876300a1d638",
+      "evidenceRef": "w8-ui-render.json",
+      "steps": [
+        "w8:ui:refresh-stale-committed-render",
+        "w8:ui:render-composed-sources"
+      ],
+      "ordering": "Compile and validate at docs/ui-spec after source composition, BEFORE moving its spec.config.yaml and inputs to docs/platform/ui-spec/architecture; the mandated old-root invocation is not executable after that move"
     }
   ],
   "supplementalResolutions": [
@@ -14841,9 +15085,13 @@
         "f07932",
         "f07938"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:system-overview-partial",
-      "unresolvedRowIds": [
+      "status": "composed-conditional",
+      "composedSpecId": "w8:description:system-overview-complete",
+      "composedSpecIds": [
+        "w8:repin:w2:description:system-overview-partial",
+        "w8:description:system-overview-complete"
+      ],
+      "resolvedRowIds": [
         "f07928",
         "f07929"
       ]
@@ -14861,18 +15109,13 @@
         "f07866",
         "f07867"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:architecture-intent-self-route",
-      "unresolvedRowIds": [
-        "f07855",
-        "f07859",
-        "f07861",
-        "f07862",
-        "f07863",
-        "f07864",
-        "f07866",
-        "f07867"
-      ]
+      "status": "composed-conditional",
+      "composedSpecId": "w8:description:architecture-intent-complete",
+      "composedSpecIds": [
+        "w2:description:architecture-intent-self-route",
+        "w8:description:architecture-intent-complete"
+      ],
+      "ruling": "L13-11.1"
     }
   ],
   "continuationResolutions": [
@@ -14956,9 +15199,9 @@
         "f07397"
       ],
       "status": "composed-conditional",
-      "composedSpecId": "w2:status:docs/platform/platform-foundations.md",
-      "beforeSha256": "dadfff52aa1925ab33c1b0f0c6cc1ac404c8a94eba518d4f7713170758321dcc",
-      "expectedAfterSha256": "cab29f26eea1c1cd2c5d237763a985126a2509df42eaa9120d6f733923e64e52"
+      "composedSpecId": "w8:repin:w2:status:docs/platform/platform-foundations.md",
+      "beforeSha256": "7bc5be11431ffc33c8bd636301eac20aa1128946bc6c45e8e43ea7dbab4e4aa0",
+      "expectedAfterSha256": "2995b529eb84877e7d79763c0a757ea07e885496ded9e1510429fb49ee04b7ea"
     },
     {
       "path": "docs/platform/packaging-distribution/README.md",
@@ -15039,11 +15282,11 @@
         "f07932",
         "f07938"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:system-overview-partial",
-      "unresolvedRowIds": [
-        "f07928",
-        "f07929"
+      "status": "composed-conditional",
+      "composedSpecId": "w8:description:system-overview-complete",
+      "composedSpecIds": [
+        "w8:repin:w2:description:system-overview-partial",
+        "w8:description:system-overview-complete"
       ]
     },
     {
@@ -15059,17 +15302,11 @@
         "f07866",
         "f07867"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:architecture-intent-self-route",
-      "unresolvedRowIds": [
-        "f07855",
-        "f07859",
-        "f07861",
-        "f07862",
-        "f07863",
-        "f07864",
-        "f07866",
-        "f07867"
+      "status": "composed-conditional",
+      "composedSpecId": "w8:description:architecture-intent-complete",
+      "composedSpecIds": [
+        "w2:description:architecture-intent-self-route",
+        "w8:description:architecture-intent-complete"
       ]
     },
     {
@@ -15141,14 +15378,10 @@
         "f08409",
         "f08410"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:status-partial:docs/transitional-switchboard.md",
-      "unresolvedRowIds": [
-        "f08382",
-        "f08383",
-        "f08384"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable."
+      "status": "composed-conditional",
+      "composedSpecId": "w8:status-complete:docs/transitional-switchboard.md",
+      "beforeSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "expectedAfterSha256": "adb51802d2432ff699650b55f32efdd4974e1c8b6c9b8d4f0a4dea06737661e0"
     },
     {
       "path": "docs/platform/documentation/switchboard.md",
@@ -15219,218 +15452,15 @@
         "f06776",
         "f06777"
       ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "unresolvedRowIds": [
-        "f06749",
-        "f06750",
-        "f06751"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable."
+      "status": "composed-conditional",
+      "composedSpecId": "w8:status-complete:docs/platform/documentation/switchboard.md",
+      "beforeSha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+      "expectedAfterSha256": "089bd2ab3aa1337216cb7604899ddf71b8efa8f70fdba4d0add21b1022c9e0c1"
     }
   ],
-  "unresolved": [
-    {
-      "path": "docs/platform/system-overview/spec.md",
-      "rowIds": [
-        "f07926",
-        "f07928",
-        "f07929",
-        "f07931",
-        "f07932",
-        "f07938"
-      ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:system-overview-partial",
-      "unresolvedRowIds": [
-        "f07928",
-        "f07929"
-      ]
-    },
-    {
-      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
-      "rowIds": [
-        "f07855",
-        "f07858",
-        "f07859",
-        "f07861",
-        "f07862",
-        "f07863",
-        "f07864",
-        "f07866",
-        "f07867"
-      ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:description:architecture-intent-self-route",
-      "unresolvedRowIds": [
-        "f07855",
-        "f07859",
-        "f07861",
-        "f07862",
-        "f07863",
-        "f07864",
-        "f07866",
-        "f07867"
-      ]
-    },
-    {
-      "path": "docs/transitional-switchboard.md",
-      "rowIds": [
-        "f08346",
-        "f08347",
-        "f08348",
-        "f08349",
-        "f08350",
-        "f08351",
-        "f08352",
-        "f08353",
-        "f08354",
-        "f08355",
-        "f08356",
-        "f08357",
-        "f08358",
-        "f08359",
-        "f08360",
-        "f08361",
-        "f08362",
-        "f08363",
-        "f08364",
-        "f08365",
-        "f08366",
-        "f08367",
-        "f08368",
-        "f08369",
-        "f08370",
-        "f08371",
-        "f08372",
-        "f08373",
-        "f08374",
-        "f08375",
-        "f08376",
-        "f08377",
-        "f08378",
-        "f08379",
-        "f08380",
-        "f08381",
-        "f08382",
-        "f08383",
-        "f08384",
-        "f08385",
-        "f08386",
-        "f08387",
-        "f08388",
-        "f08389",
-        "f08390",
-        "f08391",
-        "f08392",
-        "f08393",
-        "f08394",
-        "f08395",
-        "f08396",
-        "f08397",
-        "f08398",
-        "f08399",
-        "f08400",
-        "f08401",
-        "f08402",
-        "f08403",
-        "f08404",
-        "f08405",
-        "f08406",
-        "f08407",
-        "f08408",
-        "f08409",
-        "f08410"
-      ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:status-partial:docs/transitional-switchboard.md",
-      "unresolvedRowIds": [
-        "f08382",
-        "f08383",
-        "f08384"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable."
-    },
-    {
-      "path": "docs/platform/documentation/switchboard.md",
-      "rowIds": [
-        "f06713",
-        "f06714",
-        "f06715",
-        "f06716",
-        "f06717",
-        "f06718",
-        "f06719",
-        "f06720",
-        "f06721",
-        "f06722",
-        "f06723",
-        "f06724",
-        "f06725",
-        "f06726",
-        "f06727",
-        "f06728",
-        "f06729",
-        "f06730",
-        "f06731",
-        "f06732",
-        "f06733",
-        "f06734",
-        "f06735",
-        "f06736",
-        "f06737",
-        "f06738",
-        "f06739",
-        "f06740",
-        "f06741",
-        "f06742",
-        "f06743",
-        "f06744",
-        "f06745",
-        "f06746",
-        "f06747",
-        "f06748",
-        "f06749",
-        "f06750",
-        "f06751",
-        "f06752",
-        "f06753",
-        "f06754",
-        "f06755",
-        "f06756",
-        "f06757",
-        "f06758",
-        "f06759",
-        "f06760",
-        "f06761",
-        "f06762",
-        "f06763",
-        "f06764",
-        "f06765",
-        "f06766",
-        "f06767",
-        "f06768",
-        "f06769",
-        "f06770",
-        "f06771",
-        "f06772",
-        "f06773",
-        "f06774",
-        "f06775",
-        "f06776",
-        "f06777"
-      ],
-      "status": "partial-blocked",
-      "composedSpecId": "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "unresolvedRowIds": [
-        "f06749",
-        "f06750",
-        "f06751"
-      ],
-      "reason": "Full end-user authoring/index owner row has no accepted complete live holders; complete authored rows/algorithm retained, but whole action is not executable."
-    }
-  ],
-  "continuationBlockers": [
+  "unresolved": [],
+  "continuationBlockers": [],
+  "priorContinuationBlockers": [
     {
       "scope": "unfinished-park",
       "path": "docs/platform/system-overview/spec.md",
@@ -15469,5 +15499,7 @@
       "specId": "w2:status-partial:docs/platform/documentation/switchboard.md",
       "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
     }
-  ]
+  ],
+  "fixAuthority": "L13-11; no product edit, authority promotion or gate closure",
+  "proof": "w8-independent-verification.json"
 }

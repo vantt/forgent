@@ -1,0 +1,2 @@
+ERROR: Cannot read spec.config.yaml at /tmp/fgos-work/w8-comp-fix/candidate/docs/ui-spec/spec.config.yaml
+  ENOENT: no such file or directory, open '/tmp/fgos-work/w8-comp-fix/candidate/docs/ui-spec/spec.config.yaml'

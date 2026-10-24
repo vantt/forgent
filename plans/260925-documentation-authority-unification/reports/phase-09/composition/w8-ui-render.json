@@ -1,0 +1,18 @@
+{
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "committedSha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+  "freshHeadSha256": "f06815ee4fc6a0c1e4abc6a3ffd657d84a7860ed25bf957524803cc1e71cd1fd",
+  "composedSha256": "50fcd1383578f0da35faba1f4b9fb12897de9cd2ede1ae21395de629d27deb06",
+  "recordedStalePair": {
+    "committed": "77894fdd",
+    "fresh": "f06815ee"
+  },
+  "patchSpecIds": [
+    "w8:ui:refresh-stale-committed-render",
+    "w8:ui:render-composed-sources"
+  ],
+  "sourceCommand": "(cd .claude/skills/ui-spec/tools && npm ci) && node .claude/skills/ui-spec/tools/interpret-wireframe.mjs --root docs/ui-spec",
+  "proof": "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+  "executedWithIsolatedNpmCache": true,
+  "ordering": "Compile and validate at docs/ui-spec after source composition, BEFORE moving its spec.config.yaml and inputs to docs/platform/ui-spec/architecture; the mandated old-root invocation is not executable after that move"
+}

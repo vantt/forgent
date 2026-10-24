@@ -1,6 +1,6 @@
 {
-  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
-  "authority": "L12-96 Q3",
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "authority": "L13-4 / L13-11; candidate routes, independent acceptance pending",
   "scopeIsFreeText": true,
   "repoScope": {
     "scope": "repo",
@@ -66,23 +66,31 @@
     },
     {
       "scope": "enduser-docs-authoring",
-      "canonicalArea": "enduser-docs-authoring",
-      "readFirst": null,
-      "factAndRuleHolders": [],
-      "narrativeHolders": [],
-      "decisionWriteHome": "docs/platform/enduser-docs-authoring/decisions/",
+      "canonicalArea": "work-state",
+      "readFirst": "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+      "factAndRuleHolders": [
+        "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring"
+      ],
+      "narrativeHolders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "decisionWriteHome": "docs/platform/work-state/decisions/",
       "legacySource": "docs/specs/enduser-docs-authoring.md",
-      "status": "missing-live-holder; Lead/D1 carriage required"
+      "status": "candidate-routing; holder carried under L13-4; acceptance at cutover"
     },
     {
       "scope": "enduser-docs-index",
-      "canonicalArea": "enduser-docs-index",
-      "readFirst": null,
-      "factAndRuleHolders": [],
-      "narrativeHolders": [],
-      "decisionWriteHome": "docs/platform/enduser-docs-index/decisions/",
+      "canonicalArea": "work-state",
+      "readFirst": "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+      "factAndRuleHolders": [
+        "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index"
+      ],
+      "narrativeHolders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "decisionWriteHome": "docs/platform/work-state/decisions/",
       "legacySource": "docs/specs/enduser-docs-index.md",
-      "status": "missing-live-holder; Lead/D1 carriage required"
+      "status": "candidate-routing; holder carried under L13-4; acceptance at cutover"
     },
     {
       "scope": "fgos-plugin",
@@ -160,12 +168,14 @@
     {
       "scope": "seat-binding",
       "canonicalArea": "seat-binding",
-      "readFirst": null,
-      "factAndRuleHolders": [],
+      "readFirst": "docs/platform/seat-binding/spec.md",
+      "factAndRuleHolders": [
+        "docs/platform/seat-binding/spec.md"
+      ],
       "narrativeHolders": [],
       "decisionWriteHome": "docs/platform/seat-binding/decisions/",
       "legacySource": "docs/specs/seat-binding.md",
-      "status": "missing-live-holder; Lead/D1 carriage required"
+      "status": "candidate-routing; holder carried under L13-4; acceptance at cutover"
     },
     {
       "scope": "system-overview",
@@ -196,12 +206,15 @@
     {
       "scope": "workflow",
       "canonicalArea": "workflow",
-      "readFirst": null,
-      "factAndRuleHolders": [],
+      "readFirst": "docs/platform/workflow/spec.md",
+      "factAndRuleHolders": [
+        "docs/platform/workflow/spec.md"
+      ],
       "narrativeHolders": [],
       "decisionWriteHome": "docs/platform/workflow/decisions/",
       "legacySource": "docs/specs/workflow.md",
-      "status": "missing-live-holder; Lead/D1 carriage required"
+      "status": "candidate-routing; holder carried under L13-4; acceptance at cutover"
     }
-  ]
+  ],
+  "writeHomePolicy": "Narrative write homes are declared locations, not a claim directories already exist; create on first approved narrative write. No empty authority stores created in this records turn."
 }

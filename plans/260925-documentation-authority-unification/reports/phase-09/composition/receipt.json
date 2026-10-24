@@ -1,806 +1,137 @@
 {
-  "status": "blocked",
-  "briefComplete": false,
+  "status": "prepared-complete",
+  "briefComplete": true,
   "gateClosed": false,
-  "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
-  "createdAt": "2026-10-23T13:20:29.156941+00:00",
-  "summary": "docs(composition): complete available park compositions and verify replay guards\nCompleted 11 of 15 unfinished entries; four remain explicitly blocked on accepted full-content holders, not guessed destinations.",
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "createdAt": "2026-10-24T15:09:12.886787+00:00",
+  "summary": "Current-byte patch records complete; 101 park actions plus supplemental holders composed, 88 binding coverage overlays and 140 prepared citation corrections. No live product application or acceptance claimed. Final post-generator replay also exposed and fixed two rendered RUL45 findings through one prepared canonical-source gloss.",
   "counts": {
-    "parkActionsPreserved": 101,
-    "unfinishedEntriesRevisited": 15,
-    "completedConditionalEntries": 11,
-    "partialBlockedEntries": 4,
-    "historicalSpecsPreserved": 38,
-    "newSpecs": 31,
-    "newEffectiveSpecs": 29,
-    "proposalOnlySpecs": 2,
-    "totalSpecs": 69,
-    "effectiveSpecs": 62,
-    "effectiveFiles": 58,
-    "independentPatchInvocations": 146,
-    "priorPredecessorDeferrals": 19,
-    "priorDeferralsRecomposed": 8,
-    "priorDeferralsAlreadyAtExactApprovedBefore": 11,
-    "allCurrentPredecessorReplacements": 12,
-    "allGeneratedOutputChanges": 33
+    "parkActions": 101,
+    "unresolvedCompositions": 0,
+    "effectiveSpecs": 79,
+    "deferredFinalPinFSpecs": 14,
+    "replayedFiles": 74,
+    "independentPatchInvocations": 221,
+    "bindingCoverageOverlays": 88,
+    "movedHeadingAnchors": 22,
+    "terminalSupersessionEdges": 44,
+    "alreadySupersededLookups": 22,
+    "historicalPreimageLookups": 22,
+    "branchCitationSites": 10,
+    "mainCitationSitesAtF": 130,
+    "excludedHistorySites": 2,
+    "cleanRepins": 9,
+    "recomposedDriftedFiles": 2,
+    "matchingParkedRenders": 69,
+    "postRegenerationCanonicalCorrections": 1,
+    "postRegenerationRenderedFindingsFixed": 2
   },
-  "remainingBlockers": [
-    {
-      "scope": "unfinished-park",
-      "path": "docs/platform/system-overview/spec.md",
-      "rowIds": [
-        "f07928",
-        "f07929"
-      ],
-      "partialSpecId": "w2:description:system-overview-partial",
-      "reason": "D1 knowledge-registry.md carries identity/lifecycle/role/attestation, not complete enduser-docs-authoring.md or enduser-docs-index.md contracts. No approved exact live holders exist for those two sources. Full carry plus independent placement acceptance is needed; neither a root law nor the registry proposal substitutes for it."
-    },
-    {
-      "scope": "unfinished-park",
-      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
-      "rowIds": [
-        "f07855",
-        "f07859",
-        "f07861",
-        "f07862",
-        "f07863",
-        "f07864",
-        "f07866",
-        "f07867"
-      ],
-      "partialSpecId": "w2:description:architecture-intent-self-route",
-      "reason": "D1 did not author/accept live holders for system vision, Step 09/10 proposals, component authority map, intent ledger, coordination-session or flow-definition evidence. Exact mirrors remain carriage/history. The vision status packet is conditional, not independent authority acceptance. Do not silently redirect live Related/evidence links to history or rename old design intent into a current engine claim."
-    },
-    {
-      "scope": "unfinished-park",
-      "path": "docs/transitional-switchboard.md",
-      "specId": "w2:status-partial:docs/transitional-switchboard.md",
-      "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
-    },
-    {
-      "scope": "unfinished-park",
-      "path": "docs/platform/documentation/switchboard.md",
-      "specId": "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
-    }
+  "remainingBlockers": [],
+  "remainingExternalGates": [
+    "Independent G0 review of the 88 overlay coverage records (44 terminal edges; historical preimages immutable)",
+    "G7/G9 current-digest review; authority/source-conservation and final pin F approval",
+    "Apply 130 main-owned citation corrections only at final pin F under docs lease; recompose if lane bytes drift",
+    "At cutover run fgos docs-index then fgos doctor enduser-docs-index-stale; neither CLI executed in this turn",
+    "Full-suite/final-pin parity and independent source acceptance remain Lead-owned, not inferred from these local proofs"
   ],
-  "touchedIds": {
-    "continuationRows": [
-      "f04445",
-      "f04446",
-      "f04447",
-      "f04448",
-      "f04449",
-      "f04450",
-      "f04451",
-      "f04452",
-      "f04453",
-      "f04454",
-      "f04455",
-      "f04456",
-      "f04457",
-      "f04458",
-      "f04459",
-      "f04460",
-      "f04461",
-      "f04462",
-      "f06456",
-      "f06713",
-      "f06714",
-      "f06715",
-      "f06716",
-      "f06717",
-      "f06718",
-      "f06719",
-      "f06720",
-      "f06721",
-      "f06722",
-      "f06723",
-      "f06724",
-      "f06725",
-      "f06726",
-      "f06727",
-      "f06728",
-      "f06729",
-      "f06730",
-      "f06731",
-      "f06732",
-      "f06733",
-      "f06734",
-      "f06735",
-      "f06736",
-      "f06737",
-      "f06738",
-      "f06739",
-      "f06740",
-      "f06741",
-      "f06742",
-      "f06743",
-      "f06744",
-      "f06745",
-      "f06746",
-      "f06747",
-      "f06748",
-      "f06749",
-      "f06750",
-      "f06751",
-      "f06752",
-      "f06753",
-      "f06754",
-      "f06755",
-      "f06756",
-      "f06757",
-      "f06758",
-      "f06759",
-      "f06760",
-      "f06761",
-      "f06762",
-      "f06763",
-      "f06764",
-      "f06765",
-      "f06766",
-      "f06767",
-      "f06768",
-      "f06769",
-      "f06770",
-      "f06771",
-      "f06772",
-      "f06773",
-      "f06774",
-      "f06775",
-      "f06776",
-      "f06777",
-      "f07153",
-      "f07154",
-      "f07155",
-      "f07156",
-      "f07157",
-      "f07158",
-      "f07383",
-      "f07384",
-      "f07385",
-      "f07386",
-      "f07387",
-      "f07388",
-      "f07389",
-      "f07390",
-      "f07391",
-      "f07392",
-      "f07393",
-      "f07394",
-      "f07395",
-      "f07396",
-      "f07397",
-      "f07855",
-      "f07858",
-      "f07859",
-      "f07861",
-      "f07862",
-      "f07863",
-      "f07864",
-      "f07866",
-      "f07867",
-      "f07883",
-      "f07891",
-      "f07896",
-      "f07899",
-      "f07906",
-      "f07926",
-      "f07928",
-      "f07929",
-      "f07931",
-      "f07932",
-      "f07938",
-      "f08010",
-      "f08015",
-      "f08016",
-      "f08017",
-      "f08018",
-      "f08019",
-      "f08020",
-      "f08022",
-      "f08023",
-      "f08346",
-      "f08347",
-      "f08348",
-      "f08349",
-      "f08350",
-      "f08351",
-      "f08352",
-      "f08353",
-      "f08354",
-      "f08355",
-      "f08356",
-      "f08357",
-      "f08358",
-      "f08359",
-      "f08360",
-      "f08361",
-      "f08362",
-      "f08363",
-      "f08364",
-      "f08365",
-      "f08366",
-      "f08367",
-      "f08368",
-      "f08369",
-      "f08370",
-      "f08371",
-      "f08372",
-      "f08373",
-      "f08374",
-      "f08375",
-      "f08376",
-      "f08377",
-      "f08378",
-      "f08379",
-      "f08380",
-      "f08381",
-      "f08382",
-      "f08383",
-      "f08384",
-      "f08385",
-      "f08386",
-      "f08387",
-      "f08388",
-      "f08389",
-      "f08390",
-      "f08391",
-      "f08392",
-      "f08393",
-      "f08394",
-      "f08395",
-      "f08396",
-      "f08397",
-      "f08398",
-      "f08399",
-      "f08400",
-      "f08401",
-      "f08402",
-      "f08403",
-      "f08404",
-      "f08405",
-      "f08406",
-      "f08407",
-      "f08408",
-      "f08409",
-      "f08410"
-    ],
-    "unresolvedRows": [
-      "f06749",
-      "f06750",
-      "f06751",
-      "f07855",
-      "f07859",
-      "f07861",
-      "f07862",
-      "f07863",
-      "f07864",
-      "f07866",
-      "f07867",
-      "f07928",
-      "f07929",
-      "f08382",
-      "f08383",
-      "f08384"
-    ],
-    "newSpecIds": [
-      "w2:predecessor:apps/fgos-gateway/Cargo.toml",
-      "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
-      "w2:predecessor:docs/platform/component-boundary.md",
-      "w2:predecessor:docs/platform/git/spec.md",
-      "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
-      "w2:predecessor:docs/platform/holder-lock/spec.md",
-      "w2:predecessor:docs/platform/runner/README.md",
-      "w2:predecessor:src/cli/command-registry.mjs",
-      "w2:predecessor:src/runner/worktree.mjs",
-      "w2:predecessor:src/setup/registrations.mjs",
-      "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
-      "w2:predecessor:test/runner/worktree.test.mjs",
-      "w2:status:docs/platform/vision.md",
-      "w2:status:docs/platform/system-architecture/architecture/roadmap.md",
-      "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
-      "w2:status:docs/platform/platform-foundations.md",
-      "w2:status:docs/platform/packaging-distribution/README.md",
-      "w2:status:docs/platform/work-state/README.md",
-      "w2:status:docs/platform/README.md",
-      "w2:description:participant",
-      "w2:description:system-overview-partial",
-      "w2:description:architecture-intent-self-route",
-      "w2:status-partial:docs/transitional-switchboard.md",
-      "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "w2:scan:live-successor-specs",
-      "w2:guard:retired-schema-qualification",
-      "w2:proposal:gap05-relocation",
-      "w2:proposal:gap05-history"
-    ],
-    "effectiveSpecIds": [
-      "w2:predecessor:apps/fgos-gateway/Cargo.toml",
-      "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
-      "w2:predecessor:docs/platform/component-boundary.md",
-      "w2:predecessor:docs/platform/git/spec.md",
-      "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
-      "w2:predecessor:docs/platform/holder-lock/spec.md",
-      "w2:predecessor:docs/platform/runner/README.md",
-      "w2:predecessor:src/cli/command-registry.mjs",
-      "w2:predecessor:src/runner/worktree.mjs",
-      "w2:predecessor:src/setup/registrations.mjs",
-      "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
-      "w2:predecessor:test/runner/worktree.test.mjs",
-      "rework:test/cli/fgos-merge.test.mjs",
-      "rework:docs/how-to/fix-bare-citation-findings.md",
-      "carry:credential-store-setup",
-      "convention:citation-homes",
-      "scan:recursive-platform-citations",
-      "proof:recursive-platform-citation-scan",
-      "convention:area-holder-table",
-      "scope-consumer:bin/fgos.mjs",
-      "scope-consumer:src/state/store.mjs",
-      "scope-consumer:src/cli/command-registry.mjs",
-      "scope-consumer:AGENTS.md",
-      "hunk-park:bin/fgos.mjs",
-      "hunk-park:docs/platform/process/spec.md",
-      "hunk-park:identity-successor",
-      "hunk-park:docs/specs/workflow.md",
-      "hunk-park:packages/herdr-fgos-common/rust/src/fgos.rs",
-      "hunk-park:src/runner/merge.mjs",
-      "hunk-park:test/runner/merge.test.mjs",
-      "description:work-boundary",
-      "description:mutation-admission",
-      "description:read-first",
-      "description:cas-evidence-correction",
-      "scan:successor-dead-vocabulary",
-      "scan:proof-inventory-comment",
-      "status-units:docs/doc-governance.md",
-      "status-units:docs/platform/governance.md",
-      "status-units:docs/README.md",
-      "status-units:docs/platform/documentation/operations/portals/docs-portal.md",
-      "status-units:docs/platform/host-invocation-routing/README.md",
-      "status-units:docs/user/README.md",
-      "status-units:docs/platform/migration-authoring-rules.md",
-      "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
-      "status-units:docs/platform/proposals/documentation-system-unification.md",
-      "w2:status:docs/platform/vision.md",
-      "w2:status:docs/platform/system-architecture/architecture/roadmap.md",
-      "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
-      "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
-      "w2:status:docs/platform/platform-foundations.md",
-      "w2:status:docs/platform/packaging-distribution/README.md",
-      "w2:status:docs/platform/work-state/README.md",
-      "w2:status:docs/platform/README.md",
-      "w2:description:participant",
-      "w2:description:system-overview-partial",
-      "w2:description:architecture-intent-self-route",
-      "w2:status-partial:docs/transitional-switchboard.md",
-      "w2:status-partial:docs/platform/documentation/switchboard.md",
-      "w2:scan:live-successor-specs",
-      "w2:guard:retired-schema-qualification"
-    ],
-    "placementProposalMember": "dynamic-023895",
-    "placementProposalRow": "r28621"
-  },
   "proof": {
-    "independentEffectiveReplay": "w2-independent-verification.json",
-    "authorRoundtripsAndPredecessors": "w2-chain-verification.json",
-    "predecessorRecomposition": "w2-predecessor-recomposition.json",
-    "owningTests": [
-      {
-        "file": "test/runner/dead-vocabulary-guard.test.mjs",
-        "exit": 1,
-        "log": "w2-dead-vocabulary-guard.test.log",
-        "pass": "9",
-        "fail": "1"
-      },
-      {
-        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
-        "exit": 0,
-        "log": "w2-generate-shipped-path-inventory.test.log",
-        "pass": "11",
-        "fail": "0"
-      },
-      {
-        "file": "test/scripts/check-decision-citation-drift.test.mjs",
-        "exit": 1,
-        "log": "w2-check-decision-citation-drift.test.log",
-        "pass": "31",
-        "fail": "1"
-      }
-    ],
-    "deadVocabularyOnlyGap05": "w2-gap05-verification.json",
-    "controlReplay": {
-      "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test test/runner/dead-vocabulary-guard.test.mjs",
-      "exit": 0,
-      "pass": 10,
-      "fail": 0,
-      "log": "w2-gap05-control.log"
-    },
-    "liveScanNegativeProbe": {
-      "injectedSymbols": [
-        "modelForTier",
-        "FlowDefinition"
-      ],
-      "file": "docs/platform/doer-negative-probe/spec.md (scratch only, removed)",
-      "exit": 1,
-      "log": "w2-live-scan-negative-probe.log",
-      "meaning": "Both the Phase 1-3 and P5 guards reject retired symbols in a live nested successor; history exclusion is not a live-symbol exemption."
-    },
-    "citationBaselineUnchanged": true,
-    "citationBaselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
-    "citationNewFindings": 124,
-    "skillBuild": "w2-skill-regeneration.json",
-    "nativeFixture": "w2-native-fixture.json",
-    "initialFailuresRetained": [
-      "initial-w2-generate-shipped-path-inventory.test.log",
-      "initial-w2-post-move-replay.json",
-      "initial-w2-commands.json"
-    ],
-    "interpretation": "Byte replays are reproducible local evidence, not semantic approval. Inventory observes an immutable pre-move Git fixture. Full source move, holder acceptance, final-pin F review and whole-suite parity are not certified."
+    "independentReplay": "w8-independent-verification.json",
+    "owningTests": "w8-owning-proofs.json",
+    "switchboardsAndIndex": "w8-switchboard-index-verification.json",
+    "citation": "w8-citation-glosses.json",
+    "ui": "w8-ui-render.json",
+    "overlays": "w8-gap05-overlay-verification.json",
+    "repinning": "w8-repinning.json",
+    "skills": "w8-skill-regeneration.json",
+    "historyNegative": "w8-history-negative-control.json"
   },
-  "commands": {
-    "reproduce": [
-      "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/complete-parks.py",
-      "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/verify-effective.py"
-    ],
-    "argvCwdExitStdoutStderr": "w2-commands.json",
-    "testDoor": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<authorized activation releasePath>/bin/fgos node --test <single-file>",
-    "verificationExit": 0
-  },
+  "commands": "w8-commands.json",
   "scope": {
-    "repositoryWritesOnly": "plans/260925-documentation-authority-unification/reports/phase-09/composition/**",
-    "sourceApplied": false,
-    "worktreeGitAddCommit": false,
-    "temporaryFixtureGitWritesAuthorized": true,
-    "fgosCliRun": false,
-    "liveStateOrSecretsRead": false,
-    "activationMetadataOnlyRead": "/home/vantt/projects/forgentX/.fgos/installation/activation.json",
-    "pairAccountingEdited": false,
-    "leadRecordsEdited": false,
+    "appliedToDocs": false,
+    "gitWrites": false,
+    "fgosCli": false,
+    "liveStateOrSecrets": false,
+    "productCodeOrTestsEdited": false,
     "baselineChanged": false,
-    "fullSuiteRun": false,
-    "impactAnalysis": "degraded under brief no-CLI boundary; no production symbol edited",
+    "scratchOnly": "/tmp/fgos-work/w8-comp-fix",
     "needsWrites": []
   },
   "notRun": [
-    "npm test and scripts/run-tests.mjs (brief prohibition)",
-    "cargo test --workspace (outside single-Node-test scope)",
-    "Rust MCP owning tests for source-drift path recomposition",
-    "final-pin F/full-parity and independent semantic reviews"
+    "npm test",
+    "cargo test --workspace",
+    "Git-writing fixture tests",
+    "fgos CLI",
+    "Browser preview service"
   ],
+  "impactAnalysis": "degraded: CLI forbidden, records-only turn; no production symbol edited",
   "previousAttempt": {
     "status": "blocked",
     "briefComplete": false,
     "gateClosed": false,
-    "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
-    "createdAt": "2026-10-23T12:40:15.155675+00:00",
-    "summary": "docs: compose migration records and disclose unresolved replay gaps. Indexed 48/16/8 members and 101 parks, composed 38 patch specs, regenerated skills in scratch; blocked, not gate closure.",
+    "sourceCommit": "cffe725b948f5a695728c8da08f114e7e97075d6",
+    "createdAt": "2026-10-23T13:20:29.156941+00:00",
+    "summary": "docs(composition): complete available park compositions and verify replay guards\nCompleted 11 of 15 unfinished entries; four remain explicitly blocked on accepted full-content holders, not guessed destinations.",
     "counts": {
-      "familyMemberJoins": {
-        "8": 48,
-        "13": 16,
-        "17": 8
-      },
-      "exactCurrentPassageJoins": 72,
-      "parkActions": 101,
-      "parkActionKinds": {
-        "composed-current-hunks": 7,
-        "renamed-source": 1,
-        "retire-source-after-carriage": 1,
-        "generator": 71,
-        "composed-status-units": 9,
-        "whole-row-authority-flip": 12
-      },
-      "unfinishedParkEntries": 15,
-      "patchSpecs": 38,
-      "changedPatchSpecsRoundtripped": 37,
-      "noByteChangePatchSpecs": 1,
-      "canonicalSkillInputs": 12,
-      "parkedRenderSpecs": 69,
-      "changedParkedRenders": 24,
-      "allGeneratedOutputChanges": 33,
-      "generatedChangesOutsideParkedSet": 9,
-      "sameFileImmediateEdgesVerified": 10,
-      "physicalScratchMoves": 1039,
-      "predecessorsDeferredForSourceDrift": 19,
-      "finalRecordedCommands": 615,
-      "firstReplayRecordedCommands": 532
+      "parkActionsPreserved": 101,
+      "unfinishedEntriesRevisited": 15,
+      "completedConditionalEntries": 11,
+      "partialBlockedEntries": 4,
+      "historicalSpecsPreserved": 38,
+      "newSpecs": 31,
+      "newEffectiveSpecs": 29,
+      "proposalOnlySpecs": 2,
+      "totalSpecs": 69,
+      "effectiveSpecs": 62,
+      "effectiveFiles": 58,
+      "independentPatchInvocations": 146,
+      "priorPredecessorDeferrals": 19,
+      "priorDeferralsRecomposed": 8,
+      "priorDeferralsAlreadyAtExactApprovedBefore": 11,
+      "allCurrentPredecessorReplacements": 12,
+      "allGeneratedOutputChanges": 33
     },
+    "remainingBlockers": [
+      {
+        "scope": "unfinished-park",
+        "path": "docs/platform/system-overview/spec.md",
+        "rowIds": [
+          "f07928",
+          "f07929"
+        ],
+        "partialSpecId": "w2:description:system-overview-partial",
+        "reason": "D1 knowledge-registry.md carries identity/lifecycle/role/attestation, not complete enduser-docs-authoring.md or enduser-docs-index.md contracts. No approved exact live holders exist for those two sources. Full carry plus independent placement acceptance is needed; neither a root law nor the registry proposal substitutes for it."
+      },
+      {
+        "scope": "unfinished-park",
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "rowIds": [
+          "f07855",
+          "f07859",
+          "f07861",
+          "f07862",
+          "f07863",
+          "f07864",
+          "f07866",
+          "f07867"
+        ],
+        "partialSpecId": "w2:description:architecture-intent-self-route",
+        "reason": "D1 did not author/accept live holders for system vision, Step 09/10 proposals, component authority map, intent ledger, coordination-session or flow-definition evidence. Exact mirrors remain carriage/history. The vision status packet is conditional, not independent authority acceptance. Do not silently redirect live Related/evidence links to history or rename old design intent into a current engine claim."
+      },
+      {
+        "scope": "unfinished-park",
+        "path": "docs/transitional-switchboard.md",
+        "specId": "w2:status-partial:docs/transitional-switchboard.md",
+        "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
+      },
+      {
+        "scope": "unfinished-park",
+        "path": "docs/platform/documentation/switchboard.md",
+        "specId": "w2:status-partial:docs/platform/documentation/switchboard.md",
+        "reason": "End-user authoring/index complete owner row remains blocked on GAP-02; remaining source delegations must not be deleted without that carry."
+      }
+    ],
     "touchedIds": {
-      "families": [
-        8,
-        13,
-        17
-      ],
-      "gates": [
-        "G1",
-        "G7"
-      ],
-      "memberIds": [
-        "author-s67-citation-core-4-51",
-        "author-s67-citation-core-6-2",
-        "author-s67-citation-core-96-44",
-        "author-seam8-agents-decision-home-74",
-        "dynamic-006494",
-        "dynamic-006495",
-        "dynamic-006511",
-        "dynamic-006516",
-        "dynamic-014397",
-        "dynamic-014398",
-        "dynamic-014399",
-        "dynamic-014400",
-        "dynamic-014401",
-        "dynamic-014402",
-        "dynamic-021577",
-        "dynamic-023835",
-        "dynamic-023836",
-        "dynamic-023873",
-        "dynamic-023874",
-        "dynamic-023890",
-        "dynamic-023891",
-        "dynamic-023892",
-        "dynamic-023893",
-        "dynamic-023895",
-        "dynamic-023896",
-        "dynamic-023901",
-        "dynamic-023902",
-        "dynamic-023903",
-        "dynamic-033375",
-        "dynamic-033376",
-        "dynamic-033383",
-        "dynamic-033384",
-        "reference-000004",
-        "reference-000012",
-        "reference-000013",
-        "reference-000123",
-        "reference-000145",
-        "reference-000151",
-        "reference-000231",
-        "reference-002308",
-        "reference-002316",
-        "reference-002317",
-        "reference-002441",
-        "reference-002442",
-        "reference-002443",
-        "reference-002444",
-        "reference-002467",
-        "reference-002469",
-        "reference-002471",
-        "reference-003579",
-        "reference-003580",
-        "reference-003581",
-        "reference-003587",
-        "reference-003588",
-        "reference-003591",
-        "reference-003592",
-        "reference-003595",
-        "reference-003596",
-        "reference-003598",
-        "reference-003599",
-        "reference-003600",
-        "reference-003601",
-        "reference-003634",
-        "reference-003640",
-        "reference-003643",
-        "reference-003666",
-        "reference-003908",
-        "reference-004353",
-        "reference-004371",
-        "reference-004373",
-        "reference-005064",
-        "reference-005072"
-      ],
-      "parkedSpecIds": [
-        "file:.agents/skills/_shared/ak-cook-worker-contract.md",
-        "file:.agents/skills/_shared/capability-catalog.md",
-        "file:.agents/skills/_shared/catchup-self-recovery.md",
-        "file:.agents/skills/_shared/citation-format.md",
-        "file:.agents/skills/_shared/coding-worker-contract.md",
-        "file:.agents/skills/_shared/executor-dispatch-fallback.md",
-        "file:.agents/skills/_shared/planning-capability-awareness.md",
-        "file:.agents/skills/distill/SKILL.md",
-        "file:.agents/skills/distill/references/consult-protocol.md",
-        "file:.agents/skills/distill/references/deep-dive-protocol.md",
-        "file:.agents/skills/distill/references/extract-rules.md",
-        "file:.agents/skills/distill/scripts/distill.mjs",
-        "file:.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
-        "file:.agents/skills/fgos-clarifying/SKILL.md",
-        "file:.agents/skills/fgos-coding-discovering/SKILL.md",
-        "file:.agents/skills/fgos-coding-exploring/SKILL.md",
-        "file:.agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
-        "file:.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-        "file:.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
-        "file:.agents/skills/fgos-coding-implement/SKILL.md",
-        "file:.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-        "file:.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-        "file:.agents/skills/fgos-coding-knowledge/SKILL.md",
-        "file:.agents/skills/fgos-coding-planning/SKILL.md",
-        "file:.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-        "file:.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-        "file:.agents/skills/fgos-coding-shaping/SKILL.md",
-        "file:.agents/skills/fgos-coding-validating/SKILL.md",
-        "file:.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-        "file:.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-        "file:.agents/skills/fgos-indexing/SKILL.md",
-        "file:.agents/skills/fgos-researching/SKILL.md",
-        "file:.claude/skills/distill/scripts/distill.mjs",
-        "file:.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
-        "file:.claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
-        "file:.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-        "file:.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-        "file:.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-        "file:.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-        "file:.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-        "file:.claude/skills/fgos-coding-shaping/SKILL.md",
-        "file:.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-        "file:.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-        "file:bin/fgos.mjs",
-        "file:docs/README.md",
-        "file:docs/doc-governance.md",
-        "file:docs/enduser-docs-index.json",
-        "file:docs/platform/README.md",
-        "file:docs/platform/documentation/operations/portals/docs-portal.md",
-        "file:docs/platform/documentation/switchboard.md",
-        "file:docs/platform/governance.md",
-        "file:docs/platform/host-invocation-routing/README.md",
-        "file:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
-        "file:docs/platform/migration-authoring-rules.md",
-        "file:docs/platform/packaging-distribution/README.md",
-        "file:docs/platform/platform-foundations.md",
-        "file:docs/platform/process/spec.md",
-        "file:docs/platform/proposals/documentation-system-unification.md",
-        "file:docs/platform/session-identity/spec.md",
-        "file:docs/platform/system-architecture/architecture/roadmap.md",
-        "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
-        "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
-        "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
-        "file:docs/platform/system-architecture/architecture/workspace-topology.md",
-        "file:docs/platform/vision.md",
-        "file:docs/platform/work-state/README.md",
-        "file:docs/specs/reading-map.md",
-        "file:docs/specs/workflow.md",
-        "file:docs/transitional-switchboard.md",
-        "file:docs/ui-spec/generated/wireframe-v2.html",
-        "file:docs/user/README.md",
-        "file:packages/herdr-fgos-common/rust/src/fgos.rs",
-        "file:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
-        "file:plugins/fgOS/skills/_shared/capability-catalog.md",
-        "file:plugins/fgOS/skills/_shared/catchup-self-recovery.md",
-        "file:plugins/fgOS/skills/_shared/citation-format.md",
-        "file:plugins/fgOS/skills/_shared/coding-worker-contract.md",
-        "file:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
-        "file:plugins/fgOS/skills/_shared/planning-capability-awareness.md",
-        "file:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
-        "file:plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
-        "file:plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
-        "file:plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-        "file:plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
-        "file:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
-        "file:plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-        "file:plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
-        "file:plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
-        "file:plugins/fgOS/skills/fgos-indexing/SKILL.md",
-        "file:plugins/fgOS/skills/fgos-researching/SKILL.md",
-        "file:src/runner/merge.mjs",
-        "file:src/setup/git-hooks.mjs",
-        "file:test/runner/merge.test.mjs"
-      ],
-      "rowIds": [
-        "f00001",
-        "f00002",
-        "f00003",
-        "f00004",
-        "f00005",
-        "f00006",
-        "f00007",
-        "f00008",
-        "f00009",
-        "f00010",
-        "f00011",
-        "f00012",
-        "f00013",
-        "f00014",
-        "f00015",
-        "f00016",
-        "f00017",
-        "f00018",
-        "f00019",
-        "f00020",
-        "f00021",
-        "f00022",
-        "f00023",
-        "f00024",
-        "f00025",
-        "f00026",
-        "f00027",
-        "f00028",
-        "f00029",
-        "f00030",
-        "f00031",
-        "f00032",
-        "f00033",
-        "f00034",
-        "f00035",
-        "f00036",
-        "f00037",
-        "f00038",
-        "f00039",
-        "f00040",
-        "f00041",
-        "f00042",
-        "f00043",
-        "f00044",
-        "f00045",
-        "f00046",
-        "f00047",
-        "f00048",
-        "f00049",
-        "f00050",
-        "f00051",
-        "f00052",
-        "f00053",
-        "f00054",
-        "f00055",
-        "f00056",
-        "f00057",
-        "f00058",
-        "f00059",
-        "f00060",
-        "f00061",
-        "f00062",
-        "f00063",
-        "f00064",
-        "f00065",
-        "f00066",
-        "f00067",
-        "f00068",
-        "f00069",
-        "f00070",
-        "f00071",
-        "f00072",
-        "f00073",
-        "f00074",
-        "f00075",
-        "f00076",
-        "f00077",
-        "f00078",
-        "f00079",
-        "f00080",
-        "f00081",
-        "f00082",
-        "f00083",
-        "f00084",
-        "f00085",
-        "f00086",
-        "f00087",
-        "f00088",
-        "f00089",
-        "f00090",
-        "f00091",
-        "f00092",
-        "f00434",
-        "f00457",
-        "f00516",
-        "f00517",
-        "f00518",
-        "f00519",
-        "f00520",
-        "f00522",
-        "f00523",
-        "f00526",
-        "f01222",
-        "f01223",
+      "continuationRows": [
         "f04445",
         "f04446",
         "f04447",
@@ -819,11 +150,7 @@
         "f04460",
         "f04461",
         "f04462",
-        "f06704",
-        "f06705",
-        "f06707",
-        "f06708",
-        "f06710",
+        "f06456",
         "f06713",
         "f06714",
         "f06715",
@@ -889,14 +216,6 @@
         "f06775",
         "f06776",
         "f06777",
-        "f06796",
-        "f06797",
-        "f06850",
-        "f07100",
-        "f07122",
-        "f07123",
-        "f07124",
-        "f07125",
         "f07153",
         "f07154",
         "f07155",
@@ -918,18 +237,26 @@
         "f07395",
         "f07396",
         "f07397",
-        "f07408",
-        "f07410",
-        "f07536",
-        "f07537",
-        "f07538",
-        "f07539",
-        "f07853",
+        "f07855",
+        "f07858",
+        "f07859",
+        "f07861",
+        "f07862",
+        "f07863",
+        "f07864",
+        "f07866",
+        "f07867",
         "f07883",
         "f07891",
         "f07896",
         "f07899",
         "f07906",
+        "f07926",
+        "f07928",
+        "f07929",
+        "f07931",
+        "f07932",
+        "f07938",
         "f08010",
         "f08015",
         "f08016",
@@ -939,42 +266,6 @@
         "f08020",
         "f08022",
         "f08023",
-        "f08208",
-        "f08214",
-        "f08215",
-        "f08221",
-        "f08230",
-        "f08233",
-        "f08234",
-        "f08235",
-        "f08236",
-        "f08237",
-        "f08238",
-        "f08239",
-        "f08240",
-        "f08253",
-        "f08254",
-        "f08255",
-        "f08256",
-        "f08261",
-        "f08263",
-        "f08264",
-        "f08268",
-        "f08269",
-        "f08270",
-        "f08271",
-        "f08272",
-        "f08273",
-        "f08274",
-        "f08277",
-        "f08278",
-        "f08279",
-        "f08280",
-        "f08282",
-        "f08284",
-        "f08289",
-        "f08330",
-        "f08334",
         "f08346",
         "f08347",
         "f08348",
@@ -1039,1029 +330,543 @@
         "f08407",
         "f08408",
         "f08409",
-        "f08410",
-        "f08448",
-        "f08449",
-        "f08450",
-        "f08451",
-        "f08504",
-        "f08505",
-        "f08523",
-        "f08524",
-        "f08525",
-        "f08526",
-        "f08527",
-        "f08528",
-        "f08529",
-        "f08530",
-        "f08531",
-        "f08532",
-        "f08533",
-        "f08534",
-        "f08535",
-        "f08536",
-        "f08537",
-        "f08538",
-        "f08539",
-        "f08540",
-        "f08541",
-        "f08542",
-        "f08543",
-        "f08544",
-        "f08545",
-        "f08546",
-        "f08547",
-        "f08571",
-        "f08572",
-        "f08573",
-        "f08574",
-        "f08575",
-        "f08576",
-        "f08577",
-        "f08578",
-        "f08579",
-        "f08580",
-        "f08581",
-        "f08582",
-        "f08583",
-        "f08584",
-        "f08585",
-        "f08586",
-        "f08587",
-        "f08588",
-        "f08589",
-        "f08590",
-        "f08591",
-        "f08592",
-        "f08593",
-        "f08594",
-        "f08595",
-        "f08596",
-        "f08597",
-        "f08598",
-        "f08599",
-        "f08600",
-        "f08601",
-        "f08602",
-        "f08603",
-        "f08604",
-        "f08605",
-        "f08606",
-        "f08607",
-        "f08608",
-        "f08609",
-        "f08610",
-        "f08611",
-        "f08612",
-        "f08613",
-        "f08614",
-        "f08615",
-        "f08616",
-        "f08617",
-        "f08703",
-        "f08709",
-        "f08715",
-        "f08718",
-        "r00001",
-        "r00002",
-        "r00003",
-        "r00004",
-        "r00005",
-        "r00006",
-        "r00007",
-        "r00008",
-        "r00009",
-        "r00010",
-        "r00011",
-        "r00012",
-        "r00013",
-        "r00016",
-        "r00017",
-        "r00018",
-        "r00019",
-        "r00020",
-        "r00021",
-        "r00022",
-        "r00023",
-        "r00024",
-        "r00026",
-        "r00028",
-        "r00029",
-        "r00030",
-        "r00031",
-        "r00033",
-        "r00034",
-        "r00035",
-        "r00036",
-        "r00037",
-        "r00038",
-        "r00039",
-        "r00040",
-        "r00045",
-        "r00046",
-        "r00047",
-        "r00049",
-        "r00051",
-        "r00054",
-        "r00055",
-        "r00058",
-        "r00059",
-        "r00060",
-        "r00061",
-        "r00062",
-        "r00070",
-        "r00071",
-        "r00073",
-        "r00074",
-        "r00075",
-        "r00076",
-        "r00078",
-        "r00085",
-        "r00090",
-        "r00091",
-        "r00115",
-        "r00130",
-        "r00133",
-        "r00134",
-        "r00145",
-        "r00146",
-        "r00156",
-        "r00158",
-        "r00159",
-        "r00160",
-        "r00164",
-        "r00165",
-        "r00169",
-        "r00174",
-        "r00175",
-        "r00176",
-        "r00185",
-        "r00189",
-        "r00190",
-        "r00191",
-        "r00192",
-        "r00194",
-        "r00195",
-        "r00196",
-        "r00202",
-        "r00203",
-        "r00204",
-        "r00205",
-        "r00206",
-        "r00208",
-        "r00209",
-        "r00210",
-        "r00211",
-        "r00213",
-        "r00214",
-        "r00215",
-        "r00216",
-        "r00217",
-        "r00218",
-        "r00219",
-        "r00221",
-        "r00223",
-        "r00224",
-        "r00227",
-        "r00228",
-        "r00230",
-        "r00233",
-        "r00234",
-        "r00235",
-        "r00236",
-        "r00239",
-        "r00240",
-        "r00241",
-        "r00242",
-        "r00243",
-        "r00244",
-        "r00245",
-        "r00246",
-        "r00247",
-        "r00250",
-        "r00251",
-        "r00252",
-        "r00253",
-        "r00254",
-        "r00255",
-        "r00256",
-        "r00257",
-        "r00258",
-        "r00259",
-        "r00261",
-        "r00262",
-        "r00263",
-        "r00264",
-        "r00265",
-        "r00266",
-        "r00267",
-        "r00268",
-        "r00269",
-        "r00270",
-        "r00271",
-        "r00272",
-        "r00273",
-        "r00279",
-        "r00280",
-        "r00281",
-        "r00283",
-        "r00285",
-        "r00288",
-        "r00289",
-        "r00292",
-        "r00293",
-        "r00294",
-        "r00295",
-        "r00296",
-        "r00304",
-        "r00305",
-        "r00307",
-        "r00308",
-        "r00309",
-        "r00310",
-        "r00312",
-        "r00319",
-        "r00324",
-        "r00325",
-        "r00349",
-        "r00364",
-        "r00367",
-        "r00368",
-        "r00379",
-        "r00380",
-        "r00390",
-        "r00392",
-        "r00393",
-        "r00394",
-        "r00398",
-        "r00399",
-        "r00403",
-        "r00408",
-        "r00409",
-        "r00410",
-        "r00419",
-        "r00423",
-        "r00424",
-        "r00425",
-        "r00426",
-        "r00428",
-        "r00429",
-        "r00430",
-        "r00436",
-        "r00437",
-        "r00438",
-        "r00439",
-        "r00728",
-        "r00735",
-        "r00757",
-        "r00763",
-        "r01530",
-        "r01877",
-        "r01903",
-        "r01912",
-        "r01921",
-        "r01964",
-        "r01967",
-        "r01971",
-        "r03718",
-        "r03739",
-        "r03806",
-        "r03900",
-        "r04382",
-        "r04383",
-        "r04385",
-        "r04388",
-        "r04390",
-        "r04392",
-        "r04393",
-        "r04395",
-        "r04396",
-        "r04397",
-        "r04410",
-        "r06686",
-        "r06688",
-        "r08631",
-        "r08632",
-        "r08633",
-        "r08634",
-        "r08635",
-        "r08636",
-        "r08637",
-        "r08638",
-        "r08639",
-        "r08640",
-        "r08641",
-        "r08642",
-        "r08643",
-        "r08646",
-        "r08647",
-        "r08648",
-        "r08649",
-        "r08650",
-        "r08651",
-        "r08652",
-        "r08653",
-        "r08654",
-        "r08656",
-        "r08658",
-        "r08659",
-        "r08660",
-        "r08661",
-        "r08663",
-        "r08664",
-        "r08694",
-        "r08696",
-        "r08697",
-        "r08698",
-        "r08699",
-        "r08701",
-        "r08702",
-        "r08703",
-        "r08704",
-        "r08705",
-        "r08706",
-        "r08707",
-        "r08709",
-        "r08711",
-        "r08712",
-        "r08715",
-        "r08716",
-        "r08718",
-        "r08721",
-        "r08722",
-        "r08723",
-        "r08724",
-        "r08727",
-        "r08728",
-        "r08729",
-        "r08730",
-        "r08731",
-        "r08732",
-        "r08733",
-        "r08734",
-        "r08735",
-        "r08738",
-        "r08739",
-        "r08740",
-        "r08741",
-        "r08742",
-        "r08743",
-        "r08744",
-        "r08745",
-        "r08746",
-        "r08747",
-        "r08749",
-        "r08750",
-        "r08751",
-        "r08752",
-        "r08753",
-        "r08754",
-        "r08755",
-        "r08756",
-        "r08757",
-        "r08758",
-        "r08759",
-        "r08760",
-        "r08761",
-        "r09010",
-        "r09011",
-        "r09012",
-        "r09013",
-        "r09039",
-        "r09040",
-        "r09056",
-        "r09061",
-        "r09076",
-        "r09078",
-        "r09080",
-        "r11573",
-        "r11574",
-        "r11575",
-        "r11581",
-        "r11582",
-        "r11585",
-        "r11586",
-        "r11589",
-        "r11590",
-        "r11592",
-        "r11593",
-        "r11594",
-        "r11595",
-        "r12598",
-        "r12914",
-        "r13046",
-        "r13069",
-        "r16757",
-        "r16873",
-        "r16887",
-        "r16893",
-        "r16894",
-        "r17564",
-        "r18309",
-        "r18310",
-        "r18311",
-        "r18312",
-        "r18313",
-        "r18314",
-        "r19798",
-        "r26231",
-        "r26241",
-        "r28561",
-        "r28562",
-        "r28599",
-        "r28600",
-        "r28616",
-        "r28617",
-        "r28618",
-        "r28619",
-        "r28621",
-        "r28622",
-        "r28627",
-        "r28628",
-        "r28629",
-        "r28634",
-        "r28636",
-        "r33083",
-        "r33111",
-        "r33119",
-        "r33120",
-        "r33122",
-        "r39490",
-        "r39491",
-        "r39498",
-        "r39499",
-        "r39557",
-        "r39565"
+        "f08410"
       ],
-      "newPatchSpecIds": [
+      "unresolvedRows": [
+        "f06749",
+        "f06750",
+        "f06751",
+        "f07855",
+        "f07859",
+        "f07861",
+        "f07862",
+        "f07863",
+        "f07864",
+        "f07866",
+        "f07867",
+        "f07928",
+        "f07929",
+        "f08382",
+        "f08383",
+        "f08384"
+      ],
+      "newSpecIds": [
+        "w2:predecessor:apps/fgos-gateway/Cargo.toml",
+        "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
+        "w2:predecessor:docs/platform/component-boundary.md",
+        "w2:predecessor:docs/platform/git/spec.md",
+        "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
+        "w2:predecessor:docs/platform/holder-lock/spec.md",
+        "w2:predecessor:docs/platform/runner/README.md",
+        "w2:predecessor:src/cli/command-registry.mjs",
+        "w2:predecessor:src/runner/worktree.mjs",
+        "w2:predecessor:src/setup/registrations.mjs",
+        "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
+        "w2:predecessor:test/runner/worktree.test.mjs",
+        "w2:status:docs/platform/vision.md",
+        "w2:status:docs/platform/system-architecture/architecture/roadmap.md",
+        "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
+        "w2:status:docs/platform/platform-foundations.md",
+        "w2:status:docs/platform/packaging-distribution/README.md",
+        "w2:status:docs/platform/work-state/README.md",
+        "w2:status:docs/platform/README.md",
+        "w2:description:participant",
+        "w2:description:system-overview-partial",
+        "w2:description:architecture-intent-self-route",
+        "w2:status-partial:docs/transitional-switchboard.md",
+        "w2:status-partial:docs/platform/documentation/switchboard.md",
+        "w2:scan:live-successor-specs",
+        "w2:guard:retired-schema-qualification",
+        "w2:proposal:gap05-relocation",
+        "w2:proposal:gap05-history"
+      ],
+      "effectiveSpecIds": [
+        "w2:predecessor:apps/fgos-gateway/Cargo.toml",
+        "w2:predecessor:apps/fgos-gateway/src/mcp.rs",
+        "w2:predecessor:docs/platform/component-boundary.md",
+        "w2:predecessor:docs/platform/git/spec.md",
+        "w2:predecessor:docs/platform/herdr-web-dashboard/README.md",
+        "w2:predecessor:docs/platform/holder-lock/spec.md",
+        "w2:predecessor:docs/platform/runner/README.md",
+        "w2:predecessor:src/cli/command-registry.mjs",
+        "w2:predecessor:src/runner/worktree.mjs",
+        "w2:predecessor:src/setup/registrations.mjs",
+        "w2:predecessor:test/runner/dispatch-executor-profile.test.mjs",
+        "w2:predecessor:test/runner/worktree.test.mjs",
+        "rework:test/cli/fgos-merge.test.mjs",
+        "rework:docs/how-to/fix-bare-citation-findings.md",
         "carry:credential-store-setup",
-        "convention:area-holder-table",
         "convention:citation-homes",
-        "description:cas-evidence-correction",
-        "description:mutation-admission",
-        "description:read-first",
-        "description:work-boundary",
+        "scan:recursive-platform-citations",
+        "proof:recursive-platform-citation-scan",
+        "convention:area-holder-table",
+        "scope-consumer:bin/fgos.mjs",
+        "scope-consumer:src/state/store.mjs",
+        "scope-consumer:src/cli/command-registry.mjs",
+        "scope-consumer:AGENTS.md",
         "hunk-park:bin/fgos.mjs",
         "hunk-park:docs/platform/process/spec.md",
-        "hunk-park:docs/specs/workflow.md",
         "hunk-park:identity-successor",
+        "hunk-park:docs/specs/workflow.md",
         "hunk-park:packages/herdr-fgos-common/rust/src/fgos.rs",
         "hunk-park:src/runner/merge.mjs",
-        "hunk-park:src/setup/git-hooks.mjs",
         "hunk-park:test/runner/merge.test.mjs",
-        "proof:recursive-platform-citation-scan",
-        "recomposed-predecessor:docs/platform/component-boundary.md",
-        "recomposed-predecessor:src/cli/command-registry.mjs",
-        "recomposed-predecessor:src/cli/command-registry.mjs",
-        "recomposed-predecessor:src/cli/command-registry.mjs",
-        "rework:docs/how-to/fix-bare-citation-findings.md",
-        "rework:test/cli/fgos-merge.test.mjs",
-        "scan:proof-inventory-comment",
-        "scan:recursive-platform-citations",
+        "description:work-boundary",
+        "description:mutation-admission",
+        "description:read-first",
+        "description:cas-evidence-correction",
         "scan:successor-dead-vocabulary",
-        "scope-consumer:AGENTS.md",
-        "scope-consumer:bin/fgos.mjs",
-        "scope-consumer:src/cli/command-registry.mjs",
-        "scope-consumer:src/state/store.mjs",
-        "status-units:docs/README.md",
+        "scan:proof-inventory-comment",
         "status-units:docs/doc-governance.md",
-        "status-units:docs/platform/documentation/operations/portals/docs-portal.md",
         "status-units:docs/platform/governance.md",
+        "status-units:docs/README.md",
+        "status-units:docs/platform/documentation/operations/portals/docs-portal.md",
         "status-units:docs/platform/host-invocation-routing/README.md",
-        "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "status-units:docs/user/README.md",
         "status-units:docs/platform/migration-authoring-rules.md",
+        "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
         "status-units:docs/platform/proposals/documentation-system-unification.md",
-        "status-units:docs/user/README.md"
-      ],
-      "rebindRequired": [
-        "claim_15308eb4"
+        "w2:status:docs/platform/vision.md",
+        "w2:status:docs/platform/system-architecture/architecture/roadmap.md",
+        "w2:status:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "w2:status:docs/platform/system-architecture/architecture/workspace-topology.md",
+        "w2:status:docs/platform/platform-foundations.md",
+        "w2:status:docs/platform/packaging-distribution/README.md",
+        "w2:status:docs/platform/work-state/README.md",
+        "w2:status:docs/platform/README.md",
+        "w2:description:participant",
+        "w2:description:system-overview-partial",
+        "w2:description:architecture-intent-self-route",
+        "w2:status-partial:docs/transitional-switchboard.md",
+        "w2:status-partial:docs/platform/documentation/switchboard.md",
+        "w2:scan:live-successor-specs",
+        "w2:guard:retired-schema-qualification"
       ],
       "placementProposalMember": "dynamic-023895",
       "placementProposalRow": "r28621"
     },
-    "commands": {
-      "reproduce": [
-        "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py"
-      ],
-      "finalReplay": "commands.json",
-      "firstReplayIncludingConstraintIncident": "commands-first-replay.json",
-      "readOnlyFinalAudit": [
-        {
-          "argv": [
-            "git",
-            "--no-optional-locks",
-            "rev-parse",
-            "HEAD"
-          ],
-          "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
-          "exit": 0,
-          "stdout": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b\n",
-          "stderr": ""
-        },
-        {
-          "argv": [
-            "git",
-            "--no-optional-locks",
-            "diff",
-            "--name-only"
-          ],
-          "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
-          "exit": 0,
-          "stdout": "",
-          "stderr": ""
-        },
-        {
-          "argv": [
-            "git",
-            "--no-optional-locks",
-            "diff",
-            "--cached",
-            "--name-only"
-          ],
-          "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
-          "exit": 0,
-          "stdout": "",
-          "stderr": ""
-        },
-        {
-          "argv": [
-            "git",
-            "--no-optional-locks",
-            "status",
-            "--porcelain"
-          ],
-          "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
-          "exit": 0,
-          "stdout": "?? plans/260925-documentation-authority-unification/reports/phase-09/composition/\n",
-          "stderr": ""
-        }
-      ],
-      "claimValidation": {
-        "argv": [
-          "node",
-          "--input-type=module",
-          "-e",
-          "import fs from 'node:fs'; import {validateAgentResultClaimContract as validate} from './src/runner/dispatch/agent-result-claim-contract.mjs'; const result=validate(JSON.parse(fs.readFileSync(0,'utf8'))); console.log(JSON.stringify(result)); if(!result.valid) process.exitCode=1;"
-        ],
-        "exit": 0,
-        "stdout": "{\"valid\":true}\n",
-        "stderr": ""
-      },
-      "note": "These logs retain pipeline argv/cwd/exits/stdout/stderr. Exploratory read/grep tool calls and earlier iterative composer runs are not represented as independent proof."
-    },
     "proof": {
-      "skillBuildExit": 0,
-      "singleTests": [
-        {
-          "file": "test/scripts/check-decision-citation-drift.test.mjs",
-          "exit": 1,
-          "environment": {
-            "CLAUDE_CODE_SESSION_ID": "unset",
-            "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
-            "TMPDIR": "/tmp/fgos-work/w1-d2-brief"
-          },
-          "log": "check-decision-citation-drift.test.log"
-        },
+      "independentEffectiveReplay": "w2-independent-verification.json",
+      "authorRoundtripsAndPredecessors": "w2-chain-verification.json",
+      "predecessorRecomposition": "w2-predecessor-recomposition.json",
+      "owningTests": [
         {
           "file": "test/runner/dead-vocabulary-guard.test.mjs",
           "exit": 1,
-          "environment": {
-            "CLAUDE_CODE_SESSION_ID": "unset",
-            "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
-            "TMPDIR": "/tmp/fgos-work/w1-d2-brief"
-          },
-          "log": "dead-vocabulary-guard.test.log"
+          "log": "w2-dead-vocabulary-guard.test.log",
+          "pass": "9",
+          "fail": "1"
+        },
+        {
+          "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+          "exit": 0,
+          "log": "w2-generate-shipped-path-inventory.test.log",
+          "pass": "11",
+          "fail": "0"
+        },
+        {
+          "file": "test/scripts/check-decision-citation-drift.test.mjs",
+          "exit": 1,
+          "log": "w2-check-decision-citation-drift.test.log",
+          "pass": "31",
+          "fail": "1"
         }
       ],
-      "citationTest": {
-        "pass": 31,
-        "fail": 1,
-        "skipped": 0,
-        "newNestedReaderCase": "pass",
-        "realRepoBaselineCase": "fail: 126 new findings; baseline unchanged"
+      "deadVocabularyOnlyGap05": "w2-gap05-verification.json",
+      "controlReplay": {
+        "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test test/runner/dead-vocabulary-guard.test.mjs",
+        "exit": 0,
+        "pass": 10,
+        "fail": 0,
+        "log": "w2-gap05-control.log"
       },
-      "deadVocabularyTest": {
-        "pass": 8,
-        "fail": 2,
-        "skipped": 0,
-        "details": "18 P5 occurrences in successor/history specs; 9 retired gateway/plugin names in live component-boundary carriage"
-      },
-      "formatOnlyScan": {
-        "beforeFiles": 17,
-        "afterFiles": 68,
-        "beforeFindings": 0,
-        "afterFindings": 124,
-        "missingExactFindingOccurrences": [],
-        "exactCoverageSuperset": true,
-        "retainedSourceFilesNotScanned": [],
-        "baselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
-        "baselineUnchanged": true,
-        "newUnbaselinedFindings": 124,
-        "note": "Strict finding-content coverage is not acceptance or a baseline rewrite; each miss needs source-unit carriage/rewrite review."
-      },
-      "enduserProjection": {
-        "before": 492,
-        "after": 490,
-        "beforeSha256": "9bc71cf022a86ec5cad295fb2487cf96351f17d3630f02cd15d719f5bfb2bb9d",
-        "afterSha256": "f1da752704c0599673f8c6d96d0c3a28c56aa8d5cfa4a8320c56ed1ba18eb9e4",
-        "removed": [
-          {
-            "quadrant": "explanation",
-            "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
-            "audience": "A user seeking understanding of the design, not a task to complete.",
-            "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
-            "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
-            "sourceCaptureId": "tsk-2zv",
-            "aliases": [
-              "docs/explanation/work-item-lifecycle-and-domain-model.md"
-            ]
-          },
-          {
-            "quadrant": "how-to",
-            "purpose": "Show the steps to accomplish one specific, already-understood goal.",
-            "audience": "A user who already knows the system and wants a concrete recipe.",
-            "docPath": "docs/how-to/check-rollup-progress.md",
-            "title": "How to check a root item's progress with `fgos rollup`",
-            "sourceCaptureId": "doc-fgos-rollup-howto",
-            "aliases": [
-              "docs/how-to/check-rollup-progress.md",
-              "docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
-            ]
-          }
+      "liveScanNegativeProbe": {
+        "injectedSymbols": [
+          "modelForTier",
+          "FlowDefinition"
         ],
-        "added": [],
-        "boundedExportSha256": "704bc549891c7fdac665b18d46362c192c758478cd4ca61d717635f785774159",
-        "noLiveStoreRead": true
+        "file": "docs/platform/doer-negative-probe/spec.md (scratch only, removed)",
+        "exit": 1,
+        "log": "w2-live-scan-negative-probe.log",
+        "meaning": "Both the Phase 1-3 and P5 guards reject retired symbols in a live nested successor; history exclusion is not a live-symbol exemption."
       },
-      "nearDuplicate": {
-        "before": {
-          "passed": true,
-          "message": "no near-duplicate authoritative claims"
-        },
-        "after": {
-          "passed": true,
-          "message": "no near-duplicate authoritative claims"
-        }
-      },
-      "shippedClassifier": {
-        "cases": [
-          {
-            "path": "docs/specs",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/specs/runner.md",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/architect",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/architect/component-boundary/README.md",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/platform/runner/spec.md",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-            "before": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            },
-            "after": {
-              "scope": "repository-local-contract",
-              "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-            }
-          },
-          {
-            "path": "docs/knowledge/example/guide.md",
-            "before": {
-              "scope": "mixed-or-unclassified",
-              "rationale": "Requires audit during Phase 02 inventory"
-            },
-            "after": {
-              "scope": "mixed-or-unclassified",
-              "rationale": "Requires audit during Phase 02 inventory"
-            }
-          }
-        ],
-        "unchanged": true
-      },
-      "strictCoverageLimitation": "Format-only finding multiset is an additive superset, but its old set has zero findings. That does not certify the whole guard or final-pin coverage. Whole-file guards remain red. No rebaseline, filter loosening, test skipping, or source application."
+      "citationBaselineUnchanged": true,
+      "citationBaselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "citationNewFindings": 124,
+      "skillBuild": "w2-skill-regeneration.json",
+      "nativeFixture": "w2-native-fixture.json",
+      "initialFailuresRetained": [
+        "initial-w2-generate-shipped-path-inventory.test.log",
+        "initial-w2-post-move-replay.json",
+        "initial-w2-commands.json"
+      ],
+      "interpretation": "Byte replays are reproducible local evidence, not semantic approval. Inventory observes an immutable pre-move Git fixture. Full source move, holder acceptance, final-pin F review and whole-suite parity are not certified."
     },
-    "blocker": "The full brief is not complete: 15 park entries remain without accepted complete composition (12 whole-row units still need authoring; 3 need exact live-holder/carriage decisions), four area scopes lack live holders, current-byte predecessor drift needs G9 review, and the citation/dead-vocabulary owning guards are red. GAP-05 placement is only a proposal. The prohibited Git-fixture side effect is disclosed in constraint-incident.json.",
-    "unfinishedEntries": [
-      {
-        "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
-        "rowIds": [
-          "f06456"
-        ],
-        "beforeSha256": "6ea6c31a400fe69271cbc00790d0457f885338c3c3d78a5070a7e1412c8ec470",
-        "predecessor": {
-          "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
-          "expectedAfterSha256": "6ea6c31a400fe69271cbc00790d0457f885338c3c3d78a5070a7e1412c8ec470",
-          "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+    "commands": {
+      "reproduce": [
+        "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/complete-parks.py",
+        "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/verify-effective.py"
+      ],
+      "argvCwdExitStdoutStderr": "w2-commands.json",
+      "testDoor": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<authorized activation releasePath>/bin/fgos node --test <single-file>",
+      "verificationExit": 0
+    },
+    "scope": {
+      "repositoryWritesOnly": "plans/260925-documentation-authority-unification/reports/phase-09/composition/**",
+      "sourceApplied": false,
+      "worktreeGitAddCommit": false,
+      "temporaryFixtureGitWritesAuthorized": true,
+      "fgosCliRun": false,
+      "liveStateOrSecretsRead": false,
+      "activationMetadataOnlyRead": "/home/vantt/projects/forgentX/.fgos/installation/activation.json",
+      "pairAccountingEdited": false,
+      "leadRecordsEdited": false,
+      "baselineChanged": false,
+      "fullSuiteRun": false,
+      "impactAnalysis": "degraded under brief no-CLI boundary; no production symbol edited",
+      "needsWrites": []
+    },
+    "notRun": [
+      "npm test and scripts/run-tests.mjs (brief prohibition)",
+      "cargo test --workspace (outside single-Node-test scope)",
+      "Rust MCP owning tests for source-drift path recomposition",
+      "final-pin F/full-parity and independent semantic reviews"
+    ],
+    "previousAttempt": {
+      "status": "blocked",
+      "briefComplete": false,
+      "gateClosed": false,
+      "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+      "createdAt": "2026-10-23T12:40:15.155675+00:00",
+      "summary": "docs: compose migration records and disclose unresolved replay gaps. Indexed 48/16/8 members and 101 parks, composed 38 patch specs, regenerated skills in scratch; blocked, not gate closure.",
+      "counts": {
+        "familyMemberJoins": {
+          "8": 48,
+          "13": 16,
+          "17": 8
         },
-        "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
-        "gate": "G1",
-        "members": [
-          {
-            "rowId": "f06456",
-            "memberId": "maps-j-06573",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 45,
-                "columnStart": 3,
-                "line": 31,
-                "text": "docs/specs/platform-foundations.md:210-219"
-              }
-            ],
-            "blocker": "P8-DOC-GAP-02: the precise event-log Participant append/read/subscribe contract and old line range 210-219 remain in the retiring platform-foundations spec projection. Carry the full content to an approved candidate owner and rebind the complete locator before redirecting; root locked laws are not the missing protocol definition."
-          }
-        ]
-      },
-      {
-        "path": "docs/platform/system-overview/spec.md",
-        "rowIds": [
-          "f07926",
-          "f07928",
-          "f07929",
-          "f07931",
-          "f07932",
-          "f07938"
-        ],
-        "beforeSha256": "a750421251baf79dce390bb7e7a88b543bc6a159448a73318381ea8e001e1f7b",
-        "predecessor": {
-          "patchSpecId": "file:docs/platform/system-overview/spec.md",
-          "expectedAfterSha256": "a750421251baf79dce390bb7e7a88b543bc6a159448a73318381ea8e001e1f7b",
-          "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+        "exactCurrentPassageJoins": 72,
+        "parkActions": 101,
+        "parkActionKinds": {
+          "composed-current-hunks": 7,
+          "renamed-source": 1,
+          "retire-source-after-carriage": 1,
+          "generator": 71,
+          "composed-status-units": 9,
+          "whole-row-authority-flip": 12
         },
-        "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
-        "gate": "G1",
-        "members": [
-          {
-            "rowId": "f07926",
-            "memberId": "author-wave5g-docs-platform-system-overview-spec-L42C95",
-            "sourceSpans": [
-              {
-                "line": 42,
-                "columnStart": 95,
-                "columnEndExclusive": 118,
-                "text": "platform-foundations.md"
-              }
-            ],
-            "blocker": "P8-DOC-GAP-02: this area-spec/decision citation names the full platform-foundations spec narrative, not the retained root L1–L10 law text. The complete content must be carried to an accepted live holder before the retiring spec is redirected or deleted."
-          },
-          {
-            "rowId": "f07928",
-            "memberId": "author-wave5g-docs-platform-system-overview-spec-L44C254",
-            "sourceSpans": [
-              {
-                "line": 44,
-                "columnStart": 254,
-                "columnEndExclusive": 279,
-                "text": "enduser-docs-authoring.md"
-              }
-            ],
-            "blocker": "P8-DOC-GAP-02: complete enduser-docs-authoring.md source must be carried before the retiring spec is deleted. No accepted candidate owner carries that full write-side/read-side contract; do not invent a destination or waive capture/linkage conservation."
-          },
-          {
-            "rowId": "f07929",
-            "memberId": "author-wave5g-docs-platform-system-overview-spec-L45C254",
-            "sourceSpans": [
-              {
-                "line": 45,
-                "columnStart": 254,
-                "columnEndExclusive": 275,
-                "text": "enduser-docs-index.md"
-              }
-            ],
-            "blocker": "P8-DOC-GAP-02: complete enduser-docs-index.md source must be carried before the retiring spec is deleted. No accepted candidate owner carries that full write-side/read-side contract; do not invent a destination or waive capture/linkage conservation."
-          },
-          {
-            "rowId": "f07931",
-            "memberId": "author-wave5g-docs-platform-system-overview-spec-L47C129",
-            "sourceSpans": [
-              {
-                "line": 47,
-                "columnStart": 129,
-                "columnEndExclusive": 143,
-                "text": "fgos-plugin.md"
-              }
-            ],
-            "blocker": "Description needs rewrite: the area-map bullet asserts 12 verb wrappers, including the old plugin shape. Candidate claude-plugin/spec.md explicitly marks unshipped check behavior; reconcile this whole count/list/shipped-state claim before redirecting to that owner."
-          },
-          {
-            "rowId": "f07932",
-            "memberId": "author-wave5g-docs-platform-system-overview-spec-L48C82",
-            "sourceSpans": [
-              {
-                "line": 48,
-                "columnStart": 82,
-                "columnEndExclusive": 97,
-                "text": "distribution.md"
-              }
-            ],
-            "blocker": "Description needs rewrite: this area-map bullet defines distribution as npm install via GitHub. The promoted packaging-distribution owner covers Rust-host release staging/activation, setup/doctor and Node compatibility. Rewrite the complete installation/ownership description instead of endorsing an obsolete npm-only scope with a path substitution."
-          },
-          {
-            "rowId": "f07938",
-            "memberId": "maps-j-07805",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 32,
-                "columnStart": 3,
-                "line": 16,
-                "text": "docs/specs/system-overview.md"
-              }
-            ],
-            "blocker": "Description needs rewrite (L12-34(4), L12-40(2)): this Related/Legacy-source item names docs/specs/system-overview.md; its live holder docs/platform/system-overview/spec.md is this consumer itself. Consolidate the complete duplicate/source-labelled navigation item at cutover; preserve the separate original Provenance line."
-          }
-        ]
+        "unfinishedParkEntries": 15,
+        "patchSpecs": 38,
+        "changedPatchSpecsRoundtripped": 37,
+        "noByteChangePatchSpecs": 1,
+        "canonicalSkillInputs": 12,
+        "parkedRenderSpecs": 69,
+        "changedParkedRenders": 24,
+        "allGeneratedOutputChanges": 33,
+        "generatedChangesOutsideParkedSet": 9,
+        "sameFileImmediateEdgesVerified": 10,
+        "physicalScratchMoves": 1039,
+        "predecessorsDeferredForSourceDrift": 19,
+        "finalRecordedCommands": 615,
+        "firstReplayRecordedCommands": 532
       },
-      {
-        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
-        "rowIds": [
-          "f07855",
-          "f07858",
-          "f07859",
-          "f07861",
-          "f07862",
-          "f07863",
-          "f07864",
-          "f07866",
-          "f07867"
+      "touchedIds": {
+        "families": [
+          8,
+          13,
+          17
         ],
-        "beforeSha256": "07bea7f4e9cdd2aaa6dc14245cdfe2ebf6fa76725740acf35f4e108e942b8446",
-        "predecessor": {
-          "patchSpecId": "file:docs/platform/system-architecture/architecture/architecture-intent.md",
-          "expectedAfterSha256": "07bea7f4e9cdd2aaa6dc14245cdfe2ebf6fa76725740acf35f4e108e942b8446",
-          "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
-        },
-        "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
-        "gate": "G1",
-        "members": [
-          {
-            "rowId": "f07855",
-            "memberId": "author-wave5g-docs-platform-system-architecture-architecture-architecture-intent-L61C39",
-            "sourceSpans": [
-              {
-                "line": 61,
-                "columnStart": 39,
-                "columnEndExclusive": 76,
-                "text": "system-vision-trong-mem-ngoai-cung.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: Related names the complete system vision, but its exact candidate docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md is a whole-source Architecture carrier (Purpose Preserve the complete; Writer type Agent carriage). It is not an executable live target under L12-30(3). Establish the accepted live vision holder before redirecting this Related pointer."
-          },
-          {
-            "rowId": "f07858",
-            "memberId": "maps-j-07754",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 40,
-                "columnStart": 3,
-                "line": 16,
-                "text": "docs/architect/architecture-intent.md"
-              }
-            ],
-            "blocker": "Description needs rewrite (L12-34(4), L12-40(2)): metadata Related names the source whose promoted owner is this consumer itself. Remove/consolidate this self-related item, keeping original Provenance and cutover metadata as separate source units."
-          },
-          {
-            "rowId": "f07859",
-            "memberId": "maps-j-07755",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 56,
-                "columnStart": 4,
-                "line": 42,
-                "text": "docs/architect/system-vision-trong-mem-ngoai-cung.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: Related names the complete system vision, but its exact candidate docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md is a whole-source Architecture carrier (Purpose Preserve the complete; Writer type Agent carriage). It is not an executable live target under L12-30(3). Establish the accepted live vision holder before redirecting this Related pointer."
-          },
-          {
-            "rowId": "f07861",
-            "memberId": "maps-j-07757",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 64,
-                "columnStart": 4,
-                "line": 44,
-                "text": "docs/architect/proposals/step-09-group-thinking-substrate.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/step-09-group-thinking-substrate.md; exact candidate mirror docs/platform/proposals/step-09-group-thinking-substrate.md is explicitly history/source conservation, not live authority. Carry/accept the complete step-09-group-thinking-substrate.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
-          },
-          {
-            "rowId": "f07862",
-            "memberId": "maps-j-07758",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 62,
-                "columnStart": 4,
-                "line": 45,
-                "text": "docs/architect/proposals/step-10-coding-domain-adoption.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/step-10-coding-domain-adoption.md; exact candidate mirror docs/platform/proposals/step-10-coding-domain-adoption.md is explicitly history/source conservation, not live authority. Carry/accept the complete step-10-coding-domain-adoption.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
-          },
-          {
-            "rowId": "f07863",
-            "memberId": "maps-j-07759",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 64,
-                "columnStart": 4,
-                "line": 46,
-                "text": "docs/architect/proposals/component-authority-boundary-map.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/component-authority-boundary-map.md; exact candidate mirror docs/platform/proposals/component-authority-boundary-map.md is explicitly history/source conservation, not live authority. Carry/accept the complete component-authority-boundary-map.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
-          },
-          {
-            "rowId": "f07864",
-            "memberId": "maps-j-07760",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 67,
-                "columnStart": 4,
-                "line": 47,
-                "text": "docs/architect/agent-coordination/intent-preservation-ledger.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/intent-preservation-ledger.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
-          },
-          {
-            "rowId": "f07866",
-            "memberId": "maps-j-07762",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 71,
-                "columnStart": 4,
-                "line": 792,
-                "text": "docs/architect/agent-coordination/contracts/coordination-session.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/contracts/coordination-session.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
-          },
-          {
-            "rowId": "f07867",
-            "memberId": "maps-j-07763",
-            "sourceSpans": [
-              {
-                "columnEndExclusive": 66,
-                "columnStart": 4,
-                "line": 794,
-                "text": "docs/architect/agent-coordination/contracts/flow-definition.md"
-              }
-            ],
-            "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/contracts/flow-definition.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
-          }
-        ]
-      },
-      {
-        "id": "file:docs/platform/README.md",
-        "path": "docs/platform/README.md",
+        "gates": [
+          "G1",
+          "G7"
+        ],
+        "memberIds": [
+          "author-s67-citation-core-4-51",
+          "author-s67-citation-core-6-2",
+          "author-s67-citation-core-96-44",
+          "author-seam8-agents-decision-home-74",
+          "dynamic-006494",
+          "dynamic-006495",
+          "dynamic-006511",
+          "dynamic-006516",
+          "dynamic-014397",
+          "dynamic-014398",
+          "dynamic-014399",
+          "dynamic-014400",
+          "dynamic-014401",
+          "dynamic-014402",
+          "dynamic-021577",
+          "dynamic-023835",
+          "dynamic-023836",
+          "dynamic-023873",
+          "dynamic-023874",
+          "dynamic-023890",
+          "dynamic-023891",
+          "dynamic-023892",
+          "dynamic-023893",
+          "dynamic-023895",
+          "dynamic-023896",
+          "dynamic-023901",
+          "dynamic-023902",
+          "dynamic-023903",
+          "dynamic-033375",
+          "dynamic-033376",
+          "dynamic-033383",
+          "dynamic-033384",
+          "reference-000004",
+          "reference-000012",
+          "reference-000013",
+          "reference-000123",
+          "reference-000145",
+          "reference-000151",
+          "reference-000231",
+          "reference-002308",
+          "reference-002316",
+          "reference-002317",
+          "reference-002441",
+          "reference-002442",
+          "reference-002443",
+          "reference-002444",
+          "reference-002467",
+          "reference-002469",
+          "reference-002471",
+          "reference-003579",
+          "reference-003580",
+          "reference-003581",
+          "reference-003587",
+          "reference-003588",
+          "reference-003591",
+          "reference-003592",
+          "reference-003595",
+          "reference-003596",
+          "reference-003598",
+          "reference-003599",
+          "reference-003600",
+          "reference-003601",
+          "reference-003634",
+          "reference-003640",
+          "reference-003643",
+          "reference-003666",
+          "reference-003908",
+          "reference-004353",
+          "reference-004371",
+          "reference-004373",
+          "reference-005064",
+          "reference-005072"
+        ],
+        "parkedSpecIds": [
+          "file:.agents/skills/_shared/ak-cook-worker-contract.md",
+          "file:.agents/skills/_shared/capability-catalog.md",
+          "file:.agents/skills/_shared/catchup-self-recovery.md",
+          "file:.agents/skills/_shared/citation-format.md",
+          "file:.agents/skills/_shared/coding-worker-contract.md",
+          "file:.agents/skills/_shared/executor-dispatch-fallback.md",
+          "file:.agents/skills/_shared/planning-capability-awareness.md",
+          "file:.agents/skills/distill/SKILL.md",
+          "file:.agents/skills/distill/references/consult-protocol.md",
+          "file:.agents/skills/distill/references/deep-dive-protocol.md",
+          "file:.agents/skills/distill/references/extract-rules.md",
+          "file:.agents/skills/distill/scripts/distill.mjs",
+          "file:.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+          "file:.agents/skills/fgos-clarifying/SKILL.md",
+          "file:.agents/skills/fgos-coding-discovering/SKILL.md",
+          "file:.agents/skills/fgos-coding-exploring/SKILL.md",
+          "file:.agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+          "file:.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+          "file:.agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "file:.agents/skills/fgos-coding-implement/SKILL.md",
+          "file:.agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+          "file:.agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+          "file:.agents/skills/fgos-coding-knowledge/SKILL.md",
+          "file:.agents/skills/fgos-coding-planning/SKILL.md",
+          "file:.agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+          "file:.agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "file:.agents/skills/fgos-coding-shaping/SKILL.md",
+          "file:.agents/skills/fgos-coding-validating/SKILL.md",
+          "file:.agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "file:.agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "file:.agents/skills/fgos-indexing/SKILL.md",
+          "file:.agents/skills/fgos-researching/SKILL.md",
+          "file:.claude/skills/distill/scripts/distill.mjs",
+          "file:.claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+          "file:.claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
+          "file:.claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+          "file:.claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+          "file:.claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+          "file:.claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+          "file:.claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "file:.claude/skills/fgos-coding-shaping/SKILL.md",
+          "file:.claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "file:.claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "file:bin/fgos.mjs",
+          "file:docs/README.md",
+          "file:docs/doc-governance.md",
+          "file:docs/enduser-docs-index.json",
+          "file:docs/platform/README.md",
+          "file:docs/platform/documentation/operations/portals/docs-portal.md",
+          "file:docs/platform/documentation/switchboard.md",
+          "file:docs/platform/governance.md",
+          "file:docs/platform/host-invocation-routing/README.md",
+          "file:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "file:docs/platform/migration-authoring-rules.md",
+          "file:docs/platform/packaging-distribution/README.md",
+          "file:docs/platform/platform-foundations.md",
+          "file:docs/platform/process/spec.md",
+          "file:docs/platform/proposals/documentation-system-unification.md",
+          "file:docs/platform/session-identity/spec.md",
+          "file:docs/platform/system-architecture/architecture/roadmap.md",
+          "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+          "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+          "file:docs/platform/system-architecture/architecture/workspace-topology.md",
+          "file:docs/platform/vision.md",
+          "file:docs/platform/work-state/README.md",
+          "file:docs/specs/reading-map.md",
+          "file:docs/specs/workflow.md",
+          "file:docs/transitional-switchboard.md",
+          "file:docs/ui-spec/generated/wireframe-v2.html",
+          "file:docs/user/README.md",
+          "file:packages/herdr-fgos-common/rust/src/fgos.rs",
+          "file:plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+          "file:plugins/fgOS/skills/_shared/capability-catalog.md",
+          "file:plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+          "file:plugins/fgOS/skills/_shared/citation-format.md",
+          "file:plugins/fgOS/skills/_shared/coding-worker-contract.md",
+          "file:plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+          "file:plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+          "file:plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+          "file:plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+          "file:plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+          "file:plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+          "file:plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+          "file:plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+          "file:plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+          "file:plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+          "file:plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+          "file:plugins/fgOS/skills/fgos-indexing/SKILL.md",
+          "file:plugins/fgOS/skills/fgos-researching/SKILL.md",
+          "file:src/runner/merge.mjs",
+          "file:src/setup/git-hooks.mjs",
+          "file:test/runner/merge.test.mjs"
+        ],
         "rowIds": [
+          "f00001",
+          "f00002",
+          "f00003",
+          "f00004",
+          "f00005",
+          "f00006",
+          "f00007",
+          "f00008",
+          "f00009",
+          "f00010",
+          "f00011",
+          "f00012",
+          "f00013",
+          "f00014",
+          "f00015",
+          "f00016",
+          "f00017",
+          "f00018",
+          "f00019",
+          "f00020",
+          "f00021",
+          "f00022",
+          "f00023",
+          "f00024",
+          "f00025",
+          "f00026",
+          "f00027",
+          "f00028",
+          "f00029",
+          "f00030",
+          "f00031",
+          "f00032",
+          "f00033",
+          "f00034",
+          "f00035",
+          "f00036",
+          "f00037",
+          "f00038",
+          "f00039",
+          "f00040",
+          "f00041",
+          "f00042",
+          "f00043",
+          "f00044",
+          "f00045",
+          "f00046",
+          "f00047",
+          "f00048",
+          "f00049",
+          "f00050",
+          "f00051",
+          "f00052",
+          "f00053",
+          "f00054",
+          "f00055",
+          "f00056",
+          "f00057",
+          "f00058",
+          "f00059",
+          "f00060",
+          "f00061",
+          "f00062",
+          "f00063",
+          "f00064",
+          "f00065",
+          "f00066",
+          "f00067",
+          "f00068",
+          "f00069",
+          "f00070",
+          "f00071",
+          "f00072",
+          "f00073",
+          "f00074",
+          "f00075",
+          "f00076",
+          "f00077",
+          "f00078",
+          "f00079",
+          "f00080",
+          "f00081",
+          "f00082",
+          "f00083",
+          "f00084",
+          "f00085",
+          "f00086",
+          "f00087",
+          "f00088",
+          "f00089",
+          "f00090",
+          "f00091",
+          "f00092",
+          "f00434",
+          "f00457",
+          "f00516",
+          "f00517",
+          "f00518",
+          "f00519",
+          "f00520",
+          "f00522",
+          "f00523",
+          "f00526",
+          "f01222",
+          "f01223",
           "f04445",
           "f04446",
           "f04447",
@@ -2079,15 +884,12 @@
           "f04459",
           "f04460",
           "f04461",
-          "f04462"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/documentation/switchboard.md",
-        "path": "docs/platform/documentation/switchboard.md",
-        "rowIds": [
+          "f04462",
+          "f06704",
+          "f06705",
+          "f06707",
+          "f06708",
+          "f06710",
           "f06713",
           "f06714",
           "f06715",
@@ -2152,29 +954,21 @@
           "f06774",
           "f06775",
           "f06776",
-          "f06777"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/packaging-distribution/README.md",
-        "path": "docs/platform/packaging-distribution/README.md",
-        "rowIds": [
+          "f06777",
+          "f06796",
+          "f06797",
+          "f06850",
+          "f07100",
+          "f07122",
+          "f07123",
+          "f07124",
+          "f07125",
           "f07153",
           "f07154",
           "f07155",
           "f07156",
           "f07157",
-          "f07158"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/platform-foundations.md",
-        "path": "docs/platform/platform-foundations.md",
-        "rowIds": [
+          "f07158",
           "f07383",
           "f07384",
           "f07385",
@@ -2189,69 +983,20 @@
           "f07394",
           "f07395",
           "f07396",
-          "f07397"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/system-architecture/architecture/roadmap.md",
-        "path": "docs/platform/system-architecture/architecture/roadmap.md",
-        "rowIds": [
-          "f07883"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
-        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
-        "rowIds": [
-          "f07891"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
-        "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
-        "rowIds": [
-          "f07896"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
-        "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
-        "rowIds": [
-          "f07899"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/system-architecture/architecture/workspace-topology.md",
-        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
-        "rowIds": [
-          "f07906"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/vision.md",
-        "path": "docs/platform/vision.md",
-        "rowIds": [
-          "f08010"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/platform/work-state/README.md",
-        "path": "docs/platform/work-state/README.md",
-        "rowIds": [
+          "f07397",
+          "f07408",
+          "f07410",
+          "f07536",
+          "f07537",
+          "f07538",
+          "f07539",
+          "f07853",
+          "f07883",
+          "f07891",
+          "f07896",
+          "f07899",
+          "f07906",
+          "f08010",
           "f08015",
           "f08016",
           "f08017",
@@ -2259,15 +1004,43 @@
           "f08019",
           "f08020",
           "f08022",
-          "f08023"
-        ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
-      },
-      {
-        "id": "file:docs/transitional-switchboard.md",
-        "path": "docs/transitional-switchboard.md",
-        "rowIds": [
+          "f08023",
+          "f08208",
+          "f08214",
+          "f08215",
+          "f08221",
+          "f08230",
+          "f08233",
+          "f08234",
+          "f08235",
+          "f08236",
+          "f08237",
+          "f08238",
+          "f08239",
+          "f08240",
+          "f08253",
+          "f08254",
+          "f08255",
+          "f08256",
+          "f08261",
+          "f08263",
+          "f08264",
+          "f08268",
+          "f08269",
+          "f08270",
+          "f08271",
+          "f08272",
+          "f08273",
+          "f08274",
+          "f08277",
+          "f08278",
+          "f08279",
+          "f08280",
+          "f08282",
+          "f08284",
+          "f08289",
+          "f08330",
+          "f08334",
           "f08346",
           "f08347",
           "f08348",
@@ -2332,31 +1105,1423 @@
           "f08407",
           "f08408",
           "f08409",
-          "f08410"
+          "f08410",
+          "f08448",
+          "f08449",
+          "f08450",
+          "f08451",
+          "f08504",
+          "f08505",
+          "f08523",
+          "f08524",
+          "f08525",
+          "f08526",
+          "f08527",
+          "f08528",
+          "f08529",
+          "f08530",
+          "f08531",
+          "f08532",
+          "f08533",
+          "f08534",
+          "f08535",
+          "f08536",
+          "f08537",
+          "f08538",
+          "f08539",
+          "f08540",
+          "f08541",
+          "f08542",
+          "f08543",
+          "f08544",
+          "f08545",
+          "f08546",
+          "f08547",
+          "f08571",
+          "f08572",
+          "f08573",
+          "f08574",
+          "f08575",
+          "f08576",
+          "f08577",
+          "f08578",
+          "f08579",
+          "f08580",
+          "f08581",
+          "f08582",
+          "f08583",
+          "f08584",
+          "f08585",
+          "f08586",
+          "f08587",
+          "f08588",
+          "f08589",
+          "f08590",
+          "f08591",
+          "f08592",
+          "f08593",
+          "f08594",
+          "f08595",
+          "f08596",
+          "f08597",
+          "f08598",
+          "f08599",
+          "f08600",
+          "f08601",
+          "f08602",
+          "f08603",
+          "f08604",
+          "f08605",
+          "f08606",
+          "f08607",
+          "f08608",
+          "f08609",
+          "f08610",
+          "f08611",
+          "f08612",
+          "f08613",
+          "f08614",
+          "f08615",
+          "f08616",
+          "f08617",
+          "f08703",
+          "f08709",
+          "f08715",
+          "f08718",
+          "r00001",
+          "r00002",
+          "r00003",
+          "r00004",
+          "r00005",
+          "r00006",
+          "r00007",
+          "r00008",
+          "r00009",
+          "r00010",
+          "r00011",
+          "r00012",
+          "r00013",
+          "r00016",
+          "r00017",
+          "r00018",
+          "r00019",
+          "r00020",
+          "r00021",
+          "r00022",
+          "r00023",
+          "r00024",
+          "r00026",
+          "r00028",
+          "r00029",
+          "r00030",
+          "r00031",
+          "r00033",
+          "r00034",
+          "r00035",
+          "r00036",
+          "r00037",
+          "r00038",
+          "r00039",
+          "r00040",
+          "r00045",
+          "r00046",
+          "r00047",
+          "r00049",
+          "r00051",
+          "r00054",
+          "r00055",
+          "r00058",
+          "r00059",
+          "r00060",
+          "r00061",
+          "r00062",
+          "r00070",
+          "r00071",
+          "r00073",
+          "r00074",
+          "r00075",
+          "r00076",
+          "r00078",
+          "r00085",
+          "r00090",
+          "r00091",
+          "r00115",
+          "r00130",
+          "r00133",
+          "r00134",
+          "r00145",
+          "r00146",
+          "r00156",
+          "r00158",
+          "r00159",
+          "r00160",
+          "r00164",
+          "r00165",
+          "r00169",
+          "r00174",
+          "r00175",
+          "r00176",
+          "r00185",
+          "r00189",
+          "r00190",
+          "r00191",
+          "r00192",
+          "r00194",
+          "r00195",
+          "r00196",
+          "r00202",
+          "r00203",
+          "r00204",
+          "r00205",
+          "r00206",
+          "r00208",
+          "r00209",
+          "r00210",
+          "r00211",
+          "r00213",
+          "r00214",
+          "r00215",
+          "r00216",
+          "r00217",
+          "r00218",
+          "r00219",
+          "r00221",
+          "r00223",
+          "r00224",
+          "r00227",
+          "r00228",
+          "r00230",
+          "r00233",
+          "r00234",
+          "r00235",
+          "r00236",
+          "r00239",
+          "r00240",
+          "r00241",
+          "r00242",
+          "r00243",
+          "r00244",
+          "r00245",
+          "r00246",
+          "r00247",
+          "r00250",
+          "r00251",
+          "r00252",
+          "r00253",
+          "r00254",
+          "r00255",
+          "r00256",
+          "r00257",
+          "r00258",
+          "r00259",
+          "r00261",
+          "r00262",
+          "r00263",
+          "r00264",
+          "r00265",
+          "r00266",
+          "r00267",
+          "r00268",
+          "r00269",
+          "r00270",
+          "r00271",
+          "r00272",
+          "r00273",
+          "r00279",
+          "r00280",
+          "r00281",
+          "r00283",
+          "r00285",
+          "r00288",
+          "r00289",
+          "r00292",
+          "r00293",
+          "r00294",
+          "r00295",
+          "r00296",
+          "r00304",
+          "r00305",
+          "r00307",
+          "r00308",
+          "r00309",
+          "r00310",
+          "r00312",
+          "r00319",
+          "r00324",
+          "r00325",
+          "r00349",
+          "r00364",
+          "r00367",
+          "r00368",
+          "r00379",
+          "r00380",
+          "r00390",
+          "r00392",
+          "r00393",
+          "r00394",
+          "r00398",
+          "r00399",
+          "r00403",
+          "r00408",
+          "r00409",
+          "r00410",
+          "r00419",
+          "r00423",
+          "r00424",
+          "r00425",
+          "r00426",
+          "r00428",
+          "r00429",
+          "r00430",
+          "r00436",
+          "r00437",
+          "r00438",
+          "r00439",
+          "r00728",
+          "r00735",
+          "r00757",
+          "r00763",
+          "r01530",
+          "r01877",
+          "r01903",
+          "r01912",
+          "r01921",
+          "r01964",
+          "r01967",
+          "r01971",
+          "r03718",
+          "r03739",
+          "r03806",
+          "r03900",
+          "r04382",
+          "r04383",
+          "r04385",
+          "r04388",
+          "r04390",
+          "r04392",
+          "r04393",
+          "r04395",
+          "r04396",
+          "r04397",
+          "r04410",
+          "r06686",
+          "r06688",
+          "r08631",
+          "r08632",
+          "r08633",
+          "r08634",
+          "r08635",
+          "r08636",
+          "r08637",
+          "r08638",
+          "r08639",
+          "r08640",
+          "r08641",
+          "r08642",
+          "r08643",
+          "r08646",
+          "r08647",
+          "r08648",
+          "r08649",
+          "r08650",
+          "r08651",
+          "r08652",
+          "r08653",
+          "r08654",
+          "r08656",
+          "r08658",
+          "r08659",
+          "r08660",
+          "r08661",
+          "r08663",
+          "r08664",
+          "r08694",
+          "r08696",
+          "r08697",
+          "r08698",
+          "r08699",
+          "r08701",
+          "r08702",
+          "r08703",
+          "r08704",
+          "r08705",
+          "r08706",
+          "r08707",
+          "r08709",
+          "r08711",
+          "r08712",
+          "r08715",
+          "r08716",
+          "r08718",
+          "r08721",
+          "r08722",
+          "r08723",
+          "r08724",
+          "r08727",
+          "r08728",
+          "r08729",
+          "r08730",
+          "r08731",
+          "r08732",
+          "r08733",
+          "r08734",
+          "r08735",
+          "r08738",
+          "r08739",
+          "r08740",
+          "r08741",
+          "r08742",
+          "r08743",
+          "r08744",
+          "r08745",
+          "r08746",
+          "r08747",
+          "r08749",
+          "r08750",
+          "r08751",
+          "r08752",
+          "r08753",
+          "r08754",
+          "r08755",
+          "r08756",
+          "r08757",
+          "r08758",
+          "r08759",
+          "r08760",
+          "r08761",
+          "r09010",
+          "r09011",
+          "r09012",
+          "r09013",
+          "r09039",
+          "r09040",
+          "r09056",
+          "r09061",
+          "r09076",
+          "r09078",
+          "r09080",
+          "r11573",
+          "r11574",
+          "r11575",
+          "r11581",
+          "r11582",
+          "r11585",
+          "r11586",
+          "r11589",
+          "r11590",
+          "r11592",
+          "r11593",
+          "r11594",
+          "r11595",
+          "r12598",
+          "r12914",
+          "r13046",
+          "r13069",
+          "r16757",
+          "r16873",
+          "r16887",
+          "r16893",
+          "r16894",
+          "r17564",
+          "r18309",
+          "r18310",
+          "r18311",
+          "r18312",
+          "r18313",
+          "r18314",
+          "r19798",
+          "r26231",
+          "r26241",
+          "r28561",
+          "r28562",
+          "r28599",
+          "r28600",
+          "r28616",
+          "r28617",
+          "r28618",
+          "r28619",
+          "r28621",
+          "r28622",
+          "r28627",
+          "r28628",
+          "r28629",
+          "r28634",
+          "r28636",
+          "r33083",
+          "r33111",
+          "r33119",
+          "r33120",
+          "r33122",
+          "r39490",
+          "r39491",
+          "r39498",
+          "r39499",
+          "r39557",
+          "r39565"
         ],
-        "gate": "G7",
-        "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        "newPatchSpecIds": [
+          "carry:credential-store-setup",
+          "convention:area-holder-table",
+          "convention:citation-homes",
+          "description:cas-evidence-correction",
+          "description:mutation-admission",
+          "description:read-first",
+          "description:work-boundary",
+          "hunk-park:bin/fgos.mjs",
+          "hunk-park:docs/platform/process/spec.md",
+          "hunk-park:docs/specs/workflow.md",
+          "hunk-park:identity-successor",
+          "hunk-park:packages/herdr-fgos-common/rust/src/fgos.rs",
+          "hunk-park:src/runner/merge.mjs",
+          "hunk-park:src/setup/git-hooks.mjs",
+          "hunk-park:test/runner/merge.test.mjs",
+          "proof:recursive-platform-citation-scan",
+          "recomposed-predecessor:docs/platform/component-boundary.md",
+          "recomposed-predecessor:src/cli/command-registry.mjs",
+          "recomposed-predecessor:src/cli/command-registry.mjs",
+          "recomposed-predecessor:src/cli/command-registry.mjs",
+          "rework:docs/how-to/fix-bare-citation-findings.md",
+          "rework:test/cli/fgos-merge.test.mjs",
+          "scan:proof-inventory-comment",
+          "scan:recursive-platform-citations",
+          "scan:successor-dead-vocabulary",
+          "scope-consumer:AGENTS.md",
+          "scope-consumer:bin/fgos.mjs",
+          "scope-consumer:src/cli/command-registry.mjs",
+          "scope-consumer:src/state/store.mjs",
+          "status-units:docs/README.md",
+          "status-units:docs/doc-governance.md",
+          "status-units:docs/platform/documentation/operations/portals/docs-portal.md",
+          "status-units:docs/platform/governance.md",
+          "status-units:docs/platform/host-invocation-routing/README.md",
+          "status-units:docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "status-units:docs/platform/migration-authoring-rules.md",
+          "status-units:docs/platform/proposals/documentation-system-unification.md",
+          "status-units:docs/user/README.md"
+        ],
+        "rebindRequired": [
+          "claim_15308eb4"
+        ],
+        "placementProposalMember": "dynamic-023895",
+        "placementProposalRow": "r28621"
+      },
+      "commands": {
+        "reproduce": [
+          "python3 -B plans/260925-documentation-authority-unification/reports/phase-09/composition/compose.py"
+        ],
+        "finalReplay": "commands.json",
+        "firstReplayIncludingConstraintIncident": "commands-first-replay.json",
+        "readOnlyFinalAudit": [
+          {
+            "argv": [
+              "git",
+              "--no-optional-locks",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+            "exit": 0,
+            "stdout": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "git",
+              "--no-optional-locks",
+              "diff",
+              "--name-only"
+            ],
+            "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+            "exit": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "git",
+              "--no-optional-locks",
+              "diff",
+              "--cached",
+              "--name-only"
+            ],
+            "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+            "exit": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "git",
+              "--no-optional-locks",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "/home/vantt/projects/forgentX-p9-w1-d2",
+            "exit": 0,
+            "stdout": "?? plans/260925-documentation-authority-unification/reports/phase-09/composition/\n",
+            "stderr": ""
+          }
+        ],
+        "claimValidation": {
+          "argv": [
+            "node",
+            "--input-type=module",
+            "-e",
+            "import fs from 'node:fs'; import {validateAgentResultClaimContract as validate} from './src/runner/dispatch/agent-result-claim-contract.mjs'; const result=validate(JSON.parse(fs.readFileSync(0,'utf8'))); console.log(JSON.stringify(result)); if(!result.valid) process.exitCode=1;"
+          ],
+          "exit": 0,
+          "stdout": "{\"valid\":true}\n",
+          "stderr": ""
+        },
+        "note": "These logs retain pipeline argv/cwd/exits/stdout/stderr. Exploratory read/grep tool calls and earlier iterative composer runs are not represented as independent proof."
+      },
+      "proof": {
+        "skillBuildExit": 0,
+        "singleTests": [
+          {
+            "file": "test/scripts/check-decision-citation-drift.test.mjs",
+            "exit": 1,
+            "environment": {
+              "CLAUDE_CODE_SESSION_ID": "unset",
+              "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+              "TMPDIR": "/tmp/fgos-work/w1-d2-brief"
+            },
+            "log": "check-decision-citation-drift.test.log"
+          },
+          {
+            "file": "test/runner/dead-vocabulary-guard.test.mjs",
+            "exit": 1,
+            "environment": {
+              "CLAUDE_CODE_SESSION_ID": "unset",
+              "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+              "TMPDIR": "/tmp/fgos-work/w1-d2-brief"
+            },
+            "log": "dead-vocabulary-guard.test.log"
+          }
+        ],
+        "citationTest": {
+          "pass": 31,
+          "fail": 1,
+          "skipped": 0,
+          "newNestedReaderCase": "pass",
+          "realRepoBaselineCase": "fail: 126 new findings; baseline unchanged"
+        },
+        "deadVocabularyTest": {
+          "pass": 8,
+          "fail": 2,
+          "skipped": 0,
+          "details": "18 P5 occurrences in successor/history specs; 9 retired gateway/plugin names in live component-boundary carriage"
+        },
+        "formatOnlyScan": {
+          "beforeFiles": 17,
+          "afterFiles": 68,
+          "beforeFindings": 0,
+          "afterFindings": 124,
+          "missingExactFindingOccurrences": [],
+          "exactCoverageSuperset": true,
+          "retainedSourceFilesNotScanned": [],
+          "baselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+          "baselineUnchanged": true,
+          "newUnbaselinedFindings": 124,
+          "note": "Strict finding-content coverage is not acceptance or a baseline rewrite; each miss needs source-unit carriage/rewrite review."
+        },
+        "enduserProjection": {
+          "before": 492,
+          "after": 490,
+          "beforeSha256": "9bc71cf022a86ec5cad295fb2487cf96351f17d3630f02cd15d719f5bfb2bb9d",
+          "afterSha256": "f1da752704c0599673f8c6d96d0c3a28c56aa8d5cfa4a8320c56ed1ba18eb9e4",
+          "removed": [
+            {
+              "quadrant": "explanation",
+              "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+              "audience": "A user seeking understanding of the design, not a task to complete.",
+              "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
+              "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+              "sourceCaptureId": "tsk-2zv",
+              "aliases": [
+                "docs/explanation/work-item-lifecycle-and-domain-model.md"
+              ]
+            },
+            {
+              "quadrant": "how-to",
+              "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+              "audience": "A user who already knows the system and wants a concrete recipe.",
+              "docPath": "docs/how-to/check-rollup-progress.md",
+              "title": "How to check a root item's progress with `fgos rollup`",
+              "sourceCaptureId": "doc-fgos-rollup-howto",
+              "aliases": [
+                "docs/how-to/check-rollup-progress.md",
+                "docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+              ]
+            }
+          ],
+          "added": [],
+          "boundedExportSha256": "704bc549891c7fdac665b18d46362c192c758478cd4ca61d717635f785774159",
+          "noLiveStoreRead": true
+        },
+        "nearDuplicate": {
+          "before": {
+            "passed": true,
+            "message": "no near-duplicate authoritative claims"
+          },
+          "after": {
+            "passed": true,
+            "message": "no near-duplicate authoritative claims"
+          }
+        },
+        "shippedClassifier": {
+          "cases": [
+            {
+              "path": "docs/specs",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/specs/runner.md",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/architect",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/architect/component-boundary/README.md",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/platform/runner/spec.md",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+              "before": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              },
+              "after": {
+                "scope": "repository-local-contract",
+                "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+              }
+            },
+            {
+              "path": "docs/knowledge/example/guide.md",
+              "before": {
+                "scope": "mixed-or-unclassified",
+                "rationale": "Requires audit during Phase 02 inventory"
+              },
+              "after": {
+                "scope": "mixed-or-unclassified",
+                "rationale": "Requires audit during Phase 02 inventory"
+              }
+            }
+          ],
+          "unchanged": true
+        },
+        "strictCoverageLimitation": "Format-only finding multiset is an additive superset, but its old set has zero findings. That does not certify the whole guard or final-pin coverage. Whole-file guards remain red. No rebaseline, filter loosening, test skipping, or source application."
+      },
+      "blocker": "The full brief is not complete: 15 park entries remain without accepted complete composition (12 whole-row units still need authoring; 3 need exact live-holder/carriage decisions), four area scopes lack live holders, current-byte predecessor drift needs G9 review, and the citation/dead-vocabulary owning guards are red. GAP-05 placement is only a proposal. The prohibited Git-fixture side effect is disclosed in constraint-incident.json.",
+      "unfinishedEntries": [
+        {
+          "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+          "rowIds": [
+            "f06456"
+          ],
+          "beforeSha256": "6ea6c31a400fe69271cbc00790d0457f885338c3c3d78a5070a7e1412c8ec470",
+          "predecessor": {
+            "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+            "expectedAfterSha256": "6ea6c31a400fe69271cbc00790d0457f885338c3c3d78a5070a7e1412c8ec470",
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+          },
+          "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
+          "gate": "G1",
+          "members": [
+            {
+              "rowId": "f06456",
+              "memberId": "maps-j-06573",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 45,
+                  "columnStart": 3,
+                  "line": 31,
+                  "text": "docs/specs/platform-foundations.md:210-219"
+                }
+              ],
+              "blocker": "P8-DOC-GAP-02: the precise event-log Participant append/read/subscribe contract and old line range 210-219 remain in the retiring platform-foundations spec projection. Carry the full content to an approved candidate owner and rebind the complete locator before redirecting; root locked laws are not the missing protocol definition."
+            }
+          ]
+        },
+        {
+          "path": "docs/platform/system-overview/spec.md",
+          "rowIds": [
+            "f07926",
+            "f07928",
+            "f07929",
+            "f07931",
+            "f07932",
+            "f07938"
+          ],
+          "beforeSha256": "a750421251baf79dce390bb7e7a88b543bc6a159448a73318381ea8e001e1f7b",
+          "predecessor": {
+            "patchSpecId": "file:docs/platform/system-overview/spec.md",
+            "expectedAfterSha256": "a750421251baf79dce390bb7e7a88b543bc6a159448a73318381ea8e001e1f7b",
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+          },
+          "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
+          "gate": "G1",
+          "members": [
+            {
+              "rowId": "f07926",
+              "memberId": "author-wave5g-docs-platform-system-overview-spec-L42C95",
+              "sourceSpans": [
+                {
+                  "line": 42,
+                  "columnStart": 95,
+                  "columnEndExclusive": 118,
+                  "text": "platform-foundations.md"
+                }
+              ],
+              "blocker": "P8-DOC-GAP-02: this area-spec/decision citation names the full platform-foundations spec narrative, not the retained root L1–L10 law text. The complete content must be carried to an accepted live holder before the retiring spec is redirected or deleted."
+            },
+            {
+              "rowId": "f07928",
+              "memberId": "author-wave5g-docs-platform-system-overview-spec-L44C254",
+              "sourceSpans": [
+                {
+                  "line": 44,
+                  "columnStart": 254,
+                  "columnEndExclusive": 279,
+                  "text": "enduser-docs-authoring.md"
+                }
+              ],
+              "blocker": "P8-DOC-GAP-02: complete enduser-docs-authoring.md source must be carried before the retiring spec is deleted. No accepted candidate owner carries that full write-side/read-side contract; do not invent a destination or waive capture/linkage conservation."
+            },
+            {
+              "rowId": "f07929",
+              "memberId": "author-wave5g-docs-platform-system-overview-spec-L45C254",
+              "sourceSpans": [
+                {
+                  "line": 45,
+                  "columnStart": 254,
+                  "columnEndExclusive": 275,
+                  "text": "enduser-docs-index.md"
+                }
+              ],
+              "blocker": "P8-DOC-GAP-02: complete enduser-docs-index.md source must be carried before the retiring spec is deleted. No accepted candidate owner carries that full write-side/read-side contract; do not invent a destination or waive capture/linkage conservation."
+            },
+            {
+              "rowId": "f07931",
+              "memberId": "author-wave5g-docs-platform-system-overview-spec-L47C129",
+              "sourceSpans": [
+                {
+                  "line": 47,
+                  "columnStart": 129,
+                  "columnEndExclusive": 143,
+                  "text": "fgos-plugin.md"
+                }
+              ],
+              "blocker": "Description needs rewrite: the area-map bullet asserts 12 verb wrappers, including the old plugin shape. Candidate claude-plugin/spec.md explicitly marks unshipped check behavior; reconcile this whole count/list/shipped-state claim before redirecting to that owner."
+            },
+            {
+              "rowId": "f07932",
+              "memberId": "author-wave5g-docs-platform-system-overview-spec-L48C82",
+              "sourceSpans": [
+                {
+                  "line": 48,
+                  "columnStart": 82,
+                  "columnEndExclusive": 97,
+                  "text": "distribution.md"
+                }
+              ],
+              "blocker": "Description needs rewrite: this area-map bullet defines distribution as npm install via GitHub. The promoted packaging-distribution owner covers Rust-host release staging/activation, setup/doctor and Node compatibility. Rewrite the complete installation/ownership description instead of endorsing an obsolete npm-only scope with a path substitution."
+            },
+            {
+              "rowId": "f07938",
+              "memberId": "maps-j-07805",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 32,
+                  "columnStart": 3,
+                  "line": 16,
+                  "text": "docs/specs/system-overview.md"
+                }
+              ],
+              "blocker": "Description needs rewrite (L12-34(4), L12-40(2)): this Related/Legacy-source item names docs/specs/system-overview.md; its live holder docs/platform/system-overview/spec.md is this consumer itself. Consolidate the complete duplicate/source-labelled navigation item at cutover; preserve the separate original Provenance line."
+            }
+          ]
+        },
+        {
+          "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "rowIds": [
+            "f07855",
+            "f07858",
+            "f07859",
+            "f07861",
+            "f07862",
+            "f07863",
+            "f07864",
+            "f07866",
+            "f07867"
+          ],
+          "beforeSha256": "07bea7f4e9cdd2aaa6dc14245cdfe2ebf6fa76725740acf35f4e108e942b8446",
+          "predecessor": {
+            "patchSpecId": "file:docs/platform/system-architecture/architecture/architecture-intent.md",
+            "expectedAfterSha256": "07bea7f4e9cdd2aaa6dc14245cdfe2ebf6fa76725740acf35f4e108e942b8446",
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-composed-patches.json"
+          },
+          "reason": "G1/G9 live-holder carriage/truth acceptance required; no source-carriage mirror promoted by path alone",
+          "gate": "G1",
+          "members": [
+            {
+              "rowId": "f07855",
+              "memberId": "author-wave5g-docs-platform-system-architecture-architecture-architecture-intent-L61C39",
+              "sourceSpans": [
+                {
+                  "line": 61,
+                  "columnStart": 39,
+                  "columnEndExclusive": 76,
+                  "text": "system-vision-trong-mem-ngoai-cung.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: Related names the complete system vision, but its exact candidate docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md is a whole-source Architecture carrier (Purpose Preserve the complete; Writer type Agent carriage). It is not an executable live target under L12-30(3). Establish the accepted live vision holder before redirecting this Related pointer."
+            },
+            {
+              "rowId": "f07858",
+              "memberId": "maps-j-07754",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 40,
+                  "columnStart": 3,
+                  "line": 16,
+                  "text": "docs/architect/architecture-intent.md"
+                }
+              ],
+              "blocker": "Description needs rewrite (L12-34(4), L12-40(2)): metadata Related names the source whose promoted owner is this consumer itself. Remove/consolidate this self-related item, keeping original Provenance and cutover metadata as separate source units."
+            },
+            {
+              "rowId": "f07859",
+              "memberId": "maps-j-07755",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 56,
+                  "columnStart": 4,
+                  "line": 42,
+                  "text": "docs/architect/system-vision-trong-mem-ngoai-cung.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: Related names the complete system vision, but its exact candidate docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md is a whole-source Architecture carrier (Purpose Preserve the complete; Writer type Agent carriage). It is not an executable live target under L12-30(3). Establish the accepted live vision holder before redirecting this Related pointer."
+            },
+            {
+              "rowId": "f07861",
+              "memberId": "maps-j-07757",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 64,
+                  "columnStart": 4,
+                  "line": 44,
+                  "text": "docs/architect/proposals/step-09-group-thinking-substrate.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/step-09-group-thinking-substrate.md; exact candidate mirror docs/platform/proposals/step-09-group-thinking-substrate.md is explicitly history/source conservation, not live authority. Carry/accept the complete step-09-group-thinking-substrate.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
+            },
+            {
+              "rowId": "f07862",
+              "memberId": "maps-j-07758",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 62,
+                  "columnStart": 4,
+                  "line": 45,
+                  "text": "docs/architect/proposals/step-10-coding-domain-adoption.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/step-10-coding-domain-adoption.md; exact candidate mirror docs/platform/proposals/step-10-coding-domain-adoption.md is explicitly history/source conservation, not live authority. Carry/accept the complete step-10-coding-domain-adoption.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
+            },
+            {
+              "rowId": "f07863",
+              "memberId": "maps-j-07759",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 64,
+                  "columnStart": 4,
+                  "line": 46,
+                  "text": "docs/architect/proposals/component-authority-boundary-map.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: this live Related/evidence item names docs/architect/proposals/component-authority-boundary-map.md; exact candidate mirror docs/platform/proposals/component-authority-boundary-map.md is explicitly history/source conservation, not live authority. Carry/accept the complete component-authority-boundary-map.md subject into a live holder before redirecting; do not turn the old architecture intent into a current retired-engine claim."
+            },
+            {
+              "rowId": "f07864",
+              "memberId": "maps-j-07760",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 67,
+                  "columnStart": 4,
+                  "line": 47,
+                  "text": "docs/architect/agent-coordination/intent-preservation-ledger.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/intent-preservation-ledger.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
+            },
+            {
+              "rowId": "f07866",
+              "memberId": "maps-j-07762",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 71,
+                  "columnStart": 4,
+                  "line": 792,
+                  "text": "docs/architect/agent-coordination/contracts/coordination-session.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/contracts/coordination-session.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
+            },
+            {
+              "rowId": "f07867",
+              "memberId": "maps-j-07763",
+              "sourceSpans": [
+                {
+                  "columnEndExclusive": 66,
+                  "columnStart": 4,
+                  "line": 794,
+                  "text": "docs/architect/agent-coordination/contracts/flow-definition.md"
+                }
+              ],
+              "blocker": "Phase 9 carry: the architecture intent names docs/architect/agent-coordination/contracts/flow-definition.md as live Related/evidence reading. The current candidate split retains old coordination plans/contracts through retired-engine history, not an accepted current authority for this whole subject. Resolve that exact architecture/design intent into a live holder before redirecting; keep its evidence role separate from current runtime claims."
+            }
+          ]
+        },
+        {
+          "id": "file:docs/platform/README.md",
+          "path": "docs/platform/README.md",
+          "rowIds": [
+            "f04445",
+            "f04446",
+            "f04447",
+            "f04448",
+            "f04449",
+            "f04450",
+            "f04451",
+            "f04452",
+            "f04453",
+            "f04454",
+            "f04455",
+            "f04456",
+            "f04457",
+            "f04458",
+            "f04459",
+            "f04460",
+            "f04461",
+            "f04462"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/documentation/switchboard.md",
+          "path": "docs/platform/documentation/switchboard.md",
+          "rowIds": [
+            "f06713",
+            "f06714",
+            "f06715",
+            "f06716",
+            "f06717",
+            "f06718",
+            "f06719",
+            "f06720",
+            "f06721",
+            "f06722",
+            "f06723",
+            "f06724",
+            "f06725",
+            "f06726",
+            "f06727",
+            "f06728",
+            "f06729",
+            "f06730",
+            "f06731",
+            "f06732",
+            "f06733",
+            "f06734",
+            "f06735",
+            "f06736",
+            "f06737",
+            "f06738",
+            "f06739",
+            "f06740",
+            "f06741",
+            "f06742",
+            "f06743",
+            "f06744",
+            "f06745",
+            "f06746",
+            "f06747",
+            "f06748",
+            "f06749",
+            "f06750",
+            "f06751",
+            "f06752",
+            "f06753",
+            "f06754",
+            "f06755",
+            "f06756",
+            "f06757",
+            "f06758",
+            "f06759",
+            "f06760",
+            "f06761",
+            "f06762",
+            "f06763",
+            "f06764",
+            "f06765",
+            "f06766",
+            "f06767",
+            "f06768",
+            "f06769",
+            "f06770",
+            "f06771",
+            "f06772",
+            "f06773",
+            "f06774",
+            "f06775",
+            "f06776",
+            "f06777"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/packaging-distribution/README.md",
+          "path": "docs/platform/packaging-distribution/README.md",
+          "rowIds": [
+            "f07153",
+            "f07154",
+            "f07155",
+            "f07156",
+            "f07157",
+            "f07158"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/platform-foundations.md",
+          "path": "docs/platform/platform-foundations.md",
+          "rowIds": [
+            "f07383",
+            "f07384",
+            "f07385",
+            "f07386",
+            "f07387",
+            "f07388",
+            "f07389",
+            "f07390",
+            "f07391",
+            "f07392",
+            "f07393",
+            "f07394",
+            "f07395",
+            "f07396",
+            "f07397"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/system-architecture/architecture/roadmap.md",
+          "path": "docs/platform/system-architecture/architecture/roadmap.md",
+          "rowIds": [
+            "f07883"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+          "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+          "rowIds": [
+            "f07891"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "rowIds": [
+            "f07896"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+          "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+          "rowIds": [
+            "f07899"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/system-architecture/architecture/workspace-topology.md",
+          "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+          "rowIds": [
+            "f07906"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/vision.md",
+          "path": "docs/platform/vision.md",
+          "rowIds": [
+            "f08010"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/platform/work-state/README.md",
+          "path": "docs/platform/work-state/README.md",
+          "rowIds": [
+            "f08015",
+            "f08016",
+            "f08017",
+            "f08018",
+            "f08019",
+            "f08020",
+            "f08022",
+            "f08023"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        },
+        {
+          "id": "file:docs/transitional-switchboard.md",
+          "path": "docs/transitional-switchboard.md",
+          "rowIds": [
+            "f08346",
+            "f08347",
+            "f08348",
+            "f08349",
+            "f08350",
+            "f08351",
+            "f08352",
+            "f08353",
+            "f08354",
+            "f08355",
+            "f08356",
+            "f08357",
+            "f08358",
+            "f08359",
+            "f08360",
+            "f08361",
+            "f08362",
+            "f08363",
+            "f08364",
+            "f08365",
+            "f08366",
+            "f08367",
+            "f08368",
+            "f08369",
+            "f08370",
+            "f08371",
+            "f08372",
+            "f08373",
+            "f08374",
+            "f08375",
+            "f08376",
+            "f08377",
+            "f08378",
+            "f08379",
+            "f08380",
+            "f08381",
+            "f08382",
+            "f08383",
+            "f08384",
+            "f08385",
+            "f08386",
+            "f08387",
+            "f08388",
+            "f08389",
+            "f08390",
+            "f08391",
+            "f08392",
+            "f08393",
+            "f08394",
+            "f08395",
+            "f08396",
+            "f08397",
+            "f08398",
+            "f08399",
+            "f08400",
+            "f08401",
+            "f08402",
+            "f08403",
+            "f08404",
+            "f08405",
+            "f08406",
+            "f08407",
+            "f08408",
+            "f08409",
+            "f08410"
+          ],
+          "gate": "G7",
+          "reason": "Whole-row authority flip has no exact forward/rollback diff yet; source-unit custody is indexed, not execution proof."
+        }
+      ],
+      "constraintIncident": "constraint-incident.json",
+      "scope": {
+        "repositoryWritesOnly": "plans/260925-documentation-authority-unification/reports/phase-09/composition/**",
+        "sourceApplied": false,
+        "worktreeGitAddCommit": false,
+        "gitFixtureWritesOccurred": true,
+        "liveStateOrSecretsRead": false,
+        "activationOnlyRead": "/home/vantt/projects/forgentX/.fgos/installation/activation.json",
+        "fullSuiteRun": false,
+        "fgosCliRun": false,
+        "leadRecordsEdited": false,
+        "pairAccountingEdited": false,
+        "needsWrites": [],
+        "outboxException": "/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792757491674-9a8c53d5/producer/1/runs/01/outbox"
+      },
+      "integrity": {
+        "actions.json": {
+          "sha256": "77fef29070852627f4bbe0518472cd2acaca98bf0c1e89393570400fe2a220ad",
+          "bytes": 340800
+        },
+        "area-holder-table.json": {
+          "sha256": "bec74180e5a04435c4d09cc4d3a95cf3b540b94d9f9c1e1cc01394363250d900",
+          "bytes": 7931
+        },
+        "chain-verification.json": {
+          "sha256": "7e9557180be6868047a80011a251ac1208502b67c89da9082aa66af10d0e8080",
+          "bytes": 2744
+        },
+        "check-decision-citation-drift.test.log": {
+          "sha256": "c49627db24fb90c2088279a8df7f1f54f4a82959785ddc16b691ff1dc4f3454e",
+          "bytes": 21414
+        },
+        "citation-test-integration.json": {
+          "sha256": "232fcd60135a278709aee6e807f72de02adf0fe0d5873b923c45f87e3b4f5d3f",
+          "bytes": 380
+        },
+        "commands-first-replay.json": {
+          "sha256": "9a7f6fd6003ffd08cc6fe18ea4b776ed01358fa0a3cd6fd6b1989dc48c0cc367",
+          "bytes": 202180
+        },
+        "commands.json": {
+          "sha256": "97cf0c7560494862e0c64d26e4fef76661c1aa9b92eb009f22b7c081207ac4ea",
+          "bytes": 220699
+        },
+        "compose.py": {
+          "sha256": "518617e00a3e8d6d923f9f92330f0e5c801c2eaca269e05d1cb0f53b687c313c",
+          "bytes": 54258
+        },
+        "constraint-incident.json": {
+          "sha256": "b3af816540e19ffc6be48c914cb7b784612e83a862146bb95826bbc31ee21b8f",
+          "bytes": 1289
+        },
+        "dead-vocabulary-guard.test.log": {
+          "sha256": "4eb20fa48e970b617b0713c14d101e6efc26994bd01267bf6842224b04eb9fad",
+          "bytes": 13258
+        },
+        "description-holder-witnesses.json": {
+          "sha256": "69d5d42981b3913e570bf73cb47813acabec13d9c3a9b79ed9e3e2d7a5ecb638",
+          "bytes": 868
+        },
+        "finalize.py": {
+          "sha256": "de5a922e58b724aa5d5be9ef0d27d7aa7b8e393064cb361c84613a3b2d730f79",
+          "bytes": 14508
+        },
+        "gap05-placement-proposal.json": {
+          "sha256": "14b86fdd802d8f55725457c21bb1175cb91bab10154ce30a751d2c10417fe1a1",
+          "bytes": 81937
+        },
+        "generate-shipped-path-inventory.test.log": {
+          "sha256": "6b28875313c2360c2bb07506f773002ff88a3ee083430fd4dda16da1cf6cca3d",
+          "bytes": 3578
+        },
+        "generator-all-output-deltas.json": {
+          "sha256": "24fdcdaa259830bc2186ccf4f2a7ad89a92e8d5b3d04cdf5431fac7e77a2992d",
+          "bytes": 201014
+        },
+        "member-joins.json": {
+          "sha256": "b802560b47b18414603ff61bf1bb7a4ec0dd43a5e0b4aaa2b84fb1b3258fa60c",
+          "bytes": 119783
+        },
+        "patch-specs.json": {
+          "sha256": "7a393b1613d71188283a34ec672699d14f6dedc6287544049d9e91d6402845db",
+          "bytes": 202486
+        },
+        "post-move-replay.json": {
+          "sha256": "bd0520f5ff9f3cdd21761641a2ce4ca7f22d4347ac7ba9f39edf5cc9fc96b94d",
+          "bytes": 615234
+        },
+        "replay-scans.mjs": {
+          "sha256": "28750994eaf0bdaa6546ddd06a9b36061745bbb73e69bd0796b28c5a9611f934",
+          "bytes": 6019
+        },
+        "scan-policy.json": {
+          "sha256": "819919562bf368469254eac0dc3a933dde544fee52b5ec981dec17aa22e15acc",
+          "bytes": 2013
+        },
+        "scan-replay-first.json": {
+          "sha256": "bbe2d8f9a7ceafd5075be639350b1220f1055461fdfa0412f682be1f8b980ed4",
+          "bytes": 5373
+        },
+        "scan-replay.json": {
+          "sha256": "bbe2d8f9a7ceafd5075be639350b1220f1055461fdfa0412f682be1f8b980ed4",
+          "bytes": 5373
+        },
+        "scan-replay.log": {
+          "sha256": "2075ef39e502f41b51fdd08198bace48eff134b0e974a92862d3fd63f2c9b48d",
+          "bytes": 4329
+        },
+        "skill-regeneration.json": {
+          "sha256": "8e152039f8965b9ab3ee3baeacebe621402d066f393fb55f2e83e470ebce18de",
+          "bytes": 423406
+        }
       }
-    ],
-    "constraintIncident": "constraint-incident.json",
-    "scope": {
-      "repositoryWritesOnly": "plans/260925-documentation-authority-unification/reports/phase-09/composition/**",
-      "sourceApplied": false,
-      "worktreeGitAddCommit": false,
-      "gitFixtureWritesOccurred": true,
-      "liveStateOrSecretsRead": false,
-      "activationOnlyRead": "/home/vantt/projects/forgentX/.fgos/installation/activation.json",
-      "fullSuiteRun": false,
-      "fgosCliRun": false,
-      "leadRecordsEdited": false,
-      "pairAccountingEdited": false,
-      "needsWrites": [],
-      "outboxException": "/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792757491674-9a8c53d5/producer/1/runs/01/outbox"
     },
     "integrity": {
       "actions.json": {
-        "sha256": "77fef29070852627f4bbe0518472cd2acaca98bf0c1e89393570400fe2a220ad",
-        "bytes": 340800
+        "sha256": "c470fb236e104732e213bc02bdd5edf795f4d50a597042c343f87311b665bd35",
+        "bytes": 953525
       },
       "area-holder-table.json": {
         "sha256": "bec74180e5a04435c4d09cc4d3a95cf3b540b94d9f9c1e1cc01394363250d900",
@@ -2381,6 +2546,10 @@
       "commands.json": {
         "sha256": "97cf0c7560494862e0c64d26e4fef76661c1aa9b92eb009f22b7c081207ac4ea",
         "bytes": 220699
+      },
+      "complete-parks.py": {
+        "sha256": "6f58ac5039eb867b29b8468b181fbb337d6f25cc04b88af1631690f65377f227",
+        "bytes": 45346
       },
       "compose.py": {
         "sha256": "518617e00a3e8d6d923f9f92330f0e5c801c2eaca269e05d1cb0f53b687c313c",
@@ -2414,17 +2583,33 @@
         "sha256": "24fdcdaa259830bc2186ccf4f2a7ad89a92e8d5b3d04cdf5431fac7e77a2992d",
         "bytes": 201014
       },
+      "initial-w2-commands.json": {
+        "sha256": "1b0d5bfe1a35a2a9e3e750fed0eacf878292c68868a75802532ade4cc38f5e84",
+        "bytes": 1914444
+      },
+      "initial-w2-generate-shipped-path-inventory.test.log": {
+        "sha256": "a6882b5d217cb2c810bcf86809c9cbb2502629645fb88fb992e53c114cc311ec",
+        "bytes": 8305
+      },
+      "initial-w2-post-move-replay.json": {
+        "sha256": "b30cf9e71c9c2ba480d7c0ae37dbd5f6f331164177027128ef31e6023c027a89",
+        "bytes": 410382
+      },
       "member-joins.json": {
         "sha256": "b802560b47b18414603ff61bf1bb7a4ec0dd43a5e0b4aaa2b84fb1b3258fa60c",
         "bytes": 119783
       },
       "patch-specs.json": {
-        "sha256": "7a393b1613d71188283a34ec672699d14f6dedc6287544049d9e91d6402845db",
-        "bytes": 202486
+        "sha256": "d47d28600d27eefb047038d6fdd64667a0f7c240169f9884f5778e86ab28296f",
+        "bytes": 534247
       },
       "post-move-replay.json": {
         "sha256": "bd0520f5ff9f3cdd21761641a2ce4ca7f22d4347ac7ba9f39edf5cc9fc96b94d",
         "bytes": 615234
+      },
+      "receipt.md": {
+        "sha256": "b5da2ab85eaa3b2047a468e2607c02bf978c9fb53690a7ba44b2789dfcdfadb3",
+        "bytes": 10992
       },
       "replay-scans.mjs": {
         "sha256": "28750994eaf0bdaa6546ddd06a9b36061745bbb73e69bd0796b28c5a9611f934",
@@ -2449,181 +2634,112 @@
       "skill-regeneration.json": {
         "sha256": "8e152039f8965b9ab3ee3baeacebe621402d066f393fb55f2e83e470ebce18de",
         "bytes": 423406
+      },
+      "verify-effective.py": {
+        "sha256": "c8e6a5d95510b33efd4ca72362193dfa6eeae6b01528533fa0faf3acdf26989d",
+        "bytes": 3983
+      },
+      "w2-chain-verification.json": {
+        "sha256": "08836a2e5c3dd87171e27db4a18a58b3409a56364dda2139cb1e6bb85db495e8",
+        "bytes": 228011
+      },
+      "w2-check-decision-citation-drift.test.log": {
+        "sha256": "edc0754d9018e60cfae53956e8c121f06bdd1c6e8e4bd1a436c8806adf6b66d4",
+        "bytes": 21145
+      },
+      "w2-commands.json": {
+        "sha256": "80a71602cdf1607970b590fbd6da1c837bfe7ff72f5fda63d7a3b437961fd8bb",
+        "bytes": 1915904
+      },
+      "w2-dead-vocabulary-guard.test.log": {
+        "sha256": "2378387d928fcb938dc78740e46a09c3b7db3d8aa710389257894105f3d8847b",
+        "bytes": 5070
+      },
+      "w2-gap05-control.log": {
+        "sha256": "da0ba16658ee928d1c3ce40196894434fed4a98a408119675ad9747c341ef201",
+        "bytes": 1491
+      },
+      "w2-gap05-verification.json": {
+        "sha256": "1b66b5483c53ab43eee1eb28dbe459b4a053ef0478b2cf0050416b88ffcede4f",
+        "bytes": 83953
+      },
+      "w2-generate-shipped-path-inventory.test.log": {
+        "sha256": "edbffb3eeb97a2b55e2c5ab3d57ffec30142e737ada13936b03bc1af256a55ec",
+        "bytes": 1240
+      },
+      "w2-independent-verification.json": {
+        "sha256": "108fe9ae1be942cc83e1441a3a6daa2b1ed49dd97453360c670b655a87424aee",
+        "bytes": 27181
+      },
+      "w2-live-scan-negative-probe.log": {
+        "sha256": "f59dc4a0130e36a9851ae2a8f5dce157ee7658699e97b8eff44b48a17e247a7a",
+        "bytes": 4117
+      },
+      "w2-native-fixture.json": {
+        "sha256": "b73f2bfbcc1b8192e942665730339bf5756063904ea1bcbf4d8a940f1c0ef643",
+        "bytes": 629
+      },
+      "w2-post-move-replay.json": {
+        "sha256": "1d02e78cb7c8b9c260439fd2c3132a728653897b595337eab259a43dab6d6e9c",
+        "bytes": 410383
+      },
+      "w2-predecessor-recomposition.json": {
+        "sha256": "77ff9b1a82f091abe69d469b7332b67caee198418be7fed817a5619f1c3b6a25",
+        "bytes": 16478
+      },
+      "w2-skill-regeneration.json": {
+        "sha256": "a724f895e9d3df4e1b8849f0f655fbe3d0a164071d82cb5dfeb55590ada094e6",
+        "bytes": 103570
       }
     }
   },
   "integrity": {
-    "actions.json": {
-      "sha256": "c470fb236e104732e213bc02bdd5edf795f4d50a597042c343f87311b665bd35",
-      "bytes": 953525
-    },
-    "area-holder-table.json": {
-      "sha256": "bec74180e5a04435c4d09cc4d3a95cf3b540b94d9f9c1e1cc01394363250d900",
-      "bytes": 7931
-    },
-    "chain-verification.json": {
-      "sha256": "7e9557180be6868047a80011a251ac1208502b67c89da9082aa66af10d0e8080",
-      "bytes": 2744
-    },
-    "check-decision-citation-drift.test.log": {
-      "sha256": "c49627db24fb90c2088279a8df7f1f54f4a82959785ddc16b691ff1dc4f3454e",
-      "bytes": 21414
-    },
-    "citation-test-integration.json": {
-      "sha256": "232fcd60135a278709aee6e807f72de02adf0fe0d5873b923c45f87e3b4f5d3f",
-      "bytes": 380
-    },
-    "commands-first-replay.json": {
-      "sha256": "9a7f6fd6003ffd08cc6fe18ea4b776ed01358fa0a3cd6fd6b1989dc48c0cc367",
-      "bytes": 202180
-    },
-    "commands.json": {
-      "sha256": "97cf0c7560494862e0c64d26e4fef76661c1aa9b92eb009f22b7c081207ac4ea",
-      "bytes": 220699
-    },
-    "complete-parks.py": {
-      "sha256": "6f58ac5039eb867b29b8468b181fbb337d6f25cc04b88af1631690f65377f227",
-      "bytes": 45346
-    },
-    "compose.py": {
-      "sha256": "518617e00a3e8d6d923f9f92330f0e5c801c2eaca269e05d1cb0f53b687c313c",
-      "bytes": 54258
-    },
-    "constraint-incident.json": {
-      "sha256": "b3af816540e19ffc6be48c914cb7b784612e83a862146bb95826bbc31ee21b8f",
-      "bytes": 1289
-    },
-    "dead-vocabulary-guard.test.log": {
-      "sha256": "4eb20fa48e970b617b0713c14d101e6efc26994bd01267bf6842224b04eb9fad",
-      "bytes": 13258
-    },
-    "description-holder-witnesses.json": {
-      "sha256": "69d5d42981b3913e570bf73cb47813acabec13d9c3a9b79ed9e3e2d7a5ecb638",
-      "bytes": 868
-    },
-    "finalize.py": {
-      "sha256": "de5a922e58b724aa5d5be9ef0d27d7aa7b8e393064cb361c84613a3b2d730f79",
-      "bytes": 14508
-    },
-    "gap05-placement-proposal.json": {
-      "sha256": "14b86fdd802d8f55725457c21bb1175cb91bab10154ce30a751d2c10417fe1a1",
-      "bytes": 81937
-    },
-    "generate-shipped-path-inventory.test.log": {
-      "sha256": "6b28875313c2360c2bb07506f773002ff88a3ee083430fd4dda16da1cf6cca3d",
-      "bytes": 3578
-    },
-    "generator-all-output-deltas.json": {
-      "sha256": "24fdcdaa259830bc2186ccf4f2a7ad89a92e8d5b3d04cdf5431fac7e77a2992d",
-      "bytes": 201014
-    },
-    "initial-w2-commands.json": {
-      "sha256": "1b0d5bfe1a35a2a9e3e750fed0eacf878292c68868a75802532ade4cc38f5e84",
-      "bytes": 1914444
-    },
-    "initial-w2-generate-shipped-path-inventory.test.log": {
-      "sha256": "a6882b5d217cb2c810bcf86809c9cbb2502629645fb88fb992e53c114cc311ec",
-      "bytes": 8305
-    },
-    "initial-w2-post-move-replay.json": {
-      "sha256": "b30cf9e71c9c2ba480d7c0ae37dbd5f6f331164177027128ef31e6023c027a89",
-      "bytes": 410382
-    },
-    "member-joins.json": {
-      "sha256": "b802560b47b18414603ff61bf1bb7a4ec0dd43a5e0b4aaa2b84fb1b3258fa60c",
-      "bytes": 119783
-    },
-    "patch-specs.json": {
-      "sha256": "d47d28600d27eefb047038d6fdd64667a0f7c240169f9884f5778e86ab28296f",
-      "bytes": 534247
-    },
-    "post-move-replay.json": {
-      "sha256": "bd0520f5ff9f3cdd21761641a2ce4ca7f22d4347ac7ba9f39edf5cc9fc96b94d",
-      "bytes": 615234
-    },
-    "receipt.md": {
-      "sha256": "b5da2ab85eaa3b2047a468e2607c02bf978c9fb53690a7ba44b2789dfcdfadb3",
-      "bytes": 10992
-    },
-    "replay-scans.mjs": {
-      "sha256": "28750994eaf0bdaa6546ddd06a9b36061745bbb73e69bd0796b28c5a9611f934",
-      "bytes": 6019
-    },
-    "scan-policy.json": {
-      "sha256": "819919562bf368469254eac0dc3a933dde544fee52b5ec981dec17aa22e15acc",
-      "bytes": 2013
-    },
-    "scan-replay-first.json": {
-      "sha256": "bbe2d8f9a7ceafd5075be639350b1220f1055461fdfa0412f682be1f8b980ed4",
-      "bytes": 5373
-    },
-    "scan-replay.json": {
-      "sha256": "bbe2d8f9a7ceafd5075be639350b1220f1055461fdfa0412f682be1f8b980ed4",
-      "bytes": 5373
-    },
-    "scan-replay.log": {
-      "sha256": "2075ef39e502f41b51fdd08198bace48eff134b0e974a92862d3fd63f2c9b48d",
-      "bytes": 4329
-    },
-    "skill-regeneration.json": {
-      "sha256": "8e152039f8965b9ab3ee3baeacebe621402d066f393fb55f2e83e470ebce18de",
-      "bytes": 423406
-    },
-    "verify-effective.py": {
-      "sha256": "c8e6a5d95510b33efd4ca72362193dfa6eeae6b01528533fa0faf3acdf26989d",
-      "bytes": 3983
-    },
-    "w2-chain-verification.json": {
-      "sha256": "08836a2e5c3dd87171e27db4a18a58b3409a56364dda2139cb1e6bb85db495e8",
-      "bytes": 228011
-    },
-    "w2-check-decision-citation-drift.test.log": {
-      "sha256": "edc0754d9018e60cfae53956e8c121f06bdd1c6e8e4bd1a436c8806adf6b66d4",
-      "bytes": 21145
-    },
-    "w2-commands.json": {
-      "sha256": "80a71602cdf1607970b590fbd6da1c837bfe7ff72f5fda63d7a3b437961fd8bb",
-      "bytes": 1915904
-    },
-    "w2-dead-vocabulary-guard.test.log": {
-      "sha256": "2378387d928fcb938dc78740e46a09c3b7db3d8aa710389257894105f3d8847b",
-      "bytes": 5070
-    },
-    "w2-gap05-control.log": {
-      "sha256": "da0ba16658ee928d1c3ce40196894434fed4a98a408119675ad9747c341ef201",
-      "bytes": 1491
-    },
-    "w2-gap05-verification.json": {
-      "sha256": "1b66b5483c53ab43eee1eb28dbe459b4a053ef0478b2cf0050416b88ffcede4f",
-      "bytes": 83953
-    },
-    "w2-generate-shipped-path-inventory.test.log": {
-      "sha256": "edbffb3eeb97a2b55e2c5ab3d57ffec30142e737ada13936b03bc1af256a55ec",
-      "bytes": 1240
-    },
-    "w2-independent-verification.json": {
-      "sha256": "108fe9ae1be942cc83e1441a3a6daa2b1ed49dd97453360c670b655a87424aee",
-      "bytes": 27181
-    },
-    "w2-live-scan-negative-probe.log": {
-      "sha256": "f59dc4a0130e36a9851ae2a8f5dce157ee7658699e97b8eff44b48a17e247a7a",
-      "bytes": 4117
-    },
-    "w2-native-fixture.json": {
-      "sha256": "b73f2bfbcc1b8192e942665730339bf5756063904ea1bcbf4d8a940f1c0ef643",
-      "bytes": 629
-    },
-    "w2-post-move-replay.json": {
-      "sha256": "1d02e78cb7c8b9c260439fd2c3132a728653897b595337eab259a43dab6d6e9c",
-      "bytes": 410383
-    },
-    "w2-predecessor-recomposition.json": {
-      "sha256": "77ff9b1a82f091abe69d469b7332b67caee198418be7fed817a5619f1c3b6a25",
-      "bytes": 16478
-    },
-    "w2-skill-regeneration.json": {
-      "sha256": "a724f895e9d3df4e1b8849f0f655fbe3d0a164071d82cb5dfeb55590ada094e6",
-      "bytes": 103570
-    }
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-check-decision-citation-drift.test.log": "9a1e9fd9ce9f72d75bc141aac15dba3941299700b15a5d868224fe829e352b2c",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-glosses.json": "e3050c3ccb08177ad48bd5d2b82f5aa8be6e512216c7fb2a094a373371d08464",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-citation-history-negative.log": "e4a9b3cbe754e6289986374c8d19e2337496b74f59ca2d206c86619263ae9c0b",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-commands.json": "5f83dc4956af4a93fa90023fca1dcfac77ecd9086bfc26f12ded5ef032a0b57b",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-dead-vocabulary-guard.test.log": "fedffe8e9e41bef5c91a8c24210b1490dbc7139f08356ad4344347ff23744051",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-dead-vocabulary-negative.log": "0c4ade165c82e5ec8dd143d01644a461a7f197597c4fad22ee4d65fcc7db31bb",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-doc-link-pass.test.log": "554eac3c4fb647fc018aa2154ef7a9f15bef532d7d8087afc9155ad9184569b0",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-gap05-overlay-verification.json": "cc7b89b0ef076a505025d8d2e621a5c0c431aaad405aeb177f206e977919010e",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-gap05-placement.json": "1e00d1591e8e31289f48bfef4d0ac3053d6ed2f0e8ca04f81e1c053e136705de",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-history-negative-control.json": "b75ffaf97a4554adfe676b46e4cfda9723ac774c720e3db370ca6f726e99c864",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-independent-verification.json": "3481557e224be0ca4e322b22dd7efded575ea09af45b380c7e6a44baeb9084f1",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-owning-proofs.json": "8a3d727df4f5064868a07654f26570817a3aeee4cd6abda80e0df3518d3cd303",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-post-regeneration-citation-initial.log": "524fa926af9ab9e6b4a237f99f6f05bd3588a35560014d78540c4744cba3c349",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-repinning.json": "c608c71a6759d3b628cb8ebea21bd2cc2d261cd482dcad8c3395b0965ba7b7a3",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-replay-recipes.json": "a8790015d3e02d1718b58078ad78566f58b53ce0c1b3960dd37d7c6e9d13ef86",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-skill-build.log": "a76b9c9fbf1f110261273bec33549e8380ae90e3728fda9b4f049454ad6f9d29",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-skill-regeneration.json": "3f3c18581618512cd059408bd67a4bfcc165c7dbdf1b80427f0615699e8c0d8e",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-switchboard-index-verification.json": "71a222d432968b9cf9857658b07fb48f874708aff436ecdc3e8d39272995a766",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-interpret-candidate.log": "dab96743d52cb092404b287c2e8059028d0b20354acf0c1a496f9dab24e22355",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-interpret-current.log": "001acf7333399949eb34748151415072726b29c5d7b19f45662b9daeba34e213",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-interpret-ui-composed-before-moves.log": "3dbfd315f88fbf013a4f1a1d627623894169371f32676625be381b0816e29d68",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-npm-candidate.log": "dea27e174f28fb3027cf35432c8710f31df870ab6300430390b3c40a7918d05b",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-npm-current.log": "5381ed4a32922f94ce3652ce0f53291d2846d4b5aab73b5f204a91deb5250a5e",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-npm-ui-composed-before-moves.log": "f7953ab68d3300c5715b1adb81e1168f5dd8a6f179c7d3587bb715be87953dca",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-render.json": "3bf0557e2d042e67a637344b8ef5b90c1da5cea3ac9c8feb8594db0c2810697b",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-validate-current.log": "a27afeb3330795331b4b836fee4ab88c6768d3428b9773dada12076dbc8ffacf",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/w8-ui-validate-ui-composed-before-moves.log": "a27afeb3330795331b4b836fee4ab88c6768d3428b9773dada12076dbc8ffacf",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/receipt.md": "f62d99757309e906968a980cf0ea533cc2e8501039d8eca9c3472bf2f95a296c",
+    "plans/260925-documentation-authority-unification/ledger/decisions/w8-component-carriage-heading-overlays.json": "98e6a4f575f85b83f88e2c3063b331ebd6bb4575f3b781136c158e0794f9ee20",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/actions.json": "b4ebc8d7c8e48d7acd2c15eddcbc8fa7bc40f2718b9e5094f88542dace732af2",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/area-holder-table.json": "ad2da75ebe1b3c6d7f2964a47e73c3011c6578e6ff07d3de483e7ec8472a0005",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/citation-test-integration.json": "33c2613fc0d4107982b1a1b261b8d40338f83572c884336620a37f60e9dfddac",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/gap05-placement-proposal.json": "133e94ac452c0ed7928e6945fbd80eb0f746219d6634d0758381d068c7d23e59",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/member-joins.json": "c2116432c57126885c94575a17b58faddab2a6637f14eee0bd695c60fe0fe852",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/patch-specs.json": "cc23ef40a26d142cb8aa555233233a8f1a9de24b47b5d8aa7f6a34246e164eb9",
+    "plans/260925-documentation-authority-unification/reports/phase-09/composition/skill-regeneration.json": "bb9e1590e87502d566a0f7b00d3950bd99824f238ce5872607d88c3103c73248"
+  },
+  "finalAudit": {
+    "publishedEmbeddedRecipeExit": 0,
+    "gitDiffCheckExit": 0,
+    "scopeAuditExit": 0,
+    "trackedAndUntrackedPaths": 37,
+    "historicalPatchEntriesPreserved": 69,
+    "preparedPatchEntries": 122,
+    "effectiveIdUniqueness": true,
+    "postGeneratorFocusedProofsExit": 0,
+    "baselineExactBytes": true
   }
 }

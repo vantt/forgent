@@ -1,0 +1,431 @@
+{
+  "sourceCommit": "eb744281deba853f201cda15dcb4876300a1d638",
+  "command": "node scripts/build-skill-wrappers.mjs",
+  "exit": 0,
+  "parkedRenders": 69,
+  "matchingRenders": 69,
+  "files": [
+    {
+      "path": ".agents/skills/_shared/ak-cook-worker-contract.md",
+      "actualSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/capability-catalog.md",
+      "actualSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/catchup-self-recovery.md",
+      "actualSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "actualSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/coding-worker-contract.md",
+      "actualSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "actualSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/_shared/planning-capability-awareness.md",
+      "actualSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/SKILL.md",
+      "actualSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+      "expectedAfterSha256": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/references/consult-protocol.md",
+      "actualSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "expectedAfterSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/references/deep-dive-protocol.md",
+      "actualSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "expectedAfterSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/references/extract-rules.md",
+      "actualSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "expectedAfterSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "actualSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "actualSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-clarifying/SKILL.md",
+      "actualSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "actualSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "actualSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "actualSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "actualSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "actualSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "actualSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "actualSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "actualSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "actualSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "actualSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "actualSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "actualSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "actualSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "actualSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "actualSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "actualSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-indexing/SKILL.md",
+      "actualSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "exactBytes": true
+    },
+    {
+      "path": ".agents/skills/fgos-researching/SKILL.md",
+      "actualSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "exactBytes": true,
+      "priorExpectedAfterSha256": "689fa1aaf4efe3f96efd2063c8fec75030e68ff2fba40851c17154f37bac17f4",
+      "canonicalCorrectionSpecId": "w8:gloss:researching-source"
+    },
+    {
+      "path": ".claude/skills/distill/scripts/distill.mjs",
+      "actualSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "expectedAfterSha256": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "actualSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "expectedAfterSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "actualSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "actualSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "actualSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "actualSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "actualSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "actualSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-shaping/SKILL.md",
+      "actualSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
+      "expectedAfterSha256": "27e123882bde8196b7d79142a3a4707f924de1e4ff282fd6be1029c7b23277fa",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "actualSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "exactBytes": true
+    },
+    {
+      "path": ".claude/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "actualSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+      "actualSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "expectedAfterSha256": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "actualSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "expectedAfterSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+      "actualSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "expectedAfterSha256": "5c28f38990c6f0fa4cd57d7fb8f0b8a4bbb9c53567e179e2b3a69a2328aa1a0f",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "actualSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "expectedAfterSha256": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "actualSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "expectedAfterSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "actualSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "expectedAfterSha256": "b84b818a921c440ed327d5edb07cd3cdda8e3a81b51974856ab444f82819bdfb",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "actualSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "expectedAfterSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "actualSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "expectedAfterSha256": "53d83811c8d2357e2b0ec3d7baa428e9350f41a1bbddb54a36d775c4c2bbb9f9",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "actualSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "expectedAfterSha256": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "actualSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "expectedAfterSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "actualSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "expectedAfterSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "actualSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "expectedAfterSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "actualSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "expectedAfterSha256": "ea26b214e482b93ac34b3650a6c4ddfd7161618ceb317dbb849285bb8839a3bc",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      "actualSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "expectedAfterSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "actualSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "expectedAfterSha256": "5c09c38ed592fd2fd0e7cbca6d02934dc676c41dae311c5aba0f14861c5542cd",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "actualSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "expectedAfterSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "actualSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "expectedAfterSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "actualSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "expectedAfterSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "actualSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "expectedAfterSha256": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "actualSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "expectedAfterSha256": "bf5fb8c3c1ddd09fcaed0774d2c24f906ba9125f74ee3e76d5d55ae9a4285674",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "actualSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "expectedAfterSha256": "af9e3de7c660b46169675422520102072e23cfd012626c1c8dbb7f31f6677c94",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "actualSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "expectedAfterSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "actualSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "expectedAfterSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "actualSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "expectedAfterSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "actualSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "expectedAfterSha256": "1405226ce6624ad9c57ea910b6952e6f0690406fa21ba67e99f54f50ddbf7a74",
+      "exactBytes": true
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "actualSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "expectedAfterSha256": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
+      "exactBytes": true,
+      "priorExpectedAfterSha256": "689fa1aaf4efe3f96efd2063c8fec75030e68ff2fba40851c17154f37bac17f4",
+      "canonicalCorrectionSpecId": "w8:gloss:researching-source"
+    }
+  ],
+  "policy": "Source plus generator is the door; render diffs are evidence only",
+  "canonicalCorrectionSpecId": "w8:gloss:researching-source",
+  "postRegenerationFindingsFixed": 2,
+  "postRegenerationFindingCause": "One previously bare canonical RUL45 citation acquired a changed line key when the legacy pointer was retargeted; two generated surfaces exposed it"
+}

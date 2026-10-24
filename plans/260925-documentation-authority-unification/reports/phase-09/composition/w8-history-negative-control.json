@@ -1,0 +1,7 @@
+{
+  "exit": 1,
+  "expectedExit": 1,
+  "log": "w8-citation-history-negative.log",
+  "restored": true,
+  "meaning": "Removing only the added history filter makes the owning default-reader fixture fail; live nested spec/decision findings are still asserted. Baseline untouched."
+}
