@@ -428,6 +428,55 @@ fn a_bounded_step_whose_every_item_is_too_large_takes_nothing_and_still_counts_t
 }
 
 #[test]
+fn a_bounded_step_after_a_stamped_one_still_takes_a_fitting_message_the_budget_left_beside_a_too_large_one(
+) {
+    let mut pair = Pair::new(t(100));
+    pair.send("a", B_NAME, &"x".repeat(4000), t(100));
+    let first = pair.send("a", B_NAME, "one", t(101));
+    let second = pair.send("a", B_NAME, "two", t(102));
+    let sizes = worst_cases(&pair, "b", t(110));
+    // Each small message fits alone, the two do not fit together, and the oldest never fits.
+    let budget = sizes[1].max(sizes[2]);
+    assert!(sizes[0] > budget && sizes[1] + 2 + sizes[2] > budget);
+    let bound = Checkpoint::BoundedStep(bound_for(budget));
+
+    let taken = pair
+        .state
+        .claim(&key("b"), G1, bound, t(110), &pair.limits, &mut pair.ids);
+    assert_eq!(
+        taken.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![first]
+    );
+    assert_eq!(taken.too_large, 1);
+
+    // The stamp is current and no new mail came, yet a fitting item waits: the
+    // next step takes it, and only the too-large one is left for the pointer.
+    let next = pair
+        .state
+        .claim(&key("b"), G1, bound, t(111), &pair.limits, &mut pair.ids);
+    assert_eq!(
+        next.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![second]
+    );
+    assert_eq!(next.too_large, 1);
+}
+
+#[test]
+fn a_bounded_step_repeated_in_the_millisecond_its_stamp_and_the_newest_mail_share_writes_nothing() {
+    let mut pair = Pair::new(t(100));
+    pair.send("a", B_NAME, &"x".repeat(4000), t(110));
+    let bound = Checkpoint::BoundedStep(bound_for(10));
+    let first = pair
+        .state
+        .claim(&key("b"), G1, bound, t(110), &pair.limits, &mut pair.ids);
+    assert!(first.changed, "the first step stamps");
+    let again = pair
+        .state
+        .claim(&key("b"), G1, bound, t(110), &pair.limits, &mut pair.ids);
+    assert_eq!((again.changed, again.too_large), (false, 1));
+}
+
+#[test]
 fn a_stop_claim_and_a_plain_step_claim_are_not_limited_by_a_bound() {
     let mut pair = Pair::new(t(100));
     let body = "x".repeat(pair.limits.max_body_bytes as usize);
