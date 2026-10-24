@@ -1,6 +1,9 @@
 {
   "sourceCommit": "cd4f80eccbb5c44893daec58af416395d139494b",
-  "doerPinsRepinned": ["92260972cb2dc2ab3740859dc1c005bb9be42857", "a27d85d0a"],
+  "doerPinsRepinned": [
+    "92260972cb2dc2ab3740859dc1c005bb9be42857",
+    "a27d85d0a"
+  ],
   "repinnedRecords": [
     "plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json",
     "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
@@ -23,7 +26,17 @@
     "action": "Equivalence recorded; no active pure JSON Doer pin to this side-branch commit was found. Do not delete the ref in this assignment."
   },
   "inputTreeComparison": {
-    "command": ["git", "diff", "--name-only", "92260972cb2dc2ab3740859dc1c005bb9be42857", "5965143b4fd56df6698b2096df1a672d26293c90", "--", "docs", "plans/260925-documentation-authority-unification/ledger", "scripts/check-legacy-docs-ratchet.exceptions.json"],
+    "command": [
+      "git",
+      "diff",
+      "--name-only",
+      "92260972cb2dc2ab3740859dc1c005bb9be42857",
+      "5965143b4fd56df6698b2096df1a672d26293c90",
+      "--",
+      "docs",
+      "plans/260925-documentation-authority-unification/ledger",
+      "scripts/check-legacy-docs-ratchet.exceptions.json"
+    ],
     "exit": 0,
     "stdout": ""
   },
@@ -235,7 +248,13 @@
         {
           "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
           "line": 4,
-          "key": "head"
+          "key": "head",
+          "currentCommit": "814c06f3dca5bebcc2521fac4ff31d0248b3660d",
+          "refreshEvidence": {
+            "changedByCommit": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+            "currentFileSha256": "67acf94fc3dc8d9c27a796d2c86f39ee544b63634d0f9c82cd947e108186e382",
+            "reason": "Import-3 regenerated report advances head; historical patch-id equivalence remains unchanged."
+          }
         },
         {
           "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",

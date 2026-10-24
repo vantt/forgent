@@ -1,0 +1,2757 @@
+{
+  "pin": "d786e305eb20dfdda8d1634b227bd9f8a9328541",
+  "exit": 0,
+  "passagesChanged": 274,
+  "affectedRecords": 26,
+  "recordClassificationChanges": [
+    {
+      "id": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "before": "changed",
+      "after": "moved"
+    }
+  ],
+  "passages": [
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010507",
+      "startLine": 1051,
+      "endLine": 1059,
+      "boundSha256": "cc31472d6527b7b2c452caf36e6cd6649bd4ba53b3ab77c76caef2f17f63be77",
+      "currentSha256": "d52d2fe78224e406b36571476475bb27a535bbe256f1ed63f3b8b77d1eb347ff",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010512",
+      "startLine": 1073,
+      "endLine": 1081,
+      "boundSha256": "cc31472d6527b7b2c452caf36e6cd6649bd4ba53b3ab77c76caef2f17f63be77",
+      "currentSha256": "d52d2fe78224e406b36571476475bb27a535bbe256f1ed63f3b8b77d1eb347ff",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010539",
+      "startLine": 379,
+      "endLine": 387,
+      "boundSha256": "1ae351b1ebeca346294d54230d83a915e6398ed8b2d9d8e69626e9628bcd0132",
+      "currentSha256": "290a8c5b7af76872e108f2f164b3fac5880e0ec351d35dffb8f5e8254e569eee",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010540",
+      "startLine": 380,
+      "endLine": 388,
+      "boundSha256": "81c6f16f9a81fa068ce1233d006e7424e24eee058547ace4cb1829fbe9758611",
+      "currentSha256": "8c84a65e77e9a602d32a7cbab2bb54ae77f34d0758c193522582022f4dd366f0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010579",
+      "startLine": 836,
+      "endLine": 844,
+      "boundSha256": "1ae351b1ebeca346294d54230d83a915e6398ed8b2d9d8e69626e9628bcd0132",
+      "currentSha256": "290a8c5b7af76872e108f2f164b3fac5880e0ec351d35dffb8f5e8254e569eee",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl:28",
+      "path": "src/runner/dispatch/cli.mjs",
+      "passageId": "dynamic-010580",
+      "startLine": 837,
+      "endLine": 845,
+      "boundSha256": "81c6f16f9a81fa068ce1233d006e7424e24eee058547ace4cb1829fbe9758611",
+      "currentSha256": "8c84a65e77e9a602d32a7cbab2bb54ae77f34d0758c193522582022f4dd366f0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:3",
+      "path": "src/runner/dispatch/provider-credential-renewal.mjs",
+      "passageId": "dynamic-011779",
+      "startLine": 289,
+      "endLine": 297,
+      "boundSha256": "37a6731477230b748b664376512f7f9ee1db743da2d9103fa33d58aa2a4ed6bd",
+      "currentSha256": "da8e211c24bbc94b3aef8f739deb62a7e996540f94c6170cd4ce2e28fd6af0ac",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:3",
+      "path": "src/runner/dispatch/provider-credential-renewal.mjs",
+      "passageId": "dynamic-011786",
+      "startLine": 355,
+      "endLine": 363,
+      "boundSha256": "37a6731477230b748b664376512f7f9ee1db743da2d9103fa33d58aa2a4ed6bd",
+      "currentSha256": "da8e211c24bbc94b3aef8f739deb62a7e996540f94c6170cd4ce2e28fd6af0ac",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+      "path": "src/runner/loop.mjs",
+      "passageId": "dynamic-012874",
+      "startLine": 386,
+      "endLine": 394,
+      "boundSha256": "9b6a318f12e27a325b6e28457aeb908b712a959bf04082c30867f8854c64bc33",
+      "currentSha256": "3ec4b9f3ad86aeabeffedd7bf84a8dcf0fbc13019ec698d95470a47547420634",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:35",
+      "path": "src/runner/loop.mjs",
+      "passageId": "dynamic-012878",
+      "startLine": 445,
+      "endLine": 453,
+      "boundSha256": "9b6a318f12e27a325b6e28457aeb908b712a959bf04082c30867f8854c64bc33",
+      "currentSha256": "3ec4b9f3ad86aeabeffedd7bf84a8dcf0fbc13019ec698d95470a47547420634",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+      "path": "src/runner/operation-choice.mjs",
+      "passageId": "dynamic-013087",
+      "startLine": 2014,
+      "endLine": 2022,
+      "boundSha256": "9aa60f970df1e39984bbc8c5fa112d40769fd29340933d18dc5a86888ffeb1bc",
+      "currentSha256": "a0bcb344ab9df28b1aa0686751b06b549df3afca8cb0faaa993dbbdf0a4a38c7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl:39",
+      "path": "src/runner/operation-choice.mjs",
+      "passageId": "dynamic-013089",
+      "startLine": 2113,
+      "endLine": 2121,
+      "boundSha256": "9aa60f970df1e39984bbc8c5fa112d40769fd29340933d18dc5a86888ffeb1bc",
+      "currentSha256": "a0bcb344ab9df28b1aa0686751b06b549df3afca8cb0faaa993dbbdf0a4a38c7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "passageId": "dynamic-014975",
+      "startLine": 332,
+      "endLine": 336,
+      "boundSha256": "050c74b376d67dbcfe8d74162024efc036f6f34b18ce2add84f474d6a1215663",
+      "currentSha256": "d7c3ce43024fbfa6a5ae821ec3eed9c4805a810a69bea9f62a9e3666d3ae6a39",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:22",
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "passageId": "dynamic-015000",
+      "startLine": 429,
+      "endLine": 433,
+      "boundSha256": "050c74b376d67dbcfe8d74162024efc036f6f34b18ce2add84f474d6a1215663",
+      "currentSha256": "d7c3ce43024fbfa6a5ae821ec3eed9c4805a810a69bea9f62a9e3666d3ae6a39",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "passageId": "dynamic-023831",
+      "startLine": 111,
+      "endLine": 119,
+      "boundSha256": "c5c910a6e177717b18133562c66c0514069681bccbb3b0415e30598fac488a6a",
+      "currentSha256": "8c09d4ed03802890c6a40e0e2e14650cc7c631e858ebd4388738fa30b669878a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl:1",
+      "path": "test/runner/dead-vocabulary-guard.test.mjs",
+      "passageId": "dynamic-023880",
+      "startLine": 452,
+      "endLine": 460,
+      "boundSha256": "c5c910a6e177717b18133562c66c0514069681bccbb3b0415e30598fac488a6a",
+      "currentSha256": "8c09d4ed03802890c6a40e0e2e14650cc7c631e858ebd4388738fa30b669878a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022489",
+      "startLine": 883,
+      "endLine": 891,
+      "boundSha256": "9c569b3e236d81ed7e44da995401d5ee6a5f2c6ac0632f510497d2da646b8b50",
+      "currentSha256": "2802999327988e3851a51769cbd39e90bab28576338ed2a731c6b84105bd0618",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022668",
+      "startLine": 148,
+      "endLine": 156,
+      "boundSha256": "a8893c50ded0fc2de139ae2d6ecf08a7f0ffc4d01edda564e81909c5bc64dcdc",
+      "currentSha256": "645f9554c4bf07d851666b23b3bf218d44422013b97fd64b09ed5c7cea865261",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022696",
+      "startLine": 1684,
+      "endLine": 1692,
+      "boundSha256": "fdc3cd059c530f5650c16f8d374e2277e78f6b197928704bc4f75a8c53032107",
+      "currentSha256": "78596e916ce39cb8472fc555e67fe3ee5f7aac66ce1ad49d7cbf72c91f60e016",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022712",
+      "startLine": 1750,
+      "endLine": 1758,
+      "boundSha256": "fdc3cd059c530f5650c16f8d374e2277e78f6b197928704bc4f75a8c53032107",
+      "currentSha256": "78596e916ce39cb8472fc555e67fe3ee5f7aac66ce1ad49d7cbf72c91f60e016",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022749",
+      "startLine": 178,
+      "endLine": 186,
+      "boundSha256": "a8893c50ded0fc2de139ae2d6ecf08a7f0ffc4d01edda564e81909c5bc64dcdc",
+      "currentSha256": "645f9554c4bf07d851666b23b3bf218d44422013b97fd64b09ed5c7cea865261",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022919",
+      "startLine": 536,
+      "endLine": 544,
+      "boundSha256": "9c569b3e236d81ed7e44da995401d5ee6a5f2c6ac0632f510497d2da646b8b50",
+      "currentSha256": "2802999327988e3851a51769cbd39e90bab28576338ed2a731c6b84105bd0618",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022935",
+      "startLine": 615,
+      "endLine": 623,
+      "boundSha256": "9c569b3e236d81ed7e44da995401d5ee6a5f2c6ac0632f510497d2da646b8b50",
+      "currentSha256": "2802999327988e3851a51769cbd39e90bab28576338ed2a731c6b84105bd0618",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022944",
+      "startLine": 697,
+      "endLine": 705,
+      "boundSha256": "582914043164f5233685a40a253471d23a2637997330b56902f846074bb6ee3d",
+      "currentSha256": "bffc7a634292db2335fb983c4aa229620028bd01df5ae195a97742d495c30439",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022945",
+      "startLine": 702,
+      "endLine": 710,
+      "boundSha256": "27691ff330433e15c956e71ebb22613c78915361ab5ea2e091165295b52fa7fd",
+      "currentSha256": "8b74be935b54abf45e6e54e4b86f3a8219da39e0c3ae460277135ab886c6c691",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022979",
+      "startLine": 762,
+      "endLine": 770,
+      "boundSha256": "582914043164f5233685a40a253471d23a2637997330b56902f846074bb6ee3d",
+      "currentSha256": "bffc7a634292db2335fb983c4aa229620028bd01df5ae195a97742d495c30439",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:33",
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "passageId": "dynamic-022980",
+      "startLine": 767,
+      "endLine": 775,
+      "boundSha256": "27691ff330433e15c956e71ebb22613c78915361ab5ea2e091165295b52fa7fd",
+      "currentSha256": "8b74be935b54abf45e6e54e4b86f3a8219da39e0c3ae460277135ab886c6c691",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
+      "path": "test/runner/dispatch.test.mjs",
+      "passageId": "dynamic-025572",
+      "startLine": 2039,
+      "endLine": 2047,
+      "boundSha256": "f2642d0b3358f817c26148a972bd26bc9b0df208873e75b3160ac82a5c53f75f",
+      "currentSha256": "c95b2a570ff47022b15b82ff2e35d8fad230bf1a4e53e074a1534a197d8d4008",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
+      "path": "test/runner/dispatch.test.mjs",
+      "passageId": "dynamic-025574",
+      "startLine": 2054,
+      "endLine": 2062,
+      "boundSha256": "f2642d0b3358f817c26148a972bd26bc9b0df208873e75b3160ac82a5c53f75f",
+      "currentSha256": "c95b2a570ff47022b15b82ff2e35d8fad230bf1a4e53e074a1534a197d8d4008",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
+      "path": "test/runner/dispatch.test.mjs",
+      "passageId": "dynamic-025579",
+      "startLine": 2099,
+      "endLine": 2107,
+      "boundSha256": "eef1ea851462243683d892262aed15c81e00f26fd3fb105b9f60d41a5529c2e1",
+      "currentSha256": "9d10a1b3c23b2ec2aba24b7d42e18f7972901d8af3c57ea4d455429c5218805f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:36",
+      "path": "test/runner/dispatch.test.mjs",
+      "passageId": "dynamic-025582",
+      "startLine": 2115,
+      "endLine": 2123,
+      "boundSha256": "eef1ea851462243683d892262aed15c81e00f26fd3fb105b9f60d41a5529c2e1",
+      "currentSha256": "9d10a1b3c23b2ec2aba24b7d42e18f7972901d8af3c57ea4d455429c5218805f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027511",
+      "startLine": 2258,
+      "endLine": 2266,
+      "boundSha256": "3a708e6b6920060eea45e3547d0fb681f3635878ad8ec20507f2a1d5d7101fd6",
+      "currentSha256": "100364cfa170ee1f7ca9ecd85d9134e1437d428e4184b177d6c209b95ac96d1f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027535",
+      "startLine": 2374,
+      "endLine": 2382,
+      "boundSha256": "3a708e6b6920060eea45e3547d0fb681f3635878ad8ec20507f2a1d5d7101fd6",
+      "currentSha256": "100364cfa170ee1f7ca9ecd85d9134e1437d428e4184b177d6c209b95ac96d1f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027549",
+      "startLine": 2449,
+      "endLine": 2457,
+      "boundSha256": "3a708e6b6920060eea45e3547d0fb681f3635878ad8ec20507f2a1d5d7101fd6",
+      "currentSha256": "100364cfa170ee1f7ca9ecd85d9134e1437d428e4184b177d6c209b95ac96d1f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027560",
+      "startLine": 2520,
+      "endLine": 2528,
+      "boundSha256": "3a708e6b6920060eea45e3547d0fb681f3635878ad8ec20507f2a1d5d7101fd6",
+      "currentSha256": "100364cfa170ee1f7ca9ecd85d9134e1437d428e4184b177d6c209b95ac96d1f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027569",
+      "startLine": 2579,
+      "endLine": 2587,
+      "boundSha256": "7e007016ff83a1e729facab05673f29be2351998ec290c86d9df444971f92f1f",
+      "currentSha256": "460bb5f04b37828b084cacfefb72d5e9c9c540b3e4ee0d48fff142923c8ee885",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027581",
+      "startLine": 2634,
+      "endLine": 2642,
+      "boundSha256": "7e007016ff83a1e729facab05673f29be2351998ec290c86d9df444971f92f1f",
+      "currentSha256": "460bb5f04b37828b084cacfefb72d5e9c9c540b3e4ee0d48fff142923c8ee885",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027610",
+      "startLine": 2802,
+      "endLine": 2810,
+      "boundSha256": "3bd6c47dcb868622c6f6a4d007b69413cb668428d3adcc44d1364f21f44e4016",
+      "currentSha256": "1b7d5eaf660c0bdd1a20354619650af87a6e0bed244710d6fd1c257bba4dc758",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027611",
+      "startLine": 2805,
+      "endLine": 2813,
+      "boundSha256": "8247214273a9452f41c05e5a5161f576914040f4a80d8fc468b0a9127dfe469c",
+      "currentSha256": "cb03e933b9af8b1a939b1c3fe0bdda2894dee5e2502d6cd7e79fdee9f7d4f202",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027612",
+      "startLine": 2809,
+      "endLine": 2817,
+      "boundSha256": "f7f1a10f5227f150df2617b67707cab56273aa283559e971f81d7efab055ffd8",
+      "currentSha256": "582749603fa7f16a8957f6522b05bc4d7e37a20a87a77e5ddebb9ceb1b7d38b2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027613",
+      "startLine": 2818,
+      "endLine": 2826,
+      "boundSha256": "a1f6e1642d491c5f582db8134bca71ad88257653f8e5e7acffe84611cdadd52b",
+      "currentSha256": "78d5fe84f5d9e85c63d2fb0911f9980b79072299cf8ac7572803a2a83efe6c8f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027654",
+      "startLine": 3108,
+      "endLine": 3116,
+      "boundSha256": "f7f1a10f5227f150df2617b67707cab56273aa283559e971f81d7efab055ffd8",
+      "currentSha256": "582749603fa7f16a8957f6522b05bc4d7e37a20a87a77e5ddebb9ceb1b7d38b2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027655",
+      "startLine": 3117,
+      "endLine": 3125,
+      "boundSha256": "a1f6e1642d491c5f582db8134bca71ad88257653f8e5e7acffe84611cdadd52b",
+      "currentSha256": "78d5fe84f5d9e85c63d2fb0911f9980b79072299cf8ac7572803a2a83efe6c8f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027669",
+      "startLine": 3185,
+      "endLine": 3193,
+      "boundSha256": "0cce49ad71fb0b3dfae5c6a5cd608d24e040cab4371270a60b60017e83ba3aee",
+      "currentSha256": "747fa335d5cb773c2b82fdeacc99bdbe0b1b48ec4e87828c911c4478aa580b56",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027670",
+      "startLine": 3191,
+      "endLine": 3199,
+      "boundSha256": "aacf6c50cdabdc0a236c2f073d48d832a1e78cb60baf9c7a01cb3392e4298a10",
+      "currentSha256": "c85c96e1283dbe24d5bfb94164ce153a8c3b293706cda83499ad5c21a18ef50a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027678",
+      "startLine": 3226,
+      "endLine": 3234,
+      "boundSha256": "0cce49ad71fb0b3dfae5c6a5cd608d24e040cab4371270a60b60017e83ba3aee",
+      "currentSha256": "747fa335d5cb773c2b82fdeacc99bdbe0b1b48ec4e87828c911c4478aa580b56",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027685",
+      "startLine": 3251,
+      "endLine": 3259,
+      "boundSha256": "0cce49ad71fb0b3dfae5c6a5cd608d24e040cab4371270a60b60017e83ba3aee",
+      "currentSha256": "747fa335d5cb773c2b82fdeacc99bdbe0b1b48ec4e87828c911c4478aa580b56",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027695",
+      "startLine": 3305,
+      "endLine": 3313,
+      "boundSha256": "0cce49ad71fb0b3dfae5c6a5cd608d24e040cab4371270a60b60017e83ba3aee",
+      "currentSha256": "747fa335d5cb773c2b82fdeacc99bdbe0b1b48ec4e87828c911c4478aa580b56",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027696",
+      "startLine": 3311,
+      "endLine": 3319,
+      "boundSha256": "aacf6c50cdabdc0a236c2f073d48d832a1e78cb60baf9c7a01cb3392e4298a10",
+      "currentSha256": "c85c96e1283dbe24d5bfb94164ce153a8c3b293706cda83499ad5c21a18ef50a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027699",
+      "startLine": 3323,
+      "endLine": 3331,
+      "boundSha256": "a1f6e1642d491c5f582db8134bca71ad88257653f8e5e7acffe84611cdadd52b",
+      "currentSha256": "78d5fe84f5d9e85c63d2fb0911f9980b79072299cf8ac7572803a2a83efe6c8f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027702",
+      "startLine": 3348,
+      "endLine": 3356,
+      "boundSha256": "0cce49ad71fb0b3dfae5c6a5cd608d24e040cab4371270a60b60017e83ba3aee",
+      "currentSha256": "747fa335d5cb773c2b82fdeacc99bdbe0b1b48ec4e87828c911c4478aa580b56",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027703",
+      "startLine": 3354,
+      "endLine": 3362,
+      "boundSha256": "3bd6c47dcb868622c6f6a4d007b69413cb668428d3adcc44d1364f21f44e4016",
+      "currentSha256": "1b7d5eaf660c0bdd1a20354619650af87a6e0bed244710d6fd1c257bba4dc758",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027704",
+      "startLine": 3357,
+      "endLine": 3365,
+      "boundSha256": "8247214273a9452f41c05e5a5161f576914040f4a80d8fc468b0a9127dfe469c",
+      "currentSha256": "cb03e933b9af8b1a939b1c3fe0bdda2894dee5e2502d6cd7e79fdee9f7d4f202",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl:38",
+      "path": "test/runner/loop.test.mjs",
+      "passageId": "dynamic-027706",
+      "startLine": 3370,
+      "endLine": 3378,
+      "boundSha256": "a1f6e1642d491c5f582db8134bca71ad88257653f8e5e7acffe84611cdadd52b",
+      "currentSha256": "78d5fe84f5d9e85c63d2fb0911f9980b79072299cf8ac7572803a2a83efe6c8f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028278",
+      "startLine": 1442,
+      "endLine": 1450,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028284",
+      "startLine": 1496,
+      "endLine": 1504,
+      "boundSha256": "aad059294a0d5e51dd04ddeb8811f4000fc538d4697612ebc882370043208980",
+      "currentSha256": "c77abbbd069cf1054dd0e8cb70a7dfc286fe311b6cf5d575b077f8cd8accccef",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028345",
+      "startLine": 1920,
+      "endLine": 1928,
+      "boundSha256": "cd84079adeb811be868880f324ea3bab3f9e5f54635c4878528633e4da6c7a5d",
+      "currentSha256": "666a453ad17c38b4a9c1a5f3c72de92194558d8a50d07e23c821faf24dd6e25c",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028352",
+      "startLine": 1946,
+      "endLine": 1954,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028353",
+      "startLine": 1957,
+      "endLine": 1965,
+      "boundSha256": "1e9c4ed71928a794a4a16581452a09793fd8e13546dda78eea48901f11d158e0",
+      "currentSha256": "e842c719004f4e69e4b0d0644930fe1a2bf90f08731b745561206ce236fa569a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028371",
+      "startLine": 2064,
+      "endLine": 2072,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028401",
+      "startLine": 2263,
+      "endLine": 2271,
+      "boundSha256": "09628acc63831a990762552fd8d3ad5b64f3118a958d87be3855ce3ec88316cb",
+      "currentSha256": "b896759d0dde7ec90f82d183a5ebb579c067ac3ab39309e19aade3b5d0eed857",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028403",
+      "startLine": 2272,
+      "endLine": 2280,
+      "boundSha256": "f1579ec4e7408f86e77cc199288ebc0204a9069b901b7959a78c225b3bc4bb5a",
+      "currentSha256": "a9dbea7182fb6feb8191634b7c6dfa3351eeefd11a756020c5362eabf86d4fb7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028409",
+      "startLine": 2292,
+      "endLine": 2300,
+      "boundSha256": "bcb3aa5e3067fa609abe588da1b55d549fed388ac0c066dddf61df1e9c4895b5",
+      "currentSha256": "c3e80e60d339fdac348361e42ff581edac0dad9fc8dcbe7b35cc382821bd2f4b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028410",
+      "startLine": 2294,
+      "endLine": 2302,
+      "boundSha256": "39cd351894af5f625504ff910d2e7697d845c1ae0459b1d620e33ff7d69c8c93",
+      "currentSha256": "9fbabbc327cdecbd188cfac569a3b8a81bf60bd7334c85b13255d247a54832a0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028416",
+      "startLine": 2315,
+      "endLine": 2323,
+      "boundSha256": "bcb3aa5e3067fa609abe588da1b55d549fed388ac0c066dddf61df1e9c4895b5",
+      "currentSha256": "c3e80e60d339fdac348361e42ff581edac0dad9fc8dcbe7b35cc382821bd2f4b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028417",
+      "startLine": 2317,
+      "endLine": 2325,
+      "boundSha256": "39cd351894af5f625504ff910d2e7697d845c1ae0459b1d620e33ff7d69c8c93",
+      "currentSha256": "9fbabbc327cdecbd188cfac569a3b8a81bf60bd7334c85b13255d247a54832a0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028435",
+      "startLine": 2386,
+      "endLine": 2394,
+      "boundSha256": "f1579ec4e7408f86e77cc199288ebc0204a9069b901b7959a78c225b3bc4bb5a",
+      "currentSha256": "a9dbea7182fb6feb8191634b7c6dfa3351eeefd11a756020c5362eabf86d4fb7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028440",
+      "startLine": 2405,
+      "endLine": 2413,
+      "boundSha256": "901b9f3ad86acc3d621aef3ce9407dcc6f6f5a1ac8d3427bddc87fa9df4fa690",
+      "currentSha256": "58cd0c6d84df3679f294d2cd8941c07291c55cdbd57c0ca052a95a6f99315e75",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028441",
+      "startLine": 2407,
+      "endLine": 2415,
+      "boundSha256": "c08719f3518d6cfb04510729bd06168cb1602830aa086e29482cf558edee46f3",
+      "currentSha256": "1bbbab07e49925c566bb9f73c02c3c1b7baf6214f00b2268a22a9ceb6404ff58",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028442",
+      "startLine": 2409,
+      "endLine": 2417,
+      "boundSha256": "a9ca258dd84a16140773a963ce6da961ae7454ad9b13ca4b1b0562912cda22ed",
+      "currentSha256": "2ee0fd63eec3624e965ec12b2b4397915cb9cecb80c11194c094ca99c3882264",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028447",
+      "startLine": 2436,
+      "endLine": 2444,
+      "boundSha256": "901b9f3ad86acc3d621aef3ce9407dcc6f6f5a1ac8d3427bddc87fa9df4fa690",
+      "currentSha256": "58cd0c6d84df3679f294d2cd8941c07291c55cdbd57c0ca052a95a6f99315e75",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028449",
+      "startLine": 2438,
+      "endLine": 2446,
+      "boundSha256": "c08719f3518d6cfb04510729bd06168cb1602830aa086e29482cf558edee46f3",
+      "currentSha256": "1bbbab07e49925c566bb9f73c02c3c1b7baf6214f00b2268a22a9ceb6404ff58",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028450",
+      "startLine": 2440,
+      "endLine": 2448,
+      "boundSha256": "a9ca258dd84a16140773a963ce6da961ae7454ad9b13ca4b1b0562912cda22ed",
+      "currentSha256": "2ee0fd63eec3624e965ec12b2b4397915cb9cecb80c11194c094ca99c3882264",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028457",
+      "startLine": 2467,
+      "endLine": 2475,
+      "boundSha256": "901b9f3ad86acc3d621aef3ce9407dcc6f6f5a1ac8d3427bddc87fa9df4fa690",
+      "currentSha256": "58cd0c6d84df3679f294d2cd8941c07291c55cdbd57c0ca052a95a6f99315e75",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028458",
+      "startLine": 2469,
+      "endLine": 2477,
+      "boundSha256": "c08719f3518d6cfb04510729bd06168cb1602830aa086e29482cf558edee46f3",
+      "currentSha256": "1bbbab07e49925c566bb9f73c02c3c1b7baf6214f00b2268a22a9ceb6404ff58",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028459",
+      "startLine": 2471,
+      "endLine": 2479,
+      "boundSha256": "765ebbcb774c9c746fd7af93d03ce1faa11c2ab209f59d55e44f6365c07adb74",
+      "currentSha256": "2135513ca0d7d144a32428ef80cf0d0110d7cfd3903cc907a3cf729cce568e7f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028464",
+      "startLine": 2496,
+      "endLine": 2504,
+      "boundSha256": "901b9f3ad86acc3d621aef3ce9407dcc6f6f5a1ac8d3427bddc87fa9df4fa690",
+      "currentSha256": "58cd0c6d84df3679f294d2cd8941c07291c55cdbd57c0ca052a95a6f99315e75",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028466",
+      "startLine": 2498,
+      "endLine": 2506,
+      "boundSha256": "c08719f3518d6cfb04510729bd06168cb1602830aa086e29482cf558edee46f3",
+      "currentSha256": "1bbbab07e49925c566bb9f73c02c3c1b7baf6214f00b2268a22a9ceb6404ff58",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028467",
+      "startLine": 2500,
+      "endLine": 2508,
+      "boundSha256": "a9ca258dd84a16140773a963ce6da961ae7454ad9b13ca4b1b0562912cda22ed",
+      "currentSha256": "2ee0fd63eec3624e965ec12b2b4397915cb9cecb80c11194c094ca99c3882264",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028473",
+      "startLine": 2527,
+      "endLine": 2535,
+      "boundSha256": "901b9f3ad86acc3d621aef3ce9407dcc6f6f5a1ac8d3427bddc87fa9df4fa690",
+      "currentSha256": "58cd0c6d84df3679f294d2cd8941c07291c55cdbd57c0ca052a95a6f99315e75",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028475",
+      "startLine": 2529,
+      "endLine": 2537,
+      "boundSha256": "c08719f3518d6cfb04510729bd06168cb1602830aa086e29482cf558edee46f3",
+      "currentSha256": "1bbbab07e49925c566bb9f73c02c3c1b7baf6214f00b2268a22a9ceb6404ff58",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028476",
+      "startLine": 2531,
+      "endLine": 2539,
+      "boundSha256": "765ebbcb774c9c746fd7af93d03ce1faa11c2ab209f59d55e44f6365c07adb74",
+      "currentSha256": "2135513ca0d7d144a32428ef80cf0d0110d7cfd3903cc907a3cf729cce568e7f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028521",
+      "startLine": 2738,
+      "endLine": 2746,
+      "boundSha256": "0a66fb4e908afae2ca0610994df4a95561c7e903fc8e6fe00e81199df6386b3e",
+      "currentSha256": "a9b5e9b493c0d44cb2a34f971828752ee28579dabf048af9ae7e9816e0c3cc31",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028529",
+      "startLine": 2768,
+      "endLine": 2776,
+      "boundSha256": "0a66fb4e908afae2ca0610994df4a95561c7e903fc8e6fe00e81199df6386b3e",
+      "currentSha256": "a9b5e9b493c0d44cb2a34f971828752ee28579dabf048af9ae7e9816e0c3cc31",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028532",
+      "startLine": 2790,
+      "endLine": 2798,
+      "boundSha256": "0a66fb4e908afae2ca0610994df4a95561c7e903fc8e6fe00e81199df6386b3e",
+      "currentSha256": "a9b5e9b493c0d44cb2a34f971828752ee28579dabf048af9ae7e9816e0c3cc31",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028541",
+      "startLine": 2825,
+      "endLine": 2833,
+      "boundSha256": "9dcb11fa253810f37a77c9a37bbf6d82e1d6876affb36cb504dffa012bce5a33",
+      "currentSha256": "651a37ca90a3c97028bd6e2836749215dd4a9ed03a3280fe1dc9c39a58fc0660",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028550",
+      "startLine": 2861,
+      "endLine": 2869,
+      "boundSha256": "9dcb11fa253810f37a77c9a37bbf6d82e1d6876affb36cb504dffa012bce5a33",
+      "currentSha256": "651a37ca90a3c97028bd6e2836749215dd4a9ed03a3280fe1dc9c39a58fc0660",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028558",
+      "startLine": 2900,
+      "endLine": 2908,
+      "boundSha256": "1e9c4ed71928a794a4a16581452a09793fd8e13546dda78eea48901f11d158e0",
+      "currentSha256": "e842c719004f4e69e4b0d0644930fe1a2bf90f08731b745561206ce236fa569a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028569",
+      "startLine": 2943,
+      "endLine": 2951,
+      "boundSha256": "09628acc63831a990762552fd8d3ad5b64f3118a958d87be3855ce3ec88316cb",
+      "currentSha256": "b896759d0dde7ec90f82d183a5ebb579c067ac3ab39309e19aade3b5d0eed857",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028600",
+      "startLine": 309,
+      "endLine": 317,
+      "boundSha256": "b29bf10ef703f2358fc21c5c79e8e2cbe3aaf618c7b458d183fec205c5277b6b",
+      "currentSha256": "54537ee120c20029a5e757ee961a510369bf46b2fddf7234a36c376b1e329a31",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028622",
+      "startLine": 3213,
+      "endLine": 3221,
+      "boundSha256": "1e9c4ed71928a794a4a16581452a09793fd8e13546dda78eea48901f11d158e0",
+      "currentSha256": "e842c719004f4e69e4b0d0644930fe1a2bf90f08731b745561206ce236fa569a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028624",
+      "startLine": 3223,
+      "endLine": 3231,
+      "boundSha256": "b32f2b07195caac9df6c4bfcf7e6a63b79403776893bb9084e968c0d41f2b795",
+      "currentSha256": "63f9a32ac86db26b0ec03e5e376679e85da07a29aba76a73d064024a97f72010",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028629",
+      "startLine": 3242,
+      "endLine": 3250,
+      "boundSha256": "1e9c4ed71928a794a4a16581452a09793fd8e13546dda78eea48901f11d158e0",
+      "currentSha256": "e842c719004f4e69e4b0d0644930fe1a2bf90f08731b745561206ce236fa569a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028632",
+      "startLine": 3259,
+      "endLine": 3267,
+      "boundSha256": "b32f2b07195caac9df6c4bfcf7e6a63b79403776893bb9084e968c0d41f2b795",
+      "currentSha256": "63f9a32ac86db26b0ec03e5e376679e85da07a29aba76a73d064024a97f72010",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028638",
+      "startLine": 3278,
+      "endLine": 3286,
+      "boundSha256": "1e9c4ed71928a794a4a16581452a09793fd8e13546dda78eea48901f11d158e0",
+      "currentSha256": "e842c719004f4e69e4b0d0644930fe1a2bf90f08731b745561206ce236fa569a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028662",
+      "startLine": 3369,
+      "endLine": 3377,
+      "boundSha256": "606c38a4e503485499fbff0039d4ebe2207435d9a802f74826b35f44b866062d",
+      "currentSha256": "9831b608e587633d38e2fa2e1918a6261681150ff8ecbbfef378c0b08be1029c",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028678",
+      "startLine": 3428,
+      "endLine": 3436,
+      "boundSha256": "606c38a4e503485499fbff0039d4ebe2207435d9a802f74826b35f44b866062d",
+      "currentSha256": "9831b608e587633d38e2fa2e1918a6261681150ff8ecbbfef378c0b08be1029c",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028683",
+      "startLine": 344,
+      "endLine": 352,
+      "boundSha256": "b29bf10ef703f2358fc21c5c79e8e2cbe3aaf618c7b458d183fec205c5277b6b",
+      "currentSha256": "54537ee120c20029a5e757ee961a510369bf46b2fddf7234a36c376b1e329a31",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028696",
+      "startLine": 3544,
+      "endLine": 3552,
+      "boundSha256": "ce2f64c98d78d9daa85ca3c2d1e7fe8c8db70c47bdb0106073193f00fa596bb6",
+      "currentSha256": "25796fd9afd666ab2908e5ec4447af723e219babf75c9e0191c86ac3fe5efeda",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028717",
+      "startLine": 3666,
+      "endLine": 3674,
+      "boundSha256": "ce2f64c98d78d9daa85ca3c2d1e7fe8c8db70c47bdb0106073193f00fa596bb6",
+      "currentSha256": "25796fd9afd666ab2908e5ec4447af723e219babf75c9e0191c86ac3fe5efeda",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028728",
+      "startLine": 372,
+      "endLine": 380,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028746",
+      "startLine": 3838,
+      "endLine": 3846,
+      "boundSha256": "6670aae7257b1413555fd2dd558dfa07898788bd54604ff622ef947fe1251d04",
+      "currentSha256": "875e234601b32daabd189f991555324313fbfa17e8ecbdec9f23d69d9bc7fa3f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028752",
+      "startLine": 3903,
+      "endLine": 3911,
+      "boundSha256": "6670aae7257b1413555fd2dd558dfa07898788bd54604ff622ef947fe1251d04",
+      "currentSha256": "875e234601b32daabd189f991555324313fbfa17e8ecbdec9f23d69d9bc7fa3f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028761",
+      "startLine": 3949,
+      "endLine": 3957,
+      "boundSha256": "e03d3f242eaf72a2f94b3ab90ed5a65ae4f62f285af724c9d31502158cdfd95d",
+      "currentSha256": "d62feec19b18a514e1904b2457ec79126a19f3f2de4a1dbc7983ebcf3abaf0f6",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028764",
+      "startLine": 3979,
+      "endLine": 3987,
+      "boundSha256": "e03d3f242eaf72a2f94b3ab90ed5a65ae4f62f285af724c9d31502158cdfd95d",
+      "currentSha256": "d62feec19b18a514e1904b2457ec79126a19f3f2de4a1dbc7983ebcf3abaf0f6",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028827",
+      "startLine": 4438,
+      "endLine": 4446,
+      "boundSha256": "bfe387709138192747baa1a530bf4aae47bec6a4ded83f6016e148cc5de020f4",
+      "currentSha256": "026ed5d0fe151cf1190b2942d16d6e7b93c67f25c985ed0016a0953c9f2cfd43",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028838",
+      "startLine": 4504,
+      "endLine": 4512,
+      "boundSha256": "bfe387709138192747baa1a530bf4aae47bec6a4ded83f6016e148cc5de020f4",
+      "currentSha256": "026ed5d0fe151cf1190b2942d16d6e7b93c67f25c985ed0016a0953c9f2cfd43",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028843",
+      "startLine": 453,
+      "endLine": 461,
+      "boundSha256": "aad059294a0d5e51dd04ddeb8811f4000fc538d4697612ebc882370043208980",
+      "currentSha256": "c77abbbd069cf1054dd0e8cb70a7dfc286fe311b6cf5d575b077f8cd8accccef",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028960",
+      "startLine": 531,
+      "endLine": 539,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-028968",
+      "startLine": 540,
+      "endLine": 548,
+      "boundSha256": "f49ddb0749b7b1087d873a54bc883b3b7949557d1105cab01f9366fe81265b0d",
+      "currentSha256": "73f4549e37fb11b8b5515d5c72733132324ee2739057855da59e8bc7f4f797e7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029007",
+      "startLine": 5866,
+      "endLine": 5874,
+      "boundSha256": "ec868723e56f21d3d0d5980237e0203d1aece7a7ccef88f1f65ddaf9af6d9b84",
+      "currentSha256": "9766e067a2abab51c05474960016fdd22775bf9853026818c13f43ab595c2b37",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029013",
+      "startLine": 5893,
+      "endLine": 5901,
+      "boundSha256": "ec868723e56f21d3d0d5980237e0203d1aece7a7ccef88f1f65ddaf9af6d9b84",
+      "currentSha256": "9766e067a2abab51c05474960016fdd22775bf9853026818c13f43ab595c2b37",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029038",
+      "startLine": 682,
+      "endLine": 690,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029039",
+      "startLine": 691,
+      "endLine": 699,
+      "boundSha256": "f49ddb0749b7b1087d873a54bc883b3b7949557d1105cab01f9366fe81265b0d",
+      "currentSha256": "73f4549e37fb11b8b5515d5c72733132324ee2739057855da59e8bc7f4f797e7",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029047",
+      "startLine": 741,
+      "endLine": 749,
+      "boundSha256": "884f774778423626349ebe642b6001df06fc2b5b7f1b0aa8ce368210ec33122e",
+      "currentSha256": "d59196b6312032bc543ce230863c3e59a0581c4f84da29cf3d6df5d793c1bf70",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:16",
+      "path": "test/runner/operation-choice.test.mjs",
+      "passageId": "dynamic-029054",
+      "startLine": 807,
+      "endLine": 815,
+      "boundSha256": "cd84079adeb811be868880f324ea3bab3f9e5f54635c4878528633e4da6c7a5d",
+      "currentSha256": "666a453ad17c38b4a9c1a5f3c72de92194558d8a50d07e23c821faf24dd6e25c",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005075",
+      "startLine": 108,
+      "endLine": 114,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005076",
+      "startLine": 139,
+      "endLine": 145,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005077",
+      "startLine": 194,
+      "endLine": 200,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005078",
+      "startLine": 225,
+      "endLine": 231,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005079",
+      "startLine": 22,
+      "endLine": 28,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005080",
+      "startLine": 541,
+      "endLine": 547,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005081",
+      "startLine": 49,
+      "endLine": 55,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005082",
+      "startLine": 580,
+      "endLine": 586,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005085",
+      "startLine": 83,
+      "endLine": 89,
+      "boundSha256": "cefded236c1cd93010acb196f685e51802e446aea823297bdb79fd74355f364a",
+      "currentSha256": "1fa11872a2a75a1090d42aead078de5458da5aee857326fb8a9a5b831b01efae",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005102",
+      "startLine": 115,
+      "endLine": 121,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005103",
+      "startLine": 170,
+      "endLine": 176,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005104",
+      "startLine": 201,
+      "endLine": 207,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005105",
+      "startLine": 232,
+      "endLine": 238,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005106",
+      "startLine": 29,
+      "endLine": 35,
+      "boundSha256": "fc88e83cf536094745550a8faf2278199d3b352b88957d6bfb44a2a0da9d2445",
+      "currentSha256": "a5f1b1c474339fc7ee1a6135b5fcb54f0d1ac0ab96514eedc9b38bb5cf0b1ff4",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005107",
+      "startLine": 486,
+      "endLine": 492,
+      "boundSha256": "fc88e83cf536094745550a8faf2278199d3b352b88957d6bfb44a2a0da9d2445",
+      "currentSha256": "a5f1b1c474339fc7ee1a6135b5fcb54f0d1ac0ab96514eedc9b38bb5cf0b1ff4",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005108",
+      "startLine": 548,
+      "endLine": 554,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005109",
+      "startLine": 587,
+      "endLine": 593,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005110",
+      "startLine": 56,
+      "endLine": 62,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005111",
+      "startLine": 640,
+      "endLine": 646,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005112",
+      "startLine": 682,
+      "endLine": 688,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005113",
+      "startLine": 90,
+      "endLine": 96,
+      "boundSha256": "37c8856fe6e63cdaa3c18d88c49dbcabe7aeb863ce15719a8861f46d995903aa",
+      "currentSha256": "b1c0623fe4da9f3f9dca04cd1fe12c96c7d276bfa10b0cacb0e5222b9f5c71a3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005123",
+      "startLine": 112,
+      "endLine": 118,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005125",
+      "startLine": 167,
+      "endLine": 173,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005126",
+      "startLine": 198,
+      "endLine": 204,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005127",
+      "startLine": 229,
+      "endLine": 235,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005128",
+      "startLine": 26,
+      "endLine": 32,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005130",
+      "startLine": 545,
+      "endLine": 551,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005131",
+      "startLine": 584,
+      "endLine": 590,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005132",
+      "startLine": 53,
+      "endLine": 59,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005133",
+      "startLine": 637,
+      "endLine": 643,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005134",
+      "startLine": 679,
+      "endLine": 685,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005135",
+      "startLine": 87,
+      "endLine": 93,
+      "boundSha256": "32ef51588fe58e0ccb289f489f355aa3a799ea1fff35a0a1c35d54fba130fae4",
+      "currentSha256": "c605b52e5e7c404f8b087d30f6b343af342fce1a8ebbaad6f25fee55da0b5b48",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005136",
+      "startLine": 110,
+      "endLine": 116,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005137",
+      "startLine": 141,
+      "endLine": 147,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005139",
+      "startLine": 196,
+      "endLine": 202,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005140",
+      "startLine": 227,
+      "endLine": 233,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005143",
+      "startLine": 24,
+      "endLine": 30,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005150",
+      "startLine": 543,
+      "endLine": 549,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005151",
+      "startLine": 582,
+      "endLine": 588,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005152",
+      "startLine": 51,
+      "endLine": 57,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "reference-005157",
+      "startLine": 85,
+      "endLine": 91,
+      "boundSha256": "b2f59795e56a0b7de9b5280b406d36a2e1705d0f5b7e9072e81568f5ff20b47a",
+      "currentSha256": "c036be9ff2be28bda3cb82f4d7fad9a954986cb456cc441726049be044b38a1b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033484",
+      "startLine": 109,
+      "endLine": 117,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033486",
+      "startLine": 111,
+      "endLine": 119,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033487",
+      "startLine": 112,
+      "endLine": 120,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033490",
+      "startLine": 114,
+      "endLine": 122,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033492",
+      "startLine": 140,
+      "endLine": 148,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033500",
+      "startLine": 167,
+      "endLine": 175,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033501",
+      "startLine": 169,
+      "endLine": 177,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033504",
+      "startLine": 195,
+      "endLine": 203,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033506",
+      "startLine": 197,
+      "endLine": 205,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033507",
+      "startLine": 198,
+      "endLine": 206,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033508",
+      "startLine": 200,
+      "endLine": 208,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033513",
+      "startLine": 226,
+      "endLine": 234,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033515",
+      "startLine": 228,
+      "endLine": 236,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033516",
+      "startLine": 229,
+      "endLine": 237,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033517",
+      "startLine": 231,
+      "endLine": 239,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033538",
+      "startLine": 23,
+      "endLine": 31,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033541",
+      "startLine": 25,
+      "endLine": 33,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033544",
+      "startLine": 26,
+      "endLine": 34,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033565",
+      "startLine": 421,
+      "endLine": 429,
+      "boundSha256": "f105719304883b5d94c7880f3fe36cb49f4f8be083444d651d7d4760f3a2e721",
+      "currentSha256": "50b4cb6897edce072a3a75921cf2fcedfe868e8ec5ef509975f0da775d4d77da",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033588",
+      "startLine": 542,
+      "endLine": 550,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033590",
+      "startLine": 544,
+      "endLine": 552,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033591",
+      "startLine": 545,
+      "endLine": 553,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033592",
+      "startLine": 547,
+      "endLine": 555,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033596",
+      "startLine": 581,
+      "endLine": 589,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033598",
+      "startLine": 583,
+      "endLine": 591,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033599",
+      "startLine": 50,
+      "endLine": 58,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033601",
+      "startLine": 584,
+      "endLine": 592,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033602",
+      "startLine": 586,
+      "endLine": 594,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033604",
+      "startLine": 52,
+      "endLine": 60,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033606",
+      "startLine": 53,
+      "endLine": 61,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033609",
+      "startLine": 55,
+      "endLine": 63,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033612",
+      "startLine": 636,
+      "endLine": 644,
+      "boundSha256": "fb947bace94957d0052c9d89553fbe7155699421998df75b6c868c084f99f581",
+      "currentSha256": "31fa430a17836284dcc98daeb3d0007d4a75d842966d8e088e662f3da400b92f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033613",
+      "startLine": 637,
+      "endLine": 645,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033614",
+      "startLine": 639,
+      "endLine": 647,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033620",
+      "startLine": 678,
+      "endLine": 686,
+      "boundSha256": "fb947bace94957d0052c9d89553fbe7155699421998df75b6c868c084f99f581",
+      "currentSha256": "31fa430a17836284dcc98daeb3d0007d4a75d842966d8e088e662f3da400b92f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033621",
+      "startLine": 679,
+      "endLine": 687,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033622",
+      "startLine": 681,
+      "endLine": 689,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033627",
+      "startLine": 715,
+      "endLine": 723,
+      "boundSha256": "f105719304883b5d94c7880f3fe36cb49f4f8be083444d651d7d4760f3a2e721",
+      "currentSha256": "50b4cb6897edce072a3a75921cf2fcedfe868e8ec5ef509975f0da775d4d77da",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033635",
+      "startLine": 84,
+      "endLine": 92,
+      "boundSha256": "97ae11a5ba7b969dcb14f4f2a96af07c5600821bc698a94bd38004dbf7550054",
+      "currentSha256": "2b0f19c8d33cb3821fb4685211d4ae3e10daa3222904e1686e43b0276ac2e7dd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033637",
+      "startLine": 86,
+      "endLine": 94,
+      "boundSha256": "ce16db0d7eb6bce6cc01bc395f3e0584722b60b200998e41e0efc6eb1fb6d72f",
+      "currentSha256": "53728307e4448ad52b077b16fa0d10997da5f3a317b6445e67da0a1cfa7d18bd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033638",
+      "startLine": 87,
+      "endLine": 95,
+      "boundSha256": "a0ef9c5c748ba09dc29375297eaff75d07364e15c686959cbde114a4ba6edbc3",
+      "currentSha256": "89c94ab7121b7442d31458cecdddb4052164e183b08d866590efb385f1e7dafb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "dynamic-033639",
+      "startLine": 89,
+      "endLine": 97,
+      "boundSha256": "1893354b742948ae501a0969e68f2775daba9d8054b92b74119e934e27dc8b3e",
+      "currentSha256": "b205fa3943b6f89ef368f324caee0aaeb81f71baadf599632c7eb39095955105",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "author-s5-b6-knowledge-migration-426-70",
+      "startLine": 421,
+      "endLine": 427,
+      "boundSha256": "6cf39065c474f77dd25c38804442fc6ef5c753fe4869d4ff3852a5546b3346cd",
+      "currentSha256": "d3c6bdf6d674b19c22d78afe6ad594f926ef473451a13bbf0808c9ffbf05b4cd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "author-s5-b6-knowledge-migration-720-70",
+      "startLine": 715,
+      "endLine": 721,
+      "boundSha256": "6cf39065c474f77dd25c38804442fc6ef5c753fe4869d4ff3852a5546b3346cd",
+      "currentSha256": "d3c6bdf6d674b19c22d78afe6ad594f926ef473451a13bbf0808c9ffbf05b4cd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:30",
+      "path": "test/scripts/knowledge-migration.test.mjs",
+      "passageId": "author-s5-b6-knowledge-migration-723-43",
+      "startLine": 718,
+      "endLine": 724,
+      "boundSha256": "f165525e96192144c4337d09609ae326466a8db15052c187e33555e0789cc84c",
+      "currentSha256": "0cea8c8c0dd397008b6bf1d3e259bf16ccf972704c93579d9191b0874842dae3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:38",
+      "path": "test/setup/knowledge-doctor.test.mjs",
+      "passageId": "author-s5-b6-knowledge-doctor-168-96",
+      "startLine": 162,
+      "endLine": 168,
+      "boundSha256": "915e8b9516c2869c8c43abfd0a32f479354b2fffe029e7f2bce0ac4cade6ea41",
+      "currentSha256": "b3947edd2df79fd0369d2215595779a9336cf5201223fdd7d4ce89b3657f9cb8",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:38",
+      "path": "test/setup/knowledge-doctor.test.mjs",
+      "passageId": "author-s5-b6-knowledge-doctor-232-96",
+      "startLine": 226,
+      "endLine": 232,
+      "boundSha256": "915e8b9516c2869c8c43abfd0a32f479354b2fffe029e7f2bce0ac4cade6ea41",
+      "currentSha256": "b3947edd2df79fd0369d2215595779a9336cf5201223fdd7d4ce89b3657f9cb8",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
+      "path": "test/state/events-jsonl-truncation-guard.test.mjs",
+      "passageId": "dynamic-037693",
+      "startLine": 291,
+      "endLine": 299,
+      "boundSha256": "b16d74d7c0a44cfa070383692e6abd98c4eb88417a91f8f943197697ba702f23",
+      "currentSha256": "45959ef71861ca4f27ab1c1ea374fd0ae7618dea91b0cb7e4ae2954d7c72994e",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
+      "path": "test/state/events-jsonl-truncation-guard.test.mjs",
+      "passageId": "dynamic-037695",
+      "startLine": 293,
+      "endLine": 301,
+      "boundSha256": "25d6673cf5b75ca89cf6bf5871daf1422ed1916fe741a8220ed1678465d7db21",
+      "currentSha256": "f19113066f830e3bc0bee964f4c2ecfd32d25fec7e0bb58d813762136553ccd1",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
+      "path": "test/state/events-jsonl-truncation-guard.test.mjs",
+      "passageId": "dynamic-037737",
+      "startLine": 474,
+      "endLine": 482,
+      "boundSha256": "5abfd634f1c20101e4ec24beba637e1d86f4d2b5b0a51631fb6d006cbf04053d",
+      "currentSha256": "ceccf34b6eeee5c784eba8a9519453df268f8f3e05c4688e1d5292a2eafb652a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:46",
+      "path": "test/state/events-jsonl-truncation-guard.test.mjs",
+      "passageId": "dynamic-037748",
+      "startLine": 499,
+      "endLine": 507,
+      "boundSha256": "5abfd634f1c20101e4ec24beba637e1d86f4d2b5b0a51631fb6d006cbf04053d",
+      "currentSha256": "ceccf34b6eeee5c784eba8a9519453df268f8f3e05c4688e1d5292a2eafb652a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:57",
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "passageId": "dynamic-001144",
+      "startLine": 864,
+      "endLine": 872,
+      "boundSha256": "6a7fb61a0d04c13793818d2f54138a00d209eef4a255f3a0ac70da514a41f45a",
+      "currentSha256": "d27b41e4a4199aec689b2c92502b14d4868fa8ef0ce800f36a6a2472a128384f",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003940",
+      "startLine": 1156,
+      "endLine": 1164,
+      "boundSha256": "4d4ea6521c3cde1f6d5deaddd7260ecc56a4f9c5f785da72c541ca3b5f451b0f",
+      "currentSha256": "2d096cdd7a7aa345ae7c488371cac58c264e5a87fecdf02578f8971472cb5d21",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003941",
+      "startLine": 1157,
+      "endLine": 1165,
+      "boundSha256": "f87885076d5a43942d64303fb62cedabae48075250e871c14dca3ba0fd54d2ff",
+      "currentSha256": "26eedac90df695278339d6f2691e104f6fb2024f9663c0fe1dad6ad0ca9deb4d",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003948",
+      "startLine": 1227,
+      "endLine": 1235,
+      "boundSha256": "47e33e7d531122c422c695e5803c2a39c95524af8a7dd0c093ded52b764e2051",
+      "currentSha256": "1cf56bc37eb923a58fcb59f886777b131b62c8918923df8e0a32ae55048b729b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003949",
+      "startLine": 1228,
+      "endLine": 1236,
+      "boundSha256": "416a14ae6ad5af8d22d8780282e77b565bb32498ab3e82dad67d7b7abbeb9817",
+      "currentSha256": "18b53a7f54071c879d65e08379fbdae39663b92d9aa982f2841964616e5796cb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003958",
+      "startLine": 1333,
+      "endLine": 1341,
+      "boundSha256": "d4b27c180a589448678d5b75f65d73fd565e9b031901735587cd1110815814f8",
+      "currentSha256": "da837b1603f7242817f5e81461fcf7b4041237dd7f2cdaf075981068a0a3c8c0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003960",
+      "startLine": 1336,
+      "endLine": 1344,
+      "boundSha256": "de4eae004c6dfe1d11f5bf40177d0ed2a6625517e65a0dec83fe249ca40e81ce",
+      "currentSha256": "b3b617b73f93d9e330e42c098b2887ae42ddb82609187dc14ed65fc4d0cbbc34",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003971",
+      "startLine": 1458,
+      "endLine": 1466,
+      "boundSha256": "d4b27c180a589448678d5b75f65d73fd565e9b031901735587cd1110815814f8",
+      "currentSha256": "da837b1603f7242817f5e81461fcf7b4041237dd7f2cdaf075981068a0a3c8c0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003973",
+      "startLine": 1461,
+      "endLine": 1469,
+      "boundSha256": "4d4ea6521c3cde1f6d5deaddd7260ecc56a4f9c5f785da72c541ca3b5f451b0f",
+      "currentSha256": "2d096cdd7a7aa345ae7c488371cac58c264e5a87fecdf02578f8971472cb5d21",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-003974",
+      "startLine": 1462,
+      "endLine": 1470,
+      "boundSha256": "f87885076d5a43942d64303fb62cedabae48075250e871c14dca3ba0fd54d2ff",
+      "currentSha256": "26eedac90df695278339d6f2691e104f6fb2024f9663c0fe1dad6ad0ca9deb4d",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-004044",
+      "startLine": 2284,
+      "endLine": 2292,
+      "boundSha256": "d4b27c180a589448678d5b75f65d73fd565e9b031901735587cd1110815814f8",
+      "currentSha256": "da837b1603f7242817f5e81461fcf7b4041237dd7f2cdaf075981068a0a3c8c0",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-004081",
+      "startLine": 468,
+      "endLine": 476,
+      "boundSha256": "47e33e7d531122c422c695e5803c2a39c95524af8a7dd0c093ded52b764e2051",
+      "currentSha256": "1cf56bc37eb923a58fcb59f886777b131b62c8918923df8e0a32ae55048b729b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-004082",
+      "startLine": 469,
+      "endLine": 477,
+      "boundSha256": "416a14ae6ad5af8d22d8780282e77b565bb32498ab3e82dad67d7b7abbeb9817",
+      "currentSha256": "18b53a7f54071c879d65e08379fbdae39663b92d9aa982f2841964616e5796cb",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:84",
+      "path": "packages/git/rust/tests/publication.rs",
+      "passageId": "dynamic-004101",
+      "startLine": 705,
+      "endLine": 713,
+      "boundSha256": "eb3b9700f5a47d343b10a61bb9fda437c30ee5fc27ce582b7b0e4f5a28f4a61e",
+      "currentSha256": "9c7f2e22fc7b3f7f36c6c731142d7e11ce9008633d51c33632ae54a95a7b0fcd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023202",
+      "startLine": 1046,
+      "endLine": 1054,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023210",
+      "startLine": 1082,
+      "endLine": 1090,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023218",
+      "startLine": 1119,
+      "endLine": 1127,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023227",
+      "startLine": 1153,
+      "endLine": 1161,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023235",
+      "startLine": 1187,
+      "endLine": 1195,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023243",
+      "startLine": 1217,
+      "endLine": 1225,
+      "boundSha256": "59994ce96c7b3b556e47e88c6b7bd3ae65621c2f7c21c946f9997d9751cb4947",
+      "currentSha256": "814ac2394265dff4223cd58d22356347efda57a01848612c92322a81c9642550",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023247",
+      "startLine": 1281,
+      "endLine": 1289,
+      "boundSha256": "e8e383acb6a3e59c65f4fb62d72e61e6b2abe9e2ddcdfd4526856c8ca1f4ca4d",
+      "currentSha256": "a0c59cb472a293b6e029a36ba50241ce72cbc81eee237aadb10be25f7a8caeca",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023249",
+      "startLine": 1282,
+      "endLine": 1290,
+      "boundSha256": "cb0e413b70df366ce498e39e981f14c9fe55e7c60ddeeb7c8efea05c3602ccad",
+      "currentSha256": "3ebfc75819bb45c0ab0ef2f2fcaf63030313ab65679a5b2676389be2d3ae94af",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023252",
+      "startLine": 1300,
+      "endLine": 1308,
+      "boundSha256": "59994ce96c7b3b556e47e88c6b7bd3ae65621c2f7c21c946f9997d9751cb4947",
+      "currentSha256": "814ac2394265dff4223cd58d22356347efda57a01848612c92322a81c9642550",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023257",
+      "startLine": 1364,
+      "endLine": 1372,
+      "boundSha256": "e8e383acb6a3e59c65f4fb62d72e61e6b2abe9e2ddcdfd4526856c8ca1f4ca4d",
+      "currentSha256": "a0c59cb472a293b6e029a36ba50241ce72cbc81eee237aadb10be25f7a8caeca",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023259",
+      "startLine": 1365,
+      "endLine": 1373,
+      "boundSha256": "cb0e413b70df366ce498e39e981f14c9fe55e7c60ddeeb7c8efea05c3602ccad",
+      "currentSha256": "3ebfc75819bb45c0ab0ef2f2fcaf63030313ab65679a5b2676389be2d3ae94af",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023272",
+      "startLine": 1430,
+      "endLine": 1438,
+      "boundSha256": "d5573b4fc9a72302ea3a6002a207e6dabcc09c862a338719c35249d5be2298ab",
+      "currentSha256": "dfeef2191156f5bc6513b62d165da4e52245f478277fdf6c3ea235f9fd3dd05b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023282",
+      "startLine": 1459,
+      "endLine": 1467,
+      "boundSha256": "a5c9c31d572d1e6fd21a2bdb899aaecf857e0e7f22f26f404c0b89cf0443598b",
+      "currentSha256": "59d7c32ea36e32ed83ce2b5a2baa903a98b311e756733b2255b84dc0e8842cc1",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023292",
+      "startLine": 1497,
+      "endLine": 1505,
+      "boundSha256": "d5573b4fc9a72302ea3a6002a207e6dabcc09c862a338719c35249d5be2298ab",
+      "currentSha256": "dfeef2191156f5bc6513b62d165da4e52245f478277fdf6c3ea235f9fd3dd05b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023301",
+      "startLine": 1534,
+      "endLine": 1542,
+      "boundSha256": "a5c9c31d572d1e6fd21a2bdb899aaecf857e0e7f22f26f404c0b89cf0443598b",
+      "currentSha256": "59d7c32ea36e32ed83ce2b5a2baa903a98b311e756733b2255b84dc0e8842cc1",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023404",
+      "startLine": 409,
+      "endLine": 417,
+      "boundSha256": "d5573b4fc9a72302ea3a6002a207e6dabcc09c862a338719c35249d5be2298ab",
+      "currentSha256": "dfeef2191156f5bc6513b62d165da4e52245f478277fdf6c3ea235f9fd3dd05b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023428",
+      "startLine": 534,
+      "endLine": 542,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023433",
+      "startLine": 556,
+      "endLine": 564,
+      "boundSha256": "29afbd85d09581837c3803590e705db500bd55c2e6a84f5c8a82a1fd0d188c49",
+      "currentSha256": "8ce16316fed5ec1ff33ef0ae8c7cae869a433630d3953ee37e12468e333b8fa3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023436",
+      "startLine": 579,
+      "endLine": 587,
+      "boundSha256": "17116b4fcd04d3862470fdaa4c5184c5cbc57b7277b9f4285914fee937800dc1",
+      "currentSha256": "273f606dd10697ef40d280de1264dc6e1d5fcacc88819e6aa7dcbc4ad1ed4bb2",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:114",
+      "path": "test/runner/assignment-runresult.test.mjs",
+      "passageId": "dynamic-023441",
+      "startLine": 601,
+      "endLine": 609,
+      "boundSha256": "29afbd85d09581837c3803590e705db500bd55c2e6a84f5c8a82a1fd0d188c49",
+      "currentSha256": "8ce16316fed5ec1ff33ef0ae8c7cae869a433630d3953ee37e12468e333b8fa3",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024086",
+      "startLine": 1134,
+      "endLine": 1142,
+      "boundSha256": "3294443ee25133a1a919b694699f14cc15cfa41d0b889db33b34b6949c2957b1",
+      "currentSha256": "46448c3c27676ba92b0520df83251f3aef225874e3e8b83d76fd65aed7a1f358",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024087",
+      "startLine": 1135,
+      "endLine": 1143,
+      "boundSha256": "1118b1db37cde2838237bb4e90869d535b7be6e1a961accb716fe19f59237b71",
+      "currentSha256": "2bce2c9fd8c4818d4d44f45e1886d087dce7a7682ef891201b77da486206664a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024102",
+      "startLine": 1243,
+      "endLine": 1251,
+      "boundSha256": "3294443ee25133a1a919b694699f14cc15cfa41d0b889db33b34b6949c2957b1",
+      "currentSha256": "46448c3c27676ba92b0520df83251f3aef225874e3e8b83d76fd65aed7a1f358",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024103",
+      "startLine": 1244,
+      "endLine": 1252,
+      "boundSha256": "1118b1db37cde2838237bb4e90869d535b7be6e1a961accb716fe19f59237b71",
+      "currentSha256": "2bce2c9fd8c4818d4d44f45e1886d087dce7a7682ef891201b77da486206664a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024197",
+      "startLine": 492,
+      "endLine": 500,
+      "boundSha256": "86143614d0407af869bd28f899c5190cabe9322cddc2dfe110ad059467aa136f",
+      "currentSha256": "aec60857588dd32d169731e07afff8fb1c0f95a7d3f13cd7de7f4c413a65cbb5",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:123",
+      "path": "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "passageId": "dynamic-024211",
+      "startLine": 596,
+      "endLine": 604,
+      "boundSha256": "86143614d0407af869bd28f899c5190cabe9322cddc2dfe110ad059467aa136f",
+      "currentSha256": "aec60857588dd32d169731e07afff8fb1c0f95a7d3f13cd7de7f4c413a65cbb5",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:133",
+      "path": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+      "passageId": "dynamic-025001",
+      "startLine": 336,
+      "endLine": 344,
+      "boundSha256": "78ec4f1bb1138446093c5c266e77db3ac2c0122b9129ada4d954211a53aa529d",
+      "currentSha256": "23e29c0d569a0fa90116a0000cb3ac7e12d45b8cea33968771e07219d8a4663b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:133",
+      "path": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+      "passageId": "dynamic-025011",
+      "startLine": 397,
+      "endLine": 405,
+      "boundSha256": "78ec4f1bb1138446093c5c266e77db3ac2c0122b9129ada4d954211a53aa529d",
+      "currentSha256": "23e29c0d569a0fa90116a0000cb3ac7e12d45b8cea33968771e07219d8a4663b",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:183",
+      "path": "test/rust-host/fgctl-upgrade.test.mjs",
+      "passageId": "dynamic-031188",
+      "startLine": 576,
+      "endLine": 584,
+      "boundSha256": "2be7e5bf953b71b2771190f106b891e7ff3823bfab78ed4ee0efd1af9d3c64a6",
+      "currentSha256": "e0680743c84b7f644c18e4f97da416cb3a03baccf163911bfd8bbdcf35d27024",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:183",
+      "path": "test/rust-host/fgctl-upgrade.test.mjs",
+      "passageId": "dynamic-031204",
+      "startLine": 631,
+      "endLine": 639,
+      "boundSha256": "2be7e5bf953b71b2771190f106b891e7ff3823bfab78ed4ee0efd1af9d3c64a6",
+      "currentSha256": "e0680743c84b7f644c18e4f97da416cb3a03baccf163911bfd8bbdcf35d27024",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:225",
+      "path": "test/setup/observe-doctor-checks.test.mjs",
+      "passageId": "dynamic-036111",
+      "startLine": 119,
+      "endLine": 127,
+      "boundSha256": "a66eb49d777ac3b06b7cec8aaf9a53b17f48eb225fd17bd0b2acc83a308d2cc4",
+      "currentSha256": "deffb16a6d7e30c3adb87c99013eaf856cec9321c2ecce866fb227f253a723ea",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:225",
+      "path": "test/setup/observe-doctor-checks.test.mjs",
+      "passageId": "dynamic-036115",
+      "startLine": 153,
+      "endLine": 161,
+      "boundSha256": "a66eb49d777ac3b06b7cec8aaf9a53b17f48eb225fd17bd0b2acc83a308d2cc4",
+      "currentSha256": "deffb16a6d7e30c3adb87c99013eaf856cec9321c2ecce866fb227f253a723ea",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
+      "path": "test/workflow/workflow-runner.test.mjs",
+      "passageId": "dynamic-039478",
+      "startLine": 1043,
+      "endLine": 1051,
+      "boundSha256": "bde92faa34f81342b71d7e14891bdd5523d0353612fa8bd84f0e9a5e9317369a",
+      "currentSha256": "1a226bb8f9ef4d30e029d7c6a2084551aebfa709f51eb48fc8910e5c95605631",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
+      "path": "test/workflow/workflow-runner.test.mjs",
+      "passageId": "dynamic-039574",
+      "startLine": 1653,
+      "endLine": 1661,
+      "boundSha256": "23f4440fc8f32b15df0b03fd00007c0adb22b2b7b5255044acac1a0a2de70154",
+      "currentSha256": "684d5c169bc716b342506f3aa8ea29f09adf61b2796e9913eb93f4f621b977ab",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
+      "path": "test/workflow/workflow-runner.test.mjs",
+      "passageId": "dynamic-039590",
+      "startLine": 1702,
+      "endLine": 1710,
+      "boundSha256": "23f4440fc8f32b15df0b03fd00007c0adb22b2b7b5255044acac1a0a2de70154",
+      "currentSha256": "684d5c169bc716b342506f3aa8ea29f09adf61b2796e9913eb93f4f621b977ab",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl:263",
+      "path": "test/workflow/workflow-runner.test.mjs",
+      "passageId": "dynamic-039846",
+      "startLine": 983,
+      "endLine": 991,
+      "boundSha256": "bde92faa34f81342b71d7e14891bdd5523d0353612fa8bd84f0e9a5e9317369a",
+      "currentSha256": "1a226bb8f9ef4d30e029d7c6a2084551aebfa709f51eb48fc8910e5c95605631",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "passageId": "reference-000193",
+      "startLine": 527,
+      "endLine": 531,
+      "boundSha256": "7fc85c53aaebbe54a6e358dd5a8fbd9233517951ae44de58fcee70950116e750",
+      "currentSha256": "a6f6f914857f6359928396ae5daa86e151136fd634841bc3f9f7772dec671af4",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "passageId": "reference-000195",
+      "startLine": 561,
+      "endLine": 565,
+      "boundSha256": "7fc85c53aaebbe54a6e358dd5a8fbd9233517951ae44de58fcee70950116e750",
+      "currentSha256": "a6f6f914857f6359928396ae5daa86e151136fd634841bc3f9f7772dec671af4",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "passageId": "dynamic-000779",
+      "startLine": 528,
+      "endLine": 532,
+      "boundSha256": "55553dfa975f2a183a0d784fa67a8252834cc48063c1ae8b4ddbd5ee2e8ca655",
+      "currentSha256": "216fcfdaad8fe2adc3d6b3e03f19abef8a005b0a6f601984d02363002e4e4b84",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl:2",
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "passageId": "dynamic-000789",
+      "startLine": 562,
+      "endLine": 566,
+      "boundSha256": "55553dfa975f2a183a0d784fa67a8252834cc48063c1ae8b4ddbd5ee2e8ca655",
+      "currentSha256": "216fcfdaad8fe2adc3d6b3e03f19abef8a005b0a6f601984d02363002e4e4b84",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "path": "bin/fgos.mjs",
+      "passageId": "dynamic-001295",
+      "startLine": 1293,
+      "endLine": 1301,
+      "boundSha256": "4d50765b0cd8adc06fb1991cb16b6acbd1601ea5b952957a2bf7fbbb51bcd974",
+      "currentSha256": "652ba3e05d72d4892eac8d95fc7eabd0a590c76882e7537e4073845efebde958",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl:13",
+      "path": "bin/fgos.mjs",
+      "passageId": "dynamic-001297",
+      "startLine": 1330,
+      "endLine": 1338,
+      "boundSha256": "4d50765b0cd8adc06fb1991cb16b6acbd1601ea5b952957a2bf7fbbb51bcd974",
+      "currentSha256": "652ba3e05d72d4892eac8d95fc7eabd0a590c76882e7537e4073845efebde958",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "path": "src/setup/registrations.mjs",
+      "passageId": "dynamic-014175",
+      "startLine": 1713,
+      "endLine": 1717,
+      "boundSha256": "52fb81b692147cef8bd60bedc3265d8fc20604d06004522b5b1ab791b557e15a",
+      "currentSha256": "1bb5ed2215a5f3137c50b90853188946a7d7a13fb28d829c2d2e85f69eb08d74",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "path": "src/setup/registrations.mjs",
+      "passageId": "dynamic-014179",
+      "startLine": 1761,
+      "endLine": 1765,
+      "boundSha256": "52fb81b692147cef8bd60bedc3265d8fc20604d06004522b5b1ab791b557e15a",
+      "currentSha256": "1bb5ed2215a5f3137c50b90853188946a7d7a13fb28d829c2d2e85f69eb08d74",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl:21",
+      "path": "src/setup/registrations.mjs",
+      "passageId": "dynamic-014744",
+      "startLine": 5621,
+      "endLine": 5625,
+      "boundSha256": "915458f292766029a5aee38b498edbddcf0da70764e41eb5f4159759a28b8ff1",
+      "currentSha256": "9ccaf9ba9ba8e55cd78eb77918ff22707cfe6646d88ce5fc9fb0e7d85ac60cdd",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "passageId": "dynamic-024493",
+      "startLine": 141,
+      "endLine": 149,
+      "boundSha256": "d8ffcb91cf9631cf25b2f78bf189773da2e0e1712a4b79e5e3ef15f0595a6209",
+      "currentSha256": "8334c1fa7bd4d019b4c1332642e5da31ec020f633e2f611d8cf2402cf5843036",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "passageId": "dynamic-024499",
+      "startLine": 222,
+      "endLine": 230,
+      "boundSha256": "d8ffcb91cf9631cf25b2f78bf189773da2e0e1712a4b79e5e3ef15f0595a6209",
+      "currentSha256": "8334c1fa7bd4d019b4c1332642e5da31ec020f633e2f611d8cf2402cf5843036",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "passageId": "dynamic-024504",
+      "startLine": 314,
+      "endLine": 322,
+      "boundSha256": "ad82a9e7f7b659041b929e9fe0bf2506eb643d327d063455bb79d771aac50dc8",
+      "currentSha256": "0ee89b1e82151cd2dc8f80f056c963d1836743e4ceaffdb643c97761062b3a10",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "passageId": "dynamic-024506",
+      "startLine": 358,
+      "endLine": 366,
+      "boundSha256": "ad82a9e7f7b659041b929e9fe0bf2506eb643d327d063455bb79d771aac50dc8",
+      "currentSha256": "0ee89b1e82151cd2dc8f80f056c963d1836743e4ceaffdb643c97761062b3a10",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:13",
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "passageId": "dynamic-024516",
+      "startLine": 580,
+      "endLine": 588,
+      "boundSha256": "d8ffcb91cf9631cf25b2f78bf189773da2e0e1712a4b79e5e3ef15f0595a6209",
+      "currentSha256": "8334c1fa7bd4d019b4c1332642e5da31ec020f633e2f611d8cf2402cf5843036",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:20",
+      "path": "test/runner/worktree.test.mjs",
+      "passageId": "dynamic-030218",
+      "startLine": 1176,
+      "endLine": 1184,
+      "boundSha256": "d763e620f8feda789559df775b39f7db1374b0eaa44e833a16eef62190b6843b",
+      "currentSha256": "695f521b8d2ed3683bc2e464184f8357ccb8673c06a714ae869e98ede4b7714a",
+      "difference": "one final LF only"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl:20",
+      "path": "test/runner/worktree.test.mjs",
+      "passageId": "dynamic-030223",
+      "startLine": 1204,
+      "endLine": 1212,
+      "boundSha256": "d763e620f8feda789559df775b39f7db1374b0eaa44e833a16eef62190b6843b",
+      "currentSha256": "695f521b8d2ed3683bc2e464184f8357ccb8673c06a714ae869e98ede4b7714a",
+      "difference": "one final LF only"
+    }
+  ],
+  "dispositionChanges": [],
+  "semantics": "Only one added/removed final LF; not arbitrary whitespace or CRLF normalization."
+}

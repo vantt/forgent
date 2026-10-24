@@ -1,0 +1,9 @@
+{
+  "records": 574,
+  "distinctEvidenceBodies": 20621,
+  "counts": {
+    "still-valid-as-recorded": 229,
+    "owned-park": 338,
+    "needs-recomposition": 7
+  }
+}

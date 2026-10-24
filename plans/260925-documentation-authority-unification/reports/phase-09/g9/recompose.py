@@ -16,7 +16,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-TMP = Path('/tmp/fgos-work/w10-g9-rework')
+TMP = Path('/tmp/fgos-work/w11-g9')
 TMP.mkdir(parents=True, exist_ok=True)
 
 
