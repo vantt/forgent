@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5d7cab416542080773bde7c687898ffb179cd7b9b6371db2d95571606512e8dd",
+  "payloadDigest": "771244d08149dfbef3b7fb4050a36c65920da76813fe23f8344ed65212932511",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -982,6 +982,7 @@
     "src/setup/blind-steps-proven-pools.mjs": "d4f7875c55bac7eaf7cad6e70317a48e7ae120d90fb58931c9258a1a478ab0bb",
     "src/setup/checks.mjs": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
+    "src/setup/config-checks.mjs": "719e03ec310567d1f5c84604ad779c23fe577b28ec78254e37e05de7a3b00b1f",
     "src/setup/config-merge.mjs": "2780e5fb05bb3a10aecff0f21eca4394738489960c2dbd9d86dff9f6c74cc176",
     "src/setup/event-store-checks.mjs": "2af5215a4933ea47638121c0997e8684fe9afb5eb6a616bf8bab8757cd24f645",
     "src/setup/event-store-fixes.mjs": "c02842cf801adb41fb3e338c025bc519159833ee256dca558202f19e97d453b2",
@@ -997,7 +998,7 @@
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/model-pool-checks.mjs": "70a0da781563716c82e93ab0563da0e9c19b3cefe112588cf5a65e94842c87e0",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "fa8fd88bdcc6a4d083a3d9b828dedc2c765a37c68c1534dbbb6c3428f7429710",
+    "src/setup/registrations.mjs": "6eb54f673b99cf1fc227c02ff162e8bcbbf6a584d0a2e4cb35e15e393d102d1f",
     "src/setup/run-supervisor-checks.mjs": "b5919215aaa5f3910306a6f6edb53aa2eb9d60382c6505d46975776d44c369e9",
     "src/setup/seat-binding-checks.mjs": "99b7fd75a9449d67c6596d6b0cee652fd6bde3c6b74a5643288a83699486d73f",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
@@ -3124,77 +3125,77 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3028,
+      "line": 2976,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3042,
+      "line": 2990,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3096,
+      "line": 3044,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3108,
+      "line": 3056,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5502,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
+      "line": 5450,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1567",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5549,
+      "line": 5497,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:703",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5590,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
+      "line": 5538,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1567",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5597,
+      "line": 5545,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:522",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5982,
+      "line": 5930,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6233,
+      "line": 6181,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6303,
+      "line": 6251,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

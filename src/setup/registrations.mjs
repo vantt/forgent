@@ -25,7 +25,6 @@ import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflo
 // exactly as before (D2 of the gate-bypass item — no default-behavior
 // change).
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -108,6 +107,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
+import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -171,6 +171,26 @@ export const CONFIG_DEFAULT_REGISTRATIONS = [];
 export const FIX_REGISTRATIONS = [];
 
 /**
+ * A refused config file, or a door that cannot answer, fails the row that read it with the door's own message
+ * (file, position, path, never a value; for a missing addon, the command that onboards the project) instead of
+ * ending the whole doctor run. Anything else is a bug and propagates.
+ */
+function reportConfigRefusal(check) {
+  const failed = (err) => {
+    if (isConfigDoorFailure(err)) return { passed: false, message: err.message };
+    throw err;
+  };
+  return (...args) => {
+    try {
+      const result = check(...args);
+      return typeof result?.then === 'function' ? result.catch(failed) : result;
+    } catch (err) {
+      return failed(err);
+    }
+  };
+}
+
+/**
  * Register a doctor check (D1/D2). `id` must be unique among registered
  * checks — a duplicate is a programming error (two modules picked the same
  * name), not a runtime condition to degrade gracefully on, so it throws.
@@ -185,7 +205,7 @@ export function registerCheck({ id, description, check }) {
   if (typeof check !== 'function') {
     throw new Error(`registerCheck("${id}") requires a check function`);
   }
-  DOCTOR_CHECKS.push({ id, description, check });
+  DOCTOR_CHECKS.push({ id, description, check: reportConfigRefusal(check) });
 }
 
 /**
@@ -2912,82 +2932,10 @@ registerFix({
   fix: (cwd) => fixIronLawConfigured(cwd),
 });
 
-// tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
-// 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
-// `gateway.port` (apps/fgos-gateway/src/gateway.rs's `load_gateway_config`,
-// D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
-// never provisioned the section, and `fgos doctor` had no way to notice,
-// violating AGENTS.md's own install/setup/doctor gate.
-//
-// This reads/writes `os.homedir()` explicitly, NOT the `cwd` every other
-// check/fix in this file receives -- `load_gateway_config` reads
-// `~/.fgos/config.json` specifically (a machine-level secret, not a
-// per-project one), so checking/fixing `cwd`'s own `.fgos/config.json`
-// would silently target the wrong file entirely.
-const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
-
-// Matches apps/fgos-gateway/src/gateway.rs's own `DEFAULT_PORT`.
-const DEFAULT_GATEWAY_PORT = 4170;
-
-function checkGatewayTokenConfigured() {
-  const home = GATEWAY_HOME_CONFIG_DIR();
-  const shared = readSharedConfig(home);
-  const token = shared?.gateway?.token;
-  if (typeof token !== 'string' || token.trim() === '') {
-    return {
-      passed: false,
-      message: `gateway.token missing from ${sharedConfigFilePath(home)} -- run fgos doctor --fix`,
-    };
-  }
-  return { passed: true, message: 'gateway.token present' };
-}
-
-// Idempotent (same discipline fixGateBypassConfigured above already uses):
-// an already-present token is left untouched and reported unchanged, never
-// rotated out from under a client that already has it.
-function fixGatewayTokenConfigured() {
-  const home = GATEWAY_HOME_CONFIG_DIR();
-  const shared = readSharedConfig(home);
-  const existingToken = shared?.gateway?.token;
-  if (typeof existingToken === 'string' && existingToken.trim() !== '') {
-    return { changed: false, message: 'gateway.token already present' };
-  }
-  const existingGateway =
-    shared.gateway && typeof shared.gateway === 'object' && !Array.isArray(shared.gateway) ? shared.gateway : {};
-  // 256 bits, not crypto.randomUUID()'s 122 -- this is a bearer secret,
-  // not a non-secret session id (session.mjs's own use of randomUUID is a
-  // different kind of value).
-  const token = crypto.randomBytes(32).toString('hex');
-  const merged = {
-    ...shared,
-    gateway: { port: existingGateway.port ?? DEFAULT_GATEWAY_PORT, ...existingGateway, token },
-  };
-  writeSharedConfig(home, merged);
-  return { changed: true, message: `wrote a new gateway.token to ${sharedConfigFilePath(home)}` };
-}
-
-registerConfigDefault({
-  id: 'gateway',
-  key: 'gateway',
-  // `token: null` -- present but unarmed, the same shape `workerSlots`'s
-  // own `ceiling: null` registration already uses below: shipping a real
-  // value here would mean every fresh install gets the SAME shared,
-  // predictable secret, defeating D4's whole point. A real token only
-  // ever comes from fixGatewayTokenConfigured's own crypto.randomBytes
-  // call, run explicitly via `fgos doctor --fix`.
-  shape: { port: DEFAULT_GATEWAY_PORT, token: null },
-});
-
-registerCheck({
-  id: 'gateway-token-configured',
-  description: 'gateway.token in ~/.fgos/config.json (home, not project) is present and non-empty',
-  check: () => checkGatewayTokenConfigured(),
-});
-
-registerFix({
-  id: 'gateway-token-configured',
-  fix: () => fixGatewayTokenConfigured(),
-});
+// The rows over the config files themselves, from the config crate's contract (spec section 11), and their
+// repairs; the gateway token row is the contract's machine-files row.
+for (const entry of CONFIG_CHECKS) registerCheck(entry);
+for (const entry of CONFIG_FIXES) registerFix(entry);
 
 // tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new
 // project set up via `fgos setup` never got the fgOS Claude Code plugin
