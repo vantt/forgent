@@ -71,3 +71,5 @@ Nhánh `mailbox/v1-v3` đang ở `e8d5b3de5`, chưa merge main. V7a–V7f (phầ
 | 6 | **Xác nhận máy tin cậy cho thư xuyên máy** | **B**: trạng thái `confirmed` nằm trong IDENT, mailbox chỉ thêm một công tắc | Lead IDENT đồng ý. |
 | 7 | Có thử **Codex với effort cao hơn** không (khoảng 20 lần chạy) | Không bắt buộc | V7c đo ở effort `low`, đã ghim trong pre-registration. |
 | 8 | **Pointer mode**: giữ hay bỏ, vì không còn dùng tới sau V7c | Bỏ, nếu kênh đánh thức không dùng tới | |
+
+**Owner trả lời 2026-10-24 09:59:** 1 ok (đo nhánh có hại với khung socket thật của Claude), 2 ok (chạy probe tương tác), 4 ok (pi với model Claude), 5 ok theo khuyến nghị (không thử Codex effort cao), 6 ok (Q4 = B, chưa ghi thời điểm claim), 7 ok (B: trạng thái `confirmed` trong IDENT, mailbox chỉ có công tắc `requireConfirmed`), 8 ok (bỏ pointer mode). Câu 3 (P3: đăng nhập Gemini) chưa trả lời.
