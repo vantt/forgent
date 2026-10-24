@@ -1,0 +1,156 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": "{\n  \"files\": 545,\n  \"driftedChainInputs\": 15,\n  \"problems\": [],\n  \"patchInvocations\": 1515\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": "{\n  \"records\": 574,\n  \"distinctEvidenceBodies\": 20621,\n  \"counts\": {\n    \"still-valid-as-recorded\": 214,\n    \"owned-park\": 353,\n    \"needs-recomposition\": 7\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": "{\n  \"pin\": \"cd4f80eccbb5c44893daec58af416395d139494b\",\n  \"status\": \"pass\",\n  \"uniqueRecords\": 574,\n  \"cohortMemberships\": 684,\n  \"effectiveFiles\": 545,\n  \"purePinFieldsVerified\": 10,\n  \"patchIdEquivalencesVerified\": 12,\n  \"negativeControls\": [\n    \"changed passage digest rejects judgment\",\n    \"missing row rejects judgment\",\n    \"changed record body rejects judgment\",\n    \"same source bytes at another commit retain their content-bound judgment\"\n  ],\n  \"independentAcceptance\": false,\n  \"scope\": \"Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure.\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": null,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+      "stdoutSha256": "09dad1bdf7f6f9e40af72f7e232f8e99443bc077157aa0180efd1ec1a851ff7d"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--pin",
+        "HEAD^",
+        "--check"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": null,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/g9/same-bytes-pin-check.json",
+      "stdoutSha256": "0a8d1901a1a84cb3e6b7c3a403329e5c57a5d948dea1f3f1dbccebb042522fa9"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--pin",
+        "5e03159334df726e43ffe9505ad4ed43f72ba94d",
+        "--check"
+      ],
+      "exit": 1,
+      "expectedExit": 1,
+      "stdout": null,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/g9/historical-pin-negative.json",
+      "stdoutSha256": "38bcd01899b32edec876a68bf6170d6ce6dbf7ea449a740b68161f8789444384"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": "{\n  \"files\": 545,\n  \"driftedChainInputs\": 15,\n  \"problems\": [],\n  \"patchInvocations\": 1515\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": "{\n  \"records\": 574,\n  \"distinctEvidenceBodies\": 20621,\n  \"counts\": {\n    \"still-valid-as-recorded\": 214,\n    \"owned-park\": 353,\n    \"needs-recomposition\": 7\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "stdout": null,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+      "stdoutSha256": "09dad1bdf7f6f9e40af72f7e232f8e99443bc077157aa0180efd1ec1a851ff7d"
+    }
+  ],
+  "scope": "Final proof commands. Per-patch invocations: patch-commands.json and verification-commands.json; per-source Git reads: source-read-commands.json and sweep-check.json.commands. Earlier exploratory/failed attempts are disclosed in receipt.md.",
+  "finalFollowup": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py",
+        "--pin",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\n  \"pin\": \"cd4f80eccbb5c44893daec58af416395d139494b\",\n  \"status\": \"pass\",\n  \"uniqueRecords\": 574,\n  \"cohortMemberships\": 684,\n  \"effectiveFiles\": 545,\n  \"purePinFieldsVerified\": 10,\n  \"patchIdEquivalencesVerified\": 12,\n  \"negativeControls\": [\n    \"changed passage digest rejects judgment\",\n    \"missing row rejects judgment\",\n    \"changed record body rejects judgment\",\n    \"same source bytes at another commit retain their content-bound judgment\"\n  ],\n  \"independentAcceptance\": false,\n  \"scope\": \"Byte/provenance replay only; no owning product parity, semantic approval, final pin F or gate closure.\"\n}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdoutArtifact": "plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json",
+      "stdoutSha256": "09dad1bdf7f6f9e40af72f7e232f8e99443bc077157aa0180efd1ec1a851ff7d"
+    }
+  ]
+}

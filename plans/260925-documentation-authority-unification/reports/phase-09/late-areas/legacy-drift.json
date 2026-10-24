@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "L13-4 section 4; w2-d6-brief task 3",
-  "head": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+  "head": "5965143b4fd56df6698b2096df1a672d26293c90",
   "finalSourcePin": "5e03159334df726e43ffe9505ad4ed43f72ba94d",
   "finalSourcePinEvidence": "reports/phase-08/step-07-final-determinism.json sourceCommit; L12-124",
   "inventoryPin": "f0c76c5e590339d9c815038539ff1f4a072c64e4",

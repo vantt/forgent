@@ -1,0 +1,15 @@
+{
+  "first": {
+    "recomposed.json": "1d0fed91705f87af92d0b6cb20e0e6715363227b08ab449faf783b1610dc742f",
+    "judgments.json": "e362272d0d40adae68eb56fd6c7d6560b9c574495bcdd147ff26b75d1d455545",
+    "passages.json": "da39c723559f69debe050336551ad14cad6602867bfe6298bd8a7baf82d690a4",
+    "source-context.json": "47436e537d3fad595bac3739d0aeab43644f594bc62ef5e8f6a812cef53f4f71"
+  },
+  "second": {
+    "recomposed.json": "1d0fed91705f87af92d0b6cb20e0e6715363227b08ab449faf783b1610dc742f",
+    "judgments.json": "e362272d0d40adae68eb56fd6c7d6560b9c574495bcdd147ff26b75d1d455545",
+    "passages.json": "da39c723559f69debe050336551ad14cad6602867bfe6298bd8a7baf82d690a4",
+    "source-context.json": "47436e537d3fad595bac3739d0aeab43644f594bc62ef5e8f6a812cef53f4f71"
+  },
+  "byteIdentical": true
+}

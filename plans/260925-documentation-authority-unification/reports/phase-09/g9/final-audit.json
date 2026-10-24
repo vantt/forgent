@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "cd4f80eccbb5c44893daec58af416395d139494b\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json\nplans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json\nplans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json\nplans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json\nplans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json\nplans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json\nplans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json\nplans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json\nplans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": " M plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g0fix/needs-writes.json\n M plans/260925-documentation-authority-unification/reports/phase-09/g0fix/receipt.json\n M plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json\n M plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json\n M plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json\n M plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json\n M plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json\n M plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/determinism.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/historical-pin-negative.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/judge.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/judgments.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/passages.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/patch-commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/provenance.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/reading-map-resolution.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/receipt.md\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/recompose.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/recomposed.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/record-repins.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/same-bytes-pin-check.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/sha-map.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/source-context.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/source-read-commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep-check.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/sweep.py\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/verification-commands.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/verification.json\n?? plans/260925-documentation-authority-unification/reports/phase-09/g9/verify.py\n",
+      "stderr": ""
+    }
+  ],
+  "stagedPaths": [],
+  "sourcePathsUnaffectedByRecordRepins": true,
+  "forbiddenProductWrites": [],
+  "needsWrites": []
+}

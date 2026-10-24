@@ -1,7 +1,7 @@
 {
   "needsWrites": [],
   "status": "resolved; pilot continuation applied and independently reviewable",
-  "continuationSourceCommit": "a27d85d0a",
+  "continuationSourceCommit": "e7074223277e2879d6599f57656037f8efa31ee9",
   "originalNeedsWrites": [
     "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
   ],
