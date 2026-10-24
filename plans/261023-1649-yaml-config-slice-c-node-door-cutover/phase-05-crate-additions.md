@@ -45,3 +45,11 @@ Three things the door needs that no landed code provides:
 ## Rollback
 
 Revert: three additive functions, one contract file; nothing calls them until phase 06.
+
+## Landed (2026-10-24, landing B)
+
+- `write::init(roots, target, lock_root, lock_wait_ms) -> InitResult { created, revision }` (no `ctx` or writer: the file holds no value and no `[actor]`); `machine::snapshot(ctx, global_dir, class)`, `machine::context(detectors)` (process-wide bundle in a `OnceLock`), `detect::PathDetectors { path }`, `contracts/detected.v1.json`. `produce` and `init` share one `header_text()`.
+- `snapshot.rs` changed (outside the file list): `read_sources` is now `machine_reads` + `collect`, and `machine_sources` exposes the machine half, +17 net lines. The machine view is the same `build` over those sources, not a project root pointed at a missing directory.
+- The proofs are plain Rust cases over real temp directories (`golden_init.rs` 4 tests, `detect_path.rs` 5, `machine_view.rs` 5), not fixture JSON files: nothing in them is data another runner needs. The template pin compares `detected.v1.json` with `runner.executors.claude.invocations[0]` of the bundled standard; the `DEFAULT_RUNNER_CONFIG` half of the pin waits for the JS copy's deletion (phase 10).
+- Lines added (net): `write.rs` 72 (cap 80), `detect.rs` 49 (cap 80), `machine.rs` 44 (cap 50), `snapshot.rs` 17.
+- The snapshot cache (`cache.rs`) is request-keyed over `read_sources`, so the machine view is not cached by the crate; phase 06 keeps it uncached in the addon too (a machine read is global file, accounts file and the shared bundle: measured in phase 08).

@@ -277,6 +277,15 @@ pub fn commit_observed(
     Ok(result)
 }
 
+/// What a new file holds before any key: the grammar line and the header, and a blank line.
+fn header_text() -> String {
+    let lines = header_lines(1)
+        .iter()
+        .map(|l| format!("# {l}\n"))
+        .collect::<String>();
+    lines + "\n"
+}
+
 type Edited = (Vec<u8>, Vec<(String, bool)>, Vec<(&'static str, String)>);
 
 /// Whether the edits write no value: each sets what the key inherits already on a key the file does
@@ -310,11 +319,7 @@ pub(crate) fn produce(
     base: Option<&LoadedFile>,
     name: &str,
 ) -> Result<Edited, SnapshotError> {
-    let header = header_lines(1)
-        .iter()
-        .map(|l| format!("# {l}\n"))
-        .collect::<String>()
-        + "\n";
+    let header = header_text();
     let mut doc = parse(
         base.map_or(header.as_bytes(), |f| &f.bytes),
         Profile::StrictConfig,
@@ -429,4 +434,71 @@ pub fn refresh(
 ) -> Result<WriteResult, SnapshotError> {
     req.edits = vec![Edit::Docs];
     commit_observed(ctx, &req, writer, observe)
+}
+
+/// What [`init`] found or made.
+#[derive(Debug, PartialEq, Eq)]
+pub struct InitResult {
+    pub created: bool,
+    /// The revision of the file now (the existing one when nothing was created).
+    pub revision: String,
+}
+
+/// Creates the file of a project or the global scope holding the header and nothing else, only when
+/// the scope has no file: create-only, under the scope's lock, beneath its root without following a
+/// symlink. An existing `config.yaml` or legacy `config.json` is left alone (a legacy file is
+/// migrated, never shadowed). A confined session is refused.
+pub fn init(
+    roots: &SnapshotRequest,
+    target: SourceKind,
+    lock_root: &Path,
+    lock_wait_ms: u64,
+) -> Result<InitResult, SnapshotError> {
+    if roots.class == SessionClass::Confined {
+        return Err(ConfigRefusal::new("config-write-confined").into());
+    }
+    let project = match target {
+        SourceKind::Project => true,
+        SourceKind::Global => false,
+        SourceKind::Accounts => return Err(ConfigRefusal::new("config-key-out-of-scope").into()),
+    };
+    let (root, dir, name) = place(roots, target)?;
+    let mode = if project { 0o755 } else { PRIVATE_DIR_MODE };
+    let held = dir_identity(&root, &dir, mode)?;
+    let (lock, fgos_dir) = if project {
+        (PROJECT_CONFIG, root.join(&dir))
+    } else {
+        (GLOBAL_CONFIG, PathBuf::new())
+    };
+    let _scope = hold(lock, &fgos_dir, lock_root, lock_wait_ms)?;
+    let max = Profile::StrictConfig.limits().input_bytes;
+    let existing = |source: Source| match source {
+        Source::Yaml(file) | Source::LegacyJson(file) => Some(file.revision),
+        Source::Absent => None,
+    };
+    if let Some(revision) = existing(select_source(&root, &dir, max)?) {
+        return Ok(InitResult {
+            created: false,
+            revision,
+        });
+    }
+    if dir_identity(&root, &dir, mode)? != held {
+        return Err(conflict("directory-changed"));
+    }
+    let bytes = header_text().into_bytes();
+    let file_mode = if project { 0o644 } else { PRIVATE_FILE_MODE };
+    match install_once_with_mode(&root.join(&dir), name, &bytes, file_mode).map_err(io_error)? {
+        Installed::Created => Ok(InitResult {
+            created: true,
+            revision: sha(&bytes),
+        }),
+        // Lost a race with a creator outside the lock.
+        Installed::AlreadyExists => {
+            let revision = existing(select_source(&root, &dir, max)?);
+            Ok(InitResult {
+                created: false,
+                revision: revision.ok_or_else(|| conflict("revision-changed"))?,
+            })
+        }
+    }
 }
