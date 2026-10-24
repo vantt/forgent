@@ -10,6 +10,7 @@
 #   FAKE_HERDR_READ_JSON     set: `pane read` answers in the JSON envelope (older herdr)
 #   FAKE_HERDR_GARBLE     set: every command answers text that is not JSON
 #   FAKE_HERDR_FDS        file that receives the list of open fds of this process
+#   FAKE_HERDR_SHELL_PID  the shell pid `pane process-info` reports, replacing the recorded one
 #   FAKE_HERDR_FOREGROUND  `shell`: `pane process-info` reports only the shell in the
 #                         foreground (default: a foreign `sleep 300`), and text typed at the
 #                         pane (`pane send-text`, `agent prompt`) is run by a shell, as the
@@ -21,6 +22,7 @@ fi
 if [ -n "$FAKE_HERDR_FDS" ]; then ls /proc/$$/fd > "$FAKE_HERDR_FDS" 2>/dev/null; fi
 if [ "$1" = "--session" ]; then shift 2; fi
 [ "$1" = "--version" ] && { echo "herdr 0.9.1-fake"; exit 0; }
+[ "$1 $2 $3" = "agent start --help" ] && [ -z "$FAKE_HERDR_GARBLE" ] && { cat "$dir/agent-start-help.txt"; exit 0; }
 [ "$3" = "--help" ] && { echo "usage"; exit 0; }
 [ -n "$FAKE_HERDR_GARBLE" ] && { echo "oops, not json"; exit 0; }
 case "$FAKE_HERDR_HANG" in "$1 $2") exec sleep 30 ;; esac
@@ -40,12 +42,13 @@ case "$1 $2" in
   "workspace create") cat "$dir/tab-create.json" ;;
   "status server") sed "s#\"socket\":\"[^\"]*\"#\"socket\":\"$FAKE_HERDR_SOCKET\"#" "$dir/status-server.json" ;;
   "tab create") cat "$dir/tab-create.json" ;;
-  "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent start"|"agent prompt"|"pane report-agent") cat "$dir/pane-close-ok.json" ;;
+  "integration status") cat "$dir/integration-status.txt" ;;
+  "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent prompt") cat "$dir/pane-close-ok.json" ;;
   "pane split") cat "$dir/pane-split.json" ;;
   "pane layout") cat "$dir/pane-layout-two-panes.json" ;;
   "agent explain") cat "$dir/agent-explain.json" ;;
   "agent get"|"pane get") cat "$dir/pane-get.json" ;;
-  "pane process-info") cat "$dir/pane-process-info-${FAKE_HERDR_FOREGROUND:-running}.json" ;;
+  "pane process-info") sed "s/2785881/${FAKE_HERDR_SHELL_PID:-2785881}/g" "$dir/pane-process-info-${FAKE_HERDR_FOREGROUND:-running}.json" ;;
   "pane read") if [ -n "$FAKE_HERDR_READ_JSON" ]; then echo '{"id":"cli:pane:read","result":{"read":{"text":"enveloped screen"}}}'; else printf 'line one\nline two\n'; fi ;;
   "pane close") [ -n "$FAKE_HERDR_ON_CLOSE" ] && sh -c "$FAKE_HERDR_ON_CLOSE"; cat "$dir/pane-close-ok.json" ;;
   *) echo '{"error":{"code":"unknown_command","message":"fake"}}' >&2; exit 2 ;;

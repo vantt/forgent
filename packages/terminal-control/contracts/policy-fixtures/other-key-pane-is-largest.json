@@ -1,5 +1,6 @@
 {
   "name": "other-key-pane-is-largest",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

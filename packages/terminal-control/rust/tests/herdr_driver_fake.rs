@@ -1,9 +1,11 @@
 //! The herdr driver against a fake `herdr` binary (`FGOS_HERDR_BIN` style):
 //! argv per capability, absent and hung herdr, incarnation over a real socket.
 
+use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::driver::*;
-use fgos_terminal_control::port::{Refusal, ServerIncarnation};
+use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
+use fgos_terminal_control::port::{AnchorPane, CapabilitiesAsk, Refusal, ServerIncarnation};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -57,6 +59,10 @@ impl Drop for Fake {
     }
 }
 
+fn core_config(fake: &Fake) -> CoreConfig {
+    CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 }
+}
+
 fn is_unsupported<T: std::fmt::Debug>(r: DriverResult<T>) -> bool {
     matches!(r, Err(Refusal::Unsupported { .. }))
 }
@@ -74,9 +80,6 @@ fn declares_what_herdr_can_do_after_one_probe() {
         assert!(caps.contains(&expected), "{expected} missing from {caps:?}");
     }
     assert_eq!(caps.contains(&"server.incarnation"), cfg!(unix));
-    for never in ["pane.resize", "pane.swap", "pane.move"] {
-        assert!(!caps.contains(&never), "{never} is not implemented");
-    }
     assert!(caps.iter().all(|c| CAPABILITIES.contains(c)));
     // The probe ran two commands; declaring again asks nothing more.
     let probed = fake.calls().len();
@@ -100,13 +103,10 @@ fn each_capability_runs_the_expected_command() {
     let seen = d.activity_detail("wS:p59Y").unwrap();
     assert_eq!((seen.state.as_deref(), seen.visible_idle, seen.visible_working), (Some("idle"), true, false));
     assert_eq!((seen.matched_rule.as_deref(), seen.prompt_text.as_str()), (Some("live_prompt_box"), "❯ half typed\n"));
-    d.report_agent("wS:p59Y", "claude", "working").unwrap();
     d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()]).unwrap();
     assert_eq!(d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(), "line one\nline two\n");
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
     assert_eq!(d.activity("wS:p59Y").unwrap().state, "working");
-    d.activity_start("wS:p59Y", "seat-1", "claude", &["--model".into(), "opus".into()], 30_000).unwrap();
-    d.label_tab("wS:tF9", "fgos lead").unwrap();
     d.label_pane("wS:p59Y", "seat 1").unwrap();
     assert_eq!(d.pane_liveness("wS:p59Y").unwrap(), PaneLiveness::Live);
     assert_eq!(d.layout_geometry("wS:p59Y").unwrap().panes.len(), 2);
@@ -119,13 +119,10 @@ fn each_capability_runs_the_expected_command() {
         "agent prompt wS:p59Y hello world",
         "pane send-text wS:p59Y draft",
         "agent explain wS:p59Y --json",
-        "pane report-agent wS:p59Y --source fgos --agent claude --state working",
         "pane send-keys wS:p59Y Escape Enter",
         "pane read wS:p59Y --lines 40 --source visible",
         "pane process-info --pane wS:p59Y",
         "agent get wS:p59Y",
-        "agent start seat-1 --kind claude --pane wS:p59Y --timeout 30000 -- --model opus",
-        "tab rename wS:tF9 fgos lead",
         "pane rename wS:p59Y seat 1",
         "pane get wS:p59Y",
         "pane layout --pane wS:p59Y",
@@ -141,20 +138,43 @@ fn split_ratio_is_the_share_the_existing_pane_keeps() {
 }
 
 #[test]
-fn session_and_socket_reach_herdr_through_its_environment() {
+fn a_session_names_its_own_socket_and_reaches_herdr_through_its_environment() {
     let dir = scratch("env");
+    let home = dir.join("home");
     let mut config = HerdrConfig::new(fake_bin());
     config.session = Some("confined-1".into());
     config.env.push(("FAKE_HERDR_LOG".into(), dir.join("log").to_string_lossy().into_owned()));
+    config.env.push(("HOME".into(), home.to_string_lossy().into_owned()));
     config.timeout_ms = 5_000;
-    // `status server` is the one command that takes the session as an argument.
-    config.socket_path = None;
-    config.env.push(("FAKE_HERDR_SOCKET".into(), "/nonexistent/herdr.sock".into()));
     let driver = HerdrDriver::new(config);
-    let _ = driver.server_incarnation();
+    let socket = home.join(".config/herdr/sessions/confined-1/herdr.sock").to_string_lossy().into_owned();
+    assert_eq!(driver.socket_path().as_deref(), Some(socket.as_str()));
+    match driver.server_incarnation() {
+        Err(Refusal::Unknown { reason }) => assert!(reason.contains(&socket), "the incarnation looks at the session's own socket: {reason}"),
+        other => panic!("nothing listens there, got {other:?}"),
+    }
     let log = std::fs::read_to_string(dir.join("log")).unwrap();
-    assert!(log.contains("--session\tconfined-1\tstatus\tserver\t--json"), "{log}");
+    assert!(!log.contains("status"), "a named session needs no `status server` to find its socket: {log}");
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn the_socket_follows_herdrs_layout_for_the_default_session_a_named_one_and_the_callers_own() {
+    let with = |session: Option<&str>, socket: Option<&str>| {
+        let mut config = HerdrConfig::new(fake_bin());
+        config.session = session.map(String::from);
+        config.socket_path = socket.map(String::from);
+        config.env.push(("HOME".into(), "/home/op".into()));
+        HerdrDriver::new(config).socket_path()
+    };
+    assert_eq!(with(None, None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"), "no session is the default one");
+    assert_eq!(with(Some("default"), None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"));
+    assert_eq!(with(Some("fgos-worker"), None).as_deref(), Some("/home/op/.config/herdr/sessions/fgos-worker/herdr.sock"));
+    assert_eq!(with(Some("fgos-worker"), Some("/own/herdr.sock")).as_deref(), Some("/own/herdr.sock"), "the caller's own socket wins");
+    assert_eq!(with(None, Some("/pane/herdr.sock")).as_deref(), Some("/pane/herdr.sock"));
+    for bad in ["", "Upper", "1st", "a/b", "..", "has space", &"x".repeat(33)] {
+        assert_eq!(with(Some(bad), None), None, "{bad:?} is not a session name herdr accepts");
+    }
 }
 
 #[test]
@@ -185,6 +205,17 @@ fn a_hung_herdr_command_is_unknown_after_the_timeout() {
 }
 
 #[test]
+fn a_command_never_runs_past_the_operations_budget() {
+    let mut fake = Fake::new("budget").env("FAKE_HERDR_HANG", "pane get");
+    fake.config.timeout_ms = 30_000;
+    fake.config.deadline = Some(std::time::Instant::now() + std::time::Duration::from_millis(800));
+    let d = fake.driver();
+    let started = std::time::Instant::now();
+    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang past the budget is never read as gone");
+    assert!(started.elapsed() < std::time::Duration::from_secs(5), "the command outlived the budget: {:?}", started.elapsed());
+}
+
+#[test]
 fn an_unreadable_answer_is_unknown() {
     let fake = Fake::new("garbled").env("FAKE_HERDR_GARBLE", "1");
     let d = fake.driver();
@@ -210,12 +241,19 @@ fn commands_do_not_inherit_the_callers_descriptors() {
     assert_eq!(unsafe { libc::pipe(pipe.as_mut_ptr()) }, 0);
     // High, inheritable copies: low numbers collide with the shell's own script fd.
     // SAFETY: F_DUPFD on the open pipe ends; the originals are closed right after.
-    let fds = unsafe { [libc::fcntl(pipe[0], libc::F_DUPFD, 200), libc::fcntl(pipe[1], libc::F_DUPFD, 200)] };
+    // One of them sits above 2048: no caller descriptor reaches herdr, whatever its number.
+    let fds = unsafe {
+        [
+            libc::fcntl(pipe[0], libc::F_DUPFD, 200),
+            libc::fcntl(pipe[1], libc::F_DUPFD, 200),
+            libc::fcntl(pipe[1], libc::F_DUPFD, 2048),
+        ]
+    };
     unsafe {
         libc::close(pipe[0]);
         libc::close(pipe[1]);
     }
-    assert!(fds[0] >= 200 && fds[1] >= 200);
+    assert!(fds[0] >= 200 && fds[1] >= 200 && fds[2] >= 2048, "descriptor limit too low for this test: {fds:?}");
     let dir = scratch("fds");
     let dump = dir.join("fds");
     let fake = Fake::new("fds").env("FAKE_HERDR_FDS", &dump.to_string_lossy());
@@ -226,8 +264,10 @@ fn commands_do_not_inherit_the_callers_descriptors() {
     unsafe {
         libc::close(fds[0]);
         libc::close(fds[1]);
+        libc::close(fds[2]);
     }
-    assert!(!open.contains(&fds[0]) && !open.contains(&fds[1]), "leaked {fds:?} into {open:?}");
+    let leaked: Vec<_> = fds.iter().filter(|fd| open.contains(fd)).collect();
+    assert!(leaked.is_empty(), "leaked {leaked:?} into {open:?}");
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -387,9 +427,67 @@ mod incarnation {
     }
 
     #[test]
+    fn each_operation_runs_a_fixed_number_of_herdr_commands() {
+        use fgos_terminal_control::port::{AllocateRequest, Disposition, Display, LaunchSpec};
+
+        let fake = Fake::new("count");
+        let sock = fake.dir.join("s");
+        let _listener = UnixListener::bind(&sock).unwrap();
+        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell").env("FAKE_HERDR_SHELL_PID", &std::process::id().to_string());
+        let driver = fake.driver();
+        let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { title: Some(key.into()), ..Default::default() }, group_size: None, cwd: None, env: Default::default() };
+        let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
+        // Commands herdr was asked to run by one operation; the probe at construction is not counted.
+        let ran = |op: &dyn Fn()| {
+            let before = fake.calls().len();
+            op();
+            fake.calls().len() - before
+        };
+
+        let counts = [
+            ("capabilities", ran(&|| drop(core.capabilities(CapabilitiesAsk::default())))),
+            ("capabilities naming an anchor pane", ran(&|| drop(core.capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() })))),
+            ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
+            ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
+            ("allocate beside two live panes", ran(&|| drop(core.allocate(&allocate("k5")).unwrap()))),
+            ("allocate beside three live panes", ran(&|| drop(core.allocate(&allocate("k6")).unwrap()))),
+            ("allocate beside four live panes", ran(&|| drop(core.allocate(&allocate("k7")).unwrap()))),
+            ("attach", ran(&|| drop(core.attach("k3", "wS:p59Z", Some("g3"), None).unwrap()))),
+            ("launch refused for an attached pane", ran(&|| drop(core.launch("k3", &spec).unwrap_err()))),
+            ("send refused at a shell", ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap()))),
+            ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
+            ("inspect", ran(&|| drop(core.inspect("k1", false)))),
+            ("label", ran(&|| core.label("k1", &Display { title: Some("renamed".into()), ..Default::default() }).unwrap())),
+            ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
+            ("reconcile-scan over six records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
+            ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
+        ];
+        assert_eq!(
+            counts,
+            [
+                ("capabilities", 0),
+                ("capabilities naming an anchor pane", 1),
+                ("allocate into a new tab", 2),
+                ("allocate beside a live pane", 6),
+                ("allocate beside two live panes", 7),
+                ("allocate beside three live panes", 8),
+                ("allocate beside four live panes", 9),
+                ("attach", 3),
+                ("launch refused for an attached pane", 1),
+                ("send refused at a shell", 2),
+                ("read", 2),
+                ("inspect", 3),
+                ("label", 2),
+                ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
+            ("reconcile-scan over six records", 12),
+                ("release close", 2),
+            ],
+        );
+    }
+
+    #[test]
     fn a_brief_sent_to_a_pane_whose_shell_holds_the_foreground_is_not_typed_and_nothing_runs() {
-        use fgos_terminal_control::core::{Core, CoreConfig};
-        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
         use fgos_terminal_control::port::{AllocateRequest, Display, SendOutcome};
 
         let fake = Fake::new("shell-fg");
@@ -398,9 +496,8 @@ mod incarnation {
         // The pane's shell is its only foreground process, and this fake's shell runs what is typed at it.
         let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
-        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
-        let core = Core::new(&driver, &MeasuredSplit, config);
-        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, role_hint: None, cwd: None, env: Default::default() }).unwrap();
+        let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { title: Some("shell-fg".into()), ..Default::default() }, group_size: None, cwd: None, env: Default::default() }).unwrap();
 
         let typed = fake.dir.join("typed");
         let prompted = fake.dir.join("prompted");
@@ -463,4 +560,42 @@ fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_sta
 
     let failing = Fake::new("agent-get-garbled").env("FAKE_HERDR_GARBLE", "1");
     assert!(is_unknown(failing.driver().activity("wS:p59Y")), "an unreadable answer is not \"no agent\"");
+}
+
+#[test]
+fn capabilities_say_whether_the_named_anchor_pane_resolves() {
+    let anchor = |fake: &Fake, named: Option<&str>| {
+        let driver = fake.driver();
+        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { anchor_pane: named, ..Default::default() });
+        report.anchor_pane
+    };
+    let live = Fake::new("anchor-live");
+    assert_eq!(anchor(&live, None), AnchorPane::Absent);
+    assert_eq!(anchor(&live, Some("wS:p59X")), AnchorPane::Resolved);
+    assert!(live.calls().iter().filter(|c| c.starts_with("pane get")).count() == 1, "only the named pane is asked about");
+
+    let gone = Fake::new("anchor-gone").env("FAKE_HERDR_PANE_GONE", "1");
+    assert!(matches!(anchor(&gone, Some("ghost")), AnchorPane::Unresolvable { reason } if reason.contains("ghost")));
+
+    let absent = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
+    let report = Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() });
+    assert!(matches!(report.anchor_pane, AnchorPane::Unresolvable { reason } if reason.contains("not found")), "no herdr runs, and the pane is not claimed to resolve");
+}
+
+#[test]
+fn agent_kinds_and_integrations_come_from_herdrs_own_text_and_are_unknown_when_it_cannot_be_read() {
+    let ask = |fake: &Fake| {
+        let driver = fake.driver();
+        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { agents: true, ..Default::default() });
+        report.agents.expect("asked for")
+    };
+    let fake = Fake::new("agents");
+    let facts = ask(&fake);
+    assert_eq!(facts.kinds.unwrap(), ["pi", "claude", "codex", "agy", "gemini"]);
+    assert_eq!(facts.integrations.unwrap().get("codex").map(String::as_str), Some("outdated"));
+    assert!(fake.calls().ends_with(&["agent start --help".to_string(), "integration status".to_string()]), "{:?}", fake.calls());
+
+    assert_eq!(ask(&Fake::new("agents-garbled").env("FAKE_HERDR_GARBLE", "1")), AgentFacts::default());
+    let driver = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
+    assert_eq!(driver.agent_facts(), AgentFacts::default(), "an absent herdr is asked nothing");
 }

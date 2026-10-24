@@ -17,9 +17,10 @@ fgos-git = { path = "../rust" }
 fgos-event-store = { path = "../../event-store/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-process = { path = "../../process/rust" }
-fgos-identity = { path = "../../identity/rust", default-features = false }
+fgos-identity = { path = "../../identity/rust", default-features = false, features = ["directory"] }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 
 [build-dependencies]
 napi-build = "=2.2.4"

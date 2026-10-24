@@ -71,6 +71,25 @@ test('the seats of one batch share a tab and each gets the key of its attempt', 
     assert.equal(splits.length, 2, 'the other two seats split from panes of the group');
     for (const split of splits) assert.ok(new Set(['mock-pane-1', 'mock-pane-2', 'mock-pane-3']).has(split[split.indexOf('--pane') + 1]));
     assert.deepEqual(fake.closedPaneIds(), [], 'preparing a seat closes nothing');
+    const renames = verbs(fake, 'pane', 'rename');
+    assert.equal(renames.length, 3, 'every seat\'s pane is named, the first of the tab included');
+    assert.ok(renames.every((call) => call[call.length - 1] === 'batch-one'));
+  } finally { fake.cleanup(); }
+});
+
+test('a batch size reaches the placement policy: the split plans equal thirds, and halves without it', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}, {}, {}, {}] });
+  try {
+    // The policy is named so a machine config that pins another one cannot change the proof.
+    const terminalConfig = { policy: 'even-split' };
+    await seat({ dir, fake, name: 'sized-1', groupKey: 'batch-sized', terminalConfig, dispatchBatchSize: 3 });
+    await seat({ dir, fake, name: 'sized-2', groupKey: 'batch-sized', terminalConfig, dispatchBatchSize: 3 });
+    await seat({ dir, fake, name: 'unsized-1', groupKey: 'batch-unsized', terminalConfig });
+    await seat({ dir, fake, name: 'unsized-2', groupKey: 'batch-unsized', terminalConfig });
+    const ratios = verbs(fake, 'pane', 'split').map((split) => Number(split[split.indexOf('--ratio') + 1]));
+    assert.equal(ratios.length, 2);
+    assert.ok(Math.abs(ratios[0] - 1 / 3) < 1e-6, `sized batch plans thirds, got ${ratios[0]}`);
+    assert.equal(ratios[1], 0.5);
   } finally { fake.cleanup(); }
 });
 
@@ -86,9 +105,10 @@ test('a batch whose first pane is already closed continues in a new tab with the
 });
 
 test('a caller anchor pane joins the group, so the batch opens beside it and never closes it', { skip, timeout: 120_000 }, async () => {
-  const { dir, fake } = fakeWith({ panes: [{}, {}] });
+  // The anchor is the caller's own pane: its shell is this process.
+  const { dir, fake } = fakeWith({ panes: [{}, {}], shellPid: process.pid });
   try {
-    const own = createTerminalControl({ herdrBin: fake.herdrBin }).allocate({ key: 'caller-own', groupKey: 'caller-tab', display: { label: 'caller' } });
+    const own = createTerminalControl({ herdrBin: fake.herdrBin }).allocate({ key: 'caller-own', groupKey: 'caller-tab', display: { title: 'caller' } });
     assert.equal(own.result, 'slot');
     const beside = await seat({ dir, fake, name: 'beside', groupKey: 'batch-anchor', anchorPaneId: own.slot.paneId });
     const splits = verbs(fake, 'pane', 'split');
@@ -253,10 +273,21 @@ test('an agy trust entry a seat wrote is removed by the step; one the person alr
 test('the brief a reviewer reads says its claim needs assessment.verdict; the producer\'s does not', { skip, timeout: 120_000 }, async () => {
   const { dir, fake } = fakeWith({ panes: [{}, {}] });
   try {
-    await seat({ dir, fake, name: 'producer', groupKey: 'g-roles', effectiveContract: { mutation: 'mutating', assignment: { role: 'producer', operation: 'implement-item' } } });
-    await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
+    await seat({ dir, fake, name: 'producer', groupKey: 'g-roles', workLabel: { id: 'tsk-1lvxq7m2h9', title: 'fix terminal layout' }, effectiveContract: { mutation: 'mutating', assignment: { role: 'producer', operation: 'implement-item' } } });
+    await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', workLabel: { id: 'tsk-1lvxq7m2h9', title: 'fix terminal layout' }, effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
     assert.match(fs.readFileSync(path.join(dir, 'run-reviewer', 'brief-1.md'), 'utf8'), /"assessment\.verdict" is required for this assessment role/);
     assert.doesNotMatch(fs.readFileSync(path.join(dir, 'run-producer', 'brief-1.md'), 'utf8'), /assessment\.verdict/);
+    // The role reaches the port with the display data, not only the brief.
+    const herdrState = path.join(harness.stateRoot, 'terminal', 'herdr');
+    const recordOf = (key) => {
+      const incarnation = fs.readdirSync(herdrState).find((id) => fs.existsSync(path.join(herdrState, id, 'allocations', `${key}.json`)));
+      return JSON.parse(fs.readFileSync(path.join(herdrState, incarnation, 'allocations', `${key}.json`), 'utf8'));
+    };
+    assert.equal(recordOf('cmd_reviewer').display.role, 'reviewer');
+    assert.equal(recordOf('cmd_producer').display.role, 'producer');
+    // The person reads the id and title on the tab and the role and model on each pane.
+    assert.deepEqual(verbs(fake, 'tab', 'create').map(labelOf), ['tsk-1lvx \u00b7 fix terminal layout']);
+    assert.deepEqual(verbs(fake, 'pane', 'rename').map((call) => call[call.length - 1]), ['producer \u00b7 sonnet', 'reviewer \u00b7 sonnet']);
   } finally { fake.cleanup(); }
 });
 

@@ -750,6 +750,60 @@ fn fetch_rewind_and_stale_destinations_settle_with_observations() {
 }
 
 #[test]
+fn fetch_refuses_destinations_outside_remote_tracking_and_symbolic_destinations() {
+    let f = Fixture::new("files");
+    let remote = f.remote();
+    git(
+        &f.path,
+        &[
+            "push",
+            &remote.pinned_url,
+            &format!("{}:refs/heads/shared", f.first.as_str()),
+        ],
+    );
+    let into = |destination: &str| {
+        [RefMapping {
+            source: RefName::parse("refs/heads/shared").unwrap(),
+            destination: RefName::parse(destination).unwrap(),
+        }]
+    };
+    let trunk = git(&f.path, &["rev-parse", "refs/heads/trunk"]);
+    let outside = f
+        .driver
+        .fetch_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &into("refs/heads/trunk"),
+            "fixture",
+            "outside",
+        )
+        .unwrap_err();
+    assert_eq!(outside.cause, "invalid-remote-mappings");
+    git(
+        &f.path,
+        &[
+            "symbolic-ref",
+            "refs/remotes/origin/redirect",
+            "refs/heads/trunk",
+        ],
+    );
+    let symbolic = f
+        .driver
+        .fetch_refs(
+            &f.repo,
+            vec![],
+            &remote,
+            &into("refs/remotes/origin/redirect"),
+            "fixture",
+            "symbolic",
+        )
+        .unwrap_err();
+    assert_eq!(symbolic.cause, "symbolic-ref-refused");
+    assert_eq!(git(&f.path, &["rev-parse", "refs/heads/trunk"]), trunk);
+}
+
+#[test]
 fn rebase_bisect_and_user_locked_worktrees_have_precise_membership() {
     let f = Fixture::new("files");
     let linked = f.root.join("linked");

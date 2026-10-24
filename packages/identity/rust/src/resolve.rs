@@ -6,11 +6,16 @@ use serde::Serialize;
 use std::path::Path;
 
 /// Env variables tried in order; the first usable value wins.
-pub const ENV_ORDER: [&str; 3] = [
+pub const ENV_ORDER: [&str; 4] = [
     "FGOS_SESSION_ID",
     "CODEX_THREAD_ID",
+    PI_SESSION_VAR,
     "CLAUDE_CODE_SESSION_ID",
 ];
+/// The one variable both pi and omp export for a session. Its name cannot say
+/// which of the two it is, so the CLI is read from the process ancestry
+/// ([`pi_family_cli`]).
+pub const PI_SESSION_VAR: &str = "PI_SESSION_ID";
 /// Longest env id accepted, in characters.
 pub const MAX_ID_LENGTH: usize = 200;
 /// Registry file under the fgos dir that can confirm an env id.
@@ -53,6 +58,11 @@ pub struct WriterIdentity {
     /// part of the `{id, source}` answer.
     #[serde(skip)]
     pub env_var: Option<&'static str>,
+    /// The CLI read from the process ancestry, set only for an id whose
+    /// variable several CLIs share ([`PI_SESSION_VAR`]); `None` lets the
+    /// variable name the CLI.
+    #[serde(skip)]
+    pub cli: Option<&'static str>,
 }
 
 impl WriterIdentity {
@@ -61,6 +71,7 @@ impl WriterIdentity {
             id: WriterId::Pid(pid),
             source: Source::Pid,
             env_var: None,
+            cli: None,
         }
     }
     fn unresolved(pid: u32) -> Self {
@@ -68,6 +79,7 @@ impl WriterIdentity {
             id: WriterId::Pid(pid),
             source: Source::Unresolved,
             env_var: None,
+            cli: None,
         }
     }
 }
@@ -79,6 +91,16 @@ pub struct WriterKey<'a> {
     /// The env variable the value came from: one of [`ENV_ORDER`].
     pub source: &'a str,
     pub value: &'a str,
+}
+
+/// One process named by its pid and the start time that pid had when the
+/// caller checked it (the text `fgos_process::facts::Record::start_time`
+/// carries). A pid alone can be reused between the caller's check and
+/// Identity's read; pid plus start time cannot.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeadRef {
+    pub pid: u32,
+    pub start_time: String,
 }
 
 impl<'a> WriterKey<'a> {
@@ -131,6 +153,7 @@ pub fn env_identity(
             id: WriterId::Session(id),
             source,
             env_var: Some(*key),
+            cli: None,
         })
     })
 }
@@ -161,6 +184,37 @@ pub fn terminal_head(tree: &dyn ProcessTree, caller_pid: u32) -> Option<u32> {
     highest_tty
 }
 
+/// The CLI behind a [`PI_SESSION_VAR`] id: the nearest ancestor of `from_pid`
+/// (itself included) whose kernel command name is `omp` gives `omp`, one named
+/// `pi` gives `pi`. Neutral `pi` when none is found (no pid, headless, or the
+/// process table is unreadable). Names, not paths: `omp` is its own binary and
+/// `pi` is node titled `pi`, so only the command name is stable across versions.
+pub fn pi_family_cli(tree: &dyn ProcessTree, from_pid: Option<u32>) -> &'static str {
+    let Some(mut pid) = from_pid else { return "pi" };
+    for _ in 0..MAX_WALK {
+        match tree.comm(pid).as_deref() {
+            Some("omp") => return "omp",
+            Some("pi") => return "pi",
+            _ => {}
+        }
+        match tree.stat(pid) {
+            Some(stat) if stat.ppid != 0 && pid != 1 => pid = stat.ppid,
+            _ => break,
+        }
+    }
+    "pi"
+}
+
+/// The ancestry-derived CLI for an id from `env_var`; `None` when the variable
+/// alone names the CLI.
+pub fn ancestry_cli(
+    env_var: &str,
+    tree: &dyn ProcessTree,
+    from_pid: Option<u32>,
+) -> Option<&'static str> {
+    (env_var == PI_SESSION_VAR).then(|| pi_family_cli(tree, from_pid))
+}
+
 /// Steps 2-4: the terminal head; else the caller's session id; else the
 /// caller itself, unresolved.
 pub fn tree_identity(tree: &dyn ProcessTree, caller_pid: u32) -> WriterIdentity {
@@ -181,7 +235,15 @@ pub fn resolve(
     caller_pid: u32,
     fgos_dir: Option<&Path>,
 ) -> WriterIdentity {
-    env_identity(lookup, fgos_dir).unwrap_or_else(|| tree_identity(tree, caller_pid))
+    match env_identity(lookup, fgos_dir) {
+        Some(identity) => {
+            let cli = identity
+                .env_var
+                .and_then(|var| ancestry_cli(var, tree, Some(caller_pid)));
+            WriterIdentity { cli, ..identity }
+        }
+        None => tree_identity(tree, caller_pid),
+    }
 }
 
 /// The rule for the current process, as an in-process Rust caller (Observe)

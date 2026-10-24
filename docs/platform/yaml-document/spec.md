@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
 Design status: Signed by the owner on 2026-10-22 as a whole; amendments go through "Lịch sử quyết định"
-Implementation status: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) not started
+Implementation status: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) done 2026-10-23 (addon `yaml` namespace, `src/util/yaml.mjs` over it, js-yaml deleted, RUL108 supersedes RUL101)
 Canonical: Yes
 Owner: YAML Document component (proposed)
 Source: packages/yaml-doc/rust (crate fgos-yaml-doc)
@@ -14,7 +14,7 @@ Last reviewed: 2026-10-22
 Related:
 - docs/platform/config/spec.md (the one component above this one that applies a schema)
 - docs/platform/component-boundary.md
-- docs/specs/distribution.md, "Lịch sử quyết định", RUL101 (vendored js-yaml, superseded by this spec when it lands)
+- docs/specs/distribution.md, "Lịch sử quyết định", RUL108 (every YAML parse goes through the native door; supersedes RUL101, the vendored js-yaml)
 - plans/reports/research-261021-2221-config-access-inventory.md
 - plans/reports/spike-261022-0017-yaml-config-gate-evidence.md
 - architecture panel run wf-run-1792598883803-72bd2251 (final packet: unit-run-1792600163126-d1239fca/producer round 2)
@@ -189,8 +189,8 @@ Node reaches the component through the one combined native addon, as it already 
 
 1. Crate, contract file and golden fixtures, including every case of `test/util/yaml.test.mjs`.
 2. Rust consumers of `serde_yaml` move to the crate; the advisory ignore is removed.
-3. Addon namespace and the `src/util/yaml.mjs` re-point; js-yaml and its hash test deleted; RUL101 supersession recorded; the Node test becomes one wiring proof.
-4. Architecture test: no import of a YAML library anywhere in `src`, `bin`, `scripts` or `test` other than the door.
+3. Addon namespace and the `src/util/yaml.mjs` re-point; js-yaml and its hash test deleted; RUL101 supersession recorded (RUL108); the Node test becomes one wiring proof. Done 2026-10-23.
+4. Architecture test: no import of a YAML library anywhere in `src`, `bin`, `scripts`, `test` or `core`, the door included. Done 2026-10-23.
 
 ## 13. Known limits
 
@@ -218,3 +218,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: the refused invisible set widens.** The directional marks U+200E and U+200F, the Arabic letter mark U+061C and the word joiner U+2060 hide text in a diff like the listed characters; they join the set for values, keys and comment text alike (sections 4 and 6).
 - **2026-10-22: one acknowledgement for every edit that can drop a note.** `set` and `insert` take the same `CommentLoss` argument `remove` already had; without it they keep refusing `comment-would-be-lost`. `setInlineComment` takes an optional text: absent removes the comment, empty text is refused (`inline-comment-empty`, one added rule id) so a removal cannot happen by accident.
 - **2026-10-22: a caught panic is silent.** One process-wide hook, installed once by the first guard, stays quiet inside a guarded call and delegates all other panics to the previous hook (section 10).
+- **2026-10-23: the Node door landed.** The addon's `yaml` namespace returns JSON text in document order plus the non-finite floats (JSON has no form for them, so they are restored from a path list); `parseYaml` keeps its signature, a refusal is a `YamlParseError` with rule, file, line and column and no input text. Parity of the old and new door over 1414 tracked documents: 1396 equal, 18 rejected by both, 0 different. RUL101 is superseded by RUL108 in `docs/specs/distribution.md`.

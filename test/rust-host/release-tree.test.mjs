@@ -51,7 +51,7 @@ after(() => {
   if (staged.dir) fs.rmSync(staged.dir, { recursive: true, force: true });
 });
 
-test('the staged legacy-node payload carries the vendored YAML parser and any declared production dependencies, and loads them', () => {
+test('the staged legacy-node payload carries the YAML door, loads nothing but the native door for it, and any declared production dependencies', () => {
   const tempOut = staged.dir;
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-work-'));
   try {
@@ -60,18 +60,22 @@ test('the staged legacy-node payload carries the vendored YAML parser and any de
 
     const manifest = JSON.parse(fs.readFileSync(path.join(tempOut, 'manifest.json'), 'utf8'));
     const listed = new Set(manifest.files.map((f) => f.path));
-    for (const vendored of ['src/util/yaml.mjs', 'src/util/third-party/js-yaml.mjs']) {
-      const rel = `libexec/legacy-node/${vendored}`;
-      assert.ok(fs.existsSync(path.join(tempOut, rel)), `${vendored} must be staged with the legacy-node sources`);
-      assert.ok(listed.has(rel), `${vendored} must be listed in manifest files[] so verify covers it`);
-    }
+    const door = 'libexec/legacy-node/src/util/yaml.mjs';
+    assert.ok(listed.has(door), 'src/util/yaml.mjs must be listed in manifest files[] so verify covers it');
+    assert.deepEqual(
+      [...fs.readFileSync(path.join(tempOut, door), 'utf8').matchAll(/^import .* from '([^']+)';$/gm)].map((m) => m[1]),
+      ['../native/door.mjs'],
+      'the staged YAML door imports the native door and no parser',
+    );
+    assert.ok(!listed.has('libexec/legacy-node/src/util/third-party/js-yaml.mjs'), 'no vendored YAML parser ships');
     for (const dep of declared) {
       const rel = `libexec/legacy-node/${DEPENDENCY_DIR}/${dep}/package.json`;
       assert.ok(fs.existsSync(path.join(tempOut, rel)), `${dep} must be staged next to the legacy-node sources`);
       assert.ok(listed.has(rel), `${dep} must be listed in manifest files[] so verify covers it`);
     }
 
-    // Modules that read YAML must load and run from the staged tree alone, with no checkout around it.
+    // Modules that read YAML must load and run from the staged tree alone, with no checkout around it: the parse goes
+    // through the staged release's own addon.
     const probe = [
       "const door = await import(process.argv[1] + '/src/util/yaml.mjs');",
       "await import(process.argv[1] + '/src/workflow/loader.mjs');",
@@ -81,7 +85,7 @@ test('the staged legacy-node payload carries the vendored YAML parser and any de
     const res = spawnSync(process.execPath, ['--input-type=module', '-e', probe, pathToFileURL(legacyNodeDir).href], {
       cwd: workDir,
       encoding: 'utf8',
-      env: { ...process.env, NODE_PATH: '' },
+      env: { ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !ACTIVE_RELEASE_KEYS.includes(key))), FGOS_HOST_BIN: path.join(tempOut, 'bin', 'fgos'), NODE_PATH: '' },
     });
     assert.equal(res.status, 0, `${res.stdout}${res.stderr}`);
     assert.equal(res.stdout, '{"a":[1,2]}');

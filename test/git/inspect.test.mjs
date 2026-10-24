@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { createGitInspect } from '../../src/git/index.mjs';
+import { gitPortOptions } from '../../src/git/inspect.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
 const built = ensureGitAddon();
 const loader = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
@@ -93,5 +94,20 @@ console.log(JSON.stringify({ identity, writer: options.writer, door: gitWriter(p
     assert.equal(typeof identity.id, 'number');
     assert.equal(writer, String(identity.id));
     assert.equal(door, writer);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+// A caller that already holds an inspect port for the repository must not pay for a second
+// resolution; the options come from the answer that port gives.
+test('mutation port options reuse an inspect port the caller already holds', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-options-'));
+  try {
+    const repoPath = path.join(temp, 'repo'); fs.mkdirSync(repoPath);
+    let resolutions = 0;
+    const held = { resolveRepo: () => { resolutions += 1; return { trustedMainRoot: repoPath }; } };
+    const options = gitPortOptions(repoPath, { mutation: true, inspect: held });
+    assert.equal(resolutions, 1);
+    assert.equal(options.trustedMain, repoPath);
+    assert.equal(typeof options.writer, 'string');
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });

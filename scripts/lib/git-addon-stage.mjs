@@ -70,6 +70,15 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   return { addon, manifest, hostBin, cargoEnv };
 }
 
+/**
+ * Makes the addon loadable for a script that reads YAML from a checkout: every YAML parse goes through the
+ * native door, which loads only through a staged manifest. Stages (one cargo build, then reused) unless the
+ * caller's env already names one, as the test launcher and a release do.
+ */
+export function ensureAddonForScript(env = process.env, cwd = REPO_ROOT) {
+  if (!env.FGOS_ACTIVE_MANIFEST_PATH) ensureGitAddon(env, cwd);
+}
+
 // Answers this process already proved, so a caller that prepares two runs (the canary, the suite)
 // starts one check, not two. A named host is keyed by its file identity, so a rebuilt binary is
 // checked again; a build by checkout and target directory.

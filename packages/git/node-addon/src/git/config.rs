@@ -1,4 +1,4 @@
-//! Dormant RepositoryConfig transport. Policy and effects live in Rust.
+//! RepositoryConfig transport. Policy and effects live in Rust.
 use super::{operation, text};
 use crate::{check, error};
 use fgos_git::*;
@@ -29,12 +29,6 @@ impl GitRepositoryConfig {
     #[napi]
     pub fn call(&self, method: String, args: Value) -> Result<Value> {
         check()?;
-        if method == "recover" {
-            return Ok(json!(self
-                .driver
-                .recover_hooks_config(&self.repo, text(&args, "operationId")?)
-                .map_err(operation)?));
-        }
         let path = Path::new(text(&args, "ownedPath")?);
         match method.as_str() {
             "inspectHooks" => Ok(json!(self

@@ -136,6 +136,75 @@
       }
     },
     {
+      "name": "PI_SESSION_ID alone",
+      "env": {
+        "PI_SESSION_ID": "01a1681b-5502-77ce-870e-b2a223ece46b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "01a1681b-5502-77ce-870e-b2a223ece46b",
+        "source": "env"
+      }
+    },
+    {
+      "name": "codex thread wins over pi session",
+      "env": {
+        "CODEX_THREAD_ID": "codex-thread-a",
+        "PI_SESSION_ID": "pi-session-b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "codex-thread-a",
+        "source": "env"
+      }
+    },
+    {
+      "name": "pi session wins over claude session",
+      "env": {
+        "PI_SESSION_ID": "pi-session-b",
+        "CLAUDE_CODE_SESSION_ID": "claude-session-b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "pi-session-b",
+        "source": "env"
+      }
+    },
+    {
+      "name": "fgos id wins over pi session",
+      "env": {
+        "FGOS_SESSION_ID": "child-own",
+        "PI_SESSION_ID": "pi-session-b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "child-own",
+        "source": "env"
+      }
+    },
+    {
+      "name": "invalid pi session falls through to the next variable",
+      "env": {
+        "PI_SESSION_ID": "bad value",
+        "CLAUDE_CODE_SESSION_ID": "lead-claude"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "lead-claude",
+        "source": "env"
+      }
+    },
+    {
       "name": "200 characters accepted",
       "env": {
         "FGOS_SESSION_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"

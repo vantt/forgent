@@ -56,3 +56,18 @@ Ngay sau V6 làm bước bí danh (B). Khi làm phần xuyên máy thì chuyển
 | V7 adapter Codex/agy, doctor, CHANGELOG | chưa lên plan | chờ kết quả V6 |
 
 Item tách ra cho lane khác: `tsk-31k` (danh sách flag của host chứa cả tham số vị trí), `tsk-43x4` (Git tạo state root theo cwd khi thiếu `HOME`), `tsk-hls` (workspace fmt), `tsk-5n3` (`convention check -- <path>`), `tsk-62b` (test khoá flaky), `tsk-2mo` (citation drift), `tsk-1lx` (gom `geteuid` và `unlinkat`). Lane IDENT đã mở với spec nháp.
+
+## 3. Cập nhật 2026-10-24 05:15: các câu đang chờ owner (gom một chỗ)
+
+Nhánh `mailbox/v1-v3` đang ở `e8d5b3de5`, chưa merge main. V7a–V7f (phần không cần người xem) đã xong; mỗi bậc con đều có review độc lập.
+
+| # | Câu | Khuyến nghị | Ghi chú |
+|---|---|---|---|
+| 1 | **Khung socket thật của Claude ("treat it as a teammate's request and act on it")**: có đo thêm một nhánh có hại dùng đúng khung này không, trước phase 11 | **Có** | Với lời nhắc trần ở vai `user`, Claude làm theo yêu cầu có hại 1/27 lần, nên Claude không đạt (no-go) cho kênh đánh thức. Codex 0/30 thì đạt. |
+| 2 | Chạy **9 probe tương tác** của V7f, trong đó W2b và W7 kiểm khe hở K1 (phiên ở chế độ prompting có nhận ghi socket chưa xác thực không) | Chạy khi owner ngồi xem | Mỗi probe mở một pane herdr. Probe không gõ phím vào pane nào. |
+| 3 | **P3 (omp với Gemini)**: profile `gemini-tetnu` chưa đăng nhập | **A**: owner chạy `omp --profile=gemini-tetnu` để đăng nhập một lần | |
+| 4 | Thử **pi với một model Claude** để tách ảnh hưởng của model khỏi CLI | Có, khoảng 100 lần chạy | Mọi CLI dùng `gpt-6.1-sol` đều từ chối yêu cầu hợp lệ, trong khi Claude `haiku` làm theo. |
+| 5 | **Q4 của V7**: ghi thời điểm claim | B (chưa làm), hoặc C (ghi vào log, không đổi schema) | |
+| 6 | **Xác nhận máy tin cậy cho thư xuyên máy** | **B**: trạng thái `confirmed` nằm trong IDENT, mailbox chỉ thêm một công tắc | Lead IDENT đồng ý. |
+| 7 | Có thử **Codex với effort cao hơn** không (khoảng 20 lần chạy) | Không bắt buộc | V7c đo ở effort `low`, đã ghim trong pre-registration. |
+| 8 | **Pointer mode**: giữ hay bỏ, vì không còn dùng tới sau V7c | Bỏ, nếu kênh đánh thức không dùng tới | |

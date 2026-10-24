@@ -207,6 +207,75 @@ fn dead_config_writer_recovers_wal_before_and_after_effect_without_replay() {
     }
 }
 
+/// Fails every named step and records the steps it was asked about, in order.
+struct FailAt(&'static [&'static str], std::sync::Mutex<Vec<&'static str>>);
+impl FailAt {
+    fn new(steps: &'static [&'static str]) -> Self {
+        Self(steps, Default::default())
+    }
+}
+impl FileSystem for FailAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        self.1.lock().unwrap().push(step);
+        if self.0.contains(&step) {
+            Err(std::io::Error::other("injected durability fault"))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+fn edit_that_failed_after_the_rename(
+    steps: &'static [&'static str],
+) -> (Option<Outcome>, Vec<&'static str>) {
+    // A value that is merely visible after the rename says nothing about the parent directory, so
+    // an acknowledgement may rest only on a durability step that was completed and observed.
+    let f = Fixture::new();
+    let path = f.main.join(".githooks");
+    let fs = FailAt::new(steps);
+    f.driver
+        .ensure_hooks_with_filesystem(&f.repo, &path, "fault", &fs)
+        .unwrap_err();
+    let chain = Wal::open(&f.repo).unwrap().inspect("fault").unwrap();
+    // The edit is in the file exactly once, never replayed, and no native lock is left behind.
+    assert_eq!(
+        git(&f.main, &["config", "--get-all", "core.hooksPath"]),
+        path.to_str().unwrap()
+    );
+    assert!(!f.main.join(".git/config.lock").exists());
+    let seen = fs.1.lock().unwrap().clone();
+    (chain.outcome().cloned(), seen)
+}
+
+#[test]
+fn a_config_edit_that_failed_after_the_rename_is_acknowledged_only_once_its_sync_completed() {
+    let (outcome, seen) = edit_that_failed_after_the_rename(&["config-replaced"]);
+    assert!(
+        matches!(
+            outcome,
+            Some(Outcome::Transfer { acknowledged: true, unknown: false, .. })
+        ),
+        "{outcome:?}"
+    );
+    // The sync step runs after the fault and before the acknowledging record is installed.
+    let synced = seen.iter().rposition(|s| *s == "config-synced");
+    let installed = seen.iter().rposition(|s| *s == "record-install");
+    assert!(synced < installed && synced.is_some(), "{seen:?}");
+}
+
+#[test]
+fn a_config_edit_whose_sync_cannot_be_completed_keeps_unknown_evidence() {
+    let (outcome, seen) = edit_that_failed_after_the_rename(&["config-replaced", "config-synced"]);
+    assert!(seen.contains(&"config-synced"), "{seen:?}");
+    assert!(
+        matches!(
+            outcome,
+            Some(Outcome::Transfer { acknowledged: false, unknown: true, .. })
+        ),
+        "{outcome:?}"
+    );
+}
+
 struct EditAtAttempt {
     config: PathBuf,
     records: std::sync::atomic::AtomicUsize,
@@ -329,4 +398,13 @@ fn included_value_cannot_reuse_an_owned_local_wal_record() {
     assert!(report.provenance.is_none());
     assert_eq!(f.driver.remove_owned_hooks_config(&f.repo, &path, "preserve-included-remove").unwrap().status, "skippedExisting");
     assert_eq!(fs::read_to_string(included).unwrap(), contents);
+}
+
+#[test]
+fn a_remote_name_is_the_crate_name_grammar_everywhere_it_is_checked() {
+    // Mapping names, grants and operation ids share one grammar; no other case pins its edges.
+    assert!(fgos_git::publication_fetch_mappings("origin_2-b").is_ok());
+    for bad in ["", "a b", "a/b", &"x".repeat(81)] {
+        assert_eq!(fgos_git::publication_fetch_mappings(bad).unwrap_err().cause, "invalid-fetch-mapping-remote", "{bad:?}");
+    }
 }

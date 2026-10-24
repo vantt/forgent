@@ -1,7 +1,7 @@
 //! Explicit non-event transfers. Remote transport is never enabled by another port.
 use crate::{
     driver::{Output, Policy},
-    refs::{admission, direct, failure, pending, receipt, recovery, sync_refs, tip, Authority},
+    refs::{admission, direct, pending, receipt, sync_refs, tip, zero_oid, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -38,34 +38,34 @@ pub(crate) fn transfer_argv(scheme: &str, args: &[String]) -> Vec<String> {
     argv
 }
 impl GitDriver {
-    pub(crate) fn transfer_url(
+    /// The one remote door: read the configured URL raw, refuse what must
+    /// never reach git, compare it with the grant's pin and name its
+    /// transport. Callers run the transfer under their own authority.
+    pub(crate) fn remote_target(
         &self,
         repo: &RepoHandle,
         grant: &RemoteGrant,
     ) -> Result<(String, &'static str)> {
-        if grant.name.is_empty()
-            || !grant
-                .name
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-        {
+        if !wal::valid_id(&grant.name) {
             return Err(failure("remote-not-granted"));
         }
-        let url = Inspect::remote_url(self, repo, &grant.name)?;
-        if url != grant.pinned_url || url_has_credentials_or_controls(&url) || url.starts_with('-')
-        {
+        let out = self.checked(repo, &["remote", "get-url", "--", &grant.name], Policy::Inspect)?;
+        let url = std::str::from_utf8(out.strip_suffix(b"\n").unwrap_or(&out))
+            .map_err(|_| failure("git-protocol-invalid-utf8"))?;
+        // Every URL accepted here reads back identically in display form, so the pin is a raw compare.
+        if url != grant.pinned_url || url_has_credentials_or_controls(url) || url.starts_with('-') {
             return Err(failure("remote-url-not-pinned-or-credentials-present"));
         }
         let scheme = if url.starts_with('/') || url.starts_with("file://") {
             "file"
         } else if url.starts_with("https://") {
             "https"
-        } else if url.starts_with("ssh://") {
+        } else if url.starts_with("ssh://") || is_scp_form(url) {
             "ssh"
         } else {
             return Err(failure("remote-protocol-not-supported"));
         };
-        Ok((url, scheme))
+        Ok((url.to_owned(), scheme))
     }
     fn transfer_call(
         &self,
@@ -147,7 +147,7 @@ impl GitDriver {
         names: &[RefName],
     ) -> Result<Vec<RemoteRef>> {
         let scope = self.remote_scope(held)?;
-        let (url, scheme) = self.transfer_url(repo, grant)?;
+        let (url, scheme) = self.remote_target(repo, grant)?;
         self.advertised(repo, &scope, &url, scheme, names)
     }
     pub fn fetch_refs(
@@ -217,12 +217,11 @@ impl GitDriver {
                 return Err(failure("invalid-remote-mappings"));
             }
         }
-        let (url, scheme) = self.transfer_url(repo, grant)?;
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
+        let (url, scheme) = self.remote_target(repo, grant)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources: Vec<String> = destinations.into_iter().map(str::to_owned).collect();
         admission(&wal, id, &resources)?;
-        let digest = wal::canonical_digest(&(push, &url, mappings, writer)).map_err(failure)?;
+        let digest = wal::canonical_digest(&(push, &url, mappings, writer))?;
         // Terminal replay returns its recorded acknowledgement, without a new
         // network request. A pending id can never send a second transfer.
         match wal.inspect(id) {
@@ -331,8 +330,7 @@ impl GitDriver {
                 "remote",
                 &grant.name,
                 &url,
-            ))
-            .map_err(failure)?,
+            ))?,
             writer_identity: writer.into(),
             object_format: repo.object_format(),
             expected: Tip::Absent,
@@ -342,7 +340,7 @@ impl GitDriver {
             scope: &scope,
             binding: intent.authority_binding.clone(),
         };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             Begin::Existing(c) => {
                 return match c.outcome() {
@@ -369,7 +367,7 @@ impl GitDriver {
             }
             Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
         };
-        let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        let chain = wal.append(&chain, Phase::Prepared)?;
         scope.validate().map_err(failure)?;
         let attempted = wal
             .append(
@@ -379,8 +377,7 @@ impl GitDriver {
                     expected: Tip::Absent,
                     next: Tip::Absent,
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let mut install_attempted = false;
         let result = (|| {
             filesystem
@@ -397,16 +394,14 @@ impl GitDriver {
                     "--",
                 ]
             } else {
-                vec![
-                    "-c",
-                    "core.fsync=all",
+                durable_args(&[
                     "fetch",
                     "--no-write-fetch-head",
                     "--no-tags",
                     "--no-recurse-submodules",
                     "--no-auto-maintenance",
                     "--",
-                ]
+                ])
             }
             .into_iter()
             .map(str::to_owned)
@@ -461,11 +456,7 @@ impl GitDriver {
                         observations.push((name.as_str().into(), tip(&direct(self, repo, name)?)));
                         continue;
                     }
-                    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-                        40
-                    } else {
-                        64
-                    });
+                    let zero = zero_oid(repo.object_format());
                     let prior = old.clone();
                     let old = match old {
                         ExpectedTip::Oid(o) => o.as_str(),
@@ -478,15 +469,13 @@ impl GitDriver {
                     let cas = self.invoke(
                         Some(repo),
                         repo.trusted_main_root(),
-                        &[
-                            "-c",
-                            "core.fsync=all",
+                        &durable_args(&[
                             "update-ref",
                             "--no-deref",
                             name.as_str(),
                             next.as_str(),
                             old,
-                        ],
+                        ]),
                         if loan.is_some() {
                             Policy::Publication
                         } else {
@@ -539,8 +528,7 @@ impl GitDriver {
                     }
                     .into()],
                 }),
-            )
-            .map_err(failure)?;
+            )?;
             receipt(
                 id,
                 attempted.intent(),
@@ -616,9 +604,17 @@ fn sync_downloaded_objects(repo: &RepoHandle) -> Result<()> {
 }
 
 // SSH user names select an account, not a password. Other userinfo and all
-// password-bearing SSH userinfo are refused before transport.
+// password-bearing SSH userinfo are credentials; so is anything that could
+// pass for an option, a git transport helper or more than one argument.
+pub(crate) fn userinfo_is_credential(scheme: &str, user: &str) -> bool {
+    scheme != "ssh" || user.is_empty() || user.starts_with('-') || user.contains([':', '%', '@'])
+}
+
 pub(crate) fn url_has_credentials_or_controls(url: &str) -> bool {
-    if url.contains(['\n', '\r', '\0']) {
+    if url.bytes().any(|b| b.is_ascii_control() || b.is_ascii_whitespace())
+        || url.contains(['?', '#'])
+        || url.contains("::")
+    {
         return true;
     }
     let Some((scheme, rest)) = url.split_once("://") else {
@@ -626,19 +622,40 @@ pub(crate) fn url_has_credentials_or_controls(url: &str) -> bool {
     };
     let authority = rest.split('/').next().unwrap_or("");
     match authority.rsplit_once('@') {
-        None => false,
-        Some((user, _)) => scheme != "ssh" || user.is_empty() || user.contains([':', '%', '@']),
+        None => scheme == "ssh" && authority.starts_with('-'),
+        Some((user, host)) => {
+            userinfo_is_credential(scheme, user) || (scheme == "ssh" && host.starts_with('-'))
+        }
     }
 }
 
+/// git's scp form `[user@]host:path`: no scheme, the first `:` before any `/`,
+/// a plain host name and an account name. `user:secret@host:path` also reads as
+/// host `user` with a path, so an `@` in the path's first segment is refused.
+fn is_scp_form(url: &str) -> bool {
+    let Some((target, path)) = url.split_once(':') else {
+        return false;
+    };
+    if url.contains("://") || target.contains('/') || path.split('/').next().unwrap_or("").contains('@') {
+        return false;
+    }
+    let (user, host) = match target.rsplit_once('@') {
+        Some((user, host)) => (Some(user), host),
+        None => (None, target),
+    };
+    let host_ok = !host.is_empty()
+        && !host.starts_with('-')
+        && host.bytes().all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b));
+    host_ok && !user.is_some_and(|u| userinfo_is_credential("ssh", u))
+}
 
 impl GitDriver {
     /// A transport timeout stays unknown: observation never repeats the request.
     pub fn recover_transfer(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
         let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         if !matches!(chain.intent().kind, OperationKind::RemoteFetch {..} | OperationKind::RemotePush {..}) { return Err(failure("not-remote-transfer-operation")); }
         if chain.intent().writer_identity != writer || chain.intent().repo_identity != wal.repository_identity() { return Err(failure("remote-authority-mismatch")); }
         if let Some(o) = chain.outcome() { return Ok(o.clone()); }
@@ -647,7 +664,7 @@ impl GitDriver {
             let observations = chain.intent().resource_set.iter().map(|n| Ok((n.clone(), tip(&direct(self,repo,&RefName::parse(n).map_err(failure)?)?)))).collect::<Result<Vec<_>>>()?;
             Outcome::Transfer {acknowledged:false,unknown:true,observations,details:vec!["outcome-unknown; query remote before any new request".into()]}
         };
-        wal.append(&chain,Phase::Outcome(outcome.clone())).map_err(failure)?;
+        wal.append(&chain,Phase::Outcome(outcome.clone()))?;
         Ok(outcome)
     }
 }
@@ -671,6 +688,10 @@ mod tests {
             "https://user@example.invalid/repo",
             "https://user:secret@example.invalid/repo",
             "ssh://git@example.invalid/repo\n",
+            "ssh://-oProxyCommand=x@example.invalid/repo",
+            "ssh://git@-oProxyCommand=x/repo",
+            "ssh://example.invalid/repo\tx",
+            "ssh://example.invalid/repo?x",
         ] {
             assert!(url_has_credentials_or_controls(url), "{url}");
         }

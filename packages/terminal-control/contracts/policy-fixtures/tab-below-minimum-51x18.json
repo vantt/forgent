@@ -1,5 +1,6 @@
 {
   "name": "tab-below-minimum-51x18",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

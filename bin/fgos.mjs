@@ -4283,8 +4283,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // A check may return its result directly or as a promise (one drives promise-based runner code).
       const checks = [];
       for (const { id, description, check } of DOCTOR_CHECKS) {
-        const { passed, message } = await check(repoRoot);
-        checks.push({ id, description, passed, message });
+        const { passed, message, detail } = await check(repoRoot);
+        checks.push({ id, description, passed, message, ...(detail !== undefined && { detail }) });
       }
       return fixed === undefined ? { checks } : { fixed, checks };
     }

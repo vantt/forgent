@@ -1,5 +1,6 @@
 {
   "name": "portrait-110x80",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

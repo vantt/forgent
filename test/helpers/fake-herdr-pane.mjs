@@ -22,6 +22,8 @@
 //                       a brief typed before the detector turned idle is lost, like a real UI that is not up yet
 //   swallowEnter: N     the first N submit keys are lost: `agent prompt` leaves the brief as an unsent
 //                       draft in the prompt box, and only a later `agent send-keys Enter` submits it
+// `shellPid` (scenario, not per pane) is the shell pid every pane reports (default 100); a test whose caller
+// must own a pane through attach passes its own pid.
 // `signalDir` is where the in-sandbox agent looks for `signal-<pane id>.json` (default: the fake's own dir).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -175,8 +177,9 @@ if (group === 'pane' && action === 'process-info') {
   const paneVanished = scenario.paneVanishesAfterBrief && Object.values(state.panes).some((p) => p.delivered);
   if (paneVanished || !openPane(id)) fail('pane_not_found', 'pane not found');
   const pane = state.panes[id];
-  const foreground = [{ pid: 100, name: 'zsh', argv: ['zsh'] }];
-  let fgPid = 100;
+  const shellPid = scenario.shellPid ?? 100;
+  const foreground = [{ pid: shellPid, name: 'zsh', argv: ['zsh'] }];
+  let fgPid = shellPid;
   const gone = scenario.agentGone || pane.exited;
   if (pane.pid && !gone && alive(pane.pid)) {
     const argvOf = (pid) => {
@@ -197,7 +200,7 @@ if (group === 'pane' && action === 'process-info') {
     fgPid = members[0];
     writeState(state);
   }
-  ok({ process_info: { pane_id: id, shell_pid: 100, foreground_process_group_id: fgPid, foreground_processes: foreground } });
+  ok({ process_info: { pane_id: id, shell_pid: shellPid, foreground_process_group_id: fgPid, foreground_processes: foreground } });
 }
 
 if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {

@@ -440,6 +440,12 @@
         "kind",
         "release"
       ],
+      "pins": [
+        "dir",
+        "forget",
+        "help",
+        "json"
+      ],
       "project": [
         "dir",
         "handle",

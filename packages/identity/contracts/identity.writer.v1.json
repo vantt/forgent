@@ -18,6 +18,7 @@
   "x-envOrder": [
     "FGOS_SESSION_ID",
     "CODEX_THREAD_ID",
+    "PI_SESSION_ID",
     "CLAUDE_CODE_SESSION_ID"
   ],
   "x-idPattern": "^[A-Za-z0-9._-]+$",
