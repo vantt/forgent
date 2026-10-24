@@ -13486,13 +13486,14 @@
       ],
       "targetAnchor": "owns",
       "targetOwner": "docs/platform/observe/spec.md",
-      "targetUnitDigest": "7b8d6f910b416f05bc1a72a0c7e2dbb9b2457a52f89afea674fd93391f5d15b8",
-      "bindingSha256": "a3a55a8da717217a6a55524f20c058552a5896c4e53a69be22a0b180c9a63a36",
+      "targetUnitDigest": "15cf2d08571be0557c0159bc4ce5e07b282a840ed14172cea109bbe4f4e544c5",
+      "bindingSha256": "ebfcac2a9dff46497322d64d97dfb66f46efe61f1485e5bd8091cc6a6330a029",
       "disposition": {
         "kind": "equivalent-current-content",
         "reason": "Full source text is already present; only heading depth, link destinations or whitespace differ. Heading payload units are accounted separately."
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "sourcePath": "docs/specs/observe.md",
@@ -13512,8 +13513,8 @@
       ],
       "targetAnchor": "unheaded-block-5",
       "targetOwner": "docs/platform/observe/spec.md",
-      "targetUnitDigest": "324fe8aa7e192344d1fef8804f9933cc1fc4707642443dd8fa9802400782ad23",
-      "bindingSha256": "d26506d71c197c880e16659b41e75519d24b123daf3f053cf3fafec5b31fbfa5",
+      "targetUnitDigest": "516bd5db5c2ca2d7390dc20ddba2b6438a01dcce310bb225d2d2dc9d7d457eea",
+      "bindingSha256": "72593be3c85e403df8b73a6a4fb15f54a9fa63a326b293554ed961702bdacb2e",
       "disposition": {
         "kind": "retained-truth-correction",
         "reason": "Preserve the shipped friction ping/migrate commands and the correctly rebased Identity spec link; omitting real commands is not a faithful current inventory.",
@@ -13522,7 +13523,8 @@
           "docs/platform/identity/spec.md"
         ]
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "sourcePath": "docs/specs/observe.md",
@@ -13738,8 +13740,8 @@
       ],
       "targetAnchor": "unheaded-block-16",
       "targetOwner": "docs/reading-map.md",
-      "targetUnitDigest": "60f7eaadc97853842e74f054e7fee760e3e2d7f4ff51ecddb5e0e27ec8fe2893",
-      "bindingSha256": "bdb52087011b7bbd4ab67b4ed6c11cf7d469d0d25a589b32b7b78fb01c961c64",
+      "targetUnitDigest": "b07d62f4f1e6d1be975f4d866244196117bf86e3c056100e192cb97175bf37df",
+      "bindingSha256": "291bf8416f995dff7266cd5e202d6a7655d6486cebcc9bb5e9711f9d4d95d5c0",
       "disposition": {
         "kind": "entry-union-current-source-delta",
         "reason": "Merge the complete current hot-lock, identity mint, Workflow/admission, Seat Binding, process, supervisor, terminal, Git, YAML/config, mailbox and test-governance entries into section 5. Keep both compounding-to-knowledge lines and earlier explicit truth corrections for removed evolve, actual skill lookup/wrappers, archived plans and absent benchmark. The source's stale mirror-entropy/unused Iron Law claims do not override code-backed corrections.",
@@ -13752,7 +13754,8 @@
           "src/runner/iron-law-gate.mjs"
         ]
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "sourcePath": "docs/specs/seat-binding.md",

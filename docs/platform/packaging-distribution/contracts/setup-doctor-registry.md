@@ -203,11 +203,11 @@ Added in candidate — complete source units from `docs/specs/distribution.md` a
   overwritten. The lock directories of row 5g are created when missing:
   `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);
   the `terminal` section of row 5h is one of the defaults the
-  fill-missing-only merge adds; `<stateRoot>/terminal` is created with mode 0700 (the
-  `terminal-dir` fix).
+  fill-missing-only merge adds; `<stateRoot>/terminal` is not set up here: the
+  terminal allocation store creates it with mode 0700 on first use.
 - **Side effects:** the caller's own shell profile file(s), local project
-  config file, global config file (`~/.fgos/config.json`), the two lock
-  directories and `<stateRoot>/terminal` may be created or modified; nothing outside the caller's own
+  config file, global config file (`~/.fgos/config.json`), and the two lock
+  directories may be created or modified; nothing outside the caller's own
   environment is touched, and no network access happens.
 - **Afterwards:** the caller sees exactly what changed — which profile
   file(s) gained the source line (or already had it), which project config

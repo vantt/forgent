@@ -1,0 +1,2716 @@
+{
+  "inputHEAD": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+  "merge": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+  "scope": "Step 3 all physical revisions; Step 4/5 canonical consumer-matrix batches, only primary file/sourceRenderProvenance/protectedPins dependency keys, never incidental path mentions. No .fgos source bytes read.",
+  "traversed": {
+    "step3": 1037,
+    "step4": 275,
+    "step5": 1479
+  },
+  "counts": {
+    "step3": 17,
+    "step4": 16,
+    "step5": 117
+  },
+  "records": {
+    "step3": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+        "recordLine": 4,
+        "recordSha256": "106253fb7919811281d36cd3b5d1f5444dc665ae21a08fa2f99518b60ec87652",
+        "file": "docs/reading-map.md",
+        "changedDependencies": [
+          {
+            "path": "docs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 4,
+        "recordSha256": "2ec528e548524013cf50acc51e346df04a8a32eb857907e84125c330959ed5dc",
+        "file": "docs/specs/distribution.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/distribution.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 9,
+        "recordSha256": "0e682316eac42f47f0401747846bf9016c7bfd6c7d4f36765a70c9884051e540",
+        "file": "docs/specs/observe.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/observe.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+        "recordLine": 11,
+        "recordSha256": "b1526ab184a7d8ab5cf9124355efc0cf950788878808dd22a5940bc4c50252c8",
+        "file": "docs/specs/reading-map.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+        "recordLine": 1,
+        "recordSha256": "4ac7d62813f0438afd0bea5ff6b90270cf66f709c102c80afb1ca2cb1cefabba",
+        "file": "docs/specs/runner.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+        "recordLine": 16,
+        "recordSha256": "a08ddaf2ed0c4b3ac386706094d6a57f84c8450be2dafd03e59cea05d3d260ee",
+        "file": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+        "changedDependencies": [
+          {
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+        "recordLine": 1,
+        "recordSha256": "08afcd61b4fcdbd3b33265bf40651ae381a29aee46287be531d3787e49e05eee",
+        "file": "docs/platform/component-boundary.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/component-boundary.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+        "recordLine": 1,
+        "recordSha256": "49d86abfb90457e2380dd5f29899b6fc5d2278af4b8f3025a8d36eed6ead0a1a",
+        "file": "docs/platform/event-store/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/event-store/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+        "recordLine": 1,
+        "recordSha256": "98fd8131377c48df0337199e9341bd9131727242efbaa861eb201788517ac439",
+        "file": "docs/platform/git/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/git/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-109.jsonl",
+        "recordLine": 2,
+        "recordSha256": "47085181f6657f68e5a5130637de13fafa51cd31f025ad72ea6576df36734934",
+        "file": "docs/platform/observe/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/observe/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+        "recordLine": 10,
+        "recordSha256": "dcdefc180bebfd6ef3a212be9eeb3cbd539d691cfcaa6025929271a96891ff3a",
+        "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+        "recordLine": 16,
+        "recordSha256": "b972738e571fdde8f522883277e2e033035662613641f679feabd8053ae5dcb5",
+        "file": "docs/platform/packaging-distribution/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/packaging-distribution/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-115.jsonl",
+        "recordLine": 13,
+        "recordSha256": "231424318d8ba8076b4117136408e127f9e622be82aa155e67218c495ecb6c3e",
+        "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-119.jsonl",
+        "recordLine": 1,
+        "recordSha256": "e0dc6a2d7f49b566f6306022f60508be8132efaabe40a3690eac35a03d93425f",
+        "file": "docs/platform/terminal-control/spec.md",
+        "changedDependencies": [
+          {
+            "path": "docs/platform/terminal-control/spec.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+        "recordLine": 1,
+        "recordSha256": "cdedba2cb0ee301765850d58578c3c120833f66ff92a365c7b8fdc116a3a400d",
+        "file": "docs/architecture-manifest.json",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+        "recordLine": 2,
+        "recordSha256": "952ab5dcafe6959ac00b12b43d7711345370f81d5bbc7e0ac325dce5ea4932fc",
+        "file": "docs/backlog.md",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+        "recordLine": 2,
+        "recordSha256": "c0ee7b241f6e26ee3056e754f567f7b9946a500429f055081c651e74c6ba1c74",
+        "file": "docs/io-contract.md",
+        "changedDependencies": [
+          {
+            "path": "docs/io-contract.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      }
+    ],
+    "step4": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl",
+        "recordLine": 2,
+        "recordSha256": "51a715529312e998527a05a0e056686692318f1a0e73d6980c5ed4020b862042",
+        "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "2",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+        "recordLine": 3,
+        "recordSha256": "8c07e9ac7bb5171c3fec7849ed50b2d7ed0db86ec48b4b072f58f8434fa9d14a",
+        "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "3",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "2",
+              "existingEdgeJoins",
+              "3",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+        "recordLine": 15,
+        "recordSha256": "8f716bf7bdc53814a523ff80f92a819934222248a7219a832652abf9a098a7a9",
+        "file": "plugins/fgOS/skills/terminal/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/SKILL.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordLine": 3,
+        "recordSha256": "b4967b211da5075fe571726d9259eeb880c20c899ca48bdb6dc4651581244baf",
+        "file": "core/instructions/design-principles.md",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+        "recordLine": 1,
+        "recordSha256": "f72c3cb0e25c09af046b0ed86659e2d982eca459c3c6639e7873743c06494171",
+        "file": "bin/fgos.mjs",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+        "recordLine": 1,
+        "recordSha256": "a44bb49f7559ca3d3d7afcf5565a289cf61f16c7fd01102f07d2816066665a88",
+        "file": "src/cli/command-registry.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+        "recordLine": 1,
+        "recordSha256": "8c218697e50bd71903d5837180c4a1db2eabeb0d8c1c4cb39bb83ea8dc3a000a",
+        "file": "CHANGELOG.md",
+        "changedDependencies": [
+          {
+            "path": "CHANGELOG.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+        "recordLine": 6,
+        "recordSha256": "d94d8425f83b4e447ef09e3a861255d9bd9468e0efbf0acc413777bd50fd4294",
+        "file": "src/runner/dispatch/assignment-runner.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 7,
+        "recordSha256": "7d61b86e0616522af5514a03fb6d66a541bd94d916a9d841e667a1d70f06046c",
+        "file": "src/runner/dispatch/herdr-round.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+        "recordLine": 5,
+        "recordSha256": "c81ada75122217547a0249d39dd94bebc3b9500ab2011835525569f5ee939832",
+        "file": "src/runner/dispatch/worker-home.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/worker-home.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+        "recordLine": 1,
+        "recordSha256": "51e29a6fd630e7d75933c095ab76e2e3606668daab5fc79b8a963ebacee41d20",
+        "file": "src/runner/merge.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/merge.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 4,
+        "recordSha256": "eb13ce0a0b8be004d96bb27a385abca7bf065a2c85f79c61377d2dd040086434",
+        "file": "core/skills/_shared/citation-format.md",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "7",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "1",
+              "existingEdgeJoins",
+              "7",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 7,
+        "recordSha256": "0d5ff6290621d64ab4a8fcc989bb7f7683da62be5c0d03a3af01ee4ce8b8e481",
+        "file": "core/skills/fgos-clarifying/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "2",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordLine": 8,
+        "recordSha256": "3e3d313ae2c829627477849a66d3cbb1f6137aa9b618d9cc45ff161eec0b0a6c",
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/reading-map.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "2",
+              "existingEdgeJoins",
+              "0",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+        "recordLine": 1,
+        "recordSha256": "97a60ea0b13df13c49be5e0edc24db734a3bef5e3564db5e9e6f4406c0125fb8",
+        "file": "core/skills/fgos-researching/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "existingEdgeJoins",
+              "1",
+              "sourceSpan",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "2",
+              "existingEdgeJoins",
+              "1",
+              "sourceSpan",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl",
+        "recordLine": 1,
+        "recordSha256": "8f58e4e465dfbc06e192cb6ab4995906929688ab04fbaae1549963e63e2a5d55",
+        "file": "core/skills/_shared/ak-cook-worker-contract.md",
+        "changedDependencies": [
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "0",
+              "spanCorrespondence",
+              "text"
+            ]
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "pointer": [
+              "sourceRenderProvenance",
+              "0",
+              "renderFiles",
+              "1",
+              "spanCorrespondence",
+              "text"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      }
+    ],
+    "step5": [
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 2,
+        "recordSha256": "1c06f74e0c2b0299e1144547b7140c6f737c48c17f840d7ffbd3704f11b0ccf6",
+        "file": "bin/fgos.mjs",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 3,
+        "recordSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+        "file": "src/cli/command-registry.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/cli/command-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 7,
+        "recordSha256": "f853ff512c689547cf8fc009b37edcddb88d8fc0aa9e29bd519f30dc7114329c",
+        "file": "src/runner/merge.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/merge.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 66,
+        "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+        "file": "docs/backlog.md",
+        "changedDependencies": [
+          {
+            "path": "docs/backlog.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 153,
+        "recordSha256": "ca2bf792db3e7bf23e4e1046fda3c183f730128b3d977d625edef21704717fca",
+        "file": "plugins/fgOS/skills/terminal-close/close.sh",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal-close/close.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 154,
+        "recordSha256": "8ec8b163e1ff67cf09f6d7c2bbb954d47de409b911dfa3eef985967432fac747",
+        "file": "plugins/fgOS/skills/terminal/SKILL.md",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/SKILL.md",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 155,
+        "recordSha256": "b1e6bf139a36497c67688204d62d65d4e3a18a166d36b721d128d766b54ced1f",
+        "file": "plugins/fgOS/skills/terminal/rename.sh",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/rename.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 156,
+        "recordSha256": "3cd4c0e0288e58eb59eb74961f617cf497e8c3a0d5351593e849cf6098596195",
+        "file": "plugins/fgOS/skills/terminal/terminal-port.sh",
+        "changedDependencies": [
+          {
+            "path": "plugins/fgOS/skills/terminal/terminal-port.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 160,
+        "recordSha256": "b1a896324352a6b42f8e09d2613a0277eab8afce6564edfcc41ab775e81d6de9",
+        "file": "scripts/build-domain-registry.mjs",
+        "changedDependencies": [
+          {
+            "path": "scripts/build-domain-registry.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 184,
+        "recordSha256": "550c0af46de92fdfbb4225c291f93d570a2a3b8f14df1b8f50023be776e7abad",
+        "file": "scripts/event-store/v-spawn-bench.mjs",
+        "changedDependencies": [
+          {
+            "path": "scripts/event-store/v-spawn-bench.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 216,
+        "recordSha256": "3ad8b712151092bfe39c8f1dac1ad4339180d0f0e4617996b854dae6ffe98624",
+        "file": "scripts/project-agents.mjs",
+        "changedDependencies": [
+          {
+            "path": "scripts/project-agents.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 221,
+        "recordSha256": "e75cf61c41156124d4b2854d9899e384af8188fe2f3b1fe3ec5e9234a170b8a4",
+        "file": "scripts/run-tests.mjs",
+        "changedDependencies": [
+          {
+            "path": "scripts/run-tests.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 227,
+        "recordSha256": "caead5653916d19ba78e7a1dfa582b556e90f8aedb8df47b17f2c07293343919",
+        "file": "scripts/test-select-mutate.mjs",
+        "changedDependencies": [
+          {
+            "path": "scripts/test-select-mutate.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13,
+        "recordSha256": "233a9993f79750b0aec3fbcef0fe0b5e512f9a83d99d23565d13ebcb89c54000",
+        "file": "bin/fgos.mjs",
+        "changedDependencies": [
+          {
+            "path": "bin/fgos.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 14,
+        "recordSha256": "433d6f7a1764ce52de8f3ea4e0376bb9394d9a10b43d4367f298d6207831808f",
+        "file": "docs/architecture-manifest.json",
+        "changedDependencies": [
+          {
+            "path": "docs/architecture-manifest.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 13,
+        "recordSha256": "d95f436a3b8d847976d9c4dfe261d5ecb4b9c6781a4db444fd177a8e8c9974ec",
+        "file": "packages/durable-file/rust/src/lib.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/durable-file/rust/src/lib.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 19,
+        "recordSha256": "54dec509aa80a7fefeed7cbed81ddbe8b82ef9b94ca2dc6540d2017256bc1404",
+        "file": "packages/git/node-addon/src/git.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/src/git.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 20,
+        "recordSha256": "f58f452fb0cab9228d6692c4557365cff76fdfa7db25783cecac5d954a887871",
+        "file": "packages/git/node-addon/src/git/worktree.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/src/git/worktree.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 22,
+        "recordSha256": "2d789df1f0616b7d7d1f1966b6d93c29e59465b5ddac720d26421dcafad623a6",
+        "file": "packages/git/rust/src/driver.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/driver.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 23,
+        "recordSha256": "ca873051718f4720751c0906430b59194117e03495610fb7f3a823e4f4fb503a",
+        "file": "packages/git/rust/src/inspect.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/inspect.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 24,
+        "recordSha256": "2116db63e0aba7f5a24f17cd5e1508a7c70a8179f9a8c9a813384926c084ebb0",
+        "file": "packages/git/rust/src/publication.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/publication.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 1,
+        "recordSha256": "6e17a1078bc65b14f0d74d59f93ad807f1df062763a5cb68082460c128b9e1f2",
+        "file": "packages/git/rust/src/refs.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/refs.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 2,
+        "recordSha256": "1dd6d2e2368f0fe26d21ac3c2482dace5298ae2386c3b7c65e88cf89c941d32e",
+        "file": "packages/git/rust/src/remote.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/remote.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 3,
+        "recordSha256": "264e949dc6a6e873cc4ffb61076fbc7d0ed98007af5d08d132899d02fabeabad",
+        "file": "packages/git/rust/src/repository_config.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/repository_config.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 4,
+        "recordSha256": "f5ecd1cafa9e5484e95f51f9a622cd5ea032c9ff86c1c6da2234c61646d75e7e",
+        "file": "packages/git/rust/src/wal.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/wal.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 5,
+        "recordSha256": "9fcfaadd621f934c425cdd67ef2c2bb845905aeab8c7d5460ec6c30e0bdfabd4",
+        "file": "packages/git/rust/src/worktree.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/worktree.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 29,
+        "recordSha256": "72900bf140aadf0940deac70d78d19048c503e8a68cc58c45302d983cba1f6ba",
+        "file": "packages/process/rust/src/platform/linux.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/process/rust/src/platform/linux.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 11,
+        "recordSha256": "8a349e948318f3348dc575ee3d232c4642b154b6d080ae0cb693d7b92083b2ce",
+        "file": "packages/terminal-control/rust/src/store.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/store.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 16,
+        "recordSha256": "088e5af910cd63d66f869d0f2eafe8251db2abeb0767362f5f501217100fd2bc",
+        "file": "src/git/native.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/git/native.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 25,
+        "recordSha256": "4208a00f208b73b27b4974c59744ef74ac80277750dde1b7baf11d3aab309ffd",
+        "file": "src/runner/dispatch/assignment-runner.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 38,
+        "recordSha256": "b26c81433fa0ae373f6503d9e55024919d675aea457ac7b5e97b6d192c336da4",
+        "file": "src/runner/dispatch/confinement/resources.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/confinement/resources.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 41,
+        "recordSha256": "dff3ebc9e4a0d0d45bad5c2348253c58e19e8e0b665128c3182ce48bfe0a281c",
+        "file": "src/runner/dispatch/herdr-round.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 15,
+        "recordSha256": "fdb0f573e0d2dc0d714d2f8d331d59820efd91e9ec0a433d5b41f48e63162115",
+        "file": "src/runner/dispatch/visibility-session.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/visibility-session.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 17,
+        "recordSha256": "ba78a73df5332ba7566e4b72c57b756645435b6aa5d714afcfbe3192b173f2e6",
+        "file": "src/runner/dispatch/worker-home.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/worker-home.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 18,
+        "recordSha256": "61040ecc036045bee653dc122b4e5e33639d5c643a6c095ef0a51e0c5993f24b",
+        "file": "src/runner/dispatch/worker-session.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/worker-session.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 26,
+        "recordSha256": "36218544ddae37beac9dccecb4ce1bfe577c36313572e191d6dd65068a3a3265",
+        "file": "src/runner/execution/run.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 33,
+        "recordSha256": "8aba8f209d8da76daeb43e14c17ef5ea001541886abffe598c51db840b105ddf",
+        "file": "src/runner/lock-fence.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/lock-fence.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 38,
+        "recordSha256": "e01007f20caa00e2cab402f023469558b8a7e6e0d303af9fa51edb39cd56d586",
+        "file": "src/runner/merge.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/merge.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 3,
+        "recordSha256": "7f684f754058ad4c0b631a1729b1f8e3997e99d7a690f7226faec0a1f7c3e181",
+        "file": "src/runner/repo-locks.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/repo-locks.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 6,
+        "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+        "file": "src/runner/work-dispatch.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/work-dispatch.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 33,
+        "recordSha256": "a2cb150d5d9f3e528d6b5fb3806c402e2db06428ebf1784fd5a1608d443d63a0",
+        "file": "src/terminal-control/client.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/terminal-control/client.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 37,
+        "recordSha256": "3562ef6b9b88ee150811b7a6a87ad51d8cf690f4fe13fcb5ebbde2d7293801a2",
+        "file": "src/util/session-identity.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/util/session-identity.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 38,
+        "recordSha256": "b349176ac3649f92df0721640e58d92917c8e9c7ea0e730c8803782dd670afe2",
+        "file": "src/util/third-party/js-yaml.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/util/third-party/js-yaml.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 39,
+        "recordSha256": "504907b2fd0f1b5eab2f6744f2015cc95aa7e48d42863e9de2d2fc00e61ada3a",
+        "file": "src/util/yaml.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/util/yaml.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+        "recordLine": 3,
+        "recordSha256": "0bbb39ff70c893c64b6c21ae269046f3ba623db6f48d8c0c748af58d8bc35536",
+        "file": "packages/terminal-control/rust/src/port.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/port.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 21,
+        "recordSha256": "0e7babe03c2e3d056c6c970d6dde236bbfabc979ea522c2069340f130b598e59",
+        "file": "apps/fgos/src/cli_projector.rs",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/src/cli_projector.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 52,
+        "recordSha256": "503033f95134fcf275a27926c8c542fb424720da1c0dfdd559ef9f03ebfdf195",
+        "file": "packages/event-store/rust/src/read.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/event-store/rust/src/read.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 54,
+        "recordSha256": "ad055a7a298eac868030714a0672d632853fa1aab9ff3d971b060bab7bb1f4ec",
+        "file": "packages/event-store/rust/src/refs.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/event-store/rust/src/refs.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 58,
+        "recordSha256": "b5b06b514307f947c45cbeed3c29d488ab5c014889ca0cf3055047fa420befe0",
+        "file": "packages/git/node-addon/Cargo.toml",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/Cargo.toml",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 62,
+        "recordSha256": "e2a0c728b85c80b5ce05435fd06edc6970c8ecfb1220fe509f1511a1c50c3ae2",
+        "file": "packages/git/node-addon/src/git/inspect.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/src/git/inspect.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 64,
+        "recordSha256": "877e34a67245060aa4ee4a33040cf8fd0d59b60ebcc0f18ec29360812290ff26",
+        "file": "packages/git/node-addon/src/git/remote.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/node-addon/src/git/remote.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 66,
+        "recordSha256": "2e3be34693c06f4856f22cf09efe15554ad8f1b4a48eb37a166ba44a9e9f330c",
+        "file": "packages/git/rust/src/lib.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/src/lib.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 72,
+        "recordSha256": "3f85767ceebb997b1e82e6267bd848e0f7cd1cac5a22d2998b1374c395652eaa",
+        "file": "packages/holder-lock/rust/src/driver/flock.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/holder-lock/rust/src/driver/flock.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 91,
+        "recordSha256": "c18bccdf3d79814be7a612bbba8a20a33b832c66b70d4089318a0ed88484838c",
+        "file": "packages/process/rust/src/facts.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/process/rust/src/facts.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 104,
+        "recordSha256": "58e1b87e25e6901eefbae943ed2a23376d7c72471f38125b9e17edcc856243db",
+        "file": "packages/terminal-control/contracts/terminal-control.port.v1.json",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/contracts/terminal-control.port.v1.json",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 106,
+        "recordSha256": "6a1907b668a21db6758b03b403c9a3e5fbb762a4a5b2890d787cdc1266e63a1f",
+        "file": "packages/terminal-control/rust/src/core.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/core.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 107,
+        "recordSha256": "68c5bfdbcb181c2d71fec98b4c24430295bc505b1d3561c121636154a0f77f5a",
+        "file": "packages/terminal-control/rust/src/driver/herdr.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/driver/herdr.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 108,
+        "recordSha256": "70674cb28d44dc45cf899cfbbddadd08cbddf82b25e21ca1616a9193bdb7cc4c",
+        "file": "packages/terminal-control/rust/src/driver/mod.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/driver/mod.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 109,
+        "recordSha256": "444965709050893b47c7ebf7a2acd12c7516126c005abccc2c8ec1694e833ad1",
+        "file": "packages/terminal-control/rust/src/identity.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/identity.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 111,
+        "recordSha256": "843c52dbdc7cdd46e1ddc00cf90fe4432a7b964ff17e529a48daa451d38f1ce3",
+        "file": "packages/terminal-control/rust/src/policy/mod.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/policy/mod.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 112,
+        "recordSha256": "96c10df271e68058e1075b1863fddcea1389bde263a7a4b6fcac1e163db17fce",
+        "file": "packages/terminal-control/rust/src/route.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/src/route.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 133,
+        "recordSha256": "e28728195662f4bce0e520af4a32abf63c5db66af0d2fbe82b08dc45ac834fa8",
+        "file": "src/runner/dispatch/adapters.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/adapters.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 141,
+        "recordSha256": "14ddf7446eb4cd81c262e8f2ce83c3097a4cd8d75e94c270c3afc595b6bbeb5e",
+        "file": "src/runner/dispatch/terminal-slot.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/terminal-slot.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 143,
+        "recordSha256": "d23950c4d7a343e36f8868afa07f555a724ba21f64929a645d648fbb598b469f",
+        "file": "src/runner/dispatch/worker-session-boot.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/runner/dispatch/worker-session-boot.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 173,
+        "recordSha256": "93fbd539cb7c0e1efd3fc159e81c252f4596b65abbb287ee76b0e05b5a56c605",
+        "file": "src/terminal-control/config.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/terminal-control/config.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "recordLine": 4,
+        "recordSha256": "115b384cbda26052611db3af6701160ccb385e1770e4e65531f56312724c5f85",
+        "file": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 13,
+        "recordSha256": "1e8087d6a02b7d6a693f30efa8a84a185197649fb3a5fb6a004b60cf7f18c162",
+        "file": "src/setup/git-checks.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/setup/git-checks.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+        "file": "src/setup/registrations.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/setup/registrations.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 25,
+        "recordSha256": "38c280227990002bdbc4303588994e134d4edb32f9f67d6180489b3db18e8083",
+        "file": "src/setup/terminal-control-checks.mjs",
+        "changedDependencies": [
+          {
+            "path": "src/setup/terminal-control-checks.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 45,
+        "recordSha256": "c3736b687a70e44fc613710b0f0a879c7cf423622e2d3bf00058e4e9a668dec1",
+        "file": "packages/terminal-control/rust/tests/core_failures.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/core_failures.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 46,
+        "recordSha256": "193edf46160373c9c15766e518b7216f046758b654a857ca76cbdffbadbd0d29",
+        "file": "packages/terminal-control/rust/tests/core_rules.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/core_rules.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 47,
+        "recordSha256": "8d6a9d2c6f7cde39627f242685e6042c3bd77de868054e12d30ff992c6e1ce92",
+        "file": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 48,
+        "recordSha256": "2452a9c849c4f3179a34c3766d036d9aed102f8f4885db1d81b37be6bc4b3ff4",
+        "file": "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 49,
+        "recordSha256": "9bed085418a439cb80e30f975c43483521dbbd1e5c482f088fb6eb38ff0b2740",
+        "file": "packages/terminal-control/rust/tests/herdr_driver_live.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/herdr_driver_live.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 75,
+        "recordSha256": "7e63b54ae985e5c87287ee2ba7d5cf3ecac43bcf2b13170ad88d67c7f470311b",
+        "file": "test/git/inspect.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/git/inspect.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 78,
+        "recordSha256": "c24d4febd6815f8b3ebba2eeaf561032f6334cfe28137d8c084aa1a02833953e",
+        "file": "test/git/remote.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/git/remote.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 114,
+        "recordSha256": "03c659a865414b49598ade7084938c5193d18de71bf2ec516b81494db9d0d7a6",
+        "file": "test/runner/dispatch-visibility-session.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-visibility-session.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 123,
+        "recordSha256": "854632f8042fedb12b9ca7a7f9846cbc614dc562ca2715e78228fd08df1f5fcf",
+        "file": "test/runner/herdr-agent.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/herdr-agent.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 138,
+        "recordSha256": "c4222c16fcb53ec4c2f7ddb9cf357f5a083adeb0014a9c5e64cf98e06c66d487",
+        "file": "test/runner/worktree-admin-multiprocess.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/worktree-admin-multiprocess.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 161,
+        "recordSha256": "3d644d1f23c958758b8bc60099c961d0306980585f7a7860ce41dfa145450957",
+        "file": "test/scripts/test-select-mutate.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/test-select-mutate.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 167,
+        "recordSha256": "b11f586da51df452a15b3da15f1ed2fef83620840a3b9d69eee75e47ba9e2ce7",
+        "file": "test/session-identity/attempt-writer-id.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/session-identity/attempt-writer-id.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 169,
+        "recordSha256": "9a3c81498778d812ffed5dffecc061fb88d31de4b32f20de7f9db6170fc4be4b",
+        "file": "test/setup/git-checks.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/git-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 171,
+        "recordSha256": "b2ccc6a8bae78e3a5f4da4c77ee60dda50d1bc4e24ef7790084ed50184f71fc6",
+        "file": "test/skills/terminal-pane-ownership.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/skills/terminal-pane-ownership.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 187,
+        "recordSha256": "b4c83fe8f43178d2fc904d7bc044e7720715d81e9506777fa00b01e7212a224a",
+        "file": "test/terminal-control/client-route.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/terminal-control/client-route.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 188,
+        "recordSha256": "502ccd6f957a5477859ab546ccda030f319998d2917158b078432ab727100157",
+        "file": "test/terminal-control/group-queue.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/terminal-control/group-queue.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 192,
+        "recordSha256": "045903202f49ea962fde5e725c95bed69467263da7f6c1048086b6d44e44b255",
+        "file": "test/util/yaml.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/util/yaml.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 2,
+        "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+        "file": "test/architecture.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/architecture.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 27,
+        "recordSha256": "f0fd31a4a0d87b8a7bd5d92e957c00b0e9b7383dce0f2278ceb3104b575ff653",
+        "file": "test/runner/dispatch-worker-session.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-worker-session.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "recordLine": 37,
+        "recordSha256": "e74e8ba435d92dae4f9200e805f7e90c9e2c74c586e0fb83407396c4d0a6a683",
+        "file": "test/runner/driver-rununit.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/driver-rununit.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 18,
+        "recordSha256": "27d4a93eaa409a2dc2b23616d6d8ceec0b71f8e6a3bcea37e48d8098d0493b8b",
+        "file": "test/runner/work-unit-for.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/work-unit-for.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 35,
+        "recordSha256": "8e61c58b8e1bd693a3af7de2616ea5c7f9cbcd4c51973fd92243e95e10f78ab3",
+        "file": "test/setup/checks.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 57,
+        "recordSha256": "68a5a3f9430eee3cb43f2012df4af0784641ff1b73d27e03eb8122578fa7b5b1",
+        "file": "apps/fgos/tests/cli_tests.rs",
+        "changedDependencies": [
+          {
+            "path": "apps/fgos/tests/cli_tests.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 83,
+        "recordSha256": "c255d036f66d5926395089f337ec4b75e3478cb821b03a523a174dcf0764d8b9",
+        "file": "packages/git/rust/tests/inspect.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/tests/inspect.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 84,
+        "recordSha256": "43055583b093bef572970ca3bd9373085cc6409049763eea8f4bff40aaa97cc1",
+        "file": "packages/git/rust/tests/publication.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/tests/publication.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 85,
+        "recordSha256": "57a88657a29697dbc2a69a563ebba31374c2ea73184ed2138c200c520b85ced4",
+        "file": "packages/git/rust/tests/refs_remote.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/tests/refs_remote.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 9,
+        "recordSha256": "a2a6723497fac4513e2e551a8701ef4cd801e9f42909c725087ec4b4fe7e996e",
+        "file": "packages/terminal-control/rust/tests/policy_fixtures.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/policy_fixtures.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 10,
+        "recordSha256": "fbb9415b2b1c96bc4a492a232ea536b9b7c5e191d8fc6f363bdb5f5e35033dce",
+        "file": "packages/terminal-control/rust/tests/store_publish.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/store_publish.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 53,
+        "recordSha256": "f303efd7e783c5f800455449c640e64d9c35bd58268b0119b4de20146d991f40",
+        "file": "test/git/native-load.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/git/native-load.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 55,
+        "recordSha256": "0a1cde5ab49346685f148bc2fdb5b630cdc935ff75552d3a91bf085bb1140ece",
+        "file": "test/git/worktree.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/git/worktree.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 56,
+        "recordSha256": "e426df5caf7346a797dd37157d3c5cd0510c69bcd719ae19a862d48527f65891",
+        "file": "test/helpers/fake-herdr-pane.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/helpers/fake-herdr-pane.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 84,
+        "recordSha256": "3dfe51e42e0a02e97e9d00767e9606430467f4b8cb3ce02e6173bed59eece1d9",
+        "file": "test/plugins/terminal-skill-attach.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/plugins/terminal-skill-attach.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 90,
+        "recordSha256": "42562abfe451d4d32e21bec74fb85e2051aff6a6079be121fadbaf740d13e8e0",
+        "file": "test/run-supervisor/contracts-terminal.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/contracts-terminal.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 108,
+        "recordSha256": "3c6ca94622a186783fa2dc2b5573a1c9e067f3bfd47f00aba8ae11e72365826d",
+        "file": "test/run-supervisor/terminal-groups.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/run-supervisor/terminal-groups.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 122,
+        "recordSha256": "70d736fc9f1daad10502267803220955ff8cbf45b2382ddc10d7f820f2f2d697",
+        "file": "test/runner/dispatch-confinement-authority.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-confinement-authority.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 124,
+        "recordSha256": "440a575764fa7cccd08956127ea2cf4d6b921f0c4e832a160cb1fb319469549a",
+        "file": "test/runner/dispatch-confinement-blind.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-confinement-blind.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 133,
+        "recordSha256": "9b7d4a535684cbb152894da6dc7f2935a298cefc38987bd9ec837a4913f54271",
+        "file": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 188,
+        "recordSha256": "b068c4d73e3e1fc4b7dffb7cf42a43e57ea9e10f9701b74d1bb198547f5b4bee",
+        "file": "test/rust-host/release-tree.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/rust-host/release-tree.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 200,
+        "recordSha256": "719bbc71f0449fd12cf3a8c52ebed3c4a64e1fc1544cff2d316ccd2d354fdbe0",
+        "file": "test/scripts/run-tests.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/scripts/run-tests.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 218,
+        "recordSha256": "cd23a8791f7440e6f1914066837906f48e71962a89f7685750e513fdc6294160",
+        "file": "test/setup/event-store-checks.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/event-store-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 229,
+        "recordSha256": "07fbe22da5d3d6f2e68fe0ac2f830f6b14710849a9b36fe6ae87909547b9c5f1",
+        "file": "test/setup/terminal-control-checks.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/terminal-control-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 232,
+        "recordSha256": "219d577dc96b1ee5b3596100526e02e2dfb370bf3dc6910c3f0fcdd0bfc063c6",
+        "file": "test/setup/visibility-checks.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/visibility-checks.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 235,
+        "recordSha256": "c45096484051ae476116f6d94bf575a19c560083ce39c7491e3c5cbb2de6b0f6",
+        "file": "test/setup/yaml-parse-failures.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/setup/yaml-parse-failures.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 248,
+        "recordSha256": "381216fc3596a033400711cbea70ea096f5219a9f8583a199e158f91f3ee0e4a",
+        "file": "test/terminal-control/contracts.test.mjs",
+        "changedDependencies": [
+          {
+            "path": "test/terminal-control/contracts.test.mjs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 11,
+        "recordSha256": "2f52e08038ed5c269980b1b5149e0d9959d3468752d8a3becaa6a0c108b61346",
+        "file": "packages/git/rust/tests/contracts.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/git/rust/tests/contracts.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 29,
+        "recordSha256": "466f110550772a6e59ba36fbe154faf0ee80aee7a6011e22462d3dd072a848a6",
+        "file": "packages/run-supervisor/rust/tests/support/herdr.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/run-supervisor/rust/tests/support/herdr.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 30,
+        "recordSha256": "5725e1f0f5356fff8b20de4c4f09a7abffa9e0e49afd49fd063f6388b3be7bd0",
+        "file": "packages/terminal-control/rust/tests/common/mod.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/common/mod.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      },
+      {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 31,
+        "recordSha256": "136de64545bf0c67ceed98be079afce89d8a5eff43bcda09c661ce0c252b806a",
+        "file": "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+        "changedDependencies": [
+          {
+            "path": "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+            "pointer": [
+              "file"
+            ]
+          }
+        ],
+        "owner": "Documentation source-binding reviewer / Lead",
+        "gateId": "source-context-and-post-pin-recomposition",
+        "status": "pending final-pin re-location and whole-file recomposition; old judgments/reviews retained as historical"
+      }
+    ]
+  }
+}

@@ -1,242 +1,272 @@
 {
-  "version": 1,
-  "status": "blocked",
-  "sourceHead": "dac65ad8ba135e8acf33438c8790efc222133e37",
+  "version": 2,
+  "status": "done",
+  "meaning": "Authored and focused-verified only; independent review and authority cutover are not claimed.",
+  "sourceHead": "92260972cb2dc2ab3740859dc1c005bb9be42857",
   "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w3-import2-brief.md",
-  "needsWrites": [
-    "docs/reading-map.md"
+  "completedAt": "2026-10-24T03:16:26.446622+00:00",
+  "supersedes": {
+    "blockedReceiptAt": "92260972cb2dc2ab3740859dc1c005bb9be42857:plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.json",
+    "scopeCorrection": "docs/reading-map.md explicitly writable for this continuation"
+  },
+  "needsWrites": [],
+  "merge": {
+    "commit": "bc5589ed757e41f38c1f548daffddf28cbacfa26",
+    "importedCommits": 233,
+    "changedPaths": 348,
+    "incomingPlatformPaths": [
+      "docs/platform/component-boundary.md",
+      "docs/platform/event-store/spec.md",
+      "docs/platform/git/spec.md",
+      "docs/platform/identity/spec.md",
+      "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "docs/platform/terminal-control/spec.md",
+      "docs/platform/yaml-document/spec.md"
+    ],
+    "artifact": "plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json"
+  },
+  "step0": {
+    "status": "pass",
+    "authorSourcePin": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+    "effectiveBindingsChecked": 791,
+    "historicalOverlayPredecessorsNotRewritten": 277,
+    "preimageAuthenticatedBindings": 769,
+    "refreshedRows": 242,
+    "freshSourceBindings": 17,
+    "partialCarryResiduals": 3,
+    "ratchetDigestRefreshes": [
+      "docs/specs/reading-map.md",
+      "docs/specs/distribution.md",
+      "docs/specs/runner.md",
+      "docs/specs/observe.md"
+    ],
+    "legacyFiles": 33,
+    "missingCurrentUnits": 0,
+    "negativeProbesRejected": [
+      "stale digest",
+      "wrong neighbour",
+      "parents-only ancestry",
+      "wrong serialization"
+    ],
+    "independentReview": "pending; no gate acceptance or authority flip"
+  },
+  "deferredSourceContext": {
+    "step3": 17,
+    "step4": 16,
+    "step5": 117,
+    "artifact": "plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json",
+    "status": "pending with existing owners; no pair acceptance"
+  },
+  "census": {
+    "method": "unchanged scan/census exports with full cached+untracked inventory filtered by unchanged declaredProduct; no CLI bootstrap or census write",
+    "fileCount": 1107,
+    "siteCount": 25,
+    "classCount": 262,
+    "classCounts": {
+      "standalone-skill-script": 3,
+      "hook-read-context": 21,
+      "configured-binary": 87,
+      "rust-test": 111,
+      "argv-runner": 13,
+      "production-sandbox-probe": 4,
+      "uncalled-wrapper": 20,
+      "git-driver": 1,
+      "sandbox-door": 2
+    },
+    "generatedEqual": true,
+    "generatedSha256": "d3bca3fba55ff1e74a451941528d403eda2658381c635491a3d9001868fb2d8d",
+    "committedSha256": "d3bca3fba55ff1e74a451941528d403eda2658381c635491a3d9001868fb2d8d",
+    "committedSelfDigestMatches": true,
+    "sameSiteIdentitiesExcludingLine": true,
+    "priorSiteCount": 25
+  },
+  "checks": {
+    "artifact": "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
+    "sha256": "7d2ce63086a47ec9f1605722ddb4ccb2d8d0c890e1e3e799c5cd2c48c2b0d22c",
+    "allPassed": true,
+    "names": [
+      "binding-and-conservation",
+      "legacy-drift-check",
+      "ratchet",
+      "ratchet-owning-test",
+      "evidence-relocation-before",
+      "undeclared-census"
+    ]
+  },
+  "scope": {
+    "passed": true,
+    "repositoryHeadUnchanged": true,
+    "repositoryIndexUnchanged": true,
+    "gitDiffCheck": true,
+    "productionSymbolsChanged": false,
+    "impactAnalysis": "degraded/unqueried under no-CLI brief",
+    "allowedNavigationAddition": "docs/reading-map.md",
+    "preview": "not started within confined worker scope"
+  },
+  "pending": [
+    "Independent review of changed effective ledger rows and three refreshed partial-carry residuals.",
+    "Deferred Step 3/4/5 source-context re-location by their existing owners.",
+    "Rejoin historical gate/review/recipe projections and whole-file/source recomposition at final pin."
   ],
-  "blocker": "Task 2 must update the existing detailed navigation holder docs/reading-map.md section 5 for three imported Terminal/Git/YAML entries. That path is outside the exact write scope. Stopped under the brief, without editing it or duplicating the holder.",
-  "scan": {
-    "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
-    "sha256": "bfaa9d4271ebc772fe33027cbfae62cef9b50c9b6968fb7909b829aa06a886a9",
-    "counts": {
-      "postFinalPinFiles": 5,
-      "postInventoryPinFiles": 33,
-      "files": 33,
-      "filesWithUnprovenChange": 5,
-      "missingChangedUnits": 17
-    },
-    "checkExit": 0,
-    "missingBySource": [
-      {
-        "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
-        "counts": {
-          "currentUnits": 166,
-          "changedSinceInventory": 13,
-          "changedSinceFinal": 0,
-          "missingCurrent": 2,
-          "missingChangedSinceInventory": 2,
-          "missingChangedSinceFinal": 0
-        },
-        "units": [
-          {
-            "anchor": "5-high-level-component-authority-register",
-            "digest": "2cf73fb7faa401dafde89b07119f4a5181bbe92232d67b936ecc5c068f602384"
-          },
-          {
-            "anchor": "unheaded-block-25",
-            "digest": "9819ff097e5460c144503f4feb1ee09463529060b03882c2deafe01fb9ebe148"
-          }
-        ]
-      },
-      {
-        "sourcePath": "docs/specs/distribution.md",
-        "counts": {
-          "currentUnits": 44,
-          "changedSinceInventory": 28,
-          "changedSinceFinal": 10,
-          "missingCurrent": 9,
-          "missingChangedSinceInventory": 9,
-          "missingChangedSinceFinal": 9
-        },
-        "units": [
-          {
-            "anchor": "data-dictionary",
-            "digest": "ea2e6b86ff3cfb046074dd1da3defe6ff5f212c8528f6124837782848f91eddc"
-          },
-          {
-            "anchor": "unheaded-block-5",
-            "digest": "86d9739018bbdc85f6ca63e19467ca3eb07fd4126aefa1421c16587f9e9aeffd"
-          },
-          {
-            "anchor": "setup",
-            "digest": "3ddc0439eab8352041049e0935f8d5c4b51b519b2bc13d2db2c2503f0971d8af"
-          },
-          {
-            "anchor": "unheaded-block-9",
-            "digest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7"
-          },
-          {
-            "anchor": "business-rules",
-            "digest": "2bf8f761d6f896e77001be77524779fbeb2d871183170be2112ff5aa6403de19"
-          },
-          {
-            "anchor": "unheaded-block-16",
-            "digest": "5800c000957e2ab00a37613ce7a1eaf82e0b941da1280fd8e2c19829386ecf2f"
-          },
-          {
-            "anchor": "lịch-sử-quyết-định",
-            "digest": "d71c624ba65b9c20499c1d6033fe9748cb9c61ddb770c011fd25b37979cca2e5"
-          },
-          {
-            "anchor": "unheaded-block-17",
-            "digest": "45ccc7989661f3fd7109d1e585b79ebbdf1223d00279819149037540bdc2ab2a"
-          },
-          {
-            "anchor": "unheaded-block-23",
-            "digest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212"
-          }
-        ]
-      },
-      {
-        "sourcePath": "docs/specs/observe.md",
-        "counts": {
-          "currentUnits": 27,
-          "changedSinceInventory": 27,
-          "changedSinceFinal": 2,
-          "missingCurrent": 2,
-          "missingChangedSinceInventory": 2,
-          "missingChangedSinceFinal": 2
-        },
-        "units": [
-          {
-            "anchor": "owns",
-            "digest": "c6d3ff381aeb510ef54a48e3ba171bee0de005c3464ba697990a3b613420a5a6"
-          },
-          {
-            "anchor": "unheaded-block-3",
-            "digest": "39cfbe4a9a2fb100d91ee501bbb8818f6de52fc8ffa8c5fff5019bd8a0ee4e0f"
-          }
-        ]
-      },
-      {
-        "sourcePath": "docs/specs/reading-map.md",
-        "counts": {
-          "currentUnits": 3,
-          "changedSinceInventory": 2,
-          "changedSinceFinal": 2,
-          "missingCurrent": 2,
-          "missingChangedSinceInventory": 2,
-          "missingChangedSinceFinal": 2
-        },
-        "units": [
-          {
-            "anchor": "reading-map-sản-phẩm",
-            "digest": "27c830b14aa03e662057073b1f73ae34bfd2282ca2bac8498001d4f3ac0e17ca"
-          },
-          {
-            "anchor": "unheaded-block-2",
-            "digest": "aa5ef3b591f7b65841e3f7a389df5ae06c44ff7f6e948e9d0e21fc3e7fcdfc64"
-          }
-        ]
-      },
-      {
-        "sourcePath": "docs/specs/runner.md",
-        "counts": {
-          "currentUnits": 517,
-          "changedSinceInventory": 148,
-          "changedSinceFinal": 2,
-          "missingCurrent": 2,
-          "missingChangedSinceInventory": 2,
-          "missingChangedSinceFinal": 2
-        },
-        "units": [
-          {
-            "anchor": "business-rules",
-            "digest": "f182ae334ab9402bcb21c9a4568e96cea5a0fde149656b2722f152dcb16a45e9"
-          },
-          {
-            "anchor": "unheaded-block-93",
-            "digest": "797c7185bf24809a88d85e66f8323b72dc2ba3246091c741028323e90a7a3208"
-          }
-        ]
-      }
-    ]
-  },
-  "navigationEvidence": {
-    "sourcePath": "docs/specs/reading-map.md",
-    "sourceSha256": "70b55dd49b5f5eebe6203ff4bae1fe853a6c14136ce5e26bdb26b56fd4e3421b",
-    "successorPath": "docs/reading-map.md",
-    "successorSha256": "1e7296664eb04d3858a2b3a092cf949b31dc43bc39979797dfdea6d7bb673332",
-    "entries": [
-      {
-        "entry": "docs/platform/terminal-control/spec.md",
-        "source": {
-          "line": 63,
-          "text": "- `docs/platform/terminal-control/spec.md` — spec thành phần Terminal Control: nguồn duy nhất trả lời \"key này chạy ở pane nào\" trên terminal multiplexer (cổng trên theo key, driver herdr khai báo khả năng, layout đo thật + policy cắm được, luật gom tab); source: `packages/terminal-control/rust`, contracts: `packages/terminal-control/contracts/`; Node chỉ gọi qua route nội bộ `fgos internal terminal-control` (`src/terminal-control/client.mjs` client mỏng, `src/terminal-control/config.mjs` mục `terminal.*`); doctor/setup: `src/setup/terminal-control-checks.mjs` (hai dòng `terminal-control` và `terminal-allocations`, không có fix `terminal-dir`: store tự tạo thư mục); migration Node đã xong. Key của một lần chạy agent là attempt id; supervisor gọi in-process theo key (§12)."
-        },
-        "successor": {
-          "line": 185,
-          "text": "- `docs/platform/terminal-control/spec.md` — spec thành phần Terminal Control: nguồn duy nhất trả lời \"key này chạy ở pane nào\" trên terminal multiplexer (cổng trên theo key, driver herdr khai báo khả năng, layout đo thật + policy cắm được, luật gom tab); source: `packages/terminal-control/rust`, contracts: `packages/terminal-control/contracts/`; Node chỉ gọi qua route nội bộ `fgos internal terminal-control` (`src/terminal-control/client.mjs` client mỏng, `src/terminal-control/config.mjs` mục `terminal.*`); doctor/setup: `src/setup/terminal-control-checks.mjs`; migration Node đã xong. Key của một lần chạy agent là attempt id; supervisor gọi in-process theo key (§12)."
-        }
-      },
-      {
-        "entry": "docs/platform/git/spec.md",
-        "source": {
-          "line": 64,
-          "text": "- `docs/platform/git/spec.md` — spec thành phần Git (foundation): một authority cho mọi thao tác repository qua các port có kiểu (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), file WAL dưới git common dir là authority phục hồi duy nhất (§10), một cửa remote cho Remote, Publication và bộ đếm sequence (§3), cửa kích hoạt C5 và sáu dòng doctor Git (§12), vector bằng chứng §15/§19; source: `packages/git/rust` (crate `fgos-git`), addon N-API kết hợp `packages/git/node-addon` (link cả `fgos-event-store`), facade Node `src/git/` (không có cổng `git(args)` công khai), contracts: `packages/git/contracts/`; script bằng chứng: `scripts/git/` (E1 `e1-power-cut.*`, E3 `e3-bench.mjs`, P-SPACE/P-RESOURCE `p-space*.{sh,mjs}`, P-RELEASE `p-release-checks.sh`)"
-        },
-        "successor": {
-          "line": 186,
-          "text": "- `docs/platform/git/spec.md` — spec thành phần Git (foundation): một authority cho mọi thao tác repository qua các port có kiểu (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), file WAL dưới git common dir là authority phục hồi duy nhất (§10), cửa kích hoạt C5 (§12), vector bằng chứng §15/§19; source: `packages/git/rust` (crate `fgos-git`), addon N-API kết hợp `packages/git/node-addon` (link cả `fgos-event-store`), facade Node `src/git/` (không có cổng `git(args)` công khai), contracts: `packages/git/contracts/`; script bằng chứng: `scripts/git/` (E1 `e1-power-cut.*`, E3 `e3-bench.mjs`, P-SPACE/P-RESOURCE `p-space*.{sh,mjs}`, P-RELEASE `p-release-checks.sh`)"
-        }
-      },
-      {
-        "entry": "docs/platform/yaml-document/spec.md",
-        "source": {
-          "line": 65,
-          "text": "- `docs/platform/yaml-document/spec.md` — spec thành phần YAML Document (L0 leaf, owner ký 2026-10-22; crate Rust `packages/yaml-doc/rust`, các consumer Rust và cửa Node đã xong; js-yaml đã xoá, RUL108 (every YAML parse goes through the native door) thay RUL101 (every YAML parse goes through one vendored js-yaml)): một authority cho đọc/sửa/merge YAML giữ nguyên byte không đụng tới, hai profile parse (`strict-config`, `tool`), comment là text có vị trí kèm chặn injection, merge primitive nhận luật từ caller; source dự kiến `packages/yaml-doc/rust` (crate `fgos-yaml-doc`), Node qua namespace `yaml` của native door sau facade `src/util/yaml.mjs` (thay js-yaml vendored, đã supersede RUL101 (every YAML parse goes through one vendored js-yaml)); bằng chứng: `plans/reports/spike-261022-0017-yaml-config-gate-evidence.md`"
-        },
-        "successor": {
-          "line": 187,
-          "text": "- `docs/platform/yaml-document/spec.md` — spec thành phần YAML Document (L0 leaf, owner ký 2026-10-22; crate Rust `packages/yaml-doc/rust` và các consumer Rust đã xong, cửa Node chưa làm): một authority cho đọc/sửa/merge YAML giữ nguyên byte không đụng tới, hai profile parse (`strict-config`, `tool`), comment là text có vị trí kèm chặn injection, merge primitive nhận luật từ caller; source dự kiến `packages/yaml-doc/rust` (crate `fgos-yaml-doc`), Node qua namespace `yaml` của native door sau facade `src/util/yaml.mjs` (thay js-yaml vendored, supersede RUL101 (the per-worktree dispatch lock is a kernel lock) khi land); bằng chứng: `plans/reports/spike-261022-0017-yaml-config-gate-evidence.md`"
-        }
-      }
-    ]
-  },
-  "commands": [
+  "limitations": [
+    "Default live state root is read-only to this worker: initial native Inspect floor probe refused. Final unchanged evidence checker and census use a real private scratch FGOS_STATE_ROOT, not a disabled check or alternate parser.",
+    "No broad suites run under the brief. No YAML-focused node test attempted or bypassed. The record-only census uses the production script addon staging door exactly as the owning CLI.",
+    "Independent content review, protected Step 3/4/5 source-context refresh, final-pin recomposition and authority cutover are not claimed."
+  ],
+  "artifacts": [
     {
-      "command": "git status --short (initial)",
-      "exit": 0,
-      "result": "clean"
+      "path": "docs/platform/observe/spec.md",
+      "sha256": "ac552c7d2f819abc1ac5044ac5140da3b602353dc835147b6978a57e63c77da5"
     },
     {
-      "command": "git show --no-patch --format=raw bc5589ed7",
-      "exit": 0
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sha256": "8ec115df65702b9661e41d77e88ae28c1be9a6d110e0c5cc43571acbdbe9c926"
     },
     {
-      "command": "git diff bc5589ed7^1 bc5589ed7 -- docs/specs/distribution.md docs/specs/observe.md docs/specs/runner.md docs/specs/reading-map.md",
-      "exit": 0
+      "path": "docs/platform/packaging-distribution/decisions/vendored-yaml-parser.md",
+      "sha256": "43d413dc0f8922e50fe49a56fad268939e1299157c6fc05a9468e14c9e055cf6"
     },
     {
-      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
-      "exit": 0
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sha256": "421f8ddc5f3859a1d2fbf01bba4500337b745e8bdbb75875aae614b7ee55f1b6"
     },
     {
-      "command": "node plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs --check",
-      "exit": 0
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "sha256": "8a974e8880f101b835a5daf35dd261960f8f06b5016d051fb2b77ded21158646"
     },
     {
-      "command": "git diff --check",
-      "exit": 0
+      "path": "docs/reading-map.md",
+      "sha256": "45af45bfca6ce4cad5391f746e40eaa581a2b80ba357eb9fb26bc755e81ebd8b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+      "sha256": "618eebf65f70a075bdf8fbd201e889372a79a0650813b8967f3ced645392f08e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s11-preflip-carries.json",
+      "sha256": "69cc51e2c7ab32fece07f1aa579eaea1ca0c38e07f136f59cb98719b818b0476"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s13-resync-a.json",
+      "sha256": "dc827c6fc9eb89e1272238ddaedc908bc1173cbfb91aee6b3399bb62ef996c47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s14-resync-b.json",
+      "sha256": "478fb71a6ec05c1545f944f6a66f8142ab197aed5589b8db23bb71a3db80241d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s15-navigation-review-fixes.json",
+      "sha256": "e6377da83bf45b19b9438ce0dc68940bd6716daea01ed4b8ebc747cb6101a446"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "sha256": "e5fd2c783d80ebf970bd27a09564b3a8857229c41297b3a12488dc67ac406362"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "sha256": "3f9cfc788d4ffec523da77c40857f04629966b9e1b440af38eb6a42675e01619"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "sha256": "5b989328d48648d6b44957ce641d05a66e2c71c04d6218f9b995cc62b66219d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "sha256": "7dbdbcc5b2998400de5a3c945f4e56f83487212a4282bcc29dd3d205037c7807"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "sha256": "8a92d4c9a5e8a6a5e0fd123fd248c68c0e8215cbbcb1e4722a0fdaee084b03f1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "sha256": "9393a1f46c341dc1d057f138574a9badb6ef455bd846fe1641ccbe9536736e27"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "sha256": "464bdd6643d17800b8f1b0c263c42b88ff0ac39c8d3f96c78f6ca2641f7bca0b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "sha256": "475e89790cbc8a9ffd0f6ad08ba02f5a8d10f9e814ca40ad4dca9e483bef732d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "sha256": "dcfa1d3567c3c23cd10094252ec5d621f65475099141e38401f2aa3298a9caee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "sha256": "b97d15f1e804c643eef3b5a9bb3b8692a9eba36b55d48a156e094386375ba2e1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/receipt.md",
+      "sha256": "dca32f135cde63a6c1c3d7ce0628af68493b2d06e50102e78ae83bf5455a6ec8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+      "sha256": "89bf47e8bf8e7ff96ae4581b8e9389d70f0346461499d0c71a6ab76860a49380"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "sha256": "b0cc4d28bcdbb7a26371d09653f576e62655a91ab795ab96d3c53fed396fcadd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s16-import2-resync.json",
+      "sha256": "8f46a01870801406ad1e512cbdd2863f63cc25cf1ea9f283b8506406cc01951b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/account.py",
+      "sha256": "b012303df69369402ae3cf0934e4115463227d21d2c15ad62c2ae7e535ff954e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json",
+      "sha256": "3cf75c0420d243c85b5b2cc716aa75effd537801c8fa21a08409b37d3cadd03f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/census.mjs",
+      "sha256": "a3ddc1beb86333e541cd4fa63b1969ebe4e66f5b908447c4edd8e5b60997b402"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/checks.json",
+      "sha256": "7d2ce63086a47ec9f1605722ddb4ccb2d8d0c890e1e3e799c5cd2c48c2b0d22c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/deferred-rebinds.json",
+      "sha256": "42a6eac6fbe88f1e0b55add2d6ece8dc4c88449b7cd978a75de7daf176cc3d64"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/evidence-fixture.json",
+      "sha256": "db16c582582bd4918fc7e3d0f13c585816a57f0fdba7fbe17905a9ac1967084a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/extract-units.mjs",
+      "sha256": "679d653510a30cdeb4a1160935a403b49c58a0f08748722ae1d7b905cf9fa05a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/merge-accounting.json",
+      "sha256": "faf25b470f0af4676e6e6140062e811b9e0ad805bc67129aa83721b0fe853e7d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/partial-carry-residuals.json",
+      "sha256": "a74cbf0275c63e91fb80447382d294fa8e6b89c93946e3285a1d7a7c9f25c78e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/replay-evidence.py",
+      "sha256": "3dffe3ec6add0bd9a2944269a41fc68f0f5706bcc17e4b6bb181e43dc324b31e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/run-checks.py",
+      "sha256": "32326c503833452e92ce5872eee5910beb8824415720867a7ea5ebff4468574c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/import2/verify.py",
+      "sha256": "037dcf5b77c6eefeda247bf358fe253fbe15c40bef36dd383c4bc15d6a9b2bce"
     }
   ],
-  "notCompleted": [
-    "Merge accounting and conflict/census reproduction",
-    "Step 0 current content/neighbour binding accounting and incoming obligation update",
-    "Legacy re-sync and rebinds to zero missing",
-    "Evidence relocation --before",
-    "Ratchet digest accounting and owning test"
-  ],
-  "restrictions": {
-    "repositoryGitWrites": false,
-    "fgosCli": false,
-    "lifecycleVerbs": false,
-    "outOfScopeWorkspaceWrites": false,
-    "productionSymbolEdits": false,
-    "independentAcceptance": false,
-    "previewStarted": false
-  },
-  "impactAnalysis": "degraded/unqueried: brief forbids fgOS CLI; no impact-analysis tool exposed; no production symbol edited"
+  "guardrails": [
+    "No repository Git write or fgOS CLI/lifecycle call.",
+    "No source edits under docs/specs, baseline rewrite, production implementation change or hidden native-parser fallback.",
+    "No broad tests, secrets, live config change, owner-answer/progress/gate edits or authority promotion.",
+    "Only disposable /tmp fixture Git writes; normal native script-addon door and private scratch machine-state root used for owning read checks."
+  ]
 }

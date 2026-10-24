@@ -1,0 +1,113 @@
+{
+  "sourceHEAD": "92260972cb2dc2ab3740859dc1c005bb9be42857",
+  "checks": [
+    {
+      "name": "binding-and-conservation",
+      "command": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import2/verify.py"
+      ],
+      "environmentOverrides": {},
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:14.622287+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"status\": \"pass\",\n  \"authorSourcePin\": \"92260972cb2dc2ab3740859dc1c005bb9be42857\",\n  \"effectiveBindingsChecked\": 791,\n  \"historicalOverlayPredecessorsNotRewritten\": 277,\n  \"preimageAuthenticatedBindings\": 769,\n  \"refreshedRows\": 242,\n  \"freshSourceBindings\": 17,\n  \"partialCarryResiduals\": 3,\n  \"ratchetDigestRefreshes\": [\n    \"docs/specs/reading-map.md\",\n    \"docs/specs/distribution.md\",\n    \"docs/specs/runner.md\",\n    \"docs/specs/observe.md\"\n  ],\n  \"legacyFiles\": 33,\n  \"missingCurrentUnits\": 0,\n  \"negativeProbesRejected\": [\n    \"stale digest\",\n    \"wrong neighbour\",\n    \"parents-only ancestry\",\n    \"wrong serialization\"\n  ],\n  \"independentReview\": \"pending; no gate acceptance or authority flip\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "legacy-drift-check",
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+        "--check"
+      ],
+      "environmentOverrides": {},
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:15.642255+00:00",
+      "exit": 0,
+      "stdout": "{\"postFinalPinFiles\":5,\"postInventoryPinFiles\":33,\"files\":33,\"filesWithUnprovenChange\":0,\"missingChangedUnits\":0}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ratchet",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "environmentOverrides": {},
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:17.296403+00:00",
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "name": "ratchet-owning-test",
+      "command": [
+        "node",
+        "--test",
+        "test/scripts/check-legacy-docs-ratchet.test.mjs"
+      ],
+      "environmentOverrides": {
+        "FGOS_HOST_BIN": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8/bin/fgos"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:17.360753+00:00",
+      "exit": 0,
+      "stdout": "✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (1.844677ms)\n✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.121251ms)\n✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (0.981217ms)\n✔ accounted edit: file modified with valid reviewed exception passes (0.55255ms)\n✔ unaccounted edit: file modified without exception or with digest mismatch is refused (0.403333ms)\n✔ unexpected deletion: baselined file missing without exception is refused (0.306119ms)\n✔ malformed baseline: schema validator rejects invalid baseline structures (0.343397ms)\n✔ malformed exception: schema validator rejects invalid exception objects (0.600695ms)\n✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.163089ms)\n✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (0.470928ms)\n✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (3.052924ms)\n✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (0.395926ms)\n✔ symlink target: retargeting a symlink to another file of equal bytes is refused (3.678884ms)\n✔ tree escape: symlink pointing outside repository root or directory symlink is refused (0.353534ms)\n✔ classification: includes curated generated projections alongside maintained authority (0.066196ms)\n✔ CLI: exits 0 on clean tree and exits 1 on finding (77.621009ms)\n✔ live self-check: repository baseline and ratchet verify cleanly (68.994673ms)\n✔ policy-aware: permits edited and new generated projections without exception (0.398024ms)\n✔ policy-aware: permits new and edited history-evidence payloads without exception (0.986688ms)\n✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.362424ms)\n✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.533897ms)\n✔ safety: detects and refuses class spoofing attempts in baseline (0.353002ms)\n✔ messages: ensure messages do not call non-authority payloads maintained authority (0.289729ms)\n✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (0.293786ms)\n✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.301084ms)\n✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.292227ms)\n✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.302456ms)\n✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.349748ms)\nℹ tests 28\nℹ suites 0\nℹ pass 28\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 209.671975\n",
+      "stderr": ""
+    },
+    {
+      "name": "evidence-relocation-before",
+      "command": [
+        "node",
+        "scripts/check-evidence-relocation.mjs",
+        "--manifest",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json",
+        "--before"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w3-import2-brief/fgos"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:17.593964+00:00",
+      "exit": 0,
+      "stdout": "[check-evidence-relocation] PASS: before mode verified (867 entries, 0 violations)\n",
+      "stderr": ""
+    },
+    {
+      "name": "undeclared-census",
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/import2/census.mjs"
+      ],
+      "environmentOverrides": {
+        "FGOS_STATE_ROOT": "/tmp/fgos-work/w3-import2-brief/fgos"
+      },
+      "unsetEnvironment": [
+        "CLAUDE_CODE_SESSION_ID"
+      ],
+      "startedAt": "2026-10-24T03:14:18.425638+00:00",
+      "exit": 0,
+      "stdout": "{\n  \"method\": \"unchanged scan/census exports with full cached+untracked inventory filtered by unchanged declaredProduct; no CLI bootstrap or census write\",\n  \"fileCount\": 1107,\n  \"siteCount\": 25,\n  \"classCount\": 262,\n  \"classCounts\": {\n    \"standalone-skill-script\": 3,\n    \"hook-read-context\": 21,\n    \"configured-binary\": 87,\n    \"rust-test\": 111,\n    \"argv-runner\": 13,\n    \"production-sandbox-probe\": 4,\n    \"uncalled-wrapper\": 20,\n    \"git-driver\": 1,\n    \"sandbox-door\": 2\n  },\n  \"generatedEqual\": true,\n  \"generatedSha256\": \"d3bca3fba55ff1e74a451941528d403eda2658381c635491a3d9001868fb2d8d\",\n  \"committedSha256\": \"d3bca3fba55ff1e74a451941528d403eda2658381c635491a3d9001868fb2d8d\",\n  \"committedSelfDigestMatches\": true,\n  \"sameSiteIdentitiesExcludingLine\": true,\n  \"priorSiteCount\": 25\n}\n",
+      "stderr": ""
+    }
+  ],
+  "allPassed": true,
+  "limitations": [
+    "Default live state root is read-only to this worker: initial native Inspect floor probe refused. Final unchanged evidence checker and census use a real private scratch FGOS_STATE_ROOT, not a disabled check or alternate parser.",
+    "No broad suites run under the brief. No YAML-focused node test attempted or bypassed. The record-only census uses the production script addon staging door exactly as the owning CLI.",
+    "Independent content review, protected Step 3/4/5 source-context refresh, final-pin recomposition and authority cutover are not claimed."
+  ]
+}

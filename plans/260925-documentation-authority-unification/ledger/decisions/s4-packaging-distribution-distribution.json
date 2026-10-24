@@ -11,7 +11,7 @@
       "claimId": "claim_e7f7734953cc2e9478d81719b046f0cc",
       "sourceUnitDigest": "03a0da5fd22a7227b1f996d39b3a6f7ae43a1a49bfaf061e1edb11774c09eee2",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-86",
+      "targetAnchor": "unheaded-block-87",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -23,7 +23,7 @@
         "Retained Distribution Source Detail"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "5fc39edd95ed5fcd216f5635c65940237cf417c81f7d1ad99bf67b8cde2980ad",
+      "bindingSha256": "94ca1c088c3dd29a8d262512056ee360b19e4c1b7215c112f94690d5d75cdeda",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -50,7 +50,7 @@
       "claimId": "claim_67a64ed4e0700ecab3cb28af6962195c",
       "sourceUnitDigest": "38e7467e63d434cad969f415699ed7a67abeaa8becb100975d091f9ad55a7074",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-87",
+      "targetAnchor": "unheaded-block-88",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -63,7 +63,7 @@
         "Spec: Distribution"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "251ac7ca5ff31b107de3f476db517166e553d8da38c2cfc141701dd67bc0f0b0",
+      "bindingSha256": "2d363b43170e8708854b45a0e0ab8bc62ef1e5219854bb7c11af9716d3a50729",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -91,7 +91,7 @@
       "claimId": "claim_8a26867c2037ac3caf4e9eaf2f4c9ec1",
       "sourceUnitDigest": "549a25720da16da540b9f09cc50f9674df47eaaab30a9780ba5b3d97cd8de6b4",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-88",
+      "targetAnchor": "unheaded-block-89",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -105,7 +105,7 @@
         "Entry Points & Triggers"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "1c6fef969cde74c1f045a508094a04f4a15bfbc82a00e62b00148d2645faa03a",
+      "bindingSha256": "8c2078de517fa7c1c09756503c205871d8f0fad6606e618369fc2ba3f574f2e2",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -155,7 +155,7 @@
       "claimId": "claim_391af7258478be2a89286128fcd86063",
       "sourceUnitDigest": "ddee3916eeb71a2e1df124e5b3b2737128f48fa21494c2720fd4284db23a9941",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-90",
+      "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -170,7 +170,7 @@
         "Install"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "ded48c3f8e0139f7688868d5d305faaff65390843a7867294d7d675848810511",
+      "bindingSha256": "65bf54dd598146378b824fc99839b9771101ddf697ffea50127a3df6e0c18535",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -199,7 +199,7 @@
       "claimId": "claim_e36dc6d7c4cffd08e74b89407c1de2d1",
       "sourceUnitDigest": "29db1d0b391ac93fe635489740b466a4285c3c06d6afcc67e40e7a76d841c91c",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-91",
+      "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -214,7 +214,7 @@
         "Dev checkout shell helpers"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "13b2395caa2f6b3f8f5ea0a531e5fecb9f8c4f2f9ffd4e8be919803724cf2fca",
+      "bindingSha256": "907547e761dfb2895ea821d36c95f330c1dce42be77817d037960e0fe6a0af06",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -266,13 +266,13 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/setup-doctor-registry.md:186-186#setup; SHA256 67db6969421f5b23163946c68822bc23b2272a1e04afae0da23b7f7bf5d09d9e. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "targetUnitDigest": "41adc5aa289703d83ed7911ef907e08ebe84c975c31b21b57f56a6f87a55c078",
+      "targetUnitDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
       "targetAncestry": [
         "Contract: Setup Doctor Registry",
         "Retained Distribution Source Detail",
         "Setup"
       ],
-      "bindingSha256": "c322cff7edc8bcd3da1bded522d97b3702b2d6658140d3b8e23ec66b4f10c98e",
+      "bindingSha256": "1d57c8890917395dc13e16522cf3046288138a2282e866fba5c1d23b2336f13e",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
       "placement": {
@@ -280,7 +280,7 @@
           "anchor": "setup",
           "unitKind": "heading",
           "title": "Setup",
-          "textDigest": "41adc5aa289703d83ed7911ef907e08ebe84c975c31b21b57f56a6f87a55c078",
+          "textDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
           "startLine": 186,
           "endLine": 186,
           "ancestry": [
@@ -306,7 +306,7 @@
           "anchor": "unheaded-block-30",
           "unitKind": "unheaded-block",
           "title": "Unheaded block 30",
-          "textDigest": "a30cb05c84322802961d2fce177da588b51bc58d25d9a74e5feaf0a3d1287828",
+          "textDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
           "startLine": 188,
           "endLine": 218,
           "ancestry": [
@@ -316,7 +316,8 @@
           ]
         },
         "content": "##### Setup"
-      }
+      },
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
@@ -382,7 +383,7 @@
       "claimId": "claim_bc11bca870313f227b78bebe0f81d49a",
       "sourceUnitDigest": "8a7f8b1ec294e660bb2f226cadfbb2ce6fd85e6d65417ba4122b18bb2fc81825",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-92",
+      "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -396,7 +397,7 @@
         "Actors & Access"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "369780cb6521f3a8b98efb4b1f5fd6a1f8ddfe17f0530683cac88d86161fdb45",
+      "bindingSha256": "a3676e26ceb573a70cf19d86c2c36eea8bd02e442b150330bd5f5df0fb071b7f",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -424,7 +425,7 @@
       "claimId": "claim_8930ab9733374cfbb11470da79f610cf",
       "sourceUnitDigest": "914e48925f5e42f4270598fcf5322dbfb5b2777fe26e0349a30c6c290ba2f08a",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-93",
+      "targetAnchor": "unheaded-block-94",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -438,14 +439,14 @@
         "Business Rules"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "4748432ee15223ac6d1f393c458bc704193eac0d4a46f55d886a44ae8375a068",
+      "bindingSha256": "923e1ad5f8060cb6a7c7980d97aa0fd1ad0795ffccd8fdf3a1d6eca11a401c04",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_7932ee258c8d561f60718b34edc2d44a",
       "sourceUnitDigest": "cd11cb8c94cd0a27e819aa61df4a4f4fb2e32a83c7e0fd4066e27bc7cd22bb89",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-94",
+      "targetAnchor": "unheaded-block-95",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -459,7 +460,7 @@
         "Business Rules"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "45b379914de81056ff132ba145cf6e7fc0f7e46a5f249235fa952035561e9201",
+      "bindingSha256": "6b95a9c7e69d432ad12ad0e15764ea628e6638bdc5807a867be05d1ea8b259ac",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -508,7 +509,7 @@
       "claimId": "claim_4ef3a246eb6f72de0409c2cc711b6f7a",
       "sourceUnitDigest": "f2aa140aabef20a5a98af537527987721e90af6779c22a7a854dc6b9f0979b31",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-104",
+      "targetAnchor": "unheaded-block-106",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -522,14 +523,14 @@
         "Open Gaps"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "534ece61d028e91df7388606a654e3db739700d619cb2e786e161398c23810ac",
+      "bindingSha256": "0285ef4a91019fc908c5f37549ac8ecbbbddb1c5c8e32dec99560e22fae60a87",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_e7c9f593b4b15dfa15ae91707e9a64ec",
       "sourceUnitDigest": "291f58705fa5b9342b82921aa8ab5eb129462c0bb6c7320a817a6a70fbac6e74",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-105",
+      "targetAnchor": "unheaded-block-107",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -543,7 +544,7 @@
         "Open Gaps"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "868e0965393a57cb08b94febfa4fa949572e58e44dd27379766359958ffeeb5e",
+      "bindingSha256": "e752ed061a1cb7adb41a68d697d655c94510c13c890e608bce25ca78d710f6a3",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -571,7 +572,7 @@
       "claimId": "claim_a84463023d9ac4e9ff86edae6ccd1bd4",
       "sourceUnitDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-106",
+      "targetAnchor": "unheaded-block-108",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -585,7 +586,7 @@
         "Visuals"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "6393d255bd903291bf343b00356c0affd1918fca4b3877fa5f24ad039cc285db",
+      "bindingSha256": "47e707f626bc0cd473bf16c787da0bebb76d318849a144fc9604f29297ee371a",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -613,7 +614,7 @@
       "claimId": "claim_b5695d38282e111f8ed06656b2efa433",
       "sourceUnitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-107",
+      "targetAnchor": "unheaded-block-109",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
@@ -627,7 +628,7 @@
         "Pointers (implementation)"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "ecb05ed269ea26015eaae8fab611b0e68661dfc3abc24ce6014eec9f88ec7c1f",
+      "bindingSha256": "30676f45fe9bd6407cb09734e51d708506f9516cccd55fcf8464fa2c4c19f6fb",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -638,7 +639,7 @@
       "claimKind": "specification",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "data-dictionary",
-      "targetUnitDigest": "f07277877d493b3955e5799befa1da627319c90d54b2edf115e429a58a21a856",
+      "targetUnitDigest": "438bb4ff71a3e3cbbd3272d44a638cc3bf5e7abe4492455fe229f65b9962a203",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -649,7 +650,7 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:561-561#data-dictionary; SHA256 8614119392e90a5380a4a517637f837d0b55045239e9dbcee00c3d3c6579f1b2. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "bindingSha256": "a9bfd6bc76b9c60c275e495b450796db0d2b5218f3ecbb1a22f76dcb8713bfda",
+      "bindingSha256": "fe74779a50168c46bcbbc131bc026a43ef44bbe8230c351d4fef9e3e76e3daac",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
       "placement": {
@@ -657,9 +658,9 @@
           "anchor": "data-dictionary",
           "unitKind": "heading",
           "title": "Data Dictionary",
-          "textDigest": "f07277877d493b3955e5799befa1da627319c90d54b2edf115e429a58a21a856",
-          "startLine": 531,
-          "endLine": 531,
+          "textDigest": "438bb4ff71a3e3cbbd3272d44a638cc3bf5e7abe4492455fe229f65b9962a203",
+          "startLine": 533,
+          "endLine": 533,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -668,12 +669,12 @@
           ]
         },
         "previous": {
-          "anchor": "unheaded-block-88",
+          "anchor": "unheaded-block-89",
           "unitKind": "unheaded-block",
-          "title": "Unheaded block 88",
+          "title": "Unheaded block 89",
           "textDigest": "2bceb305d29a7f8e789401b4cc799de05d744748eed33b9ba12c4dacaaf5b0fa",
-          "startLine": 506,
-          "endLine": 529,
+          "startLine": 508,
+          "endLine": 531,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -682,12 +683,12 @@
           ]
         },
         "next": {
-          "anchor": "unheaded-block-89",
+          "anchor": "unheaded-block-90",
           "unitKind": "unheaded-block",
-          "title": "Unheaded block 89",
-          "textDigest": "c20b720745d4079ef84fbbc4f919bf033342c0388038cd45569a335c692c67c5",
-          "startLine": 533,
-          "endLine": 559,
+          "title": "Unheaded block 90",
+          "textDigest": "64ca696b17ff35e6f93b68f54c255204d1064c5745aba29178e6925bad329254",
+          "startLine": 535,
+          "endLine": 561,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -696,7 +697,8 @@
           ]
         },
         "content": "#### Data Dictionary"
-      }
+      },
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
@@ -706,7 +708,7 @@
       "claimKind": "specification",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "lịch-sử-quyết-định",
-      "targetUnitDigest": "27d7a05d471a4ffc3af8d8404aed76c501ce7697f1cff50a85b004a9ce09bc4f",
+      "targetUnitDigest": "f9c90772c897f5be41cd3554d3810ef2641ec4dd7c3d3a415840d0b4eb06a4f6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -717,9 +719,10 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:767-767#lịch-sử-quyết-định; SHA256 27d7a05d471a4ffc3af8d8404aed76c501ce7697f1cff50a85b004a9ce09bc4f. same full heading title; changed direct payload accounted explicitly; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "bindingSha256": "1a0606307df675a4c314efe229f98c8d59f89ab0fb50b1dd29f7d96cd605704f",
+      "bindingSha256": "9f110e93a66d7af4f9e94376009c50d05fc92af706936c276e70749a78e474ea",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
-      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only."
+      "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; unique heading content and ancestry; direct payload changed. Earlier source snapshots are provenance, not exact current-text assertions."
     }
   ],
   "files": [
@@ -738,7 +741,7 @@
       "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
       "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-89",
+      "targetAnchor": "unheaded-block-90",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -746,7 +749,7 @@
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:563-589#unheaded-block-89; SHA256 7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261. same complete first line and full named heading ancestry; exact content delta recorded; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-5",
-      "targetUnitDigest": "c20b720745d4079ef84fbbc4f919bf033342c0388038cd45569a335c692c67c5",
+      "targetUnitDigest": "64ca696b17ff35e6f93b68f54c255204d1064c5745aba29178e6925bad329254",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -754,16 +757,16 @@
         "Data Dictionary"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "2e99f1f0062fec2a3adddc23d118477559db23acc8dcb466f60b731789c55cf4",
+      "bindingSha256": "ed05096564d3263119cb1aa7214bac4855177f726c896b35f5bb7120211d300d",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
       "placement": {
         "selected": {
-          "anchor": "unheaded-block-89",
+          "anchor": "unheaded-block-90",
           "unitKind": "unheaded-block",
-          "title": "Unheaded block 89",
-          "textDigest": "c20b720745d4079ef84fbbc4f919bf033342c0388038cd45569a335c692c67c5",
-          "startLine": 533,
-          "endLine": 559,
+          "title": "Unheaded block 90",
+          "textDigest": "64ca696b17ff35e6f93b68f54c255204d1064c5745aba29178e6925bad329254",
+          "startLine": 535,
+          "endLine": 561,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -775,9 +778,9 @@
           "anchor": "data-dictionary",
           "unitKind": "heading",
           "title": "Data Dictionary",
-          "textDigest": "f07277877d493b3955e5799befa1da627319c90d54b2edf115e429a58a21a856",
-          "startLine": 531,
-          "endLine": 531,
+          "textDigest": "438bb4ff71a3e3cbbd3272d44a638cc3bf5e7abe4492455fe229f65b9962a203",
+          "startLine": 533,
+          "endLine": 533,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -790,8 +793,8 @@
           "unitKind": "heading",
           "title": "Behaviors & Operations",
           "textDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
-          "startLine": 561,
-          "endLine": 561,
+          "startLine": 563,
+          "endLine": 563,
           "ancestry": [
             "Spec: Packaging-Distribution",
             "Retained Distribution Source Detail",
@@ -799,14 +802,15 @@
             "Behaviors & Operations"
           ]
         },
-        "content": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data, and `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json`, the tier names the runner config loader accepts, read from the same file the Seat Binding crate embeds | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). Its locks are holder-lock kernel locks under the machine lock root (row 5g): `provider-state` guards this file, and `provider-account/<provider>/<account>` guards one account while a renewal or unlock probe runs through it, held until that call and every process it started have exited. The same directory holds `account-locks/<provider>/<account>/`: copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 5g | Lock directories | `<lockRoot>` = `<stateRoot>/locks` (machine-scope lock files: `full-suite`, `provider-account/<provider>/<account>`, `provider-state`, `install`) and `<fgosDir>/locks` (repo-scope lock files: `gateway`, `runner`, `sessions`, `reconcile`, `main-checkout`, `worktree-admin`, `merge-slot--<encodeURIComponent(ref)>` per target ref, `state.hot` and `state.reclaim.lock`, `porting-events.hot` and `porting-events.reclaim.lock` (the state store's hot mutex: the `.hot` record is not a kernel lock file, only the `.reclaim.lock` file is), `activation`, `observe`, and `dispatch-cwd--<dev>-<ino>` keyed by the dispatch directory's identity after realpath; the run locks live in their run: `<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), both created by `fgos setup` (the machine root with mode 0700); `stateRoot` is the single resolution of `docs/platform/holder-lock/spec.md` §11 (`FGOS_STATE_ROOT` pinned by the host, else `FGOS_STATE_HOME`, `XDG_STATE_HOME/fgos`, `HOME/.local/state/fgos`). There is no lock config key: the wait for the processes of a dead previous holder to exit after they are terminated is fixed at 2000 ms. Lock files are never packaged, committed or repaired; `lock-kernel-semantics`, `lock-borrow-vectors` and `lock-holders` report them (row 7) | two directories | no (created by setup) | none |\n| 5h | Terminal-control directory and the `terminal` config key | `<stateRoot>/terminal` (one subdirectory per driver; allocation records and their markers, a cache of what the port opened: deleting it never closes a pane because nobody closes a pane that has no record), created by `fgos setup` with mode 0700 (the `terminal-dir` fix). One config key, `terminal` (`registerConfigDefault({id: 'terminal', key: 'terminal', shape: {allocationGraceMs: 60000, retainFailedPaneMs: null, layout: {policy: 'measured-split', minCols: 80, minRows: 20, maxPanesPerTab: 8}}})`); `docs/platform/terminal-control/spec.md` §9 gives each number's source. Project over global over default; the merge adds a missing key only. No new environment variable (`FGOS_HERDR_ANCHOR_PANE` stays, as the input of `attach`). Checked 2026-10-18: the release active in the forgentX, mdview and mcp-skill-hub workspaces (one digest) accepts a `terminal` section in the global and in the project config, so the key is written like `lock`; had it refused unknown keys, setup would have written it to the project config only until all three workspaces ran the new release. | `<stateRoot>/terminal` present / absent; config key present / absent | yes (computed, not stored) | — |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `git-worktree-recovery`, `git-component-compatible`, `git-transport-config`, `git-trust-topology`, `git-operation-journal`, `git-native-locks`, `git-publication-refspecs`, `git-durability-capability`, `documentation-cutover-lease`, `git-land-recovery`, `git-mutation-one-door`, `identity-ids-unique`, `seat-binding-config`, `seat-binding-route`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `convention-conformance`, `identity-project-id` (this repository carries one project id in the tracked file `.fgos/project.json`, asked through `fgos identity project --json`; absent only warns and there is no fix, because a fix on every machine would mint one id per clone: `fgos identity project --init` runs once on one machine, the file is committed and the others pull it; an unreadable or invalid file fails), `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `lock-kernel-semantics` (for the workspace lock directory and the machine lock root: the holder-lock driver's guarantee through the in-process door, then a two-process probe on that same mount, a description locked here and handed to a child must read held while the child lives and free once it died; prints driver, exclusion, borrow and holders levels, then the state root with its source and the fixed 2000 ms kill wait; kernel with a green probe passes, a missing directory warns until setup creates it, a guarantee of unsupported (a platform with no driver), a network filesystem none, an unresolved state root and an unreachable door fail by name; on Windows the probe runs over a lock-hold helper and the message shows lockfileex), `lock-borrow-vectors` (runs the host's lock-borrow-vectors route: a lock description borrowed by a git child must not leak to any background process git starts; any red vector or a red sibling check fails, unavailable fails, since activation refuses the same result and there is no run-time switch that disables borrowing; runs on Windows with its own pid-handle assertion), `lock-holders` (for every existing lock file of the locks this release cut over, including the main checkout, merge slot and worktree-admin files, the holders the kernel lists: a holder whose origin is foreign (neither a fgOS process, by the host's state-root pin or a fgOS payload in its argv, nor a borrowed child of that lock) warns with pid and cmdline; a predecessor record next to a lock file naming a domain that is not empty, an unknown record version or a Windows job the host does not judge empty warns with the domain and the reason; the state and porting-events hot records of the workspace, under .fgos/locks, warn with the path and the fence command of the lock verb when a record does not parse or its holder cannot be placed for more than five minutes (absent, alive or dead holders pass; no automatic fix, because a person confirms the holder is gone); holders that cannot be listed are informational), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the precompiled form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; the check reports a missing, unreadable or stale file and domain YAML that cannot be parsed, and a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `terminal-control` (the terminal-control driver answers through the internal route: driver, declared capabilities and the herdr server incarnation are printed; a missing herdr only warns, a missing layout.geometry capability is information, and a bad FGOS_HERDR_ANCHOR_PANE fails), `terminal-config` (the terminal section after the merge, each value with its source; fails by name on a grace below the ready timeout plus 30 s, a retain time that is neither null nor a positive integer, an unregistered policy, or limits that are not positive integers or sit below the measured floor of 40x8), `terminal-allocations` (slots past terminal.allocationGraceMs that never launched and retained panes past their time, from the route's reconcile-scan; reports only, closes nothing), `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `seat-binding-dry-bind` (binds every seat of every Workflow unit through the runner's own pattern code, in a fixed headless session with no lease, and fails on a policy refusal such as a missing tier cell or an independence rule the pool cannot meet; no pool, account state, tier caps and shared families are information), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `identity-machine-id` (this machine has an id minted by the Identity component, asked through `fgos identity machine --json`; absent only warns, `fgos doctor --fix` mints it once and never replaces it; an unreadable or invalid file fails), `observe-run-coverage`, `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `executor-family-unique` (two agent executors of one provider family fail, naming both), `executor-skills-installed` (every skill an agent executor declares in its supports.skills has a SKILL.md in its runtime's skill directory of the main checkout, chosen by each invocation's CLI (claude: .claude/skills, codex: .agents/skills, omp: .omp/skills, pi: .pi/skills, grok: .grok/skills), every invocation of an executor must have the skill; a missing one fails naming the path and the remedy; a CLI with no known skill directory is reported as not checked), `model-policy-pools` (a tier cell entry model@pool whose pool runner.llmAccounts does not declare warns; not evaluated when no cell names a pool), `llm-accounts-shape` (every problem the runner.llmAccounts reader finds fails: an inventory in the project config, a pool name with an at-sign or another spelling of a family, an account without a credentialStore directory), `llm-accounts-vs-legacy` (when runner.llmAccounts is declared, accounts or login directories that differ from runner.providers, which the lease still reads, warn), `global-model-policies-portable` (a list or model@pool cell in the global runner.modelPolicies fails, since older releases on the machine cannot read it), `tier-fallback` (a family `runner.tierFallback` lists for a tier that has no `modelPolicies` cell at that tier, or no agent executor, warns: the walk skips it; never fails), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `process-containment`, `run-supervisor-route`, `runtime-socket-dir`, `run-attempts-stuck`, `gate-kill-grace`, `legacy-attempts-stuck`, `units-awaiting-resume`, `cancel-wait`. The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `git-driver-directories`, `git-land-recovery`, `git-publication-refspecs`, `git-wal-dir`, `workflow-case-bindings`, `identity-machine-id`, `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `terminal-dir` (creates the terminal directory under the state root with mode 0700 when missing, and tightens an existing one to 0700), `lock-dirs` (creates the workspace lock directory and the machine lock root with mode 0700 when missing, and tightens an existing one to 0700, since the first lock taken before setup may have created it with the umask's mode), `instruction-projections-stale`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `runtime-socket-dir`, `run-attempts-stuck`, `legacy-attempts-stuck`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 7c | Doctor check `process-containment` | Which process-containment driver this machine would pick for an attempt (`bwrap-pidns`, `linux-pgroup`, `windows-job`, `macos-tree`), the level it gives and the named escapes; read from the host route's `--protocol 1 --probe` answer (`docs/platform/run-supervisor/spec.md` §14, `docs/platform/process/spec.md` §10) | passed with `kernel`; warning with the name `best-effort` (Linux without a user namespace, macOS); never a failure for being best-effort | yes (computed) | — |\n| 7d | Doctor check `runtime-socket-dir` | The run supervisor's runtime socket directory (`$XDG_RUNTIME_DIR/fgos`, else `/tmp/fgos-<uid>`): exists, mode 0700, owned by the user, short enough for a unix socket path. `fgos setup` creates it; the fix creates it too | passed / failed (missing, wrong owner or mode, too long) | yes (computed) | created by setup |\n| 7e | Doctor check `run-attempts-stuck` | Runs with an envelope v3 and no `closed.json` whose attempt lock is free, counted by `fgos internal adopt --scan --probe-only` (writes nothing, takes no lock); the fix drives them to closed through the one sweep (`sweepAttempts`) | passed / warning with the count | yes (computed) | — |\n| 7f | Doctor check `run-supervisor-route` | The active host binary answers `--protocol 1 --probe` with `result: ok` for each of `fgos internal supervise`, `gate`, `adopt`, `attempt-step` | passed / failed naming the route or the protocol mismatch | yes (computed) | — |\n| 7g | Doctor check `gate-kill-grace` | The config key `dispatch.gateKillGraceMs` (the SIGTERM to SIGKILL grace of the launch gate): value and source (`project`, `global`, `default`); project overrides global; setup does not write the key into the global config until every workspace runs a release that knows it | passed with the value (absent: default 10000); failed when not an integer or below 1000 | yes (computed) | 10000 |\n| 7h | Doctor check `cancel-wait` | The config key `dispatch.cancelWaitMs` (how long a controller stopped by Ctrl-C or SIGTERM waits for its attempts' receipts), read by the same reader as `gate-kill-grace`: value and source (`project`, `global`, `default` = grace + 5000); an unusable value, below 1000 or shorter than the grace, fails | yes (computed) | — |\n| 7i | Doctor check `legacy-attempts-stuck` | Runs from before the run supervisor still `running`: fails while one is provably dead (every recorded pid dead, no version-1 home), warns with the reason for each run that is kept; fix settles the provable ones as `abandoned-legacy` | yes (computed) | settled in `run.json` by fix |\n| 7j | Doctor check `units-awaiting-resume` | Unit runs whose controller is gone and whose last attempt is closed, with the `fgos run --resume <unit>` command; warns, never fails | yes (computed) | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
-      }
+        "content": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data, and `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json`, the tier names the runner config loader accepts, read from the same file the Seat Binding crate embeds | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). Its locks are holder-lock kernel locks under the machine lock root (row 5g): `provider-state` guards this file, and `provider-account/<provider>/<account>` guards one account while a renewal or unlock probe runs through it, held until that call and every process it started have exited. The same directory holds `account-locks/<provider>/<account>/`: copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 5g | Lock directories | `<lockRoot>` = `<stateRoot>/locks` (machine-scope lock files: `full-suite`, `provider-account/<provider>/<account>`, `provider-state`, `install`) and `<fgosDir>/locks` (repo-scope lock files: `gateway`, `runner`, `sessions`, `reconcile`, `main-checkout`, `worktree-admin`, `merge-slot--<encodeURIComponent(ref)>` per target ref, `state.hot` and `state.reclaim.lock`, `porting-events.hot` and `porting-events.reclaim.lock` (the state store's hot mutex: the `.hot` record is not a kernel lock file, only the `.reclaim.lock` file is), `activation`, `observe`, and `dispatch-cwd--<dev>-<ino>` keyed by the dispatch directory's identity after realpath; the run locks live in their run: `<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), both created by `fgos setup` (the machine root with mode 0700); `stateRoot` is the single resolution of `docs/platform/holder-lock/spec.md` §11 (`FGOS_STATE_ROOT` pinned by the host, else `FGOS_STATE_HOME`, `XDG_STATE_HOME/fgos`, `HOME/.local/state/fgos`). There is no lock config key: the wait for the processes of a dead previous holder to exit after they are terminated is fixed at 2000 ms. Lock files are never packaged, committed or repaired; `lock-kernel-semantics`, `lock-borrow-vectors` and `lock-holders` report them (row 7) | two directories | no (created by setup) | none |\n| 5h | Terminal-control directory and the `terminal` config key | `<stateRoot>/terminal` (one subdirectory per driver; allocation records and their markers, a cache of what the port opened: deleting it never closes a pane because nobody closes a pane that has no record), created by the terminal allocation store itself with mode 0700 on first use (no `terminal-dir` fix). One config key, `terminal` (`registerConfigDefault({id: 'terminal', key: 'terminal', shape: {allocationGraceMs: 60000, retainFailedPaneMs: null, layout: {policy: 'measured-split', minCols: 80, minRows: 20, maxPanesPerTab: 8}}})`); `docs/platform/terminal-control/spec.md` §9 gives each number's source. Project over global over default; the merge adds a missing key only. No new environment variable (`FGOS_HERDR_ANCHOR_PANE` stays, as the input of `attach`). Checked 2026-10-18: the release active in the forgentX, mdview and mcp-skill-hub workspaces (one digest) accepts a `terminal` section in the global and in the project config, so the key is written like `lock`; had it refused unknown keys, setup would have written it to the project config only until all three workspaces ran the new release. | `<stateRoot>/terminal` present / absent; config key present / absent | yes (computed, not stored) | — |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `git-worktree-recovery`, `git-component-compatible`, `git-repository-config`, `git-operation-journal`, `git-native-locks`, `documentation-cutover-lease`, `git-mutation-one-door`, `identity-machine-key`, `identity-pinned-machines`, `identity-ssh-keygen`, `identity-ids-unique`, `seat-binding-config`, `seat-binding-route`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `convention-conformance`, `identity-project-id` (this repository carries one project id in the tracked file `.fgos/project.json`, asked through `fgos identity project --json`; absent only warns and there is no fix, because a fix on every machine would mint one id per clone: `fgos identity project --init` runs once on one machine, the file is committed and the others pull it; an unreadable or invalid file fails), `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `lock-kernel-semantics` (for the workspace lock directory and the machine lock root: the holder-lock driver's guarantee through the in-process door, then a two-process probe on that same mount, a description locked here and handed to a child must read held while the child lives and free once it died; prints driver, exclusion, borrow and holders levels, then the state root with its source and the fixed 2000 ms kill wait; kernel with a green probe passes, a missing directory warns until setup creates it, a guarantee of unsupported (a platform with no driver), a network filesystem none, an unresolved state root and an unreachable door fail by name; on Windows the probe runs over a lock-hold helper and the message shows lockfileex), `lock-borrow-vectors` (runs the host's lock-borrow-vectors route: a lock description borrowed by a git child must not leak to any background process git starts; any red vector or a red sibling check fails, unavailable fails, since activation refuses the same result and there is no run-time switch that disables borrowing; runs on Windows with its own pid-handle assertion), `lock-holders` (for every existing lock file of the locks this release cut over, including the main checkout, merge slot and worktree-admin files, the holders the kernel lists: a holder whose origin is foreign (neither a fgOS process, by the host's state-root pin or a fgOS payload in its argv, nor a borrowed child of that lock) warns with pid and cmdline; a predecessor record next to a lock file naming a domain that is not empty, an unknown record version or a Windows job the host does not judge empty warns with the domain and the reason; the state and porting-events hot records of the workspace, under .fgos/locks, warn with the path and the fence command of the lock verb when a record does not parse or its holder cannot be placed for more than five minutes (absent, alive or dead holders pass; no automatic fix, because a person confirms the holder is gone); holders that cannot be listed are informational), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the precompiled form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; the check reports a missing, unreadable or stale file and domain YAML that cannot be parsed, and a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `terminal-control` (the terminal-control driver answers through the internal route: driver, declared capabilities and the herdr server incarnation are printed; a missing herdr only warns, a missing layout.geometry capability is information, and a bad FGOS_HERDR_ANCHOR_PANE fails; also validates the terminal section after the merge, each value with its source, refusing invalid grace, retention, policy or limits), `terminal-allocations` (slots past terminal.allocationGraceMs that never launched and retained panes past their time, from the route's reconcile-scan; reports only, closes nothing), `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `seat-binding-dry-bind` (binds every seat of every Workflow unit through the runner's own pattern code, in a fixed headless session with no lease, and fails on a policy refusal such as a missing tier cell or an independence rule the pool cannot meet; no pool, account state, tier caps and shared families are information), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `identity-machine-id` (this machine has an id minted by the Identity component, asked through `fgos identity machine --json`; absent only warns, `fgos doctor --fix` mints it once and never replaces it; an unreadable or invalid file fails), `observe-run-coverage`, `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `executor-family-unique` (two agent executors of one provider family fail, naming both), `executor-skills-installed` (every skill an agent executor declares in its supports.skills has a SKILL.md in its runtime's skill directory of the main checkout, chosen by each invocation's CLI (claude: .claude/skills, codex: .agents/skills, omp: .omp/skills, pi: .pi/skills, grok: .grok/skills), every invocation of an executor must have the skill; a missing one fails naming the path and the remedy; a CLI with no known skill directory is reported as not checked), `model-policy-pools` (a tier cell entry model@pool whose pool runner.llmAccounts does not declare warns; not evaluated when no cell names a pool), `llm-accounts-shape` (every problem the runner.llmAccounts reader finds fails: an inventory in the project config, a pool name with an at-sign or another spelling of a family, an account without a credentialStore directory), `llm-accounts-vs-legacy` (when runner.llmAccounts is declared, accounts or login directories that differ from runner.providers, which the lease still reads, warn), `global-model-policies-portable` (a list or model@pool cell in the global runner.modelPolicies fails, since older releases on the machine cannot read it), `tier-fallback` (a family `runner.tierFallback` lists for a tier that has no `modelPolicies` cell at that tier, or no agent executor, warns: the walk skips it; never fails), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `process-containment`, `run-supervisor-route`, `runtime-socket-dir`, `run-attempts-stuck`, `gate-kill-grace`, `legacy-attempts-stuck`, `units-awaiting-resume`, `cancel-wait`. The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `git-driver-directories`, `git-land-recovery`, `git-publication-refspecs`, `git-wal-dir`, `workflow-case-bindings`, `identity-machine-id`, `identity-machine-key`, `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `lock-dirs` (creates the workspace lock directory and the machine lock root with mode 0700 when missing, and tightens an existing one to 0700, since the first lock taken before setup may have created it with the umask's mode), `instruction-projections-stale`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `runtime-socket-dir`, `run-attempts-stuck`, `legacy-attempts-stuck`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 7c | Doctor check `process-containment` | Which process-containment driver this machine would pick for an attempt (`bwrap-pidns`, `linux-pgroup`, `windows-job`, `macos-tree`), the level it gives and the named escapes; read from the host route's `--protocol 1 --probe` answer (`docs/platform/run-supervisor/spec.md` §14, `docs/platform/process/spec.md` §10) | passed with `kernel`; warning with the name `best-effort` (Linux without a user namespace, macOS); never a failure for being best-effort | yes (computed) | — |\n| 7d | Doctor check `runtime-socket-dir` | The run supervisor's runtime socket directory (`$XDG_RUNTIME_DIR/fgos`, else `/tmp/fgos-<uid>`): exists, mode 0700, owned by the user, short enough for a unix socket path. `fgos setup` creates it; the fix creates it too | passed / failed (missing, wrong owner or mode, too long) | yes (computed) | created by setup |\n| 7e | Doctor check `run-attempts-stuck` | Runs with an envelope v3 and no `closed.json` whose attempt lock is free, counted by `fgos internal adopt --scan --probe-only` (writes nothing, takes no lock); the fix drives them to closed through the one sweep (`sweepAttempts`) | passed / warning with the count | yes (computed) | — |\n| 7f | Doctor check `run-supervisor-route` | The active host binary answers `--protocol 1 --probe` with `result: ok` for each of `fgos internal supervise`, `gate`, `adopt`, `attempt-step` | passed / failed naming the route or the protocol mismatch | yes (computed) | — |\n| 7g | Doctor check `gate-kill-grace` | The config key `dispatch.gateKillGraceMs` (the SIGTERM to SIGKILL grace of the launch gate): value and source (`project`, `global`, `default`); project overrides global; setup does not write the key into the global config until every workspace runs a release that knows it | passed with the value (absent: default 10000); failed when not an integer or below 1000 | yes (computed) | 10000 |\n| 7h | Doctor check `cancel-wait` | The config key `dispatch.cancelWaitMs` (how long a controller stopped by Ctrl-C or SIGTERM waits for its attempts' receipts), read by the same reader as `gate-kill-grace`: value and source (`project`, `global`, `default` = grace + 5000); an unusable value, below 1000 or shorter than the grace, fails | yes (computed) | — |\n| 7i | Doctor check `legacy-attempts-stuck` | Runs from before the run supervisor still `running`: fails while one is provably dead (every recorded pid dead, no version-1 home), warns with the reason for each run that is kept; fix settles the provable ones as `abandoned-legacy` | yes (computed) | settled in `run.json` by fix |\n| 7j | Doctor check `units-awaiting-resume` | Unit runs whose controller is gone and whose last attempt is closed, with the `fgos run --resume <unit>` command; warns, never fails | yes (computed) | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+      },
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
       "sourceUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-95",
+      "targetAnchor": "unheaded-block-96",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -822,14 +826,14 @@
         "Business Rules"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "7d88fb3ed321d87d6ca6bf01ae003ee33a5eda8b0fa1f9a43a3bead3d437b57a",
+      "bindingSha256": "a691faaf66fa1f8a065b0e7b0cf23471e90203d0f88acb2c257f24825c7fef0b",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_45e83e644c43384e188c16e20172a52c",
       "sourceUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-102",
+      "targetAnchor": "unheaded-block-104",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -837,7 +841,7 @@
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:780-783#unheaded-block-102; SHA256 4599fc3ec109b2d879d8b76e5a841b4452d69865da0f4517e5a267003628c104. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-15",
-      "targetUnitDigest": "4599fc3ec109b2d879d8b76e5a841b4452d69865da0f4517e5a267003628c104",
+      "targetUnitDigest": "17e86891b31441849e0a2d91751b94f2c01fb3fe13a987609e5f58a30816e212",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -845,14 +849,15 @@
         "Lịch sử quyết định"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "b5c47a2dd7dffd5d49dcc4f0c91c1c661d035aee6530cc4391e5dd749674ca92",
-      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
+      "bindingSha256": "5f1efe93f6e6f5dc089fb73d9f97bdb45c5f24aa17f82d45a803aecde7e479de",
+      "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
     },
     {
       "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
       "sourceUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-103",
+      "targetAnchor": "unheaded-block-105",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -868,14 +873,14 @@
         "Edge Cases Settled"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "bbfccfec5aea447084fc5e674fa167e063e1c3acdfa7ae7f938d8e9ec35382e4",
+      "bindingSha256": "6882705e72f2e63e2111efb2d61f5d4de9ba20f20869dfcb7ff973dc5bb3adc0",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
       "claimId": "claim_c87924f5a8b4ef3683e8133768ec69b9",
       "sourceUnitDigest": "cd73c7d7afa6bd9767046774eb05db442c0db18e1e32762566ec4d01e48ed814",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-85",
+      "targetAnchor": "unheaded-block-86",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
@@ -888,7 +893,7 @@
       ],
       "sourcePath": "docs/specs/distribution.md",
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "b1c1318d4fe73fbe24216f6b2abb5b81a79c8549fa16147257f8f9b304de614b",
+      "bindingSha256": "df801227b8f6cbd24fc85a31eb96825e3001b15f2b3a589946c5254d409dde6f",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
@@ -901,7 +906,7 @@
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/contracts/setup-doctor-registry.md:188-218#unheaded-block-30; SHA256 4d0599aeabec3d9f17d933e855897f53a6ffb0479400426111b48cdc07ff6a66. same complete first line and full named heading ancestry; exact content delta recorded; current-source or corrected-layout content supersedes the earlier candidate unit, not a verbatim move. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
-      "targetUnitDigest": "a30cb05c84322802961d2fce177da588b51bc58d25d9a74e5feaf0a3d1287828",
+      "targetUnitDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
       "targetAncestry": [
         "Contract: Setup Doctor Registry",
         "Retained Distribution Source Detail",
@@ -909,14 +914,14 @@
       ],
       "sourcePath": "docs/specs/distribution.md",
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "ad4a35cf5d5c2467c6e42a670fa66702997e906789cdc0dfdf7e6a80c0a981a9",
+      "bindingSha256": "16e40f7d66cc4a6deeeb32e52f387c24fa6d05f202ace822a9a49bc0614a88fa",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))",
       "placement": {
         "selected": {
           "anchor": "unheaded-block-30",
           "unitKind": "unheaded-block",
           "title": "Unheaded block 30",
-          "textDigest": "a30cb05c84322802961d2fce177da588b51bc58d25d9a74e5feaf0a3d1287828",
+          "textDigest": "56a9269a6139c7decbb50dc5a46edf077a2d6d68c328b1620443082cc61e7aa7",
           "startLine": 188,
           "endLine": 218,
           "ancestry": [
@@ -929,7 +934,7 @@
           "anchor": "setup",
           "unitKind": "heading",
           "title": "Setup",
-          "textDigest": "41adc5aa289703d83ed7911ef907e08ebe84c975c31b21b57f56a6f87a55c078",
+          "textDigest": "170ce67e010e1bc0f007c97c410db3aeb3f4af54ba6788c9a04f30b194614d34",
           "startLine": 186,
           "endLine": 186,
           "ancestry": [
@@ -951,8 +956,9 @@
             "Doctor"
           ]
         },
-        "content": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `terminal` section of row 5h is one of the defaults the\n  fill-missing-only merge adds; `<stateRoot>/terminal` is created with mode 0700 (the\n  `terminal-dir` fix).\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), the two lock\n  directories and `<stateRoot>/terminal` may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
-      }
+        "content": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `terminal` section of row 5h is one of the defaults the\n  fill-missing-only merge adds; `<stateRoot>/terminal` is not set up here: the\n  terminal allocation store creates it with mode 0700 on first use.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+      },
+      "rebindReason": "Import 2 current-byte rebind; full delta and neighbours: plans/260925-documentation-authority-unification/reports/phase-09/import2/binding-refresh.json; changed complete block in same ancestry; full before/after and both neighbouring blocks retained for review. Earlier source snapshots are provenance, not exact current-text assertions."
     }
   ],
   "correctionSession": "fgos-run_unit-run-1792750955a733"

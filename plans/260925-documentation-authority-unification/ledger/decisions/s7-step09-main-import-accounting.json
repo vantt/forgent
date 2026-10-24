@@ -249,7 +249,11 @@
       "targetUnitDigest": "ded31e658f6b1c1816df565939e71e41ba27723124035f0cf9c118fed1c5a415",
       "rationale": "L11-21 mechanical main-import accounting: complete source unit docs/specs/observe.md#unheaded-block-6 (SHA256 ded31e658f6b1c1816df565939e71e41ba27723124035f0cf9c118fed1c5a415) occurs byte-identically as the unique same-kind unit in the existing mapped owner docs/platform/observe/spec.md#unheaded-block-8. Reuses the established mapped owner and Unit-exact conservation mechanism. No new authority, current-truth verdict or approval. Independent review pending.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18"
+      "authoredBy": "codex-session:fgos-run_unit-run-179229832261fa@2026-10-18",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "3. Storage Model"
+      ]
     },
     {
       "claimId": "claim_b9894bde7cf2a02c2c66258e4ff40a8c",
@@ -6545,7 +6549,7 @@
       "sourceUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-79",
+      "targetAnchor": "unheaded-block-80",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
@@ -6556,7 +6560,7 @@
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "bindingSha256": "94e9cccdde4f85fc355c2cfff74692b9559f947cb35f9213575b4a3a1c9b2771",
+      "bindingSha256": "0ef67046cab72cea9837f1e75cf659a324d98fb03dea713fed8417c57619167a",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {

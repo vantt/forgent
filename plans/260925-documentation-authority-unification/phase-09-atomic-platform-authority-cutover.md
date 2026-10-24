@@ -82,6 +82,18 @@ Merge `022c0ee67` (actual main parent `628e47d86`, two board-only commits beyond
 
 Config has no candidate binding in the current ledger; its signed spec predates this import. Before flip, the documentation-navigation/area-inventory owner must route its incoming Rust crate, section schemas and standard status through the switchboard, retained reading-map entry union and inventory, without silently promoting the area or claiming caller wiring. Identity's section 7a local session-writer scope stays intact. Exact provenance and the one content/neighbour-verified component-table rebind are in [W0 accounting](reports/phase-09/w0-merge-accounting.json) and [binding witnesses](reports/phase-09/w0-merge-rebindings.json); independent changed-binding review and final-pin source recomposition remain owed.
 
+Merge `bc5589ed7` (main parent `62ce98513`, 233 imported commits) adds the following incoming `docs/platform/**` changed-file obligations (union/deduplicate with all earlier sets; not seven additional unique files):
+
+- `docs/platform/component-boundary.md`
+- `docs/platform/event-store/spec.md`
+- `docs/platform/git/spec.md`
+- `docs/platform/identity/spec.md`
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+- `docs/platform/terminal-control/spec.md`
+- `docs/platform/yaml-document/spec.md`
+
+The import's complete provenance, both-parent conflict witnesses, registry reconciliation, Step 0 content/neighbour checks and deferred Step 3/4/5 overlaps are in [import accounting](reports/phase-09/import2/merge-accounting.json). [Binding refresh](reports/phase-09/import2/binding-refresh.json) and `ledger/decisions/s16-import2-resync.json` carry current legacy changes, including RUL108 replacing the historical vendored-parser policy, into existing holders. The retained detailed navigation holder is `docs/reading-map.md` section 5, not a second platform map. Identity §7a retains its local session-writer scope; imported signing changes do not broaden this turn's authority. Every changed binding requires a fresh independent verdict; frozen gate/review projections and final-pin source recomposition remain owned by their existing owners. No authority promotion or cutover is performed.
+
 [Phase 8 merge accounting](reports/phase-08/merge-accounting.json) preserves merge/base/digest/main-commit provenance. Final native identity transitions, content/context validation, approvals and per-unit review remain owed against final bytes; incorporate the Phase 8 Step 0 and subsequent N1 receipts rather than deferring those binding repairs. Also include legacy main edits, architecture-manifest changes and any later full identity-scope drift as their existing obligations require.
 
 At landing, reconcile main's only references to its new PF-I011/PF-I012 rows in `plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md` with their candidate PF-I022/PF-I023 identities; do not alter the plan's existing PF-I011/PF-I012. This is an intent-ledger collision account, not contract renumbering authority.

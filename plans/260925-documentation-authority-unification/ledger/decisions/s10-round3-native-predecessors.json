@@ -40,7 +40,7 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-79",
+      "targetAnchor": "unheaded-block-80",
       "rationale": "Source identity and sourceUnitDigest remain the historical claim identity. Current target: docs/platform/packaging-distribution/spec.md:480-484#unheaded-block-79; SHA256 19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a. complete unit digest equal. Full before/after content and neighboring placement are in reports/phase-09/carries/binding-refresh.json for this exact shard/key/index/claimId. Legacy/current-source parity is independently recorded in source-parity.json; a matching target digest alone does not establish source freshness. Independent review pending; no approval carry.",
       "reviewStatus": "pending",
       "authoredBy": "fgos-run_unit-run-1792750955a733",
@@ -51,7 +51,7 @@
         "Workspace Runtime Model"
       ],
       "reviewNote": "Re-authored candidate binding and rationale; previous independent review, if any, is historical only.",
-      "bindingSha256": "94e9cccdde4f85fc355c2cfff74692b9559f947cb35f9213575b4a3a1c9b2771",
+      "bindingSha256": "0ef67046cab72cea9837f1e75cf659a324d98fb03dea713fed8417c57619167a",
       "bindingHashEncoding": "sha256(UTF-8(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry},sort_keys=True,ensure_ascii=False,separators=(\",\",\":\"))+\"\\n\"))"
     },
     {
