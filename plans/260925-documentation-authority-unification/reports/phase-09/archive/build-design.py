@@ -141,7 +141,7 @@ def main():
                 row = {'readerPath': p, 'line': number, 'targetPath': target, 'text': line}
                 (external_refs if outside else navigation_refs).append(row)
                 keep(target, ('outside-plan path/link: ' if outside else 'plan navigation link: ') + p + ':' + str(number))
-    emit('external-references.json', {'inputCommit': pin, 'scan': 'all tracked non-symlink files outside the plan, excluding .fgos; full-path lines plus normalized exact/glob/directory and relative Markdown targets', 'rawLines': raw_external, 'references': external_refs, 'navigationReferences': navigation_refs})
+    external_audit = {'inputCommit': pin, 'scan': 'all tracked non-symlink files outside the plan, excluding .fgos; full-path lines plus normalized exact/glob/directory and relative Markdown targets', 'rawLines': raw_external, 'references': external_refs, 'navigationReferences': navigation_refs}
     for p in files:
         if re.search(r'/review-request-step10-.*-(345f15d95|287a22d33)\.json$', p):
             keep(p, 'round3/4 rationale directory-filter input')
@@ -263,6 +263,65 @@ def main():
                     keep(dst, 'retained plan reader: ' + src + '#' + witness['field'] + ':' + str(witness['line']) + ' ' + witness['text']); changed = True
                 if dst in sources and dst not in live:
                     live.add(dst); changed = True
+    # Navigation and kept rulings form a reading graph, not just one-hop links.
+    # Infer ruling roots from their declared document type, never a filename list.
+    # Do not apply any part of the closure if the brief's 50 MB budget is exceeded.
+    ruling = set()
+    for path in sorted(protected):
+        if not path.endswith('.md'): continue
+        with (root / path).open() as stream:
+            header = stream.read(12000)
+        kind = re.search(r'^Document type:\s*([^\n]+)', header, re.M)
+        if kind and re.match(r'(?:Specification|Policy|Governance|Contract|Decision)\b', kind[1], re.I):
+            ruling.add(path)
+    link_edges = {}
+    closure_reasons = collections.defaultdict(set)
+    closure_refs = []
+    reached = set()
+    pending = [(p, label) for label, roots_set in [('ruling', ruling), ('navigation', navigation)] for p in sorted(roots_set)]
+    visited = set()
+    while pending:
+        path, label = pending.pop()
+        if (path, label) in visited: continue
+        visited.add((path, label)); reached.add(path)
+        if path not in link_edges:
+            links = []
+            text = (root / path).read_bytes().decode('utf8', errors='replace')
+            if '\0' not in text:
+                for number, line in enumerate(text.splitlines(), 1):
+                    for match in link_pattern.finditer(line):
+                        value = match[1].split('#')[0].split('?')[0]
+                        if not value or re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I): continue
+                        target = posixpath.normpath(posixpath.join(posixpath.dirname(path), value))
+                        if target in files:
+                            links.append({'readerPath': path, 'line': number, 'targetPath': target})
+            link_edges[path] = links
+        for row in link_edges[path]:
+            target = row['targetPath']
+            reason = ('ruling link: ' if label == 'ruling' else 'navigation closure link: ') + path + ':' + str(row['line'])
+            closure_reasons[target].add(reason)
+            closure_refs.append({**row, 'rootKind': label})
+            pending.append((target, label))
+    added = reached - protected
+    closure_bytes = sum(files[p]['size'] for p in added)
+    closure = {'inputCommit': pin, 'status': 'blocked-budget-exceeded' if closure_bytes > 50000000 else 'within-budget',
+        'policy': 'Fixed point of relative Markdown links from kept declared Specification/Policy/Governance/Contract/Decision documents and navigation roots; descendants inherit root kind. No size-based pruning of the closure.',
+        'budgetBytes': 50000000, 'rulingRoots': sorted(ruling), 'navigationRoots': sorted(navigation),
+        'beforeRetainedPaths': sorted(protected),
+        'before': {'retainFiles': len(protected), 'retainBytes': sum(files[p]['size'] for p in protected)},
+        'proposedAfter': {'retainFiles': len(protected | reached), 'retainBytes': sum(files[p]['size'] for p in protected | reached)},
+        'addedFiles': len(added), 'addedBytes': closure_bytes,
+        'added': [{**files[p], 'reasons': sorted(closure_reasons[p])} for p in sorted(added)],
+        'references': closure_refs}
+    # Plain JSON is also the complete list to hand to the owner if stopped.
+    (out / 'link-closure.json').write_text(json.dumps(closure, ensure_ascii=False, indent=2) + '\n')
+    if closure_bytes > closure['budgetBytes']:
+        print(json.dumps({k: v for k, v in closure.items() if k not in ('added', 'references', 'rulingRoots', 'navigationRoots', 'beforeRetainedPaths')}), flush=True)
+        raise SystemExit('Link closure exceeds 50 MB: stopped without replacing manifest/audits or retaining proposed files; see link-closure.json')
+    for path in reached:
+        for reason in closure_reasons[path]: keep(path, reason)
+    emit('link-closure.json', closure)
+    emit('external-references.json', external_audit)
     # Join the old scriptRefs conservatively for non-plan reader roots. Fixture
     # strings are intentionally over-retained, rather than mistaken for new scope.
     for row in prune['inventory']:
@@ -417,7 +476,7 @@ def main():
     corrections = []
     for row in false_rows:
         path = row['path']
-        assert path in moving or any(s.startswith(('plan navigation link:', 'outside-plan path/link:')) for s in reasons[path])
+        assert path in moving or any(s.startswith(('plan navigation link:', 'outside-plan path/link:', 'ruling link:', 'navigation closure link:')) for s in reasons[path])
         corrections.append({'path': path, 'previousSize': row['size'], 'previousFalseReasons': row['reasons'],
             'disposition': 'archive' if path in moving else 'retain-required-navigation-link',
             'currentReasons': sorted(reasons[path]) if path in protected else [],

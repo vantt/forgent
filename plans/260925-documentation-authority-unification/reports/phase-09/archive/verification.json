@@ -1,52 +1,20 @@
 {
-  "inputCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
-  "exit": 0,
-  "partitionFiles": 6899,
-  "movingFiles": 6016,
-  "retainedFiles": 883,
-  "retirementSpecs": 359,
-  "gatePrograms": 43,
-  "reviewedTen": 10,
-  "historicalReaderFiles": 47,
-  "historicalJoins": 135,
-  "priorScriptRefOccurrences": 2918,
-  "externalReferenceJoinsVerified": 184,
-  "navigationReferenceJoinsVerified": 619,
-  "falseBasenameRowsReviewed": 22,
-  "falseBasenameRowsArchived": 20,
-  "falseBasenameRowsNowRequiredByNavigation": 2,
-  "sixRestoredInputsRetained": true,
-  "alreadyPrunedRecoveryBlobsVerified": 279,
-  "negativeProbes": [
-    {
-      "probe": "wrong digest",
-      "rejected": true
-    },
-    {
-      "probe": "wrong object",
-      "rejected": true
-    },
-    {
-      "probe": "unsafe path",
-      "rejected": true
-    },
-    {
-      "probe": "self-owning retired proof",
-      "rejected": true
-    }
-  ],
-  "mainManifestBytes": 7253,
-  "auditCompressedBytes": 1709754,
-  "rehearsalCustody": {
-    "bundleHeadsAndDigestVerified": true,
-    "testsPerSide": 11,
-    "baselineFailureParity": true,
-    "accountingRecipesGreen": 2,
-    "realDisk": "/dev/nvme0n1p2[/home/vantt/projects/forgentX-p9-w1-d4] ext4   /home/vantt/projects/forgentX-p9-w1-d4",
-    "variantTipBytes": [
-      818290357,
-      2117345765
-    ]
+  "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
+  "status": "blocked-budget-exceeded",
+  "exit": 2,
+  "closureFixedPointAndDigestsVerified": true,
+  "addedFiles": 637,
+  "addedBytes": 281770653,
+  "budgetBytes": 50000000,
+  "before": {
+    "retainFiles": 888,
+    "retainBytes": 632057359
   },
-  "limits": "Pin-bounded custody and conservative static reader closure; not independent semantics, arbitrary reachability, F approval or a product-suite pass."
+  "proposedAfter": {
+    "retainFiles": 1525,
+    "retainBytes": 913828012
+  },
+  "rehearsalRerun": false,
+  "checkARevalidated": false,
+  "limits": "Stop condition verified; no new retained-set, cold timing, or cutover pass. Historical manifest assets/rehearsal remain bound to their old pin."
 }

@@ -1,6 +1,17 @@
 {
   "contract": "documentation-record-archive.v2",
-  "status": "candidate-local-design-not-cutover-approval",
+  "status": "blocked-rework-link-closure-budget",
+  "pendingRework": {
+    "status": "blocked-budget-exceeded",
+    "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
+    "closurePath": "plans/260925-documentation-authority-unification/reports/phase-09/archive/link-closure.json",
+    "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893",
+    "addedFiles": 637,
+    "addedBytes": 281770653,
+    "budgetBytes": 50000000,
+    "applied": false,
+    "note": "Owner disposition required by w5-d5d-brief.md item 1. Existing sourceCommit/counts/audit assets remain historical; no replacement partition or new timing candidate was built."
+  },
   "inputCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "archiveRef": "refs/heads/archive/260925-records",
   "archiveCommit": null,

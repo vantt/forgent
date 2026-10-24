@@ -13,6 +13,57 @@ def main():
         return json.loads(gzip.decompress((HERE / 'audit' / (name.replace('/', '--') + '.gz')).read_bytes()))
     def git(*args): return subprocess.check_output(['git', *args], cwd=ROOT)
     m = json.loads((HERE / 'manifest.json').read_text())
+    if m.get('pendingRework', {}).get('status') == 'blocked-budget-exceeded':
+        # This owns the stopped-build proof; old rehearsal custody is not a pass
+        # for a new source pin. Independently traverse the declared reading roots.
+        pending = m['pendingRework']
+        data = (ROOT / pending['closurePath']).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == pending['sha256']
+        closure = json.loads(data)
+        pin = closure['inputCommit']
+        assert git('rev-parse', 'HEAD').decode().strip() == pin
+        sizes = {}
+        for row in git('ls-tree', '-rlz', pin, '--', P).split(b'\0'):
+            if not row: continue
+            meta, path = row.split(b'\t', 1)
+            mode, typ, oid, size = meta.split(); path = path.decode()
+            if typ == b'blob' and mode != b'120000' and not path.startswith(A): sizes[path] = int(size)
+        before = set(closure['beforeRetainedPaths'])
+        roots = set(closure['rulingRoots'] + closure['navigationRoots'])
+        assert roots <= before <= sizes.keys()
+        reached = set(); queue = list(roots)
+        import posixpath
+        while queue:
+            path = queue.pop()
+            if path in reached: continue
+            reached.add(path)
+            text = (ROOT / path).read_bytes().decode('utf8', errors='replace')
+            if '\0' in text: continue
+            for match in re.finditer(r'\[[^\]]*\]\(\s*<?([^\s)>]+)', text):
+                value = match[1].split('#')[0].split('?')[0]
+                if not value or re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I): continue
+                target = posixpath.normpath(posixpath.join(posixpath.dirname(path), value))
+                if target in sizes: queue.append(target)
+        added = {r['path']: r for r in closure['added']}
+        assert len(added) == len(closure['added']) == closure['addedFiles']
+        assert set(added) == reached - before
+        for path, row in added.items():
+            blob = (ROOT / path).read_bytes()
+            assert row['size'] == sizes[path] == len(blob)
+            assert hashlib.sha256(blob).hexdigest() == row['sha256']
+            assert hashlib.sha1(b'blob ' + str(len(blob)).encode() + b'\0' + blob).hexdigest() == row['blobId']
+            assert row['reasons']
+        assert sum(sizes[p] for p in added) == closure['addedBytes'] > closure['budgetBytes'] == 50000000
+        for label, paths in [('before', before), ('proposedAfter', before | reached)]:
+            assert closure[label] == {'retainFiles': len(paths), 'retainBytes': sum(sizes[p] for p in paths)}
+        result = {'inputCommit': pin, 'status': 'blocked-budget-exceeded', 'exit': 2,
+            'closureFixedPointAndDigestsVerified': True, 'addedFiles': len(added), 'addedBytes': closure['addedBytes'],
+            'budgetBytes': closure['budgetBytes'], 'before': closure['before'], 'proposedAfter': closure['proposedAfter'],
+            'rehearsalRerun': False, 'checkARevalidated': False,
+            'limits': 'Stop condition verified; no new retained-set, cold timing, or cutover pass. Historical manifest assets/rehearsal remain bound to their old pin.'}
+        (HERE / 'verification.json').write_text(json.dumps(result, indent=2) + '\n')
+        print(json.dumps(result))
+        raise SystemExit(2)
     pin = m['sourceCommit']
     assert git('rev-parse', 'HEAD').decode().strip() == pin
     for asset in m['auditAssets']:

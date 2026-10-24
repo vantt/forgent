@@ -1,91 +1,66 @@
 {
-  "status": "local-correction-and-rehearsal-complete; G8 unaccepted pending independent review and F",
-  "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
-  "authority": ["w4-d5c-brief.md", "L12-129", "L12-137"],
+  "status": "blocked-budget-exceeded",
+  "sourceCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
+  "authority": "w5-d5d-brief.md item 1",
   "scope": "plans/260925-documentation-authority-unification/reports/phase-09/archive/**",
   "needsWrites": [],
   "gateAccepted": false,
-  "partition": {
-    "files": 6899, "bytes": 2897413094,
-    "archiveFiles": 6016, "archiveBytes": 2265926393,
-    "retainedFiles": 883, "retainedBytes": 631486701,
-    "outsidePlanBasenameJoins": 0,
-    "sizeThresholdRetention": false,
-    "retirementSpecs": 359, "currentGatePrograms": 43, "reviewedTen": 10,
-    "temporaryGateFiles": 3283, "temporaryGateBytes": 1299055408
+  "closure": {
+    "path": "link-closure.json",
+    "sha256": "93be72ebb0f8b964eccdb38666c8045c29fe2bd842d0bbc473aaf447d3b4e893",
+    "budgetBytes": 50000000,
+    "rulingRoots": 3,
+    "navigationRoots": 102,
+    "historicalD5c": {"retainFiles": 883, "retainBytes": 631486701},
+    "before": {"retainFiles": 888, "retainBytes": 632057359},
+    "addedFiles": 637,
+    "addedBytes": 281770653,
+    "proposedAfter": {"retainFiles": 1525, "retainBytes": 913828012},
+    "appliedFiles": 0,
+    "appliedBytes": 0,
+    "directRulingTargets": 4,
+    "directRulingTargetBytes": 783918,
+    "largestAddedPath": "reports/phase-06/checkpoint-10-source-population.json",
+    "largestAddedBytes": 71398693
   },
-  "reviewCorrections": {
-    "reviewedRows": 22, "originalBytes": 23297481,
-    "archivedRows": 20, "archivedOriginalBytes": 23083394,
-    "retainedWithRealNavigationLinks": [
-      {"path": "pilot/README.md", "locator": "phase-06-transform-all-platform-areas-as-candidate-material.md:25"},
-      {"path": "reports/phase-06/review-6-checkpoint.md", "locator": "reports/phase-06/progress.md:1306"}
-    ],
-    "qualification": "Keep-every-navigation-target rule takes precedence for these two real links; all 22 false basename reasons were removed",
-    "audit": "audit/retained-set-corrections.json.gz"
-  },
-  "readerProof": {
-    "allTrackedOutsidePlanFilesScanned": true,
-    "excluded": [".fgos/**", "symlinks", "binary bodies"],
-    "rawFullPathLines": 164, "outsidePlanNormalizedJoins": 184,
-    "planNavigationJoins": 619, "formerlyArchivedOutsidePlanJoinsNowKept": 45,
-    "allExistingExactTargetsRetained": true,
-    "directoryMentionNotBlanketRetention": true,
-    "historicalReaderFiles": 47, "historicalJoins": 135,
-    "priorScriptRefOccurrences": 2918, "restoredInputs": 6, "priorRecoveryBlobsVerified": 279,
-    "audit": "audit/external-references.json.gz"
-  },
-  "rehearsal": {
-    "archiveRef": "refs/heads/archive/260925-records",
-    "archiveCommit": "b9ce940e293d27fb03751063b5f5e2db304fdf83",
-    "removalCommit": "b4fd9a7d6b5b7c795b1a034f9a9f56134c10cc64",
-    "accountedCandidate": "98a121070744e334bb2333bfcd2f10ec672e7ec4",
-    "preFreezeCandidate": "dd78c6b18fca66243a624dae1d8c165e1e9fe23c",
-    "filesystem": "NVMe ext4; stat -f ext2/ext3 ef53; actual findmnt in rehearsal.json",
-    "coldMethod": "drop_caches not writable/permitted; first add in fresh --no-hardlinks --no-checkout clone per variant, brief-authorized fallback, not physical eviction",
-    "postFreeze": {"tipBytes": 818290357, "runsSeconds": [2.4145886469632387, 6.091207563877106, 6.01169649604708], "medianSeconds": 6.01169649604708},
-    "preFreeze": {"tipBytes": 2117345765, "runsSeconds": [49.51505667902529, 27.737128988141194, 13.364804548909888], "medianSeconds": 27.737128988141194},
-    "firstRunIsColdFallback": true, "physicalCachesDropped": false,
-    "bundle": "audit/rehearsal.bundle", "bundleVerified": true,
-    "measuredMainSideBytes": 50093, "templateManifestBytes": 7253,
-    "archiveOnlyAssets": 11, "compressedAuditBytes": 1709754,
-    "postMeasurementDelta": "audit/final-artifact-delta.json.gz",
-    "scratchRemoved": true, "sourceRefInstalled": false
-  },
-  "accounting": {
-    "recipes": 2, "recipeScope": "entire unchanged checks.mjs including B/H/I, not an A slice",
-    "removalPairsPerRecipe": 3384, "preexistingPendingPairsPerRecipe": 48,
-    "preexistingPairAuthority": "fixture-only simulation of pending Lead accounting, not source approval",
-    "beforeUnaccountedPairs": 3432, "afterAOk": true,
-    "afterUnaccountedPairs": 0, "afterWorkingViolations": 0,
-    "afterBOk": true, "afterIOk": true,
-    "afterHFindings": 4, "afterHNewFindings": 0, "afterHUnresolvedLinks": 0,
-    "afterFullRecipeExit": 1,
-    "fullRecipeFailureReason": "same four preexisting missing candidate metadata headers on both sides",
-    "sourceExceptionArraysChanged": false,
-    "audit": "audit/pair-accounting.json.gz"
+  "retainedToArchivedLinks": {
+    "before": {"readerFiles": 124, "links": 1029, "targetFiles": 631},
+    "proposedAfterNotApplied": {"readerFiles": 1, "links": 3, "targetFiles": 3},
+    "method": "Source-relative Markdown links to existing non-archive plan files at sourceCommit; occurrences counted, not unique source-line-target tuples"
   },
   "proofs": {
-    "custodyVerifierExit": 0, "negativeProbesRejected": 4,
-    "testFilesPerSide": 11, "casesPerSide": 314,
-    "passPerSide": 312, "failPerSide": 2, "skipPerSide": 0, "cancelledPerSide": 0,
-    "newFailingTitles": 0,
-    "remainingFailures": "two reproduction fresh-reviewer ownership cases fail at current.noNewDoubleOwnership, same at pin and candidate",
-    "candidateStatus": {"fullCountsAndFindingsEqual": true, "existingMetadataFindings": 4, "newFindings": 0, "linkFindings": 0, "owningCasesPassed": 11},
-    "retirement": {"fullCliExitBothSides": 1, "fullCliGap": "saved inventory shards are uncommitted and missing; CLI cannot load doc-inventory.parts/part-0001.jsonl", "productionLinksResolveEvaluator": "pass with real tracked docs/metadata/switchboard/constitution on both sides; unrelated evaluator fields are fixture inputs, not full inventory acceptance", "newLinkFindings": 0, "owningCasesPassed": 36},
-    "verifyPhase02OwningCasesPassedPerSide": 16,
-    "releaseId": "sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8",
-    "rustFreshness": "activated addon only, not working-tree Rust freshness",
-    "failedAttemptPreserved": "audit/attempt-1/; navigation program retention and scratch CommonJS package boundary corrected without changing checks/tests"
+    "builderExit": 1,
+    "builderStopIntentional": true,
+    "verifierExit": 2,
+    "verifierMeaning": "independent closure/digest/budget stop proof; not completed archive custody or rehearsal",
+    "rehearsalGuardExit": 1,
+    "rehearsalRerun": false,
+    "newTimingRuns": 0,
+    "coldCacheEvidence": false,
+    "checkARevalidated": false,
+    "newLinkParityRevalidated": false
   },
+  "deleted": {"path": "audit/attempt-1/rehearsal.bundle", "bytes": 1788526},
+  "attempt1OtherFilesUnchanged": true,
+  "historicalManifestAndRehearsalSourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
+  "historicalColdClaimRejected": true,
+  "deferred": [
+    "Owner disposition of the complete over-budget closure",
+    "External real-disk scratch migration",
+    "Measured posix_fadvise cache eviction and cold/warm classification",
+    "Sequential reduced/pre-freeze timing runs and cleanup",
+    "Fresh candidate full A and link-finding parity",
+    "Final full custody/rehearsal verification"
+  ],
   "sourceGuards": {
-    "sourceGitIndexOrRefsWritten": false, "productOrTestEdited": false,
-    "fgosCliInvokedAgainstSource": false, "lifecycleInvoked": false,
-    "realLeaseHeld": false, "sourcePairAccountingApplied": false,
-    "activationMetadataRead": "authorized releasePath only",
-    "allTrackedChangesInsideScope": true
+    "sourceGitWrites": false,
+    "sourcePairAccounting": false,
+    "fgosCli": false,
+    "lifecycle": false,
+    "productOrTestsEdited": false,
+    "newScratchCreated": false,
+    "publicationOrLease": false
   },
-  "impactAnalysis": "degraded/unqueried under explicit no-fgOS-CLI brief; direct source/history review only",
-  "unclaimed": ["G8 acceptance", "full retirement CLI/inventory pass", "all-green ownership or H metadata", "physical cache eviction", "F timing/independent review", "G10/G11", "publication/main landing/real lease", "working-tree Rust freshness"],
-  "unrun": ["npm test and scripts/run-tests.mjs prohibited", "Cargo workspace suite outside records-only verification", "browser preview/service state outside constrained task"]
+  "impactAnalysis": "degraded/unqueried: no-fgOS-CLI brief; direct source/history review",
+  "unrun": ["npm test and scripts/run-tests.mjs prohibited", "Cargo workspace suite", "browser/service preview"]
 }

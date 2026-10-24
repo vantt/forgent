@@ -1,4 +1,14 @@
 {
+  "evidenceStatus": "historical-D5c-only; D5d blocked before rehearsal",
+  "pendingRework": {
+    "status": "blocked-budget-exceeded",
+    "inputCommit": "3c368e5201f4ab4a5a245f4c6caf896d64bfc0a8",
+    "addedFiles": 637,
+    "addedBytes": 281770653,
+    "newTimingRuns": 0,
+    "coldEvidenceAccepted": false,
+    "correction": "The runs below are unchanged historical evidence, not a D5d rerun. Their old cold-fallback labels do not establish cold residency; the review identified a warm page cache. Owner disposition of the 50 MB stop is required before new cache-eviction, external-scratch and timing work."
+  },
   "sourceCommit": "23f6eaccf5eb195a8f50e5788d38f386a901b6d2",
   "archiveRef": "refs/heads/archive/260925-records",
   "archiveCommit": "b9ce940e293d27fb03751063b5f5e2db304fdf83",

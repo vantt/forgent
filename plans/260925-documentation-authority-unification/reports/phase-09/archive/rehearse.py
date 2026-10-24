@@ -35,6 +35,9 @@ def main():
     assert str(scratch).startswith('/tmp/fgos-work/')
     if opts.rebuild:
         subprocess.run(['python3', '-B', str(output / 'build-design.py'), '--output-dir', str(output)], cwd=source, check=True)
+    manifest = json.loads((output / 'manifest.json').read_text())
+    if manifest.get('pendingRework', {}).get('status') == 'blocked-budget-exceeded':
+        raise SystemExit('Rehearsal stopped: link closure exceeds 50 MB; owner disposition required before scratch or timing')
     assert not scratch.exists() and not scratch.is_symlink(), 'use a fresh scratch name'
     physical = output / '.scratch' / scratch.name
     physical.mkdir(parents=True)
