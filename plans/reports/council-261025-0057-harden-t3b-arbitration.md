@@ -131,3 +131,20 @@ Sent to the owner in Vietnamese; summary:
 4. **Hot lock:** WORK does not agree that the store does not need it, because the state lock also keeps the fold, the cache and the own-stream precondition coherent. The cheaper lever is the ~20 ms rewrite of the 8.5 MB view under the lock: write the cache after release, behind a revision check. HARDEN brings that as a proposal with release-build numbers, and WORK reviews it before anything else in the lock moves.
 
 WORK recorded D4–D7, D13 and D14 on H33 (`f6382cdaf`). **Ordering:** the stray-shard import-legacy must land and run on fg-server and design-lap before D4 and D6 remove the import path.
+
+## OPC's decisions on the Git items (2026-10-25, `forgent-e3`)
+
+1. **RT10, refusal name.** `WalError::Untrusted` currently covers three failures.
+   - A real identity change keeps `repository-identity-changed`.
+   - An unsafe owner or mode, and a non-canonical common dir, get the new cause `git-wal-path-unsafe` (class Refused). Its diagnostic names the path, the reason and the next step.
+   - The same change also adds a contract row, the Git spec cause list and a CHANGELOG line.
+   - **The "775 refusal name" red test moves from §4 item 1 to Git's WAL tests (OPC).** HARDEN's 04b tests assert only the cause string.
+2. **RT6, ref count against the record bound.** OPC shards the fetch:
+   - `publication.rs` `fetch` packs mappings into chunks by encoded record size, using the existing `check_record_bound`;
+   - each chunk is its own recoverable RemoteFetch transfer;
+   - no semantic change;
+   - the owning proof is a 400-ref publication test.
+
+   Refs only accumulate, there is no retire verb, and junk refs can be pushed. Those stay Event Store items for WORK.
+
+Both are OPC's own Git branch and do not block 04b.
