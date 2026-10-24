@@ -41,9 +41,13 @@ pub fn facts(
         .map_err(git_error)?;
     let push = driver.push_refspecs(repo, remote).map_err(git_error)?;
     let url = driver.remote_url(repo, remote);
-    let provenance = driver
-        .fetch_mapping_provenance(repo, remote)
-        .map_err(git_error)?;
+    // Mapping records written before Git stamped a config sequence have no
+    // relative order; Git refuses to pick one, so the fact is "no provenance"
+    // and setup records a current, ordered one through RepositoryConfig.
+    let provenance = match driver.fetch_mapping_provenance(repo, remote) {
+        Err(e) if e.cause == "fetch-provenance-order-unknown" => None,
+        other => other.map_err(git_error)?,
+    };
     let configured = driver.machine_id(repo).map_err(git_error)?;
     let configured = configured
         .as_ref()
