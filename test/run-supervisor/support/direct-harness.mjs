@@ -5,7 +5,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');
@@ -50,7 +50,7 @@ export function killToken(token) {
 
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, stdio: 'ignore' });
 
-/** `agent` options reach the agent through AGENT_OPTS; `config` is merged into .fgos/config.json. */
+/** `agent` options reach the agent through AGENT_OPTS; `runner` is merged into the project config. */
 export function createProject({ agent = {}, runner = {}, dispatch = null, timeoutMs = 30_000 } = {}) {
   const repoDir = makeFixtureDir('fgos-direct-repo-');
   const stateDir = makeFixtureDir('fgos-direct-state-');
@@ -79,7 +79,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
           }],
         },
       },
-      capabilities: { 'docs:write': { prefer: ['noisy'] } },
+      capabilities: { 'docs:write': capabilityServedBy('noisy', 'docs:write') },
       ...runner,
     },
     ...(dispatch ? { dispatch } : {}),
@@ -92,8 +92,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
     repoDir, stateDir, tmpDir, env,
     /** Change what the agent does (and the run timeout) for the runs started from now on. */
     reconfigure({ agent: nextAgent, timeoutMs: nextTimeoutMs } = {}) {
-      const file = path.join(repoDir, '.fgos', 'config.json');
-      const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+      const config = readProjectConfig(repoDir);
       if (nextAgent) config.runner.executors.noisy.invocations[0].env = { AGENT_OPTS: JSON.stringify(nextAgent) };
       if (nextTimeoutMs) config.runner.timeoutMs = nextTimeoutMs;
       writeProjectConfig(repoDir, config);
