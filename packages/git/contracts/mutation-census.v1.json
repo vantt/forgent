@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "559116bb01a83887d958fecab0bddf642a76ab91c270ca44c2cae16684688b84",
+  "payloadDigest": "ad6af8291c6d4b890e9678da3d89b1996a3416c2f11f046ce5745ef4af3d7792",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -277,7 +277,7 @@
     "packages/durable-file/rust/tests/install.rs": "96c695200ff51256788f0655cf49130420cac48091de1df2d11a9b8d85ac647b",
     "packages/event-store/rust/build.rs": "38ef607f803934266807e0cc329f9b6796904a9f86199e8c9e4efb6c5dfe337f",
     "packages/event-store/rust/examples/distribution_digest_audit.rs": "3793a8a4d92cfc469eb3b6220d15b709b662990c801d082870ad1c7fc289f089",
-    "packages/event-store/rust/src/append.rs": "9adc833dc4bba535bab7c1f9327d61742f7674907283996f3cd66cdd1fb12f4f",
+    "packages/event-store/rust/src/append.rs": "8916b163dac4498a3dddd6ff5eee72a72445d589e11c06bb076608b13783c624",
     "packages/event-store/rust/src/checkpoint.rs": "0a66f45971c102a178f2bc633c1aa1ccd2315119f531f5e2d97018397442ec1f",
     "packages/event-store/rust/src/commit_memo.rs": "ad5692a8ef36039dd1ce1dfd5c0dc71f880e047fe74f5524e0ead6f12969b99c",
     "packages/event-store/rust/src/cursor.rs": "7589fddf99e0a99de8d4a3d044f34d823e55b037eeddb3f325bb53ccb9cbcee5",
@@ -308,7 +308,7 @@
     "packages/event-store/rust/src/sync.rs": "5490054b566437cec4e9974959048e2ae9ad2f257fdc38ae9a15884a030784d8",
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
     "packages/event-store/rust/src/walk.rs": "429928b27ac16e6bc1cb14dbbd56e30e02aafda1b140a479c78502c913b2e392",
-    "packages/event-store/rust/tests/append_recovery.rs": "3885a9356c15bf29ba56273baf15e44bd09623213a9b08f5817dbbb41c1e8964",
+    "packages/event-store/rust/tests/append_recovery.rs": "fb956bf800c04a7ce6ed0ab4c838073f3b9f1ce867f39381ff51daa0b677d811",
     "packages/event-store/rust/tests/branch_local_refs.rs": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
     "packages/event-store/rust/tests/checkpoint.rs": "082d41b7dbeb3bf2000e36a4456def251e98967795da86b9564337b6a937ab5b",
     "packages/event-store/rust/tests/common/mod.rs": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",
