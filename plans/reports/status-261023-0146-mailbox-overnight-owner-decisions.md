@@ -75,3 +75,5 @@ Nhánh `mailbox/v1-v3` đang ở `e8d5b3de5`, chưa merge main. V7a–V7f (phầ
 **Owner trả lời 2026-10-24 09:59:** 1 ok (đo nhánh có hại với khung socket thật của Claude), 2 ok (chạy probe tương tác), 4 ok (pi với model Claude), 5 ok theo khuyến nghị (không thử Codex effort cao), 6 ok (Q4 = B, chưa ghi thời điểm claim), 7 ok (B: trạng thái `confirmed` trong IDENT, mailbox chỉ có công tắc `requireConfirmed`), 8 ok (bỏ pointer mode). Câu 3 (P3: đăng nhập Gemini) chưa trả lời.
 
 **Owner 2026-10-24 12:48:** bỏ phép đo pi với model Claude (câu 4), vì không có tài khoản đã duyệt nào phục vụ được model khác OpenAI cho pi. Câu hỏi lỗi nằm ở model hay ở CLI vẫn để mở.
+
+**Owner 13:05:** đổi quyết định lúc 12:48, giờ cho đo pi với model Claude qua tài khoản `openrouter`. Khoảng 105 lần chạy confined, dùng model haiku giống V6. Lead báo ước tính chi phí trước khi chạy và dừng nếu vượt 25 USD.
