@@ -27,8 +27,10 @@
 //   - standalone-skill-script: code of a skill whose own SKILL.md declares `metadata.oneDoor: standalone`
 //     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
 // Explicit owner declarations extend these classes by exact path + function/call digest, never by
-// line number. Tooling that cannot use an existing port has its own declared-tooling-exemption class;
-// every declaration carries its reason and retirement condition and must match exactly one raw site.
+// line number. Pass-through argv also binds the sorted multiset of wrapper caller-call digests, so a
+// new caller cannot inherit an exemption. Hook verb claims must equal the callers' literal read verbs.
+// Tooling that cannot use an existing port has its own declared-tooling-exemption class; every
+// declaration carries its reason and retirement condition and must match exactly one raw site.
 //
 // Usage: node scripts/git-one-door-scan.mjs [--json] [--root <dir>] [--write-census]
 // The release build writes the census (packages/git/contracts/mutation-census.v1.json); doctor's
@@ -1538,8 +1540,12 @@ function computeValueFlow(ctx, file, fn) {
     while (outer.stop === ',' || outer.stop === ':') outer = flowContext(file.shape, outer.at);
     if (outer.stop === '{') follow(file, outer.at, splitArgs(file.shape, outer.at).close + 1, [fn.name]);
     else escape(file, fn.from, 'a member of an unreadable object');
-  } else {
+  } else if (fn.name) {
     push({ kind: 'name', file, scope: enclosing(file.spans, fn.from - 1), name: fn.name, path: [], origin: true });
+  } else {
+    // An anonymous callback can still be assigned to a named local (`const run = fallback ||
+    // ((command, args) => ...))`). Follow that expression to its binding, then to its calls.
+    follow(file, fn.from, fn.to + (file.shape[fn.bodyFrom] === '{' ? 1 : 0), []);
   }
   drain();
   for (let i = 0; i < items.length; i++) {
@@ -2426,17 +2432,74 @@ function scanSkill(name, source, ctx) {
 // Shipped with scripts/, so verifyCensus binds this input just like the other Node payload files.
 export const GIT_DECLARATIONS_PATH = 'scripts/lib/git-one-door-declarations.v1.json';
 
-/** A call's identity ignores preceding line shifts, but not edits to its callee, operands or owner. */
-function declaredSiteId(file, site) {
-  let fn = enclosing(file.spans, site.open);
+/** Comment-blanked call text, without preceding lines or offsets. */
+function declarationCallText(file, open) {
+  let start = open;
+  while (/\s/.test(file.shape[start - 1] ?? '')) start--;
+  let depth = 0;
+  let i = start - 1;
+  for (; i >= 0; i--) {
+    const c = file.shape[i];
+    if (')]}'.includes(c)) { depth++; continue; }
+    if (depth) { if ('([{'.includes(c)) depth--; continue; }
+    if (/[\w$.]/.test(c) || (c === '?' && file.shape[i + 1] === '.')) continue;
+    // Whitespace around member/index/call syntax belongs to the callee, not `return`/`await`.
+    if (/\s/.test(c) && (/\.$/.test(file.shape.slice(0, i).trimEnd())
+      || /^[.(\[]/.test(file.shape.slice(i + 1, start).trimStart()))) continue;
+    break;
+  }
+  return file.code.slice(i + 1, start).trim() + file.code.slice(open, splitArgs(file.shape, open).close + 1);
+}
+
+/** A literal argv verb, preserving unknown operands rather than mistaking their string fragments
+ * for a verb. Spreads are unresolved: they can insert options or a verb, including write forms. */
+function declarationVerb(argv) {
+  const text = argv.trim();
+  const shape = lexSource(text).shape;
+  if (!text.startsWith('[') || splitArgs(shape, 0).close !== text.length - 1) return undefined;
+  const items = splitArgs(shape, 0).args.map(({ from, to }) => text.slice(from, to).trim());
+  if (items.some(item => item.startsWith('...'))) return undefined;
+  const words = items.map(item => /^(['"])((?:\\.|(?!\1).)*)\1$/s.exec(item)?.[2]);
+  let i = 0;
+  for (; i < words.length;) {
+    if (/^(-C|-c|--git-dir|--work-tree)$/.test(words[i] ?? '')) { i += 2; continue; }
+    if (/^(?:--(?:no-replace-objects|no-optional-locks|bare|literal-pathspecs)|--(?:git-dir|work-tree)=.+)$/.test(words[i] ?? '')) { i++; continue; }
+    break;
+  }
+  if (!words[i] || words[i].startsWith('-')) return undefined;
+  return hookVerb(words.slice(i).map(word => word ?? '__operand__'));
+}
+
+/** A pass-through site's identity also binds the sorted call digests of its wrapper. Reuse both
+ * caller resolvers: a callback handed under a key, or an anonymous local, is not called by name. */
+function declaredSiteId(ctx, file, site) {
+  const owner = enclosing(file.spans, site.open);
+  let fn = owner;
   while (fn && !fn.name) fn = enclosing(file.spans, fn.from - 1);
-  const callee = /[\w$.]+\s*$/.exec(file.shape.slice(0, site.open))?.[0].trim() ?? '';
-  const call = callee + file.code.slice(site.open, splitArgs(file.shape, site.open).close + 1);
-  return `${fn?.name ?? '<module>'}:${sha256(call)}`;
+  const call = declarationCallText(file, site.open);
+  const { args } = splitArgs(file.shape, site.open);
+  const argv = args[1] ? file.code.slice(args[1].from, args[1].to) : '';
+  const verb = declarationVerb(argv);
+  if (verb) return { siteId: `${fn?.name ?? '<module>'}:${sha256(call)}`, callerVerbs: [verb] };
+  const callers = owner ? dedupeCalls([
+    ...(owner.name ? callersOf(ctx, file, owner.name) : []),
+    ...valueFlowCalls(ctx, file, owner).calls,
+  ]) : [];
+  const callerDigests = callers.map(c => sha256(`${c.file.name}\0${declarationCallText(c.file, c.open)}`)).sort();
+  budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
+  const parameters = argv ? file.elements(argv, site.open, 0).filter(v => v.param !== undefined) : [];
+  const callerVerbs = callers.flatMap(c => {
+    const { args: supplied } = splitArgs(c.file.shape, c.open);
+    return parameters.map(v => {
+      const arg = supplied[v.index];
+      return arg ? declarationVerb(c.file.code.slice(arg.from, arg.to)) : undefined;
+    });
+  });
+  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs };
 }
 
 /** Owner declarations classify raw sites only; stale/ambiguous inputs never yield a green census. */
-function applyDeclarations(root, sites, classes, digests) {
+function applyDeclarations(root, sites, classes, digests, observedVerbs) {
   let bytes;
   try { bytes = fs.readFileSync(path.join(root, GIT_DECLARATIONS_PATH), 'utf8'); }
   catch (err) { if (err.code === 'ENOENT') return sites; throw err; }
@@ -2462,9 +2525,12 @@ function applyDeclarations(root, sites, classes, digests) {
     const found = sites.filter(s => s.path === entry.path && s.siteId === entry.siteId);
     if (found.length !== 1) throw new Error(`stale or ambiguous Git declaration: ${entry.path} ${entry.siteId} matched ${found.length} sites`);
     const [site] = found;
+    const verbs = observedVerbs.get(site);
     if (entry.class === 'hook-read-context') {
       if (!entry.path.startsWith(`${HOOKS_DIR}/`) || site.binary !== 'git'
-        || !Array.isArray(entry.verbs) || !entry.verbs.length || !entry.verbs.every(v => READ_VERBS.has(v))) invalid(`hook read verbs for ${entry.path}`);
+        || !Array.isArray(entry.verbs) || !entry.verbs.length || !entry.verbs.every(v => READ_VERBS.has(v))
+        || !verbs?.length || verbs.some(v => !v || !entry.verbs.includes(v))
+        || entry.verbs.some(v => !verbs.includes(v))) invalid(`hook read verbs for ${entry.path}: declared verbs must equal literal caller verbs`);
     } else if (entry.verbs !== undefined) invalid(`verbs on non-hook ${entry.path}`);
     if (entry.class === 'configured-binary' && site.family !== 'unresolved-binary') invalid(`fixed program is not configured data: ${entry.path}`);
     classes.push({ ...site, ...entry });
@@ -2520,6 +2586,7 @@ export function scan({ root = REPO, files, openInspect } = {}) {
     if (own) doors.add(mk.path); else ctx.raw.push({ path: mk.path, line: mk.line, spawn: 'sandbox marker', binary: 'marker outside the sandbox door', family: 'sandbox-marker' });
   }
   const sites = [];
+  const observedVerbs = new Map();
   for (const s of ctx.raw) {
     const { file, site, enclosing: _e, ...record } = s;
     const skill = standaloneSkillOf(path.join(root, record.path), root);
@@ -2539,11 +2606,16 @@ export function scan({ root = REPO, files, openInspect } = {}) {
       });
       if (verbs.every((v) => v && READ_VERBS.has(v))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs }); continue; }
     }
-    sites.push(file && site ? { ...record, siteId: declaredSiteId(file, site) } : record);
+    if (file && site) {
+      const { callerVerbs, ...identity } = declaredSiteId(ctx, file, site);
+      const identified = { ...record, ...identity };
+      observedVerbs.set(identified, callerVerbs);
+      sites.push(identified);
+    } else sites.push(record);
   }
   const key = (s) => `${s.path}:${String(s.line).padStart(6, '0')}:${s.binary}`;
   const unique = (list) => [...new Map(list.map((s) => [key(s), s])).values()].sort((a, b) => key(a).localeCompare(key(b)));
-  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests));
+  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests, observedVerbs));
   const classes = unique(ctx.classes);
   const families = {};
   for (const s of finalSites) families[s.family] = (families[s.family] ?? 0) + 1;
@@ -2588,7 +2660,8 @@ export function censusDrift(doc, root, changes) {
   const drift = [];
   for (const [name, source] of changes) {
     if (name === 'scripts/git-one-door-scan.mjs' || (product && !product(name))) continue;
-    const digest = source !== null && kindOf(name, source) ? sha256(source) : undefined;
+    // The declarations file is a recorded scan input (not code), so it is judged by digest like the sources it declares.
+    const digest = source !== null && (kindOf(name, source) || name === GIT_DECLARATIONS_PATH) ? sha256(source) : undefined;
     if (doc.files[name] !== digest) drift.push(name);
   }
   return drift;

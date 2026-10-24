@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Git one-door declarations now bind pass-through wrappers to their caller-call digests: new or changed callers, including reads, require re-declaration; cold-hook verb claims are checked against literal caller verbs.
+
 - Git one-door scanning reproducibly declares 25 owner-approved hook, documentation-tooling and configured-command sites with reasons and retirement conditions; stale or ambiguous declarations fail the scan, and doctor verifies the declaration bytes with the census.
 - Documentation gates and immutable-verification tooling reuse typed Git reads and bounded blob batches, preserving non-ASCII and tab-containing filenames. Verifiers reclaim their own dependency/build outputs (including partial installs) before guarded worktree removal; unrelated dirty or ignored bytes still retain the checkout with a warning. The non-pinned blob reader rejects objects beyond Inspect's bound instead of spawning raw Git.
 - Reproduction-pinned documentation generators retain their exact historical bytes; migrated callers use a separate non-pinned reader so reproduction check B remains valid without rebaselining.

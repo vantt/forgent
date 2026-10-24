@@ -1,0 +1,92 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (18.64772ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (5.739346ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (9.438176ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (2.24204ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (3.549338ms)
+✖ new or changed write callers cannot inherit any declared pass-through wrapper (3.252454ms)
+✖ wrapper caller identities survive line shifts but an added read caller needs a new declaration (2.004651ms)
+✖ caller fingerprints bind computed callees and duplicates but not caller ordering (2.675165ms)
+✖ declared hook verbs must equal observed literal caller verbs even after re-declaration (2.68537ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (1.619011ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 6
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 121.90713
+
+✖ failing tests:
+
+test at test/scripts/git-one-door-declarations.test.mjs:131:1
+✖ new or changed write callers cannot inherit any declared pass-through wrapper (3.252454ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: tooling wrapper: ['reset', '--hard', 'HEAD']
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w4-g4-fix-brief/test-payload/test/scripts/git-one-door-declarations.test.mjs:138:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /stale or ambiguous Git declaration/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:148:1
+✖ wrapper caller identities survive line shifts but an added read caller needs a new declaration (2.004651ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: tooling wrapper: added read
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w4-g4-fix-brief/test-payload/test/scripts/git-one-door-declarations.test.mjs:158:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /stale or ambiguous Git declaration/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:167:1
+✖ caller fingerprints bind computed callees and duplicates but not caller ordering (2.675165ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: an identical new caller still changes the multiset
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w4-g4-fix-brief/test-payload/test/scripts/git-one-door-declarations.test.mjs:178:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /stale or ambiguous Git declaration/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/git-one-door-declarations.test.mjs:183:1
+✖ declared hook verbs must equal observed literal caller verbs even after re-declaration (2.68537ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: a read-only claim is not proof of the callers
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w4-g4-fix-brief/test-payload/test/scripts/git-one-door-declarations.test.mjs:188:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid Git declaration.*hook read verbs/,
+    operator: 'throws',
+    diff: 'simple'
+  }

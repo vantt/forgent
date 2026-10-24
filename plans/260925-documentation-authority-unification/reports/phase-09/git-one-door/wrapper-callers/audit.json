@@ -1,0 +1,137 @@
+{
+  "head": "7a9db5cf5108d2542f4dcf83e41280a4e0f19ab4",
+  "declarationCount": 25,
+  "changedIdentities": [
+    {
+      "path": ".githooks/pre-commit",
+      "before": "leaseGitRead:9255f52f42825e097705fa0572fd14d13f16ee94f2e31eea33034ff36560c590",
+      "after": "leaseGitRead:90abf7f3892c18964a007d28726432916f3a7e606601ccbe23b87c8623e62463"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "before": "runVerb:53e53c2a74a00e28aa957af1ae7d5248385aa34fe07fbfa04c321c47839b4eec",
+      "after": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "before": "runVerb:3a0732fb58eb3197745e010e072f0b5abb60521c8fb25f12eeb1c7d7dcb97fc2",
+      "after": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7"
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "before": "git:53debf93da60e2b113507b6e7bf34109035481375d31fe905ed98c347a753560",
+      "after": "git:79ebd2a981c21db1c4937f2a653310053ab9285d4af4e4e2166c56e7660a36f2"
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "before": "registryBindsToCommit:f84b879cb0b77f01ec8bf30371ded0096a87c3dbe5b8acd1903029e959d01448",
+      "after": "registryBindsToCommit:0edec6a84bd894fefd26324f8de4a213bb672be733a0c889cd32801a7c547acc"
+    },
+    {
+      "path": "scripts/verify-phase-02.mjs",
+      "before": "verifyForbiddenPhase02Diff:818919097a7279e97647ea6d9745d9ff9147d36d831f79dbc9c3a6b835490505",
+      "after": "verifyForbiddenPhase02Diff:b73042bb7fc8d417b359b18111600e3c5da4cb0a07f6fd3dbcad0ea07b5eb93b"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "before": "landRunnerItem:8165a81879ec9c8a9ca3fccd2770f4503c92b11423008b6e579ed0835598712f",
+      "after": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "before": "landRunnerItem:b37bcbdb73dae348262e030c72754506c813c1d517dbc4684454a8adec28b19e",
+      "after": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "before": "runWorktreeSetupCommands:bb9514972db619239b027efa0a0bc3c59f089e1562d8335b179861fddae363a2",
+      "after": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1"
+    }
+  ],
+  "unchangedDeclarationReasonsClassesAndRetirements": true,
+  "allPreviouslyScannedProductDigestsExceptDeclarationUnchanged": true,
+  "specUnchangedOutsideSection12": true,
+  "pinnedGeneratorBlobs": {
+    "scripts/generate-doc-inventory.mjs": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+    "scripts/generate-shipped-path-inventory.mjs": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+  },
+  "payloadDigest": "1c60d024d3537dc1d5115b1910f28e5e8cc627047ca20f8bdaf5e264d371342f",
+  "censusSha256": "bf5faa260ca12b4d5ad4b09b128004bc343253a6646e399751dec14da9accd24",
+  "scannerSha256": "ec8801f8de55a18ee940dcc00951730a210eb2254bca102f145d36427f559274",
+  "declarationSha256": "f115aa3bb6f30a8aa09820cd1f518fbb97a1d7adc7f6eee7eb899ffd8e4c0c97",
+  "scannedFiles": 1108,
+  "classifiedRows": 287,
+  "undeclaredSites": 0,
+  "deterministicReplay": true,
+  "testedPayloadByteEqual": [
+    "scripts/git-one-door-scan.mjs",
+    "scripts/lib/git-one-door-declarations.v1.json",
+    "test/git/one-door.test.mjs"
+  ],
+  "sourceBackedProbes": {
+    "sourceBackedProbes": [
+      {
+        "shape": "tooling",
+        "probe": "line shift",
+        "result": "matches"
+      },
+      {
+        "shape": "tooling",
+        "probe": "['reset', '--hard', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "tooling",
+        "probe": "['push', '--force', 'origin', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "tooling",
+        "probe": "['ls-tree', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "callback",
+        "probe": "line shift",
+        "result": "matches"
+      },
+      {
+        "shape": "callback",
+        "probe": "['reset', '--hard', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "callback",
+        "probe": "['push', '--force', 'origin', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "callback",
+        "probe": "['ls-tree', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "cold-hook",
+        "probe": "line shift",
+        "result": "matches"
+      },
+      {
+        "shape": "cold-hook",
+        "probe": "['reset', '--hard', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "cold-hook",
+        "probe": "['push', '--force', 'origin', 'HEAD']",
+        "result": "stale declaration refused"
+      },
+      {
+        "shape": "cold-hook",
+        "probe": "['ls-tree', 'HEAD']",
+        "result": "stale declaration refused"
+      }
+    ],
+    "sourceFilesUnchanged": true
+  },
+  "needsWrites": []
+}

@@ -71,9 +71,10 @@ test('declarations reject duplicate keys, path patterns, unknown classes, empty 
     hook.declare([{ ...hook.entry, class: 'hook-read-context', verbs }]);
     assert.throws(() => scan({ root: hook.root }), /invalid Git declaration/);
   }
-  const verbs = ['cat-file', 'ls-tree', 'show-ref', 'diff', 'show', 'symbolic-ref read', 'rev-parse', 'diff-tree', 'rev-list'];
-  hook.declare([{ ...hook.entry, class: 'hook-read-context', verbs }]);
-  assert.deepEqual(scan({ root: hook.root }).classes[0].verbs, verbs);
+  const readHook = fixture(t, '.githooks/pre-commit', '#!/usr/bin/env node\n' + SOURCE.replace("['ls-tree', ref]", "['--no-replace-objects', ...ref]").replace("readTree('HEAD')", "readTree(['ls-tree', 'HEAD'])"));
+  const verbs = ['ls-tree'];
+  readHook.declare([{ ...readHook.entry, class: 'hook-read-context', verbs }]);
+  assert.deepEqual(scan({ root: readHook.root }).classes[0].verbs, verbs);
 });
 
 test('the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours', (t) => {
@@ -89,6 +90,110 @@ test('an explicitly declared unresolved consumer command uses the existing confi
   const result = scan({ root: f.root });
   assert.deepEqual(result.sites, []);
   assert.equal(result.classes[0].class, 'configured-binary');
+});
+
+// The fixed-argv cases above cannot observe caller growth through a pass-through wrapper.
+// These shapes reproduce the tooling, callback and cold-hook declaration boundaries.
+const WRAPPERS = [
+  {
+    name: 'tooling wrapper', path: 'scripts/read.mjs',
+    source: "import { execFileSync } from 'node:child_process';\nfunction git(root, args) { return execFileSync('git', args, { cwd: root }); }\ngit('.', ['ls-tree', 'HEAD']);\n",
+    caller: (argv) => `git('.', ${argv});\n`,
+  },
+  {
+    name: 'callback wrapper', path: 'scripts/read.mjs',
+    source: "import { spawnSync } from 'node:child_process';\nfunction runOrThrow(command, args, options) { return spawnSync(command, args, options); }\nexport function verify(root, deps = {}) {\n  const run = deps.run || ((command, args) => runOrThrow(command, args, { cwd: root }));\n  run('git', ['diff', '--check', 'base..end']);\n}\nverify('.');\n",
+    caller: (argv) => `run('git', ${argv});\n`,
+    change: (source, call) => source.replace("  run('git', ['diff', '--check', 'base..end']);", `  run('git', ['diff', '--check', 'base..end']);\n  ${call}`),
+  },
+  {
+    name: 'cold-hook callback', path: '.githooks/pre-commit',
+    source: "#!/usr/bin/env node\nimport { execFileSync } from 'node:child_process';\nimport { guard } from '../src/guard.mjs';\nfunction leaseGitRead(args) { return execFileSync('git', ['--no-replace-objects', ...args]); }\nguard({ git: leaseGitRead });\n",
+    other: "export function guard({ git }) { return git(['ls-tree', 'HEAD']); }\n",
+    caller: (argv) => `git(${argv});\n`,
+    changeOther: (source, call) => source.replace('return git(', `${call} return git(`),
+    class: 'hook-read-context', verbs: ['ls-tree'],
+  },
+];
+function wrapperFixture(t, shape) {
+  const f = fixture(t, shape.path, shape.source);
+  if (shape.other) f.write('src/guard.mjs', shape.other);
+  const raw = scan({ root: f.root }).sites;
+  assert.equal(raw.length, 1, shape.name);
+  f.entry = { ...f.entry, siteId: raw[0].siteId, ...(shape.class ? { class: shape.class, verbs: shape.verbs } : {}) };
+  const change = (call) => {
+    if (shape.other) f.write('src/guard.mjs', shape.changeOther(shape.other, call));
+    else f.write(shape.path, shape.change ? shape.change(shape.source, call) : shape.source + call);
+  };
+  return { ...f, change };
+}
+
+test('new or changed write callers cannot inherit any declared pass-through wrapper', (t) => {
+  for (const shape of WRAPPERS) {
+    for (const argv of ["['reset', '--hard', 'HEAD']", "['push', '--force', 'origin', 'HEAD']"]) {
+      const f = wrapperFixture(t, shape);
+      f.declare([f.entry]);
+      assert.deepEqual(scan({ root: f.root }).sites, [], `${shape.name}: baseline`);
+      f.change(shape.caller(argv));
+      assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, `${shape.name}: ${argv}`);
+    }
+    const f = wrapperFixture(t, shape);
+    f.declare([f.entry]);
+    const target = shape.other ? 'src/guard.mjs' : shape.path;
+    f.write(target, (shape.other ?? shape.source).replace("'ls-tree'", "'reset'").replace("'diff', '--check'", "'push', '--force'"));
+    assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, `${shape.name}: changed caller`);
+  }
+});
+
+test('wrapper caller identities survive line shifts but an added read caller needs a new declaration', (t) => {
+  for (const shape of WRAPPERS) {
+    const f = wrapperFixture(t, shape);
+    f.declare([f.entry]);
+    f.write(shape.path, shape.source.startsWith('#!')
+      ? shape.source.replace('\n', '\n\n// shifted wrapper\n')
+      : '\n// shifted wrapper\n' + shape.source);
+    if (shape.other) f.write('src/guard.mjs', '\n// shifted caller\n' + shape.other);
+    assert.deepEqual(scan({ root: f.root }).sites, [], `${shape.name}: line shifts`);
+    f.change(shape.caller("['ls-tree', 'other-ref']"));
+    assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, `${shape.name}: added read`);
+    f.declare([]);
+    const [site] = scan({ root: f.root }).sites;
+    assert.notEqual(site.siteId, f.entry.siteId);
+    f.declare([{ ...f.entry, siteId: site.siteId }]);
+    assert.deepEqual(scan({ root: f.root }).sites, [], `${shape.name}: explicitly re-declared`);
+  }
+});
+
+test('caller fingerprints bind computed callees and duplicates but not caller ordering', (t) => {
+  // Neither a direct-call-only lookup nor an unordered set of call texts proves this boundary.
+  const shape = WRAPPERS[0];
+  const first = "table['launch']('.', ['ls-tree', 'HEAD']);\n";
+  const second = "table['launch']('.', ['ls-tree', 'other']);\n";
+  const source = shape.source.replace("git('.', ['ls-tree', 'HEAD']);\n", 'const table = { launch: git };\n' + first + second);
+  const f = fixture(t, shape.path, source);
+  f.declare([f.entry]);
+  f.write(shape.path, source.replace(first + second, second + first));
+  assert.deepEqual(scan({ root: f.root }).sites, [], 'the sorted caller multiset is order independent');
+  f.write(shape.path, source + first);
+  assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, 'an identical new caller still changes the multiset');
+  f.write(shape.path, source.replaceAll("['launch']", "[\"launch\"]"));
+  assert.throws(() => scan({ root: f.root }), /stale or ambiguous Git declaration/, 'the complete computed callee is hashed, not just its parentheses');
+});
+
+test('declared hook verbs must equal observed literal caller verbs even after re-declaration', (t) => {
+  const shape = WRAPPERS[2];
+  const f = wrapperFixture(t, shape);
+  for (const verbs of [['show'], ['ls-tree', 'show']]) {
+    f.declare([{ ...f.entry, verbs }]);
+    assert.throws(() => scan({ root: f.root }), /invalid Git declaration.*hook read verbs/, 'a read-only claim is not proof of the callers');
+  }
+  for (const argv of ["['reset', '--hard']", 'unresolvedArgs()', "['symbolic-ref', 'HEAD', 'refs/heads/main']"]) {
+    f.change(shape.caller(argv));
+    f.declare([]);
+    const [site] = scan({ root: f.root }).sites;
+    f.declare([{ ...f.entry, siteId: site.siteId }]);
+    assert.throws(() => scan({ root: f.root }), /invalid Git declaration.*hook read verbs/, 'refreshing the digest cannot label unknown or write argv as a read');
+  }
 });
 
 test('the census binds declaration bytes so doctor rejects missing or changed declarations', (t) => {

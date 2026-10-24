@@ -1,0 +1,18 @@
+✔ a declaration classifies exactly one call, retains its rationale, and survives line shifts (22.359472ms)
+✔ deleted, edited, renamed, or ambiguous declared calls fail closed instead of reusing a line number (6.989802ms)
+✔ declarations reject duplicate keys, path patterns, unknown classes, empty reasons and invalid hook verbs (15.902232ms)
+✔ the hook read set adds only show-ref and diff-tree and still rejects their mutating neighbours (2.828884ms)
+✔ an explicitly declared unresolved consumer command uses the existing configured-binary class (5.905098ms)
+✔ new or changed write callers cannot inherit any declared pass-through wrapper (36.997326ms)
+✔ wrapper caller identities survive line shifts but an added read caller needs a new declaration (17.087616ms)
+✔ caller fingerprints bind computed callees and duplicates but not caller ordering (4.884006ms)
+✔ declared hook verbs must equal observed literal caller verbs even after re-declaration (9.711607ms)
+✔ the census binds declaration bytes so doctor rejects missing or changed declarations (2.250003ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 211.806605

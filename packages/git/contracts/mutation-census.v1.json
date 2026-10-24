@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8d8a57a129adcab4782cde169978c904e6d318fe5f9249f9f84d759d8b38277d",
+  "payloadDigest": "aebd9f51ee42f550986b0aa6d1cc892c3f444c631b4bfd4672e31c22ca60a29d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -1128,7 +1128,7 @@
     "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
     "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
-    "scripts/lib/git-one-door-declarations.v1.json": "72b122f1ecefb235c3e8cd3e6b897dbc5afcd74250d3f38d6275bfafcd5650d1"
+    "scripts/lib/git-one-door-declarations.v1.json": "f115aa3bb6f30a8aa09820cd1f518fbb97a1d7adc7f6eee7eb899ffd8e4c0c97"
   },
   "sites": [],
   "classes": [
@@ -1493,7 +1493,19 @@
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
-      "siteId": "leaseGitRead:9255f52f42825e097705fa0572fd14d13f16ee94f2e31eea33034ff36560c590",
+      "siteId": "leaseGitRead:90abf7f3892c18964a007d28726432916f3a7e606601ccbe23b87c8623e62463",
+      "callerDigests": [
+        "307e191fbe28ee61a44466b663cac0f1bfb9fe3cb871cefc98b9cefc87f0cb0f",
+        "3b5228841de568039de9635263347a2911a53ac8573de5a7fdbda8d81a2f4491",
+        "4440bc188380750bb59aa3cf7d6c771e66a76352b377c08cdf6232d681979101",
+        "447577fa871f99004e70acfc19f0cc424b4f19f0f747a8f0016bd2647eeccb40",
+        "614748b726f4f66ff14dd6fe3a39dce82bbf1cd5caf809ed679bb62ebe98b037",
+        "640435846d151c508d250164e9de895b3ebc0f22076d0db84bec3aa50c4944fc",
+        "77f7bf619bd6b111ec7537eed465d2a46abf30545f07aefbdcd7682c7d478215",
+        "85e53bf9f9938b49e76fbb8d2a3a206d1561eb0018a3bf4480a1bbc422ea7e71",
+        "932a5e12ce7d2a6c1657d1ec6bd44fc5f5e218950f0641aa3e6a358351e4a831",
+        "f20c3ad557799f9f4046f07bb1e51d16052d9410fcf3556deffd0e46d6053cf2"
+      ],
       "class": "hook-read-context",
       "reason": "Owner L13-6 approves S1: the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
       "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
@@ -1788,7 +1800,10 @@
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary",
-      "siteId": "runVerb:53e53c2a74a00e28aa957af1ae7d5248385aa34fe07fbfa04c321c47839b4eec",
+      "siteId": "runVerb:5015bae31309f661fda9ed9e2e7c69052e479737c20a6d248620eaf23f8a9377",
+      "callerDigests": [
+        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
+      ],
       "class": "configured-binary",
       "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -1799,7 +1814,10 @@
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary",
-      "siteId": "runVerb:3a0732fb58eb3197745e010e072f0b5abb60521c8fb25f12eeb1c7d7dcb97fc2",
+      "siteId": "runVerb:7c4188212f1a46f409d6c6c8c060ac228b3e2bec876a988791dd2ed25b3ef2e7",
+      "callerDigests": [
+        "b998668a76604c0e5f56267e0fffd5fb0dde0a836c17f766d364e77f3ca78da5"
+      ],
       "class": "configured-binary",
       "reason": "Owner L13-6: invariant commands come from readInvariantCheckCommands -> readCommandList -> JSON.parse project configuration (Git spec section 12), not product-selected Git programs; indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -2690,7 +2708,10 @@
       "callers": [
         "scripts/check-evidence-relocation.mjs:42"
       ],
-      "siteId": "git:53debf93da60e2b113507b6e7bf34109035481375d31fe905ed98c347a753560",
+      "siteId": "git:79ebd2a981c21db1c4937f2a653310053ab9285d4af4e4e2166c56e7660a36f2",
+      "callerDigests": [
+        "9ba6d1524a3f9d0fc4b85b4955d2daf96c7dfd32410e2af89ecd8f819d6b0b8e"
+      ],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-2: gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
       "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
@@ -2766,7 +2787,11 @@
         "scripts/generate-doc-inventory.mjs:1661",
         "scripts/generate-doc-inventory.mjs:1902"
       ],
-      "siteId": "registryBindsToCommit:f84b879cb0b77f01ec8bf30371ded0096a87c3dbe5b8acd1903029e959d01448",
+      "siteId": "registryBindsToCommit:0edec6a84bd894fefd26324f8de4a213bb672be733a0c889cd32801a7c547acc",
+      "callerDigests": [
+        "49d74c4fa2526e3f442469282813ae6a34e5dbba488267f6e6759f76e24ba1e2",
+        "d3f16a0d461378bb8849283c9417a7300dfe35fd5188642e0dc5e09be057ce19"
+      ],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-3: scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
       "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
@@ -3142,7 +3167,10 @@
       "spawn": "runOrThrow -> scripts/verify-phase-02.mjs:88",
       "binary": "param command (no caller found for anonymous function)",
       "family": "unresolved-binary",
-      "siteId": "verifyForbiddenPhase02Diff:818919097a7279e97647ea6d9745d9ff9147d36d831f79dbc9c3a6b835490505",
+      "siteId": "verifyForbiddenPhase02Diff:b73042bb7fc8d417b359b18111600e3c5da4cb0a07f6fd3dbcad0ea07b5eb93b",
+      "callerDigests": [
+        "a4421f7f173e2b0cd4444d760c7a8fc7dfa44d3a3c848640f6242545ee7602c7"
+      ],
       "class": "declared-tooling-exemption",
       "reason": "Owner L13-6 / L13-2: run('git', ['diff', '--check', ...]) reaches runOrThrow through a callback the scanner cannot resolve. Exact repository whitespace/conflict diagnostics have no equivalent Inspect validation; no check may be dropped.",
       "retireWhen": "Immutable verifiers and their consumers/proofs retire, or Git supplies equivalent diff validation."
@@ -3372,7 +3400,8 @@
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary",
-      "siteId": "landRunnerItem:8165a81879ec9c8a9ca3fccd2770f4503c92b11423008b6e579ed0835598712f",
+      "siteId": "landRunnerItem:cc9889cc48b52606b9bc90ec69d9c7e3216188c53719a6b06f5243f78ef87115",
+      "callerDigests": [],
       "class": "configured-binary",
       "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -3383,7 +3412,11 @@
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary",
-      "siteId": "landRunnerItem:b37bcbdb73dae348262e030c72754506c813c1d517dbc4684454a8adec28b19e",
+      "siteId": "landRunnerItem:a7d2645a7b32b2cbd3ccc8248ee7b4e5b369da5845a9e8f02bf176709ac52b51",
+      "callerDigests": [
+        "4de7c2717184fdba8f7f1b017a6ce53a3d527978fe0ce8d184c95de99ac26969",
+        "82473f253ab13fd30ad7b23b52a9f1823606077e200c1a67f4d0640ce58adbc7"
+      ],
       "class": "configured-binary",
       "reason": "Owner L13-6: readInvariantCheckCommands -> readCommandList -> JSON.parse project-configured invariant commands are consumer verification (Git spec section 12); indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this invariant-command consumer retires."
@@ -3394,7 +3427,12 @@
       "spawn": "execFileSync",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary",
-      "siteId": "runWorktreeSetupCommands:bb9514972db619239b027efa0a0bc3c59f089e1562d8335b179861fddae363a2",
+      "siteId": "runWorktreeSetupCommands:248e44e1134e762a1a88f3d776215e3515492e402a14b26abdb11f281e78d2a1",
+      "callerDigests": [
+        "a57a1a129bac20c39cac3f800b21d3572b64cf1388f19e9266bb8f882ade9b05",
+        "c1d61a7df27c8bb7eb3cd56b09c6f966ad9c3d7af4c5e5206c4f1d7d064c6a59",
+        "fa545c9254fead58d86d5ede9ec00c29cc6478cb35a5e721511fe5a5ea5dc3ec"
+      ],
       "class": "configured-binary",
       "reason": "Owner L13-6: worktreeSetup.commands is JSON project configuration, not product-selected Git; the existing consumer-command marker agrees with runtime classification but indexed configuration loses static provenance.",
       "retireWhen": "The scanner proves parsed-config provenance, or this setup-command consumer retires."

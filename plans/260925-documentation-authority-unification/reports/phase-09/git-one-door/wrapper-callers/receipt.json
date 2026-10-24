@@ -1,0 +1,46 @@
+{
+  "status": "implemented",
+  "authority": "w4-g4-fix-brief.md; owner L13-6 (1)",
+  "inputHead": "7a9db5cf5108d2542f4dcf83e41280a4e0f19ab4",
+  "impactAnalysis": "degraded under brief's no-fgOS-CLI rule; read-only source/import/history cross-checks, no graph-confirmed blast radius",
+  "releasePath": "/home/vantt/.local/state/fgos/releases/sha256:a970a7e6052bdef1bb4113212d16caf5f2a916f6a66d2a6130b744fe458328c8",
+  "scratchRoot": "/tmp/fgos-work/w4-g4-fix-brief",
+  "testCommandTemplate": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/w4-g4-fix-brief/tmp FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <one-file>",
+  "nativeScratchState": {
+    "FGOS_STATE_ROOT": "/tmp/fgos-work/w4-g4-fix-brief/state",
+    "mode": "0700",
+    "newEnvironmentContract": false
+  },
+  "testsFirst": {
+    "initial": { "exit": 1, "passed": 6, "total": 9, "log": "logs/tests-first.log" },
+    "unchangedHeadScannerWithFinalTests": { "exit": 1, "passed": 6, "total": 10, "log": "logs/baseline-final-tests.log" }
+  },
+  "individualTests": [
+    { "file": "test/scripts/git-one-door-declarations.test.mjs", "context": "actual source", "exit": 0, "passed": 10, "total": 10, "log": "logs/declarations.log" },
+    { "file": "test/setup/git-mutation-census.test.mjs", "context": "actual source, unchanged wiring proof", "exit": 0, "passed": 1, "total": 1, "log": "logs/doctor.log" },
+    { "file": "test/git/one-door.test.mjs", "context": "byte-equal scratch payload, supported release-addon descriptor", "exit": 0, "passed": 6, "total": 6, "log": "logs/one-door-payload.log" },
+    { "file": "test/git/one-door.test.mjs", "context": "direct unstaged checkout", "exit": 1, "passed": 4, "total": 6, "limitation": "git-addon-not-shipped during fixture enumeration", "log": "logs/one-door.log" }
+  ],
+  "sourceBackedProbes": { "total": 12, "passed": 12, "details": "audit.json:sourceBackedProbes" },
+  "census": {
+    "command": "node /tmp/fgos-work/w4-g4-fix-brief/scan-source.mjs --write",
+    "productionFunctions": ["createGitInspect", "scan", "writeMutationCensus", "verifyCensus"],
+    "context": "actual source worktree, explicit verified released-addon descriptor",
+    "runs": 2,
+    "exits": [0, 0],
+    "declarations": 25,
+    "changedIdentities": 9,
+    "scannedFiles": 1108,
+    "classifiedRows": 287,
+    "undeclaredSites": 0,
+    "deterministicReplay": true,
+    "doctorPassed": true,
+    "payloadDigest": "1c60d024d3537dc1d5115b1910f28e5e8cc627047ca20f8bdaf5e264d371342f",
+    "sha256": "bf5faa260ca12b4d5ad4b09b128004bc343253a6646e399751dec14da9accd24"
+  },
+  "audit": "audit.json",
+  "diffCheck": { "command": "git diff --check", "exit": 0 },
+  "notRun": ["plain scanner CLI (automatic addon bootstrap may write outside scope)", "fgos CLI and lifecycle verbs", "npm test and full-suite launchers", "cargo test/build", "GitNexus impact/detect_changes", "MDView external registry writes"],
+  "notClaimed": ["Git-owner verdict", "overall G4 closure", "cutover authorization", "full-suite/Cargo green", "new-release proof"],
+  "needsWrites": []
+}

@@ -1,0 +1,48 @@
+✖ the static scan reports a Git spawn in each shape a literal search misses (2.18965ms)
+✖ a declared standalone skill and text quoted into a data command are not sites (0.930538ms)
+✔ the scan judges every file its root declares as product, whatever the directory is called, and only counts the rest (15.009355ms)
+✔ doctor refuses a census that lists a site, or whose files do not match the payload it sits in (3254.568509ms)
+✔ the spawn spy charges a command run through runBorrowed to the code that called runBorrowed (0.476854ms)
+✔ a sandbox Git call is judged by every repository path it names, in separate and = forms (0.291669ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7033.361377
+
+✖ failing tests:
+
+test at test/git/one-door.test.mjs:58:1
+✖ the static scan reports a Git spawn in each shape a literal search misses (2.18965ms)
+  Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+      at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d3/src/native/door.mjs:14:46)
+      at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d3/src/native/door.mjs:39:117)
+      at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/native.mjs:11:17)
+      at createGitInspect (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:12:18)
+      at openInspect (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:67:53)
+      at listFiles (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:69:41)
+      at scan (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:2548:24)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/git/one-door.test.mjs:60:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25) {
+    code: 'git-addon-not-shipped'
+  }
+
+test at test/git/one-door.test.mjs:68:1
+✖ a declared standalone skill and text quoted into a data command are not sites (0.930538ms)
+  Error: git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`
+      at unavailable (file:///home/vantt/projects/forgentX-p9-w1-d3/src/native/door.mjs:14:46)
+      at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d3/src/native/door.mjs:39:117)
+      at loadNativeAddon (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/native.mjs:11:17)
+      at createGitInspect (file:///home/vantt/projects/forgentX-p9-w1-d3/src/git/inspect.mjs:12:18)
+      at openInspect (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:67:53)
+      at listFiles (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:69:41)
+      at scan (file:///home/vantt/projects/forgentX-p9-w1-d3/scripts/git-one-door-scan.mjs:2548:24)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-p9-w1-d3/test/git/one-door.test.mjs:70:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25) {
+    code: 'git-addon-not-shipped'
+  }
