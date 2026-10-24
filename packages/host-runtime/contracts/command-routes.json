@@ -432,7 +432,9 @@
         "release"
       ],
       "pins": [
+        "confirm",
         "dir",
+        "fingerprint",
         "forget",
         "help",
         "json"

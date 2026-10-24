@@ -147,7 +147,9 @@ export function checkIdentityPinnedMachines(cwd, { hostBin } = {}) {
   });
   if (result) return result;
   if (data.pins.length === 0) return { passed: true, message: 'no machine pinned yet' };
-  return { passed: true, message: `${data.pins.length} pinned: ${data.pins.map((pin) => `${pin.machineId} ${pin.fingerprint}`).join('; ')}` };
+  const seen = data.pins.filter((pin) => pin.state !== 'confirmed').map((pin) => pin.machineId);
+  const unconfirmed = seen.length === 0 ? 'all confirmed' : `${seen.length} seen, not yet confirmed: ${seen.join(', ')}`;
+  return { passed: true, message: `${data.pins.length} pinned (${unconfirmed}): ${data.pins.map((pin) => `${pin.machineId} ${pin.fingerprint}`).join('; ')}` };
 }
 
 /**
